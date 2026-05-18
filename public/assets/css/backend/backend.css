@@ -1,0 +1,214 @@
+/* Fonts */
+@font-face {
+    font-family: Comfortaa;
+    src: url(../../fonts/Comfortaa/Comfortaa-Light.ttf);
+}
+
+/* Tags */
+body {
+    font-family: 'Comfortaa', sans-serif;
+    padding: 4.5rem 0 6rem 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+label {
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.classe-sbagl {}
+
+a {
+    color: RGBA(var(--bs-secondary-rgb), var(--bs-bg-opacity, 1)) !important;
+    text-decoration: none;
+}
+
+a:hover, button.btn-link:hover {
+    font-weight: 700;
+}
+
+textarea {
+    resize: none;
+}
+
+/* Bootstrap's override */
+.dropdown-menu, .btn, .alert, .navbar, .card {
+    /* border-radius: 0!Important; */
+    box-shadow: 0 0 0 rgb(0 0 0 / 10%), 0 0 .15rem rgb(0 0 0 / 10%);
+}
+
+.btn-link {
+    text-decoration: none;
+}
+
+.dropdown-menu {
+    padding-top: 0;
+    padding-bottom: 0;
+    overflow: hidden;
+    border-radius: .25rem;
+}
+
+.dropdown-divider {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.dropdown-item {
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+}
+
+.dropdown-item:hover {
+    color: #fff !important;
+    background-color: rgba(var(--bs-secondary-rgb), var(--bs-bg-opacity, 1)) !important;
+    /* niente radius qui */
+}
+
+.dropdown-item.active {
+    background-color: #6c757d !important;
+    color: #ffffff !important;
+}
+
+.page-item:last-child .page-link {
+    /* border-top-right-radius: 0;
+    border-bottom-right-radius: 0; */
+}
+
+.page-item:first-child .page-link {
+    /* border-top-left-radius: 0;
+    border-bottom-left-radius: 0; */
+}
+
+.active > .page-link, .page-link.active {
+    background-color: var(--bs-secondary);
+    border-color: var(--bs-secondary);
+    color: var(--bs-white);
+}
+
+.page-link, .page-link:hover {
+    color: var(--bs-secondary);
+}
+
+/* Font Awesome override */
+.fa-solid {
+    padding-right: .40rem;
+}
+
+/* Custom style */
+#customBackdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1040;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+#customBackdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.disabled-link {
+    opacity: 0.6;
+    cursor: default;
+}
+
+/* Command bar */
+.bar {
+    background: #f8f9fa;
+    border: 0.0625rem solid rgba(0,0,0,.125);
+    padding: .5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 0 0 rgb(0 0 0 / 10%), 0 0 .15rem rgb(0 0 0 / 10%);
+    border-radius: .25rem;
+}
+
+.bar-item {
+    text-align: left;
+}
+
+/* Account left menu */
+.left-menu .list-group-item.active {
+    background: #6c757d;
+    border: none;
+    color: #fff!Important;
+}
+
+.left-menu .list-group-item:first-child {
+    /* border-top-left-radius: 0;
+    border-top-right-radius: 0; */
+}
+
+.left-menu .list-group-item:last-child {
+    /* border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0; */
+}
+
+/* Loader */
+#show_loader {
+    position: fixed;
+    top: 8%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: .2rem .5rem;
+    background: white;
+    display: none;
+    border: rgba(0, 0, 0, 0.175) solid 0.0625rem;
+    box-shadow: 0 0 0 rgb(0 0 0 / 10%), 0 0 .15rem rgb(0 0 0 / 10%);
+    z-index: 9999;
+}
+
+/* Scrollup */
+.scrollup {
+    position: fixed;
+    bottom: 3.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: none;
+    box-shadow: 0 0 0 rgb(0 0 0 / 10%), 0 0 .15rem rgb(0 0 0 / 10%);
+    cursor: pointer;
+}
+
+@media (max-width: 767px) {
+    .bar-link {
+        padding: .25rem;
+        width: 100%;
+        background-color: #6c757d;
+        color: #fff !important;
+        text-align: center;
+        border-radius: .25rem;
+    }
+
+    .bar {
+        background: transparent;
+        padding: 0;
+        margin-bottom: 1rem;
+        border: 0;
+    }
+
+    .bar-item {
+        background: #f8f9fa;
+        text-align: center;
+        padding: .5rem 0;
+        border: .0625rem solid #ccc;
+        border-radius: .25rem;
+    }
+
+    /* solo le bar_item che NON sono l’ultima hanno margin-bottom */
+    .bar .row > div:not(:last-child) .bar_item {
+        margin-bottom: .25rem;
+    }
+
+    .bar-item a {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+    }
+}

@@ -1,0 +1,1 @@
+<p>qui generalPartial</p>
