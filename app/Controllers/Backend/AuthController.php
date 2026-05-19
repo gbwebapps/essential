@@ -27,11 +27,85 @@ class AuthController extends BackendController
 
     public function index()
     {
+        if($this->request->isAJAX()):
+
+            // some code here...
+
+        endif;
+
         $this->data['action'] = 'index';
         
         $this->data['title'] = 'Auth';
         $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
 
+        $this->data['sections'] = [
+            'login' => [
+                'title' => lang('backend/auth.titles.login'),
+                'class' => 'col-4',
+                'icon_3x' => '<i class="fa-solid fa-right-to-bracket fa-3x"></i>',
+                'route' => 'backend/auth/login',
+            ],
+            'recovery' => [
+                'title' => lang('backend/auth.titles.resetPassword'),
+                'class' => 'col-4',
+                'icon_3x' => '<i class="fa-solid fa-unlock fa-3x"></i>',
+                'route' => 'backend/auth/resetPassword',
+            ],
+        ];
+
         return $this->render('backend/auth/indexView', $this->data);
+    }
+
+    public function login()
+    {
+        if($this->request->isAJAX()):
+
+            // some code here...
+
+        endif;
+
+        $this->data['action'] = 'login';
+        
+        $this->data['title'] = lang('backend/auth.titles.login');
+        $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
+
+        return $this->render('backend/auth/loginView', $this->data);
+    }
+
+    public function resetPassword()
+    {
+        if($this->request->isAJAX()):
+
+            // some code here...
+
+        endif;
+
+        $this->data['action'] = 'resetPassword';
+        
+        $this->data['title'] = lang('backend/auth.titles.resetPassword');
+        $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
+
+        return $this->render('backend/auth/resetPasswordView', $this->data);
+    }
+
+    public function setPassword()
+    {
+        if($this->request->isAJAX()):
+
+            // some code here...
+
+        endif;
+        
+        $this->data['action'] = 'setPassword';
+        
+        $this->data['title'] = lang('backend/auth.titles.setPassword');
+        $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
+
+        return $this->render('backend/auth/setPasswordView', $this->data);
+    }
+
+    public function logout()
+    {
+        return redirect()->to('backend/auth')->with('class', 'success')->with('message', lang('backend/global.messages.logoutSuccess'))->with('icon', '<i class="fa-solid fa-hand-wave"></i>');
     }
 }

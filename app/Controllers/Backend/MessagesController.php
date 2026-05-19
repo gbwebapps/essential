@@ -27,11 +27,49 @@ class MessagesController extends BackendController
 
     public function index()
     {
+        if($this->request->isAJAX()):
+
+            // some code here...
+
+        endif;
+
         $this->data['action'] = 'index';
         
-        $this->data['title'] = 'Messages';
+        $this->data['title'] = lang('backend/messages.titles.index');
         $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
 
         return $this->render('backend/messages/indexView', $this->data);
+    }
+
+    public function showAll()
+    {
+        if($this->request->isAJAX()):
+
+            // some code here...
+
+        endif;
+
+        $this->data['action'] = 'showAll';
+        
+        $this->data['title'] = lang('backend/messages.titles.showAll');
+        $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
+
+        return $this->render('backend/messages/showAllView', $this->data);
+    }
+
+    public function show()
+    {
+        if($this->request->isAJAX()):
+
+            // some code here...
+
+        endif;
+        
+        $this->data['action'] = 'show';
+        
+        $this->data['title'] = lang('backend/messages.titles.show');
+        $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
+
+        return $this->render('backend/messages/showView', $this->data);
     }
 }

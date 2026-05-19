@@ -29,7 +29,7 @@ class ToolsController extends BackendController
     {
         $this->data['action'] = 'index';
         
-        $this->data['title'] = 'Tools';
+        $this->data['title'] = lang('backend/tools.titles.index');
         $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
 
         return $this->render('backend/tools/indexView', $this->data);

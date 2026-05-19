@@ -16,9 +16,9 @@ class AdminsClass extends BaseClass
 	{
 		return 
 		[
-		    ['label' => 'Elenco',  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => 'Aggiorna', 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => 'Elimina',  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.showAll'),  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.edit'), 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.delete'),  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
 		];
 	}
 
@@ -27,9 +27,9 @@ class AdminsClass extends BaseClass
 	{
 		return 
 		[
-		    ['label' => 'Elenco',  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => 'Aggiorna', 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => 'Elimina',  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.showAll'),  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.edit'), 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.delete'),  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
 		];
 	}
 
@@ -38,9 +38,9 @@ class AdminsClass extends BaseClass
 	{
 		return 
 		[
-		    ['label' => 'Elenco',  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => 'Aggiorna', 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => 'Elimina',  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.showAll'),  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.edit'), 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.delete'),  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
 		];
 	}
 
@@ -49,9 +49,9 @@ class AdminsClass extends BaseClass
 	{
 		return 
 		[
-		    ['label' => 'Elenco',  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => 'Aggiorna', 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => 'Elimina',  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.showAll'),  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.edit'), 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.delete'),  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
 		];
 	}
 
@@ -60,9 +60,9 @@ class AdminsClass extends BaseClass
 	{
 		return 
 		[
-		    ['label' => 'Elenco',  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => 'Aggiorna', 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => 'Elimina',  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.showAll'),  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.edit'), 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.delete'),  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
 		];
 	}
 
@@ -73,8 +73,8 @@ class AdminsClass extends BaseClass
 	{
 		return 
 		[
-            ['icon' => '<i class="fa-solid fa-users"></i>', 'label' => 'Elenco amministratori', 'route' => 'backend/admins/showAll'],
-            ['icon' => '<i class="fa-solid fa-user-plus"></i>', 'label' => 'Aggiungi amministratore', 'route' => 'backend/admins/add'], 
+            ['icon' => '<i class="fa-solid fa-users"></i>', 'label' => lang('backend/admins.linksBar.showAll'), 'route' => 'backend/admins/showAll'],
+            ['icon' => '<i class="fa-solid fa-user-plus"></i>', 'label' => lang('backend/admins.linksBar.add'), 'route' => 'backend/admins/add'], 
         ];
 	}
 
@@ -83,8 +83,8 @@ class AdminsClass extends BaseClass
 	{
 		return 
 		[
-		    ['icon' => '<i class="fa-solid fa-chart-simple"></i>', 'label' => 'Dati amministratori', 'route' => 'backend/admins'],
-		    ['icon' => '<i class="fa-solid fa-user-plus"></i>', 'label' => 'Aggiungi amministratore', 'route' => 'backend/admins/add'], 
+		    ['icon' => '<i class="fa-solid fa-chart-simple"></i>', 'label' => lang('backend/admins.linksBar.index'), 'route' => 'backend/admins'],
+		    ['icon' => '<i class="fa-solid fa-user-plus"></i>', 'label' => lang('backend/admins.linksBar.add'), 'route' => 'backend/admins/add'], 
 		];
 	}
 
@@ -93,8 +93,8 @@ class AdminsClass extends BaseClass
 	{
 		return 
 		[
-            ['icon' => '<i class="fa-solid fa-chart-simple"></i>', 'label' => 'Dati amministratori', 'route' => 'backend/admins'],
-            ['icon' => '<i class="fa-solid fa-users"></i>', 'label' => 'Elenco amministratori', 'route' => 'backend/admins/showAll'], 
+            ['icon' => '<i class="fa-solid fa-chart-simple"></i>', 'label' => lang('backend/admins.linksBar.index'), 'route' => 'backend/admins'],
+            ['icon' => '<i class="fa-solid fa-users"></i>', 'label' => lang('backend/admins.linksBar.showAll'), 'route' => 'backend/admins/showAll'], 
         ];
 	}
 
@@ -103,10 +103,10 @@ class AdminsClass extends BaseClass
 	{
 		return 
 		[
-            ['icon' => '<i class="fa-solid fa-chart-simple"></i>', 'label' => 'Dati amministratori', 'route' => 'backend/admins'],
-            ['icon' => '<i class="fa-solid fa-users"></i>', 'label' => 'Elenco amministratori', 'route' => 'backend/admins/showAll'],
-            ['icon' => '<i class="fa-solid fa-user-plus"></i>', 'label' => 'Aggiungi amministratore', 'route' => 'backend/admins/add'],
-            ['icon' => '<i class="fa-solid fa-user"></i>', 'label' => 'Dettaglio amministratore', 'route' => "backend/admins/show/{$uuid}"],
+            ['icon' => '<i class="fa-solid fa-chart-simple"></i>', 'label' => lang('backend/admins.linksBar.index'), 'route' => 'backend/admins'],
+            ['icon' => '<i class="fa-solid fa-users"></i>', 'label' => lang('backend/admins.linksBar.showAll'), 'route' => 'backend/admins/showAll'],
+            ['icon' => '<i class="fa-solid fa-user-plus"></i>', 'label' => lang('backend/admins.linksBar.add'), 'route' => 'backend/admins/add'],
+            ['icon' => '<i class="fa-solid fa-user"></i>', 'label' => lang('backend/admins.linksBar.show'), 'route' => "backend/admins/show/{$uuid}"],
         ];
 	}
 
@@ -117,10 +117,10 @@ class AdminsClass extends BaseClass
 		if ( ! $uuid) return [];
 
 		return [
-	        ['icon' => '<i class="fa-solid fa-chart-simple"></i>', 'label' => 'Dati amministratori', 'route' => 'backend/admins'],
-	        ['icon' => '<i class="fa-solid fa-users"></i>', 'label' => 'Elenco amministratori', 'route' => 'backend/admins/showAll'],
-	        ['icon' => '<i class="fa-solid fa-user-plus"></i>', 'label' => 'Aggiungi amministratore', 'route' => 'backend/admins/add'],
-	        ['icon' => '<i class="fa-solid fa-user-pen"></i>', 'label' => 'Aggiorna amministratore', 'route' => "backend/admins/edit/{$uuid}"],
+	        ['icon' => '<i class="fa-solid fa-chart-simple"></i>', 'label' => lang('backend/admins.linksBar.index'), 'route' => 'backend/admins'],
+	        ['icon' => '<i class="fa-solid fa-users"></i>', 'label' => lang('backend/admins.linksBar.showAll'), 'route' => 'backend/admins/showAll'],
+	        ['icon' => '<i class="fa-solid fa-user-plus"></i>', 'label' => lang('backend/admins.linksBar.add'), 'route' => 'backend/admins/add'],
+	        ['icon' => '<i class="fa-solid fa-user-pen"></i>', 'label' => lang('backend/admins.linksBar.edit'), 'route' => "backend/admins/edit/{$uuid}"],
 	    ];
 	}
 

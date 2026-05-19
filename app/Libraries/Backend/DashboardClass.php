@@ -16,9 +16,9 @@ class DashboardClass extends BaseClass
 	{
 		return 
 		[
-		    ['label' => 'Elenco',  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => 'Aggiorna', 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => 'Elimina',  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/dashboard.options.index'),  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/dashboard.options.add'), 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/dashboard.options.delete'),  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
 		];
 	}*/
 
@@ -29,7 +29,7 @@ class DashboardClass extends BaseClass
 	{
 		return 
 		[
-            ['icon' => '<i class="fa-solid fa-tachometer"></i>', 'label' => 'Performances', 'route' => 'backend/dashboard'],
+            ['icon' => '<i class="fa-solid fa-tachometer"></i>', 'label' => lang('backend/dashboard.options.performances'), 'route' => 'backend/dashboard'],
         ];
 	}*/
 

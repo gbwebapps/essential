@@ -16,9 +16,9 @@ class ToolsClass extends BaseClass
 	{
 		return 
 		[
-		    ['label' => 'Elenco',  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => 'Aggiorna', 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => 'Elimina',  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/tools.options.showAll'),  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/tools.options.edit'), 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/tools.options.delete'),  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
 		];
 	}
 
@@ -29,7 +29,7 @@ class ToolsClass extends BaseClass
 	{
 		return 
 		[
-            ['icon' => '<i class="fa-solid fa-sliders"></i>', 'label' => 'Impostazioni', 'route' => 'backend/settings'],
+            ['icon' => '<i class="fa-solid fa-sliders"></i>', 'label' => lang('backend/tools.linksBar.settings'), 'route' => 'backend/settings'],
         ];
 	}
 

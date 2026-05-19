@@ -27,11 +27,49 @@ class UsersController extends BackendController
 
     public function index()
     {
+        if($this->request->isAJAX()):
+
+            // some code here...
+
+        endif;
+
         $this->data['action'] = 'index';
         
-        $this->data['title'] = 'Users';
+        $this->data['title'] = lang('backend/users.titles.index');
         $this->data['icon'] = '<i class="fa-solid fa-user"></i>';
 
         return $this->render('backend/users/indexView', $this->data);
+    }
+
+    public function showAll()
+    {
+        if($this->request->isAJAX()):
+
+            // some code here...
+
+        endif;
+
+        $this->data['action'] = 'showAll';
+        
+        $this->data['title'] = lang('backend/users.titles.showAll');
+        $this->data['icon'] = '<i class="fa-solid fa-user"></i>';
+
+        return $this->render('backend/users/showAllView', $this->data);
+    }
+
+    public function show()
+    {
+        if($this->request->isAJAX()):
+
+            // some code here...
+
+        endif;
+        
+        $this->data['action'] = 'show';
+        
+        $this->data['title'] = lang('backend/users.titles.show');
+        $this->data['icon'] = '<i class="fa-solid fa-user"></i>';
+
+        return $this->render('backend/users/showView', $this->data);
     }
 }

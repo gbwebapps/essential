@@ -29,7 +29,7 @@ class SettingsController extends BackendController
     {
         $this->data['action'] = 'index';
         
-        $this->data['title'] = 'Settings';
+        $this->data['title'] = lang('backend/settings.titles.index');
         $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
 
         return $this->render('backend/settings/indexView', $this->data);

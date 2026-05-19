@@ -3,7 +3,7 @@
     <div class="dropdown pb-2">
         <!-- Pulsante di attivazione del menu Opzioni -->
         <button class="btn btn-secondary dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Opzioni
+            <?= lang('backend/global.labels.options'); ?>
         </button>
         
         <!-- Menu a comparsa allineato alla fine del contenitore -->

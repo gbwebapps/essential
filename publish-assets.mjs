@@ -21,29 +21,6 @@ const assetsToCopy = [
         from: 'node_modules/@fortawesome/fontawesome-free/webfonts',
         to: 'public/assets/vendor/fontawesome/webfonts'
     },
-    // DataTables
-    {
-        from: 'node_modules/datatables.net/js/dataTables.min.js',
-        to: 'public/assets/vendor/datatables/js/dataTables.min.js'
-    },
-    {
-        from: 'node_modules/datatables.net/js/dataTables.mjs',
-        to: 'public/assets/vendor/datatables/js/dataTables.mjs'
-    },
-    /* DataTables Bootstrap 5 Integration */
-    {
-        from: 'node_modules/datatables.net-bs5/css/dataTables.bootstrap5.min.css',
-        to: 'public/assets/vendor/datatables/css/dataTables.bootstrap5.min.css'
-    },
-    {
-        from: 'node_modules/datatables.net-bs5/js/dataTables.bootstrap5.min.js',
-        to: 'public/assets/vendor/datatables/js/dataTables.bootstrap5.min.js'
-    },
-    // jQuery
-    {
-        from: 'node_modules/jquery/dist/jquery.min.js',
-        to: 'public/assets/vendor/jquery/jquery.min.js'
-    }
 ];
 
 assetsToCopy.forEach(asset => {

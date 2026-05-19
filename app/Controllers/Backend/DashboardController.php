@@ -29,7 +29,7 @@ class DashboardController extends BackendController
     {
         $this->data['action'] = 'index';
         
-        $this->data['title'] = 'Dashboard';
+        $this->data['title'] = lang('backend/dashboard.titles.index');
         $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
 
         return $this->render('backend/dashboard/indexView', $this->data);

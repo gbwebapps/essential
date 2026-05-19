@@ -16,9 +16,9 @@ class SettingsClass extends BaseClass
 	{
 		return 
 		[
-		    ['label' => 'Elenco',  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => 'Aggiorna', 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => 'Elimina',  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/settings.options.showAll'),  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/settings.options.edit'), 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/settings.options.delete'),  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
 		];
 	}
 
@@ -29,7 +29,7 @@ class SettingsClass extends BaseClass
 	{
 		return 
 		[
-            ['icon' => '<i class="fa-solid fa-screwdriver-wrench"></i>', 'label' => 'Strumenti', 'route' => 'backend/tools'],
+            ['icon' => '<i class="fa-solid fa-screwdriver-wrench"></i>', 'label' => lang('backend/settings.linksBar.tools'), 'route' => 'backend/tools'],
         ];
 	}
 
