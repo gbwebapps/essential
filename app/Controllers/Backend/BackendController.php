@@ -35,7 +35,7 @@ abstract class BackendController extends BaseController
     protected array $customJs  = [];
 
     /* @var mixed Oggetto per i dati utente corrente */
-    protected $currentUser; // qui va il tipo di dato
+    protected $currentAdmin; // qui va il tipo di dato
 
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
@@ -65,14 +65,11 @@ abstract class BackendController extends BaseController
         $this->data['title'] = 'Backend';
         $this->data['siteName'] = 'Essential';
 
-        /* Recupero dati admin corrente */
-        $this->currentUser = new \stdClass();
-        $this->currentUser->firstname = 'Giorgio';
-        $this->currentUser->lastname = 'Barone';
-        $this->currentUser->master = 1;
+        /* Per richiamare l'utente corrente */
+        $this->currentAdmin = service('authorization')->currentAdmin();
 
         /* Rendiamo admin corrente disponibile a tutte le viste */
-        $this->data['currentUser'] = $this->currentUser;
+        $this->data['currentAdmin'] = $this->currentAdmin;
     }
 
     protected function addCss(array $css): void 

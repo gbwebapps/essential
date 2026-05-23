@@ -3,7 +3,7 @@
     <div class="container-fluid d-flex align-items-center justify-content-between">
 
         <!-- Il contenuto viene renderizzato solo per utenti autenticati-->
-        <?php if (isset($currentUser) && $currentUser): ?>
+        <?php if (isset($currentAdmin) && $currentAdmin): ?>
 
             <!-- Sezione Sinistra: Menu a comparsa verso l'alto (Moduli) -->
             <div class="btn-group dropup me-auto">
@@ -38,7 +38,7 @@
             </div>
 
             <!-- Sezione Destra: Menu Servizi (visibile solo agli utenti Master) -->
-            <?php if ($currentUser->master === 1): ?>
+            <?php if ((int) $currentAdmin->master === 1): ?>
                 <div class="btn-group dropup ms-auto">
                     <button type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fa-solid fa-gears"></i> 

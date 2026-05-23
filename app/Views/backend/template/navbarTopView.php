@@ -7,7 +7,7 @@
         </a>
         
         <!-- Il menu viene mostrato solo se l'utente è autenticato -->
-        <?php if (isset($currentUser) && $currentUser): ?>
+        <?php if (isset($currentAdmin) && $currentAdmin): ?>
             <!-- Pulsante toggle per visualizzazione mobile -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -21,7 +21,7 @@
                         <?php $isActive = (isset($controller) && in_array($controller, ['users', 'account'])); ?>
                         
                         <a class="nav-link dropdown-toggle<?= $isActive ? ' active fw-bold' : ''; ?>" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fa-solid fa-user-circle"></i> <?= esc($currentUser->firstname); ?> <?= esc($currentUser->lastname); ?>
+                            <i class="fa-solid fa-user-circle"></i> <?= esc($currentAdmin->firstname); ?> <?= esc($currentAdmin->lastname); ?>
                         </a>
                         
                         <ul class="dropdown-menu dropdown-menu-end"> 
@@ -30,7 +30,7 @@
                                 $visibleItems = [];
                                 foreach ($menuTopRight as $item):
                                     /* Se l'utente non è master, nascondi le voci relative alla gestione utenti */
-                                    if ( ! ($currentUser->master === 1) && $item['controller'] === 'admins'):
+                                    if ( ! ((int) $currentAdmin->master === 1) && $item['controller'] === 'admins'):
                                         continue;
                                     endif;
                                     $visibleItems[] = $item;

@@ -6,7 +6,7 @@ use App\Models\Backend\BackendModel;
 
 class AdminsModel extends BackendModel
 {
-    protected string $module = 'admins';
+    protected ?string $module = 'admins';
 
     /* @var array Campi consentiti per la visualizzazione Tabella */
     protected array $showAllAllowedFields = ['column', 'order', 'page', 'rows', 'search_fields'];

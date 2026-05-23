@@ -19,7 +19,33 @@ use CodeIgniter\Config\BaseService;
  */
 class Services extends BaseService
 {
-    public static function regexp($getShared = true)
+    /* Servizio per l'autorizzazione degli Admins (Singleton) */
+    public static function authorization(bool $getShared = true)
+    {
+        if ($getShared):
+            return static::getSharedInstance('authorization');
+        endif;
+
+        /* Inietta la connessione condivisa al database */
+        $db = \Config\Database::connect();
+
+        return new \App\Libraries\Backend\AuthorizationClass($db);
+    }
+
+    /* Servizio per la cifratura (Singleton) */
+    public static function crypto(bool $getShared = true)
+    {
+        if ($getShared):
+            return static::getSharedInstance('crypto');
+        endif;
+
+        /* Inietta la chiave di cifratura recuperata dalla configurazione */
+        $key = config('BackendAuth')->sessionCryptoKey;
+
+        return new \App\Libraries\CryptoService($key);
+    }
+
+    public static function regexp(bool $getShared = true)
     {
         if ($getShared):
             return static::getSharedInstance('regexp');
@@ -27,5 +53,4 @@ class Services extends BaseService
      
         return new \App\Libraries\RegExp();
     }
-     
 }
