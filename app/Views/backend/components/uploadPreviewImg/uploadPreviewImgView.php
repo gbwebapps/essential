@@ -19,7 +19,6 @@
 
             <div class="ms-1">
                 <form id="save_images">
-                    <?= csrf_field() ?>
                     <input type="hidden" name="uuid" value="<?= esc($uuid); ?>">
                     <input type="hidden" name="entity" value="<?= esc($entity); ?>">
                     <input type="hidden" name="context" value="<?= esc($context); ?>">

@@ -2,7 +2,6 @@
     <div class="col-4 offset-4">
 
         <form id="login_form">
-            <?= csrf_field() ?>
 
             <!-- Campo email -->
             <div class="mb-2">
@@ -21,9 +20,9 @@
             <div class="d-flex justify-content-between align-items-center">
                 <!-- Checkbox remember me -->
                 <div class="form-check text-start my-3">
-                    <input class="form-check-input" type="checkbox" name="remember" id="remember">
-                    <label class="form-check-label" for="remember">
-                        <?= lang('backend/auth.labels.remember'); ?>
+                    <input class="form-check-input" type="checkbox" name="rememberMe" id="rememberMe">
+                    <label class="form-check-label" for="rememberMe">
+                        <?= lang('backend/auth.labels.rememberMe'); ?>
                     </label>
                 </div>
                 <!-- Pulsante invio dati -->

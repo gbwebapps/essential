@@ -6,7 +6,6 @@
             <div class="card-header rounded-0 d-flex justify-content-between align-items-center">
                 <h2 class="card-title text-start mb-0"><?= lang('backend/admins.panels.general_data'); ?></h2>
                 <form id="get_general_data">
-                    <?= csrf_field() ?>
                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
                     <input type="hidden" name="context" value="show">
                     <button type="submit" class="btn btn-sm btn-secondary">
@@ -29,7 +28,6 @@
             <div class="card-header rounded-0 d-flex justify-content-between align-items-center" style="border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);">
                 <h2 class="card-title text-start mb-0"><?= lang('backend/admins.panels.meta_data'); ?></h2>
                 <form id="get_meta_data">
-                    <?= csrf_field() ?>
                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
                     <button type="submit" class="btn btn-sm btn-secondary">
                         <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/admins.buttons.reload'); ?>

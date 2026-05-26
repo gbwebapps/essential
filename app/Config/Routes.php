@@ -6,6 +6,12 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
+/* Definizione del placeholder personalizzato per UUID v1-v5 */
+$routes->addPlaceholder('uuid', '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}');
+
+/* Definizione del placeholder personalizzato per authcode setPassword */
+$routes->addPlaceholder('authcode', '[0-9a-f]{32}');
+
 /* Rotte Frontend */
 $routes->get('/', '\App\Controllers\Frontend\HomeController::index');
 $routes->get('contacts', '\App\Controllers\Frontend\ContactsController::index');
@@ -23,15 +29,15 @@ $routes->group('backend', function($routes) {
     $routes->group('auth', ['filter' => 'guest'], function($routes) {
         $routes->get('/', '\App\Controllers\Backend\AuthController::index');
         $routes->match(['GET', 'POST'], 'login', '\App\Controllers\Backend\AuthController::login');
-        $routes->get('resetPassword', '\App\Controllers\Backend\AuthController::resetPassword');
-        $routes->get('setPassword', '\App\Controllers\Backend\AuthController::setPassword');
+        $routes->match(['GET', 'POST'], 'resetPassword', '\App\Controllers\Backend\AuthController::resetPassword');
+        $routes->match(['GET', 'POST'], 'setPassword/(:authcode)', '\App\Controllers\Backend\AuthController::setPassword/$1');
     });
 
     /* Rotta di Logout (Filtro: auth - deve poter uscire solo chi è loggato) */
-    $routes->get('auth/logout', '\App\Controllers\Backend\AuthController::logout', ['filter' => 'auth']);
+    $routes->get('auth/logout', '\App\Controllers\Backend\AuthController::logout', ['filter' => 'authorization']);
 
-    /* Area Riservata Base (Filtro: auth) */
-    $routes->group('', ['filter' => 'auth'], function($routes) {
+    /* Area Riservata Base (Filtro: authorization) */
+    $routes->group('', ['filter' => 'authorization'], function($routes) {
         
         $routes->get('dashboard', '\App\Controllers\Backend\DashboardController::index');
         
@@ -48,22 +54,22 @@ $routes->group('backend', function($routes) {
         });
 
         /* Messages */
-        $routes->group('messages', function($routes) {
+        $routes->group('messages', ['filter' => 'authorization'], function($routes) {
             $routes->get('/', '\App\Controllers\Backend\MessagesController::index');
             $routes->get('showAll', '\App\Controllers\Backend\MessagesController::showAll');
             $routes->get('show', '\App\Controllers\Backend\MessagesController::show');
         });
 
         /* Users */
-        $routes->group('users', function($routes) {
+        $routes->group('users', ['filter' => 'authorization'], function($routes) {
             $routes->get('/', '\App\Controllers\Backend\UsersController::index');
             $routes->get('showAll', '\App\Controllers\Backend\UsersController::showAll');
             $routes->get('show', '\App\Controllers\Backend\UsersController::show');
         });
     });
 
-    /* Area Superadmin (Filtro multiplo: auth + master) */
-    $routes->group('', ['filter' => ['auth', 'master']], function($routes) {
+    /* Area Superadmin (Filtro multiplo: authorization + master) */
+    $routes->group('', ['filter' => ['authorization', 'master']], function($routes) {
         
         $routes->get('settings', '\App\Controllers\Backend\SettingsController::index');
         $routes->get('tools', '\App\Controllers\Backend\ToolsController::index');
@@ -73,8 +79,8 @@ $routes->group('backend', function($routes) {
             $routes->get('/', '\App\Controllers\Backend\AdminsController::index');
             $routes->get('showAll', '\App\Controllers\Backend\AdminsController::showAll');
             $routes->get('add', '\App\Controllers\Backend\AdminsController::add');
-            $routes->get('edit', '\App\Controllers\Backend\AdminsController::edit');
-            $routes->get('show', '\App\Controllers\Backend\AdminsController::show');
+            $routes->get('edit/(:uuid)', '\App\Controllers\Backend\AdminsController::edit/$1');
+            $routes->get('show/(:uuid)', '\App\Controllers\Backend\AdminsController::show/$1');
         });
     });
 });

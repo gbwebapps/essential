@@ -62,7 +62,7 @@ class AuthorizationClass
             $sqlUpdate = "update admins_tokens set token_expire = ? where token_hash = ? and token_type = ?";
             $this->db->query($sqlUpdate, [$newExpire, $tokenHash, 'session']);
 
-            $data = $this->getAdmin($query->user_uuid);
+            $data = $this->getAdmin($query->admin_uuid);
             if ($data):
                 return $data;
             endif;
@@ -97,7 +97,7 @@ class AuthorizationClass
 
         /* Anche qui il confronto avviene in formato DATETIME */
         if (isset($query->token_hash) && $query->token_expire > date('Y-m-d H:i:s')):
-            $data = $this->getAdmin($query->user_uuid);
+            $data = $this->getAdmin($query->admin_uuid);
             if ($data):
                 return $data;
             endif;
@@ -143,7 +143,7 @@ class AuthorizationClass
             $data->permissions->all = true;
         else:
             /* Interroga il database restituendo un array di oggetti */
-            $sqlPerms = "select permission from admins_permissions where user_uuid = ?";
+            $sqlPerms = "select permission from admins_permissions where admin_uuid = ?";
             $permsResult = $this->db->query($sqlPerms, [$uuid])->getResultObject();
             
             if ($permsResult):

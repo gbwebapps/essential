@@ -84,6 +84,8 @@ class AccountController extends BackendController
         $this->data['title'] = lang('backend/account.titles.index');
         $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
 
+        $this->data['centerContent'] = true;
+
         return $this->render('backend/account/indexView', $this->data);
     }
 

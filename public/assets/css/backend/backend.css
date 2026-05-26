@@ -151,7 +151,7 @@ textarea {
 }
 
 /* Loader */
-#show_loader {
+#show-loader {
     position: fixed;
     top: 8%;
     left: 50%;

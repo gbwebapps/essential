@@ -6,8 +6,6 @@
 
             <!-- Form identificato per la gestione AJAX -->
             <form id="admins_add">
-                <!-- Generazione del token di sicurezza CSRF -->
-                <?= csrf_field() ?>
 
                 <!-- Sezione: Dati Anagrafici e Contatti -->
                 <div id="general_data">

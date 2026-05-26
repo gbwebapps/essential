@@ -3,8 +3,8 @@
 <?= $this->section('content') ?>
 
     <div class="row">
-        <div class="col-lg-12">
-            <div id="setPassword-auth-container">
+        <div class="col-12">
+            <div id="set-password-auth-container">
                 <?= $this->include('backend/auth/partials/setPassword/setPasswordPartial'); ?>
             </div>
         </div>

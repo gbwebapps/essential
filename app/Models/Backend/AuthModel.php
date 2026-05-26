@@ -11,9 +11,9 @@ class AuthModel extends BackendModel
         parent::initModel();
     }
 
-    protected array $loginAllowedFields = ['email', 'password', 'remember']; 
+    protected array $loginAllowedFields = ['email', 'password', 'rememberMe']; 
     protected array $resetPasswordAllowedFields = ['email'];
-    protected array $setPasswordAllowedFields = ['password', 'confirmPassword', 'checkAuthCode'];
+    protected array $setPasswordAllowedFields = ['password', 'confirmPassword', 'checkAuthToken'];
 
     public function validateLogin(array $posts)
     {
@@ -50,7 +50,7 @@ class AuthModel extends BackendModel
                 'label' => 'Conferma password',
                 'rules' => 'required|matches[password]'
             ], 
-            'checkAuthCode' => [
+            'checkAuthToken' => [
                 'label' => 'Codice di autenticazione',
                 'rules' => 'required'
             ]
@@ -79,7 +79,7 @@ class AuthModel extends BackendModel
                 $sql = "select admins.uuid, admins.firstname, admins.lastname, admins.email, admins.password_hash, COUNT(admins_attempts.id) as times
                         from admins
                         left join admins_attempts
-                        on admins_attempts.user_uuid = admins.uuid and admins_attempts.timestamp > ?
+                        on admins_attempts.admin_uuid = admins.uuid and admins_attempts.timestamp > ?
                         where admins.email = ? and admins.status = 1 and admins.suspended_at is null
                         group by admins.uuid limit 1";
                 $params = [$attemptsInterval, $posts['email']];
@@ -95,7 +95,7 @@ class AuthModel extends BackendModel
 
             /* Se l'utente non esiste, esce immediatamente con errore generico (sicurezza) */
             if ( ! $admin):
-                return ['result' => false, 'message' => lang('backend/auth.messages.loginFailed')];
+                return ['result' => 'loginFailed', 'message' => lang('backend/auth.messages.loginFailed')];
             endif;
 
             /* 3. Controllo immediato del blocco tentativi (senza effettuare ulteriori scritture) */
@@ -112,18 +112,18 @@ class AuthModel extends BackendModel
                 $this->db->transBegin();
                 
                 if ($allowAttempts):
-                    $sql = "insert into admins_attempts (user_uuid, ip, timestamp) values (?, ?, ?)";
+                    $sql = "insert into admins_attempts (admin_uuid, ip, timestamp) values (?, ?, ?)";
                     $this->db->query($sql, [$admin->uuid, $ip, date('Y-m-d H:i:s')]);
                 endif;
 
                 $this->db->transCommit();
-                return ['result' => false, 'message' => lang('backend/auth.messages.loginFailed')];
+                return ['result' => 'loginFailed', 'message' => lang('backend/auth.messages.loginFailed')];
                 
             endif;
 
             /* 5. Gestione del Secondo Fattore di Autenticazione (2FA) */
             if ($allowTwoFactor):
-                $sql = "select method, secret from admins_2fa where user_uuid = ? and enabled = 1 limit 1";
+                $sql = "select method, secret from admins_2fa where admin_uuid = ? and enabled = 1 limit 1";
                 $twofaQuery = $this->db->query($sql, [$admin->uuid]);
                 $twofa = $twofaQuery->getRow();
 
@@ -134,7 +134,7 @@ class AuthModel extends BackendModel
                         (new EmailOtpService($this->app))->send($admin->uuid);
                     endif;
 
-                    return ['result' => '2fa_required', 'method' => $twofa->method, 'user_uuid' => $admin->uuid, 'remember_me' => $rememberMe];
+                    return ['result' => '2fa_required', 'method' => $twofa->method, 'admin_uuid' => $admin->uuid, 'remember_me' => $rememberMe];
                 endif;
             endif;
 
@@ -143,7 +143,7 @@ class AuthModel extends BackendModel
 
             /* Pulizia della tabella tentativi solo ad autenticazione completamente avvenuta */
             if ($allowAttempts):
-                $sql = "delete from admins_attempts where user_uuid = ?";
+                $sql = "delete from admins_attempts where admin_uuid = ?";
                 $this->db->query($sql, [$admin->uuid]);
             endif;
 
@@ -181,7 +181,7 @@ class AuthModel extends BackendModel
 
         /* 3. Pulizia dei vecchi token di tipo sessione se applicabile */
         if ($tokenType === 'session'):
-            $sql = "delete from admins_tokens where user_uuid = ? and token_type = ?";
+            $sql = "delete from admins_tokens where admin_uuid = ? and token_type = ?";
             $this->db->query($sql, [$admin->uuid, 'session']);
         endif;
 
@@ -189,7 +189,7 @@ class AuthModel extends BackendModel
         $userAgent = $request->getUserAgent()->getAgentString();
         $ip = $request->getIPAddress();
 
-        $sql = "insert into admins_tokens (user_uuid, token_hash, token_create, token_expire, token_type, user_agent, ip) values(?, ?, ?, ?, ?, ?, ?)";
+        $sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, token_expire, token_type, user_agent, ip) values(?, ?, ?, ?, ?, ?, ?)";
         $this->db->query($sql, [
             $admin->uuid,
             $tokenHash,
@@ -227,7 +227,7 @@ class AuthModel extends BackendModel
         endif;
 
         /* 7. Configurazione del messaggio flash di avvenuto login */
-        $welcomeMessage = sprintf(lang('backend/auth.messages.login_welcome'), esc($admin->firstname) . ' ' . esc($admin->lastname));
+        $welcomeMessage = sprintf(lang('backend/auth.messages.loginWelcome'), esc($admin->firstname) . ' ' . esc($admin->lastname));
         
         session()->setFlashdata([
             'message' => $welcomeMessage,
@@ -238,9 +238,79 @@ class AuthModel extends BackendModel
         return ['result' => true];
     }
 
-    public function resetPassword()
+    public function resetPassword(array $posts, \CodeIgniter\HTTP\IncomingRequest $request): array
     {
-        
+        $posts = $this->checkAllowedFields($posts, $this->resetPasswordAllowedFields);
+
+        $sql = "select uuid, firstname, lastname, email from admins where email = ?";
+        $admin = $this->db->query($sql, [$posts['email']])->getRow();
+
+        if ($admin):
+
+            /* 1. Transazione avviata solo se l'utente esiste (Ottimizzazione DB) */
+            try {
+                $this->db->transBegin();
+
+                $token = new \App\Libraries\Token();
+                $tokenHash = $token->getHash(config('BackendAuth')->hashKey);
+
+                $time = (int) config('BackendAuth')->activationTime;
+
+                $tokenCreate = date('Y-m-d H:i:s');
+                $tokenExpire = date('Y-m-d H:i:s', time() + $time);
+
+                $sql = "delete from admins_tokens where admin_uuid = ? and token_type = ?";
+                $this->db->query($sql, [$admin->uuid, 'activation']);
+
+                $sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, token_expire, token_type, user_agent, ip) values(?,?,?,?,?,?,?)";
+                $this->db->query($sql, [
+                    $admin->uuid,
+                    $tokenHash,
+                    $tokenCreate,
+                    $tokenExpire,
+                    'activation',
+                    $request->getUserAgent()->getAgentString(),
+                    $request->getIPAddress()
+                ]);
+
+                if ($this->db->transStatus() === false):
+                    $this->db->transRollback();
+                    return ['result' => 'resetPasswordFailed', 'message' => lang('backend/email.messages.resetPasswordFailed')];
+                endif;
+
+                $this->db->transCommit();
+
+            } catch (\Throwable $e) {
+                $this->db->transRollback();
+                return ['result' => 'resetPasswordFailed', 'message' => lang('backend/email.messages.resetPasswordFailed')];
+            }
+
+            /* 2. Integrazione classe nativa Email e compilazione della vista */
+            $emailData = [
+                'firstname' => esc($admin->firstname),
+                'lastname'  => esc($admin->lastname),
+                'email'     => esc($admin->email),
+                'token'     => $token->getValue()
+            ];
+            $emailHTML = view('backend/auth/partials/email/emailResetPasswordPartial', $emailData);
+
+            $emailService = \Config\Services::email();
+            $emailService->setTo(esc($admin->email));
+            $emailService->setSubject(sprintf(lang('backend/email.auth.resetPassword.subjectResetPasswordEmail'), esc($admin->firstname), esc($admin->lastname)));
+            $emailService->setMessage($emailHTML);
+
+            /* 3. Coerenza invio fallito: blocca il redirect se la mail non parte */
+            if (! $emailService->send()):
+
+                $debugger = $emailService->printDebugger(['headers']);
+                log_message('error', 'Errore SMTP: ' . $debugger);
+
+                return ['result' => 'emailFailed', 'message' => lang('backend/email.messages.sendingEmailFailed')];
+            endif;
+
+        endif;
+
+        return ['result' => true, 'message' => lang('backend/email.messages.sendingEmailSuccess')];
     }
 
     public function setPassword()
@@ -248,20 +318,46 @@ class AuthModel extends BackendModel
         
     }
 
-    public function checkAuthCode()
+    /* Verifica se il token di attivazione è valido e non scaduto */
+    public function checkAuthToken(string $token): bool
     {
-        
+        try 
+        {
+            $tokenObj = new \App\Libraries\Token($token);
+            $tokenHash = $tokenObj->getHash(config('BackendAuth')->hashKey);
+
+            $sql = "select t.token_expire, t.admin_uuid, u.password_hash, u.email  
+                from admins as u 
+                join admins_tokens as t 
+                on t.admin_uuid = u.uuid 
+                where t.token_hash = ? 
+                and t.token_type = ? 
+                limit 1";
+
+            $query = $this->db->query($sql, [$tokenHash, 'activation'])->getRow();
+
+            if (($query) && (date('Y-m-d H:i:s') < $query->token_expire)):
+                return true;
+            endif;
+
+            return false;
+
+        } catch (\Throwable $e) {
+            log_message('error', lang('backend/auth.messages.AuthTokenError') . ' - ' . $e->getMessage());
+            return false;
+        }
     }
 
     /* Logout basato su sessione */
     public function logoutBySession(): void
     {
-        try {
+        try 
+        {
             if (session()->has('backendSession')):
                 
                 /* Recupera il token in chiaro dalla sessione */
                 $sessionValue = session()->get('backendSession');
-                $token = new \App\Core\Token($sessionValue);
+                $token = new \App\Libraries\Token($sessionValue);
                 $tokenHash = $token->getHash(config('BackendAuth')->hashKey);
 
                 /* Elimina il record dal database */
@@ -280,13 +376,14 @@ class AuthModel extends BackendModel
     /* Logout basato su cookie persistente */
     public function logoutByCookie(string $cookieValue): void
     {
-        try {
+        try 
+        {
             /* Decifra il valore del cookie */
             $decryptedValue = service('crypto')->decrypt($cookieValue);
 
             if ($decryptedValue):
                 /* Ricava l'hash dal token decifrato */
-                $token = new \App\Core\Token($decryptedValue);
+                $token = new \App\Libraries\Token($decryptedValue);
                 $tokenHash = $token->getHash(config('BackendAuth')->hashKey);
 
                 /* Elimina il record dal database */

@@ -19,47 +19,36 @@ const actions = {
         });
 
         async function performLogin(form_data) {
+            /* 1. Reset immediato degli errori visivi */
+            document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '&nbsp;');
+
             try {
-                /* Chiamata all'endpoint usando la tua apiFetch */
                 const response = await apiFetch(urlbase + 'backend/auth/login', {
                     method: 'POST',
                     body: form_data
                 });
 
-                /* Estrazione dei dati JSON */
+                /* Se il codice arriva qui, è matematicamente un 200 OK (Successo) */
                 const data = await response.json();
-
-                /* 1. Reset immediato degli errori visivi */
-                document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '&nbsp;');
-
-                /* 2. Errori di Validazione (422 o simili) */
-                if (data.errors) {
-                    handleValidationErrors(data.errors);
-                    showToast('danger', data.message);
-                    return;
-                }
-
-                /* 3. Fallimento Logico (Credenziali errate, Account disabilitato) */
-                if (data.result === false) {
-                    showToast('danger', data.message);
-                    form.reset();
-                    return;
-                }
-
-                /* 5. Successo Finale */
+                
                 if (data.result === true) {
-                    showToast('success', 'Accesso autorizzato. Reindirizzamento...');
-
-                    /* Reindirizzamento alla login dopo un breve delay per far leggere il toast? 
-                       Oppure immediato come nel tuo vecchio codice */
-                    setTimeout(() => {
-                        window.location.href = urlbase + 'backend/dashboard';
-                    }, 1000);
+                    window.location.href = urlbase + 'backend/dashboard';
                 }
 
             } catch (error) {
-                /* L'errore è già parzialmente gestito da handleAjaxError in apiFetch */
-                console.error("Login Error:", error);
+                /* 2. Gestione centralizzata dei fallimenti HTTP */
+                if (error.status === 422) {
+                    /* Errore di Validazione (Campi vuoti, ecc.) */
+                    handleValidationErrors(error.data.errors);
+                    showToast('danger', error.data.message);
+                } else if (error.status === 401) {
+                    /* Credenziali Errate (loginFailed dal Model) */
+                    showToast('danger', error.data.message);
+                    document.getElementById('login_form').reset();
+                } else {
+                    /* Errori di rete o imprevisti */
+                    console.error("Login Error:", error);
+                }
             }
         }
     }, 
@@ -71,49 +60,40 @@ const actions = {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             const form_data = new FormData(form);
-            performReset(form_data);
+            performResetPassword(form_data);
         });
 
-        async function performReset(form_data) {
+        async function performResetPassword(form_data) {
+            /* 1. Pulizia immediata degli errori visivi */
+            document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '&nbsp;');
+
             try {
-                /* Chiamata fetch tramite la tua utility apiFetch */
+                /* 2. Chiamata fetch all'endpoint */
                 const response = await apiFetch(urlbase + 'backend/auth/resetPassword', {
                     method: 'POST',
                     body: form_data
                 });
 
+                /* 3. Estrazione dati JSON (qui arriva solo se lo status è 200 OK) */
                 const data = await response.json();
 
-                /* 1. Pulizia errori precedenti */
-                document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '&nbsp;');
-
-                /* 2. Gestione Errori di Validazione */
-                if (data.errors) {
-                    handleValidationErrors(data.errors);
-                    showToast('danger', data.message);
-                    return;
-                }
-
-                /* 3. Fallimento Logico (es. email non trovata o errore sistema) */
-                if (data.result === false) {
-                    showToast('danger', data.message);
-                    return;
-                }
-
-                /* 4. Successo */
-                if (data.result === true) {
-                    form.reset();
-                    showToast('success', data.message || 'Istruzioni inviate via email.');
-                    
-                    /* Reindirizzamento alla login dopo un breve delay per far leggere il toast? 
-                       Oppure immediato come nel tuo vecchio codice */
-                    setTimeout(() => {
-                        window.location.href = urlbase + 'backend/auth/login';
-                    }, 1000);
-                }
-
+                /* 4. Successo Finale */
+                document.getElementById('reset_password_form').reset();
+                showToast('success', data.message);
+                
             } catch (error) {
-                console.error("Errore durante il reset password:", error);
+                /* 5. Gestione centralizzata dei fallimenti HTTP */
+                if (error.status === 422) {
+                    /* Errore di Validazione (es. campo email vuoto o malformato) */
+                    handleValidationErrors(error.data.errors);
+                    showToast('danger', error.data.message);
+                } else if (error.status === 401) {
+                    /* Fallimento Logico (es. email non trovata nel database) */
+                    showToast('danger', error.data.message);
+                } else {
+                    /* Altri errori loggati in console */
+                    console.error("Errore durante il reset password:", error);
+                }
             }
         }
     }, 
@@ -129,43 +109,39 @@ const actions = {
         });
 
         async function performSetPassword(form_data) {
+            /* 1. Pulizia immediata degli errori visivi */
+            document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '&nbsp;');
+
             try {
+                /* 2. Chiamata fetch all'endpoint */
                 const response = await apiFetch(urlbase + 'backend/auth/setPassword', {
                     method: 'POST',
                     body: form_data
                 });
 
+                /* 3. Estrazione dati JSON (qui arriva solo se lo status è 200 OK) */
                 const data = await response.json();
 
-                /* 1. Pulizia errori precedenti */
-                document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '&nbsp;');
-
-                /* 2. Gestione Errori di Validazione */
-                if (data.errors) {
-                    handleValidationErrors(data.errors);
-                    showToast('danger', data.message);
-                    return;
-                }
-
-                /* 3. Fallimento Logico (es. token scaduto o non valido) */
-                if (data.result === false) {
-                    showToast('danger', data.message);
-                    return;
-                }
-
-                /* 4. Successo */
-                if (data.result === true) {
-                    form.reset();
-                    showToast('success', data.message || 'Password aggiornata con successo.');
-                    
-                    /* Reindirizzamento alla login */
-                    setTimeout(() => {
-                        window.location.href = urlbase + 'backend/auth/login';
-                    }, 1000);
-                }
+                /* 4. Successo Finale */
+                document.getElementById('set_password_form').reset(); /* Assicurati che l'ID del form sia corretto */
+                showToast('success', data.message);
+                
+                /* Reindirizzamento alla login */
+                window.location.href = urlbase + 'backend/auth/login';
 
             } catch (error) {
-                console.error("Errore durante l'impostazione della password:", error);
+                /* 5. Gestione centralizzata dei fallimenti HTTP */
+                if (error.status === 422) {
+                    /* Errore di Validazione (es. password troppo corta o non coincidente) */
+                    handleValidationErrors(error.data.errors);
+                    showToast('danger', error.data.message);
+                } else if (error.status === 401) {
+                    /* Fallimento Logico (es. token di reset scaduto o invalido) */
+                    showToast('danger', error.data.message);
+                } else {
+                    /* Altri errori loggati in console */
+                    console.error("Errore durante l'impostazione della password:", error);
+                }
             }
         }
     }

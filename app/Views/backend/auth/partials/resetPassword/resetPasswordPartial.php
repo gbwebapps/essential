@@ -2,7 +2,6 @@
     <div class="col-4 offset-4">
 
         <form id="reset_password_form">
-            <?= csrf_field() ?>
 
             <!-- Campo email -->
             <div class="mb-2">
@@ -13,7 +12,7 @@
 
             <!-- Pulsante invio dati -->
             <div class="d-flex justify-content-end">
-                <button type="submit" class="btn btn-sm btn-secondary"><i class="fa-solid fa-floppy-disk"></i><?= lang('backend/auth.buttons.reset_password'); ?></button>
+                <button type="submit" class="btn btn-sm btn-secondary"><i class="fa-solid fa-floppy-disk"></i><?= lang('backend/auth.buttons.resetPassword'); ?></button>
             </div>
 
         </form>

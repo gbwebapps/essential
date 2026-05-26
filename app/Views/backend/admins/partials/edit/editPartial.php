@@ -1,14 +1,10 @@
 <!-- Struttura principale del form di aggiornamento (Partial) -->
 
 <!-- Form per aggiornamento dati generali -->
-<form id="get_general_data">
-    <?= csrf_field() ?>
-</form>
+<form id="get_general_data"></form>
 
 <!-- Form per aggiornamento metadati -->
-<form id="get_meta_data">
-    <?= csrf_field() ?>
-</form>
+<form id="get_meta_data"></form>
 
 <div class="row">
     <div class="col-8 offset-2">
@@ -17,8 +13,6 @@
 
             <!-- Form identificato per la gestione AJAX -->
             <form id="admins_edit">
-                <!-- Generazione del token di sicurezza CSRF -->
-                <?= csrf_field() ?>
 
                 <!-- Sezione: Dati Anagrafici e Contatti -->
                 <div class="card-header rounded-0 d-flex justify-content-between align-items-center">

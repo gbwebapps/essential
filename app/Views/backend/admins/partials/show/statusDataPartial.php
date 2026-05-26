@@ -8,7 +8,6 @@
     endif;
 ?>
 <form class="change_status" data-message="<?= sprintf(lang('backend/admins.messages.are_you_sure_change_status'), esc($admin->firstname), esc($admin->lastname)); ?>">
-    <?= csrf_field() ?>
     <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
     <input type="hidden" name="context" value="show">
     <button type="submit" class="<?= $status_class; ?>">

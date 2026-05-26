@@ -40,4 +40,6 @@ class BackendAuth extends BaseConfig
     public int $rememberMeTime = 86400;
 
     public int $sessionTime = 1200;
+
+    public int $activationTime = 21600;
 }

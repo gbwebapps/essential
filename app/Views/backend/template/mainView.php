@@ -5,6 +5,7 @@
     <!-- Configurazione meta e charset -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= csrf_hash() ?>">
 
     <!-- Titolo della pagina dinamico -->
     <title><?= esc($title); ?> | <?= esc($siteName); ?></title>
@@ -25,7 +26,7 @@
     </div>
 
     <!-- Contenitore per il loader di caricamento AJAX -->
-    <div id="show_loader"></div>
+    <div id="show-loader"></div>
 
     <!-- Contenitore globale per le notifiche Toast di Bootstrap -->
     <div class="toast-container position-fixed top-0 end-0 p-3" id="toast-container"></div>
@@ -51,7 +52,11 @@
                 </div>
 
                 <!-- Punto di iniezione del contenuto specifico della vista -->
-                <?= $this->renderSection('content'); ?>
+                <div id="content-body-wrapper" 
+                    class="<?= (isset($centerContent) && $centerContent) ? 'd-flex flex-column justify-content-center w-100' : ''; ?>" 
+                    style="<?= (isset($centerContent) && $centerContent) ? 'min-height: 75vh;' : ''; ?>">
+                    <?= $this->renderSection('content'); ?>
+                </div>
                 
             </div>
         </div>

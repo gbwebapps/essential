@@ -20,6 +20,7 @@ class AuthController extends BackendController
         parent::initController($request, $response, $logger);
 
         $this->data['controller'] = 'auth';
+        $this->data['centerContent'] = true;
 
         $this->authModel = model(AuthModel::class);
         $this->authClass = (new AuthClass())->withModel($this->authModel);
@@ -58,10 +59,15 @@ class AuthController extends BackendController
             $rules = $this->authModel->validateLogin($posts);
 
             if( ! $this->validateData($posts, $rules)):
-                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validation_errors')]);
+                return $this->response->setStatusCode(422)->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validation_errors')]);
             endif;
 
             $json = $this->authModel->login($posts, $this->request);
+
+            if($json['result'] === 'loginFailed'):
+                return $this->response->setStatusCode(401)->setJSON($json);
+            endif;
+
             return $this->response->setJSON($json);
 
         endif;
@@ -82,10 +88,15 @@ class AuthController extends BackendController
             $rules = $this->authModel->validateResetpassword($posts);
 
             if( ! $this->validateData($posts, $rules)):
-                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validation_errors')]);
+                return $this->response->setStatusCode(422)->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validation_errors')]);
             endif;
 
-            $json = $this->authModel->resetPassword($posts);
+            $json = $this->authModel->resetPassword($posts, $this->request);
+
+            if(($json['result'] === 'resetPasswordFailed') || ($json['result'] === 'emailFailed')):
+                return $this->response->setStatusCode(401)->setJSON($json);
+            endif;
+
             return $this->response->setJSON($json);
 
         endif;
@@ -93,7 +104,7 @@ class AuthController extends BackendController
         $this->data['action'] = 'resetPassword';
         
         $this->data['title'] = lang('backend/auth.titles.resetPassword');
-        $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
+        $this->data['icon'] = '<i class="fa-solid fa-lock"></i>';
 
         return $this->render('backend/auth/resetPasswordView', $this->data);
     }
@@ -106,20 +117,25 @@ class AuthController extends BackendController
             $rules = $this->authModel->validateSetpassword($posts);
 
             if( ! $this->validateData($posts, $rules)):
-                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validation_errors')]);
+                return $this->response->setStatusCode(422)->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validation_errors')]);
             endif;
 
             $json = $this->authModel->setPassword($posts);
+
+            if($json['result'] === 'setPasswordFailed'):
+                return $this->response->setStatusCode(401)->setJSON($json);
+            endif;
+
             return $this->response->setJSON($json);
 
         endif;
 
-        if($authCode && $this->authModel->checkAuthCode($authCode)):
+        if($authCode && $this->authModel->checkAuthToken($authCode)):
         
             $this->data['action'] = 'setPassword';
             
             $this->data['title'] = lang('backend/auth.titles.setPassword');
-            $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
+            $this->data['icon'] = '<i class="fa-solid fa-key"></i>';
 
             return $this->render('backend/auth/setPasswordView', $this->data);
 
@@ -153,6 +169,6 @@ class AuthController extends BackendController
         $this->session->setFlashdata('message_icon', '<i class="fa-solid fa-check"></i>');
 
         /* 5. Esegue un redirect pulito in GET verso la pagina di login */
-        return redirect()->to(base_url('backend/auth'));
+        return redirect()->to(base_url('backend/auth'))->withCookies();
     }
 }

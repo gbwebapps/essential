@@ -129,9 +129,9 @@ class AdminsClass extends BaseClass
 	public function getJsShowAll(): array
 	{
 	    return [
-	        ['id' => 'jquery', 'path' => 'assets/vendor/jquery/jquery.min.js', 'isModule' => false, 'position' => 'before', 'target' => 'backend-js'],
-	        ['id' => 'datatables-js', 'path' => 'assets/vendor/datatables/js/dataTables.min.js', 'isModule' => false, 'position' => 'before', 'target' => 'backend-js'],
-	        ['id' => 'datatables-bs5-js', 'path' => 'assets/vendor/datatables/js/dataTables.bootstrap5.min.js', 'isModule' => false, 'position' => 'before', 'target' => 'backend-js'],
+	        // ['id' => 'jquery', 'path' => 'assets/vendor/jquery/jquery.min.js', 'isModule' => false, 'position' => 'before', 'target' => 'backend-js'],
+	        // ['id' => 'datatables-js', 'path' => 'assets/vendor/datatables/js/dataTables.min.js', 'isModule' => false, 'position' => 'before', 'target' => 'backend-js'],
+	        // ['id' => 'datatables-bs5-js', 'path' => 'assets/vendor/datatables/js/dataTables.bootstrap5.min.js', 'isModule' => false, 'position' => 'before', 'target' => 'backend-js'],
 	    ];
 	}
 
@@ -140,7 +140,7 @@ class AdminsClass extends BaseClass
 	public function getCssShowAll(): array
 	{
 	    return [
-	        ['id' => 'datatables-bs5-css', 'path' => 'assets/vendor/datatables/css/dataTables.bootstrap5.min.css', 'position' => 'before', 'target' => 'backend-css'],
+	        // ['id' => 'datatables-bs5-css', 'path' => 'assets/vendor/datatables/css/dataTables.bootstrap5.min.css', 'position' => 'before', 'target' => 'backend-css'],
 	    ];
 	}
 }

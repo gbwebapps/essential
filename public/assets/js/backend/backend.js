@@ -30,7 +30,7 @@ document.addEventListener('click', function(e) {
 
 /* --- Gestione globale Loader e Controlli --- */
 export function toggleLoader(show) {
-    const loader = document.getElementById('show_loader');
+    const loader = document.getElementById('show-loader');
     if (!loader) return;
 
     if (show) {
@@ -48,14 +48,44 @@ export function toggleLoader(show) {
 export async function apiFetch(input, init = {}) {
     toggleLoader(true); /* Attiva loader */
 
+    /* 1. Definiamo le intestazioni di base */
     const defaultHeaders = { 'X-Requested-With': 'XMLHttpRequest' };
+
+    /* 2. Controlliamo il metodo (se non specificato, di default è GET) */
+    const method = (init.method || 'GET').toUpperCase();
+
+    /* 3. Se il metodo richiede protezione, preleviamo il token dal meta tag */
+    if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        if (csrfMeta) {
+            defaultHeaders['X-CSRF-TOKEN'] = csrfMeta.getAttribute('content');
+        }
+    }
+
+    /* 4. Uniamo le intestazioni di default con quelle passate localmente */
     init.headers = Object.assign({}, defaultHeaders, init.headers || {});
 
     try {
         const response = await fetch(input, init);
-        if (!response.ok) handleAjaxError(response, response.statusText, null);
+        
+        if (!response.ok) {
+            /* Aggiornato: intercetta sia 422 che 401 per estrarre il json e lanciarlo localmente */
+            if (response.status === 422 || response.status === 401) {
+                const errorData = await response.json();
+                throw { status: response.status, data: errorData };
+            }
+            
+            /* Per tutti gli altri errori HTTP (500, 404, 403) usa il gestore globale */
+            handleAjaxError(response, response.statusText, null);
+            throw new Error(response.statusText);
+        }
         return response;
+        
     } catch (error) {
+        /* Aggiornato: se l'errore è 422 o 401, lo rilancia direttamente alla funzione locale */
+        if (error.status === 422 || error.status === 401) throw error;
+        
+        /* Gestione errori di rete (server irraggiungibile, ecc.) */
         handleAjaxError({ status: 0, statusText: error.message }, error.message, error);
         throw error;
     } finally {
