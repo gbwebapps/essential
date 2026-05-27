@@ -17,13 +17,8 @@ class GuestFilter implements FilterInterface
             
             $message = esc($currentAdmin->firstname) . ' ' . esc($currentAdmin->lastname) . ' la sessione è ancora in corso.';
             
-            /* Impostazione dei flashdata nativi per gli avvisi */
-            session()->setFlashdata('message', $message);
-            session()->setFlashdata('class', 'danger');
-            session()->setFlashdata('message_icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
-
-            /* Reindirizzamento alla dashboard interrompendo la richiesta corrente */
-            return redirect()->to(base_url('backend/dashboard'));
+            /* Reindirizzamento hardcoded (anti-loop) con Flashdata concatenati */
+            return redirect()->to(base_url('backend/dashboard'))->with('message', $message)->with('class', 'danger')->with('message_icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
             
         endif;
 

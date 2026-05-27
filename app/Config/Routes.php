@@ -9,8 +9,8 @@ use CodeIgniter\Router\RouteCollection;
 /* Definizione del placeholder personalizzato per UUID v1-v5 */
 $routes->addPlaceholder('uuid', '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}');
 
-/* Definizione del placeholder personalizzato per authcode setPassword */
-$routes->addPlaceholder('authcode', '[0-9a-f]{32}');
+/* Definizione del placeholder personalizzato per token setPassword */
+$routes->addPlaceholder('token', '[0-9a-f]{32}');
 
 /* Rotte Frontend */
 $routes->get('/', '\App\Controllers\Frontend\HomeController::index');
@@ -30,7 +30,8 @@ $routes->group('backend', function($routes) {
         $routes->get('/', '\App\Controllers\Backend\AuthController::index');
         $routes->match(['GET', 'POST'], 'login', '\App\Controllers\Backend\AuthController::login');
         $routes->match(['GET', 'POST'], 'resetPassword', '\App\Controllers\Backend\AuthController::resetPassword');
-        $routes->match(['GET', 'POST'], 'setPassword/(:authcode)', '\App\Controllers\Backend\AuthController::setPassword/$1');
+        $routes->get('setPassword/(:token)', '\App\Controllers\Backend\AuthController::setPassword/$1');
+        $routes->match(['GET', 'POST'], 'setPassword', '\App\Controllers\Backend\AuthController::setPassword');
     });
 
     /* Rotta di Logout (Filtro: auth - deve poter uscire solo chi è loggato) */

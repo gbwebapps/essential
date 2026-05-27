@@ -4,7 +4,7 @@
         <form id="set_password_form">
 
             <!-- Campo nascosto che trasporta il token dal caricamento pagina (GET) al salvataggio (POST) -->
-            <input type="hidden" name="token" value="<?= $token ?>">
+            <input type="hidden" name="token" value="<?= esc($token); ?>">
 
             <!-- Campo password -->
             <div class="mb-2">
@@ -15,9 +15,9 @@
 
             <!-- Campo conferma password -->
             <div class="mb-2">
-                <label for="password_confirm" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/auth.labels.confirmNewPassword'); ?></label>
-                <input type="password" id="password_confirm" name="password_confirm" class="form-control" placeholder="<?= lang('backend/auth.placeholders.confirmNewPassword'); ?>">
-                <div class="error_password_confirm text-danger fw-bold small pt-1">&nbsp;</div>
+                <label for="password-confirm" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/auth.labels.confirmNewPassword'); ?></label>
+                <input type="password" id="password-confirm" name="confirmPassword" class="form-control" placeholder="<?= lang('backend/auth.placeholders.confirmNewPassword'); ?>">
+                <div class="error_confirmPassword text-danger fw-bold small pt-1">&nbsp;</div>
             </div>
 
             <!-- Pulsante invio dati -->

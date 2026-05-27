@@ -13,7 +13,7 @@ class AuthModel extends BackendModel
 
     protected array $loginAllowedFields = ['email', 'password', 'rememberMe']; 
     protected array $resetPasswordAllowedFields = ['email'];
-    protected array $setPasswordAllowedFields = ['password', 'confirmPassword', 'checkAuthToken'];
+    protected array $setPasswordAllowedFields = ['password', 'token'];
 
     public function validateLogin(array $posts)
     {
@@ -50,9 +50,12 @@ class AuthModel extends BackendModel
                 'label' => 'Conferma password',
                 'rules' => 'required|matches[password]'
             ], 
-            'checkAuthToken' => [
-                'label' => 'Codice di autenticazione',
-                'rules' => 'required'
+            'token' => [
+                'label' => 'Token di autenticazione',
+                'rules' => 'required|checkTokenRule', 
+                'errors' => [
+                    'checkTokenRule' => lang('backend/auth.messages.checkAuthError')
+                ]
             ]
         ];    
     }
@@ -275,6 +278,7 @@ class AuthModel extends BackendModel
 
                 if ($this->db->transStatus() === false):
                     $this->db->transRollback();
+                    log_message('error', lang('backend/email.messages.resetPasswordFailed') . ' - ' . $e->getMessage());
                     return ['result' => 'resetPasswordFailed', 'message' => lang('backend/email.messages.resetPasswordFailed')];
                 endif;
 
@@ -282,6 +286,7 @@ class AuthModel extends BackendModel
 
             } catch (\Throwable $e) {
                 $this->db->transRollback();
+                log_message('error', lang('backend/email.messages.resetPasswordFailed') . ' - ' . $e->getMessage());
                 return ['result' => 'resetPasswordFailed', 'message' => lang('backend/email.messages.resetPasswordFailed')];
             }
 
@@ -313,9 +318,59 @@ class AuthModel extends BackendModel
         return ['result' => true, 'message' => lang('backend/email.messages.sendingEmailSuccess')];
     }
 
-    public function setPassword()
+    public function setPassword(array $posts): array
     {
-        
+        try 
+        {
+            $posts = $this->checkAllowedFields($posts, $this->setPasswordAllowedFields);
+
+            /* 1. Recupero il token passato dal form (il nome deve combaciare con l'input hidden) */
+            $token = new \App\Libraries\Token($posts['token']);
+            $tokenHash = $token->getHash(config('BackendAuth')->hashKey);
+
+            /* 2. Sostituito fetch() con getRow() */
+            $sql = "select uuid, firstname, lastname from admins as u join admins_tokens as t on u.uuid = t.admin_uuid where t.token_hash = ? and t.token_type = ? limit 1";
+            $admin = $this->db->query($sql, [$tokenHash, 'activation'])->getRow();
+
+            if($admin):
+
+                /* 3. Sintassi transazioni nativa CI4 */
+                $this->db->transBegin();
+
+                $sql = "update admins set password_hash = ?, resetted_at = ? where uuid = ?";
+                $this->db->query($sql, [password_hash($posts['password'], PASSWORD_DEFAULT), null, $admin->uuid]);
+
+                $sql = "delete from admins_tokens where admin_uuid = ? and token_type = ?";
+                $this->db->query($sql, [$admin->uuid, 'activation']);
+
+                /* 4. Verifica stato transazione prima del commit */
+                if ($this->db->transStatus() === false):
+                    $this->db->transRollback();
+                    return ['result' => 'setPasswordFailed', 'message' => lang('backend/auth.messages.setPasswordError')];
+                endif;
+
+                $this->db->transCommit();
+
+                $message = sprintf(lang('backend/auth.messages.setPasswordSuccess'), esc($admin->firstname), esc($admin->lastname));
+
+                return ['result' => true, 'message' => $message];
+
+            endif;
+
+            return ['result' => 'setPasswordFailed', 'message' => lang('backend/auth.messages.setPasswordFailed')];
+
+        } catch (\Throwable $e) {
+            
+            /* 5. Rollback di sicurezza solo se la transazione era effettivamente in corso */
+            if ($this->db->transStatus() !== true):
+                $this->db->transRollback();
+            endif;
+
+            log_message('error', lang('backend/auth.messages.setPasswordError') . ' - ' . $e->getMessage());
+            
+            /* Modificato false in 'setPasswordFailed' per coerenza con le aspettative del Controller */
+            return ['result' => 'setPasswordFailed', 'message' => lang('backend/auth.messages.setPasswordError')];
+        }
     }
 
     /* Verifica se il token di attivazione è valido e non scaduto */

@@ -125,9 +125,6 @@ const actions = {
                 /* 4. Successo Finale */
                 document.getElementById('set_password_form').reset(); /* Assicurati che l'ID del form sia corretto */
                 showToast('success', data.message);
-                
-                /* Reindirizzamento alla login */
-                window.location.href = urlbase + 'backend/auth/login';
 
             } catch (error) {
                 /* 5. Gestione centralizzata dei fallimenti HTTP */

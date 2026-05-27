@@ -109,7 +109,7 @@ class AuthController extends BackendController
         return $this->render('backend/auth/resetPasswordView', $this->data);
     }
 
-    public function setPassword(string $authCode)
+    public function setPassword(?string $token = null)
     {
         if($this->request->isAJAX() && $this->request->is('post')):
 
@@ -130,12 +130,14 @@ class AuthController extends BackendController
 
         endif;
 
-        if($authCode && $this->authModel->checkAuthToken($authCode)):
+        if($token && $this->authModel->checkAuthToken($token)):
         
             $this->data['action'] = 'setPassword';
             
             $this->data['title'] = lang('backend/auth.titles.setPassword');
             $this->data['icon'] = '<i class="fa-solid fa-key"></i>';
+
+            $this->data['token'] = $token;
 
             return $this->render('backend/auth/setPasswordView', $this->data);
 
