@@ -218,42 +218,20 @@ export class AddManager {
         }
 
         try {
-            /* Chiamata POST con csrf_token */
+            /* Chiamata POST: rimosso l'header CSRF manuale, lo gestisce apiFetch */
             const response = await apiFetch(this.config.url, {
                 method: 'POST',
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="X-CSRF-TOKEN"]')?.content ?? '' },
                 body: formData
             });
 
             const data = await response.json();
-
-            /* Redirect automatico se non loggato */
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = urlbase + 'backend/auth/login';
-                return;
-            }
-
-            /* Redirect automatico se 404 */
-            if (data.result === '404') {
-                window.location.href = urlbase + 'backend/404';
-                return;
-            }
 
             /* Pulisce eventuali errori di validazione visivi precedenti */
             document.querySelectorAll("[class^='error_']").forEach(el => {
                 el.innerHTML = '\u00A0';
             });
 
-            /* Errori di validazione specifici */
-            if (data.errors) {
-                handleValidationErrors(data.errors);
-                handleValidationImages(data.errors);
-                handleValidationDocuments(data.errors);
-                showToast('danger', data.message);
-                return;
-            }
-
-            /* Errore generico gestito dal backend */
+            /* Errore generico gestito dal backend (es. fallimento email o DB) */
             if (data.result === false) {
                 showToast('danger', data.message);
                 return;
@@ -261,12 +239,9 @@ export class AddManager {
 
             /* Caso successo */
             if (data.result === true) {
-                /* Prepara form data minimale per reset */
-                const resetData = new FormData();
-                resetData.append('csrf_token', formData.get('csrf_token'));
-
-                /* Chiama il metodo reset */
-                await this.reset(resetData);
+                
+                /* Chiama il metodo reset in modo pulito */
+                await this.reset();
 
                 /* Mostra messaggio di successo */
                 showToast('success', data.message);
@@ -287,48 +262,60 @@ export class AddManager {
                 }
             }
         } catch (error) {
+            
+            /* Gestione Utente non loggato (401 lanciato da apiFetch) */
+            if (error.status === 401 && error.data?.result === 'no_current_user_logged') {
+                window.location.href = urlbase + 'backend/auth/login';
+                return;
+            }
+
+            /* Gestione Errori di Validazione (422 lanciato da apiFetch) */
+            if (error.status === 422 && error.data?.errors) {
+                
+                /* Pulisce eventuali errori visivi precedenti prima di mostrare i nuovi */
+                document.querySelectorAll("[class^='error_']").forEach(el => {
+                    el.innerHTML = '\u00A0';
+                });
+                
+                handleValidationErrors(error.data.errors);
+                if (this.config.imagePreviewManager) handleValidationImages(error.data.errors);
+                if (this.config.docPreviewManager) handleValidationDocuments(error.data.errors);
+                showToast('danger', error.data.message);
+                return;
+            }
+
+            /* Altri errori non gestiti o provenienti dagli hook */
             if (typeof this.hooks.onAddError === 'function') {
                 this.hooks.onAddError(error);
             }
         }
     }
 
-    async reset(resetData = null) {
+    async reset() {
 
-        /* Hook prima del reset */
+        /* 2. Hook prima del reset (aggiornato) */
         if (typeof this.hooks.onResetBefore === 'function') {
-            const stop = this.hooks.onResetBefore(resetData);
+            const stop = this.hooks.onResetBefore();
             if (stop === false) return;
         }
 
-        /* Se manca resetId o il form non esiste, interrompe */
         if (!this.config.resetId) return;
         const resetForm = document.getElementById(this.config.resetId);
         if (!resetForm) return;
 
-        /* Prepara i dati per il reset */
-        const formData = resetData || new FormData(resetForm);
+        /* 3. Creazione diretta e pulita: prende sempre i dati dal form */
+        const formData = new FormData(resetForm);
         formData.append('action', 'reset');
 
-        try {
+        try 
+        {
+            /* Chiamata POST: rimosso l'header CSRF manuale */
             const response = await apiFetch(this.config.url, {
                 method: 'POST',
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="X-CSRF-TOKEN"]')?.content ?? '' },
                 body: formData
             });
 
             const data = await response.json();
-
-            /* Redirect automatici in caso di errore */
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = urlbase + 'backend/auth/login';
-                return;
-            }
-
-            if (data.result === '404') {
-                window.location.href = urlbase + 'backend/404';
-                return;
-            }
 
             /* Gestione fallimento reset */
             if (data.result === false) {
@@ -340,8 +327,9 @@ export class AddManager {
             if (data.result === true) {
                 const showDataEl = document.getElementById(this.config.containerId);
 
-                /* Rimuove istanza precedente del preview manager */
+                /* Rimuove istanze precedenti dei preview manager */
                 if (this.config.imagePreviewManager) this.config.imagePreviewManager.destroy();
+                if (this.config.docPreviewManager) this.config.docPreviewManager.destroy();
 
                 /* Sostituisce il markup del form con quello aggiornato */
                 await smoothReplace(showDataEl, data.output);
@@ -356,7 +344,7 @@ export class AddManager {
                     this.config.imagePreviewManager = new UploadPreviewImgManager('#inputImages', '#preview_images', '#buttonImages');
                 }
 
-                /* Reinstanzia UploadPreviewImgManager */
+                /* Reinstanzia UploadPreviewDocManager */
                 const inputDoc = document.querySelector('#inputDocuments');
                 const previewDoc = document.querySelector('#preview_documents');
                 const buttonDoc = document.querySelector('#buttonDocuments');
@@ -371,6 +359,14 @@ export class AddManager {
                 }
             }
         } catch (error) {
+            
+            /* Gestione Utente non loggato (401 lanciato da apiFetch) */
+            if (error.status === 401 && error.data?.result === 'no_current_user_logged') {
+                window.location.href = urlbase + 'backend/auth/login';
+                return;
+            }
+
+            /* Altri errori non gestiti o provenienti dagli hook */
             if (typeof this.hooks.onResetError === 'function') {
                 this.hooks.onResetError(error);
             }

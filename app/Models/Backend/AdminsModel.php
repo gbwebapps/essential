@@ -26,7 +26,11 @@ class AdminsModel extends BackendModel
     /* @var array Mapping tra indici ShowAll e colonne reali del database */
     protected array $allowedOrderColumns = ['firstname', 'lastname', 'email', 'phone', 'status']; 
 
+    /* @var array Campi di ricerca consentiti in showAll */
     protected $showAllSearchFieldsAllowed = ['firstname', 'lastname', 'email', 'phone'];
+
+    /* @var string Query per selezionare un admin */
+    protected ?string $getUUIDQuery = "select uuid, firstname, lastname, email, phone, status, master, note, created_at, updated_at, suspended_at, resetted_at from admins where uuid = ? limit 1";
 
     protected function initModel(): void 
     {
@@ -85,13 +89,13 @@ class AdminsModel extends BackendModel
             ],
             'email' => [
                 'label' => 'Email',
-                'rules' => ['required', 'valid_email', 'is_unique[auth_identities.secret]'],
+                'rules' => ['required', 'valid_email', 'is_unique[admins.email]'],
             ],
             'phone' => [
                 'label' => 'Telefono',
-                'rules' => ['required', 'is_unique[admins_details.phone]', 'regex_match[/^[0-9]{9,10}$/]'],
+                'rules' => ['required', 'is_unique[admins.phone]', 'regex_match[/^[0-9]{9,10}$/]'],
             ],
-            'active' => [
+            'status' => [
                 'label' => 'Stato',
                 'rules' => ['required', 'in_list[0,1]'],
             ],
@@ -107,7 +111,7 @@ class AdminsModel extends BackendModel
         return [
             'uuid' => [
                 'label' => 'UUID',
-                'rules' => ['required', "is_unique[admins_details.uuid,uuid,{$posts['uuid']}, 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]']"],
+                'rules' => ['required', "is_unique[admins.uuid,uuid,{$posts['uuid']}, 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]']"],
             ],
             'firstname' => [
                 'label' => 'Nome',
@@ -123,10 +127,10 @@ class AdminsModel extends BackendModel
             ],
             'phone' => [
                 'label' => 'Telefono',
-                'rules' => ['required', "is_unique[admins_details.phone,uuid,{$posts['uuid']},'regex_match[/^[0-9]{9,10}$/]']" 
+                'rules' => ['required', "is_unique[admins.phone,uuid,{$posts['uuid']},'regex_match[/^[0-9]{9,10}$/]']" 
                 ],
             ],
-            'active' => [
+            'status' => [
                 'label' => 'Stato',
                 'rules' => ['required', 'in_list[0,1]'],
             ],
@@ -177,32 +181,131 @@ class AdminsModel extends BackendModel
         ];
     }
 
+    public function getByUUID(string $uuid): array 
+    {
+        /* 1. Richiamo il metodo universale del genitore (BackendModel) */
+        $data = parent::getByUUID($uuid);
+
+        /* Se il genitore non trova il record o restituisce un errore, interrompo e restituisco l'errore */
+        if ($data['result'] === false):
+            return $data;
+        endif;
+
+        /* 2. Prendo i dati anagrafici standardizzati */
+        $result = ['result' => true,'row' => $data['row']];
+
+        try 
+        {
+            /* 3. Aggiungo le query specifiche per l'admin (tutte minuscole) */
+            
+            /* Uso getResult() per le tabelle che possono contenere righe multiple */
+            $sql = "select * from admins_permissions where admin_uuid = ?";
+            $result['permissions'] = $this->db->query($sql, [$uuid])->getResult();
+
+            $sql = "select * from admins_tokens where admin_uuid = ?";
+            $result['tokens'] = $this->db->query($sql, [$uuid])->getResult();
+
+            $sql = "select * from admins_attempts where admin_uuid = ?";
+            $result['attempts'] = $this->db->query($sql, [$uuid])->getResult();
+
+            /* Uso getRow() per il 2FA, essendo un record singolo per utente */
+            $sql = "select * from admins_2fa where admin_uuid = ?";
+            $result['twofa'] = $this->db->query($sql, [$uuid])->getRow();
+
+            return $result;
+
+        } catch(\Throwable $e) {
+            log_message('error', lang('backend/global.messages.getUUIDError') . ' - ' . $e->getMessage());
+            return ['result' => false, 'message' => lang('backend/global.messages.getUUIDError')];
+        }
+    }
+
     public function add(array $posts): array
     {
         try 
         {
-            /* Utilizza la connessione nativa del model per la transazione */
-            $this->db->transBegin();
-
-            /* Match dei posts con i campi consentiti */
+            /* Filtro campi post ammessi */
             $posts = $this->checkAllowedFields($posts, $this->addAllowedFields);
 
+            /* Genero uuid */
+            $uuid = $this->generateUUID();
 
-                // some code here...
+            /* Istanzio la classe request (prima mancava) per ricavare User Agent e IP */
+            $request = service('request');
+            $userAgent = $request->getUserAgent()->getAgentString();
+            $ip = $request->getIPAddress();
 
+            /* 1. Avvio la transazione PRIMA di eseguire qualsiasi query */
+            $this->db->transBegin();
 
+            /* Inserimento dati nella tabella principale */
+            $sql = "insert into admins (uuid, firstname, lastname, email, phone, status, note, created_at) values (?, ?, ?, ?, ?, ?, ?, ?)";
+            $this->db->query($sql, [$uuid, $posts['firstname'], $posts['lastname'], $posts['email'], $posts['phone'], $posts['status'], $posts['note'], date('Y-m-d H:i:s')]);
+
+            /* Generazione token di attivazione */
+            $token = new \App\Libraries\Token();
+            $tokenHash = $token->getHash(config('BackendAuth')->hashKey);
+
+            /* 2. Calcolo corretto della scadenza lavorando sui secondi (timestamp) */
+            $expireTime = date('Y-m-d H:i:s', time() + config('BackendAuth')->activationTime);
+
+            /* Scrittura del token di attivazione */
+            $sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, token_expire, token_type, user_agent, ip) values (?, ?, ?, ?, ?, ?, ?)";
+            $this->db->query($sql, [$uuid, $tokenHash, date('Y-m-d H:i:s'), $expireTime, 'activation', $userAgent, $ip]);
+
+            /* Metodo email di default */
+            $sql = "insert into admins_2fa (admin_uuid, method, secret, enabled) values (?, 'email', NULL, 1)";
+            $this->db->query($sql, [$uuid]);
+
+            /* 3. Verifico eventuali errori SQL prima di fare il commit */
             if ($this->db->transStatus() === false):
                 $this->db->transRollback();
-                return ['result' => false, 'message' => lang('backend/admins.messages.addError')];
+
+                log_message('error', lang('backend/admins.messages.createAdminFailed') . ' - ' . $e->getMessage());
+                return ['result' => 'createAdminFailed', 'message' => lang('backend/admins.messages.createAdminFailed')];
             endif;
 
+            /* Se le 3 query sono andate a buon fine, salvo definitivamente */
             $this->db->transCommit();
-            return ['result' => true, 'message' => lang('backend/admins.messages.addSuccess')];
 
-        } catch (\Exception $e) {
-            $this->db->transRollback();
-            return ['result' => false, 'message' => $e->getMessage()];
+            /* Recupero dati utente appena inseriti */
+            $data = $this->getByUUID($uuid);
+
+            if($data['result'] === false):
+                return ['result' => false, 'message' => $data['message']];
+            endif;
+
+        } catch (\Throwable $e) {
+            
+            /* 4. Aggiunto il rollback dentro il catch per sicurezza */
+            if ($this->db->transStatus() !== true):
+                $this->db->transRollback();
+            endif;
+
+            log_message('error', lang('backend/admins.messages.createAdminFailed') . ' - ' . $e->getMessage());
+            return ['result' => 'createAdminFailed', 'message' => lang('backend/admins.messages.createAdminFailed')];
         }
+
+        /* Istanzio il servizio email dedicato e tento l'invio */
+        $emailService = new \App\Libraries\EmailService();
+
+        /* Configuro i parametri dinamici per questa specifica chiamata */
+        $module = $this->module;
+        $template = 'emailCreateAdminPartial';
+        $subjectLangKey = 'backend/email.admins.createAdmin.subjectCreateAdminEmail';
+
+        /* Chiamata al metodo con i nuovi parametri separati */
+        if ( ! $emailService->sendActivationEmail($data['row'], $token->getValue(), $module, $template, $subjectLangKey)):
+
+            $message = sprintf(lang('backend/admins.messages.addSuccessNoEmail'), esc($data['row']->firstname), esc($data['row']->lastname));
+            return ['result' => 'emailFailed', 'message' => $message];
+            
+        else:
+            
+            $message = sprintf(lang('backend/admins.messages.addSuccess'), esc($data['row']->firstname), esc($data['row']->lastname));
+            return ['result' => true, 'message' => $message];
+            
+        endif;
     }
 
     public function edit(array $posts): array

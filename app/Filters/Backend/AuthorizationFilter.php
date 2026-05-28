@@ -35,7 +35,11 @@ class AuthorizationFilter implements FilterInterface
             return service('response')->setJSON(['result' => 'no_current_user_logged'])->setStatusCode(401);
         endif;
 
-        return redirect()->to(base_url('backend/auth'));
+        session()->set('intended_url', current_url());
+
+        $message = 'E\' necessario effettuare il login per accedere alla pagina.';
+
+        return redirect()->to(base_url('backend/auth'))->with('message', $message)->with('class', 'danger')->with('message_icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)

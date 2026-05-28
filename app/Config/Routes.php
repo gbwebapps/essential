@@ -79,7 +79,7 @@ $routes->group('backend', function($routes) {
         $routes->group('admins', function($routes) {
             $routes->get('/', '\App\Controllers\Backend\AdminsController::index');
             $routes->get('showAll', '\App\Controllers\Backend\AdminsController::showAll');
-            $routes->get('add', '\App\Controllers\Backend\AdminsController::add');
+            $routes->match(['GET', 'POST'], 'add', '\App\Controllers\Backend\AdminsController::add');
             $routes->get('edit/(:uuid)', '\App\Controllers\Backend\AdminsController::edit/$1');
             $routes->get('show/(:uuid)', '\App\Controllers\Backend\AdminsController::show/$1');
         });

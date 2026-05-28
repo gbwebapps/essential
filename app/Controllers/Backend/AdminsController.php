@@ -59,7 +59,27 @@ class AdminsController extends BackendController
 
             $posts = array_merge($this->request->getPost(), ['images' => $this->request->getFileMultiple('images') ?? []], ['documents' => $this->request->getFileMultiple('documents') ?? []]);
 
-            // ...
+            if (isset($posts['action']) && $posts['action'] === 'reset'):
+                return $this->response->setJSON(['result' => true,'output' => view('backend/admins/partials/add/addPartial', $this->data)]);
+            endif;
+
+            $rules = $this->adminsModel->addValidationRules();
+
+            if (! $this->validateData($posts, $rules)):
+                return $this->response->setStatusCode(422)->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
+            endif;
+
+            $json = $this->adminsModel->add($posts);
+
+            if (($json['result'] === 'createAdminFailed') || ($json['result'] === 'emailFailed')):
+                return $this->response->setJSON(['result' => false, 'message' => $json['message']]);
+            endif;
+
+            if($json['result'] === true):
+                $json['output'] = view('backend/admins/partials/add/addPartial', $this->data);
+            endif;
+
+            return $this->response->setJSON($json);
 
         endif;
 

@@ -15,7 +15,7 @@ class AuthModel extends BackendModel
     protected array $resetPasswordAllowedFields = ['email'];
     protected array $setPasswordAllowedFields = ['password', 'token'];
 
-    public function validateLogin(array $posts)
+    public function validateLoginRules()
     {
         return [
             'email' => [
@@ -29,7 +29,7 @@ class AuthModel extends BackendModel
         ];
     }
 
-    public function validateResetPassword(array $posts)
+    public function validateResetPasswordRules()
     {
         return [
             'email' => [
@@ -39,7 +39,7 @@ class AuthModel extends BackendModel
         ];
     }
 
-    public function validateSetPassword(array $posts)
+    public function validateSetPasswordRules()
     {
         return [
             'password' => [
@@ -252,8 +252,6 @@ class AuthModel extends BackendModel
 
             /* 1. Transazione avviata solo se l'utente esiste (Ottimizzazione DB) */
             try {
-                $this->db->transBegin();
-
                 $token = new \App\Libraries\Token();
                 $tokenHash = $token->getHash(config('BackendAuth')->hashKey);
 
@@ -261,6 +259,8 @@ class AuthModel extends BackendModel
 
                 $tokenCreate = date('Y-m-d H:i:s');
                 $tokenExpire = date('Y-m-d H:i:s', time() + $time);
+
+                $this->db->transBegin();
 
                 $sql = "delete from admins_tokens where admin_uuid = ? and token_type = ?";
                 $this->db->query($sql, [$admin->uuid, 'activation']);

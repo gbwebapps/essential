@@ -53,20 +53,29 @@ class AuthController extends BackendController
 
     public function login()
     {
-        if($this->request->isAJAX() && $this->request->is('post')):
+        if ($this->request->isAJAX() && $this->request->is('post')):
 
             $posts = $this->request->getPost();
-            $rules = $this->authModel->validateLogin($posts);
+            $rules = $this->authModel->validateLoginRules();
 
-            if( ! $this->validateData($posts, $rules)):
-                return $this->response->setStatusCode(422)->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validation_errors')]);
+            if (! $this->validateData($posts, $rules)):
+                return $this->response->setStatusCode(422)->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validationErrors')]);
             endif;
 
             $json = $this->authModel->login($posts, $this->request);
 
-            if($json['result'] === 'loginFailed'):
+            if ($json['result'] === 'loginFailed'):
                 return $this->response->setStatusCode(401)->setJSON($json);
             endif;
+
+            /* Recupera l'URL salvato dal filtro, altrimenti usa la dashboard di default */
+            $redirectUrl = session()->get('intended_url') ?? base_url('backend/dashboard');
+            
+            /* Pulisce la variabile di sessione */
+            session()->remove('intended_url');
+            
+            /* Aggiunge la destinazione alla risposta per far eseguire il redirect al JS */
+            $json['redirect'] = $redirectUrl;
 
             return $this->response->setJSON($json);
 
@@ -85,10 +94,10 @@ class AuthController extends BackendController
         if($this->request->isAJAX() && $this->request->is('post')):
 
             $posts = $this->request->getPost();
-            $rules = $this->authModel->validateResetpassword($posts);
+            $rules = $this->authModel->validateResetPasswordRules();
 
             if( ! $this->validateData($posts, $rules)):
-                return $this->response->setStatusCode(422)->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validation_errors')]);
+                return $this->response->setStatusCode(422)->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validationErrors')]);
             endif;
 
             $json = $this->authModel->resetPassword($posts, $this->request);
@@ -114,10 +123,10 @@ class AuthController extends BackendController
         if($this->request->isAJAX() && $this->request->is('post')):
 
             $posts = $this->request->getPost();
-            $rules = $this->authModel->validateSetpassword($posts);
+            $rules = $this->authModel->validateSetPasswordRules();
 
             if( ! $this->validateData($posts, $rules)):
-                return $this->response->setStatusCode(422)->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validation_errors')]);
+                return $this->response->setStatusCode(422)->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validationErrors')]);
             endif;
 
             $json = $this->authModel->setPassword($posts);

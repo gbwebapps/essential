@@ -46,7 +46,22 @@ abstract class BackendModel extends BaseModel
 
 	public function getByUUID(string $uuid): array 
 	{
+	    try 
+	    {
+	        $sql = $this->getUUIDQuery;
+	        $row = $this->db->query($sql, [$uuid])->getRow();
 
+	        if (! $row):
+	            return ['result' => false, 'message' => lang('backend/global.messages.UUIDnotFound')];
+	        endif;
+
+	        /* Struttura di ritorno fissa, coerente e affidabile per tutti i moduli */
+	        return ['result' => true, 'row' => $row];
+
+	    } catch(\Throwable $e) {
+	        log_message('error', lang('backend/global.messages.getUUIDError') . ' - ' . $e->getMessage());
+	        return ['result' => false, 'message' => lang('backend/global.messages.getUUIDError')];
+	    }
 	}
 
 	protected function hasDataChanged(array $posts, array|object $data): bool {

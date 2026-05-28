@@ -32,7 +32,7 @@ const actions = {
                 const data = await response.json();
                 
                 if (data.result === true) {
-                    window.location.href = urlbase + 'backend/dashboard';
+                    window.location.href = data.redirect;
                 }
 
             } catch (error) {
