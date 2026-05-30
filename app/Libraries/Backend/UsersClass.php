@@ -16,9 +16,9 @@ class UsersClass extends BaseClass
 	{
 		return 
 		[
-		    ['label' => lang('backend/users.options.showAll'),  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/users.options.edit'), 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/users.options.delete'),  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/users.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/users.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/users.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
 		];
 	}
 
@@ -27,9 +27,9 @@ class UsersClass extends BaseClass
 	{
 		return 
 		[
-		    ['label' => lang('backend/users.options.showAll'),  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/users.options.edit'), 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/users.options.delete'),  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/users.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/users.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/users.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
 		];
 	}
 
@@ -38,9 +38,9 @@ class UsersClass extends BaseClass
 	{
 		return 
 		[
-		    ['label' => lang('backend/users.options.showAll'),  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/users.options.edit'), 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/users.options.delete'),  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/users.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/users.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/users.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
 		];
 	}
 
@@ -52,7 +52,6 @@ class UsersClass extends BaseClass
 		return 
 		[
             ['icon' => '<i class="fa-solid fa-list"></i>', 'label' => lang('backend/users.linksBar.showAll'), 'route' => 'backend/users/showAll'],
-            ['icon' => '<i class="fa-solid fa-circle-info"></i>', 'label' => lang('backend/users.linksBar.show'), 'route' => 'backend/users/show/12'],
         ];
 	}
 
@@ -62,7 +61,6 @@ class UsersClass extends BaseClass
 		return 
 		[
             ['icon' => '<i class="fa-solid fa-chart-simple"></i>', 'label' => lang('backend/users.linksBar.index'), 'route' => 'backend/users'],
-            ['icon' => '<i class="fa-solid fa-circle-info"></i>', 'label' => lang('backend/users.linksBar.show'), 'route' => 'backend/users/show/12'],
         ];
 	}
 

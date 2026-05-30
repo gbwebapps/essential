@@ -8,8 +8,10 @@ class AdminsModel extends BackendModel
 {
     protected ?string $module = 'admins';
 
+    protected ?string $defaultColumn = 'created_at';
+
     /* @var array Campi consentiti per la visualizzazione Tabella */
-    protected array $showAllAllowedFields = ['column', 'order', 'page', 'rows', 'search_fields'];
+    protected array $showAllAllowedFields = ['column', 'order', 'page', 'rows', 'searchFields'];
 
     /* @var array Campi consentiti per la creazione di un nuovo record */
     protected array $addAllowedFields = ['firstname', 'lastname', 'email', 'phone', 'status', 'note', 'permissions', 'images', 'documents'];
@@ -27,10 +29,19 @@ class AdminsModel extends BackendModel
     protected array $allowedOrderColumns = ['firstname', 'lastname', 'email', 'phone', 'status']; 
 
     /* @var array Campi di ricerca consentiti in showAll */
-    protected $showAllSearchFieldsAllowed = ['firstname', 'lastname', 'email', 'phone'];
+    protected array $showAllSearchAllowedFields = ['firstname', 'lastname', 'email', 'phone'];
+
+    /* @var string Query per selezionare tutti gli admins */
+    protected ?string $getDataQuery = "select uuid, firstname, lastname, email, phone, status, created_at, updated_at, resetted_at, suspended_at,
+                                        (select images.filename from images where images.entity_uuid = admins.uuid and images.entity = 'admins' and images.is_cover = 1 limit 1) as cover, 
+                                        (select count(*) from images where images.entity_uuid = admins.uuid and images.entity = 'admins') as images_num, 
+                                        (select count(*) from documents where documents.entity_uuid = admins.uuid and documents.entity = 'admins') as docs_num 
+                                        from admins where master <> ? and uuid <> ?";
 
     /* @var string Query per selezionare un admin */
     protected ?string $getUUIDQuery = "select uuid, firstname, lastname, email, phone, status, master, note, created_at, updated_at, suspended_at, resetted_at from admins where uuid = ? limit 1";
+
+    protected ?string $getNumRowsQuery = 'select count(*) as num from admins where master <> ? and uuid <> ?';
 
     protected function initModel(): void 
     {
@@ -52,7 +63,7 @@ class AdminsModel extends BackendModel
             'rows' => [
                 'rules' => ['required'] 
             ],
-            'search_fields' => [
+            'searchFields.*' => [
                 'rules' => ['permit_empty']
             ],
         ];
@@ -61,17 +72,21 @@ class AdminsModel extends BackendModel
     public function showAllSearchValidationRules(): array
     {
         return [
-            'search_fields.firstname' => [
-                'rules' => ['permit_empty'] 
+            'searchFields.firstname' => [
+                'label' => lang('backend/admins.labels.firstname'), 
+                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
             ],
-            'search_fields.lastname' => [
-                'rules' => ['permit_empty'] 
+            'searchFields.lastname' => [
+                'label' => lang('backend/admins.labels.lastname'), 
+                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
             ],
-            'search_fields.email' => [
-                'rules' => ['permit_empty'] 
+            'searchFields.email' => [
+                'label' => lang('backend/admins.labels.email'), 
+                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
             ],
-            'search_fields.phone' => [
-                'rules' => ['permit_empty'] 
+            'searchFields.phone' => [
+                'label' => lang('backend/admins.labels.phone'), 
+                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
             ],
         ];
     }
@@ -80,27 +95,27 @@ class AdminsModel extends BackendModel
     {
         return [
             'firstname' => [
-                'label' => 'Nome',
+                'label' => lang('backend/admins.labels.firstname'),
                 'rules' => ['required', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'],
             ],
             'lastname' => [
-                'label' => 'Cognome',
+                'label' => lang('backend/admins.labels.lastname'),
                 'rules' => ['required', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'],
             ],
             'email' => [
-                'label' => 'Email',
+                'label' => lang('backend/admins.labels.email'),
                 'rules' => ['required', 'valid_email', 'is_unique[admins.email]'],
             ],
             'phone' => [
-                'label' => 'Telefono',
+                'label' => lang('backend/admins.labels.phone'),
                 'rules' => ['required', 'is_unique[admins.phone]', 'regex_match[/^[0-9]{9,10}$/]'],
             ],
             'status' => [
-                'label' => 'Stato',
+                'label' => lang('backend/admins.labels.status'),
                 'rules' => ['required', 'in_list[0,1]'],
             ],
             'notes' => [
-                'label' => 'Note',
+                'label' => lang('backend/admins.labels.note'),
                 'rules' => ['permit_empty', 'max_length[500]', 'regex_match[/^[^<>\x60]*$/su]'],
             ],
         ];
@@ -110,32 +125,32 @@ class AdminsModel extends BackendModel
     {
         return [
             'uuid' => [
-                'label' => 'UUID',
+                'label' => lang('backend/admins.labels.uuid'),
                 'rules' => ['required', "is_unique[admins.uuid,uuid,{$posts['uuid']}, 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]']"],
             ],
             'firstname' => [
-                'label' => 'Nome',
+                'label' => lang('backend/admins.labels.firstname'),
                 'rules' => ['required', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
             ],
             'lastname' => [
-                'label' => 'Cognome',
+                'label' => lang('backend/admins.labels.lastname'),
                 'rules' => ['required', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
             ],
             'email' => [
-                'label' => 'Email',
+                'label' => lang('backend/admins.labels.email'),
                 'rules' => ['required', 'valid_email'],
             ],
             'phone' => [
-                'label' => 'Telefono',
+                'label' => lang('backend/admins.labels.phone'),
                 'rules' => ['required', "is_unique[admins.phone,uuid,{$posts['uuid']},'regex_match[/^[0-9]{9,10}$/]']" 
                 ],
             ],
             'status' => [
-                'label' => 'Stato',
+                'label' => lang('backend/admins.labels.status'),
                 'rules' => ['required', 'in_list[0,1]'],
             ],
             'notes' => [
-                'label' => 'Note',
+                'label' => lang('backend/admins.labels.note'),
                 'rules' => ['permit_empty','max_length[500]','regex_match[/^[^<>\x60]*$/su]'],
             ],
         ];
@@ -145,7 +160,7 @@ class AdminsModel extends BackendModel
     {
         return [
             'uuid' => [
-                'label' => 'UUID',
+                'label' => lang('backend/admins.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
             ],
         ];
@@ -155,7 +170,7 @@ class AdminsModel extends BackendModel
     {
         return [
             'uuid' => [
-                'label' => 'UUID',
+                'label' => lang('backend/admins.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
             ],
         ];
@@ -165,7 +180,7 @@ class AdminsModel extends BackendModel
     {
         return [
             'uuid' => [
-                'label' => 'UUID',
+                'label' => lang('backend/admins.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
             ],
         ];
@@ -175,7 +190,7 @@ class AdminsModel extends BackendModel
     {
         return [
             'uuid' => [
-                'label' => 'UUID',
+                'label' => lang('backend/admins.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
             ],
         ];
@@ -261,8 +276,8 @@ class AdminsModel extends BackendModel
             if ($this->db->transStatus() === false):
                 $this->db->transRollback();
 
-                log_message('error', lang('backend/admins.messages.createAdminFailed') . ' - ' . $e->getMessage());
-                return ['result' => 'createAdminFailed', 'message' => lang('backend/admins.messages.createAdminFailed')];
+                log_message('error', lang('backend/admins.messages.addError'));
+                return ['result' => 'addError', 'message' => lang('backend/admins.messages.addError')];
             endif;
 
             /* Se le 3 query sono andate a buon fine, salvo definitivamente */
@@ -282,8 +297,8 @@ class AdminsModel extends BackendModel
                 $this->db->transRollback();
             endif;
 
-            log_message('error', lang('backend/admins.messages.createAdminFailed') . ' - ' . $e->getMessage());
-            return ['result' => 'createAdminFailed', 'message' => lang('backend/admins.messages.createAdminFailed')];
+            log_message('error', lang('backend/admins.messages.addError') . ' - ' . $e->getMessage());
+            return ['result' => 'addError', 'message' => lang('backend/admins.messages.addError')];
         }
 
         /* Istanzio il servizio email dedicato e tento l'invio */

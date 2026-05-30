@@ -157,7 +157,6 @@ class AuthController extends BackendController
 
     public function logout()
     {
-        helper('cookie');
         $cookie = get_cookie('backendRememberMe');
 
         /* 1. Legge i dati utente PRIMA di scollegarlo */

@@ -16,9 +16,9 @@ class AdminsClass extends BaseClass
 	{
 		return 
 		[
-		    ['label' => lang('backend/admins.options.showAll'),  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/admins.options.edit'), 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/admins.options.delete'),  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
 		];
 	}
 
@@ -27,9 +27,9 @@ class AdminsClass extends BaseClass
 	{
 		return 
 		[
-		    ['label' => lang('backend/admins.options.showAll'),  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/admins.options.edit'), 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/admins.options.delete'),  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
 		];
 	}
 
@@ -38,9 +38,9 @@ class AdminsClass extends BaseClass
 	{
 		return 
 		[
-		    ['label' => lang('backend/admins.options.showAll'),  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/admins.options.edit'), 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/admins.options.delete'),  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
 		];
 	}
 
@@ -49,9 +49,9 @@ class AdminsClass extends BaseClass
 	{
 		return 
 		[
-		    ['label' => lang('backend/admins.options.showAll'),  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/admins.options.edit'), 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/admins.options.delete'),  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
 		];
 	}
 
@@ -60,9 +60,9 @@ class AdminsClass extends BaseClass
 	{
 		return 
 		[
-		    ['label' => lang('backend/admins.options.showAll'),  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/admins.options.edit'), 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/admins.options.delete'),  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/admins.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
 		];
 	}
 

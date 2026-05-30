@@ -41,7 +41,38 @@ class AdminsController extends BackendController
 
             $posts = $this->request->getPost();
 
-            // ...
+            $rules = $this->adminsModel->showAllValidationRules();
+            if (! $this->validateData($posts, $rules)):
+                return $this->response->setStatusCode(422)->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
+            endif;
+
+            $rules = $this->adminsModel->showAllSearchValidationRules();
+            if (! $this->validateData($posts, $rules)):
+
+                $formattedErrors = removeDot('searchFields.', $this->validator->getErrors());
+
+                return $this->response->setStatusCode(422)->setJSON(['errors' => $formattedErrors, 'message' => lang('backend/admins.messages.validationErrors')]);
+            endif;
+            
+            $this->data['data'] = $this->adminsModel->getData($posts);
+
+            $json = [];
+
+            if($this->data['data']['result'] === true):
+
+                $this->data['posts'] = $posts;
+
+                $json['output'] = view('backend/admins/partials/showAll/showAllPartial', $this->data);
+                $json['result'] = true;
+
+            elseif($this->data['data']['result'] === false):
+
+                $json['result'] = false;
+                $json['message'] = $this->data['data']['message'];
+
+            endif;
+
+            return $this->response->setJSON($json);
 
         endif;
 

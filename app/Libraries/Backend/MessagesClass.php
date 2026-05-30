@@ -16,9 +16,9 @@ class MessagesClass extends BaseClass
 	{
 		return 
 		[
-		    ['label' => lang('backend/messages.options.showAll'),  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/messages.options.edit'), 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/messages.options.delete'),  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/messages.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/messages.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/messages.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
 		];
 	}
 
@@ -27,9 +27,9 @@ class MessagesClass extends BaseClass
 	{
 		return 
 		[
-		    ['label' => lang('backend/messages.options.showAll'),  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/messages.options.edit'), 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/messages.options.delete'),  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/messages.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/messages.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/messages.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
 		];
 	}
 
@@ -38,9 +38,9 @@ class MessagesClass extends BaseClass
 	{
 		return 
 		[
-		    ['label' => lang('backend/messages.options.showAll'),  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/messages.options.edit'), 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/messages.options.delete'),  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/messages.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/messages.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/messages.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
 		];
 	}
 
@@ -52,7 +52,6 @@ class MessagesClass extends BaseClass
 		return 
 		[
             ['icon' => '<i class="fa-solid fa-list"></i>', 'label' => lang('backend/messages.linksBar.showAll'), 'route' => 'backend/messages/showAll'],
-            ['icon' => '<i class="fa-solid fa-circle-info"></i>', 'label' => lang('backend/messages.linksBar.show'), 'route' => 'backend/messages/show/12'],
         ];
 	}
 
@@ -62,7 +61,6 @@ class MessagesClass extends BaseClass
 		return 
 		[
             ['icon' => '<i class="fa-solid fa-chart-simple"></i>', 'label' => lang('backend/messages.linksBar.index'), 'route' => 'backend/messages'],
-            ['icon' => '<i class="fa-solid fa-circle-info"></i>', 'label' => lang('backend/messages.linksBar.show'), 'route' => 'backend/messages/show/12'],
         ];
 	}
 

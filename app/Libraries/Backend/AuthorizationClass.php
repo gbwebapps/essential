@@ -74,8 +74,7 @@ class AuthorizationClass
 
     private function getAdminFromCookie(): ?object
     {
-        helper('cookie');
-        $cookieValue = get_cookie('backendRememberMe');
+        $cookieValue = service('request')->getCookie('backendRememberMe');
 
         if ($cookieValue === null):
             return null;

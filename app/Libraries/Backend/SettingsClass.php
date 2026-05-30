@@ -16,9 +16,9 @@ class SettingsClass extends BaseClass
 	{
 		return 
 		[
-		    ['label' => lang('backend/settings.options.showAll'),  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/settings.options.edit'), 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/settings.options.delete'),  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/settings.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/settings.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/settings.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
 		];
 	}
 

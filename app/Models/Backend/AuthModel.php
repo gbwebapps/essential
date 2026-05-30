@@ -160,7 +160,7 @@ class AuthModel extends BackendModel
                 $this->db->transRollback();
             endif;
             
-            return ['result' => false, 'message' => 'Errore: ' . $e->getMessage()];
+            return ['result' => false, 'message' => lang('backend/auth.messages.loginFailed')];
         }
     }
 
@@ -214,8 +214,7 @@ class AuthModel extends BackendModel
             /* Cifratura del token raw tramite il servizio globale prima di inserirlo nel cookie */
             $encryptedToken = service('crypto')->encrypt($token->getValue());
 
-            /* Utilizzo della funzione nativa helper di CI4 per l'impostazione sicura del cookie */
-            helper('cookie');
+            /* Utilizzo della funzione nativa set_cookie di CI4 per l'impostazione sicura del cookie */
             set_cookie([
                 'name'     => 'backendRememberMe',
                 'value'    => $encryptedToken,
@@ -230,7 +229,7 @@ class AuthModel extends BackendModel
         endif;
 
         /* 7. Configurazione del messaggio flash di avvenuto login */
-        $welcomeMessage = sprintf(lang('backend/auth.messages.loginWelcome'), esc($admin->firstname) . ' ' . esc($admin->lastname));
+        $welcomeMessage = sprintf(lang('backend/auth.messages.welcome'), esc($admin->firstname), esc($admin->lastname));
         
         session()->setFlashdata([
             'message' => $welcomeMessage,
@@ -278,16 +277,16 @@ class AuthModel extends BackendModel
 
                 if ($this->db->transStatus() === false):
                     $this->db->transRollback();
-                    log_message('error', lang('backend/email.messages.resetPasswordFailed') . ' - ' . $e->getMessage());
-                    return ['result' => 'resetPasswordFailed', 'message' => lang('backend/email.messages.resetPasswordFailed')];
+                    log_message('error', lang('backend/auth.messages.resetPasswordFailed'));
+                    return ['result' => 'resetPasswordFailed', 'message' => lang('backend/auth.messages.resetPasswordFailed')];
                 endif;
 
                 $this->db->transCommit();
 
             } catch (\Throwable $e) {
                 $this->db->transRollback();
-                log_message('error', lang('backend/email.messages.resetPasswordFailed') . ' - ' . $e->getMessage());
-                return ['result' => 'resetPasswordFailed', 'message' => lang('backend/email.messages.resetPasswordFailed')];
+                log_message('error', lang('backend/auth.messages.resetPasswordFailed') . ' - ' . $e->getMessage());
+                return ['result' => 'resetPasswordFailed', 'message' => lang('backend/auth.messages.resetPasswordFailed')];
             }
 
             /* 2. Integrazione classe nativa Email e compilazione della vista */
@@ -447,7 +446,6 @@ class AuthModel extends BackendModel
             endif;
 
             /* Rimuove il cookie fisicamente dal browser */
-            helper('cookie');
             delete_cookie('backendRememberMe');
 
         } catch (\Throwable $e) {

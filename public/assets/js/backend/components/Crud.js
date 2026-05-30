@@ -7,126 +7,279 @@ import { GalleryOneImgManager } from './GalleryOneImgManager.js';
 import { UploadPreviewDocManager } from './UploadPreviewDocManager.js';
 import { GalleryOneDocManager } from './GalleryOneDocManager.js';
 
-/* --- LIST MANAGER (Wrapper per DataTables) --- */
+/* --- LIST MANAGER (Custom SSR) --- */
 export class ListManager {
     constructor(config = {}, hooks = {}) {
         this.config = Object.assign({
-            tableId: '',
-            ajaxUrl: '',
-            columns: []
+            controller: '',
+            url: '',
+            searchFields: [],
+            containerId: ''
         }, config);
 
         this.hooks = Object.assign({
             onShowBefore: null,
-            onShowAfter: null
+            onShowAfter: null,
+            onShowError: null
         }, hooks);
 
-        this.table = null;
+        this.state = {
+            column: localStorage.getItem(`${this.config.controller}_column`) || 'created_at',
+            order: localStorage.getItem(`${this.config.controller}_order`) || 'asc',
+            page: localStorage.getItem(`${this.config.controller}_page`) || 1,
+            rows: localStorage.getItem(`${this.config.controller}_rows`) || 5,
+            searchFields: {}
+        };
+
+        this.debounceTimer = null;
+        this.container = document.querySelector(`#${this.config.containerId}`);
     }
 
     init() {
-        const tableElement = document.getElementById(this.config.tableId);
-        if ( ! tableElement) return;
+        if (!this.container) return;
 
-        /* Se esiste già una tabella, distruggila prima di ricrearla */
-        if (this.table) {
-            this.table.destroy();
-        }
+        this.initFilters();
+        this.initSearchBar();
+        this.updateActiveSearchIndicator();
+        this.bindEvents();
+        
+        this.showAll();
+    }
 
-        /* Inizializziamo DataTables */
-        this.table = new window.DataTable(`#${this.config.tableId}`, {
-            /* Attiviamo l'elaborazione lato server */
-            serverSide: true,
-            stateSave: true,
-            columns: this.config.columns,
-            language: {url: `${urlbase}assets/vendor/datatables/it-IT.json`},
+    /* --- INIZIALIZZAZIONE --- */
+    initFilters() {
+        this.config.searchFields.forEach(field => {
+            const key = `${this.config.controller}_${field}`;
+            const value = localStorage.getItem(key) || '';
+            this.state.searchFields[field] = value;
 
-            stateSaveCallback: (settings, data) => {
-                localStorage.setItem(`DataTables_${this.config.controller}`, JSON.stringify(data));
-            },
-            stateLoadCallback: (settings) => {
-                return JSON.parse(localStorage.getItem(`DataTables_${this.config.controller}`));
-            },
-
-            ajax: {
-                url: this.config.ajaxUrl,
-                /* Cambiamo il metodo in POST */
-                type: 'POST', 
-                data: (d) => {
-                    toggleLoader(true);
-                    
-                    /* Protezione CSRF di CodeIgniter 4 (Fondamentale in POST) */
-                    const csrfToken = document.querySelector('meta[name="X-CSRF-TOKEN"]')?.content;
-                    if (csrfToken) {
-                        d[configApp.csrfTokenName] = csrfToken;
-                    }
-
-                    if (typeof this.hooks.onShowBefore === 'function') {
-                        this.hooks.onShowBefore(d);
-                    }
-                }
-            },
-            
-            drawCallback: (settings) => {
-                toggleLoader(false);
-                if (typeof this.hooks.onShowAfter === 'function') {
-                    this.hooks.onShowAfter(settings.json);
+            // L'HTML usa id come "admins-firstname"
+            const inputEl = document.getElementById(`${this.config.controller}-${field}`);
+            if (inputEl) {
+                inputEl.value = value;
+                if (value !== '') {
+                    const resetBtn = inputEl.closest('.input-group')?.querySelector('.reset-search-field');
+                    if (resetBtn) resetBtn.style.display = 'flex';
                 }
             }
         });
 
-        /* Attivazione dei listener per i controlli */
-        this.attachControlListeners();
+        const rowsSelect = document.getElementById('changeNumRows');
+        if (rowsSelect) rowsSelect.value = this.state.rows;
     }
 
-    attachControlListeners() {
-        /* Aggiorna */
-        const btnReload = document.getElementById('btn-table-reload');
-        if (btnReload) {
-            btnReload.addEventListener('click', () => this.reload());
+    initSearchBar() {
+        const key = `${this.config.controller}_search_bar_visible`;
+        const searchBar = document.getElementById('search-bar');
+        const link = document.getElementById('link-search');
+        
+        if (!searchBar) return;
+
+        if (localStorage.getItem(key) === '1') {
+            searchBar.classList.add('show');
+            if (link) link.setAttribute('aria-expanded', 'true');
         }
 
-        /* Reset Ordinamento */
-        const btnResetOrder = document.getElementById('btn-table-reset-order');
-        if (btnResetOrder) {
-            btnResetOrder.addEventListener('click', () => this.resetOrdering());
-        }
-
-        /* Reset Totale */
-        const btnResetAll = document.getElementById('btn-table-reset-all');
-        if (btnResetAll) {
-            btnResetAll.addEventListener('click', () => this.resetAll());
-        }
+        searchBar.addEventListener('shown.bs.collapse', () => localStorage.setItem(key, '1'));
+        searchBar.addEventListener('hidden.bs.collapse', () => localStorage.setItem(key, '0'));
     }
 
-    /* Metodi operativi */
-    reload() {
-        if (this.table) this.table.ajax.reload(null, false);
+    /* --- EVENTI --- */
+    bindEvents() {
+        // Paginazione e Ordinamento (Delegation sul container)
+        this.container.addEventListener('click', (e) => {
+            const sortEl = e.target.closest(`a.sort`);
+            if (sortEl) {
+                e.preventDefault();
+                this.updateState('column', sortEl.dataset.column);
+                this.updateState('order', sortEl.dataset.order);
+                this.showAll();
+            }
+
+            const pageEl = e.target.closest(`.pagination li a`);
+            if (pageEl) {
+                e.preventDefault();
+                this.updateState('page', pageEl.dataset.page);
+                this.showAll();
+            }
+        });
+
+        // Modifica numero righe
+        document.getElementById('changeNumRows')?.addEventListener('change', (e) => {
+            this.updateState('rows', e.target.value);
+            this.resetSortingAndPagination();
+            this.showAll();
+        });
+
+        // Azioni Toolbar
+        document.getElementById('link-reset-search')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.resetFilters();
+            this.resetSortingAndPagination();
+            this.showAll();
+        });
+
+        document.getElementById('reset-sorting-link')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.resetSortingAndPagination();
+            this.showAll();
+        });
+
+        document.getElementById('refresh-list')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.showAll();
+        });
+
+        // Input Ricerca
+        this.config.searchFields.forEach(field => {
+            const inputEl = document.getElementById(`${this.config.controller}-${field}`);
+            if (!inputEl) return;
+
+            // Digitando nell'input
+            inputEl.addEventListener('keyup', (e) => {
+                if (['Shift', 'Control', 'Alt', 'AltGraph', 'CapsLock', 'Tab', 'Escape'].includes(e.key)) return;
+
+                const value = inputEl.value;
+                localStorage.setItem(`${this.config.controller}_${field}`, value);
+                this.state.searchFields[field] = value;
+
+                const resetBtn = inputEl.closest('.input-group')?.querySelector('.reset-search-field');
+                if (resetBtn) resetBtn.style.display = value ? 'flex' : 'none';
+
+                /* Se il campo è stato svuotato manualmente, pulisci l'errore associato */
+                this.updateActiveSearchIndicator();
+
+                clearTimeout(this.debounceTimer);
+                this.debounceTimer = setTimeout(() => {
+                    /* Spostato nel timer: pulisce l'errore in concomitanza col reload */
+                    if (!value) {
+                        const errorDiv = document.querySelector(`.error_${field}`);
+                        if (errorDiv) errorDiv.innerHTML = '&nbsp;';
+                    }
+                    
+                    this.resetSortingAndPagination();
+                    this.showAll();
+                }, 500);
+            });
+
+            // Click sulla "X" per svuotare il singolo campo
+            const resetBtn = inputEl.closest('.input-group')?.querySelector('.reset-search-field');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                    inputEl.value = '';
+                    localStorage.setItem(`${this.config.controller}_${field}`, '');
+                    
+                    this.state.searchFields[field] = '';
+                    resetBtn.style.display = 'none';
+                                        
+                    /* Pulisci l'errore associato a questo campo */
+                    const errorDiv = document.querySelector(`.error_${field}`);
+                    if (errorDiv) errorDiv.innerHTML = '&nbsp;';
+
+                    this.updateActiveSearchIndicator();
+                    this.resetSortingAndPagination();
+                    this.showAll();
+                });
+            }
+        });
     }
 
-    resetOrdering() {
-        if (this.table) this.table.order([]).page(0).draw();
+    /* --- METODI OPERATIVI --- */
+    updateState(key, value) {
+        this.state[key] = value;
+        localStorage.setItem(`${this.config.controller}_${key}`, value);
     }
 
-    resetAll() {
-        if (this.table) {
-            /* Pulisce il campo di input generato da DataTables */
-            const searchInput = document.querySelector(`#${this.config.tableId}_filter input`);
-            if (searchInput) searchInput.value = '';
+    resetFilters() {
+        this.config.searchFields.forEach(field => {
+            const inputEl = document.getElementById(`${this.config.controller}-${field}`);
+            if (inputEl) {
+                inputEl.value = '';
+                const resetBtn = inputEl.closest('.input-group')?.querySelector('.reset-search-field');
+                if (resetBtn) resetBtn.style.display = 'none';
+            }
+            localStorage.setItem(`${this.config.controller}_${field}`, '');
+            this.state.searchFields[field] = '';
             
-            /* Reset totale dello stato interno */
-            this.table.search('').order([]).page(0).draw();
+            /* Pulisci tutti gli errori iterando sui campi */
+            const errorDiv = document.querySelector(`.error_${field}`);
+            if (errorDiv) errorDiv.innerHTML = '&nbsp;';
+        });
+        this.updateActiveSearchIndicator();
+    }
+
+    resetSortingAndPagination() {
+        this.updateState('column', 'created_at');
+        this.updateState('order', 'asc');
+        this.updateState('page', 1);
+    }
+
+    updateActiveSearchIndicator() {
+        const linkSearch = document.getElementById('link-search');
+        if (!linkSearch) return;
+
+        const hasFilters = Object.values(this.state.searchFields).some(val => val?.trim() !== '');
+        linkSearch.classList.toggle('text-danger', hasFilters);
+    }
+
+    /* --- COMUNICAZIONE SERVER --- */
+    async showAll() {
+        if (typeof this.hooks.onShowBefore === 'function') {
+            this.hooks.onShowBefore(this.state);
         }
-    }
 
-    /* Serve come alias per la compatibilità con DeleteManager */
-    showAll() {
-        this.refresh();
-    }
+        const urlParams = new URLSearchParams();
+        
+        // Costruzione dinamica parametri
+        Object.keys(this.state).forEach(key => {
+            if (key === 'searchFields') {
+                Object.entries(this.state.searchFields).forEach(([subKey, val]) => {
+                    urlParams.append(`searchFields[${subKey}]`, val);
+                });
+            } else {
+                urlParams.append(key, this.state[key]);
+            }
+        });
 
-    refresh() {
-        if (this.table) {
-            this.table.ajax.reload(null, false); /* false = mantiene la posizione della paginazione */
+        // Chiamata Fetch
+        try {
+            const response = await apiFetch(this.config.url, {
+                method: 'POST',
+                body: urlParams // URLSearchParams imposta automaticamente l'header x-www-form-urlencoded
+            });
+
+            const data = await response.json();
+
+            if (data.result === 'no_current_user_logged') return window.location.href = `${urlbase}admin/auth/login`;
+            if (data.result === '404') return window.location.href = `${urlbase}admin/404`;
+
+            if (data.result === false) {
+                if (typeof showToast === 'function') showToast('danger', data.message);
+                return;
+            }
+
+            if (data.result === true) {
+                if (typeof this.hooks.onShowAfter === 'function') this.hooks.onShowAfter(data);
+                if (typeof smoothReplace === 'function') {
+                    smoothReplace(this.container, data.output);
+                } else {
+                    this.container.innerHTML = data.output;
+                }
+            }
+
+        } catch (error) {
+            /* apiFetch lancia un oggetto { status, data } per errori 422 e 401 */
+            if (error.status === 422 && error.data?.errors) {
+                const searchScope = document.getElementById('search-bar');
+                if (searchScope && typeof handleValidationErrors === 'function') {
+                    handleValidationErrors(error.data.errors, searchScope);
+                }
+                if (typeof showToast === 'function') showToast('danger', error.data.message);
+                return;
+            }
+
+            /* Fallback per altri tipi di errore non intercettati dal gestore globale */
+            if (typeof this.hooks.onShowError === 'function') this.hooks.onShowError(error);
         }
     }
 }

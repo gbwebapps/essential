@@ -11,7 +11,7 @@
                 <div id="general_data">
 
                     <div class="card-header">
-                        <h2 class="card-title text-center text-lg-start mb-0"><?= lang('backend/admins.panels.general_data'); ?></h2>
+                        <h2 class="card-title text-center text-lg-start mb-0"><?= lang('backend/admins.panels.generalData'); ?></h2>
                     </div>
 
                     <div class="card-body">

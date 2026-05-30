@@ -16,9 +16,9 @@ class ToolsClass extends BaseClass
 	{
 		return 
 		[
-		    ['label' => lang('backend/tools.options.showAll'),  'route' => 'backend/admins', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/tools.options.edit'), 'route' => 'backend/admins/edit/12', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/tools.options.delete'),  'route' => 'backend/admins/delete/12', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/tools.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/tools.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+		    ['label' => lang('backend/tools.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
 		];
 	}
 

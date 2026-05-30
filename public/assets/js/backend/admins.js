@@ -13,63 +13,10 @@ const actions = {
     showAll: function() {
 
         const adminsManager = new ListManager({
-            tableId: 'adminsTable',
-            ajaxUrl: `${urlbase}backend/admins/showAll`,
-            columns: [
-                { data: 'id' },
-                { data: 'firstname' },
-                { data: 'lastname' }, 
-                { data: 'email' },
-                { 
-                    data: 'active',
-                    render: (data, type, row) => {
-                        const checked = data === "1" ? 'checked' : '';
-                        return `
-                            <div class="form-check form-switch">
-                                <form class="change_status" data-message="Vuoi cambiare lo stato di questo admin?">
-                                    <input type="hidden" name="uuid" value="${row.uuid}">
-                                    <input class="form-check-input" type="checkbox" role="switch" ${checked}>
-                                </form>
-                            </div>`;
-                    }
-                },
-                {
-                    data: null,
-                    render: (data, type, row) => {
-                        return `
-                            <div class="dropdown text-end">
-                                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                    Azioni
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li>
-                                        <!-- Link Modifica: usa row.uuid -->
-                                        <a class="dropdown-item" href="${urlbase}backend/admins/edit/${row.uuid}">
-                                            <i class="fa-solid fa-user-pen me-2"></i> Aggiorna amministratore
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <!-- Link Modifica: usa row.uuid -->
-                                        <a class="dropdown-item" href="${urlbase}backend/admins/show/${row.uuid}">
-                                            <i class="fa-solid fa-user me-2"></i> Dettaglio amministratore
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <form class="delete_record" data-message="Eliminare definitivamente?">
-                                            <input type="hidden" name="uuid" value="${row.uuid}">
-                                            <button type="submit" class="dropdown-item">
-                                                <i class="fa-solid fa-trash me-2"></i> Elimina amministratore
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>`;
-                    },
-                    orderable: false
-                }
-            ]
+            controller: controller,
+            url: urlbase + 'backend/admins/showAll',
+            containerId: 'showAll-admins-container',
+            searchFields: ['firstname', 'lastname', 'email', 'phone']
         });
 
         adminsManager.init();

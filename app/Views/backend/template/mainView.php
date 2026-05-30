@@ -69,7 +69,7 @@
 
     <!-- Pulsante per lo scroll rapido verso l'alto -->
     <button type="button" class="scrollup btn btn-secondary btn-sm">
-        <i class="fa-solid fa-arrow-circle-up"></i> <?= lang('backend/global.buttons.back_to_top'); ?>
+        <i class="fa-solid fa-arrow-circle-up"></i> <?= lang('backend/global.buttons.backToTop'); ?>
     </button>
 
     <?php /* Passaggio del nome controller al comparto Javascript */ ?>

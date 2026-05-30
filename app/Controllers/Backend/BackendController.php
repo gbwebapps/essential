@@ -14,7 +14,7 @@ use App\Libraries\RegExp;
 abstract class BackendController extends BaseController 
 {
     /* Gli helper inseriti qui vengono caricati automaticamente */
-    protected $helpers = ['date'];
+    protected $helpers = ['date', 'array', 'cookie'];
 
     /* @var array Array centralizzato per i dati delle viste */
     protected array $data = [];

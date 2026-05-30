@@ -9,7 +9,7 @@
             <div class="btn-group dropup me-auto">
                 <button type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa-solid fa-cubes"></i> 
-                    <span class="d-none d-md-inline"><?= lang('backend/global.labels.modules'); ?></span>
+                    <span class="d-none d-md-inline"><?= lang('backend/global.buttons.modules'); ?></span>
                 </button>
 
                 <ul class="dropdown-menu">
@@ -42,7 +42,7 @@
                 <div class="btn-group dropup ms-auto">
                     <button type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fa-solid fa-gears"></i> 
-                        <span class="d-none d-md-inline"><?= lang('backend/global.labels.services'); ?></span>
+                        <span class="d-none d-md-inline"><?= lang('backend/global.buttons.services'); ?></span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <?php

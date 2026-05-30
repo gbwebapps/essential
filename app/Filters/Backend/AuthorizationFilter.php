@@ -20,7 +20,6 @@ class AuthorizationFilter implements FilterInterface
         /* Carichiamo il model. Nessun impatto negativo sulle performance */
         $authModel = model(\App\Models\Backend\AuthModel::class);
         
-        helper('cookie');
         $cookie = get_cookie('backendRememberMe');
 
         /* Eseguiamo la disconnessione completa che pulisce anche il database */
