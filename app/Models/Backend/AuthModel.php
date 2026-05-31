@@ -6,25 +6,32 @@ use App\Models\Backend\BackendModel;
 
 class AuthModel extends BackendModel
 {
+    private string $passwordRegex;
+
     protected function initModel(): void 
     {
         parent::initModel();
+
+        $this->passwordRegex = config('BackendAuth')->passwordRegex;
     }
 
     protected array $loginAllowedFields = ['email', 'password', 'rememberMe']; 
     protected array $resetPasswordAllowedFields = ['email'];
     protected array $setPasswordAllowedFields = ['password', 'token'];
 
-    public function validateLoginRules()
+    public function validateLoginRules(): array
     {
         return [
             'email' => [
                 'label' => 'Indirizzo email',
-                'rules' => 'required|valid_email'
+                'rules' => ['required', 'valid_email', 'trim']
             ], 
             'password' => [
                 'label' => 'Password',
-                'rules' => 'required'
+                'rules' => ['required', 'min_length[8]', 'max_length[255]', "regex_match[{$this->passwordRegex}]"],
+                'errors' => [
+                    'regex_match' => 'La password non rispetta i requisiti di sicurezza.'
+                ]
             ]
         ];
     }
@@ -34,7 +41,7 @@ class AuthModel extends BackendModel
         return [
             'email' => [
                 'label' => 'Indirizzo email',
-                'rules' => 'required|valid_email'
+                'rules' => ['required', 'valid_email', 'trim'], 
             ],
         ];
     }
@@ -44,11 +51,14 @@ class AuthModel extends BackendModel
         return [
             'password' => [
                 'label' => 'Password',
-                'rules' => 'required'
+                'rules' => ['required', "regex_match[{$this->passwordRegex}]"],
+                'errors' => [
+                    'regex_match' => 'La password non rispetta i requisiti di sicurezza.'
+                ]
             ], 
             'confirmPassword' => [
                 'label' => 'Conferma password',
-                'rules' => 'required|matches[password]'
+                'rules' => ['required', 'matches[password]'], 
             ], 
             'token' => [
                 'label' => 'Token di autenticazione',

@@ -9,5 +9,10 @@ return [
 	'linksBar' => [
 		'index' => 'Dati', 
 		'showAll' => 'Lista'
-	]
+	], 
+	'options' => [
+		'first' => 'Prima opzione', 
+		'second' => 'Seconda opzione', 
+		'thirst' => 'Terza opzione', 
+	], 
 ];

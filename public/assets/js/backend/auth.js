@@ -65,7 +65,7 @@ const actions = {
 
         async function performResetPassword(form_data) {
             /* 1. Pulizia immediata degli errori visivi */
-            document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '&nbsp;');
+            document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
 
             try {
                 /* 2. Chiamata fetch all'endpoint */
@@ -74,12 +74,14 @@ const actions = {
                     body: form_data
                 });
 
+                /* BLOCCO DI SICUREZZA: se apiFetch ha assorbito un 403, fermati qui */
+                if (!response) return;
+
                 /* 3. Estrazione dati JSON (qui arriva solo se lo status è 200 OK) */
                 const data = await response.json();
 
-                /* 4. Successo Finale */
-                document.getElementById('reset_password_form').reset();
-                showToast('success', data.message);
+                /* 4. Successo Finale: Redirect alla pagina di login */
+                window.location.href = `${urlbase}backend/auth`;
                 
             } catch (error) {
                 /* 5. Gestione centralizzata dei fallimenti HTTP */
@@ -100,7 +102,7 @@ const actions = {
 
     setPassword: function() {
         const form = document.getElementById('set_password_form');
-        if (!form) return; /* Early return se il form non esiste */
+        if ( ! form) return; /* Early return se il form non esiste */
 
         form.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -119,12 +121,14 @@ const actions = {
                     body: form_data
                 });
 
+                /* BLOCCO DI SICUREZZA: se apiFetch ha assorbito un 403, fermati qui */
+                if ( ! response) return;
+
                 /* 3. Estrazione dati JSON (qui arriva solo se lo status è 200 OK) */
                 const data = await response.json();
 
-                /* 4. Successo Finale */
-                document.getElementById('set_password_form').reset(); /* Assicurati che l'ID del form sia corretto */
-                showToast('success', data.message);
+                /* 4. Successo Finale: Redirect alla pagina di login */
+                window.location.href = `${urlbase}backend/auth`;
 
             } catch (error) {
                 /* 5. Gestione centralizzata dei fallimenti HTTP */

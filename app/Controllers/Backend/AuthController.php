@@ -106,6 +106,12 @@ class AuthController extends BackendController
                 return $this->response->setStatusCode(401)->setJSON($json);
             endif;
 
+            /* Imposta i dati in sessione per la pagina di destinazione */
+            session()->setFlashdata('message', $json['message']);
+            session()->setFlashdata('class', 'success');
+            session()->setFlashdata('icon', '<i class="fa-solid fa-check"></i>');
+
+            /* Restituisce l'ok al Javascript */
             return $this->response->setJSON($json);
 
         endif;
@@ -131,10 +137,16 @@ class AuthController extends BackendController
 
             $json = $this->authModel->setPassword($posts);
 
-            if($json['result'] === 'setPasswordFailed'):
+            if ($json['result'] === 'setPasswordFailed'):
                 return $this->response->setStatusCode(401)->setJSON($json);
             endif;
 
+            /* Imposta i dati in sessione per la pagina di destinazione */
+            session()->setFlashdata('message', $json['message']);
+            session()->setFlashdata('class', 'success');
+            session()->setFlashdata('icon', '<i class="fa-solid fa-check"></i>');
+
+            /* Restituisce l'ok al Javascript */
             return $this->response->setJSON($json);
 
         endif;

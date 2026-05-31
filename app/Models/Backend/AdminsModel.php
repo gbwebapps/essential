@@ -52,19 +52,16 @@ class AdminsModel extends BackendModel
     {
         return [
             'column' => [
-                'rules' => ['required'] 
+                'rules' => ['required', 'alpha_dash'] 
             ],
             'order' => [
-                'rules' => ['required'] 
+                'rules' => ['required', 'in_list[asc,desc]'] 
             ],
             'page' => [
-                'rules' => ['required'] 
+                'rules' => ['required', 'is_natural_no_zero'] 
             ],
             'rows' => [
-                'rules' => ['required'] 
-            ],
-            'searchFields.*' => [
-                'rules' => ['permit_empty']
+                'rules' => ['required', 'is_natural_no_zero'] 
             ],
         ];
     }
@@ -82,11 +79,11 @@ class AdminsModel extends BackendModel
             ],
             'searchFields.email' => [
                 'label' => lang('backend/admins.labels.email'), 
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+                'rules' => ['permit_empty', 'regex_match[/^[a-zA-Z0-9@._-]+$/]'], 
             ],
             'searchFields.phone' => [
                 'label' => lang('backend/admins.labels.phone'), 
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+                'rules' => ['permit_empty', 'regex_match[/^[0-9+\-\s()]+$/]'], 
             ],
         ];
     }
@@ -96,27 +93,30 @@ class AdminsModel extends BackendModel
         return [
             'firstname' => [
                 'label' => lang('backend/admins.labels.firstname'),
-                'rules' => ['required', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'],
+                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'],
             ],
             'lastname' => [
                 'label' => lang('backend/admins.labels.lastname'),
-                'rules' => ['required', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'],
+                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'],
             ],
             'email' => [
                 'label' => lang('backend/admins.labels.email'),
-                'rules' => ['required', 'valid_email', 'is_unique[admins.email]'],
+                'rules' => ['required', 'trim', 'valid_email', 'max_length[255]', 'is_unique[admins.email]'],
             ],
             'phone' => [
                 'label' => lang('backend/admins.labels.phone'),
-                'rules' => ['required', 'is_unique[admins.phone]', 'regex_match[/^[0-9]{9,10}$/]'],
+                'rules' => ['required', 'trim', 'is_unique[admins.phone]', 'regex_match[/^\+?[0-9]{9,15}$/]'],
             ],
             'status' => [
                 'label' => lang('backend/admins.labels.status'),
                 'rules' => ['required', 'in_list[0,1]'],
             ],
-            'notes' => [
+            'note' => [
                 'label' => lang('backend/admins.labels.note'),
-                'rules' => ['permit_empty', 'max_length[500]', 'regex_match[/^[^<>\x60]*$/su]'],
+                'rules' => ['permit_empty', 'trim', 'max_length[500]', 'safeText'],
+                'errors' => [
+                    'safeText' => 'caratteri non ammessi'
+                ]
             ],
         ];
     }

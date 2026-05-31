@@ -6,19 +6,15 @@ export const urlbase = document.getElementById('hidden-urlbase').dataset.urlbase
 /* Scrollup */
 window.addEventListener('scroll', function() {
     const scrollupElements = document.querySelectorAll('.scrollup');
-    if (window.scrollY > 120) {
-        scrollupElements.forEach(el => {
-            if (getComputedStyle(el).display === 'none') {
-                el.style.display = 'block';
-            }
-        });
-    } else {
-        scrollupElements.forEach(el => {
-            if (getComputedStyle(el).display !== 'none') {
-                el.style.display = 'none';
-            }
-        });
-    }
+    scrollupElements.forEach(el => {
+        if (window.scrollY > 120) {
+            el.classList.remove('fade-out');
+            el.classList.add('fade-in');
+        } else {
+            el.classList.remove('fade-in');
+            el.classList.add('fade-out');
+        }
+    });
 });
 
 document.addEventListener('click', function(e) {

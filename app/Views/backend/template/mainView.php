@@ -41,11 +41,6 @@
                     <?= $this->include('backend/template/sectionView'); ?>
                 </div>
 
-                <!-- Inclusione eventuale messaggio -->
-                <div id="message-view">
-                    <?= $this->include('backend/template/messageView'); ?>
-                </div>
-
                 <!-- Inclusione barra dei link di navigazione interna -->
                 <div id="links-bar-view">
                     <?= $this->include('backend/template/linksBarView'); ?>
@@ -68,7 +63,7 @@
     </div>
 
     <!-- Pulsante per lo scroll rapido verso l'alto -->
-    <button type="button" class="scrollup btn btn-secondary btn-sm">
+    <button type="button" class="scrollup fade-out btn btn-secondary btn-sm">
         <i class="fa-solid fa-arrow-circle-up"></i> <?= lang('backend/global.buttons.backToTop'); ?>
     </button>
 

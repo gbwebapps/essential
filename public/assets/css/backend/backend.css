@@ -171,7 +171,6 @@ textarea {
     left: 50%;
     transform: translateX(-50%);
     z-index: 9999;
-    display: none;
     box-shadow: 0 0 0 rgb(0 0 0 / 10%), 0 0 .15rem rgb(0 0 0 / 10%);
     cursor: pointer;
 }
@@ -206,6 +205,24 @@ textarea {
 
 .pagination-right {
     text-align: right;
+}
+
+/* transizione base */
+.fade-out,
+.fade-in {
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+/* uscita */
+.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* entrata */
+.fade-in {
+    opacity: 1;
+    visibility: visible;
 }
 
 @media (max-width: 991px) {

@@ -68,7 +68,7 @@ class AccountController extends BackendController
                 'route' => 'backend/account/resetPassword',
             ],
             'security' => [
-                'title' => lang('backend/account.leftMenu.securityView'),
+                'title' => lang('backend/account.leftMenu.security'),
                 'class' => 'col-4',
                 'icon' => '<i class="fa-solid fa-shield"></i>',
                 'icon_3x' => '<i class="fa-solid fa-shield fa-3x"></i>',

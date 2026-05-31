@@ -30,7 +30,7 @@ return [
     'admins' => [
         'add' => [
             'greeting' => 'Ciao <strong>%s</strong>,',
-            'created_notice' => 'È stato creato il tuo nuovo profilo.',
+            'createdNotice' => 'È stato creato il tuo nuovo profilo.',
             'usernameReminder' => 'Ti ricordiamo che il tuo nome utente è <strong>%s</strong>',
             'setPasswordButton' => 'Imposta password',
             'ignoreNotice' => 'Se non hai richiesto la creazione di questo profilo, puoi ignorare questa email.', 

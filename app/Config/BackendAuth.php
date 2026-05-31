@@ -42,4 +42,6 @@ class BackendAuth extends BaseConfig
     public int $sessionTime = 1200;
 
     public int $activationTime = 21600;
+
+    public string $passwordRegex = '/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/';
 }
