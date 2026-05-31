@@ -250,9 +250,6 @@ export class ListManager {
 
             const data = await response.json();
 
-            if (data.result === 'no_current_user_logged') return window.location.href = `${urlbase}admin/auth/login`;
-            if (data.result === '404') return window.location.href = `${urlbase}admin/404`;
-
             if (data.result === false) {
                 if (typeof showToast === 'function') showToast('danger', data.message);
                 return;
@@ -268,11 +265,16 @@ export class ListManager {
             }
 
         } catch (error) {
-            /* apiFetch lancia un oggetto { status, data } per errori 422 e 401 */
+            /* Intercetta l'errore 401 e forza il reindirizzamento al login */
+            if (error.status === 401 && error.data?.result === 'no_current_user_logged') {
+                return window.location.href = `${urlbase}backend/auth`;
+            }
+
+            /* Intercetta gli errori di validazione 422 */
             if (error.status === 422 && error.data?.errors) {
-                const searchScope = document.getElementById('search-bar');
-                if (searchScope && typeof handleValidationErrors === 'function') {
-                    handleValidationErrors(error.data.errors, searchScope);
+                if (typeof handleValidationErrors === 'function') {
+                    /* Passato un solo parametro, come richiesto dalla tua funzione */
+                    handleValidationErrors(error.data.errors);
                 }
                 if (typeof showToast === 'function') showToast('danger', error.data.message);
                 return;
@@ -415,10 +417,10 @@ export class AddManager {
                 }
             }
         } catch (error) {
-            
+                    
             /* Gestione Utente non loggato (401 lanciato da apiFetch) */
             if (error.status === 401 && error.data?.result === 'no_current_user_logged') {
-                window.location.href = urlbase + 'backend/auth/login';
+                window.location.href = `${urlbase}backend/auth/login`;
                 return;
             }
 
@@ -430,10 +432,23 @@ export class AddManager {
                     el.innerHTML = '\u00A0';
                 });
                 
-                handleValidationErrors(error.data.errors);
-                if (this.config.imagePreviewManager) handleValidationImages(error.data.errors);
-                if (this.config.docPreviewManager) handleValidationDocuments(error.data.errors);
-                showToast('danger', error.data.message);
+                /* Aggiunti i controlli di sicurezza typeof per allineamento */
+                if (typeof handleValidationErrors === 'function') {
+                    handleValidationErrors(error.data.errors);
+                }
+                
+                if (this.config.imagePreviewManager && typeof handleValidationImages === 'function') {
+                    handleValidationImages(error.data.errors);
+                }
+                
+                if (this.config.docPreviewManager && typeof handleValidationDocuments === 'function') {
+                    handleValidationDocuments(error.data.errors);
+                }
+                
+                if (typeof showToast === 'function') {
+                    showToast('danger', error.data.message);
+                }
+                
                 return;
             }
 
@@ -627,18 +642,6 @@ export class EditManager {
 
             const data = await response.json();
 
-            /* Controllo autenticazione */
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = urlbase + 'backend/auth/login';
-                return;
-            }
-
-            /* Controllo pagina non trovata */
-            if (data.result === '404') {
-                window.location.href = urlbase + 'backend/404';
-                return;
-            }
-
             /* Reset eventuali errori di validazione visivi */
             document.querySelectorAll("[class^='error_']").forEach(el => el.innerHTML = '\u00A0');
 
@@ -707,18 +710,6 @@ export class EditManager {
             });
 
             const data = await response.json();
-
-            /* Controllo autenticazione */
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = urlbase + 'backend/auth/login';
-                return;
-            }
-
-            /* Controllo pagina non trovata */
-            if (data.result === '404') {
-                window.location.href = urlbase + 'backend/404';
-                return;
-            }
 
             /* Caso errore generico */
             if (data.result === false) {
@@ -834,16 +825,6 @@ export class DeleteManager {
         })
         .then(response => response.json())
         .then(data => {
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = urlbase + 'backend/auth/login';
-                return;
-            }
-
-            if (data.result === '404') {
-                window.location.href = urlbase + 'backend/404';
-                return;
-            }
-
             if (data.errors) {
                 showToast('danger', data.errors);
                 return;
@@ -953,16 +934,6 @@ export class ChangeStatusManager {
         })
         .then(response => response.json())
         .then(data => {
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = urlbase + 'backend/auth/login';
-                return;
-            }
-
-            if (data.result === '404') {
-                window.location.href = urlbase + 'backend/404';
-                return;
-            }
-
             if (data.errors) {
                 showToast('danger', data.errors);
                 return;
@@ -1032,16 +1003,6 @@ export class GeneralDataManager {
         })
             .then(response => response.json())
             .then(data => {
-                if (data.result === 'no_current_user_logged') {
-                    window.location.href = urlbase + 'backend/auth/login';
-                    return;
-                }
-
-                if (data.result === '404') {
-                    window.location.href = urlbase + 'backend/404';
-                    return;
-                }
-
                 if (data.errors) {
                     showToast('danger', data.errors);
                     return;
@@ -1106,16 +1067,6 @@ export class MetaDataManager {
         })
             .then(response => response.json())
             .then(data => {
-                if (data.result === 'no_current_user_logged') {
-                    window.location.href = urlbase + 'backend/auth/login';
-                    return;
-                }
-
-                if (data.result === '404') {
-                    window.location.href = urlbase + 'backend/404';
-                    return;
-                }
-
                 if (data.errors) {
                     showToast('danger', data.errors);
                     return;

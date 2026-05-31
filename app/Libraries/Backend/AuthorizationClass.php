@@ -74,15 +74,15 @@ class AuthorizationClass
 
     private function getAdminFromCookie(): ?object
     {
-        $cookieValue = service('request')->getCookie('backendRememberMe');
+        $cookie = service('request')->getCookie('backendRememberMe');
 
-        if ($cookieValue === null):
+        if ($cookie === null):
             return null;
         endif;
 
         /* Decifra il valore del cookie prima di passarlo alla classe Token */
         $crypto = new \App\Libraries\CryptoService(config('BackendAuth')->sessionCryptoKey);
-        $decryptedValue = $crypto->decrypt($cookieValue);
+        $decryptedValue = $crypto->decrypt($cookie);
 
         if ( ! $decryptedValue):
             return null;

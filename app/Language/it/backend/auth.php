@@ -34,13 +34,17 @@ return [
 	'messages' => [
 		'goodbye' => 'Arrivederci %s %s.', 
 		'welcome' => 'Buongiorno %s %s.', 
-		'validationErrors' => 'Errori di validazione.', 
-		'setPasswordSuccess' => 'La password è stata impostata. Puoi effettuare il login.', 
-		'setPasswordFailed' => 'Errore durante impostazione della password.', 
-		'setPasswordError' => 'Errore durante impostazione della password.', 
-		'loginFailed' => 'Il tentativo di accesso non è andato a buon fine.', 
-		'checkAuthError' => 'Il codice di autenticazione non è valido oppure è scaduto.', 
+		'loginFailed' => 'Tentativo di accesso fallito.', 
+	    'loginNeeded' => 'Effettuare il login per accedere.', 
+	    'resetPasswordFailed' => 'Errore durante reset password.', 
+		'setPasswordSuccess' => 'Password impostata. Puoi effettuare il login.', 
+		'setPasswordFailed' => 'Errore durante impostazione password.', 
+		'setPasswordError' => 'Errore durante impostazione password.', 
+		'checkAuthError' => 'Codice di autenticazione non valido oppure scaduto.', 
 		'tooMAnyAttempts' => 'Sono stati effettuati troppi tentativi.', 
-	    'resetPasswordFailed' => 'Errore durante il reset della password.', 
+	    'currentSessionOn' => '%s %s sessione ancora in corso.', 
+	    'forbiddenArea' => '%s %s accesso non consentito.', 
+		'validationErrors' => 'Errori di validazione.', 
+		'subjectResetPasswordEmail' => '%s %s - Essential reset password'
 	]
 ];

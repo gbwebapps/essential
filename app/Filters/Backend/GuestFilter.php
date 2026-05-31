@@ -12,18 +12,25 @@ class GuestFilter implements FilterInterface
     {
         $currentAdmin = service('authorization')->currentAdmin();
 
-        /* Se l'utente è loggato, impediamo l'accesso alle pagine di login/reset */
-        if ($currentAdmin):
-            
-            $message = esc($currentAdmin->firstname) . ' ' . esc($currentAdmin->lastname) . ' la sessione è ancora in corso.';
-            
-            /* Reindirizzamento hardcoded (anti-loop) con Flashdata concatenati */
-            return redirect()->to(base_url('backend/dashboard'))->with('message', $message)->with('class', 'danger')->with('message_icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
-            
+        /* Se non è loggato, lasciamo proseguire regolarmente la richiesta */
+        if ( ! $currentAdmin):
+            return null;
         endif;
 
-        /* Se non è loggato, lasciamo proseguire regolarmente la richiesta */
-        return null;
+        $message = sprintf(lang('backend/auth.messages.currentSessionOn'), esc($currentAdmin->firstname), esc($currentAdmin->lastname));
+
+        /* Imposta i flashdata per entrambi i flussi */
+        session()->setFlashdata('message', $message);
+        session()->setFlashdata('class', 'danger');
+        session()->setFlashdata('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
+
+        /* Se un utente loggato tenta un'operazione AJAX su rotte guest (es. tab rimasta aperta) */
+        if ($request->isAJAX()):
+            return service('response')->setJSON(['result' => false, 'message' => $message])->setStatusCode(403);
+        endif;
+
+        /* Reindirizzamento standard alla dashboard */
+        return redirect()->to(base_url('backend/dashboard'));
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)

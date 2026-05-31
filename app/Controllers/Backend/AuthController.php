@@ -157,7 +157,7 @@ class AuthController extends BackendController
 
     public function logout()
     {
-        $cookie = get_cookie('backendRememberMe');
+        $cookie = service('request')->getCookie('backendRememberMe');
 
         /* 1. Legge i dati utente PRIMA di scollegarlo */
         $firstname = $this->currentAdmin->firstname ?? '';
@@ -176,7 +176,7 @@ class AuthController extends BackendController
         /* 4. Imposta i flashdata nativi di CI4 */
         $this->session->setFlashdata('message', $message);
         $this->session->setFlashdata('class', 'success');
-        $this->session->setFlashdata('message_icon', '<i class="fa-solid fa-check"></i>');
+        $this->session->setFlashdata('icon', '<i class="fa-solid fa-handshake"></i>');
 
         /* 5. Esegue un redirect pulito in GET verso la pagina di login */
         return redirect()->to(base_url('backend/auth'))->withCookies();

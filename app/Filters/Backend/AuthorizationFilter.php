@@ -20,7 +20,7 @@ class AuthorizationFilter implements FilterInterface
         /* Carichiamo il model. Nessun impatto negativo sulle performance */
         $authModel = model(\App\Models\Backend\AuthModel::class);
         
-        $cookie = get_cookie('backendRememberMe');
+        $cookie = service('request')->getCookie('backendRememberMe');
 
         /* Eseguiamo la disconnessione completa che pulisce anche il database */
         if ($cookie === null):
@@ -29,16 +29,21 @@ class AuthorizationFilter implements FilterInterface
             $authModel->logoutByCookie($cookie);
         endif;
 
+        session()->set('intended_url', current_url());
+        $message = lang('backend/auth.messages.loginNeeded');
+
+        /* Imposta i flashdata validi per entrambi i flussi (AJAX e Standard) */
+        session()->setFlashdata('message', $message);
+        session()->setFlashdata('class', 'danger');
+        session()->setFlashdata('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
+
         /* Gestione della risposta: AJAX vs Standard */
         if ($request->isAJAX()):
             return service('response')->setJSON(['result' => 'no_current_user_logged'])->setStatusCode(401);
         endif;
 
-        session()->set('intended_url', current_url());
-
-        $message = 'E\' necessario effettuare il login per accedere alla pagina.';
-
-        return redirect()->to(base_url('backend/auth'))->with('message', $message)->with('class', 'danger')->with('message_icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
+        /* Redirect standard pulito dai with() in quanto già impostati nella sessione */
+        return redirect()->to(base_url('backend/auth'));
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)

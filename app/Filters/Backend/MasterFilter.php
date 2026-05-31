@@ -12,26 +12,39 @@ class MasterFilter implements FilterInterface
     {
         $currentAdmin = service('authorization')->currentAdmin();
 
-        /* Se l'utente non è loggato o non ha i privilegi di master, blocca l'accesso */
-        if ( ! $currentAdmin || (int) $currentAdmin->master === 0):
-            
-            /* Gestione dell'errore per le richieste asincrone (AJAX) con status code 403 (Forbidden) */
-            if ($request->isAJAX()):
-                return service('response')->setJSON(['result'  => false, 'message' => 'Non è possibile accedere a questa area.'])->setStatusCode(403);
-            endif;
-
-            /* Gestione dell'errore per le richieste standard con Flashdata */
-            session()->setFlashdata('message', 'Non è possibile accedere a questa area.');
-            session()->setFlashdata('class', 'danger');
-            session()->setFlashdata('message_icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
-
-            /* Reindirizzamento alla dashboard */
-            return redirect()->to(base_url('backend/dashboard'));
-            
+        /* Se l'utente è loggato ed è master, prosegue normalmente */
+        if ($currentAdmin && (int) $currentAdmin->master === 1):
+            return null;
         endif;
 
-        /* L'utente è master, la richiesta prosegue normalmente */
-        return null;
+        /* 1. Definizione dinamica dei parametri in base allo stato */
+        $isNotLogged = ! $currentAdmin;
+        
+        $ajaxStatus  = $isNotLogged ? 401 : 403;
+        $ajaxResult  = $isNotLogged ? 'no_current_user_logged' : false;
+        
+        $redirectUrl = $isNotLogged ? 'backend/auth' : 'backend/dashboard';
+        $flashMsg    = $isNotLogged ? lang('backend/auth.messages.loginNeeded') : sprintf(lang('backend/auth.messages.forbiddenArea'), esc($currentAdmin->firstname), esc($currentAdmin->lastname));
+
+        /* 2. Impostazione della sessione valida per entrambi i flussi (AJAX e Standard) */
+        session()->setFlashdata('message', $flashMsg);
+        session()->setFlashdata('class', 'danger');
+        session()->setFlashdata('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
+
+        /* 3. Esecuzione blocco unificato AJAX */
+        if ($request->isAJAX()):
+            $json = ['result' => $ajaxResult];
+            
+            /* Aggiunge il messaggio all'array JSON se necessario */
+            if ( ! $isNotLogged):
+                $json['message'] = lang('backend/auth.messages.forbiddenArea');
+            endif;
+            
+            return service('response')->setJSON($json)->setStatusCode($ajaxStatus);
+        endif;
+
+        /* 4. Esecuzione blocco unificato Standard Redirect */
+        return redirect()->to(base_url($redirectUrl));
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)

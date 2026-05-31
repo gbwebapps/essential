@@ -234,7 +234,7 @@ class AuthModel extends BackendModel
         session()->setFlashdata([
             'message' => $welcomeMessage,
             'class'   => 'success',
-            'icon'    => '<i class="fa-solid fa-check"></i>'
+            'icon'    => '<i class="fa-solid fa-handshake"></i>'
         ]);
 
         return ['result' => true];

@@ -69,20 +69,30 @@ export async function apiFetch(input, init = {}) {
         const response = await fetch(input, init);
         
         if (!response.ok) {
-            /* Aggiornato: intercetta sia 422 che 401 per estrarre il json e lanciarlo localmente */
-            if (response.status === 422 || response.status === 401) {
+            /* Aggiunto il 403 per estrarre il JSON e passarlo al catch */
+            if (response.status === 422 || response.status === 401 || response.status === 403) {
                 const errorData = await response.json();
                 throw { status: response.status, data: errorData };
             }
             
-            /* Per tutti gli altri errori HTTP (500, 404, 403) usa il gestore globale */
+            /* Per tutti gli altri errori HTTP usa il gestore globale */
             handleAjaxError(response, response.statusText, null);
             throw new Error(response.statusText);
         }
         return response;
         
     } catch (error) {
-        /* Aggiornato: se l'errore è 422 o 401, lo rilancia direttamente alla funzione locale */
+        /* Intercetta il 403 e stampa direttamente il messaggio tradotto dal server */
+        if (error.status === 403) {
+            const errorMsg = error.data?.message || 'Accesso negato.';
+            
+            if (typeof showToast === 'function') {
+                showToast('danger', errorMsg);
+            }
+            return;
+        }
+
+        /* Se l'errore è 422 o 401, lo rilancia direttamente alla funzione locale */
         if (error.status === 422 || error.status === 401) throw error;
         
         /* Gestione errori di rete (server irraggiungibile, ecc.) */
