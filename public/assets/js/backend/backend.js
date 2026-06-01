@@ -64,34 +64,17 @@ export async function apiFetch(input, init = {}) {
     try {
         const response = await fetch(input, init);
         
+        /* Se la risposta non è OK (es. 500 Internal Server Error, 404 Not Found) */
         if (!response.ok) {
-            /* Aggiunto il 403 per estrarre il JSON e passarlo al catch */
-            if (response.status === 422 || response.status === 401 || response.status === 403) {
-                const errorData = await response.json();
-                throw { status: response.status, data: errorData };
-            }
-            
-            /* Per tutti gli altri errori HTTP usa il gestore globale */
+            /* Passa direttamente l'errore al gestore globale */
             handleAjaxError(response, response.statusText, null);
             throw new Error(response.statusText);
         }
+        
         return response;
         
     } catch (error) {
-        /* Intercetta il 403 e stampa direttamente il messaggio tradotto dal server */
-        if (error.status === 403) {
-            const errorMsg = error.data?.message || 'Accesso negato.';
-            
-            if (typeof showToast === 'function') {
-                showToast('danger', errorMsg);
-            }
-            return;
-        }
-
-        /* Se l'errore è 422 o 401, lo rilancia direttamente alla funzione locale */
-        if (error.status === 422 || error.status === 401) throw error;
-        
-        /* Gestione errori di rete (server irraggiungibile, ecc.) */
+        /* Gestione errori critici o di rete (server irraggiungibile, connessione assente) */
         handleAjaxError({ status: 0, statusText: error.message }, error.message, error);
         throw error;
     } finally {

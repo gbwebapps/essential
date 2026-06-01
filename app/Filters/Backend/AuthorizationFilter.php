@@ -20,7 +20,7 @@ class AuthorizationFilter implements FilterInterface
         /* Carichiamo il model. Nessun impatto negativo sulle performance */
         $authModel = model(\App\Models\Backend\AuthModel::class);
         
-        $cookie = service('request')->getCookie('backendRememberMe');
+        $cookie = $request->getCookie('backendRememberMe');
 
         /* Eseguiamo la disconnessione completa che pulisce anche il database */
         if ($cookie === null):
@@ -38,8 +38,8 @@ class AuthorizationFilter implements FilterInterface
         session()->setFlashdata('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
 
         /* Gestione della risposta: AJAX vs Standard */
-        if ($request->isAJAX()):
-            return service('response')->setJSON(['result' => 'no_current_user_logged'])->setStatusCode(401);
+        if ($request->isAJAX() && $request->is('post')):
+            return service('response')->setJSON(['result' => 'no_current_user_logged']);
         endif;
 
         /* Redirect standard pulito dai with() in quanto già impostati nella sessione */

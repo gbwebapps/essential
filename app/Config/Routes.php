@@ -80,8 +80,12 @@ $routes->group('backend', function($routes) {
             $routes->get('/', '\App\Controllers\Backend\AdminsController::index');
             $routes->match(['GET', 'POST'], 'showAll', '\App\Controllers\Backend\AdminsController::showAll');
             $routes->match(['GET', 'POST'], 'add', '\App\Controllers\Backend\AdminsController::add');
-            $routes->get('edit/(:uuid)', '\App\Controllers\Backend\AdminsController::edit/$1');
+            $routes->match(['GET', 'POST'], 'edit/(:uuid)', '\App\Controllers\Backend\AdminsController::edit/$1');
             $routes->get('show/(:uuid)', '\App\Controllers\Backend\AdminsController::show/$1');
+
+            $routes->post('delete', '\App\Controllers\Backend\AdminsController::delete');
+            $routes->post('changeStatus', '\App\Controllers\Backend\AdminsController::changeStatus');
+            $routes->post('resetPassword', '\App\Controllers\Backend\AdminsController::resetPassword');
         });
     });
 });

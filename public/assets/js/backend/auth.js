@@ -1,151 +1,46 @@
 /* Import delle costanti e utility da backend.js */
 import { urlbase, controller, action, apiFetch, handleValidationErrors, showToast, askConfirm, smoothReplace } from './backend.js';
 
+/* Import dei componenti dalla sottocartella */
+import { LoginManager, ResetPasswordManager, SetPasswordManager } from './components/Auth.js';
+
 const actions = {
     index: function(){},
     login: function() {
-        const form = document.getElementById('login_form');
-        if (!form) return; /* Early return se il form non esiste */
-
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const form_data = new FormData(form);
-            
-            /* 
-               Usiamo async/await per una lettura lineare del codice.
-               È molto più pulito rispetto ai .then() concatenati.
-            */
-            performLogin(form_data);
+        
+        /* Istanzia il manager passando le configurazioni necessarie */
+        const loginManager = new LoginManager({
+            formId: 'login_form',
+            url: `${urlbase}backend/auth/login`
         });
 
-        async function performLogin(form_data) {
-            /* 1. Reset immediato degli errori visivi */
-            document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '&nbsp;');
-
-            try {
-                const response = await apiFetch(urlbase + 'backend/auth/login', {
-                    method: 'POST',
-                    body: form_data
-                });
-
-                /* Se il codice arriva qui, è matematicamente un 200 OK (Successo) */
-                const data = await response.json();
-                
-                if (data.result === true) {
-                    window.location.href = data.redirect;
-                }
-
-            } catch (error) {
-                /* 2. Gestione centralizzata dei fallimenti HTTP */
-                if (error.status === 422) {
-                    /* Errore di Validazione (Campi vuoti, ecc.) */
-                    handleValidationErrors(error.data.errors);
-                    showToast('danger', error.data.message);
-                } else if (error.status === 401) {
-                    /* Credenziali Errate (loginFailed dal Model) */
-                    showToast('danger', error.data.message);
-                    document.getElementById('login_form').reset();
-                } else {
-                    /* Errori di rete o imprevisti */
-                    console.error("Login Error:", error);
-                }
-            }
-        }
+        loginManager.init();
     }, 
 
     resetPassword: function() {
-        const form = document.getElementById('reset_password_form');
-        if (!form) return; /* Early return se il form non esiste */
-
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const form_data = new FormData(form);
-            performResetPassword(form_data);
+        
+        /* Istanzia il manager passando le configurazioni necessarie */
+        const resetPasswordManager = new ResetPasswordManager({
+            formId: 'reset_password_form',                  /* ID del form nella pagina pubblica */
+            url: `${urlbase}backend/auth/resetPassword`,    /* Endpoint del controller Auth */
+            redirectUrl: `${urlbase}backend/auth`,          /* Redirect al login dopo il successo */ 
+            showSuccessToast: false
         });
 
-        async function performResetPassword(form_data) {
-            /* 1. Pulizia immediata degli errori visivi */
-            document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
-
-            try {
-                /* 2. Chiamata fetch all'endpoint */
-                const response = await apiFetch(urlbase + 'backend/auth/resetPassword', {
-                    method: 'POST',
-                    body: form_data
-                });
-
-                /* BLOCCO DI SICUREZZA: se apiFetch ha assorbito un 403, fermati qui */
-                if (!response) return;
-
-                /* 3. Estrazione dati JSON (qui arriva solo se lo status è 200 OK) */
-                const data = await response.json();
-
-                /* 4. Successo Finale: Redirect alla pagina di login */
-                window.location.href = `${urlbase}backend/auth`;
-                
-            } catch (error) {
-                /* 5. Gestione centralizzata dei fallimenti HTTP */
-                if (error.status === 422) {
-                    /* Errore di Validazione (es. campo email vuoto o malformato) */
-                    handleValidationErrors(error.data.errors);
-                    showToast('danger', error.data.message);
-                } else if (error.status === 401) {
-                    /* Fallimento Logico (es. email non trovata nel database) */
-                    showToast('danger', error.data.message);
-                } else {
-                    /* Altri errori loggati in console */
-                    console.error("Errore durante il reset password:", error);
-                }
-            }
-        }
+        resetPasswordManager.init();
     }, 
 
     setPassword: function() {
-        const form = document.getElementById('set_password_form');
-        if ( ! form) return; /* Early return se il form non esiste */
-
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const form_data = new FormData(form);
-            performSetPassword(form_data);
+        
+        /* Istanzia il manager passando le configurazioni necessarie */
+        const setPasswordManager = new SetPasswordManager({
+            formId: 'set_password_form',                  /* ID del form */
+            url: `${urlbase}backend/auth/setPassword`,    /* Endpoint del controller */
+            redirectUrl: `${urlbase}backend/auth`         /* Redirect al login dopo il successo */
         });
 
-        async function performSetPassword(form_data) {
-            /* 1. Pulizia immediata degli errori visivi */
-            document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '&nbsp;');
-
-            try {
-                /* 2. Chiamata fetch all'endpoint */
-                const response = await apiFetch(urlbase + 'backend/auth/setPassword', {
-                    method: 'POST',
-                    body: form_data
-                });
-
-                /* BLOCCO DI SICUREZZA: se apiFetch ha assorbito un 403, fermati qui */
-                if ( ! response) return;
-
-                /* 3. Estrazione dati JSON (qui arriva solo se lo status è 200 OK) */
-                const data = await response.json();
-
-                /* 4. Successo Finale: Redirect alla pagina di login */
-                window.location.href = `${urlbase}backend/auth`;
-
-            } catch (error) {
-                /* 5. Gestione centralizzata dei fallimenti HTTP */
-                if (error.status === 422) {
-                    /* Errore di Validazione (es. password troppo corta o non coincidente) */
-                    handleValidationErrors(error.data.errors);
-                    showToast('danger', error.data.message);
-                } else if (error.status === 401) {
-                    /* Fallimento Logico (es. token di reset scaduto o invalido) */
-                    showToast('danger', error.data.message);
-                } else {
-                    /* Altri errori loggati in console */
-                    console.error("Errore durante l'impostazione della password:", error);
-                }
-            }
-        }
-    }
+        setPasswordManager.init();
+    },
 }
 
 /* Se esiste una funzione per l'azione corrente, eseguila */

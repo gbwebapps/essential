@@ -22,6 +22,9 @@ class AdminsModel extends BackendModel
     /* @var array Campi consentiti per l'operazione di eliminazione */
     protected array $delAllowedFields = ['uuid'];
 
+    /* @var array Campi consentiti per l'operazione di eliminazione */
+    protected array $resetPasswordAllowedFields = ['uuid'];
+
     /* @var array Campi consentiti per il cambio di stato attivo/inattivo */
     protected array $changeStatusAllowedFields = ['uuid'];
 
@@ -166,6 +169,16 @@ class AdminsModel extends BackendModel
         ];
     }
 
+    public function resetPasswordValidationRules(): array
+    {
+        return [
+            'uuid' => [
+                'label' => lang('backend/admins.labels.uuid'),
+                'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
+            ],
+        ];
+    }
+
     public function changeStatusValidationRules(): array
     {
         return [
@@ -207,7 +220,7 @@ class AdminsModel extends BackendModel
         endif;
 
         /* 2. Prendo i dati anagrafici standardizzati */
-        $result = ['result' => true,'row' => $data['row']];
+        $result = ['result' => true, 'row' => $data['row']];
 
         try 
         {
@@ -235,7 +248,7 @@ class AdminsModel extends BackendModel
         }
     }
 
-    public function add(array $posts): array
+    public function add(array $posts, \CodeIgniter\HTTP\IncomingRequest $request): array
     {
         try 
         {
@@ -277,7 +290,7 @@ class AdminsModel extends BackendModel
                 $this->db->transRollback();
 
                 log_message('error', lang('backend/admins.messages.addError'));
-                return ['result' => 'addError', 'message' => lang('backend/admins.messages.addError')];
+                return ['result' => false, 'message' => lang('backend/admins.messages.addError')];
             endif;
 
             /* Se le 3 query sono andate a buon fine, salvo definitivamente */
@@ -292,13 +305,10 @@ class AdminsModel extends BackendModel
 
         } catch (\Throwable $e) {
             
-            /* 4. Aggiunto il rollback dentro il catch per sicurezza */
-            if ($this->db->transStatus() !== true):
-                $this->db->transRollback();
-            endif;
+            $this->db->transRollback();
 
             log_message('error', lang('backend/admins.messages.addError') . ' - ' . $e->getMessage());
-            return ['result' => 'addError', 'message' => lang('backend/admins.messages.addError')];
+            return ['result' => false, 'message' => lang('backend/admins.messages.addError')];
         }
 
         /* Istanzio il servizio email dedicato e tento l'invio */
@@ -313,7 +323,7 @@ class AdminsModel extends BackendModel
         if ( ! $emailService->sendActivationEmail($data['row'], $token->getValue(), $module, $template, $subjectLangKey)):
 
             $message = sprintf(lang('backend/admins.messages.addSuccessNoEmail'), esc($data['row']->firstname), esc($data['row']->lastname));
-            return ['result' => 'emailFailed', 'message' => $message];
+            return ['result' => false, 'message' => $message];
             
         else:
             
@@ -355,55 +365,169 @@ class AdminsModel extends BackendModel
     {
         try 
         {
-            /* Utilizza la connessione nativa del model per la transazione */
-            $this->db->transBegin();
-
             /* Match dei posts con i campi consentiti */
             $posts = $this->checkAllowedFields($posts, $this->delAllowedFields);
 
+            /* Recupero i dati dell'utente prima dell'eliminazione */
+            $data = $this->getByUUID($posts['uuid']);
 
-                // some code here...
+            if($data['result'] === false):
+                return ['result' => false, 'message' => $data['message']];
+            endif;
 
+            $this->db->transBegin();
+
+            /* Eliminazione utente */
+            $sql = "delete from admins where uuid = ?";
+            $this->db->query($sql, [$posts['uuid']]);
 
             if ($this->db->transStatus() === false):
+
                 $this->db->transRollback();
+                log_message('error', lang('backend/admins.messages.delError'));
+
                 return ['result' => false, 'message' => lang('backend/admins.messages.delError')];
             endif;
 
             $this->db->transCommit();
-            return ['result' => true, 'message' => lang('backend/admins.messages.delSuccess')];
+            return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.delSuccess'), esc($data['row']->firstname), esc($data['row']->lastname))];
 
         } catch (\Exception $e) {
+
+            /* Rollback incondizionato: se c'è un'eccezione, si annulla sempre */
             $this->db->transRollback();
-            return ['result' => false, 'message' => $e->getMessage()];
+
+            log_message('error', lang('backend/admins.messages.delError') . ' - ' . $e->getMessage());
+            return ['result' => false, 'message' => lang('backend/admins.messages.delError')];
+
         }
+    }
+
+    public function resetPassword(array $posts, \CodeIgniter\HTTP\IncomingRequest $request): array
+    {
+        try 
+        {
+            /* Match dei posts con i campi consentiti */
+            $posts = $this->checkAllowedFields($posts, $this->resetPasswordAllowedFields);
+
+            /* Recupero i dati dell'utente prima dell'eliminazione */
+            $data = $this->getByUUID($posts['uuid']);
+
+            if($data['result'] === false):
+                return ['result' => false, 'message' => $data['message']];
+            endif;
+
+            $userAgent = $request->getUserAgent()->getAgentString();
+            $ip = $request->getIPAddress();
+
+            /* Generazione token di attivazione */
+            $token = new \App\Libraries\Token();
+            $tokenHash = $token->getHash(config('BackendAuth')->hashKey);
+
+            /* 2. Calcolo corretto della scadenza lavorando sui secondi (timestamp) */
+            $expireTime = date('Y-m-d H:i:s', time() + config('BackendAuth')->activationTime);
+
+            $this->db->transBegin();
+
+            /* Scrittura Data di Reset nella tabella admins */
+            $sql = "update admins set resetted_at = ? where uuid = ?";
+            $this->db->query($sql, [date('Y-m-d H:i:s'), $posts['uuid']]);
+
+            /* Scrittura del token di attivazione */
+            $sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, token_expire, token_type, user_agent, ip) values (?, ?, ?, ?, ?, ?, ?)";
+            $this->db->query($sql, [$posts['uuid'], $tokenHash, date('Y-m-d H:i:s'), $expireTime, 'activation', $userAgent, $ip]);
+
+            if ($this->db->transStatus() === false):
+
+                $this->db->transRollback();
+                log_message('error', lang('backend/admins.messages.resetPasswordError'));
+
+                return ['result' => false, 'message' => lang('backend/admins.messages.resetPasswordError')];
+            endif;
+
+            $this->db->transCommit();
+
+        } catch (\Exception $e) {
+
+            $this->db->transRollback();
+
+            log_message('error', lang('backend/admins.messages.resetPasswordError') . ' - ' . $e->getMessage());
+            return ['result' => false, 'message' => lang('backend/admins.messages.resetPasswordError')];
+
+        }
+
+        /* Istanzio il servizio email dedicato e tento l'invio */
+        $emailService = new \App\Libraries\EmailService();
+
+        /* Configuro i parametri dinamici per questa specifica chiamata */
+        $module = $this->module;
+        $template = 'emailResetPasswordAdminPartial';
+        $subjectLangKey = 'backend/email.admins.resetPasswordAdmin.subjectResetPasswordAdminEmail';
+
+        /* Chiamata al metodo con i nuovi parametri separati */
+        if ( ! $emailService->sendActivationEmail($data['row'], $token->getValue(), $module, $template, $subjectLangKey)):
+
+            $message = sprintf(lang('backend/admins.messages.resetPasswordSuccessNoEmail'), esc($data['row']->firstname), esc($data['row']->lastname));
+            return ['result' => false, 'message' => $message];
+            
+        else:
+            
+            $message = sprintf(lang('backend/admins.messages.resetPasswordSuccess'), esc($data['row']->firstname), esc($data['row']->lastname));
+            return ['result' => true, 'message' => $message];
+            
+        endif;
     }
 
     public function changeStatus(array $posts): array
     {
         try 
         {
-            /* Utilizza la connessione nativa del model per la transazione */
-            $this->db->transBegin();
-
             /* Match dei posts con i campi consentiti */
             $posts = $this->checkAllowedFields($posts, $this->changeStatusAllowedFields);
 
+            /* Recupero i dati dell'utente prima dell'eliminazione */
+            $data = $this->getByUUID($posts['uuid']);
 
-                // some code here...
+            if($data['result'] === false):
+                return ['result' => false, 'message' => $data['message']];
+            endif;
 
+            $currentStatus = (int) $data['row']->status;
+
+            /* Converte il risultato in un intero (0 o 1) per MySQL */
+            if($currentStatus === 0):
+                $newStatus = 1;
+                $suspendedAt = null;
+            elseif($currentStatus === 1):
+                $newStatus = 0;
+                $suspendedAt = date('Y-m-d H:i:s');
+            endif;
+
+            $this->db->transBegin();
+
+            /* cambio status utente */
+            $sql = "update admins set status = ?, suspended_at = ? where uuid = ?";
+            $this->db->query($sql, [$newStatus, $suspendedAt, $posts['uuid']]);
 
             if ($this->db->transStatus() === false):
+
                 $this->db->transRollback();
+                log_message('error', lang('backend/admins.messages.changeStatusError'));
+
                 return ['result' => false, 'message' => lang('backend/admins.messages.changeStatusError')];
             endif;
 
             $this->db->transCommit();
-            return ['result' => true, 'message' => lang('backend/admins.messages.changeStatusSuccess')];
+            return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.changeStatusSuccess'), esc($data['row']->firstname), esc($data['row']->lastname))];
 
         } catch (\Exception $e) {
+
+            /* Rollback incondizionato: se c'è un'eccezione, si annulla sempre */
             $this->db->transRollback();
-            return ['result' => false, 'message' => $e->getMessage()];
+
+            log_message('error', lang('backend/admins.messages.changeStatusError') . ' - ' . $e->getMessage());
+            return ['result' => false, 'message' => lang('backend/admins.messages.changeStatusError')];
+
         }
     }
 }

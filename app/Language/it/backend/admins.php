@@ -36,7 +36,9 @@ return [
 		'active' => 'Attivo', 
 		'unactive' => 'Inattivo', 
 		'noImage' => 'Nessuna immagine', 
-		'created' => 'Aggiunto il ',
+		'created' => 'Aggiunto il ', 
+		'resetted' => 'Reset il ',
+		'suspended' => 'Sospeso il ',
 		'note' => 'Note aggiuntive'
 	],
 	'placeholders' => [
@@ -63,15 +65,19 @@ return [
 		'refreshData' => 'Ricarica dati', 
 	],
 	'messages' => [
-		'areYouSureResetData' => 'Sei sicuro di voler resettare i dati?',
-		'areYouSureRefreshData' => 'Sei sicuro di voler ricaricare i dati?',
-		'areYouSureChangeStatus' => 'Sei sicuro di cambiare lo stato?', 
-		'areYouSureReset' => 'Sei sicuro di resettare la password?', 
-		'areYouSureDelete' => 'Sei sicuro di eliminare l\'amministratore?', 
+		'areYouSureResetData' => 'Sei sicuro di voler resettare i dati?', 
+		'areYouSureRefreshData' => 'Sei sicuro di voler ricaricare i dati?', 
+		'areYouSureChangeStatus' => 'Sei sicuro di modificare lo stato di %s %s?', 
+		'areYouSureReset' => 'Sei sicuro di resettare la password di %s %s?', 
+		'areYouSureDelete' => 'Sei sicuro di eliminare  %s %s?', 
 		'noRecordsFound' => 'Non sono presenti amministratori.', 
 		'validationErrors' => 'Errori di validazione.', 
 		'addSuccess' => 'Amministratore %s %s aggiunto con successo.', 
-		'addSuccessNoEmail' => 'Amministratore %s %s aggiunto con successo,  ma la mail non è stata inviata. Contattare amministratore.', 
+		'addSuccessNoEmail' => 'Amministratore %s %s aggiunto con successo, ma la mail non è stata inviata. Contattare amministratore.', 
 		'addError' => 'Aggiunta amministratore non andata a buon fine.', 
+		'delSuccess' => 'Amministratore %s %s eliminato con successo.',
+		'delError' => 'Eliminazione amministratore non andata a buon fine.',
+		'changeStatusSuccess' => 'Modifica stato %s %s effettuato con successo.',
+		'changeStatusError' => 'Modifica stato amministratore non andato a buon fine.', 
 	]
 ];

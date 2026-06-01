@@ -49,7 +49,7 @@
                 <!-- Punto di iniezione del contenuto specifico della vista -->
                 <div id="content-body-wrapper" 
                     class="<?= (isset($centerContent) && $centerContent) ? 'd-flex flex-column justify-content-center w-100' : ''; ?>" 
-                    style="<?= (isset($centerContent) && $centerContent) ? 'min-height: 75vh;' : ''; ?>">
+                    style="<?= (isset($centerContent) && $centerContent) ? 'min-height: 65vh;' : ''; ?>">
                     <?= $this->renderSection('content'); ?>
                 </div>
                 

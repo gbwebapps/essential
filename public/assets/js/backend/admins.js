@@ -3,6 +3,8 @@ import { urlbase, controller, action, apiFetch, showToast, askConfirm, smoothRep
 
 /* Import dei componenti dalla sottocartella */
 import { ListManager, AddManager, EditManager, DeleteManager, ChangeStatusManager, GeneralDataManager, MetaDataManager } from './components/Crud.js';
+import { ResetPasswordManager } from './components/Auth.js';
+
 import { GalleryOneImgManager } from './components/GalleryOneImgManager.js';
 import { UploadPreviewImgManager } from './components/UploadPreviewImgManager.js';
 import { GalleryOneDocManager } from './components/GalleryOneDocManager.js';
@@ -18,73 +20,35 @@ const actions = {
             containerId: 'showAll-admins-container',
             searchFields: ['firstname', 'lastname', 'email', 'phone']
         });
-
         adminsManager.init();
 
-        let deleteManager = new DeleteManager({
+        const deleteManager = new DeleteManager({
             controller: controller,
             url: urlbase + 'backend/admins/delete',
             listManager: adminsManager
         });
         deleteManager.init();
 
-        let changeStatusManager = new ChangeStatusManager({
+        const changeStatusManager = new ChangeStatusManager({
             controller: controller,
             url: urlbase + 'backend/admins/changeStatus',
             listManager: adminsManager
         });
         changeStatusManager.init();
 
-        /* Listener per il reset password nella vista showAll */
-        document.addEventListener('submit', async function(e) {
-            if (e.target.matches('.reset_admin')) {
-                e.preventDefault();
-                const message = e.target.dataset.message;
-                const form_data = new FormData(e.target);
-
-                const ok = await askConfirm(message);
-                if (ok) {
-                    reset_password(form_data, message);
-                }
-            }
+        const adminResetManager = new ResetPasswordManager({
+            formSelector: '.reset_admin',
+            url: `${urlbase}backend/admins/resetPassword`,
+            listManager: adminsManager /* Passo l'istanza per ricaricare la tabella */
         });
-
-        /* Funzione per il reset password nella vista showAll */
-        function reset_password(form_data) {
-            apiFetch(urlbase + 'backend/admins/reset', {
-                method: 'POST',
-                headers: {'X-CSRF-Token': form_data.get('csrf_token') },
-                body: form_data
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.result === 'no_current_admin_logged') {
-                        window.location.href = urlbase + 'backend/auth/login';
-                    } else if (data.result === '404') {
-                        window.location.href = urlbase + 'backend/404';
-                    } else {
-                        if (data.errors) {
-                            showToast('danger', data.errors);
-                        } else {
-                            if (data.result === false) {
-                                showToast('danger', data.message);
-                            } else if (data.result === true) {
-                                showToast('success', data.message);
-                                adminsManager.showAll();
-                            }
-                        }
-                    }
-                })
-                .catch(error => console.error(error));
-        }
-
+        adminResetManager.init();
     },
     add: function() {
 
-        // let imagePreviewManager = new UploadPreviewImgManager('#inputImages', '#preview_images', '#buttonImages');
-        // let docPreviewManager = new UploadPreviewDocManager('#inputDocuments', '#preview_documents', '#buttonDocuments');
+        // const imagePreviewManager = new UploadPreviewImgManager('#inputImages', '#preview_images', '#buttonImages');
+        // const docPreviewManager = new UploadPreviewDocManager('#inputDocuments', '#preview_documents', '#buttonDocuments');
 
-        let addManager = new AddManager({
+        const addManager = new AddManager({
             formIds: ['admins_add'],
             url: urlbase + 'backend/admins/add',
             resetId: 'add_reset',
@@ -96,13 +60,13 @@ const actions = {
     },
     edit: function() {
 
-        // let galleryOneImgManager = new GalleryOneImgManager('#images_data');
-        // let imagePreviewManager = new UploadPreviewImgManager('#inputImages', '#preview_images', '#buttonImages');
+        // const galleryOneImgManager = new GalleryOneImgManager('#images_data');
+        // const imagePreviewManager = new UploadPreviewImgManager('#inputImages', '#preview_images', '#buttonImages');
 
-        // let galleryOneDocManager = new GalleryOneDocManager('#documents_data');
-        // let docPreviewManager = new UploadPreviewDocManager('#inputDocuments', '#preview_documents', '#buttonDocuments');
+        // const galleryOneDocManager = new GalleryOneDocManager('#documents_data');
+        // const docPreviewManager = new UploadPreviewDocManager('#inputDocuments', '#preview_documents', '#buttonDocuments');
 
-        let editManager = new EditManager({
+        const editManager = new EditManager({
             formIds: ['admins_edit'],
             url: urlbase + 'backend/admins/edit',
             refreshId: 'edit_refresh',
@@ -113,12 +77,12 @@ const actions = {
             // galleryOneDocManager: galleryOneDocManager
         });
 
-        let generalDataManager = new GeneralDataManager({
+        const generalDataManager = new GeneralDataManager({
             url: urlbase + 'backend/admins/getGeneralData'
         });
         generalDataManager.init();
 
-        let metaDataManager = new MetaDataManager({
+        const metaDataManager = new MetaDataManager({
             url: urlbase + 'backend/admins/getMetaData'
         });
         metaDataManager.init();
@@ -126,17 +90,17 @@ const actions = {
 
     show: function() {
 
-        let generalDataManager = new GeneralDataManager({
+        const generalDataManager = new GeneralDataManager({
             url: urlbase + 'backend/admins/getGeneralData'
         });
         generalDataManager.init();
 
-        let metaDataManager = new MetaDataManager({
+        const metaDataManager = new MetaDataManager({
             url: urlbase + 'backend/admins/getMetaData'
         });
         metaDataManager.init();
 
-        let statusManager = new ChangeStatusManager({
+        const statusManager = new ChangeStatusManager({
             url: urlbase + 'backend/admins/changeStatus'
         }, {
             onStatusAfter: data => {
@@ -149,8 +113,8 @@ const actions = {
         });
         statusManager.init();
 
-        // let galleryOneImgManager = new GalleryOneImgManager('#images_data');
-        // let galleryOneDocManager = new GalleryOneDocManager('#documents_data');
+        // const galleryOneImgManager = new GalleryOneImgManager('#images_data');
+        // const galleryOneDocManager = new GalleryOneDocManager('#documents_data');
 
         /* Listener per il refresh Tokens data */
         document.addEventListener('submit', function(e) {

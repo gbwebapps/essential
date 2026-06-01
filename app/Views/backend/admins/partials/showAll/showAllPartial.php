@@ -149,7 +149,7 @@
 
                                                     <!-- Pulsante Dettaglio -->
                                                     <li>
-                                                        <a class="dropdown-item" href="<?= base_url('admin/admins/show/' . esc($admin->uuid)); ?>">
+                                                        <a class="dropdown-item" href="<?= base_url('backend/admins/show/' . esc($admin->uuid)); ?>">
                                                             <i class="fa-solid fa-circle-info"></i> <?= lang('backend/admins.actions.show'); ?>
                                                         </a>
                                                     </li>
@@ -157,7 +157,7 @@
 
                                                     <!-- Pulsante Aggiorna -->
                                                     <li>
-                                                        <a class="dropdown-item" href="<?= base_url('admin/admins/edit/' . esc($admin->uuid)); ?>">
+                                                        <a class="dropdown-item" href="<?= base_url('backend/admins/edit/' . esc($admin->uuid)); ?>">
                                                             <i class="fa-solid fa-pen-to-square"></i> <?= lang('backend/admins.actions.edit'); ?>
                                                         </a>
                                                     </li>

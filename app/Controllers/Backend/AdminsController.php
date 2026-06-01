@@ -37,13 +37,13 @@ class AdminsController extends BackendController
 
     public function showAll(): string|ResponseInterface
     {
-        if($this->request->isAJAX()):
+        if ($this->request->isAJAX() && $this->request->is('post')):
 
             $posts = $this->request->getPost();
 
             $rules = $this->adminsModel->showAllValidationRules();
-            if (! $this->validateData($posts, $rules)):
-                return $this->response->setStatusCode(422)->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
+            if ( ! $this->validateData($posts, $rules)):
+                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
             endif;
 
             $rules = $this->adminsModel->showAllSearchValidationRules();
@@ -51,7 +51,7 @@ class AdminsController extends BackendController
 
                 $formattedErrors = removeDot('searchFields.', $this->validator->getErrors());
 
-                return $this->response->setStatusCode(422)->setJSON(['errors' => $formattedErrors, 'message' => lang('backend/admins.messages.validationErrors')]);
+                return $this->response->setJSON(['errors' => $formattedErrors, 'message' => lang('backend/admins.messages.validationErrors')]);
             endif;
             
             $this->data['data'] = $this->adminsModel->getData($posts);
@@ -86,7 +86,7 @@ class AdminsController extends BackendController
 
     public function add(): string|ResponseInterface
     {
-        if($this->request->isAJAX()):
+        if ($this->request->isAJAX() && $this->request->is('post')):
 
             $posts = array_merge($this->request->getPost(), ['images' => $this->request->getFileMultiple('images') ?? []], ['documents' => $this->request->getFileMultiple('documents') ?? []]);
 
@@ -97,12 +97,12 @@ class AdminsController extends BackendController
             $rules = $this->adminsModel->addValidationRules();
 
             if (! $this->validateData($posts, $rules)):
-                return $this->response->setStatusCode(422)->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
+                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
             endif;
 
-            $json = $this->adminsModel->add($posts);
+            $json = $this->adminsModel->add($posts, $this->request);
 
-            if (($json['result'] === 'createAdminFailed') || ($json['result'] === 'emailFailed')):
+            if ($json['result'] === false):
                 return $this->response->setJSON(['result' => false, 'message' => $json['message']]);
             endif;
 
@@ -124,7 +124,7 @@ class AdminsController extends BackendController
 
     public function edit(string $uuid = null): string|ResponseInterface
     {
-        if($this->request->isAJAX()):
+        if ($this->request->isAJAX() && $this->request->is('post')):
 
             $posts = array_merge($this->request->getPost(), ['images' => $this->request->getFileMultiple('images') ?? []], ['documents' => $this->request->getFileMultiple('documents') ?? []]);
 
@@ -140,7 +140,7 @@ class AdminsController extends BackendController
         return $this->render('backend/admins/editView', $this->data);
     }
 
-    public function show(string $uuid): string|ResponseInterface
+    public function show(string $uuid): string
     {
         $posts = $this->request->getPost();
         
@@ -154,29 +154,70 @@ class AdminsController extends BackendController
 
     public function delete(): ResponseInterface
     {
-        if($this->request->isAJAX()):
+        if ($this->request->isAJAX() && $this->request->is('post')):
 
             $posts = $this->request->getPost();
+            $rules = $this->adminsModel->delValidationRules();
 
-            // ...
+            if ( ! $this->validateData($posts, $rules)):
+                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
+            endif;
+
+            $json = $this->adminsModel->del($posts);
+
+            return $this->response->setJSON($json);
 
         endif;
+
+        /* Fallback per richieste non valide */
+        return $this->response->setJSON(['result' => false, 'message' => 'Richiesta non valida']);
+    }
+
+    public function resetPassword(): ResponseInterface
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            $posts = $this->request->getPost();
+            $rules = $this->adminsModel->resetPasswordValidationRules();
+
+            if ( ! $this->validateData($posts, $rules)):
+                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
+            endif;
+
+            $json = $this->adminsModel->resetPassword($posts, $this->request);
+
+            return $this->response->setJSON($json);
+
+        endif;
+
+        /* Fallback per richieste non valide */
+        return $this->response->setJSON(['result' => false, 'message' => 'Richiesta non valida']);
     }
 
     public function changeStatus(): ResponseInterface
     {
-        if($this->request->isAJAX()):
+        if ($this->request->isAJAX() && $this->request->is('post')):
 
             $posts = $this->request->getPost();
+            $rules = $this->adminsModel->changeStatusValidationRules();
 
-            // ...
+            if (! $this->validateData($posts, $rules)):
+                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
+            endif;
+
+            $json = $this->adminsModel->changeStatus($posts);
+
+            return $this->response->setJSON($json);
 
         endif;
+
+        /* Fallback per richieste non valide */
+        return $this->response->setJSON(['result' => false, 'message' => 'Richiesta non valida']);
     }
 
     public function getGeneralData(): ResponseInterface
     {
-        if($this->request->isAJAX()):
+        if ($this->request->isAJAX() && $this->request->is('post')):
 
             $posts = $this->request->getPost();
 
@@ -187,7 +228,7 @@ class AdminsController extends BackendController
 
     public function getMetaData(): ResponseInterface
     {
-        if($this->request->isAJAX()):
+        if ($this->request->isAJAX() && $this->request->is('post')):
 
             $posts = $this->request->getPost();
 

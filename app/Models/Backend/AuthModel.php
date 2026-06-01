@@ -108,7 +108,7 @@ class AuthModel extends BackendModel
 
             /* Se l'utente non esiste, esce immediatamente con errore generico (sicurezza) */
             if ( ! $admin):
-                return ['result' => 'loginFailed', 'message' => lang('backend/auth.messages.loginFailed')];
+                return ['result' => false, 'message' => lang('backend/auth.messages.loginFailed')];
             endif;
 
             /* 3. Controllo immediato del blocco tentativi (senza effettuare ulteriori scritture) */
@@ -130,7 +130,7 @@ class AuthModel extends BackendModel
                 endif;
 
                 $this->db->transCommit();
-                return ['result' => 'loginFailed', 'message' => lang('backend/auth.messages.loginFailed')];
+                return ['result' => false, 'message' => lang('backend/auth.messages.loginFailed')];
                 
             endif;
 
@@ -271,6 +271,9 @@ class AuthModel extends BackendModel
 
                 $this->db->transBegin();
 
+                $sql = "update admins set resetted_at = ? where uuid = ?";
+                $this->db->query($sql, [date('Y-m-d H:i:s'), $admin->uuid]);
+
                 $sql = "delete from admins_tokens where admin_uuid = ? and token_type = ?";
                 $this->db->query($sql, [$admin->uuid, 'activation']);
 
@@ -288,15 +291,19 @@ class AuthModel extends BackendModel
                 if ($this->db->transStatus() === false):
                     $this->db->transRollback();
                     log_message('error', lang('backend/auth.messages.resetPasswordFailed'));
-                    return ['result' => 'resetPasswordFailed', 'message' => lang('backend/auth.messages.resetPasswordFailed')];
+                    return ['result' => false, 'message' => lang('backend/auth.messages.resetPasswordFailed')];
                 endif;
 
                 $this->db->transCommit();
 
             } catch (\Throwable $e) {
-                $this->db->transRollback();
+
+                if ($this->db->transStatus() === false):
+                    $this->db->transRollback();
+                endif;
+
                 log_message('error', lang('backend/auth.messages.resetPasswordFailed') . ' - ' . $e->getMessage());
-                return ['result' => 'resetPasswordFailed', 'message' => lang('backend/auth.messages.resetPasswordFailed')];
+                return ['result' => false, 'message' => lang('backend/auth.messages.resetPasswordFailed')];
             }
 
             /* 2. Integrazione classe nativa Email e compilazione della vista */
@@ -319,7 +326,7 @@ class AuthModel extends BackendModel
                 $debugger = $emailService->printDebugger(['headers']);
                 log_message('error', 'Errore SMTP: ' . $debugger);
 
-                return ['result' => 'emailFailed', 'message' => lang('backend/email.messages.sendingEmailFailed')];
+                return ['result' => false, 'message' => lang('backend/email.messages.sendingEmailFailed')];
             endif;
 
         endif;
@@ -355,7 +362,7 @@ class AuthModel extends BackendModel
                 /* 4. Verifica stato transazione prima del commit */
                 if ($this->db->transStatus() === false):
                     $this->db->transRollback();
-                    return ['result' => 'setPasswordFailed', 'message' => lang('backend/auth.messages.setPasswordError')];
+                    return ['result' => false, 'message' => lang('backend/auth.messages.setPasswordError')];
                 endif;
 
                 $this->db->transCommit();
@@ -366,7 +373,7 @@ class AuthModel extends BackendModel
 
             endif;
 
-            return ['result' => 'setPasswordFailed', 'message' => lang('backend/auth.messages.setPasswordFailed')];
+            return ['result' => false, 'message' => lang('backend/auth.messages.setPasswordFailed')];
 
         } catch (\Throwable $e) {
             
@@ -378,7 +385,7 @@ class AuthModel extends BackendModel
             log_message('error', lang('backend/auth.messages.setPasswordError') . ' - ' . $e->getMessage());
             
             /* Modificato false in 'setPasswordFailed' per coerenza con le aspettative del Controller */
-            return ['result' => 'setPasswordFailed', 'message' => lang('backend/auth.messages.setPasswordError')];
+            return ['result' => false, 'message' => lang('backend/auth.messages.setPasswordError')];
         }
     }
 

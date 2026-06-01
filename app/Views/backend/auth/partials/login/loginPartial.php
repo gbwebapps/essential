@@ -13,7 +13,7 @@
             <!-- Campo password -->
             <div class="mb-2">
                 <label for="password" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/auth.labels.password'); ?></label>
-                <input type="password" id="password" name="password" value="19_DPhrvmlapdf_83" class="form-control" placeholder="<?= lang('backend/auth.placeholders.password'); ?>">
+                <input type="password" id="password" name="password" value="06Febbraio69@" class="form-control" placeholder="<?= lang('backend/auth.placeholders.password'); ?>">
                 <div class="error_password text-danger fw-bold small pt-1">&nbsp;</div>
             </div>
 

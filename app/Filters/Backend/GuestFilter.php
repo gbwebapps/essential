@@ -25,8 +25,8 @@ class GuestFilter implements FilterInterface
         session()->setFlashdata('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
 
         /* Se un utente loggato tenta un'operazione AJAX su rotte guest (es. tab rimasta aperta) */
-        if ($request->isAJAX()):
-            return service('response')->setJSON(['result' => false, 'message' => $message])->setStatusCode(403);
+        if ($request->isAJAX() && $request->is('post')):
+            return service('response')->setJSON(['result' => false, 'message' => $message]);
         endif;
 
         /* Reindirizzamento standard alla dashboard */

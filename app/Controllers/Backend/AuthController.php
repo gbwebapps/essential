@@ -59,14 +59,10 @@ class AuthController extends BackendController
             $rules = $this->authModel->validateLoginRules();
 
             if (! $this->validateData($posts, $rules)):
-                return $this->response->setStatusCode(422)->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validationErrors')]);
+                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validationErrors')]);
             endif;
 
             $json = $this->authModel->login($posts, $this->request);
-
-            if ($json['result'] === 'loginFailed'):
-                return $this->response->setStatusCode(401)->setJSON($json);
-            endif;
 
             /* Recupera l'URL salvato dal filtro, altrimenti usa la dashboard di default */
             $redirectUrl = session()->get('intended_url') ?? base_url('backend/dashboard');
@@ -97,14 +93,10 @@ class AuthController extends BackendController
             $rules = $this->authModel->validateResetPasswordRules();
 
             if( ! $this->validateData($posts, $rules)):
-                return $this->response->setStatusCode(422)->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validationErrors')]);
+                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validationErrors')]);
             endif;
 
             $json = $this->authModel->resetPassword($posts, $this->request);
-
-            if(($json['result'] === 'resetPasswordFailed') || ($json['result'] === 'emailFailed')):
-                return $this->response->setStatusCode(401)->setJSON($json);
-            endif;
 
             /* Imposta i dati in sessione per la pagina di destinazione */
             session()->setFlashdata('message', $json['message']);
@@ -132,14 +124,10 @@ class AuthController extends BackendController
             $rules = $this->authModel->validateSetPasswordRules();
 
             if( ! $this->validateData($posts, $rules)):
-                return $this->response->setStatusCode(422)->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validationErrors')]);
+                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validationErrors')]);
             endif;
 
             $json = $this->authModel->setPassword($posts);
-
-            if ($json['result'] === 'setPasswordFailed'):
-                return $this->response->setStatusCode(401)->setJSON($json);
-            endif;
 
             /* Imposta i dati in sessione per la pagina di destinazione */
             session()->setFlashdata('message', $json['message']);
