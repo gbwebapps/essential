@@ -186,6 +186,10 @@ class AdminsModel extends BackendModel
                 'label' => lang('backend/admins.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
             ],
+            'context' => [
+                'label' => lang('backend/admins.labels.context'),
+                'rules' => ['permit_empty', 'in_list[show]'],
+            ],
         ];
     }
 
@@ -195,6 +199,10 @@ class AdminsModel extends BackendModel
             'uuid' => [
                 'label' => lang('backend/admins.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
+            ],
+            'context' => [
+                'label' => lang('backend/admins.labels.context'),
+                'rules' => ['required', 'in_list[show,edit]'],
             ],
         ];
     }
@@ -496,11 +504,19 @@ class AdminsModel extends BackendModel
 
             /* Converte il risultato in un intero (0 o 1) per MySQL */
             if($currentStatus === 0):
+
                 $newStatus = 1;
                 $suspendedAt = null;
+                $data['row']->status = 1;
+                $data['row']->suspended_at = null;
+
             elseif($currentStatus === 1):
+
                 $newStatus = 0;
                 $suspendedAt = date('Y-m-d H:i:s');
+                $data['row']->status = 0;
+                $data['row']->suspended_at = $suspendedAt;
+
             endif;
 
             $this->db->transBegin();
@@ -518,7 +534,7 @@ class AdminsModel extends BackendModel
             endif;
 
             $this->db->transCommit();
-            return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.changeStatusSuccess'), esc($data['row']->firstname), esc($data['row']->lastname))];
+            return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.changeStatusSuccess'), esc($data['row']->firstname), esc($data['row']->lastname)), 'admin' => $data['row']];
 
         } catch (\Exception $e) {
 
@@ -529,5 +545,15 @@ class AdminsModel extends BackendModel
             return ['result' => false, 'message' => lang('backend/admins.messages.changeStatusError')];
 
         }
+    }
+
+    public function getGeneralData()
+    {
+        
+    }
+
+    public function getMetaData()
+    {
+        
     }
 }

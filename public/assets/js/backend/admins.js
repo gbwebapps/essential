@@ -31,13 +31,18 @@ const actions = {
 
         const changeStatusManager = new ChangeStatusManager({
             controller: controller,
-            url: urlbase + 'backend/admins/changeStatus',
-            listManager: adminsManager
+            url: urlbase + 'backend/admins/changeStatus'
+        }, {
+            onStatusAfter: data => {
+                if (typeof adminsManager !== 'undefined' && typeof adminsManager.showAll === 'function') {
+                    adminsManager.showAll();
+                }
+            }
         });
         changeStatusManager.init();
 
         const adminResetManager = new ResetPasswordManager({
-            formSelector: '.reset_admin',
+            formSelector: '.resetAdmin',
             url: `${urlbase}backend/admins/resetPassword`,
             listManager: adminsManager /* Passo l'istanza per ricaricare la tabella */
         });
@@ -100,197 +105,24 @@ const actions = {
         });
         metaDataManager.init();
 
-        const statusManager = new ChangeStatusManager({
+        const changeStatusManager = new ChangeStatusManager({
+            controller: controller, 
             url: urlbase + 'backend/admins/changeStatus'
         }, {
             onStatusAfter: data => {
-                const el = document.getElementById('change_status_partial');
-                if (el) el.innerHTML = data.status_view;
+                const el = document.getElementById('changeStatusPartial');
+                if (el) el.innerHTML = data.statusView;
 
-                const meta = document.getElementById('meta_data');
-                if (meta) meta.innerHTML = data.meta_view;
+                const meta = document.getElementById('metaData');
+                if (meta) meta.innerHTML = data.metaView;
             }
         });
-        statusManager.init();
+        changeStatusManager.init();
 
         // const galleryOneImgManager = new GalleryOneImgManager('#images_data');
         // const galleryOneDocManager = new GalleryOneDocManager('#documents_data');
-
-        /* Listener per il refresh Tokens data */
-        document.addEventListener('submit', function(e) {
-            if (e.target.matches('#get_tokens_data')) {
-                e.preventDefault();
-                const form_data = new FormData(e.target);
-                get_tokens_data(form_data);
-            }
-        });
-
-        /* Funzione per il refresh Tokens data */
-        function get_tokens_data(form_data) {
-            apiFetch(urlbase + 'backend/admins/getTokensData', {
-                method: 'POST',
-                headers: {'X-CSRF-Token': form_data.get('csrf_token') },
-                body: form_data
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.result === 'no_current_admin_logged') {
-                        window.location.href = urlbase + 'backend/auth/login';
-                    } else if (data.result === '404') {
-                        window.location.href = urlbase + 'backend/404';
-                    } else {
-                        if (data.errors) {
-                            showToast('danger', data.errors);
-                        } else {
-                            if (data.result === false) {
-                                showToast('danger', data.message);
-                            } else if (data.result === true) {
-                                smoothReplace(document.getElementById('tokens_data'), data.output);
-                            }
-                        }
-                    }
-                })
-                .catch(error => console.error(error));
-        }
-
-        /* Listener per il cambio permesso nella vista show */
-        document.addEventListener('submit', async function(e) {
-            if (e.target.matches('.change_permission')) {
-                e.preventDefault();
-                const message = e.target.dataset.message;
-                const form_data = new FormData(e.target);
-
-                const ok = await askConfirm(message);
-                if (ok) {
-                    change_permission(form_data, message);
-                }
-            }
-        });
-
-        /* Funzione per il cambio permesso nella vista show */
-        function change_permission(form_data) {
-            apiFetch(urlbase + 'backend/admins/changePermission', {
-                method: 'POST',
-                headers: {'X-CSRF-Token': form_data.get('csrf_token') },
-                body: form_data
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.result === 'no_current_admin_logged') {
-                        window.location.href = urlbase + 'backend/auth/login';
-                    } else if (data.result === '404') {
-                        window.location.href = urlbase + 'backend/404';
-                    } else {
-                        if (data.errors) {
-                            showToast('danger', data.errors);
-                        } else {
-                            if (data.result === false) {
-                                showToast('danger', data.message);
-                            } else if (data.result === true) {
-                                smoothReplace(document.getElementById('permissions_data'), data.permissions_view);
-                                smoothReplace(document.getElementById('meta_data'), data.meta_view);
-                                showToast('success', data.message);
-                            }
-                        }
-                    }
-                })
-                .catch(error => console.error(error));
-        }
-
-        /* Listener per l'eliminazione di un token dalla lista tokens nella vista show */
-        document.addEventListener('submit', async function(e) {
-            if (e.target.matches('.delete_token')) {
-                e.preventDefault();
-
-                const message = e.target.dataset.message;
-                const form_data = new FormData(e.target);
-
-                const ok = await askConfirm(message);
-                if (ok) {
-                    delete_token(form_data, message);
-                }
-            }
-        });
-
-        /* Funzione per l'eliminazione di un token dalla lista tokens nella vista show */
-        function delete_token(form_data) {
-            apiFetch(urlbase + 'backend/admins/deleteToken', {
-                method: 'POST',
-                headers: {'X-CSRF-Token': form_data.get('csrf_token') },
-                body: form_data
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.result === 'no_current_admin_logged') {
-                        window.location.href = urlbase + 'backend/auth/login';
-                    } else if (data.result === '404') {
-                        window.location.href = urlbase + 'backend/404';
-                    } else {
-                        if (data.errors) {
-                            showToast('danger', data.errors);
-                        } else {
-                            if (data.result === false) {
-                                showToast('danger', data.message);
-                            } else if (data.result === true) {
-                                smoothReplace(document.getElementById('tokens_data'), data.output);
-                                showToast('success', data.message);
-                            }
-                        }
-                    }
-                })
-                .catch(error => console.error(error));
-        }
     }
 };
-
-/* Listener per il refresh Permissions data */
-document.addEventListener('submit', function(e) {
-    if (e.target.matches('#get_permissions_data')) {
-        e.preventDefault();
-        const form_data = new FormData(e.target);
-        get_permissions_data(form_data);
-    }
-});
-
-/* Funzione per il refresh Permissions data */
-function get_permissions_data(form_data) {
-    apiFetch(urlbase + 'backend/admins/getPermissionsData', {
-        method: 'POST',
-        headers: {'X-CSRF-Token': form_data.get('csrf_token') },
-        body: form_data
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.result === 'no_current_admin_logged') {
-                window.location.href = urlbase + 'backend/auth/login';
-            } else if (data.result === '404') {
-                window.location.href = urlbase + 'backend/404';
-            } else {
-                if (data.errors) {
-                    showToast('danger', data.errors);
-                } else {
-                    if (data.result === false) {
-                        showToast('danger', data.message);
-                    } else if (data.result === true) {
-                        smoothReplace(document.getElementById('permissions_data'), data.output);
-                    }
-                }
-            }
-        })
-        .catch(error => console.error(error));
-}
-
-/* Listener per il link select all nei form add ed edit per selezionare tutti i check box dei permessi */
-document.addEventListener('click', function(e) {
-    if (e.target.matches('.select_all')) {
-        e.preventDefault();
-        const controller = e.target.dataset.controller;
-        const checkboxes = document.querySelectorAll(`input[type="checkbox"].${controller}`);
-        const anyChecked = Array.from(checkboxes).some(el => el.checked);
-        const newState = !anyChecked;
-        checkboxes.forEach(el => el.checked = newState);
-    }
-});
 
 /* Se esiste una funzione per l'azione corrente, eseguila */
 if (actions[action]) {

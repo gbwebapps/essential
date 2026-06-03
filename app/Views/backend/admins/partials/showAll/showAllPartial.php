@@ -121,18 +121,20 @@
                                             <!-- Cella status -->
                                             <td class="align-middle text-center">
                                                 <?php
-                                                    if($admin->status === '1'):
-                                                        $status_text = lang('backend/admins.labels.active');
-                                                        $status_class="text-success fw-bold btn btn-link shadow-none";
-                                                    elseif($admin->status === '0'):
-                                                        $status_text = lang('backend/admins.labels.unactive');
-                                                        $status_class="text-danger fw-bold btn btn-link shadow-none";
+                                                    $status = (int) $admin->status;
+
+                                                    if($status === 1):
+                                                        $statusText = lang('backend/admins.labels.active');
+                                                        $statusClass ="text-success fw-bold btn btn-link shadow-none";
+                                                    elseif($status === 0):
+                                                        $statusText = lang('backend/admins.labels.unactive');
+                                                        $statusClass ="text-danger fw-bold btn btn-link shadow-none";
                                                     endif;
                                                 ?>
-                                                <form class="change_status" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureChangeStatus'), esc($admin->firstname), esc($admin->lastname)); ?>">
+                                                <form class="changeStatus" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureChangeStatus'), esc($admin->firstname), esc($admin->lastname)); ?>">
                                                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
-                                                    <button type="submit" class="<?= $status_class; ?>">
-                                                        <?= $status_text; ?>
+                                                    <button type="submit" class="<?= $statusClass; ?>">
+                                                        <?= $statusText; ?>
                                                     </button>
                                                 </form>
                                             </td>
@@ -165,7 +167,7 @@
 
                                                     <!-- Pulsante Reset password -->
                                                     <li>
-                                                        <form class="reset_admin" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureReset'), esc($admin->firstname), esc($admin->lastname)); ?>">
+                                                        <form class="resetAdmin" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureReset'), esc($admin->firstname), esc($admin->lastname)); ?>">
                                                             <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
                                                             <button type="submit" class="dropdown-item btn-link text-secondary">
                                                                 <i class="fa-solid fa-unlock"></i> <?= lang('backend/admins.actions.reset'); ?>
@@ -176,7 +178,7 @@
 
                                                     <!-- Pulsante Elimina -->
                                                     <li>
-                                                        <form class="delete_record" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureDelete'), esc($admin->firstname), esc($admin->lastname)); ?>">
+                                                        <form class="deleteRecord" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureDelete'), esc($admin->firstname), esc($admin->lastname)); ?>">
                                                             <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
                                                             <button type="submit" class="dropdown-item btn-link text-secondary">
                                                                 <i class="fa-solid fa-trash"></i> <?= lang('backend/admins.actions.delete'); ?>

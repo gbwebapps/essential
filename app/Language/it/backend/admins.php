@@ -5,16 +5,19 @@ return [
 		'index' => 'Dati', 
 		'showAll' => 'Lista', 
 		'add' => 'Aggiungi', 
-		'edit' => 'Aggiorna'
+		'edit' => 'Aggiorna', 
+		'show' => 'Dettaglio'
 	],
 	'panels' => [
-		'generalData' => 'Dati generali'
+		'generalData' => 'Dati generali', 
+		'metaData' => 'Meta dati'
 	],
 	'linksBar' => [
 		'index' => 'Dati', 
 		'showAll' => 'Lista', 
 		'add' => 'Aggiungi', 
-		'edit' => 'Aggiorna'
+		'edit' => 'Aggiorna', 
+		'show' => 'Dettaglio'
 	], 
 	'options' => [
 		'first' => 'Prima opzione', 
@@ -63,6 +66,7 @@ return [
 		'resetData' => 'Resetta dati', 
 		'sendData' => 'Invia dati', 
 		'refreshData' => 'Ricarica dati', 
+		'reload' => 'Ricarica pannello'
 	],
 	'messages' => [
 		'areYouSureResetData' => 'Sei sicuro di voler resettare i dati?', 

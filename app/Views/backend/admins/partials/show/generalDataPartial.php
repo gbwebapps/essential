@@ -37,7 +37,7 @@
             <ul class="list-group list-group-flush">
                 <li class="list-group-item"><i class="fa-solid fa-arrow-circle-down"></i><?= lang('backend/admins.labels.status'); ?></li>
                 <li class="list-group-item">
-                    <div id="change_status_partial">
+                    <div id="changeStatusPartial">
                         <?= $this->include('backend/admins/partials/show/statusDataPartial', $this->data); ?>
                     </div>
                 </li>
@@ -48,9 +48,9 @@
         <div class="col-12">
             <!-- Campo note -->
             <ul class="list-group list-group-flush">
-                <li class="list-group-item"><i class="fa-solid fa-arrow-circle-down"></i><?= lang('backend/admins.labels.notes'); ?></li>
+                <li class="list-group-item"><i class="fa-solid fa-arrow-circle-down"></i><?= lang('backend/admins.labels.note'); ?></li>
                 <li class="list-group-item fw-bold">
-                    <?= is_null($admin->notes) ? lang('backend/admins.messages.no_notes') : esc($admin->notes); ?>
+                    <?= is_null($admin->note) ? lang('backend/admins.messages.noNotes') : esc($admin->note); ?>
                 </li>
             </ul>
         </div>

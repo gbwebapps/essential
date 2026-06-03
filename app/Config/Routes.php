@@ -86,6 +86,8 @@ $routes->group('backend', function($routes) {
             $routes->post('delete', '\App\Controllers\Backend\AdminsController::delete');
             $routes->post('changeStatus', '\App\Controllers\Backend\AdminsController::changeStatus');
             $routes->post('resetPassword', '\App\Controllers\Backend\AdminsController::resetPassword');
+            $routes->post('getGeneralData', '\App\Controllers\Backend\AdminsController::getGeneralData');
+            $routes->post('getMetaData', '\App\Controllers\Backend\AdminsController::getMetaData');
         });
     });
 });

@@ -5,6 +5,7 @@ namespace App\Controllers\Backend;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use CodeIgniter\HTTP\RedirectResponse;
 
 use App\Models\Backend\AdminsModel;
 use App\Libraries\Backend\AdminsClass;
@@ -132,22 +133,42 @@ class AdminsController extends BackendController
 
         endif;
 
+        $result = $this->adminsModel->getByUUID($uuid);
+
+        if($result['result'] !== true):
+            return redirect()->to('backend/dashboard');
+        endif;
+
         $this->data['action'] = 'edit';
         
         $this->data['title'] = lang('backend/admins.titles.edit');
         $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
 
+        $this->data['admin'] = $result['row'];
+        $this->data['uuid'] = $uuid;
+
         return $this->render('backend/admins/editView', $this->data);
     }
 
-    public function show(string $uuid): string
+    public function show(string $uuid): RedirectResponse|string
     {
-        $posts = $this->request->getPost();
+        if(( ! isset($uuid)) || ( ! $this->regexp->validateUUID($uuid))):
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', 'Formato identificativo non valido.')->with('class', 'danger');
+        endif;
+
+        $admin = $this->adminsModel->getByUUID($uuid);
+
+        if($admin['result'] === false):
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', $admin['message'])->with('class', 'danger');
+        endif;
         
         $this->data['action'] = 'show';
         
         $this->data['title'] = lang('backend/admins.titles.show');
         $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
+
+        $this->data['admin'] = $admin['row'];
+        $this->data['uuid'] = $uuid;
 
         return $this->render('backend/admins/showView', $this->data);
     }
@@ -201,11 +222,20 @@ class AdminsController extends BackendController
             $posts = $this->request->getPost();
             $rules = $this->adminsModel->changeStatusValidationRules();
 
-            if (! $this->validateData($posts, $rules)):
+            if ( ! $this->validateData($posts, $rules)):
                 return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
             endif;
 
             $json = $this->adminsModel->changeStatus($posts);
+
+            if(isset($posts['context']) && $posts['context'] === 'show'):
+
+                $this->data['admin'] = $json['admin'];
+
+                $json['statusView'] = view('backend/admins/partials/show/statusDataPartial', $this->data);
+                $json['metaView'] = view('backend/admins/partials/common/metaDataPartial', $this->data); 
+
+            endif;
 
             return $this->response->setJSON($json);
 
@@ -220,10 +250,41 @@ class AdminsController extends BackendController
         if ($this->request->isAJAX() && $this->request->is('post')):
 
             $posts = $this->request->getPost();
+            $rules = $this->adminsModel->generalDataValidationRules();
 
-            // ...
+            if ( ! $this->validateData($posts, $rules)):
+                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
+            endif;
+
+            $record = $this->adminsModel->getByUUID($posts['uuid']);
+
+            if($record['result'] === true):
+
+                $json = ['result' => true];
+
+                $this->data['admin'] = $record['row'];
+
+                if(isset($posts['context']) && $posts['context'] === 'show'):
+                    $json['output'] = view('backend/admins/partials/show/generalDataPartial', $this->data);
+                endif;
+
+                if(isset($posts['context']) && $posts['context'] === 'edit'):
+                    $json['output'] = view('backend/admins/partials/edit/generalDataPartial', $this->data);
+                endif;
+
+            else:
+
+                $json = ['result' => false];
+                $json['message'] = $record['message'];
+
+            endif;
 
         endif;
+
+        return $this->response->setJSON($json);
+
+        /* Fallback per richieste non valide */
+        return $this->response->setJSON(['result' => false, 'message' => 'Richiesta non valida']);
     }
 
     public function getMetaData(): ResponseInterface
@@ -231,9 +292,34 @@ class AdminsController extends BackendController
         if ($this->request->isAJAX() && $this->request->is('post')):
 
             $posts = $this->request->getPost();
+            $rules = $this->adminsModel->metaDataValidationRules();
 
-            // ...
+            if ( ! $this->validateData($posts, $rules)):
+                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
+            endif;
+
+            $record = $this->adminsModel->getByUUID($posts['uuid']);
+
+            if($record['result'] === true):
+
+                $json = ['result' => true];
+
+                $this->data['admin'] = $record['row'];
+
+                $json['output'] = view('backend/admins/partials/common/metaDataPartial', $this->data);
+
+            else:
+
+                $json = ['result' => false];
+                $json['message'] = $record['message'];
+
+            endif;
 
         endif;
+
+        return $this->response->setJSON($json);
+
+        /* Fallback per richieste non valide */
+        return $this->response->setJSON(['result' => false, 'message' => 'Richiesta non valida']);
     }
 }

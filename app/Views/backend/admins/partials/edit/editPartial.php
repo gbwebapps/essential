@@ -1,10 +1,10 @@
 <!-- Struttura principale del form di aggiornamento (Partial) -->
 
 <!-- Form per aggiornamento dati generali -->
-<form id="get_general_data"></form>
+<form id="getGeneralData"></form>
 
 <!-- Form per aggiornamento metadati -->
-<form id="get_meta_data"></form>
+<form id="getMetaData"></form>
 
 <div class="row">
     <div class="col-8 offset-2">
@@ -16,14 +16,14 @@
 
                 <!-- Sezione: Dati Anagrafici e Contatti -->
                 <div class="card-header rounded-0 d-flex justify-content-between align-items-center">
-                    <h2 class="card-title text-start mb-0"><?= lang('backend/admins.panels.general_data'); ?></h2>
-                    <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>" form="get_general_data">
-                    <input type="hidden" name="context" value="edit">
-                    <button type="submit" class="btn btn-sm btn-secondary" form="get_general_data">
+                    <h2 class="card-title text-start mb-0"><?= lang('backend/admins.panels.generalData'); ?></h2>
+                    <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>" form="getGeneralData">
+                    <input type="hidden" name="context" value="edit" form="getGeneralData">
+                    <button type="submit" class="btn btn-sm btn-secondary" form="getGeneralData">
                         <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/admins.buttons.reload'); ?>
                     </button>
                 </div>
-                <div id="general_data">
+                <div id="generalData">
                     <?= $this->include('backend/admins/partials/edit/generalDataPartial', $this->data); ?>
                 </div>
 
@@ -41,15 +41,15 @@
 
                 <!-- Meta Data -->
                 <div class="card-header rounded-0 d-flex justify-content-between align-items-center" style="border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);">
-                    <h2 class="card-title text-start mb-0"><?= lang('backend/admins.panels.meta_data'); ?></h2>
+                    <h2 class="card-title text-start mb-0"><?= lang('backend/admins.panels.metaData'); ?></h2>
                     <div>                            
-                        <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>" form="get_meta_data">
-                        <button type="submit" class="btn btn-sm btn-secondary" form="get_meta_data">
+                        <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>" form="getMetaData">
+                        <button type="submit" class="btn btn-sm btn-secondary" form="getMetaData">
                             <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/admins.buttons.reload'); ?>
                         </button>
                     </div>
                 </div>
-                <div id="meta_data">
+                <div id="metaData">
                     <?= $this->include('backend/admins/partials/common/metaDataPartial', $this->data); ?>
                 </div>
                 <!-- End Meta Data -->

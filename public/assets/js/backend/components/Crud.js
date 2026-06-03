@@ -224,8 +224,10 @@ export class ListManager {
 
     /* --- COMUNICAZIONE SERVER --- */
     async showAll() {
+        /* Hook opzionale prima dell'invio */
         if (typeof this.hooks.onShowBefore === 'function') {
-            this.hooks.onShowBefore(this.state);
+            const stop = this.hooks.onShowBefore(formData);
+            if (stop === false) return;
         }
 
         const urlParams = new URLSearchParams();
@@ -240,6 +242,9 @@ export class ListManager {
                 urlParams.append(key, this.state[key]);
             }
         });
+
+        /* Pulizia immediata degli errori visivi prima dell'invio */
+        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
 
         /* Chiamata Fetch */
         try {
@@ -256,14 +261,10 @@ export class ListManager {
                 return;
             }
 
-            /* 2. Controllo errori di validazione */
+            /* 2. Gestione errori di validazione (CORRETTA) */
             if (data.errors) {
-                if (typeof handleValidationErrors === 'function') {
-                    handleValidationErrors(data.errors);
-                }
-                if (data.message && typeof showToast === 'function') {
-                    showToast('danger', data.message);
-                }
+                if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
+                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
                 return;
             }
 
@@ -378,6 +379,9 @@ export class AddManager {
                 formData.append(`documents[${id}]`, file);
             });
         }
+
+        /* Pulizia immediata degli errori visivi prima dell'invio */
+        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
 
         try {
             /* Chiamata POST */
@@ -642,6 +646,9 @@ export class EditManager {
             });
         }
 
+        /* Pulizia immediata degli errori visivi prima dell'invio */
+        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
+
         try {
             /* Invio al backend con csrf token */
             const response = await apiFetch(this.config.url, {
@@ -711,6 +718,9 @@ export class EditManager {
             const stop = this.hooks.onRefreshBefore(formData);
             if (stop === false) return;
         }
+
+        /* Pulizia immediata degli errori visivi prima dell'invio */
+        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
 
         try {
             const response = await apiFetch(this.config.url, {
@@ -805,7 +815,7 @@ export class DeleteManager {
 
     bindEvents() {
         document.addEventListener('submit', async e => {
-            const formEl = e.target.closest('.delete_record');
+            const formEl = e.target.closest('.deleteRecord');
             if ( ! formEl) return;
 
             e.preventDefault();
@@ -824,8 +834,12 @@ export class DeleteManager {
 
         /* Hook opzionale prima dell'invio */
         if (typeof this.hooks.onDeleteBefore === 'function') {
-            this.hooks.onDeleteBefore(form_data);
+            const stop = this.hooks.onDeleteBefore(formData);
+            if (stop === false) return;
         }
+
+        /* Pulizia immediata degli errori visivi prima dell'invio */
+        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
 
         try {
             /* Chiamata POST all'endpoint */
@@ -842,13 +856,10 @@ export class DeleteManager {
                 return;
             }
 
-            /* 2. Gestione errori di validazione */
+            /* 2. Gestione errori di validazione (CORRETTA) */
             if (data.errors) {
-                if (data.message && typeof showToast === 'function') {
-                    showToast('danger', data.message);
-                } else if (typeof showToast === 'function') {
-                    showToast('danger', data.errors);
-                }
+                if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
+                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
                 return;
             }
 
@@ -927,7 +938,7 @@ export class ChangeStatusManager {
     bindEvents() {
         /* Gestione dell'invio dei dati (cattura il click sul button type="submit") */
         document.addEventListener('submit', async e => {
-            const formEl = e.target.closest('.change_status');
+            const formEl = e.target.closest('.changeStatus');
             if ( ! formEl) return;
 
             e.preventDefault();
@@ -948,15 +959,189 @@ export class ChangeStatusManager {
 
     async changeStatus(form_data) {
 
-        if (typeof this.hooks.onStatusBefore === 'function') {
-            this.hooks.onStatusBefore(form_data);
+        if (typeof this.hooks.onShowBefore === 'function') {
+            const stop = this.hooks.onStatusBefore(formData);
+            if (stop === false) return;
         }
 
+        /* Pulizia immediata degli errori visivi prima dell'invio */
+        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
+
         try {
-            /* Chiamata POST all'endpoint. Il token CSRF è gestito da apiFetch */
             const response = await apiFetch(this.config.url, {
                 method: 'POST',
                 body: form_data
+            });
+
+            const data = await response.json();
+
+            /* 1. Controllo per utente non loggato */
+            if (data.result === 'no_current_user_logged') {
+                window.location.href = `${urlbase}backend/auth/login`;
+                return;
+            }
+
+            /* 2. Gestione errori di validazione (CORRETTA) */
+            if (data.errors) {
+                if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
+                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
+                return;
+            }
+
+            /* 3. Gestione fallimento logico generico */
+            if (data.result === false) {
+                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
+                return;
+            }
+
+            /* 4. Caso successo */
+            if (data.result === true) {
+                if (data.message && typeof showToast === 'function') {
+                    showToast('success', data.message);
+                }
+
+                if (typeof this.hooks.onStatusAfter === 'function') {
+                    this.hooks.onStatusAfter(data);
+                }
+            }
+
+        } catch (error) {
+            if (typeof this.hooks.onStatusError === 'function') {
+                this.hooks.onStatusError(error);
+            }
+            console.error("Errore ChangeStatusManager:", error);
+        }
+    }
+}
+
+export class GeneralDataManager {
+    constructor(config = {}, hooks = {}) {
+        this.config = Object.assign({
+            url: ''
+        }, config);
+
+        this.hooks = Object.assign({
+            onGeneralDataBefore: null,
+            onGeneralDataAfter: null,
+            onGeneralDataError: null
+        }, hooks);
+    }
+
+    init() {
+        this.bindEvents();
+    }
+
+    bindEvents() {
+        document.addEventListener('submit', e => {
+            if (!e.target.matches('#getGeneralData')) return;
+
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            this.getGeneralData(formData);
+        });
+    }
+
+    async getGeneralData(formData) {
+        if (typeof this.hooks.onGeneralDataBefore === 'function') {
+            const stop = this.hooks.onGeneralDataBefore(formData);
+            if (stop === false) return;
+        }
+
+        /* Pulizia immediata degli errori visivi prima dell'invio */
+        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
+
+        try {
+            const response = await apiFetch(this.config.url, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            /* 1. Controllo per utente non loggato */
+            if (data.result === 'no_current_user_logged') {
+                window.location.href = `${urlbase}backend/auth/login`;
+                return;
+            }
+
+            /* 2. Gestione errori di validazione (UNIFORMATA) */
+            if (data.errors) {
+                if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
+                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
+                return;
+            }
+
+            /* 3. Gestione fallimento logico generico */
+            if (data.result === false) {
+                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
+                return;
+            }
+
+            /* 4. Caso successo */
+            if (data.result === true) {
+                if (data.message && typeof showToast === 'function') {
+                    showToast('success', data.message);
+                }
+
+                const generalDataEl = document.getElementById('generalData');
+                if (generalDataEl) {
+                    smoothReplace(generalDataEl, data.output);
+                }
+
+                if (typeof this.hooks.onGeneralDataAfter === 'function') {
+                    this.hooks.onGeneralDataAfter(data);
+                }
+            }
+
+        } catch (error) {
+            if (typeof this.hooks.onGeneralDataError === 'function') {
+                this.hooks.onGeneralDataError(error);
+            }
+            console.error("Errore GeneralDataManager:", error);
+        }
+    }
+}
+
+export class MetaDataManager {
+    constructor(config = {}, hooks = {}) {
+        this.config = Object.assign({
+            url: ''
+        }, config);
+
+        this.hooks = Object.assign({
+            onMetaDataBefore: null,
+            onMetaDataAfter: null,
+            onMetaDataError: null
+        }, hooks);
+    }
+
+    init() {
+        this.bindEvents();
+    }
+
+    bindEvents() {
+        document.addEventListener('submit', e => {
+            if (!e.target.matches('#getMetaData')) return;
+
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            this.getMetaData(formData);
+        });
+    }
+
+    async getMetaData(formData) {
+        if (typeof this.hooks.onMetaDataBefore === 'function') {
+            const stop = this.hooks.onMetaDataBefore(formData);
+            if (stop === false) return;
+        }
+
+        /* Pulizia immediata degli errori visivi prima dell'invio */
+        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
+
+        try {
+            const response = await apiFetch(this.config.url, {
+                method: 'POST',
+                body: formData
             });
 
             const data = await response.json();
@@ -969,174 +1154,39 @@ export class ChangeStatusManager {
 
             /* 2. Gestione errori di validazione */
             if (data.errors) {
-                if (data.message && typeof showToast === 'function') {
-                    showToast('danger', data.message);
-                } else if (typeof showToast === 'function') {
-                    showToast('danger', data.errors);
-                }
+                if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
+                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
                 return;
             }
 
             /* 3. Gestione fallimento logico generico */
             if (data.result === false) {
-                if (data.message && typeof showToast === 'function') {
-                    showToast('danger', data.message);
-                }
+                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
                 return;
             }
 
             /* 4. Caso successo */
             if (data.result === true) {
-                
                 if (data.message && typeof showToast === 'function') {
                     showToast('success', data.message);
                 }
 
-                /* Esegui il reload solo se il manager esiste */
-                if (this.config.listManager && typeof this.config.listManager.showAll === 'function') {
-                    this.config.listManager.showAll();
+                /* Gestione del DOM interna come concordato per elementi ad ID fisso */
+                const metaDataEl = document.getElementById('metaData');
+                if (metaDataEl) {
+                    smoothReplace(metaDataEl, data.output);
                 }
 
-                /* Ora l'hook verrà chiamato correttamente */
-                if (typeof this.hooks.onStatusAfter === 'function') {
-                    this.hooks.onStatusAfter(data);
+                if (typeof this.hooks.onMetaDataAfter === 'function') {
+                    this.hooks.onMetaDataAfter(data);
                 }
             }
 
         } catch (error) {
-            /* Qui finiscono solo gli errori di rete o i crash del server */
-            if (typeof this.hooks.onStatusError === 'function') {
-                this.hooks.onStatusError(error);
+            if (typeof this.hooks.onMetaDataError === 'function') {
+                this.hooks.onMetaDataError(error);
             }
-            console.error("Errore ChangeStatusManager:", error);
+            console.error("Errore MetaDataManager:", error);
         }
-    }
-}
-
-export class GeneralDataManager {
-    constructor(config = {}, hooks = {})
-    {
-        this.config = Object.assign({
-            url: ''
-        }, config);
-
-        this.hooks = Object.assign({
-            onGeneralDataAfter: null,
-            onGeneralDataError: null
-        }, hooks);
-    }
-
-    init() {
-        this.bindEvents();
-    }
-
-    bindEvents() {
-        document.addEventListener('submit', e => {
-            if (!e.target.matches('#get_general_data')) return;
-
-            e.preventDefault();
-            const form_data = new FormData(e.target);
-            this.getGeneralData(form_data);
-        });
-    }
-
-    getGeneralData(form_data) {
-        apiFetch(this.config.url, {
-            method: 'POST',
-            headers: { 'X-CSRF-Token': form_data.get('csrf_token') },
-            body: form_data
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.errors) {
-                    showToast('danger', data.errors);
-                    return;
-                }
-
-                if (data.result === false) {
-                    showToast('danger', data.message);
-                    return;
-                }
-
-                if (data.result === true) {
-                    const generalDataEl = document.getElementById('general_data');
-                    if (generalDataEl) {
-                        smoothReplace(generalDataEl, data.output);
-                    }
-
-                    if (typeof this.hooks.onGeneralDataAfter === 'function') {
-                        this.hooks.onGeneralDataAfter(data);
-                    }
-                }
-            })
-            .catch(error => {
-                if (typeof this.hooks.onGeneralDataError === 'function') {
-                    this.hooks.onGeneralDataError(error);
-                }
-            });
-    }
-}
-
-export class MetaDataManager {
-    constructor(config = {}, hooks = {})
-    {
-        this.config = Object.assign({
-            url: ''
-        }, config);
-
-        this.hooks = Object.assign({
-            onMetaDataAfter: null,
-            onMetaDataError: null
-        }, hooks);
-    }
-
-    init() {
-        this.bindEvents();
-    }
-
-    bindEvents() {
-        document.addEventListener('submit', e => {
-            if (!e.target.matches('#get_meta_data')) return;
-
-            e.preventDefault();
-            const form_data = new FormData(e.target);
-            this.getMetaData(form_data);
-        });
-    }
-
-    getMetaData(form_data) {
-        apiFetch(this.config.url, {
-            method: 'POST',
-            headers: { 'X-CSRF-Token': form_data.get('csrf_token') },
-            body: form_data
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.errors) {
-                    showToast('danger', data.errors);
-                    return;
-                }
-
-                if (data.result === false) {
-                    showToast('danger', data.message);
-                    return;
-                }
-
-                if (data.result === true) {
-                    const metaDataEl = document.getElementById('meta_data');
-                    if (metaDataEl) {
-                        smoothReplace(metaDataEl, data.output);
-                    }
-
-                    if (typeof this.hooks.onMetaDataAfter === 'function') {
-                        this.hooks.onMetaDataAfter(data);
-                    }
-                }
-            })
-            .catch(error => {
-                if (typeof this.hooks.onMetaDataError === 'function') {
-                    this.hooks.onMetaDataError(error);
-                }
-            });
     }
 }
