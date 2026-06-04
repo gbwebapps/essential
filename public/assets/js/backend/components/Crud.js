@@ -36,7 +36,7 @@ export class ListManager {
     }
 
     init() {
-        if (!this.container) return;
+        if ( ! this.container) return;
 
         this.initFilters();
         this.initSearchBar();
@@ -65,7 +65,9 @@ export class ListManager {
         });
 
         const rowsSelect = document.getElementById('changeNumRows');
-        if (rowsSelect) rowsSelect.value = this.state.rows;
+        if (rowsSelect) {
+            rowsSelect.value = this.state.rows;
+        }
     }
 
     initSearchBar() {
@@ -73,7 +75,7 @@ export class ListManager {
         const searchBar = document.getElementById('search-bar');
         const link = document.getElementById('link-search');
         
-        if (!searchBar) return;
+        if ( ! searchBar) return;
 
         if (localStorage.getItem(key) === '1') {
             searchBar.classList.add('show');
@@ -133,7 +135,7 @@ export class ListManager {
         /* Input Ricerca */
         this.config.searchFields.forEach(field => {
             const inputEl = document.getElementById(`${this.config.controller}-${field}`);
-            if (!inputEl) return;
+            if ( ! inputEl) return;
 
             /* Digitando nell'input */
             inputEl.addEventListener('keyup', (e) => {
@@ -152,7 +154,7 @@ export class ListManager {
                 clearTimeout(this.debounceTimer);
                 this.debounceTimer = setTimeout(() => {
                     /* Spostato nel timer: pulisce l'errore in concomitanza col reload */
-                    if (!value) {
+                    if ( ! value) {
                         const errorDiv = document.querySelector(`.error_${field}`);
                         if (errorDiv) errorDiv.innerHTML = '&nbsp;';
                     }
@@ -216,7 +218,7 @@ export class ListManager {
 
     updateActiveSearchIndicator() {
         const linkSearch = document.getElementById('link-search');
-        if (!linkSearch) return;
+        if ( ! linkSearch) return;
 
         const hasFilters = Object.values(this.state.searchFields).some(val => val?.trim() !== '');
         linkSearch.classList.toggle('text-danger', hasFilters);
@@ -224,14 +226,8 @@ export class ListManager {
 
     /* --- COMUNICAZIONE SERVER --- */
     async showAll() {
-        /* Hook opzionale prima dell'invio */
-        if (typeof this.hooks.onShowBefore === 'function') {
-            const stop = this.hooks.onShowBefore(formData);
-            if (stop === false) return;
-        }
-
         const urlParams = new URLSearchParams();
-        
+
         /* Costruzione dinamica parametri */
         Object.keys(this.state).forEach(key => {
             if (key === 'searchFields') {
@@ -242,6 +238,12 @@ export class ListManager {
                 urlParams.append(key, this.state[key]);
             }
         });
+
+        /* Hook opzionale prima dell'invio */
+        if (typeof this.hooks.onShowBefore === 'function') {
+            const stop = this.hooks.onShowBefore(urlParams);
+            if (stop === false) return;
+        }
 
         /* Pulizia immediata degli errori visivi prima dell'invio */
         document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
@@ -278,30 +280,33 @@ export class ListManager {
 
             /* 4. Successo */
             if (data.result === true) {
-                if (typeof this.hooks.onShowAfter === 'function') this.hooks.onShowAfter(data);
-                if (typeof smoothReplace === 'function') {
-                    smoothReplace(this.container, data.output);
-                } else {
-                    this.container.innerHTML = data.output;
+
+                const showAllEl = document.getElementById(this.config.containerId);
+                if (showAllEl) {
+                    smoothReplace(showAllEl, data.output);
+                }
+
+                if (typeof this.hooks.onShowAfter === 'function') {
+                    this.hooks.onShowAfter(data);
                 }
             }
 
         } catch (error) {
             /* Qui finiscono solo gli errori di rete o i crash del server */
-            if (typeof this.hooks.onShowError === 'function') this.hooks.onShowError(error);
+            if (typeof this.hooks.onShowError === 'function') {
+                this.hooks.onShowError(error);
+            }
             console.error("Errore ListManager:", error);
         }
     }
 }
 
 export class AddManager {
-    constructor(config = {}, hooks = {})
-    {
-        /* Configurazione di base: ID form, endpoint, reset, preview, gallery */
+    constructor(config = {}, hooks = {}) {
         this.config = Object.assign({
-            formIds: [],
+            formSelector: '', /* <--- Es: '#admins_add' */
             url: '',
-            resetId: '',
+            resetSelector: '', /* <--- Es: '#add_reset' */
             containerId: '', 
             imagePreviewManager: null,
             galleryOneImgManager: null,
@@ -309,7 +314,6 @@ export class AddManager {
             galleryOneDocManager: null
         }, config);
 
-        /* Callback opzionali eseguibili in vari momenti del flusso */
         this.hooks = Object.assign({
             onAddBefore: null,
             onAddAfter: null,
@@ -318,38 +322,30 @@ export class AddManager {
             onResetAfter: null,
             onResetError: null
         }, hooks);
-
-        /* Collega gli eventi submit ai form di aggiunta */
-        this.bindForms();
-
-        /* Collega gli eventi submit al form di reset */
-        this.bindReset();
     }
 
-    bindForms() {
-        /* Collega ogni form (by ID) al submit per aggiunta */
-        this.config.formIds.forEach(id => {
-            const form = document.getElementById(id);
-            if ( ! form) return;
-
-            form.addEventListener('submit', e => {
-                e.preventDefault();
-                const formData = new FormData(form);
-                void this.add(formData);
-            });
-        });
+    init() {
+        this.bindEvents();
     }
 
-    bindReset() {
-        /* Se non specificato l'ID per il reset, ignora */
-        if ( ! this.config.resetId) return;
-        const resetForm = document.getElementById(this.config.resetId);
-        if ( ! resetForm) return;
+    bindEvents() {
+        /* Gestione Invio Form tramite delegazione */
+        document.addEventListener('submit', async e => {
+            const formEl = e.target.closest(this.config.formSelector);
+            if ( ! formEl) return;
 
-        /* Gestione submit del form di reset con conferma */
-        resetForm.addEventListener('submit', async e => {
             e.preventDefault();
-            const message = e.target.dataset.message;
+            const formData = new FormData(formEl);
+            await this.add(formData);
+        });
+
+        /* Gestione Submit Form di Reset tramite delegazione */
+        document.addEventListener('submit', async e => {
+            const resetFormEl = e.target.closest(this.config.resetSelector);
+            if ( ! resetFormEl) return;
+
+            e.preventDefault();
+            const message = resetFormEl.dataset.message;
             const ok = await askConfirm(message);
             if ( ! ok) return;
             await this.reset();
@@ -357,8 +353,7 @@ export class AddManager {
     }
 
     async add(formData) {
-
-        /* Hook opzionale prima dell'invio */
+        /* Hook opzionale prima dell'invio: UNIFORMATO (mantiene stop per interruzione preventiva) */
         if (typeof this.hooks.onAddBefore === 'function') {
             const stop = this.hooks.onAddBefore(formData);
             if (stop === false) return;
@@ -392,19 +387,14 @@ export class AddManager {
 
             const data = await response.json();
 
-            /* 1. Controllo per utente non loggato (filtro MasterFilter) */
+            /* 1. Controllo per utente non loggato (filtro MasterFilter) - UNIFORMATO SULLA NUOVA ROTTA */
             if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth/login`;
+                window.location.href = `${urlbase}backend/auth`;
                 return;
             }
 
             /* 2. Gestione Errori di Validazione */
             if (data.errors) {
-                /* Pulisce eventuali errori visivi precedenti prima di mostrare i nuovi */
-                document.querySelectorAll("[class^='error_']").forEach(el => {
-                    el.innerHTML = '\u00A0';
-                });
-                
                 if (typeof handleValidationErrors === 'function') {
                     handleValidationErrors(data.errors);
                 }
@@ -432,17 +422,11 @@ export class AddManager {
 
             /* 4. Caso successo */
             if (data.result === true) {
-                
-                /* Pulisce eventuali errori di validazione visivi precedenti per sicurezza */
-                document.querySelectorAll("[class^='error_']").forEach(el => {
-                    el.innerHTML = '\u00A0';
-                });
-
-                /* Chiama il metodo reset in modo pulito */
-                await this.reset();
-
-                /* Mostra messaggio di successo */
+                /* TIMING FIX: Mostra subito il messaggio di successo prima di lanciare il reset asincrono */
                 if (data.message && typeof showToast === 'function') showToast('success', data.message);
+                
+                /* Chiama il metodo reset in modo pulito per aggiornare il DOM */
+                await this.reset();
 
                 /* Refresh gallery se presente */
                 if (this.config.galleryOneImgManager) {
@@ -454,13 +438,13 @@ export class AddManager {
                     this.config.galleryOneDocManager.refresh();
                 }
 
-                /* Hook opzionale post-successo */
+                /* Hook opzionale post-successo: UNIFORMATO (puro, senza stop/return ridondanti) */
                 if (typeof this.hooks.onAddAfter === 'function') {
                     this.hooks.onAddAfter(data);
                 }
             }
         } catch (error) {
-            /* Qui finiscono solo gli errori di rete o i crash del server */
+            /* Hook errore: UNIFORMATO (puro, senza stop/return ridondanti) */
             if (typeof this.hooks.onAddError === 'function') {
                 this.hooks.onAddError(error);
             }
@@ -469,23 +453,21 @@ export class AddManager {
     }
 
     async reset() {
-
-        /* Hook prima del reset */
+        /* Hook prima del reset: UNIFORMATO (mantiene stop per interruzione preventiva) */
         if (typeof this.hooks.onResetBefore === 'function') {
             const stop = this.hooks.onResetBefore();
             if (stop === false) return;
         }
 
-        if (!this.config.resetId) return;
-        const resetForm = document.getElementById(this.config.resetId);
-        if (!resetForm) return;
+        if ( ! this.config.resetSelector) return;
+        const resetForm = document.querySelector(this.config.resetSelector);
+        if ( ! resetForm) return;
 
         /* Creazione diretta e pulita: prende sempre i dati dal form */
         const formData = new FormData(resetForm);
         formData.append('action', 'reset');
 
-        try 
-        {
+        try {
             /* Chiamata POST */
             const response = await apiFetch(this.config.url, {
                 method: 'POST',
@@ -494,9 +476,9 @@ export class AddManager {
 
             const data = await response.json();
 
-            /* 1. Controllo per utente non loggato (filtro MasterFilter) */
+            /* 1. Controllo per utente non loggato (filtro MasterFilter) - UNIFORMATO SULLA NUOVA ROTTA */
             if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth/login`;
+                window.location.href = `${urlbase}backend/auth`;
                 return;
             }
 
@@ -509,20 +491,14 @@ export class AddManager {
             /* 3. Caso successo reset */
             if (data.result === true) {
                 const showDataEl = document.getElementById(this.config.containerId);
+                if (showDataEl) {
+                    smoothReplace(showDataEl, data.output);
+                }
 
                 /* Rimuove istanze precedenti dei preview manager */
                 if (this.config.imagePreviewManager) this.config.imagePreviewManager.destroy();
                 if (this.config.docPreviewManager) this.config.docPreviewManager.destroy();
-
-                /* Sostituisce il markup del form con quello aggiornato */
-                if (typeof smoothReplace === 'function') {
-                    await smoothReplace(showDataEl, data.output);
-                } else {
-                    showDataEl.innerHTML = data.output;
-                }
                 
-                this.bindForms();
-
                 /* Reinstanzia UploadPreviewImgManager */
                 const input = document.querySelector('#inputImages');
                 const preview = document.querySelector('#preview_images');
@@ -541,13 +517,13 @@ export class AddManager {
                     this.config.docPreviewManager = new UploadPreviewDocManager('#inputDocuments', '#preview_documents', '#buttonDocuments');
                 }
 
-                /* Hook dopo il completamento del reset */
+                /* Hook dopo il completamento del reset: UNIFORMATO (puro, senza stop/return ridondanti) */
                 if (typeof this.hooks.onResetAfter === 'function') {
                     this.hooks.onResetAfter(data);
                 }
             }
         } catch (error) {
-            /* Qui finiscono solo gli errori di rete o i crash del server */
+            /* Hook errore: UNIFORMATO (puro, senza stop/return ridondanti) */
             if (typeof this.hooks.onResetError === 'function') {
                 this.hooks.onResetError(error);
             }
@@ -557,13 +533,12 @@ export class AddManager {
 }
 
 export class EditManager {
-    constructor(config = {}, hooks = {})
-    {
-        /* Inizializza la configurazione di base con i riferimenti ai form, preview e gallery */
+    constructor(config = {}, hooks = {}) {
+        /* Inizializza la configurazione di base con i selettori dinamici */
         this.config = Object.assign({
-            formIds: [],
+            formSelector: '', /* <--- Es: '#admins_edit' */
             url: '',
-            refreshId: '', 
+            refreshSelector: '', /* <--- Es: '#edit_refresh' */
             containerId: '', 
             imagePreviewManager: null,
             galleryOneImgManager: null,
@@ -580,50 +555,40 @@ export class EditManager {
             onRefreshAfter: null,
             onRefreshError: null,
         }, hooks);
-
-        /* Collega gli eventi submit ai form di modifica */
-        this.bindEditForms();
-
-        /* Collega gli eventi submit al form di refresh (conferma + replace markup) */
-        this.bindRefresh();
     }
 
-    bindEditForms() {
-        /* Cicla su tutti gli ID dei form edit e lega il submit */
-        this.config.formIds.forEach(id => {
-            const form = document.getElementById(id);
-            if (!form) return;
-
-            form.addEventListener('submit', e => {
-                e.preventDefault();
-                const formData = new FormData(form);
-                void this.edit(formData);
-            });
-        });
+    init() {
+        /* Unico punto di aggancio tramite delegazione globale */
+        this.bindEvents();
     }
 
-    bindRefresh() {
-        /* Se non è stato fornito un ID di refresh, non fa nulla */
-        if (!this.config.refreshId) return;
+    bindEvents() {
+        /* Gestione Invio Form Edit tramite delegazione */
+        document.addEventListener('submit', async e => {
+            const formEl = e.target.closest(this.config.formSelector);
+            if ( ! formEl) return;
 
-        const refreshForm = document.getElementById(this.config.refreshId);
-        if ( ! refreshForm) return;
-
-        /* Collega evento submit al form di reset con conferma */
-        refreshForm.addEventListener('submit', async e => {
             e.preventDefault();
+            const formData = new FormData(formEl);
+            await this.edit(formData);
+        });
 
-            const message = e.target.dataset.message;
+        /* Gestione Submit Form di Refresh (Annulla) tramite delegazione */
+        document.addEventListener('submit', async e => {
+            const refreshFormEl = e.target.closest(this.config.refreshSelector);
+            if ( ! refreshFormEl) return;
+
+            e.preventDefault();
+            const message = refreshFormEl.dataset.message;
             const ok = await askConfirm(message);
-            if (!ok) return;
+            if ( ! ok) return;
 
-            const formData = new FormData(e.target);
+            const formData = new FormData(refreshFormEl);
             await this.refresh(formData);
         });
     }
 
     async edit(formData) {
-
         /* Esegue hook personalizzato prima del salvataggio, blocca se ritorna false */
         if (typeof this.hooks.onEditBefore === 'function') {
             const stop = this.hooks.onEditBefore(formData);
@@ -650,56 +615,75 @@ export class EditManager {
         document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
 
         try {
-            /* Invio al backend con csrf token */
+            /* Invio al backend */
             const response = await apiFetch(this.config.url, {
                 method: 'POST',
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="X-CSRF-TOKEN"]')?.content ?? '' },
                 body: formData
             });
 
             const data = await response.json();
 
-            /* Reset eventuali errori di validazione visivi */
-            document.querySelectorAll("[class^='error_']").forEach(el => el.innerHTML = '\u00A0');
+            /* Controllo per utente non loggato (filtro MasterFilter) */
+            if (data.result === 'no_current_user_logged') {
+                window.location.href = `${urlbase}backend/auth`;
+                return;
+            }
 
             /* Visualizza eventuali errori di validazione */
             if (data.errors) {
-                handleValidationErrors(data.errors);
-                handleValidationImages(data.errors);
-                handleValidationDocuments(data.errors);
-                showToast('danger', data.message);
+                if (typeof handleValidationErrors === 'function') {
+                    handleValidationErrors(data.errors);
+                }
+                
+                if (this.config.imagePreviewManager && typeof handleValidationImages === 'function') {
+                    handleValidationImages(data.errors);
+                }
+                
+                if (this.config.docPreviewManager && typeof handleValidationDocuments === 'function') {
+                    handleValidationDocuments(data.errors);
+                }
+                
+                if (data.message && typeof showToast === 'function') {
+                    showToast('danger', data.message);
+                }
+                
                 return;
             }
 
             /* Errore generico gestito dal backend */
             if (data.result === false) {
-                showToast('danger', data.message);
+                if (typeof showToast === 'function') showToast('danger', data.message);
                 return;
             }
 
             /* Caso positivo: salvataggio riuscito */
             if (data.result === true) {
-                /* Prepara nuovo FormData per la chiamata di refresh */
-                const refreshData = new FormData();
-                refreshData.append('X-CSRF-TOKEN', formData.get('X-CSRF-TOKEN'));
-                const uuidEl = document.getElementById('uuid');
-                if (uuidEl) refreshData.append('uuid', uuidEl.value);
-
-                /* Esegue il refresh dei dati */
-                await this.refresh(refreshData);
-
                 /* Mostra toast di successo */
-                showToast('success', data.message);
+                if (typeof showToast === 'function') showToast('success', data.message);
 
                 /* Hook personalizzato dopo il salvataggio */
                 if (typeof this.hooks.onEditAfter === 'function') {
                     this.hooks.onEditAfter(data);
                 }
+
+                /* Recupera il form di refresh reale dal DOM per popolare correttamente i dati */
+                const refreshFormEl = document.querySelector(this.config.refreshSelector);
+                const refreshData = refreshFormEl ? new FormData(refreshFormEl) : new FormData();
+
+                /* Se manca l'uuid nei dati del form (es. elemento non presente), lo recupera come fallback */
+                const uuidEl = document.getElementById('uuid');
+                if (uuidEl && !refreshData.has('uuid')) {
+                    refreshData.append('uuid', uuidEl.value);
+                }
+
+                /* Esegue il refresh dei dati */
+                await this.refresh(refreshData);
             }
         } catch (error) {
             if (typeof this.hooks.onEditError === 'function') {
                 this.hooks.onEditError(error);
             }
+            console.error("Errore EditManager (edit):", error);
         }
     }
 
@@ -719,44 +703,46 @@ export class EditManager {
             if (stop === false) return;
         }
 
-        /* Pulizia immediata degli errori visivi prima dell'invio */
-        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
-
         try {
             const response = await apiFetch(this.config.url, {
                 method: 'POST',
-                headers: { 'X-CSRF-Token': document.querySelector('meta[name="X-CSRF-TOKEN"]')?.content ?? '' },
                 body: formData
             });
 
             const data = await response.json();
 
+            /* Controllo per utente non loggato (filtro MasterFilter) - UNIFORMATO */
+            if (data.result === 'no_current_user_logged') {
+                window.location.href = `${urlbase}backend/auth`;
+                return;
+            }
+
             /* Caso errore generico */
             if (data.result === false) {
-                showToast('danger', data.message);
+                if (typeof showToast === 'function') showToast('danger', data.message);
                 return;
             }
 
             /* Caso positivo: rigenera markup e reinizializza componenti */
             if (data.result === true) {
                 const showDataEl = document.getElementById(this.config.containerId);
-                if ( ! showDataEl) return;
 
                 /* Distrugge vecchie istanze di preview e gallery */
-                if (this.config.imagePreviewManager)  this.config.imagePreviewManager.destroy();
-                if (this.config.galleryOneImgManager)  this.config.galleryOneImgManager.destroy();
+                if (this.config.imagePreviewManager) this.config.imagePreviewManager.destroy();
+                if (this.config.galleryOneImgManager) this.config.galleryOneImgManager.destroy();
 
                 /* Distrugge vecchie istanze di uploadManager e galleryOneDoc */
-                if (this.config.docPreviewManager)  this.config.docPreviewManager.destroy();
-                if (this.config.galleryOneDocManager)  this.config.galleryOneDocManager.destroy();
+                if (this.config.docPreviewManager) this.config.docPreviewManager.destroy();
+                if (this.config.galleryOneDocManager) this.config.galleryOneDocManager.destroy();
 
                 /* Sostituisce il DOM e reinizializza i componenti */
-                await smoothReplace(showDataEl, data.output);
-                this.bindEditForms();
+                if (showDataEl) {
+                    smoothReplace(showDataEl, data.output);
+                }
 
-                const input   = document.querySelector('#inputImages');
+                const input = document.querySelector('#inputImages');
                 const preview = document.querySelector('#preview_images');
-                const button  = document.querySelector('#buttonImages');
+                const button = document.querySelector('#buttonImages');
                 const gallery = document.querySelector('#images_data');
 
                 if (input && preview && button) {
@@ -767,9 +753,9 @@ export class EditManager {
                     this.config.galleryOneImgManager = new GalleryOneImgManager('#images_data');
                 }
 
-                const inputDoc   = document.querySelector('#inputDocuments');
+                const inputDoc = document.querySelector('#inputDocuments');
                 const previewDoc = document.querySelector('#preview_documents');
-                const buttonDoc  = document.querySelector('#buttonDocuments');
+                const buttonDoc = document.querySelector('#buttonDocuments');
                 const galleryDoc = document.querySelector('#documents_data');
 
                 if (inputDoc && previewDoc && buttonDoc) {
@@ -789,6 +775,7 @@ export class EditManager {
             if (typeof this.hooks.onRefreshError === 'function') {
                 this.hooks.onRefreshError(error);
             }
+            console.error("Errore EditManager (refresh):", error);
         }
     }
 }
@@ -821,16 +808,16 @@ export class DeleteManager {
             e.preventDefault();
 
             const message = formEl.dataset.message;
-            const form_data = new FormData(formEl);
+            const formData = new FormData(formEl);
 
             const ok = await askConfirm(message);
             if (ok) {
-                this.deleteRecord(form_data);
+                this.deleteRecord(formData);
             }
         });
     }
 
-    async deleteRecord(form_data) {
+    async deleteRecord(formData) {
 
         /* Hook opzionale prima dell'invio */
         if (typeof this.hooks.onDeleteBefore === 'function') {
@@ -845,18 +832,18 @@ export class DeleteManager {
             /* Chiamata POST all'endpoint */
             const response = await apiFetch(this.config.url, {
                 method: 'POST',
-                body: form_data
+                body: formData
             });
 
             const data = await response.json();
 
             /* 1. Controllo per utente non loggato (filtro MasterFilter) */
             if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth/login`;
+                window.location.href = `${urlbase}backend/auth`;
                 return;
             }
 
-            /* 2. Gestione errori di validazione (CORRETTA) */
+            /* 2. Gestione errori di validazione */
             if (data.errors) {
                 if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
                 if (data.message && typeof showToast === 'function') showToast('danger', data.message);
@@ -899,14 +886,14 @@ export class DeleteManager {
                     listManager.showAll();
                 }
 
-                /* Hook opzionale post-successo */
+                /* Hook opzionale post-successo corretta */
                 if (typeof this.hooks.onDeleteAfter === 'function') {
                     this.hooks.onDeleteAfter(data);
                 }
             }
 
         } catch (error) {
-            /* Qui finiscono solo gli errori di rete o i crash del server */
+            /* Errori di rete o crash del server */
             if (typeof this.hooks.onDeleteError === 'function') {
                 this.hooks.onDeleteError(error);
             }
@@ -952,14 +939,14 @@ export class ChangeStatusManager {
             }
 
             /* Recuperiamo i dati dal form e li passiamo alla funzione */
-            const form_data = new FormData(formEl);
-            this.changeStatus(form_data);
+            const formData = new FormData(formEl);
+            this.changeStatus(formData);
         });
     }
 
-    async changeStatus(form_data) {
+    async changeStatus(formData) {
 
-        if (typeof this.hooks.onShowBefore === 'function') {
+        if (typeof this.hooks.onStatusBefore === 'function') {
             const stop = this.hooks.onStatusBefore(formData);
             if (stop === false) return;
         }
@@ -970,14 +957,14 @@ export class ChangeStatusManager {
         try {
             const response = await apiFetch(this.config.url, {
                 method: 'POST',
-                body: form_data
+                body: formData
             });
 
             const data = await response.json();
 
             /* 1. Controllo per utente non loggato */
             if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth/login`;
+                window.location.href = `${urlbase}backend/auth`;
                 return;
             }
 
@@ -1017,7 +1004,8 @@ export class ChangeStatusManager {
 export class GeneralDataManager {
     constructor(config = {}, hooks = {}) {
         this.config = Object.assign({
-            url: ''
+            url: '', 
+            formSelector: ''
         }, config);
 
         this.hooks = Object.assign({
@@ -1033,7 +1021,7 @@ export class GeneralDataManager {
 
     bindEvents() {
         document.addEventListener('submit', e => {
-            if (!e.target.matches('#getGeneralData')) return;
+            if ( ! e.target.matches(this.config.formSelector)) return;
 
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -1060,7 +1048,7 @@ export class GeneralDataManager {
 
             /* 1. Controllo per utente non loggato */
             if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth/login`;
+                window.location.href = `${urlbase}backend/auth`;
                 return;
             }
 
@@ -1105,7 +1093,8 @@ export class GeneralDataManager {
 export class MetaDataManager {
     constructor(config = {}, hooks = {}) {
         this.config = Object.assign({
-            url: ''
+            url: '', 
+            formSelector: '#getMetaData'
         }, config);
 
         this.hooks = Object.assign({
@@ -1121,7 +1110,7 @@ export class MetaDataManager {
 
     bindEvents() {
         document.addEventListener('submit', e => {
-            if (!e.target.matches('#getMetaData')) return;
+            if ( ! e.target.matches(this.config.formSelector)) return;
 
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -1148,7 +1137,7 @@ export class MetaDataManager {
 
             /* 1. Controllo per utente non loggato (filtro MasterFilter) */
             if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth/login`;
+                window.location.href = `${urlbase}backend/auth`;
                 return;
             }
 

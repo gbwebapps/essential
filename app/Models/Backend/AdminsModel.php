@@ -352,7 +352,7 @@ class AdminsModel extends BackendModel
             $posts = $this->checkAllowedFields($posts, $this->editAllowedFields);
 
 
-                // some code here...
+                print_r($posts); die();
 
 
             if ($this->db->transStatus() === false):
@@ -545,15 +545,5 @@ class AdminsModel extends BackendModel
             return ['result' => false, 'message' => lang('backend/admins.messages.changeStatusError')];
 
         }
-    }
-
-    public function getGeneralData()
-    {
-        
-    }
-
-    public function getMetaData()
-    {
-        
     }
 }

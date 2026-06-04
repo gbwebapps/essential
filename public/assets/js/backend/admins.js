@@ -54,13 +54,12 @@ const actions = {
         // const docPreviewManager = new UploadPreviewDocManager('#inputDocuments', '#preview_documents', '#buttonDocuments');
 
         const addManager = new AddManager({
-            formIds: ['admins_add'],
             url: urlbase + 'backend/admins/add',
-            resetId: 'add_reset',
+            formSelector: '#admins_add', /* <--- Passiamo il selettore */
+            resetSelector: '#add_reset', /* <--- Passiamo il selettore del pulsante */
             containerId: 'add-admins-container', 
-            // imagePreviewManager: imagePreviewManager,
-            // docPreviewManager: docPreviewManager
         });
+        addManager.init();
 
     },
     edit: function() {
@@ -72,23 +71,22 @@ const actions = {
         // const docPreviewManager = new UploadPreviewDocManager('#inputDocuments', '#preview_documents', '#buttonDocuments');
 
         const editManager = new EditManager({
-            formIds: ['admins_edit'],
+            formSelector: '#admins_edit',
             url: urlbase + 'backend/admins/edit',
-            refreshId: 'edit_refresh',
+            refreshSelector: '#edit_refresh',
             containerId: 'edit-admins-container', 
-            // imagePreviewManager: imagePreviewManager,
-            // galleryOneImgManager: galleryOneImgManager,
-            // docPreviewManager: docPreviewManager,
-            // galleryOneDocManager: galleryOneDocManager
         });
+        editManager.init();
 
         const generalDataManager = new GeneralDataManager({
-            url: urlbase + 'backend/admins/getGeneralData'
+            url: urlbase + 'backend/admins/getGeneralData', 
+            formSelector: '#getGeneralData'
         });
         generalDataManager.init();
 
         const metaDataManager = new MetaDataManager({
-            url: urlbase + 'backend/admins/getMetaData'
+            url: urlbase + 'backend/admins/getMetaData', 
+            formSelector: '#getMetaData'
         });
         metaDataManager.init();
     },
@@ -96,12 +94,14 @@ const actions = {
     show: function() {
 
         const generalDataManager = new GeneralDataManager({
-            url: urlbase + 'backend/admins/getGeneralData'
+            url: urlbase + 'backend/admins/getGeneralData', 
+            formSelector: '#getGeneralData'
         });
         generalDataManager.init();
 
         const metaDataManager = new MetaDataManager({
-            url: urlbase + 'backend/admins/getMetaData'
+            url: urlbase + 'backend/admins/getMetaData', 
+            formSelector: '#getMetaData'
         });
         metaDataManager.init();
 

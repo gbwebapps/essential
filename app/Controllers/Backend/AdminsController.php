@@ -48,7 +48,7 @@ class AdminsController extends BackendController
             endif;
 
             $rules = $this->adminsModel->showAllSearchValidationRules();
-            if (! $this->validateData($posts, $rules)):
+            if ( ! $this->validateData($posts, $rules)):
 
                 $formattedErrors = removeDot('searchFields.', $this->validator->getErrors());
 
@@ -97,7 +97,7 @@ class AdminsController extends BackendController
 
             $rules = $this->adminsModel->addValidationRules();
 
-            if (! $this->validateData($posts, $rules)):
+            if ( ! $this->validateData($posts, $rules)):
                 return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
             endif;
 
@@ -129,22 +129,63 @@ class AdminsController extends BackendController
 
             $posts = array_merge($this->request->getPost(), ['images' => $this->request->getFileMultiple('images') ?? []], ['documents' => $this->request->getFileMultiple('documents') ?? []]);
 
-            // ...
+            if(( ! isset($posts['uuid'])) || ( ! $this->regexp->validateUUID($posts['uuid']))):
+                return $this->response->setJSON(['result' => false, 'message' => lang('backend/admins.messages.wrongUUIDFormat')]);
+            endif;
+
+            $admin = $this->adminsModel->getByUUID($posts['uuid']);
+
+            if($admin['result'] === false):
+                return $this->response->setJSON(['result' => false, 'message' => $admin['message']]);
+            endif;
+
+            if (isset($posts['action']) && $posts['action'] === 'refresh'):
+                $this->data['admin'] = $admin['row'] ?? null;
+                return $this->response->setJSON(['result' => true,'output' => view('backend/admins/partials/edit/editPartial', $this->data)]);
+            endif;
+
+            $rules = $this->adminsModel->editValidationRules($posts);
+            if ( ! $this->validateData($posts, $rules)):
+                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
+            endif;
+
+            $result = $this->adminsModel->edit($posts);
+
+            $json = ['result'  => $result['result'], 'message' => $result['message']];
+
+            if ($result['result'] === true):
+
+                $admin = $this->adminsModel->getByUUID($posts['uuid']);
+
+                if($admin['result'] === false):
+                    return $this->response->setJSON(['result' => false, 'message' => $admin['message']]);
+                endif;
+
+                $this->data['admin'] = $admin['row'] ?? null;
+
+                $json['output'] = view('backend/admins/partials/edit/editPartial', $this->data);
+            endif;
+
+            return $this->response->setJSON($json);
 
         endif;
 
-        $result = $this->adminsModel->getByUUID($uuid);
-
-        if($result['result'] !== true):
-            return redirect()->to('backend/dashboard');
+        if(( ! isset($uuid)) || ( ! $this->regexp->validateUUID($uuid))):
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.wrongUUIDFormat'))->with('class', 'danger');
         endif;
 
+        $admin = $this->adminsModel->getByUUID($uuid);
+
+        if($admin['result'] === false):
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', $admin['message'])->with('class', 'danger');
+        endif;
+        
         $this->data['action'] = 'edit';
         
         $this->data['title'] = lang('backend/admins.titles.edit');
         $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
 
-        $this->data['admin'] = $result['row'];
+        $this->data['admin'] = $admin['row'] ?? null;
         $this->data['uuid'] = $uuid;
 
         return $this->render('backend/admins/editView', $this->data);
@@ -167,7 +208,7 @@ class AdminsController extends BackendController
         $this->data['title'] = lang('backend/admins.titles.show');
         $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
 
-        $this->data['admin'] = $admin['row'];
+        $this->data['admin'] = $admin['row'] ?? null;
         $this->data['uuid'] = $uuid;
 
         return $this->render('backend/admins/showView', $this->data);

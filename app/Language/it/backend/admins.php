@@ -66,7 +66,9 @@ return [
 		'resetData' => 'Resetta dati', 
 		'sendData' => 'Invia dati', 
 		'refreshData' => 'Ricarica dati', 
-		'reload' => 'Ricarica pannello'
+		'reload' => 'Ricarica pannello', 
+		'print' => 'Stampa', 
+		'export' => 'Esporta'
 	],
 	'messages' => [
 		'areYouSureResetData' => 'Sei sicuro di voler resettare i dati?', 
