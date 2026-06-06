@@ -124,6 +124,18 @@ const actions = {
     }
 };
 
+/* Listener per il link select all nei form add ed edit per selezionare tutti i check box dei permessi */
+document.addEventListener('click', function(e) {
+    if (e.target.matches('.select-all')) {
+        e.preventDefault();
+        const controller = e.target.dataset.controller;
+        const checkboxes = document.querySelectorAll(`input[type="checkbox"].${controller}`);
+        const anyChecked = Array.from(checkboxes).some(el => el.checked);
+        const newState = !anyChecked;
+        checkboxes.forEach(el => el.checked = newState);
+    }
+});
+
 /* Se esiste una funzione per l'azione corrente, eseguila */
 if (actions[action]) {
     actions[action]();

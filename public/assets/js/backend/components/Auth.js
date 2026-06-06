@@ -13,23 +13,41 @@ export class LoginManager {
             onLoginAfter: null,
             onLoginError: null
         }, hooks);
+
+        /* NUOVO: Variabili di stato per la sicurezza */
+        this.eventsBound = false;
+        this.isSubmitting = false;
     }
     
     init() {
         const form = document.getElementById(this.config.formId);
-        if (!form) return;
+        if ( ! form) return;
 
-        form.addEventListener('submit', e => {
+        /* NUOVO: Impedisce cloni dei listener */
+        if (this.eventsBound) return;
+        this.eventsBound = true;
+
+        /* Aggiunto 'async' per attendere la chiamata */
+        form.addEventListener('submit', async e => {
             e.preventDefault();
             const formData = new FormData(form);
-            this.login(formData, form);
+            /* Aggiunto 'await' */
+            await this.login(formData, form);
         });
     }
     
     async login(formData, form) {
+        
+        /* NUOVO: Se c'è già una richiesta in corso, blocca */
+        if (this.isSubmitting) return;
+        this.isSubmitting = true;
+
         if (typeof this.hooks.onLoginBefore === 'function') {
             const stop = this.hooks.onLoginBefore(formData);
-            if (stop === false) return;
+            if (stop === false) {
+                this.isSubmitting = false; /* <--- NUOVO RILASCIO */
+                return;
+            }
         }
 
         /* Reset immediato degli errori visivi */
@@ -74,6 +92,9 @@ export class LoginManager {
                 this.hooks.onLoginError(error);
             }
             console.error("Errore LoginManager:", error);
+        } finally {
+            /* NUOVO: Rilascia sempre il blocco */
+            this.isSubmitting = false;
         }
     }
 }
@@ -94,46 +115,63 @@ export class ResetPasswordManager {
             onResetAfter: null,
             onResetError: null
         }, hooks);
+
+        /* NUOVO: Variabili di stato per la sicurezza */
+        this.eventsBound = false;
+        this.isSubmitting = false;
     }
     
     init() {
-        /* Caso 1: Form singolo diretto (es. Modulo Auth Pubblico) */
+        /* NUOVO: Impedisce cloni dei listener */
+        if (this.eventsBound) return;
+        this.eventsBound = true;
+
+        /* Caso 1: Form singolo diretto */
         if (this.config.formId) {
             const form = document.getElementById(this.config.formId);
             if (form) {
                 form.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     const formData = new FormData(form);
-                    this.resetPassword(formData);
+                    /* Aggiunto 'await' */
+                    await this.resetPassword(formData);
                 });
             }
         }
 
-        /* Caso 2: Event Delegation (es. Pannello Admins con lista utenti) */
+        /* Caso 2: Event Delegation */
         if (this.config.formSelector) {
             document.addEventListener('submit', async (e) => {
                 const formEl = e.target.closest(this.config.formSelector);
-                if (!formEl) return;
+                if ( ! formEl) return;
 
                 e.preventDefault();
 
-                /* Se il form ha un data-message, chiede conferma prima di procedere */
                 const message = formEl.dataset.message;
                 if (message) {
                     const ok = await askConfirm(message);
-                    if (!ok) return;
+                    if ( ! ok) return;
                 }
 
                 const formData = new FormData(formEl);
-                this.resetPassword(formData);
+                /* Aggiunto 'await' */
+                await this.resetPassword(formData);
             });
         }
     }
     
     async resetPassword(formData) {
+        
+        /* NUOVO: Se c'è già una richiesta in corso, blocca */
+        if (this.isSubmitting) return;
+        this.isSubmitting = true;
+
         if (typeof this.hooks.onResetBefore === 'function') {
             const stop = this.hooks.onResetBefore(formData);
-            if (stop === false) return;
+            if (stop === false) {
+                this.isSubmitting = false; /* <--- NUOVO RILASCIO */
+                return;
+            }
         }
 
         /* Pulizia immediata degli errori visivi */
@@ -195,6 +233,9 @@ export class ResetPasswordManager {
                 this.hooks.onResetError(error);
             }
             console.error("Errore ResetPasswordManager:", error);
+        } finally {
+            /* NUOVO: Rilascia sempre il blocco */
+            this.isSubmitting = false;
         }
     }
 }
@@ -212,23 +253,41 @@ export class SetPasswordManager {
             onSetAfter: null,
             onSetError: null
         }, hooks);
+
+        /* NUOVO: Variabili di stato per la sicurezza */
+        this.eventsBound = false;
+        this.isSubmitting = false;
     }
     
     init() {
         const form = document.getElementById(this.config.formId);
-        if (!form) return;
+        if ( ! form) return;
 
-        form.addEventListener('submit', (e) => {
+        /* NUOVO: Impedisce cloni dei listener */
+        if (this.eventsBound) return;
+        this.eventsBound = true;
+
+        /* Aggiunto 'async' per attendere la chiamata */
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(form);
-            this.savePassword(formData);
+            /* Aggiunto 'await' */
+            await this.savePassword(formData);
         });
     }
     
     async savePassword(formData) {
+        
+        /* NUOVO: Se c'è già una richiesta in corso, blocca */
+        if (this.isSubmitting) return;
+        this.isSubmitting = true;
+
         if (typeof this.hooks.onSetBefore === 'function') {
             const stop = this.hooks.onSetBefore(formData);
-            if (stop === false) return;
+            if (stop === false) {
+                this.isSubmitting = false; /* <--- NUOVO RILASCIO */
+                return;
+            }
         }
 
         /* Pulizia immediata degli errori visivi */
@@ -275,6 +334,9 @@ export class SetPasswordManager {
                 this.hooks.onSetError(error);
             }
             console.error("Errore SetPasswordManager:", error);
+        } finally {
+            /* NUOVO: Rilascia sempre il blocco */
+            this.isSubmitting = false;
         }
     }
 }

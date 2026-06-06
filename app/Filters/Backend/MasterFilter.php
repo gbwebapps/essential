@@ -24,7 +24,7 @@ class MasterFilter implements FilterInterface
 
         /* Blocco AJAX: restituisce esito negativo e messaggio */
         if ($request->isAJAX() && $request->is('post')):
-            return service('response')->setJSON(['result'  => false, 'message' => lang('backend/auth.messages.forbiddenArea')]);
+            return service('response')->setJSON(['result'  => false, 'message' => lang('backend/auth.messages.forbiddenArea'), 'csrf' => $this->csrf]);
         endif;
 
         /* Blocco Standard: reindirizza alla dashboard */

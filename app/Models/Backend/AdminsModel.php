@@ -32,7 +32,9 @@ class AdminsModel extends BackendModel
     protected array $allowedOrderColumns = ['firstname', 'lastname', 'email', 'phone', 'status']; 
 
     /* @var array Campi di ricerca consentiti in showAll */
-    protected array $showAllSearchAllowedFields = ['firstname', 'lastname', 'email', 'phone'];
+    protected array $showAllSearchAllowedFields = ['firstname', 'lastname', 'email', 'phone']; 
+
+    protected array $toCompare = ['firstname', 'lastname', 'email', 'phone', 'status', 'note', 'permissions'];
 
     /* @var string Query per selezionare tutti gli admins */
     protected ?string $getDataQuery = "select uuid, firstname, lastname, email, phone, status, created_at, updated_at, resetted_at, suspended_at,
@@ -121,6 +123,13 @@ class AdminsModel extends BackendModel
                     'safeText' => 'caratteri non ammessi'
                 ]
             ],
+            'permissions.*' => [
+                'label' => lang('backend/admins.labels.permissions'), 
+                'rules' => ['permit_empty', 'alpha_dash'], 
+                'errors' => [
+                    'alpha_dash' => lang('backend/admins.messages.wrongPermissionsFormat')
+                ]
+            ]
         ];
     }
 
@@ -217,43 +226,46 @@ class AdminsModel extends BackendModel
         ];
     }
 
-    public function getByUUID(string $uuid): array 
+    public function getPermissions(string $uuid): array
     {
-        /* 1. Richiamo il metodo universale del genitore (BackendModel) */
-        $data = parent::getByUUID($uuid);
+        /* Estrazione permessi assegnati all'admin */
+        $sql = "select * from admins_permissions where admin_uuid = ?";
+        return $this->db->query($sql, [$uuid])->getResult();
+    }
 
-        /* Se il genitore non trova il record o restituisce un errore, interrompo e restituisco l'errore */
-        if ($data['result'] === false):
-            return $data;
-        endif;
+    public function getTokens(string $uuid): array
+    {
+        /* Estrazione log dei tokens di sessione o reset */
+        $sql = "select * from admins_tokens where admin_uuid = ?";
+        return $this->db->query($sql, [$uuid])->getResult();
+    }
 
-        /* 2. Prendo i dati anagrafici standardizzati */
-        $result = ['result' => true, 'row' => $data['row']];
+    public function getAttempts(string $uuid): array
+    {
+        /* Estrazione log dei tentativi di accesso standard */
+        $sql = "select * from admins_attempts where admin_uuid = ?";
+        return $this->db->query($sql, [$uuid])->getResult();
+    }
 
-        try 
-        {
-            /* 3. Aggiungo le query specifiche per l'admin (tutte minuscole) */
-            
-            /* Uso getResult() per le tabelle che possono contenere righe multiple */
-            $sql = "select * from admins_permissions where admin_uuid = ?";
-            $result['permissions'] = $this->db->query($sql, [$uuid])->getResult();
+    public function getTwoFaAttempts(string $uuid): array
+    {
+        /* Estrazione log dei tentativi di accesso 2FA */
+        $sql = "select * from admins_2fa_attempts where admin_uuid = ?";
+        return $this->db->query($sql, [$uuid])->getResult();
+    }
 
-            $sql = "select * from admins_tokens where admin_uuid = ?";
-            $result['tokens'] = $this->db->query($sql, [$uuid])->getResult();
+    public function getTwoFaCodes(string $uuid): array
+    {
+        /* Estrazione codici di backup 2FA attivi o consumati */
+        $sql = "select * from admins_2fa_codes where admin_uuid = ?";
+        return $this->db->query($sql, [$uuid])->getResult();
+    }
 
-            $sql = "select * from admins_attempts where admin_uuid = ?";
-            $result['attempts'] = $this->db->query($sql, [$uuid])->getResult();
-
-            /* Uso getRow() per il 2FA, essendo un record singolo per utente */
-            $sql = "select * from admins_2fa where admin_uuid = ?";
-            $result['twofa'] = $this->db->query($sql, [$uuid])->getRow();
-
-            return $result;
-
-        } catch(\Throwable $e) {
-            log_message('error', lang('backend/global.messages.getUUIDError') . ' - ' . $e->getMessage());
-            return ['result' => false, 'message' => lang('backend/global.messages.getUUIDError')];
-        }
+    public function getTwoFa(string $uuid): ?object
+    {
+        /* Estrazione configurazione principale 2FA (record singolo, uso getRow) */
+        $sql = "select * from admins_2fa where admin_uuid = ?";
+        return $this->db->query($sql, [$uuid])->getRow();
     }
 
     public function add(array $posts, \CodeIgniter\HTTP\IncomingRequest $request): array
@@ -277,6 +289,18 @@ class AdminsModel extends BackendModel
             /* Inserimento dati nella tabella principale */
             $sql = "insert into admins (uuid, firstname, lastname, email, phone, status, note, created_at) values (?, ?, ?, ?, ?, ?, ?, ?)";
             $this->db->query($sql, [$uuid, $posts['firstname'], $posts['lastname'], $posts['email'], $posts['phone'], $posts['status'], $posts['note'], date('Y-m-d H:i:s')]);
+
+            /* Gestione dei permessi se esistenti */
+            if ( ! empty($posts['permissions'])):
+                $permissions = [];
+                foreach ($posts['permissions'] as $permission):
+                    $permissions[] = [
+                        'permission' => $permission,
+                        'admin_uuid'  => $uuid,
+                    ];
+                endforeach;
+                $this->insertPermissions($permissions);
+            endif;
 
             /* Generazione token di attivazione */
             $token = new \App\Libraries\Token();
@@ -345,28 +369,86 @@ class AdminsModel extends BackendModel
     {
         try 
         {
-            /* Utilizza la connessione nativa del model per la transazione */
-            $this->db->transBegin();
-
             /* Match dei posts con i campi consentiti */
             $posts = $this->checkAllowedFields($posts, $this->editAllowedFields);
 
+            /* Recupero i dati dell'utente prima dell'aggiornamento */
+            $data = $this->getByUUID($posts['uuid']);
 
-                print_r($posts); die();
+            if($data['result'] === false):
+                return ['result' => false, 'message' => $data['message']];
+            endif;
 
+            /* Se non è stato effettuato alcun cambio... */
+            if( ! $this->hasAdminChanged($posts, $data['row'])):
+                return ['result' => false, 'message' => lang('backend/admins.messages.noDataChanged')];
+            endif;
+
+            $updated_at = date('Y-m-d H:i:s');
+
+            $this->db->transBegin();
+
+            /* Aggiorno la tabella principale dell'utente */
+            $sql = 'update admins set firstname = ?, lastname = ?, email = ?, phone = ?, status = ?, note = ?, updated_at = ? where uuid = ?';
+            $this->db->query($sql, [$posts['firstname'], $posts['lastname'], $posts['email'], $posts['phone'], $posts['status'], $posts['note'], $updated_at, $posts['uuid']]);
 
             if ($this->db->transStatus() === false):
                 $this->db->transRollback();
+                log_message('error', lang('backend/admins.messages.editError'));
                 return ['result' => false, 'message' => lang('backend/admins.messages.editError')];
             endif;
 
             $this->db->transCommit();
-            return ['result' => true, 'message' => lang('backend/admins.messages.editSuccess')];
+
+            /* Aggiornamento dell'oggetto in memoria */
+            $data['row']->firstname  = $posts['firstname'];
+            $data['row']->lastname   = $posts['lastname'];
+            $data['row']->email      = $posts['email'];
+            $data['row']->phone      = $posts['phone'];
+            $data['row']->status     = $posts['status'];
+            $data['row']->note       = $posts['note'];
+            $data['row']->updated_at = $updated_at;
+
+            /* CORREZIONE: Restituisce $data['row'] (oggetto) e non l'intero array $data */
+            return [
+                'result'  => true, 
+                'message' => sprintf(lang('backend/admins.messages.editSuccess'), esc($posts['firstname']), esc($posts['lastname'])), 
+                'row'     => $data['row']
+            ];
 
         } catch (\Exception $e) {
             $this->db->transRollback();
-            return ['result' => false, 'message' => $e->getMessage()];
+            log_message('error', lang('backend/admins.messages.editError') . ' - ' . $e->getMessage());
+            return ['result' => false, 'message' => lang('backend/admins.messages.editError')];
         }
+    }
+
+    public function hasAdminChanged(array $posts, object $original): bool
+    {
+        /* 1. Controlla prima i campi base e i file usando il metodo globale */
+        if ($this->hasDataChanged($posts, $original)):
+            return true;
+        endif;
+
+        /* 2. Logica specifica dei permessi, isolata SOLO dove serve (in AdminsModel) */
+        $newPermissions = $posts['permissions'] ?? [];
+        $oldPermissions = [];
+
+        if (isset($original->permissions) && is_array($original->permissions)):
+            $oldPermissions = array_map(
+                fn($perm) => (is_object($perm)) ? $perm->permission : $perm['permission'],
+                $original->permissions
+            );
+        endif;
+
+        sort($newPermissions);
+        sort($oldPermissions);
+
+        if ($newPermissions !== $oldPermissions):
+            return true;
+        endif;
+
+        return false;
     }
 
     public function del(array $posts): array
@@ -545,5 +627,33 @@ class AdminsModel extends BackendModel
             return ['result' => false, 'message' => lang('backend/admins.messages.changeStatusError')];
 
         }
+    }
+
+    /* Metodo per l'inserimento in batch dei permessi. Utilizzato in add() ed edit() */
+    protected function insertPermissions($permissions)
+    {
+        if(empty($permissions)):
+            return;
+        endif;
+
+        $rows = [];
+        $params = [];
+
+        /* Costruisci la query dinamicamente: ogni permission aggiunge "(?, ?)" */
+        foreach($permissions as $perm):
+            $rows[] = "(?, ?)";
+            $params[] = $perm['permission'];
+            $params[] = $perm['admin_uuid'];
+        endforeach;
+
+        $sql = "insert into admins_permissions (permission, admin_uuid) values " . implode(", ", $rows);
+        $this->db->query($sql, $params);
+    }
+
+    /* Metodo per l'eliminazione dei permessi. Usato in edit() e delete(). */
+    protected function deletePermissions($user_uuid)
+    {
+        $sql = "delete from admins_permissions where admin_uuid = ?";
+        $this->db->query($sql, [$user_uuid]);
     }
 }

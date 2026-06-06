@@ -195,24 +195,24 @@
                                             <td colspan="7" class="align-middle">
 
                                                 <!-- Parte creato -->
-                                                <small><?= lang('backend/admins.labels.created'); ?> <span class="fw-bold"><?= convertDate(esc($admin->created_at)); ?></span></small>
+                                                <small><?= lang('backend/admins.labels.createdAt'); ?> <span class="fw-bold"><?= convertDate(esc($admin->created_at)); ?></span></small>
 
                                                 <!-- Parte aggiornato -->
                                                 <?php if( ! is_null($admin->updated_at)): ?>
                                                     &nbsp;&bull;&nbsp;
-                                                    <small><?= lang('backend/admins.labels.updated'); ?> <span class="fw-bold"><?= convertDate(esc($admin->updated_at)); ?></span></small>
+                                                    <small><?= lang('backend/admins.labels.updatedAt'); ?> <span class="fw-bold"><?= convertDate(esc($admin->updated_at)); ?></span></small>
                                                 <?php endif; ?>
 
                                                 <!-- Parte sospeso -->
                                                 <?php if( ! is_null($admin->suspended_at)): ?>
                                                     &nbsp;&bull;&nbsp;
-                                                    <small><?= lang('backend/admins.labels.suspended'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->suspended_at)); ?></span></small>
+                                                    <small><?= lang('backend/admins.labels.suspendedAt'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->suspended_at)); ?></span></small>
                                                 <?php endif; ?>
 
                                                 <!-- Parte resettato -->
                                                 <?php if( ! is_null($admin->resetted_at)): ?>
                                                     &nbsp;&bull;&nbsp;
-                                                    <small><?= lang('backend/admins.labels.resetted'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->resetted_at)); ?></span></small>
+                                                    <small><?= lang('backend/admins.labels.resettedAt'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->resetted_at)); ?></span></small>
                                                 <?php endif; ?>
 
                                             </td>

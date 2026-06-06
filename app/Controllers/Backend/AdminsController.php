@@ -98,7 +98,10 @@ class AdminsController extends BackendController
             $rules = $this->adminsModel->addValidationRules();
 
             if ( ! $this->validateData($posts, $rules)):
-                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
+
+                $formattedErrors = removeDotPermissions('permissions', $this->validator->getErrors());
+
+                return $this->response->setJSON(['errors' => $formattedErrors, 'message' => lang('backend/admins.messages.validationErrors')]);
             endif;
 
             $json = $this->adminsModel->add($posts, $this->request);
@@ -140,7 +143,7 @@ class AdminsController extends BackendController
             endif;
 
             if (isset($posts['action']) && $posts['action'] === 'refresh'):
-                $this->data['admin'] = $admin['row'] ?? null;
+                $this->data['admin'] = $admin['row'];
                 return $this->response->setJSON(['result' => true,'output' => view('backend/admins/partials/edit/editPartial', $this->data)]);
             endif;
 
@@ -155,13 +158,13 @@ class AdminsController extends BackendController
 
             if ($result['result'] === true):
 
-                $admin = $this->adminsModel->getByUUID($posts['uuid']);
+                $this->data['admin'] = $result['row'];
 
-                if($admin['result'] === false):
-                    return $this->response->setJSON(['result' => false, 'message' => $admin['message']]);
-                endif;
+                $rawPermissions = $this->adminsModel->getPermissions($uuid);
 
-                $this->data['admin'] = $admin['row'] ?? null;
+                $this->data['perms'] = array_map(function($perm) {
+                    return $perm->permission;
+                }, $rawPermissions);
 
                 $json['output'] = view('backend/admins/partials/edit/editPartial', $this->data);
             endif;
@@ -187,6 +190,12 @@ class AdminsController extends BackendController
 
         $this->data['admin'] = $admin['row'] ?? null;
         $this->data['uuid'] = $uuid;
+
+        $rawPermissions = $this->adminsModel->getPermissions($uuid);
+
+        $this->data['perms'] = array_map(function($perm) {
+            return $perm->permission;
+        }, $rawPermissions);
 
         return $this->render('backend/admins/editView', $this->data);
     }
@@ -230,9 +239,6 @@ class AdminsController extends BackendController
             return $this->response->setJSON($json);
 
         endif;
-
-        /* Fallback per richieste non valide */
-        return $this->response->setJSON(['result' => false, 'message' => 'Richiesta non valida']);
     }
 
     public function resetPassword(): ResponseInterface
@@ -251,9 +257,6 @@ class AdminsController extends BackendController
             return $this->response->setJSON($json);
 
         endif;
-
-        /* Fallback per richieste non valide */
-        return $this->response->setJSON(['result' => false, 'message' => 'Richiesta non valida']);
     }
 
     public function changeStatus(): ResponseInterface
@@ -281,9 +284,6 @@ class AdminsController extends BackendController
             return $this->response->setJSON($json);
 
         endif;
-
-        /* Fallback per richieste non valide */
-        return $this->response->setJSON(['result' => false, 'message' => 'Richiesta non valida']);
     }
 
     public function getGeneralData(): ResponseInterface
@@ -320,12 +320,9 @@ class AdminsController extends BackendController
 
             endif;
 
+            return $this->response->setJSON($json);
+
         endif;
-
-        return $this->response->setJSON($json);
-
-        /* Fallback per richieste non valide */
-        return $this->response->setJSON(['result' => false, 'message' => 'Richiesta non valida']);
     }
 
     public function getMetaData(): ResponseInterface
@@ -356,11 +353,8 @@ class AdminsController extends BackendController
 
             endif;
 
+            return $this->response->setJSON($json);
+
         endif;
-
-        return $this->response->setJSON($json);
-
-        /* Fallback per richieste non valide */
-        return $this->response->setJSON(['result' => false, 'message' => 'Richiesta non valida']);
     }
 }

@@ -33,6 +33,10 @@ export class ListManager {
 
         this.debounceTimer = null;
         this.container = document.querySelector(`#${this.config.containerId}`);
+
+        /* NUOVO: Variabili di stato */
+        this.eventsBound = false;
+        this.isLoading = false;
     }
 
     init() {
@@ -88,6 +92,11 @@ export class ListManager {
 
     /* --- EVENTI --- */
     bindEvents() {
+
+        /* NUOVO: Impedisce cloni dei listener */
+        if (this.eventsBound) return;
+        this.eventsBound = true;
+
         /* Paginazione e Ordinamento (Delegation sul container) */
         this.container.addEventListener('click', (e) => {
             const sortEl = e.target.closest(`a.sort`);
@@ -226,6 +235,11 @@ export class ListManager {
 
     /* --- COMUNICAZIONE SERVER --- */
     async showAll() {
+
+        /* NUOVO: Impedisce sovrapposizioni di chiamate */
+        if (this.isLoading) return;
+        this.isLoading = true;
+
         const urlParams = new URLSearchParams();
 
         /* Costruzione dinamica parametri */
@@ -239,10 +253,12 @@ export class ListManager {
             }
         });
 
-        /* Hook opzionale prima dell'invio */
         if (typeof this.hooks.onShowBefore === 'function') {
             const stop = this.hooks.onShowBefore(urlParams);
-            if (stop === false) return;
+            if (stop === false) {
+                this.isLoading = false; /* <--- AGGIUNTO */
+                return;
+            }
         }
 
         /* Pulizia immediata degli errori visivi prima dell'invio */
@@ -297,6 +313,9 @@ export class ListManager {
                 this.hooks.onShowError(error);
             }
             console.error("Errore ListManager:", error);
+        } finally {
+            /* NUOVO: Rilascia sempre il blocco */
+            this.isLoading = false;
         }
     }
 }
@@ -322,6 +341,10 @@ export class AddManager {
             onResetAfter: null,
             onResetError: null
         }, hooks);
+
+        /* Variabili di stato per prevenire sovrapposizioni e doppi click */
+        this.eventsBound = false;
+        this.isSubmitting = false;
     }
 
     init() {
@@ -329,6 +352,10 @@ export class AddManager {
     }
 
     bindEvents() {
+        /* Impedisce l'accumulo di listener multipli sul document globale */
+        if (this.eventsBound) return;
+        this.eventsBound = true;
+
         /* Gestione Invio Form tramite delegazione */
         document.addEventListener('submit', async e => {
             const formEl = e.target.closest(this.config.formSelector);
@@ -353,10 +380,18 @@ export class AddManager {
     }
 
     async add(formData) {
+
+        /* Blocco esecuzione se c'è già una chiamata in corso */
+        if (this.isSubmitting) return;
+        this.isSubmitting = true;
+
         /* Hook opzionale prima dell'invio: UNIFORMATO (mantiene stop per interruzione preventiva) */
         if (typeof this.hooks.onAddBefore === 'function') {
             const stop = this.hooks.onAddBefore(formData);
-            if (stop === false) return;
+            if (stop === false) {
+                this.isSubmitting = false;
+                return;
+            }
         }
 
         /* Se presente, aggiunge le immagini selezionate */
@@ -424,6 +459,9 @@ export class AddManager {
             if (data.result === true) {
                 /* TIMING FIX: Mostra subito il messaggio di successo prima di lanciare il reset asincrono */
                 if (data.message && typeof showToast === 'function') showToast('success', data.message);
+
+                /* NUOVO: Sblocca manualmente prima di chiamare il reset */
+                this.isSubmitting = false;
                 
                 /* Chiama il metodo reset in modo pulito per aggiornare il DOM */
                 await this.reset();
@@ -449,19 +487,37 @@ export class AddManager {
                 this.hooks.onAddError(error);
             }
             console.error("Errore AddManager (add):", error);
+        } finally {
+            /* Rilascia sempre il blocco al termine dell'operazione */
+            this.isSubmitting = false;
         }
     }
 
     async reset() {
+
+        /* Blocco esecuzione se c'è già una chiamata in corso */
+        if (this.isSubmitting) return;
+        this.isSubmitting = true;
+
         /* Hook prima del reset: UNIFORMATO (mantiene stop per interruzione preventiva) */
         if (typeof this.hooks.onResetBefore === 'function') {
             const stop = this.hooks.onResetBefore();
-            if (stop === false) return;
+            if (stop === false) {
+                this.isSubmitting = false;
+                return;
+            }
         }
 
-        if ( ! this.config.resetSelector) return;
+        if ( ! this.config.resetSelector) {
+            this.isSubmitting = false;
+            return;
+        }
+        
         const resetForm = document.querySelector(this.config.resetSelector);
-        if ( ! resetForm) return;
+        if ( ! resetForm) {
+            this.isSubmitting = false;
+            return;
+        }
 
         /* Creazione diretta e pulita: prende sempre i dati dal form */
         const formData = new FormData(resetForm);
@@ -528,6 +584,9 @@ export class AddManager {
                 this.hooks.onResetError(error);
             }
             console.error("Errore AddManager (reset):", error);
+        } finally {
+            /* Rilascia sempre il blocco al termine dell'operazione */
+            this.isSubmitting = false;
         }
     }
 }
@@ -555,6 +614,10 @@ export class EditManager {
             onRefreshAfter: null,
             onRefreshError: null,
         }, hooks);
+
+        /* NUOVO: Variabili di stato per la sicurezza */
+        this.eventsBound = false;
+        this.isSubmitting = false;
     }
 
     init() {
@@ -563,6 +626,11 @@ export class EditManager {
     }
 
     bindEvents() {
+
+        /* NUOVO: Impedisce l'accumulo di listener multipli */
+        if (this.eventsBound) return;
+        this.eventsBound = true;
+
         /* Gestione Invio Form Edit tramite delegazione */
         document.addEventListener('submit', async e => {
             const formEl = e.target.closest(this.config.formSelector);
@@ -589,10 +657,18 @@ export class EditManager {
     }
 
     async edit(formData) {
+
+        /* NUOVO: Se c'è già una richiesta in corso, blocca */
+        if (this.isSubmitting) return;
+        this.isSubmitting = true;
+
         /* Esegue hook personalizzato prima del salvataggio, blocca se ritorna false */
         if (typeof this.hooks.onEditBefore === 'function') {
             const stop = this.hooks.onEditBefore(formData);
-            if (stop === false) return;
+            if (stop === false) {
+                this.isSubmitting = false; /* <--- NUOVO RILASCIO */
+                return;
+            }
         }
 
         /* Se presente, aggiunge le immagini dal preview manager */
@@ -676,6 +752,9 @@ export class EditManager {
                     refreshData.append('uuid', uuidEl.value);
                 }
 
+                /* NUOVO: Sblocca manualmente prima di chiamare il refresh */
+                this.isSubmitting = false;
+
                 /* Esegue il refresh dei dati */
                 await this.refresh(refreshData);
             }
@@ -684,10 +763,19 @@ export class EditManager {
                 this.hooks.onEditError(error);
             }
             console.error("Errore EditManager (edit):", error);
+        } finally {
+
+            /* NUOVO: Rilascia sempre il blocco */
+            this.isSubmitting = false;
         }
     }
 
     async refresh(formData) {
+
+        /* NUOVO: Se c'è già una richiesta in corso, blocca */
+        if (this.isSubmitting) return;
+        this.isSubmitting = true;
+
         /* Aggiunge parametro action=refresh per il backend */
         formData.append('action', 'refresh');
 
@@ -700,7 +788,10 @@ export class EditManager {
         /* Esegue hook prima del refresh (può bloccare se ritorna false) */
         if (typeof this.hooks.onRefreshBefore === 'function') {
             const stop = this.hooks.onRefreshBefore(formData);
-            if (stop === false) return;
+            if (stop === false) {
+                this.isSubmitting = false; /* <--- NUOVO RILASCIO */
+                return;
+            }
         }
 
         try {
@@ -776,6 +867,9 @@ export class EditManager {
                 this.hooks.onRefreshError(error);
             }
             console.error("Errore EditManager (refresh):", error);
+        } finally {
+            /* NUOVO: Rilascia sempre il blocco */
+            this.isSubmitting = false;
         }
     }
 }
@@ -794,6 +888,10 @@ export class DeleteManager {
             onDeleteAfter: null,
             onDeleteError: null
         }, hooks);
+
+        /* NUOVO: Variabili di stato per la sicurezza */
+        this.eventsBound = false;
+        this.isSubmitting = false;
     }
 
     init() {
@@ -801,6 +899,11 @@ export class DeleteManager {
     }
 
     bindEvents() {
+
+        /* NUOVO: Impedisce cloni dei listener */
+        if (this.eventsBound) return;
+        this.eventsBound = true;
+
         document.addEventListener('submit', async e => {
             const formEl = e.target.closest('.deleteRecord');
             if ( ! formEl) return;
@@ -819,10 +922,17 @@ export class DeleteManager {
 
     async deleteRecord(formData) {
 
+        /* NUOVO: Se c'è già una richiesta in corso, blocca */
+        if (this.isSubmitting) return;
+        this.isSubmitting = true;
+
         /* Hook opzionale prima dell'invio */
         if (typeof this.hooks.onDeleteBefore === 'function') {
             const stop = this.hooks.onDeleteBefore(formData);
-            if (stop === false) return;
+            if (stop === false) {
+                this.isSubmitting = false; /* <--- NUOVO RILASCIO */
+                return;
+            }
         }
 
         /* Pulizia immediata degli errori visivi prima dell'invio */
@@ -898,6 +1008,9 @@ export class DeleteManager {
                 this.hooks.onDeleteError(error);
             }
             console.error("Errore DeleteManager:", error);
+        } finally {
+            /* NUOVO: Rilascia sempre il blocco */
+            this.isSubmitting = false;
         }
     }
 }
@@ -916,6 +1029,10 @@ export class ChangeStatusManager {
             onStatusAfter: null,
             onStatusError: null
         }, hooks);
+
+        /* NUOVO: Variabili di stato per la sicurezza */
+        this.eventsBound = false;
+        this.isSubmitting = false;
     }
 
     init() {
@@ -923,6 +1040,11 @@ export class ChangeStatusManager {
     }
 
     bindEvents() {
+
+        /* NUOVO: Impedisce cloni dei listener */
+        if (this.eventsBound) return;
+        this.eventsBound = true;
+
         /* Gestione dell'invio dei dati (cattura il click sul button type="submit") */
         document.addEventListener('submit', async e => {
             const formEl = e.target.closest('.changeStatus');
@@ -946,9 +1068,16 @@ export class ChangeStatusManager {
 
     async changeStatus(formData) {
 
+        /* NUOVO: Se c'è già una richiesta in corso, blocca */
+        if (this.isSubmitting) return;
+        this.isSubmitting = true;
+
         if (typeof this.hooks.onStatusBefore === 'function') {
             const stop = this.hooks.onStatusBefore(formData);
-            if (stop === false) return;
+            if (stop === false) {
+                this.isSubmitting = false; /* <--- NUOVO RILASCIO */
+                return;
+            }
         }
 
         /* Pulizia immediata degli errori visivi prima dell'invio */
@@ -997,6 +1126,9 @@ export class ChangeStatusManager {
                 this.hooks.onStatusError(error);
             }
             console.error("Errore ChangeStatusManager:", error);
+        } finally {
+            /* NUOVO: Rilascia sempre il blocco */
+            this.isSubmitting = false;
         }
     }
 }
@@ -1013,6 +1145,10 @@ export class GeneralDataManager {
             onGeneralDataAfter: null,
             onGeneralDataError: null
         }, hooks);
+
+        /* NUOVO: Variabili di stato per la sicurezza */
+        this.eventsBound = false;
+        this.isSubmitting = false;
     }
 
     init() {
@@ -1020,19 +1156,33 @@ export class GeneralDataManager {
     }
 
     bindEvents() {
-        document.addEventListener('submit', e => {
+
+        /* NUOVO: Impedisce cloni dei listener */
+        if (this.eventsBound) return;
+        this.eventsBound = true;
+
+        document.addEventListener('submit', async e => {
             if ( ! e.target.matches(this.config.formSelector)) return;
 
             e.preventDefault();
             const formData = new FormData(e.target);
-            this.getGeneralData(formData);
+
+            await this.getGeneralData(formData);
         });
     }
 
     async getGeneralData(formData) {
+        
+        /* NUOVO: Se c'è già una richiesta in corso, blocca */
+        if (this.isSubmitting) return;
+        this.isSubmitting = true;
+
         if (typeof this.hooks.onGeneralDataBefore === 'function') {
             const stop = this.hooks.onGeneralDataBefore(formData);
-            if (stop === false) return;
+            if (stop === false) {
+                this.isSubmitting = false; /* <--- NUOVO RILASCIO */
+                return;
+            }
         }
 
         /* Pulizia immediata degli errori visivi prima dell'invio */
@@ -1086,6 +1236,9 @@ export class GeneralDataManager {
                 this.hooks.onGeneralDataError(error);
             }
             console.error("Errore GeneralDataManager:", error);
+        } finally {
+            /* NUOVO: Rilascia sempre il blocco */
+            this.isSubmitting = false;
         }
     }
 }
@@ -1102,6 +1255,10 @@ export class MetaDataManager {
             onMetaDataAfter: null,
             onMetaDataError: null
         }, hooks);
+
+        /* NUOVO: Variabili di stato per la sicurezza */
+        this.eventsBound = false;
+        this.isSubmitting = false;
     }
 
     init() {
@@ -1109,19 +1266,32 @@ export class MetaDataManager {
     }
 
     bindEvents() {
-        document.addEventListener('submit', e => {
+
+        /* NUOVO: Impedisce cloni dei listener */
+        if (this.eventsBound) return;
+        this.eventsBound = true;
+
+        document.addEventListener('submit', async e => {
             if ( ! e.target.matches(this.config.formSelector)) return;
 
             e.preventDefault();
             const formData = new FormData(e.target);
-            this.getMetaData(formData);
+            await this.getMetaData(formData);
         });
     }
 
     async getMetaData(formData) {
+        
+        /* NUOVO: Se c'è già una richiesta in corso, blocca */
+        if (this.isSubmitting) return;
+        this.isSubmitting = true;
+
         if (typeof this.hooks.onMetaDataBefore === 'function') {
             const stop = this.hooks.onMetaDataBefore(formData);
-            if (stop === false) return;
+            if (stop === false) {
+                this.isSubmitting = false; /* <--- NUOVO RILASCIO */
+                return;
+            }
         }
 
         /* Pulizia immediata degli errori visivi prima dell'invio */
@@ -1176,6 +1346,9 @@ export class MetaDataManager {
                 this.hooks.onMetaDataError(error);
             }
             console.error("Errore MetaDataManager:", error);
+        } finally {
+            /* NUOVO: Rilascia sempre il blocco */
+            this.isSubmitting = false;
         }
     }
 }

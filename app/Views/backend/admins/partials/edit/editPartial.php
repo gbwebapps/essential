@@ -27,6 +27,11 @@
                     <?= $this->include('backend/admins/partials/edit/generalDataPartial', $this->data); ?>
                 </div>
 
+                <!-- Permessi -->
+                <div id="permissionsData">
+                    <?= $this->include('backend/admins/partials/edit/permissionsPartial'); ?>
+                </div>
+
                 <!-- Sezione: Upload e Preview Immagini Profilo -->
                 <div id="upload_preview">
                     <!-- Inclusione del componente per la preview delle immagini -->

@@ -10,7 +10,8 @@ return [
 	],
 	'panels' => [
 		'generalData' => 'Dati generali', 
-		'metaData' => 'Meta dati'
+		'metaData' => 'Meta dati', 
+		'permissions' => 'Permessi'
 	],
 	'linksBar' => [
 		'index' => 'Dati', 
@@ -28,7 +29,8 @@ return [
 		'filters' => 'Filtri', 
 		'resetFilters' => 'Resetta filtri', 
 		'resetSorting' => 'Resetta ordinamento', 
-		'reloadList' => 'Ricarica lista'
+		'reloadList' => 'Ricarica lista', 
+		'selectAll' => 'Seleziona tutti'
 	],
 	'labels' => [
 		'firstname' => 'Nome', 
@@ -39,10 +41,12 @@ return [
 		'active' => 'Attivo', 
 		'unactive' => 'Inattivo', 
 		'noImage' => 'Nessuna immagine', 
-		'created' => 'Aggiunto il ', 
-		'resetted' => 'Reset il ',
-		'suspended' => 'Sospeso il ',
-		'note' => 'Note aggiuntive'
+		'createdAt' => 'Aggiunto il ', 
+		'updatedAt' => 'Aggiornato il ', 
+		'resettedAt' => 'Reset il ',
+		'suspendedAt' => 'Sospeso il ',
+		'note' => 'Note aggiuntive', 
+		'permissions' => 'Permessi'
 	],
 	'placeholders' => [
 		'firstname' => 'Inserisci nome...', 
@@ -81,9 +85,13 @@ return [
 		'addSuccess' => 'Amministratore %s %s aggiunto con successo.', 
 		'addSuccessNoEmail' => 'Amministratore %s %s aggiunto con successo, ma la mail non è stata inviata. Contattare amministratore.', 
 		'addError' => 'Aggiunta amministratore non andata a buon fine.', 
+		'editSuccess' => 'Amministratore %s %s aggiornato con successo.', 
+		'editError' => 'Aggiornamento amministratore non andato a buon fine.', 
+		'noDataChanged' => 'Non sono state effettuate modifiche.', 
 		'delSuccess' => 'Amministratore %s %s eliminato con successo.',
 		'delError' => 'Eliminazione amministratore non andata a buon fine.',
 		'changeStatusSuccess' => 'Modifica stato %s %s effettuato con successo.',
 		'changeStatusError' => 'Modifica stato amministratore non andato a buon fine.', 
+		'wrongPermissionsFormat' => 'Uno o più permessi con formato non corretto.'
 	]
 ];

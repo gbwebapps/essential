@@ -8,7 +8,7 @@
             <form id="admins_add">
 
                 <!-- Sezione: Dati Anagrafici e Contatti -->
-                <div id="general_data">
+                <div id="generalData">
 
                     <div class="card-header">
                         <h2 class="card-title text-center text-lg-start mb-0"><?= lang('backend/admins.panels.generalData'); ?></h2>
@@ -80,6 +80,11 @@
                         </div>
                     </div>
 
+                </div>
+
+                <!-- Permessi -->
+                <div id="permissionsData">
+                    <?= $this->include('backend/admins/partials/add/permissionsPartial'); ?>
                 </div>
 
                 <!-- Sezione: Upload e Preview Immagini Profilo -->

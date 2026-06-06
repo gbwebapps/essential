@@ -27,7 +27,7 @@ document.addEventListener('click', function(e) {
 /* --- Gestione globale Loader e Controlli --- */
 export function toggleLoader(show) {
     const loader = document.getElementById('show-loader');
-    if (!loader) return;
+    if ( ! loader) return;
 
     if (show) {
         loader.style.display = 'block';
@@ -64,19 +64,53 @@ export async function apiFetch(input, init = {}) {
     try {
         const response = await fetch(input, init);
         
-        /* Se la risposta non è OK (es. 500 Internal Server Error, 404 Not Found) */
-        if (!response.ok) {
-            /* Passa direttamente l'errore al gestore globale */
-            handleAjaxError(response, response.statusText, null);
-            throw new Error(response.statusText);
+        /* Se la risposta non è OK (gestisce tutti gli errori: 403, 500, 404) */
+        if ( ! response.ok) {
+            /* Passiamo la response direttamente al catch */
+            throw response; 
+        }
+
+        /* Cloniamo la risposta per leggere il JSON senza consumare lo stream originale */
+        const clone = response.clone();
+        const data = await clone.json();
+
+        /* Se il server ha inviato un nuovo token, aggiorniamo il meta tag */
+        if (data.csrf) {
+            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+            if (csrfMeta) {
+                csrfMeta.setAttribute('content', data.csrf);
+            }
         }
         
         return response;
         
     } catch (error) {
-        /* Gestione errori critici o di rete (server irraggiungibile, connessione assente) */
-        handleAjaxError({ status: 0, statusText: error.message }, error.message, error);
-        throw error;
+        /* Se l'errore è una risposta del server ed è un 403 */
+        if (error instanceof Response && error.status === 403) {
+            /* Cloniamo la risposta di errore per lo stesso motivo */
+            const cloneError = error.clone();
+            const errorJson = await cloneError.json().catch(() => ({}));
+            
+            /* Aggiorniamo il token se presente nel payload di errore */
+            if (errorJson.csrf) {
+                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                if (csrfMeta) {
+                    csrfMeta.setAttribute('content', errorJson.csrf);
+                }
+            }
+
+            const serverMessage = errorJson.message || "Errore di sicurezza (CSRF).";
+            
+            handleAjaxError({ status: 403 }, serverMessage, null);
+        } else {
+            /* Altri errori di sistema o di rete */
+            const status = error.status || 0;
+            const statusText = error.statusText || error.message;
+            handleAjaxError({ status: status }, statusText, error);
+        }
+        
+        throw error; /* Rilancia per bloccare l'esecuzione dello script del form */
+
     } finally {
         toggleLoader(false); /* Disattiva loader */
     }
@@ -131,7 +165,7 @@ export function handleValidationErrors(errors) {
 
 /* Funzione per gestire gli errori per le immagini */
 export function handleValidationImages(errors) {
-    if (!errors.images) return;
+    if ( ! errors.images) return;
 
     if (errors.images.required) {
         const preview = document.querySelector('#preview_images');
@@ -155,7 +189,7 @@ export function handleValidationImages(errors) {
 
 /* Funzione per gestire gli errori per i documenti */
 export function handleValidationDocuments(errors) {
-    if (!errors.documents) return;
+    if ( ! errors.documents) return;
 
     if (errors.documents.required) {
         const preview = document.querySelector('#preview_documents');
@@ -180,26 +214,28 @@ export function handleValidationDocuments(errors) {
 /* Funzione per gestire il .fail delle chiamate ajax */
 export function handleAjaxError(jqXHR, textStatus, errorThrown) {
 
-    /* Messaggio descrittivo */
-    let message = `Errore AJAX:
-    - Status Code: ${jqXHR.status}
-    - Status Text: ${textStatus}
-    - Error Thrown: ${errorThrown}`;
+    /* Messaggio descrittivo di base */
+    let message = '';
 
-    /* Aggiungi il contenuto della risposta se disponibile */
-    if (jqXHR.responseText) {
-        message += `\n- Response Text: ${jqXHR.responseText}`;
+    /* Se è un errore 403, prendiamo SOLO lo statusText pulito senza debug */
+    if (jqXHR.status === 403) {
+        message = textStatus;
+    } else {
+        /* Per tutti gli altri errori (es. 500, 404), mantiene il report completo */
+        message = `Errore AJAX:
+        - Status Code: ${jqXHR.status}
+        - Status Text: ${textStatus}
+        - Error Thrown: ${errorThrown}`;
     }
 
     /* Mostra il messaggio in un toast */
     showToast('danger', message);
 
-    /* Logga il messaggio in console per debugging */
+    /* Logga comunque il messaggio completo in console per il debug dello sviluppatore */
     console.error('Dettagli errore AJAX:', {
         status: jqXHR.status,
         textStatus: textStatus,
-        errorThrown: errorThrown,
-        responseText: jqXHR.responseText
+        errorThrown: errorThrown
     });
 }
 

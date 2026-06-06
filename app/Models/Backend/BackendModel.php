@@ -134,8 +134,27 @@ abstract class BackendModel extends BaseModel
 	    }
 	}
 
-	protected function hasDataChanged(array $posts, array|object $data): bool {
+	protected function hasDataChanged(array $posts, object $original): bool
+	{
+	    /* 1. Controllo dei campi nativi della tabella (Valido per TUTTI i moduli) */
+	    foreach ($this->toCompare as $field):
+	        if (isset($posts[$field]) && $posts[$field] !== $original->$field):
+	            return true;
+	        endif;
+	    endforeach;
 
+	    /* 2. Controllo dei file caricati (Valido per TUTTI i moduli che accettano allegati) */
+	    foreach (['images', 'documents'] as $type):
+	        if (isset($posts[$type]) && is_array($posts[$type])):
+	            foreach ($posts[$type] as $file):
+	                if ($file instanceof \CodeIgniter\HTTP\Files\UploadedFile && $file->isValid() && ! $file->hasMoved()):
+	                    return true;
+	                endif;
+	            endforeach;
+	        endif;
+	    endforeach;
+
+	    return false;
 	}
 
 	protected function insertImages(Array $filenames, String $uuid, String $entity, String $action = 'add'): Void 

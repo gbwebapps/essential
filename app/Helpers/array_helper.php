@@ -19,4 +19,23 @@ if (! function_exists('removeDot')) {
 
         return $formatted;
     }
+
+}
+
+if (! function_exists('removeDotPermissions')) {
+
+    function removeDotPermissions(string $prefix, array $array): array
+    {
+        $formatted = [];
+
+        foreach ($array as $key => $message):
+            if (strpos($key, $prefix . '.') === 0):
+                $formatted[$prefix] = $message;
+            else:
+                $formatted[$key] = $message;
+            endif;
+        endforeach;
+
+        return $formatted;
+    }
 }
