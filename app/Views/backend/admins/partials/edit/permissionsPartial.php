@@ -1,12 +1,6 @@
-<div id="permissionsData">
+<div class="card-body">
 
-    <div class="card-header rounded-0" style="border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);">
-        <h2 class="card-title text-center text-lg-start mb-0"><?= lang('backend/admins.panels.permissions'); ?></h2>
-    </div>
-
-    <div class="card-body">
-
-        <?php $permissions = config('BackendPermissions')->getPermissions(); foreach($permissions as $permission): ?>
+    <?php foreach($permissions as $permission): ?>
 
         <div class="row mb-2 g-0 bg-light pt-2 ps-2 pe-2 border">
             <div class="col-6 text-start">
@@ -21,12 +15,12 @@
         </div>
 
         <div class="row">
-            <div class="col-lg-12">
+            <div class="col-12">
                 <div class="row">
 
                     <?php foreach($permission['perms'] as $k => $v): ?>
 
-                        <div class="col-lg-3 text-center py-1">
+                        <div class="col-3 text-center py-1">
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item">
                                     <label for="<?= $k; ?>"><?= $v; ?></label>
@@ -42,7 +36,8 @@
                 </div>
             </div>
         </div>
-        <?php endforeach; ?>
-        <div class="error_permissions text-danger text-center fw-bold pt-2">&nbsp;</div>
-    </div>
+
+    <?php endforeach; ?>
+
+    <div class="error_permissions text-danger text-center fw-bold pt-2">&nbsp;</div>
 </div>

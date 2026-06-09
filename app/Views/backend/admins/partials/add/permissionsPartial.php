@@ -6,18 +6,18 @@
 
     <div class="card-body">
 
-        <?php $permissions = config('BackendPermissions')->getPermissions(); foreach($permissions as $permission): ?>
+        <?php foreach($permissions as $permission): ?>
 
             <div class="row mb-2 g-0 bg-light pt-2 ps-2 pe-2 border">
-                    <div class="col-6 text-start">
-                        <h5><?= $permission['icon']; ?> <?= ucfirst($permission['title']); ?></h5>
-                    </div>
-                    <div class="col-6 text-end">
-                        <a href="#" class="select-all" data-controller="<?= $permission['controller']; ?>">
-                            <i class="fa-solid fa-check-double"></i>
-                            <?= lang('backend/admins.links.selectAll'); ?>
-                        </a>
-                    </div>
+                <div class="col-6 text-start">
+                    <h5><?= $permission['icon']; ?> <?= ucfirst($permission['title']); ?></h5>
+                </div>
+                <div class="col-6 text-end">
+                    <a href="#" class="select-all" data-controller="<?= $permission['controller']; ?>">
+                        <i class="fa-solid fa-check-double"></i>
+                        <?= lang('backend/admins.links.selectAll'); ?>
+                    </a>
+                </div>
             </div>
 
             <div class="row">

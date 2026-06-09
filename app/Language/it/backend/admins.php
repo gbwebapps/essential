@@ -11,7 +11,8 @@ return [
 	'panels' => [
 		'generalData' => 'Dati generali', 
 		'metaData' => 'Meta dati', 
-		'permissions' => 'Permessi'
+		'permissions' => 'Permessi', 
+		'tokens' => 'Sessioni'
 	],
 	'linksBar' => [
 		'index' => 'Dati', 
@@ -46,7 +47,18 @@ return [
 		'resettedAt' => 'Reset il ',
 		'suspendedAt' => 'Sospeso il ',
 		'note' => 'Note aggiuntive', 
-		'permissions' => 'Permessi'
+		'permissions' => 'Permessi', 
+		'assigned' => 'Assegnato', 
+		'notAssigned' => 'Non assegnato', 
+		'operatingSystem' => 'Sistema operativo', 
+		'browser' => 'Browser web', 
+		'ipAddress' => 'Indirizzo IP', 
+		'createdToken' => 'Data inizio', 
+		'expiredToken' => 'Data scadenza', 
+		'typeToken' => 'Tipo', 
+		'session' => 'Sessione',
+        'activation' => 'Attivazione',
+        'rememberMe' => 'Ricordami',
 	],
 	'placeholders' => [
 		'firstname' => 'Inserisci nome...', 
@@ -80,6 +92,7 @@ return [
 		'areYouSureChangeStatus' => 'Sei sicuro di modificare lo stato di %s %s?', 
 		'areYouSureReset' => 'Sei sicuro di resettare la password di %s %s?', 
 		'areYouSureDelete' => 'Sei sicuro di eliminare  %s %s?', 
+		'areYouSureChangePermission' => 'Sei sicuro di modificare il permesso di %s %s?', 
 		'noRecordsFound' => 'Non sono presenti amministratori.', 
 		'validationErrors' => 'Errori di validazione.', 
 		'addSuccess' => 'Amministratore %s %s aggiunto con successo.', 
@@ -92,6 +105,11 @@ return [
 		'delError' => 'Eliminazione amministratore non andata a buon fine.',
 		'changeStatusSuccess' => 'Modifica stato %s %s effettuato con successo.',
 		'changeStatusError' => 'Modifica stato amministratore non andato a buon fine.', 
-		'wrongPermissionsFormat' => 'Uno o più permessi con formato non corretto.'
+		'wrongPermissionsFormat' => 'Uno o più permessi con formato non corretto.', 
+		'resetPasswordError' => 'Reset password amministratore non andato a buon fine.', 
+		'resetPasswordSuccessNoEmail' => 'Password amministratore %s %s resettata con successo, ma la mail non è stata inviata. Contattare amministratore.', 
+		'resetPasswordSuccess' => 'Password amministratore %s %s resettata con successo.', 
+		'changePermissionError' => 'Modifica permesso amministratore non andato a buon fine.', 
+		'changePermissionSuccess' => 'Modifica permesso %s %s effettuato con successo.', 
 	]
 ];

@@ -6,6 +6,7 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use CodeIgniter\HTTP\RedirectResponse;
+use CodeIgniter\HTTP\UserAgent;
 
 use App\Models\Backend\AdminsModel;
 use App\Libraries\Backend\AdminsClass;
@@ -87,6 +88,8 @@ class AdminsController extends BackendController
 
     public function add(): string|ResponseInterface
     {
+        $this->data['permissions'] = config('BackendPermissions')->getPermissions();
+
         if ($this->request->isAJAX() && $this->request->is('post')):
 
             $posts = array_merge($this->request->getPost(), ['images' => $this->request->getFileMultiple('images') ?? []], ['documents' => $this->request->getFileMultiple('documents') ?? []]);
@@ -128,6 +131,8 @@ class AdminsController extends BackendController
 
     public function edit(string $uuid = null): string|ResponseInterface
     {
+        $this->data['permissions'] = config('BackendPermissions')->getPermissions();
+
         if ($this->request->isAJAX() && $this->request->is('post')):
 
             $posts = array_merge($this->request->getPost(), ['images' => $this->request->getFileMultiple('images') ?? []], ['documents' => $this->request->getFileMultiple('documents') ?? []]);
@@ -142,12 +147,17 @@ class AdminsController extends BackendController
                 return $this->response->setJSON(['result' => false, 'message' => $admin['message']]);
             endif;
 
+            /* Caso 1: Refresh della vista parziale */
             if (isset($posts['action']) && $posts['action'] === 'refresh'):
+
+                $this->data['perms'] = $this->getFlatPermissions($posts['uuid']);
                 $this->data['admin'] = $admin['row'];
+
                 return $this->response->setJSON(['result' => true,'output' => view('backend/admins/partials/edit/editPartial', $this->data)]);
             endif;
 
             $rules = $this->adminsModel->editValidationRules($posts);
+            
             if ( ! $this->validateData($posts, $rules)):
                 return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
             endif;
@@ -156,16 +166,11 @@ class AdminsController extends BackendController
 
             $json = ['result'  => $result['result'], 'message' => $result['message']];
 
+            /* Caso 2: Salvataggio riuscito (Query eliminata, riuso i dati in memoria) */
             if ($result['result'] === true):
-
                 $this->data['admin'] = $result['row'];
-
-                $rawPermissions = $this->adminsModel->getPermissions($uuid);
-
-                $this->data['perms'] = array_map(function($perm) {
-                    return $perm->permission;
-                }, $rawPermissions);
-
+                $this->data['perms'] = $posts['permissions'] ?? [];
+                
                 $json['output'] = view('backend/admins/partials/edit/editPartial', $this->data);
             endif;
 
@@ -173,6 +178,7 @@ class AdminsController extends BackendController
 
         endif;
 
+        /* GET Request - Caricamento iniziale della pagina */
         if(( ! isset($uuid)) || ( ! $this->regexp->validateUUID($uuid))):
             return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.wrongUUIDFormat'))->with('class', 'danger');
         endif;
@@ -184,20 +190,24 @@ class AdminsController extends BackendController
         endif;
         
         $this->data['action'] = 'edit';
-        
         $this->data['title'] = lang('backend/admins.titles.edit');
         $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
 
         $this->data['admin'] = $admin['row'] ?? null;
         $this->data['uuid'] = $uuid;
 
-        $rawPermissions = $this->adminsModel->getPermissions($uuid);
-
-        $this->data['perms'] = array_map(function($perm) {
-            return $perm->permission;
-        }, $rawPermissions);
+        /* Caso Caricamento standard */
+        $this->data['perms'] = $this->getFlatPermissions($uuid);
 
         return $this->render('backend/admins/editView', $this->data);
+    }
+
+    private function getFlatPermissions(string $uuid): array
+    {
+        $rawPermissions = $this->adminsModel->getPermissions($uuid);
+        return array_map(function($perm) {
+            return $perm->permission;
+        }, $rawPermissions);
     }
 
     public function show(string $uuid): RedirectResponse|string
@@ -217,8 +227,14 @@ class AdminsController extends BackendController
         $this->data['title'] = lang('backend/admins.titles.show');
         $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
 
-        $this->data['admin'] = $admin['row'] ?? null;
+        $this->data['admin'] = $admin['row'];
         $this->data['uuid'] = $uuid;
+
+        $this->data['permissions'] = config('BackendPermissions')->getPermissions();
+        $this->data['perms'] = $this->getFlatPermissions($uuid);
+
+        $this->data['userAgent'] = new UserAgent();
+        $this->data['tokens'] = $this->adminsModel->getTokens($uuid);
 
         return $this->render('backend/admins/showView', $this->data);
     }
@@ -272,14 +288,52 @@ class AdminsController extends BackendController
 
             $json = $this->adminsModel->changeStatus($posts);
 
+            if($json['result'] === false):
+                return $this->response->setJSON(['result' => false, 'message' => $json['message']]);
+            endif;
+
             if(isset($posts['context']) && $posts['context'] === 'show'):
 
                 $this->data['admin'] = $json['admin'];
 
-                $json['statusView'] = view('backend/admins/partials/show/statusDataPartial', $this->data);
+                $json['statusView'] = view('backend/admins/partials/show/statusPartial', $this->data);
                 $json['metaView'] = view('backend/admins/partials/common/metaDataPartial', $this->data); 
 
             endif;
+
+            unset($json['admin']);
+
+            return $this->response->setJSON($json);
+
+        endif;
+    }
+
+    public function changePermission(): ResponseInterface
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            $posts = $this->request->getPost();
+            $rules = $this->adminsModel->changePermissionValidationRules();
+
+            if ( ! $this->validateData($posts, $rules)):
+                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
+            endif;
+
+            $json = $this->adminsModel->changePermission($posts);
+
+            if($json['result'] === false):
+                return $this->response->setJSON(['result' => false, 'message' => $json['message']]);
+            endif;
+
+            $this->data['admin'] = $json['admin'];
+
+            $this->data['perms'] = $this->getFlatPermissions($posts['uuid']);
+            $this->data['permissions'] = config('BackendPermissions')->getPermissions();
+
+            $json['permissionsView'] = view('backend/admins/partials/show/permissionsPartial', $this->data);
+            $json['metaView'] = view('backend/admins/partials/common/metaDataPartial', $this->data); 
+
+            unset($json['admin']);
 
             return $this->response->setJSON($json);
 
@@ -345,6 +399,82 @@ class AdminsController extends BackendController
                 $this->data['admin'] = $record['row'];
 
                 $json['output'] = view('backend/admins/partials/common/metaDataPartial', $this->data);
+
+            else:
+
+                $json = ['result' => false];
+                $json['message'] = $record['message'];
+
+            endif;
+
+            return $this->response->setJSON($json);
+
+        endif;
+    }
+
+    public function getPermissions(): ResponseInterface
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            $posts = $this->request->getPost();
+            $rules = $this->adminsModel->getPermissionsValidationRules();
+
+            if ( ! $this->validateData($posts, $rules)):
+                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
+            endif;
+
+            $record = $this->adminsModel->getByUUID($posts['uuid']);
+
+            if($record['result'] === true):
+
+                $json = ['result' => true];
+
+                $this->data['admin'] = $record['row'];
+
+                $this->data['permissions'] = config('BackendPermissions')->getPermissions();
+                $this->data['perms'] = $this->getFlatPermissions($posts['uuid']);
+
+                if(isset($posts['context']) && $posts['context'] === 'show'):
+                    $json['output'] = view('backend/admins/partials/show/permissionsPartial', $this->data);
+                endif;
+
+                if(isset($posts['context']) && $posts['context'] === 'edit'):
+                    $json['output'] = view('backend/admins/partials/edit/permissionsPartial', $this->data);
+                endif;
+
+            else:
+
+                $json = ['result' => false];
+                $json['message'] = $record['message'];
+
+            endif;
+
+            return $this->response->setJSON($json);
+
+        endif;
+    }
+
+    public function getTokens(): ResponseInterface
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            $posts = $this->request->getPost();
+            $rules = $this->adminsModel->getTokensValidationRules();
+
+            if ( ! $this->validateData($posts, $rules)):
+                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
+            endif;
+
+            $record = $this->adminsModel->getByUUID($posts['uuid']);
+
+            if($record['result'] === true):
+
+                $json = ['result' => true];
+
+                $this->data['admin'] = $record['row']; 
+                $this->data['tokens'] = $this->adminsModel->getTokens($posts['uuid']);
+
+                $json['output'] = view('backend/admins/partials/show/tokensPartial', $this->data);
 
             else:
 

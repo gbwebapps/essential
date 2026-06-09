@@ -6,6 +6,9 @@
 <!-- Form per aggiornamento metadati -->
 <form id="getMetaData"></form>
 
+<!-- Form per aggiornamento permessi -->
+<form id="getPermissions"></form>
+
 <div class="row">
     <div class="col-8 offset-2">
 
@@ -27,8 +30,16 @@
                     <?= $this->include('backend/admins/partials/edit/generalDataPartial', $this->data); ?>
                 </div>
 
-                <!-- Permessi -->
-                <div id="permissionsData">
+                <!-- Sezione: Dati Anagrafici e Contatti -->
+                <div class="card-header rounded-0 d-flex justify-content-between align-items-center" style="border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);">
+                    <h2 class="card-title text-start mb-0"><?= lang('backend/admins.panels.permissions'); ?></h2>
+                    <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>" form="getPermissions">
+                    <input type="hidden" name="context" value="edit" form="getPermissions">
+                    <button type="submit" class="btn btn-sm btn-secondary" form="getPermissions">
+                        <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/admins.buttons.reload'); ?>
+                    </button>
+                </div>
+                <div id="permissions">
                     <?= $this->include('backend/admins/partials/edit/permissionsPartial'); ?>
                 </div>
 
@@ -47,12 +58,10 @@
                 <!-- Meta Data -->
                 <div class="card-header rounded-0 d-flex justify-content-between align-items-center" style="border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);">
                     <h2 class="card-title text-start mb-0"><?= lang('backend/admins.panels.metaData'); ?></h2>
-                    <div>                            
-                        <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>" form="getMetaData">
-                        <button type="submit" class="btn btn-sm btn-secondary" form="getMetaData">
-                            <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/admins.buttons.reload'); ?>
-                        </button>
-                    </div>
+                    <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>" form="getMetaData">
+                    <button type="submit" class="btn btn-sm btn-secondary" form="getMetaData">
+                        <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/admins.buttons.reload'); ?>
+                    </button>
                 </div>
                 <div id="metaData">
                     <?= $this->include('backend/admins/partials/common/metaDataPartial', $this->data); ?>

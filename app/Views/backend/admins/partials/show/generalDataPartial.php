@@ -38,7 +38,7 @@
                 <li class="list-group-item"><i class="fa-solid fa-arrow-circle-down"></i><?= lang('backend/admins.labels.status'); ?></li>
                 <li class="list-group-item">
                     <div id="changeStatusPartial">
-                        <?= $this->include('backend/admins/partials/show/statusDataPartial', $this->data); ?>
+                        <?= $this->include('backend/admins/partials/show/statusPartial', $this->data); ?>
                     </div>
                 </li>
             </ul>

@@ -26,7 +26,7 @@ class GuestFilter implements FilterInterface
 
         /* Se un utente loggato tenta un'operazione AJAX su rotte guest (es. tab rimasta aperta) */
         if ($request->isAJAX() && $request->is('post')):
-            return service('response')->setJSON(['result' => false, 'message' => $message, 'csrf' => $this->csrf]);
+            return service('response')->setJSON(['result' => false, 'message' => $message]);
         endif;
 
         /* Reindirizzamento standard alla dashboard */

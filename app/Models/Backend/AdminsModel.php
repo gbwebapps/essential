@@ -28,13 +28,16 @@ class AdminsModel extends BackendModel
     /* @var array Campi consentiti per il cambio di stato attivo/inattivo */
     protected array $changeStatusAllowedFields = ['uuid'];
 
+    /* @var array Campi consentiti per il cambio permesso on fly */
+    protected array $changePermissionAllowedFields = ['uuid', 'permission'];
+
     /* @var array Mapping tra indici ShowAll e colonne reali del database */
     protected array $allowedOrderColumns = ['firstname', 'lastname', 'email', 'phone', 'status']; 
 
     /* @var array Campi di ricerca consentiti in showAll */
     protected array $showAllSearchAllowedFields = ['firstname', 'lastname', 'email', 'phone']; 
 
-    protected array $toCompare = ['firstname', 'lastname', 'email', 'phone', 'status', 'note', 'permissions'];
+    protected array $toCompare = ['firstname', 'lastname', 'email', 'phone', 'status', 'note'];
 
     /* @var string Query per selezionare tutti gli admins */
     protected ?string $getDataQuery = "select uuid, firstname, lastname, email, phone, status, created_at, updated_at, resetted_at, suspended_at,
@@ -202,6 +205,33 @@ class AdminsModel extends BackendModel
         ];
     }
 
+    /* Validazione per il cambio del permesso on fly */
+    public function changePermissionValidationRules(): array 
+    {
+        /* Recupero l'array multidimensionale dalla configurazione */
+        $rawPermissions = config('BackendPermissions')->getPermissions();
+
+        /* Estraggo solo le chiavi (es. 'users_index') ciclando i gruppi */
+        $validKeys = [];
+        foreach ($rawPermissions as $group):
+            $validKeys = array_merge($validKeys, array_keys($group['perms']));
+        endforeach;
+
+        /* Implodo l'array piatto ottenuto per formare la stringa richiesta da in_list */
+        $inListString = implode(',', $validKeys);
+
+        return [
+            'uuid' => [
+                'label' => lang('backend/admins.labels.uuid'),
+                'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
+            ],
+            'permission' => [
+                'label' => lang('backend/admins.labels.permissions'),
+                'rules' => ['required', 'in_list[' . $inListString . ']'],
+            ]
+        ];
+    }
+
     public function generalDataValidationRules(): array
     {
         return [
@@ -217,6 +247,30 @@ class AdminsModel extends BackendModel
     }
 
     public function metaDataValidationRules(): array
+    {
+        return [
+            'uuid' => [
+                'label' => lang('backend/admins.labels.uuid'),
+                'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
+            ],
+        ];
+    }
+
+    public function getPermissionsValidationRules(): array
+    {
+        return [
+            'uuid' => [
+                'label' => lang('backend/admins.labels.uuid'),
+                'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
+            ],
+            'context' => [
+                'label' => lang('backend/admins.labels.context'),
+                'rules' => ['required', 'in_list[show,edit]'],
+            ],
+        ];
+    }
+
+    public function getTokensValidationRules(): array
     {
         return [
             'uuid' => [
@@ -292,14 +346,7 @@ class AdminsModel extends BackendModel
 
             /* Gestione dei permessi se esistenti */
             if ( ! empty($posts['permissions'])):
-                $permissions = [];
-                foreach ($posts['permissions'] as $permission):
-                    $permissions[] = [
-                        'permission' => $permission,
-                        'admin_uuid'  => $uuid,
-                    ];
-                endforeach;
-                $this->insertPermissions($permissions);
+                $this->insertPermissions($posts['permissions'], $uuid);
             endif;
 
             /* Generazione token di attivazione */
@@ -339,7 +386,7 @@ class AdminsModel extends BackendModel
             
             $this->db->transRollback();
 
-            log_message('error', lang('backend/admins.messages.addError') . ' - ' . $e->getMessage());
+            log_message('error', lang('backend/admins.messages.addError') . ' - ' . $e);
             return ['result' => false, 'message' => lang('backend/admins.messages.addError')];
         }
 
@@ -392,6 +439,14 @@ class AdminsModel extends BackendModel
             $sql = 'update admins set firstname = ?, lastname = ?, email = ?, phone = ?, status = ?, note = ?, updated_at = ? where uuid = ?';
             $this->db->query($sql, [$posts['firstname'], $posts['lastname'], $posts['email'], $posts['phone'], $posts['status'], $posts['note'], $updated_at, $posts['uuid']]);
 
+            /* Gestione Permessi: Eliminazione incondizionata seguita da eventuale reinserimento */
+            $this->deletePermissions($posts['uuid']);
+
+            if ( ! empty($posts['permissions'])):
+                /* Sfruttiamo il metodo ottimizzato che accetta array piatto e UUID */
+                $this->insertPermissions($posts['permissions'], $posts['uuid']);
+            endif;
+
             if ($this->db->transStatus() === false):
                 $this->db->transRollback();
                 log_message('error', lang('backend/admins.messages.editError'));
@@ -409,7 +464,6 @@ class AdminsModel extends BackendModel
             $data['row']->note       = $posts['note'];
             $data['row']->updated_at = $updated_at;
 
-            /* CORREZIONE: Restituisce $data['row'] (oggetto) e non l'intero array $data */
             return [
                 'result'  => true, 
                 'message' => sprintf(lang('backend/admins.messages.editSuccess'), esc($posts['firstname']), esc($posts['lastname'])), 
@@ -418,7 +472,7 @@ class AdminsModel extends BackendModel
 
         } catch (\Exception $e) {
             $this->db->transRollback();
-            log_message('error', lang('backend/admins.messages.editError') . ' - ' . $e->getMessage());
+            log_message('error', lang('backend/admins.messages.editError') . ' - ' . $e->getMessage() . ' | File: ' . $e->getFile() . ' | Riga: ' . $e->getLine());
             return ['result' => false, 'message' => lang('backend/admins.messages.editError')];
         }
     }
@@ -430,20 +484,25 @@ class AdminsModel extends BackendModel
             return true;
         endif;
 
-        /* 2. Logica specifica dei permessi, isolata SOLO dove serve (in AdminsModel) */
+        /* 2. Recupero i vecchi permessi dal database tramite il metodo dedicato */
+        $rawOldPermissions = $this->getPermissions($original->uuid);
+
+        /* 3. Preparo gli array per il confronto */
         $newPermissions = $posts['permissions'] ?? [];
         $oldPermissions = [];
 
-        if (isset($original->permissions) && is_array($original->permissions)):
-            $oldPermissions = array_map(
-                fn($perm) => (is_object($perm)) ? $perm->permission : $perm['permission'],
-                $original->permissions
-            );
+        /* 4. Se ci sono vecchi permessi, li appiattisco in un array di stringhe */
+        if ( ! empty($rawOldPermissions)):
+            $oldPermissions = array_map(function($perm) {
+                return $perm->permission;
+            }, $rawOldPermissions);
         endif;
 
+        /* 5. Ordino entrambi gli array per garantire un confronto coerente */
         sort($newPermissions);
         sort($oldPermissions);
 
+        /* 6. Confronto finale */
         if ($newPermissions !== $oldPermissions):
             return true;
         endif;
@@ -487,7 +546,7 @@ class AdminsModel extends BackendModel
             /* Rollback incondizionato: se c'è un'eccezione, si annulla sempre */
             $this->db->transRollback();
 
-            log_message('error', lang('backend/admins.messages.delError') . ' - ' . $e->getMessage());
+            log_message('error', lang('backend/admins.messages.delError') . ' - ' . $e);
             return ['result' => false, 'message' => lang('backend/admins.messages.delError')];
 
         }
@@ -541,7 +600,7 @@ class AdminsModel extends BackendModel
 
             $this->db->transRollback();
 
-            log_message('error', lang('backend/admins.messages.resetPasswordError') . ' - ' . $e->getMessage());
+            log_message('error', lang('backend/admins.messages.resetPasswordError') . ' - ' . $e);
             return ['result' => false, 'message' => lang('backend/admins.messages.resetPasswordError')];
 
         }
@@ -601,11 +660,14 @@ class AdminsModel extends BackendModel
 
             endif;
 
+            $updatedAt = date('Y-m-d H:i:s');
+            $data['row']->updated_at = $updatedAt;
+
             $this->db->transBegin();
 
             /* cambio status utente */
-            $sql = "update admins set status = ?, suspended_at = ? where uuid = ?";
-            $this->db->query($sql, [$newStatus, $suspendedAt, $posts['uuid']]);
+            $sql = "update admins set status = ?, updated_at = ?, suspended_at = ? where uuid = ?";
+            $this->db->query($sql, [$newStatus, $updatedAt, $suspendedAt, $posts['uuid']]);
 
             if ($this->db->transStatus() === false):
 
@@ -623,27 +685,89 @@ class AdminsModel extends BackendModel
             /* Rollback incondizionato: se c'è un'eccezione, si annulla sempre */
             $this->db->transRollback();
 
-            log_message('error', lang('backend/admins.messages.changeStatusError') . ' - ' . $e->getMessage());
+            log_message('error', lang('backend/admins.messages.changeStatusError') . ' - ' . $e);
             return ['result' => false, 'message' => lang('backend/admins.messages.changeStatusError')];
 
         }
     }
 
-    /* Metodo per l'inserimento in batch dei permessi. Utilizzato in add() ed edit() */
-    protected function insertPermissions($permissions)
+    /* Metodo per il cambio permesso on fly */
+    public function changePermission(array $posts): array
     {
-        if(empty($permissions)):
+        try 
+        {
+            /* Match dei posts con i campi consentiti */
+            $posts = $this->checkAllowedFields($posts, $this->changePermissionAllowedFields);
+
+            /* Recupero i dati dell'utente prima dell'eliminazione */
+            $data = $this->getByUUID($posts['uuid']);
+
+            if($data['result'] === false):
+                return ['result' => false, 'message' => $data['message']];
+            endif;
+
+            /* Query per definire l'esistenza del permesso per questo utente */
+            $sql = "select id from admins_permissions where admin_uuid = ? and permission = ?";
+            $query = $this->db->query($sql, [$posts['uuid'], $posts['permission']]);
+
+            $this->db->transBegin();
+
+            /* Se il permesso è stato trovato, lo eliminiamo... */
+            if($query->getNumRows() > 0):
+                $sql = "delete from admins_permissions where admin_uuid = ? and permission = ?";
+                $this->db->query($sql, [$posts['uuid'], $posts['permission']]);
+            /* ...se invece il permesso non è stato trovato, lo inseriamo. */
+            else:
+                $sql = "insert into admins_permissions (admin_uuid, permission) values (?, ?)";
+                $this->db->query($sql, [$posts['uuid'], $posts['permission']]);
+            endif;
+
+            /* Aggiorno nella tabella users il campo updated_at */
+            $updatedAt = date('Y-m-d H:i:s');
+            $sql = 'update admins set updated_at = ? where uuid = ?';
+            $this->db->query($sql, [$updatedAt, $posts['uuid']]);
+
+            if ($this->db->transStatus() === false):
+
+                $this->db->transRollback();
+                log_message('error', lang('backend/admins.messages.changePermissionError'));
+
+                return ['result' => false, 'message' => lang('backend/admins.messages.changePermissionError')];
+            endif;
+
+            $this->db->transCommit();
+
+            /* Aggiornamento dati dell'utente */
+            $data['row']->updated_at = $updatedAt;
+
+            return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.changePermissionSuccess'), esc($data['row']->firstname), esc($data['row']->lastname)), 'admin' => $data['row']];
+
+        } catch (\Exception $e) {
+
+            /* Rollback incondizionato: se c'è un'eccezione, si annulla sempre */
+            $this->db->transRollback();
+
+            log_message('error', lang('backend/admins.messages.changePermissionError') . ' - ' . $e);
+            return ['result' => false, 'message' => lang('backend/admins.messages.changePermissionError')];
+
+        }
+    }
+
+    /* Metodo per l'inserimento in batch dei permessi. Utilizzato in add() ed edit() */
+    protected function insertPermissions(array $permissions, string $uuid): void
+    {
+        if (empty($permissions)):
             return;
         endif;
 
         $rows = [];
         $params = [];
 
-        /* Costruisci la query dinamicamente: ogni permission aggiunge "(?, ?)" */
-        foreach($permissions as $perm):
+        /* Costruisco la query dinamicamente unendo il permesso e l'UUID passato */
+        foreach ($permissions as $permission):
             $rows[] = "(?, ?)";
-            $params[] = $perm['permission'];
-            $params[] = $perm['admin_uuid'];
+            $params[] = $permission;
+            $params[] = $uuid;
         endforeach;
 
         $sql = "insert into admins_permissions (permission, admin_uuid) values " . implode(", ", $rows);
@@ -651,9 +775,9 @@ class AdminsModel extends BackendModel
     }
 
     /* Metodo per l'eliminazione dei permessi. Usato in edit() e delete(). */
-    protected function deletePermissions($user_uuid)
+    protected function deletePermissions($admin_uuid)
     {
         $sql = "delete from admins_permissions where admin_uuid = ?";
-        $this->db->query($sql, [$user_uuid]);
+        $this->db->query($sql, [$admin_uuid]);
     }
 }

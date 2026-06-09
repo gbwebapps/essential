@@ -4,6 +4,7 @@ import { urlbase, controller, action, apiFetch, showToast, askConfirm, smoothRep
 /* Import dei componenti dalla sottocartella */
 import { ListManager, AddManager, EditManager, DeleteManager, ChangeStatusManager, GeneralDataManager, MetaDataManager } from './components/Crud.js';
 import { ResetPasswordManager } from './components/Auth.js';
+import { GetPermissionsManager, ChangePermissionManager } from './components/Admins.js';
 
 import { GalleryOneImgManager } from './components/GalleryOneImgManager.js';
 import { UploadPreviewImgManager } from './components/UploadPreviewImgManager.js';
@@ -89,6 +90,12 @@ const actions = {
             formSelector: '#getMetaData'
         });
         metaDataManager.init();
+
+        const permissionsManager = new GetPermissionsManager({
+            url: urlbase + 'backend/admins/getPermissions', 
+            formSelector: '#getPermissions'
+        });
+        permissionsManager.init();
     },
 
     show: function() {
@@ -118,6 +125,18 @@ const actions = {
             }
         });
         changeStatusManager.init();
+
+        const changePermissionManager = new ChangePermissionManager({
+            controller: controller,
+            url: urlbase + 'backend/admins/changePermission'
+        });
+        changePermissionManager.init();
+
+        const permissionsManager = new GetPermissionsManager({
+            url: urlbase + 'backend/admins/getPermissions', 
+            formSelector: '#getPermissions'
+        });
+        permissionsManager.init();
 
         // const galleryOneImgManager = new GalleryOneImgManager('#images_data');
         // const galleryOneDocManager = new GalleryOneDocManager('#documents_data');

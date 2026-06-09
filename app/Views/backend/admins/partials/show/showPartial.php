@@ -7,7 +7,7 @@
                 <h2 class="card-title text-start mb-0"><?= lang('backend/admins.panels.generalData'); ?></h2>
                 <form id="getGeneralData">
                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
-                    <input type="hidden" name="context" value="show" form="getGeneralData">
+                    <input type="hidden" name="context" value="show">
                     <button type="submit" class="btn btn-sm btn-secondary">
                         <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/admins.buttons.reload'); ?>
                     </button>
@@ -17,6 +17,37 @@
                 <?= $this->include('backend/admins/partials/show/generalDataPartial', $this->data); ?>
             </div>
             <!-- End General Data -->
+
+            <!-- Permissions -->
+            <div class="card-header rounded-0 d-flex justify-content-between align-items-center" style="border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);">
+                <h2 class="card-title text-start mb-0"><?= lang('backend/admins.panels.permissions'); ?></h2>
+                <form id="getPermissions">
+                    <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
+                    <input type="hidden" name="context" value="show">
+                    <button type="submit" class="btn btn-sm btn-secondary">
+                        <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/admins.buttons.reload'); ?>
+                    </button>
+                </form>
+            </div>
+            <div id="permissions">
+                <?= $this->include('backend/admins/partials/show/permissionsPartial', $this->data); ?>
+            </div>
+            <!-- End Permissions -->
+
+            <!-- Tokens -->
+            <div class="card-header rounded-0 d-flex justify-content-between align-items-center" style="border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);">
+                <h2 class="card-title text-start mb-0"><?= lang('backend/admins.panels.tokens'); ?></h2>
+                <form id="getTokens">
+                    <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
+                    <button type="submit" class="btn btn-sm btn-secondary">
+                        <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/admins.buttons.reload'); ?>
+                    </button>
+                </form>
+            </div>
+            <div id="tokens">
+                <?= $this->include('backend/admins/partials/show/tokensPartial', $this->data); ?>
+            </div>
+            <!-- End Tokens -->
 
             <!-- Gallery One -->
             <div id="galleryOne">

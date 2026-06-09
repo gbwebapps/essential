@@ -39,7 +39,7 @@ class AuthorizationFilter implements FilterInterface
 
         /* Gestione della risposta: AJAX vs Standard */
         if ($request->isAJAX() && $request->is('post')):
-            return service('response')->setJSON(['result' => 'no_current_user_logged', 'csrf' => csrf_hash()]);
+            return service('response')->setJSON(['result' => 'no_current_user_logged']);
         endif;
 
         /* Redirect standard pulito dai with() in quanto già impostati nella sessione */

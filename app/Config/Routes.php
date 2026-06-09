@@ -93,6 +93,8 @@ $routes->group('backend', function($routes) {
             $routes->post('resetPassword', '\App\Controllers\Backend\AdminsController::resetPassword');
             $routes->post('getGeneralData', '\App\Controllers\Backend\AdminsController::getGeneralData');
             $routes->post('getMetaData', '\App\Controllers\Backend\AdminsController::getMetaData');
+            $routes->post('getPermissions', '\App\Controllers\Backend\AdminsController::getPermissions');
+            $routes->post('changePermission', '\App\Controllers\Backend\AdminsController::changePermission');
         });
     });
 });

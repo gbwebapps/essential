@@ -170,6 +170,7 @@ class AuthModel extends BackendModel
                 $this->db->transRollback();
             endif;
             
+            log_message('error', lang('backend/auth.messages.loginFailed') . ' - ' . $e);
             return ['result' => false, 'message' => lang('backend/auth.messages.loginFailed')];
         }
     }
@@ -302,7 +303,7 @@ class AuthModel extends BackendModel
                     $this->db->transRollback();
                 endif;
 
-                log_message('error', lang('backend/auth.messages.resetPasswordFailed') . ' - ' . $e->getMessage());
+                log_message('error', lang('backend/auth.messages.resetPasswordFailed') . ' - ' . $e);
                 return ['result' => false, 'message' => lang('backend/auth.messages.resetPasswordFailed')];
             }
 
@@ -382,7 +383,7 @@ class AuthModel extends BackendModel
                 $this->db->transRollback();
             endif;
 
-            log_message('error', lang('backend/auth.messages.setPasswordError') . ' - ' . $e->getMessage());
+            log_message('error', lang('backend/auth.messages.setPasswordError') . ' - ' . $e);
             
             /* Modificato false in 'setPasswordFailed' per coerenza con le aspettative del Controller */
             return ['result' => false, 'message' => lang('backend/auth.messages.setPasswordError')];
@@ -414,7 +415,7 @@ class AuthModel extends BackendModel
             return false;
 
         } catch (\Throwable $e) {
-            log_message('error', lang('backend/auth.messages.AuthTokenError') . ' - ' . $e->getMessage());
+            log_message('error', lang('backend/auth.messages.AuthTokenError') . ' - ' . $e);
             return false;
         }
     }
@@ -440,7 +441,7 @@ class AuthModel extends BackendModel
 
             endif;
         } catch (\Throwable $e) {
-            log_message('error', lang('backend/auth.messages.logoutSessionError') . ' - ' . $e->getMessage());
+            log_message('error', lang('backend/auth.messages.logoutSessionError') . ' - ' . $e);
         }
     }
 
@@ -466,7 +467,7 @@ class AuthModel extends BackendModel
             delete_cookie('backendRememberMe');
 
         } catch (\Throwable $e) {
-            log_message('error', lang('backend/auth.messages.logoutCookieError') . ' - ' . $e->getMessage());
+            log_message('error', lang('backend/auth.messages.logoutCookieError') . ' - ' . $e);
         }
     }
 }
