@@ -13,31 +13,35 @@
             <?php foreach($tokens as $token): ?>
 
                 <?php
-                /* Se il token è una sessione, aggiungo alla data di scadenza il tempo definito nel file di configurazione */
-                if ($token->token_type === 'session'):
-                    $tokenExpire = $token->token_expire + config('BackendAuth')->sessionTime;
-                else:
-                    $tokenExpire = $token->token_expire;
-                endif;
+                    /* Creiamo l'oggetto DateTime partendo dalla data stringa del database */
+                    $dateExpire = new \DateTime($token->token_expire);
 
-                /* Formattazione visiva della scadenza */
-                if(time() < $tokenExpire):
-                    $expireDate = '<span class="text-success">' . convertDate($tokenExpire) . '</span>';
-                else:
-                    $expireDate = '<span class="text-danger"><s>' . convertDate($tokenExpire) . '</s></span>';
-                endif;
+                    /* Se è una sessione, modifichiamo la data aggiungendo i secondi del config */
+                    if ($token->token_type === 'session'):
+                        $dateExpire->modify('+' . (int) config('BackendAuth')->sessionTime . ' seconds');
+                    endif;
 
-                /* Identificazione del tipo con fallback di sicurezza finale */
-                $tokenType = '';
-                if($token->token_type === 'session'):
-                    $tokenType = lang('backend/admins.labels.session');
-                elseif($token->token_type === 'activation'):
-                    $tokenType = lang('backend/admins.labels.activation');
-                elseif($token->token_type === 'cookie'):
-                    $tokenType = lang('backend/admins.labels.rememberMe');
-                else:
-                    $tokenType = lang('backend/admins.labels.unknown');
-                endif;
+                    /* Creiamo l'oggetto DateTime con l'ora attuale per fare il confronto */
+                    $now = new \DateTime();
+
+                    /* Confrontiamo i due oggetti DateTime in modo nativo e sicuro */
+                    if ($now < $dateExpire):
+                        $expireDate = '<span class="text-success">' . convertDate($dateExpire->format('Y-m-d H:i:s')) . '</span>';
+                    else:
+                        $expireDate = '<span class="text-danger"><s>' . convertDate($dateExpire->format('Y-m-d H:i:s')) . '</s></span>';
+                    endif;
+
+                    /* Identificazione del tipo con fallback di sicurezza finale */
+                    $tokenType = '';
+                    if ($token->token_type === 'session'):
+                        $tokenType = lang('backend/admins.labels.session');
+                    elseif ($token->token_type === 'activation'):
+                        $tokenType = lang('backend/admins.labels.activation');
+                    elseif ($token->token_type === 'cookie'):
+                        $tokenType = lang('backend/admins.labels.remember_me');
+                    else:
+                        $tokenType = lang('backend/admins.labels.unknown');
+                    endif;
                 ?>
 
                 <tr>
@@ -58,33 +62,33 @@
                 </tr>
 
                 <?php 
-                /* Parsing della stringa User Agent tramite l'istanza passata dal Controller */
-                $userAgent->parse(esc($token->user_agent)); 
+                    /* Parsing della stringa User Agent tramite l'istanza passata dal Controller */
+                    $userAgent->parse(esc($token->user_agent)); 
                 ?>
                 <tr>
                     <td colspan="3">
                         <small class="fw-bold">
 
                             <?php
-                            /* Inizializzazione corretta della variabile in camelCase */
-                            $agentText = lang('backend/admins.labels.operatingSystem') . ' <span class="text-primary">' . $userAgent->getPlatform() . '</span>';
+                                /* Inizializzazione corretta della variabile in camelCase */
+                                $agentText = lang('backend/admins.labels.operatingSystem') . ' <span class="text-primary">' . $userAgent->getPlatform() . '</span>';
                             ?>
 
                             <?php
-                            /* Valutazione con metodi nativi in camelCase di CodeIgniter 4 */
-                            if($userAgent->isBrowser()):
-                                $agentText .= ' &bull; ' . lang('backend/admins.labels.browser') . ' <span class="text-primary">' . $userAgent->getBrowser() . '</span>';
-                            elseif($userAgent->isMobile()):
-                                $agentText .= ' &bull; ' . lang('backend/admins.labels.mobile') . ' <span class="text-primary">' . $userAgent->getMobile() . '</span>';
-                            elseif($userAgent->isRobot()):
-                                $agentText .= ' &bull; ' . lang('backend/admins.labels.robot') . ' Robot <span class="text-primary">' . $userAgent->getRobot() . '</span>';
-                            endif;
+                                /* Valutazione con metodi nativi in camelCase di CodeIgniter 4 */
+                                if($userAgent->isBrowser()):
+                                    $agentText .= ' &bull; ' . lang('backend/admins.labels.browser') . ' <span class="text-primary">' . $userAgent->getBrowser() . '</span>';
+                                elseif($userAgent->isMobile()):
+                                    $agentText .= ' &bull; ' . lang('backend/admins.labels.mobile') . ' <span class="text-primary">' . $userAgent->getMobile() . '</span>';
+                                elseif($userAgent->isRobot()):
+                                    $agentText .= ' &bull; ' . lang('backend/admins.labels.robot') . ' Robot <span class="text-primary">' . $userAgent->getRobot() . '</span>';
+                                endif;
                             ?>
 
                             <?= $agentText; ?>
                             &nbsp;&bull;&nbsp;
-                            <span class="text-primary"><?= lang('backend/admins.labels.ipAddress'); ?></span>
-                            <span class="text-success"><?= esc($token->ip); ?></span>
+                            <span><?= lang('backend/admins.labels.ipAddress'); ?></span>
+                            <span class="text-primary"><?= esc($token->ip); ?></span>
                         </small>
                     </td>
                 </tr>

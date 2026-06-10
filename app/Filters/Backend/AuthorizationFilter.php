@@ -29,7 +29,10 @@ class AuthorizationFilter implements FilterInterface
             $authModel->logoutByCookie($cookie);
         endif;
 
-        session()->set('intended_url', current_url());
+        if ( ! $request->isAJAX() && $request->is('get')):
+            session()->set('intended_url', current_url());
+        endif;
+
         $message = lang('backend/auth.messages.loginNeeded');
 
         /* Imposta i flashdata validi per entrambi i flussi (AJAX e Standard) */

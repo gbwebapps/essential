@@ -91,10 +91,14 @@ $routes->group('backend', function($routes) {
             $routes->post('delete', '\App\Controllers\Backend\AdminsController::delete');
             $routes->post('changeStatus', '\App\Controllers\Backend\AdminsController::changeStatus');
             $routes->post('resetPassword', '\App\Controllers\Backend\AdminsController::resetPassword');
+
             $routes->post('getGeneralData', '\App\Controllers\Backend\AdminsController::getGeneralData');
             $routes->post('getMetaData', '\App\Controllers\Backend\AdminsController::getMetaData');
             $routes->post('getPermissions', '\App\Controllers\Backend\AdminsController::getPermissions');
+            $routes->post('getTokens', '\App\Controllers\Backend\AdminsController::getTokens');
+            
             $routes->post('changePermission', '\App\Controllers\Backend\AdminsController::changePermission');
+            $routes->post('deleteToken', '\App\Controllers\Backend\AdminsController::deleteToken');
         });
     });
 });

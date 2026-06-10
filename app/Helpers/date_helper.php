@@ -13,7 +13,7 @@ if (! function_exists('convertDate')):
 
         try {
             return \CodeIgniter\I18n\Time::parse($date)->toLocalizedString($format);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             /* In caso di errore nel parsing, restituisce la stringa originale per evitare crash della vista */
             return $date;
         }

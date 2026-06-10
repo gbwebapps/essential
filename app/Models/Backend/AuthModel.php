@@ -163,7 +163,7 @@ class AuthModel extends BackendModel
             /* Delega la finalizzazione (creazione sessioni/cookie) al metodo interno */
             return $this->innerLogin($admin, $rememberMe, $request);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
 
             /* Verifica se una transazione è attiva prima di effettuare il rollback */
             if ($this->db->transStatus() === false):

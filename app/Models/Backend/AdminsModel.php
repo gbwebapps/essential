@@ -31,6 +31,9 @@ class AdminsModel extends BackendModel
     /* @var array Campi consentiti per il cambio permesso on fly */
     protected array $changePermissionAllowedFields = ['uuid', 'permission'];
 
+    /* @var array Campi consentiti per l'operazione di eliminazione token */
+    protected array $deleteTokenAllowedFields = ['id', 'uuid'];
+
     /* @var array Mapping tra indici ShowAll e colonne reali del database */
     protected array $allowedOrderColumns = ['firstname', 'lastname', 'email', 'phone', 'status']; 
 
@@ -205,31 +208,14 @@ class AdminsModel extends BackendModel
         ];
     }
 
-    /* Validazione per il cambio del permesso on fly */
-    public function changePermissionValidationRules(): array 
+    public function getTokensValidationRules(): array
     {
-        /* Recupero l'array multidimensionale dalla configurazione */
-        $rawPermissions = config('BackendPermissions')->getPermissions();
-
-        /* Estraggo solo le chiavi (es. 'users_index') ciclando i gruppi */
-        $validKeys = [];
-        foreach ($rawPermissions as $group):
-            $validKeys = array_merge($validKeys, array_keys($group['perms']));
-        endforeach;
-
-        /* Implodo l'array piatto ottenuto per formare la stringa richiesta da in_list */
-        $inListString = implode(',', $validKeys);
-
         return [
             'uuid' => [
                 'label' => lang('backend/admins.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
             ],
-            'permission' => [
-                'label' => lang('backend/admins.labels.permissions'),
-                'rules' => ['required', 'in_list[' . $inListString . ']'],
-            ]
-        ];
+        ]; 
     }
 
     public function generalDataValidationRules(): array
@@ -270,13 +256,44 @@ class AdminsModel extends BackendModel
         ];
     }
 
-    public function getTokensValidationRules(): array
+    public function deleteTokenValidationRules(): array
     {
         return [
             'uuid' => [
                 'label' => lang('backend/admins.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
             ],
+            'id' => [
+                'label' => lang('backend/admins.labels.id'),
+                'rules' => ['required', 'is_natural_no_zero'],
+            ],
+        ];
+    }
+
+    /* Validazione per il cambio del permesso on fly */
+    public function changePermissionValidationRules(): array 
+    {
+        /* Recupero l'array multidimensionale dalla configurazione */
+        $rawPermissions = config('BackendPermissions')->getPermissions();
+
+        /* Estraggo solo le chiavi (es. 'users_index') ciclando i gruppi */
+        $validKeys = [];
+        foreach ($rawPermissions as $group):
+            $validKeys = array_merge($validKeys, array_keys($group['perms']));
+        endforeach;
+
+        /* Implodo l'array piatto ottenuto per formare la stringa richiesta da in_list */
+        $inListString = implode(',', $validKeys);
+
+        return [
+            'uuid' => [
+                'label' => lang('backend/admins.labels.uuid'),
+                'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
+            ],
+            'permission' => [
+                'label' => lang('backend/admins.labels.permissions'),
+                'rules' => ['required', 'in_list[' . $inListString . ']'],
+            ]
         ];
     }
 
@@ -470,7 +487,7 @@ class AdminsModel extends BackendModel
                 'row'     => $data['row']
             ];
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->db->transRollback();
             log_message('error', lang('backend/admins.messages.editError') . ' - ' . $e->getMessage() . ' | File: ' . $e->getFile() . ' | Riga: ' . $e->getLine());
             return ['result' => false, 'message' => lang('backend/admins.messages.editError')];
@@ -541,7 +558,7 @@ class AdminsModel extends BackendModel
             $this->db->transCommit();
             return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.delSuccess'), esc($data['row']->firstname), esc($data['row']->lastname))];
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
 
             /* Rollback incondizionato: se c'è un'eccezione, si annulla sempre */
             $this->db->transRollback();
@@ -596,7 +613,7 @@ class AdminsModel extends BackendModel
 
             $this->db->transCommit();
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
 
             $this->db->transRollback();
 
@@ -680,7 +697,7 @@ class AdminsModel extends BackendModel
             $this->db->transCommit();
             return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.changeStatusSuccess'), esc($data['row']->firstname), esc($data['row']->lastname)), 'admin' => $data['row']];
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
 
             /* Rollback incondizionato: se c'è un'eccezione, si annulla sempre */
             $this->db->transRollback();
@@ -742,13 +759,45 @@ class AdminsModel extends BackendModel
 
             return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.changePermissionSuccess'), esc($data['row']->firstname), esc($data['row']->lastname)), 'admin' => $data['row']];
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
 
             /* Rollback incondizionato: se c'è un'eccezione, si annulla sempre */
             $this->db->transRollback();
 
             log_message('error', lang('backend/admins.messages.changePermissionError') . ' - ' . $e);
             return ['result' => false, 'message' => lang('backend/admins.messages.changePermissionError')];
+
+        }
+    }
+
+    public function deleteToken(array $posts): array
+    {
+        /* Match dei posts con i campi consentiti */
+        $posts = $this->checkAllowedFields($posts, $this->deleteTokenAllowedFields);
+
+        try {
+
+            /* Recupero i dati dell'utente prima dell'eliminazione */
+            $data = $this->getByUUID($posts['uuid']);
+
+            if($data['result'] === false):
+                return ['result' => false, 'message' => $data['message']];
+            endif;
+
+            /* Query per eliminare il token */
+            $sql = "delete from admins_tokens where admin_uuid = ? and id = ?";
+            $this->db->query($sql, [$posts['uuid'], $posts['id']]);
+
+            if($this->db->affectedRows() > 0):
+                return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.deleteTokenSuccess'), esc($data['row']->firstname), esc($data['row']->lastname)), 'admin' => $data['row']];
+            endif;
+
+            return ['result' => false, 'message' => lang('backend/admins.messages.deleteTokenError')];
+
+        } catch(\Throwable $e) {
+
+            log_message('error', lang('backend/admins.messages.deleteTokenError') . ' - ' . $e);
+            return ['result' => false, 'message' => lang('backend/admins.messages.deleteTokenError')];
 
         }
     }

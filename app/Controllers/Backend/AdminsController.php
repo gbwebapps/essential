@@ -472,6 +472,8 @@ class AdminsController extends BackendController
                 $json = ['result' => true];
 
                 $this->data['admin'] = $record['row']; 
+
+                $this->data['userAgent'] = new UserAgent();
                 $this->data['tokens'] = $this->adminsModel->getTokens($posts['uuid']);
 
                 $json['output'] = view('backend/admins/partials/show/tokensPartial', $this->data);
@@ -480,6 +482,39 @@ class AdminsController extends BackendController
 
                 $json = ['result' => false];
                 $json['message'] = $record['message'];
+
+            endif;
+
+            return $this->response->setJSON($json);
+
+        endif;
+    }
+
+    public function deleteToken(): ResponseInterface
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            $posts = $this->request->getPost();
+            $rules = $this->adminsModel->deleteTokenValidationRules();
+
+            if ( ! $this->validateData($posts, $rules)):
+                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
+            endif;
+
+            $result = $this->adminsModel->deleteToken($posts);
+
+            if($result['result'] === true):
+
+                $this->data['admin'] = $result['admin'];
+                $this->data['userAgent'] = new UserAgent();
+                $this->data['tokens'] = $this->adminsModel->getTokens($posts['uuid']);
+
+                $json = ['result' => true, 'message' => $result['message']];
+                $json['tokensView'] = view('backend/admins/partials/show/tokensPartial', $this->data);
+
+            else:
+
+                $json = ['result' => false, 'message' => $result['message']];
 
             endif;
 
