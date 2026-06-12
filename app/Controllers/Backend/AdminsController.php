@@ -12,11 +12,33 @@ use App\Models\Backend\AdminsModel;
 use App\Libraries\Backend\AdminsClass;
 use App\Controllers\Backend\BackendController; 
 
+/**
+ * Class AdminsController
+ *
+ * Controller centrale per la gestione completa delle utenze amministrative (Admins).
+ * Coordina le operazioni CRUD, l'assegnazione dei permessi RBAC granulari, la sicurezza 
+ * delle sessioni, la revoca dei token e i caricamenti dinamici delle viste asincrone via AJAX.
+ */
 class AdminsController extends BackendController 
 {
+    /**
+     * @var AdminsModel Istanza del modello dedicato alla persistenza e manipolazione dei dati degli amministratori.
+     */
     protected AdminsModel $adminsModel;
+
+    /**
+     * @var AdminsClass Istanza della libreria logica per l'elaborazione dei flussi e delle operazioni del modulo.
+     */
     protected AdminsClass $adminsClass;
 
+    /**
+     * Inizializza il controller impostando il contesto del modulo e istanziando modello e libreria specifici.
+     *
+     * @param RequestInterface  $request  Oggetto della richiesta HTTP corrente.
+     * @param ResponseInterface $response Oggetto della risposta HTTP corrente.
+     * @param LoggerInterface   $logger   Istanza del sistema di tracciamento log.
+     * @return void
+     */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         parent::initController($request, $response, $logger);
@@ -24,9 +46,14 @@ class AdminsController extends BackendController
         $this->data['controller'] = 'admins';
 
         $this->adminsModel = model(AdminsModel::class);
-        $this->adminsClass = (new AdminsClass())->withModel($this->adminsModel);
+        $this->adminsClass = new AdminsClass($this->adminsModel);
     }
 
+    /**
+     * Renderizza la pagina principale del modulo di gestione degli amministratori.
+     *
+     * @return string La vista HTML iniziale dell'indice.
+     */
     public function index(): string
     {
         $this->data['action'] = 'index';
@@ -37,6 +64,11 @@ class AdminsController extends BackendController
         return $this->render('backend/admins/indexView', $this->data);
     }
 
+    /**
+     * Gestisce la visualizzazione della tabella degli amministratori (GET) e il caricamento asincrono filtrato dei record (POST AJAX).
+     *
+     * @return string|ResponseInterface La vista HTML completa o la risposta JSON parziale con i dati tabellari.
+     */
     public function showAll(): string|ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -86,9 +118,14 @@ class AdminsController extends BackendController
         return $this->render('backend/admins/showAllView', $this->data);
     }
 
+    /**
+     * Gestisce la maschera di inserimento di un nuovo amministratore (GET), l'azione di reset (AJAX) e il salvataggio dei dati (POST AJAX).
+     *
+     * @return string|ResponseInterface La vista HTML completa o la risposta JSON parziale con l'esito dell'operazione.
+     */
     public function add(): string|ResponseInterface
     {
-        $this->data['permissions'] = config('BackendPermissions')->getPermissions();
+        $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
 
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -129,9 +166,15 @@ class AdminsController extends BackendController
         return $this->render('backend/admins/addView', $this->data);
     }
 
+    /**
+     * Gestisce la maschera di modifica di un amministratore (GET), il refresh parziale dei dati (AJAX) e il salvataggio in database (POST AJAX).
+     *
+     * @param string|null $uuid L'identificativo univoco dell'amministratore da modificare.
+     * @return string|ResponseInterface La vista HTML completa, un reindirizzamento di errore o la risposta JSON parziale.
+     */
     public function edit(string $uuid = null): string|ResponseInterface
     {
-        $this->data['permissions'] = config('BackendPermissions')->getPermissions();
+        $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
 
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -202,6 +245,12 @@ class AdminsController extends BackendController
         return $this->render('backend/admins/editView', $this->data);
     }
 
+    /**
+     * Estrae e normalizza in un array lineare monodimensionale i permessi attivi associati a un determinato amministratore.
+     *
+     * @param string $uuid L'identificativo univoco dell'amministratore.
+     * @return array Elenco sequenziale dei permessi dell'utente.
+     */
     private function getFlatPermissions(string $uuid): array
     {
         $rawPermissions = $this->adminsModel->getPermissions($uuid);
@@ -210,6 +259,12 @@ class AdminsController extends BackendController
         }, $rawPermissions);
     }
 
+    /**
+     * Mostra la scheda informativa completa di un amministratore, dettagliando permessi, dispositivi e token attivi.
+     *
+     * @param string $uuid L'identificativo univoco dell'amministratore da visualizzare.
+     * @return RedirectResponse|string Oggetto di reindirizzamento in caso di errore o la vista HTML dei dettagli.
+     */
     public function show(string $uuid): RedirectResponse|string
     {
         if(( ! isset($uuid)) || ( ! $this->regexp->validateUUID($uuid))):
@@ -230,7 +285,7 @@ class AdminsController extends BackendController
         $this->data['admin'] = $admin['row'];
         $this->data['uuid'] = $uuid;
 
-        $this->data['permissions'] = config('BackendPermissions')->getPermissions();
+        $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
         $this->data['perms'] = $this->getFlatPermissions($uuid);
 
         $this->data['userAgent'] = new UserAgent();
@@ -239,6 +294,11 @@ class AdminsController extends BackendController
         return $this->render('backend/admins/showView', $this->data);
     }
 
+    /**
+     * Esegue la rimozione o cancellazione di un amministratore tramite richiesta asincrona.
+     *
+     * @return ResponseInterface Risposta JSON contenente l'esito dell'operazione.
+     */
     public function delete(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -257,6 +317,11 @@ class AdminsController extends BackendController
         endif;
     }
 
+    /**
+     * Avvia la procedura amministrativa di invio o rigenerazione guidata della password di un operatore.
+     *
+     * @return ResponseInterface Risposta JSON con l'esito dell'operazione.
+     */
     public function resetPassword(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -275,6 +340,11 @@ class AdminsController extends BackendController
         endif;
     }
 
+    /**
+     * Modifica lo stato di attivazione (attivo/sospeso) di un amministratore e ne aggiorna i relativi partial grafici.
+     *
+     * @return ResponseInterface Risposta JSON contenente l'esito e i frammenti HTML aggiornati.
+     */
     public function changeStatus(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -296,7 +366,7 @@ class AdminsController extends BackendController
 
                 $this->data['admin'] = $json['admin'];
 
-                $json['statusView'] = view('backend/admins/partials/show/statusPartial', $this->data);
+                $json['statusView'] = view('backend/admins/partials/show/changeStatusPartial', $this->data);
                 $json['metaView'] = view('backend/admins/partials/common/metaDataPartial', $this->data); 
 
             endif;
@@ -308,6 +378,11 @@ class AdminsController extends BackendController
         endif;
     }
 
+    /**
+     * Aggiorna o alterna l'assegnazione di un singolo permesso RBAC per l'utente selezionato.
+     *
+     * @return ResponseInterface Risposta JSON contenente l'esito e le viste parziali dei permessi e metadati aggiornate.
+     */
     public function changePermission(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -328,7 +403,7 @@ class AdminsController extends BackendController
             $this->data['admin'] = $json['admin'];
 
             $this->data['perms'] = $this->getFlatPermissions($posts['uuid']);
-            $this->data['permissions'] = config('BackendPermissions')->getPermissions();
+            $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
 
             $json['permissionsView'] = view('backend/admins/partials/show/permissionsPartial', $this->data);
             $json['metaView'] = view('backend/admins/partials/common/metaDataPartial', $this->data); 
@@ -340,6 +415,11 @@ class AdminsController extends BackendController
         endif;
     }
 
+    /**
+     * Recupera e renderizza asincronamente il frammento HTML dei dati anagrafici in base al contesto operativo richiesto (show/edit).
+     *
+     * @return ResponseInterface Risposta JSON con il codice HTML parziale renderizzato.
+     */
     public function getGeneralData(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -379,6 +459,11 @@ class AdminsController extends BackendController
         endif;
     }
 
+    /**
+     * Recupera e renderizza asincronamente il frammento HTML relativo ai metadati cronologici di tracciamento del record.
+     *
+     * @return ResponseInterface Risposta JSON con il codice HTML parziale renderizzato.
+     */
     public function getMetaData(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -412,6 +497,11 @@ class AdminsController extends BackendController
         endif;
     }
 
+    /**
+     * Recupera e renderizza asincronamente il blocco HTML contenente l'elenco dei permessi dell'utente (show/edit).
+     *
+     * @return ResponseInterface Risposta JSON con il codice HTML parziale renderizzato.
+     */
     public function getPermissions(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -431,7 +521,7 @@ class AdminsController extends BackendController
 
                 $this->data['admin'] = $record['row'];
 
-                $this->data['permissions'] = config('BackendPermissions')->getPermissions();
+                $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
                 $this->data['perms'] = $this->getFlatPermissions($posts['uuid']);
 
                 if(isset($posts['context']) && $posts['context'] === 'show'):
@@ -454,6 +544,11 @@ class AdminsController extends BackendController
         endif;
     }
 
+    /**
+     * Recupera e renderizza asincronamente il frammento HTML della tabella dei token di sicurezza attivi dell'utente.
+     *
+     * @return ResponseInterface Risposta JSON con il codice HTML parziale renderizzato.
+     */
     public function getTokens(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -490,6 +585,11 @@ class AdminsController extends BackendController
         endif;
     }
 
+    /**
+     * Revoca e rimuove in modo permanente un determinato token (sessione o cookie persistente) associato all'amministratore.
+     *
+     * @return ResponseInterface Risposta JSON con l'esito e la tabella parziale dei token aggiornata.
+     */
     public function deleteToken(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):

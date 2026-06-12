@@ -4,8 +4,8 @@ namespace App\Libraries\Frontend;
 
 class ContactsClass 
 {
-	protected function initClass(): void
+	protected function __construct() 
 	{
-		parent::initClass();
+		
 	}
 }

@@ -2,13 +2,15 @@
 
 namespace App\Libraries\Backend;
 
-use App\Libraries\BaseClass;
+use App\Models\Backend\AdminsModel;
 
-class AdminsClass extends BaseClass  
+class AdminsClass 
 {
-	protected function initClass(): void
+	protected AdminsModel $adminsModel;
+
+	public function __construct(AdminsModel $adminsModel) 
 	{
-		parent::initClass();
+		$this->adminsModel = $adminsModel;
 	}
 
 	/* Array delle options della sezione index */

@@ -49,7 +49,7 @@ class AuthorizationClass
 
         /* Istanzia il token passando il valore salvato in sessione */
         $token = new \App\Libraries\Token(session()->get('backendSession'));
-        $tokenHash = $token->getHash(config('BackendAuth')->hashKey);
+        $tokenHash = $token->getHash(config(\Config\Backend\Auth::class)->hashKey);
 
         $sql = "select * from admins_tokens where token_hash = ? and token_type = ? limit 1";
         $query = $this->db->query($sql, [$tokenHash, 'session'])->getRow();
@@ -58,7 +58,7 @@ class AuthorizationClass
         if (isset($query->token_hash) && $query->token_expire > date('Y-m-d H:i:s')):
 
             /* Aggiorna la scadenza per mantenere la sessione attiva */
-            $newExpire = date('Y-m-d H:i:s', time() + (int) config('BackendAuth')->sessionTime);
+            $newExpire = date('Y-m-d H:i:s', time() + (int) config(\Config\Backend\Auth::class)->sessionTime);
             $sqlUpdate = "update admins_tokens set token_expire = ? where token_hash = ? and token_type = ?";
             $this->db->query($sqlUpdate, [$newExpire, $tokenHash, 'session']);
 
@@ -81,7 +81,7 @@ class AuthorizationClass
         endif;
 
         /* Decifra il valore del cookie prima di passarlo alla classe Token */
-        $crypto = new \App\Libraries\CryptoService(config('BackendAuth')->sessionCryptoKey);
+        $crypto = new \App\Libraries\CryptoService(config(\Config\Backend\Auth::class)->sessionCryptoKey);
         $decryptedValue = $crypto->decrypt($cookie);
 
         if ( ! $decryptedValue):
@@ -89,7 +89,7 @@ class AuthorizationClass
         endif;
 
         $token = new \App\Libraries\Token($decryptedValue);
-        $tokenHash = $token->getHash(config('BackendAuth')->hashKey);
+        $tokenHash = $token->getHash(config(\Config\Backend\Auth::class)->hashKey);
 
         $sql = "select * from admins_tokens where token_hash = ? and token_type = ? limit 1";
         $query = $this->db->query($sql, [$tokenHash, 'cookie'])->getRow();

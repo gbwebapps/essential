@@ -2,13 +2,15 @@
 
 namespace App\Libraries\Backend;
 
-use App\Libraries\BaseClass;
+use App\Models\Backend\SettingsModel;
 
-class SettingsClass extends BaseClass  
+class SettingsClass 
 {
-	protected function initClass(): void
+	protected SettingsModel $settingsModel;
+
+	public function __construct(SettingsModel $settingsModel) 
 	{
-		parent::initClass();
+		$this->settingsModel = $settingsModel;
 	}
 
 	/* Array delle options della sezione index */

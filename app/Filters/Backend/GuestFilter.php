@@ -6,8 +6,22 @@ use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 
+/**
+ * Class GuestFilter
+ *
+ * Filtro di protezione (Middleware) dedicato agli utenti ospiti (non autenticati).
+ * Inibisce l'accesso alle pagine di login o recupero credenziali agli amministratori
+ * che possiedono già una sessione attiva, reindirizzandoli automaticamente alla dashboard.
+ */
 class GuestFilter implements FilterInterface
 {
+    /**
+     * Intercetta la richiesta HTTP in ingresso per verificare lo stato di ospite dell'utente.
+     *
+     * @param RequestInterface $request   Oggetto della richiesta HTTP corrente.
+     * @param array|null       $arguments Argomenti opzionali configurati nella rotta.
+     * @return ResponseInterface|null Restituisce un oggetto Response (Redirect o JSON) se l'utente è già loggato, altrimenti null.
+     */
     public function before(RequestInterface $request, $arguments = null)
     {
         $currentAdmin = service('authorization')->currentAdmin();

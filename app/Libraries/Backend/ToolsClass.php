@@ -2,13 +2,15 @@
 
 namespace App\Libraries\Backend;
 
-use App\Libraries\BaseClass;
+use App\Models\Backend\ToolsModel;
 
-class ToolsClass extends BaseClass  
+class ToolsClass 
 {
-	protected function initClass(): void
+	protected ToolsModel $toolsModel;
+
+	public function __construct(ToolsModel $toolsModel) 
 	{
-		parent::initClass();
+		$this->toolsModel = $toolsModel;
 	}
 
 	/* Array delle options della sezione index */

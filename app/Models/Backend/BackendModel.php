@@ -4,31 +4,96 @@ namespace App\Models\Backend;
 
 use App\Models\BaseModel;
 
+/**
+ * Class BackendModel
+ *
+ * Modello astratto centrale per la gestione strutturata dei dati nel Backend.
+ * Centralizza le operazioni di paginazione, ricerca tramite filtri dinamici,
+ * whitelist dei campi per la sicurezza dei dati e tracciamento delle modifiche.
+ */
 abstract class BackendModel extends BaseModel
 {
+	/**
+	 * @var string|null Identificativo del modulo di backend corrente (es. 'admins').
+	 */
 	protected ?string $module = null;
 
+	/**
+	 * @var string|null Query SQL predefinita per la selezione dei record principali.
+	 */
 	protected ?string $getDataQuery = null;
+
+	/**
+	 * @var string|null Query SQL per il recupero di un record tramite il suo UUID.
+	 */
 	protected ?string $getUUIDQuery = null;
+
+	/**
+	 * @var string|null Query SQL per il conteggio totale dei record presenti nel modulo.
+	 */
 	protected ?string $getNumRowsQuery = null;
+
+	/**
+	 * @var string|null Colonna di ordinamento predefinita applicata alle query.
+	 */
 	protected ?string $defaultColumn = null;
 
+	/**
+	 * @var array Elenco dei campi da confrontare per verificare se i dati hanno subito variazioni.
+	 */
 	protected array $toCompare = [];
 
+	/**
+	 * @var array Campi della tabella consentiti per la visualizzazione nell'elenco generale.
+	 */
 	protected array $showAllAllowedFields = [];
+
+	/**
+	 * @var array Campi della tabella consentiti durante l'operazione di inserimento (Add).
+	 */
 	protected array $addAllowedFields = [];
+
+	/**
+	 * @var array Campi della tabella consentiti durante l'operazione di modifica (Edit).
+	 */
 	protected array $editAllowedFields = [];
+
+	/**
+	 * @var array Campi della tabella consentiti per la gestione della cancellazione (Delete).
+	 */
 	protected array $delAllowedFields = [];
+
+	/**
+	 * @var array Campi della tabella consentiti per la variazione rapida dello stato (Status).
+	 */
 	protected array $changeStatusAllowedFields = [];
 
+	/**
+	 * @var array Colonne sulle quali il sistema permette l'ordinamento dei dati (Order BY).
+	 */
 	protected array $allowedOrderColumns = [];
+
+	/**
+	 * @var array Elenco dei campi su cui è autorizzata l'esecuzione di filtri di ricerca.
+	 */
 	protected array $showAllSearchAllowedFields = [];
 	
+	/**
+	 * Esegue l'inizializzazione del modello richiamando le connessioni del modello padre.
+	 *
+	 * @return void
+	 */
 	protected function initModel(): void 
 	{
 		parent::initModel();
 	}
 
+	/**
+	 * Elabora l'estrazione paginata dei record applicando ordinamenti, filtri di ricerca e limiti.
+	 *
+	 * @param array $posts Parametri di input per la paginazione, l'ordinamento e i filtri.
+	 * @return array Esito dell'operazione contenente i record estratti e la configurazione della paginazione.
+	 */
 	public function getData(array $posts): array
 	{
 		try
@@ -83,6 +148,12 @@ abstract class BackendModel extends BaseModel
 		}
 	}
 
+	/**
+	 * Calcola il numero totale di righe corrispondenti ai parametri di ricerca attivi.
+	 *
+	 * @param array $paramsFilter Array contenente i filtri di ricerca attivi.
+	 * @return int Numero complessivo di record rilevati.
+	 */
 	private function getNumRows(array $paramsFilter): int
 	{
 		$params = [];
@@ -101,6 +172,13 @@ abstract class BackendModel extends BaseModel
 		return (int) $this->db->query($sql, $params)->getRow()->num;
 	}
 
+	/**
+	 * Genera dinamicamente la stringa SQL dei filtri e mappa i parametri di binding.
+	 *
+	 * @param array $searchFields Campi di ricerca inviati dal client.
+	 * @param array $params       Riferimento all'array dei parametri SQL per il binding (passato per riferimento).
+	 * @return string La stringa SQL contenente le condizioni WHERE aggiuntive.
+	 */
 	private function buildFilters(array $searchFields, array &$params): string
 	{
 		$whereClause = '';
@@ -115,6 +193,12 @@ abstract class BackendModel extends BaseModel
 		return $whereClause;
 	}
 
+	/**
+	 * Recupera un singolo record specifico estraendolo tramite il valore UUID.
+	 *
+	 * @param string $uuid Identificativo univoco globale del record richiesto.
+	 * @return array Esito dell'operazione combinato con l'oggetto del record o il messaggio di errore.
+	 */
 	public function getByUUID(string $uuid): array 
 	{
 	    try 
@@ -134,6 +218,13 @@ abstract class BackendModel extends BaseModel
 	    }
 	}
 
+	/**
+	 * Determina se i dati inviati nel form contengono differenze rispetto al record originale del DB.
+	 *
+	 * @param array  $posts    Dati inviati per il salvataggio.
+	 * @param object $original Oggetto del record originale memorizzato nel database.
+	 * @return bool True se i dati o gli allegati differiscono dall'originale, altrimenti false.
+	 */
 	protected function hasDataChanged(array $posts, object $original): bool
 	{
 	    /* 1. Controllo dei campi nativi della tabella (Valido per TUTTI i moduli) */
@@ -187,6 +278,11 @@ abstract class BackendModel extends BaseModel
 
 	}
 
+	/**
+	 * Genera un identificativo univoco crittograficamente sicuro conforme allo standard UUID versione 4.
+	 *
+	 * @return string Stringa formattata dell'UUID generato.
+	 */
 	protected function generateUUID(): string
 	{
 	    $data = random_bytes(16);
@@ -199,6 +295,13 @@ abstract class BackendModel extends BaseModel
 	    return vsprintf('%08s-%04s-%04s-%04s-%12s', sscanf($hex, '%8s%4s%4s%4s%12s'));
 	}
 
+	/**
+	 * Intercetta l'array di input e rimuove qualsiasi chiave non inclusa nella whitelist dei campi consentiti.
+	 *
+	 * @param array $posts         Insieme di dati grezzi in ingresso da ripulire.
+	 * @param array $allowedFields Elenco dei soli campi autorizzati per l'operazione corrente.
+	 * @return array L'array filtrato e sicuro per la manipolazione.
+	 */
 	protected function checkAllowedFields(array $posts, array $allowedFields): array
 	{
 	    foreach (array_keys($posts) as $key):

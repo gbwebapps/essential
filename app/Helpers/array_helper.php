@@ -1,12 +1,20 @@
-<?php
+<?php declare(strict_types = 1); 
 
-if (! function_exists('removeDot')) {
+/**
+ * Array Helper
+ *
+ * Raccolta di funzioni di utilità globale dedicate alla manipolazione,
+ * pulizia e ristrutturazione delle chiavi all'interno degli array.
+ */
+
+if ( ! function_exists('removeDot')) {
+
     /**
-     * Rimuove un prefisso dalle chiavi di un array.
+     * Rimuove un prefisso specifico da tutte le chiavi di un array associativo.
      *
-     * @param string $prefix La stringa da rimuovere (es. 'searchFields.')
-     * @param array  $array  L'array originale
-     * @return array
+     * @param string $prefix Il prefisso testuale da individuare e rimuovere.
+     * @param array  $array  L'array associativo originale da elaborare.
+     * @return array L'array risultante con le chiavi ripulite dal prefisso.
      */
     function removeDot(string $prefix, array $array): array
     {
@@ -22,8 +30,16 @@ if (! function_exists('removeDot')) {
 
 }
 
-if (! function_exists('removeDotPermissions')) {
+if ( ! function_exists('removeDotPermissions')) {
 
+    /**
+     * Ristruttura le chiavi di un array di permessi, normalizzando e raggruppando
+     * quelle che iniziano con un determinato prefisso seguito da un punto.
+     *
+     * @param string $prefix Il prefisso di settore da verificare e normalizzare.
+     * @param array  $array  L'array dei messaggi di errore o permessi da scansionare.
+     * @return array L'array risultante con le chiavi di permesso condizionate e normalizzate.
+     */
     function removeDotPermissions(string $prefix, array $array): array
     {
         $formatted = [];

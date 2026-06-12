@@ -10,11 +10,33 @@ use App\Models\Backend\AuthModel;
 use App\Libraries\Backend\AuthClass;
 use App\Controllers\Backend\BackendController; 
 
+/**
+ * Class AuthController
+ *
+ * Controller centrale per la gestione del ciclo di vita delle sessioni di autenticazione.
+ * Coordina i flussi di accesso (Login), recupero credenziali (Reset Password), 
+ * inizializzazione account (Set Password) e disconnessione sicura (Logout).
+ */
 class AuthController extends BackendController 
 {
+    /**
+     * @var AuthModel Istanza del modello dedicato alla persistenza e validazione dei dati di autenticazione.
+     */
     protected AuthModel $authModel;
+
+    /**
+     * @var AuthClass Istanza della libreria logica per l'elaborazione dei flussi di sicurezza.
+     */
     protected AuthClass $authClass;
 
+    /**
+     * Inizializza il controller impostando il contesto grafico di atterraggio e istanziando modello e libreria core.
+     *
+     * @param RequestInterface  $request  Oggetto della richiesta HTTP corrente.
+     * @param ResponseInterface $response Oggetto della risposta HTTP corrente.
+     * @param LoggerInterface   $logger   Istanza del sistema di tracciamento log.
+     * @return void
+     */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         parent::initController($request, $response, $logger);
@@ -23,9 +45,14 @@ class AuthController extends BackendController
         $this->data['centerContent'] = true;
 
         $this->authModel = model(AuthModel::class);
-        $this->authClass = (new AuthClass())->withModel($this->authModel);
+        $this->authClass = new AuthClass($this->authModel);
     }
 
+    /**
+     * Mostra la pagina di selezione iniziale (hub) per le macro-funzionalità di autenticazione.
+     *
+     * @return string La vista HTML della dashboard di autenticazione.
+     */
     public function index()
     {
         $this->data['action'] = 'index';
@@ -51,6 +78,12 @@ class AuthController extends BackendController
         return $this->render('backend/auth/indexView', $this->data);
     }
 
+    /**
+     * Gestisce la visualizzazione della maschera di accesso (GET) e l'elaborazione asincrona delle credenziali (POST AJAX).
+     * Intercetta l'eventuale URL memorizzato dai filtri di protezione per effettuare il reindirizzamento post-login.
+     *
+     * @return ResponseInterface|string Risposta JSON con l'esito del login o la vista HTML della pagina di accesso.
+     */
     public function login()
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -85,6 +118,11 @@ class AuthController extends BackendController
         return $this->render('backend/auth/loginView', $this->data);
     }
 
+    /**
+     * Gestisce la richiesta di generazione del token per il ripristino della password (GET) e il relativo invio dati (POST AJAX).
+     *
+     * @return ResponseInterface|string Risposta JSON con l'esito della richiesta o la vista HTML del form di recupero.
+     */
     public function resetPassword()
     {
         if($this->request->isAJAX() && $this->request->is('post')):
@@ -116,6 +154,12 @@ class AuthController extends BackendController
         return $this->render('backend/auth/resetPasswordView', $this->data);
     }
 
+    /**
+     * Gestisce la form di configurazione di una nuova password (GET) pre-validando il token e il salvataggio dei dati (POST AJAX).
+     *
+     * @param string|null $token Il token univoco di sicurezza passato nell'URL per autorizzare l'operazione.
+     * @return ResponseInterface|string Risposta JSON in POST, vista HTML in GET o reindirizzamento forzato se il token è invalido.
+     */
     public function setPassword(?string $token = null)
     {
         if($this->request->isAJAX() && $this->request->is('post')):
@@ -155,6 +199,11 @@ class AuthController extends BackendController
         return redirect()->to('backend/auth')->with('class', 'danger')->with('message', lang('backend/auth.messages.checkAuthError'))->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
     }
 
+    /**
+     * Esegue la disconnessione completa dell'amministratore corrente, invalidando in sicurezza cookie o sessioni attive.
+     *
+     * @return ResponseInterface Oggetto di redirect verso la radice di autenticazione con cookie aggiornati.
+     */
     public function logout()
     {
         $cookie = service('request')->getCookie('backendRememberMe');

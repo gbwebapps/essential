@@ -12,7 +12,7 @@ class AuthModel extends BackendModel
     {
         parent::initModel();
 
-        $this->passwordRegex = config('BackendAuth')->passwordRegex;
+        $this->passwordRegex = config(\Config\Backend\Auth::class)->passwordRegex;
     }
 
     protected array $loginAllowedFields = ['email', 'password', 'rememberMe']; 
@@ -80,13 +80,13 @@ class AuthModel extends BackendModel
             $ip = $request->getIPAddress();
 
             /* Lettura centralizzata delle configurazioni per evitare chiamate ridondanti */
-            $allowAttempts = (bool) config('BackendAuth')->attempts;
-            $allowTwoFactor = (bool) config('BackendAuth')->twoFactor;
+            $allowAttempts = (bool) config(\Config\Backend\Auth::class)->attempts;
+            $allowTwoFactor = (bool) config(\Config\Backend\Auth::class)->twoFactor;
 
             /* 2. Costruzione della query di lettura iniziale dell'utente */
             if ($allowAttempts):
                 /* Genera la data passata nel formato corretto per il database */
-                $secondsInterval = (int) config('BackendAuth')->attemptsInterval;
+                $secondsInterval = (int) config(\Config\Backend\Auth::class)->attemptsInterval;
                 $attemptsInterval = date('Y-m-d H:i:s', time() - $secondsInterval);
                 
                 $sql = "select admins.uuid, admins.firstname, admins.lastname, admins.email, admins.password_hash, COUNT(admins_attempts.id) as times
@@ -113,7 +113,7 @@ class AuthModel extends BackendModel
 
             /* 3. Controllo immediato del blocco tentativi (senza effettuare ulteriori scritture) */
             if ($allowAttempts && isset($admin->times)):
-                if ($admin->times >= (int) config('BackendAuth')->attemptsLimit):
+                if ($admin->times >= (int) config(\Config\Backend\Auth::class)->attemptsLimit):
                     return ['result' => false, 'message' => lang('backend/auth.messages.tooMAnyAttempts')];
                 endif;
             endif;
@@ -179,15 +179,15 @@ class AuthModel extends BackendModel
     private function innerLogin(object $admin, bool $rememberMe, \CodeIgniter\HTTP\IncomingRequest $request): array
     {
         if ($rememberMe):
-            $time = (int) config('BackendAuth')->rememberMeTime;
+            $time = (int) config(\Config\Backend\Auth::class)->rememberMeTime;
             $tokenType = 'cookie';
         else:
-            $time = (int) config('BackendAuth')->sessionTime;
+            $time = (int) config(\Config\Backend\Auth::class)->sessionTime;
             $tokenType = 'session';
         endif;
 
         $token = new \App\Libraries\Token();
-        $tokenHash = $token->getHash(config('BackendAuth')->hashKey);
+        $tokenHash = $token->getHash(config(\Config\Backend\Auth::class)->hashKey);
 
         /* Generazione delle stringhe DATETIME corrette per admins_tokens */
         $tokenCreate = date('Y-m-d H:i:s');
@@ -263,9 +263,9 @@ class AuthModel extends BackendModel
             /* 1. Transazione avviata solo se l'utente esiste (Ottimizzazione DB) */
             try {
                 $token = new \App\Libraries\Token();
-                $tokenHash = $token->getHash(config('BackendAuth')->hashKey);
+                $tokenHash = $token->getHash(config(\Config\Backend\Auth::class)->hashKey);
 
-                $time = (int) config('BackendAuth')->activationTime;
+                $time = (int) config(\Config\Backend\Auth::class)->activationTime;
 
                 $tokenCreate = date('Y-m-d H:i:s');
                 $tokenExpire = date('Y-m-d H:i:s', time() + $time);
@@ -343,7 +343,7 @@ class AuthModel extends BackendModel
 
             /* 1. Recupero il token passato dal form (il nome deve combaciare con l'input hidden) */
             $token = new \App\Libraries\Token($posts['token']);
-            $tokenHash = $token->getHash(config('BackendAuth')->hashKey);
+            $tokenHash = $token->getHash(config(\Config\Backend\Auth::class)->hashKey);
 
             /* 2. Sostituito fetch() con getRow() */
             $sql = "select uuid, firstname, lastname from admins as u join admins_tokens as t on u.uuid = t.admin_uuid where t.token_hash = ? and t.token_type = ? limit 1";
@@ -396,7 +396,7 @@ class AuthModel extends BackendModel
         try 
         {
             $tokenObj = new \App\Libraries\Token($token);
-            $tokenHash = $tokenObj->getHash(config('BackendAuth')->hashKey);
+            $tokenHash = $tokenObj->getHash(config(\Config\Backend\Auth::class)->hashKey);
 
             $sql = "select t.token_expire, t.admin_uuid, u.password_hash, u.email  
                 from admins as u 
@@ -430,7 +430,7 @@ class AuthModel extends BackendModel
                 /* Recupera il token in chiaro dalla sessione */
                 $sessionValue = session()->get('backendSession');
                 $token = new \App\Libraries\Token($sessionValue);
-                $tokenHash = $token->getHash(config('BackendAuth')->hashKey);
+                $tokenHash = $token->getHash(config(\Config\Backend\Auth::class)->hashKey);
 
                 /* Elimina il record dal database */
                 $sql = "delete from admins_tokens where token_hash = ? and token_type = ?";
@@ -456,7 +456,7 @@ class AuthModel extends BackendModel
             if ($decryptedValue):
                 /* Ricava l'hash dal token decifrato */
                 $token = new \App\Libraries\Token($decryptedValue);
-                $tokenHash = $token->getHash(config('BackendAuth')->hashKey);
+                $tokenHash = $token->getHash(config(\Config\Backend\Auth::class)->hashKey);
 
                 /* Elimina il record dal database */
                 $sql = "delete from admins_tokens where token_hash = ? and token_type = ?";

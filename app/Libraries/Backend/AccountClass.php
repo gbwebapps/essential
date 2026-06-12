@@ -2,13 +2,15 @@
 
 namespace App\Libraries\Backend;
 
-use App\Libraries\BaseClass;
+use App\Models\Backend\AccountModel;
 
-class AccountClass extends BaseClass 
+class AccountClass 
 {
-	protected function initClass(): void
+	protected AccountModel $accountModel;
+
+	public function __construct(AccountModel $accountModel) 
 	{
-		parent::initClass();
+		$this->accountModel = $accountModel;
 	}
 
 	/*public function getJsIndex()

@@ -10,11 +10,32 @@ use App\Models\Backend\MessagesModel;
 use App\Libraries\Backend\MessagesClass;
 use App\Controllers\Backend\BackendController; 
 
+/**
+ * Class MessagesController
+ *
+ * Controller dedicato alla gestione, alla visualizzazione e al monitoraggio 
+ * dei messaggi, delle comunicazioni e delle notifiche all'interno del Backend.
+ */
 class MessagesController extends BackendController 
 {
+    /**
+     * @var MessagesModel Istanza del modello dedicato alla persistenza e alla gestione dei messaggi.
+     */
     protected MessagesModel $messagesModel;
+
+    /**
+     * @var MessagesClass Istanza della libreria logica per l'elaborazione delle funzionalità del modulo messaggi.
+     */
     protected MessagesClass $messagesClass;
 
+    /**
+     * Inizializza il controller impostando il contesto operativo e istanziando modello e libreria specifici.
+     *
+     * @param RequestInterface  $request  Oggetto della richiesta HTTP corrente.
+     * @param ResponseInterface $response Oggetto della risposta HTTP corrente.
+     * @param LoggerInterface   $logger   Istanza del sistema di tracciamento log.
+     * @return void
+     */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         parent::initController($request, $response, $logger);
@@ -22,54 +43,6 @@ class MessagesController extends BackendController
         $this->data['controller'] = 'messages';
 
         $this->messagesModel = model(MessagesModel::class);
-        $this->messagesClass = (new MessagesClass())->withModel($this->messagesModel);
-    }
-
-    public function index()
-    {
-        if($this->request->isAJAX()):
-
-            // some code here...
-
-        endif;
-
-        $this->data['action'] = 'index';
-        
-        $this->data['title'] = lang('backend/messages.titles.index');
-        $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
-
-        return $this->render('backend/messages/indexView', $this->data);
-    }
-
-    public function showAll()
-    {
-        if($this->request->isAJAX()):
-
-            // some code here...
-
-        endif;
-
-        $this->data['action'] = 'showAll';
-        
-        $this->data['title'] = lang('backend/messages.titles.showAll');
-        $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
-
-        return $this->render('backend/messages/showAllView', $this->data);
-    }
-
-    public function show()
-    {
-        if($this->request->isAJAX()):
-
-            // some code here...
-
-        endif;
-        
-        $this->data['action'] = 'show';
-        
-        $this->data['title'] = lang('backend/messages.titles.show');
-        $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
-
-        return $this->render('backend/messages/showView', $this->data);
+        $this->messagesClass = new MessagesClass($this->messagesModel);
     }
 }

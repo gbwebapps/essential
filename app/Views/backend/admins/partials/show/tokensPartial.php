@@ -18,7 +18,7 @@
 
                     /* Se è una sessione, modifichiamo la data aggiungendo i secondi del config */
                     if ($token->token_type === 'session'):
-                        $dateExpire->modify('+' . (int) config('BackendAuth')->sessionTime . ' seconds');
+                        $dateExpire->modify('+' . (int) config(\Config\Backend\Auth::class)->sessionTime . ' seconds');
                     endif;
 
                     /* Creiamo l'oggetto DateTime con l'ora attuale per fare il confronto */

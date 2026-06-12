@@ -2,13 +2,15 @@
 
 namespace App\Libraries\Backend;
 
-use App\Libraries\BaseClass;
+use App\Models\Backend\DashboardModel;
 
-class DashboardClass extends BaseClass 
+class DashboardClass 
 {
-	protected function initClass(): void
+	protected DashboardModel $dashboardModel;
+
+	public function __construct(DashboardModel $dashboardModel) 
 	{
-		parent::initClass();
+		$this->dashboardModel = $dashboardModel;
 	}
 
 	/* Array delle options della sezione index */

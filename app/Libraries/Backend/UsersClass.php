@@ -2,13 +2,15 @@
 
 namespace App\Libraries\Backend;
 
-use App\Libraries\BaseClass;
+use App\Models\Backend\UsersModel;
 
-class UsersClass extends BaseClass  
+class UsersClass 
 {
-	protected function initClass(): void
+	protected UsersModel $usersModel;
+
+	public function __construct(UsersModel $usersModel) 
 	{
-		parent::initClass();
+		$this->usersModel = $usersModel;
 	}
 
 	/* Array delle options della sezione index */

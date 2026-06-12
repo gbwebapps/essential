@@ -4,10 +4,10 @@ namespace App\Libraries\Frontend;
 
 use App\Libraries\BaseClass;
 
-class FrontendClass extends BaseClass 
+class FrontendClass 
 {
-    protected function initClass(): void
+    protected function __construct() 
     {
-        parent::initClass();
+        
     }
 }

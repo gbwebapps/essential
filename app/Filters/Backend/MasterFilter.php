@@ -6,8 +6,22 @@ use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 
+/**
+ * Class MasterFilter
+ *
+ * Filtro di protezione (Middleware) di livello critico.
+ * Limita l'accesso ad aree e funzionalità sensibili del sistema esclusivamente 
+ * agli utenti amministratori dotati di privilegi di livello Superadmin (Master).
+ */
 class MasterFilter implements FilterInterface
 {
+    /**
+     * Intercetta la richiesta HTTP in ingresso per validare i privilegi Master dell'operatore.
+     *
+     * @param RequestInterface $request   Oggetto della richiesta HTTP corrente.
+     * @param array|null       $arguments Argomenti opzionali configurati nella rotta.
+     * @return ResponseInterface|null Restituisce un oggetto Response (Redirect o JSON) se l'utente non dispone dei privilegi, altrimenti null.
+     */
     public function before(RequestInterface $request, $arguments = null)
     {
         $currentAdmin = service('authorization')->currentAdmin();

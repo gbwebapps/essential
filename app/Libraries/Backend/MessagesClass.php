@@ -2,13 +2,15 @@
 
 namespace App\Libraries\Backend;
 
-use App\Libraries\BaseClass;
+use App\Models\Backend\MessagesModel;
 
-class MessagesClass extends BaseClass  
+class MessagesClass 
 {
-	protected function initClass(): void
+	protected MessagesModel $messagesModel;
+
+	public function __construct(MessagesModel $messagesModel) 
 	{
-		parent::initClass();
+		$this->messagesModel = $messagesModel;
 	}
 
 	/* Array delle options della sezione index */

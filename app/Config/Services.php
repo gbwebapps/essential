@@ -19,7 +19,12 @@ use CodeIgniter\Config\BaseService;
  */
 class Services extends BaseService
 {
-    /* Servizio per l'autorizzazione degli Admins (Singleton) */
+    /**
+     * Inizializza e restituisce il servizio di gestione dell'autorizzazione e dei permessi per gli amministratori.
+     *
+     * @param bool $getShared Determina se restituire l'istanza condivisa (Singleton) o una nuova istanza.
+     * @return \App\Libraries\Backend\AuthorizationClass
+     */
     public static function authorization(bool $getShared = true)
     {
         if ($getShared):
@@ -32,7 +37,12 @@ class Services extends BaseService
         return new \App\Libraries\Backend\AuthorizationClass($db);
     }
 
-    /* Servizio per la cifratura (Singleton) */
+    /**
+     * Inizializza e restituisce il servizio centralizzato dedicato alla cifratura e decifratura dei dati.
+     *
+     * @param bool $getShared Determina se restituire l'istanza condivisa (Singleton) o una nuova istanza.
+     * @return \App\Libraries\CryptoService
+     */
     public static function crypto(bool $getShared = true)
     {
         if ($getShared):
@@ -40,11 +50,17 @@ class Services extends BaseService
         endif;
 
         /* Inietta la chiave di cifratura recuperata dalla configurazione */
-        $key = config('BackendAuth')->sessionCryptoKey;
+        $key = config(\Config\Backend\Auth::class)->sessionCryptoKey;
 
         return new \App\Libraries\CryptoService($key);
     }
 
+    /**
+     * Inizializza e restituisce la libreria di utilità per la validazione di stringhe tramite espressioni regolari.
+     *
+     * @param bool $getShared Determina se restituire l'istanza condivisa (Singleton) o una nuova istanza.
+     * @return \App\Libraries\RegExp
+     */
     public static function regexp(bool $getShared = true)
     {
         if ($getShared):

@@ -4,8 +4,8 @@ namespace App\Libraries\Frontend;
 
 class UsersClass 
 {
-	protected function initClass(): void
+	protected function __construct() 
 	{
-		parent::initClass();
+		
 	}
 }

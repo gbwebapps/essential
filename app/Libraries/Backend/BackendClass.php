@@ -4,13 +4,8 @@ namespace App\Libraries\Backend;
 
 use App\Libraries\BaseClass;
 
-class BackendClass extends BaseClass 
+class BackendClass 
 {
-    protected function initClass(): void
-    {
-        parent::initClass();
-    }
-
     public function getOrderedAssets(array $coreAssets, array $customAssets): array
     {
         /* Se non ci sono asset extra, restituiamo i fissi così come sono */

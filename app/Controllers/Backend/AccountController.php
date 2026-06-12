@@ -10,11 +10,32 @@ use App\Models\Backend\AccountModel;
 use App\Libraries\Backend\AccountClass;
 use App\Controllers\Backend\BackendController; 
 
+/**
+ * Class AccountController
+ *
+ * Controller dedicato alla gestione completa del profilo, delle impostazioni personali,
+ * dei permessi, della sicurezza e dei token dell'operatore correntemente autenticato nel Backend.
+ */
 class AccountController extends BackendController 
 {
+    /**
+     * @var AccountModel Istanza del modello dedicato alla persistenza dei dati del profilo utente.
+     */
     protected AccountModel $accountModel;
+
+    /**
+     * @var AccountClass Istanza della libreria logica per l'elaborazione delle funzionalità dell'account.
+     */
     protected AccountClass $accountClass;
 
+    /**
+     * Inizializza il controller impostando l'albero di navigazione interno (sub-menu) e istanziando i relativi componenti core.
+     *
+     * @param RequestInterface  $request  Oggetto della richiesta HTTP corrente.
+     * @param ResponseInterface $response Oggetto della risposta HTTP corrente.
+     * @param LoggerInterface   $logger   Istanza del sistema di tracciamento log.
+     * @return void
+     */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         parent::initController($request, $response, $logger);
@@ -22,7 +43,7 @@ class AccountController extends BackendController
         $this->data['controller'] = 'account';
 
         $this->accountModel = model(AccountModel::class);
-        $this->accountClass = (new AccountClass())->withModel($this->accountModel);
+        $this->accountClass = new AccountClass($this->accountModel);
 
         $this->data['sections'] = [
             'general' => [
@@ -77,6 +98,11 @@ class AccountController extends BackendController
         ];
     }
 
+    /**
+     * Mostra la pagina principale (hub di navigazione) del pannello di gestione dell'account.
+     *
+     * @return string La vista HTML dell'indice dell'account.
+     */
     public function index()
     {
         $this->data['action'] = 'index';
@@ -89,6 +115,11 @@ class AccountController extends BackendController
         return $this->render('backend/account/indexView', $this->data);
     }
 
+    /**
+     * Mostra la sezione contenente i dati anagrafici e le informazioni generali del profilo.
+     *
+     * @return string La vista HTML dei dati generali dell'account.
+     */
     public function general()
     {
         $this->data['action'] = 'general';
@@ -99,6 +130,11 @@ class AccountController extends BackendController
         return $this->render('backend/account/generalView', $this->data);
     }
 
+    /**
+     * Mostra la maschera di configurazione e modifica dei dati del profilo dell'operatore.
+     *
+     * @return string La vista HTML del form di modifica.
+     */
     public function edit()
     {
         $this->data['action'] = 'edit';
@@ -109,6 +145,11 @@ class AccountController extends BackendController
         return $this->render('backend/account/editView', $this->data);
     }
 
+    /**
+     * Mostra l'elenco e il riepilogo dei permessi RBAC associati e attivi per l'operatore corrente.
+     *
+     * @return string La vista HTML della schermata dei permessi.
+     */
     public function permissions()
     {
         $this->data['action'] = 'permissions';
@@ -119,6 +160,11 @@ class AccountController extends BackendController
         return $this->render('backend/account/permissionsView', $this->data);
     }
 
+    /**
+     * Mostra la sezione dedicata alla gestione dell'avatar e dei file multimediali associati al profilo.
+     *
+     * @return string La vista HTML della gestione immagini.
+     */
     public function images()
     {
         $this->data['action'] = 'images';
@@ -129,6 +175,11 @@ class AccountController extends BackendController
         return $this->render('backend/account/imagesView', $this->data);
     }
 
+    /**
+     * Mostra l'elenco, lo stato di validità e la cronologia dei token di sicurezza legati all'account.
+     *
+     * @return string La vista HTML della sezione token.
+     */
     public function tokens()
     {
         $this->data['action'] = 'tokens';
@@ -139,6 +190,11 @@ class AccountController extends BackendController
         return $this->render('backend/account/tokensView', $this->data);
     }
 
+    /**
+     * Mostra la maschera per l'aggiornamento guidato delle credenziali d'accesso (Password) dell'utente.
+     *
+     * @return string La vista HTML del form di cambio password.
+     */
     public function resetPassword()
     {
         $this->data['action'] = 'resetPassword';
@@ -149,6 +205,11 @@ class AccountController extends BackendController
         return $this->render('backend/account/resetPasswordView', $this->data);
     }
 
+    /**
+     * Mostra i log di controllo degli accessi, le sessioni attive e i parametri di sicurezza del profilo.
+     *
+     * @return string La vista HTML della sezione sicurezza.
+     */
     public function security()
     {
         $this->data['action'] = 'security';

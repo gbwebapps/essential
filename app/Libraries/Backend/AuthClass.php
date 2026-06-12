@@ -2,13 +2,15 @@
 
 namespace App\Libraries\Backend;
 
-use App\Libraries\BaseClass;
+use App\Models\Backend\AuthModel;
 
-class AuthClass extends BaseClass 
+class AuthClass 
 {
-	protected function initClass(): void
+	protected AuthModel $authModel;
+
+	public function __construct(AuthModel $authModel) 
 	{
-		parent::initClass();
+		$this->authModel = $authModel;
 	}
 
 	/*public function getJsIndex()

@@ -6,8 +6,22 @@ use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 
+/**
+ * Class AuthorizationFilter
+ *
+ * Filtro di protezione (Middleware) dedicato alla verifica dello stato di autenticazione
+ * dell'amministratore di backend. Gestisce i tentativi di persistenza tramite cookie,
+ * la memorizzazione dell'URL inteso e i flussi di reindirizzamento (standard e AJAX).
+ */
 class AuthorizationFilter implements FilterInterface
 {
+    /**
+     * Intercetta la richiesta HTTP in ingresso per validare la sessione dell'utente.
+     *
+     * @param RequestInterface $request   Oggetto della richiesta HTTP corrente.
+     * @param array|null       $arguments Argomenti opzionali configurati nella rotta.
+     * @return ResponseInterface|null Restituisce un oggetto Response (Redirect o JSON) se l'utente non è autenticato, altrimenti null.
+     */
     public function before(RequestInterface $request, $arguments = null)
     {
         $currentAdmin = service('authorization')->currentAdmin();

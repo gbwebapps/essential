@@ -10,11 +10,32 @@ use App\Models\Backend\DashboardModel;
 use App\Libraries\Backend\DashboardClass;
 use App\Controllers\Backend\BackendController; 
 
+/**
+ * Class DashboardController
+ *
+ * Controller principale del pannello di controllo (Dashboard) del Backend.
+ * Coordina l'inizializzazione dei servizi di reportistica e la visualizzazione della pagina principale dell'area riservata.
+ */
 class DashboardController extends BackendController 
 {
+    /**
+     * @var DashboardModel Istanza del modello dedicato alla gestione dei dati della dashboard.
+     */
     protected DashboardModel $dashboardModel;
+
+    /**
+     * @var DashboardClass Istanza della libreria logica associata per l'elaborazione dei dati del modulo.
+     */
     protected DashboardClass $dashboardClass;
 
+    /**
+     * Inizializza il controller impostando il contesto, caricando il modello e la libreria logica specifica.
+     *
+     * @param RequestInterface  $request  Oggetto della richiesta HTTP corrente.
+     * @param ResponseInterface $response Oggetto della risposta HTTP corrente.
+     * @param LoggerInterface   $logger   Istanza del sistema di tracciamento log.
+     * @return void
+     */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         parent::initController($request, $response, $logger);
@@ -22,9 +43,14 @@ class DashboardController extends BackendController
         $this->data['controller'] = 'dashboard';
 
         $this->dashboardModel = model(DashboardModel::class);
-        $this->dashboardClass = (new DashboardClass())->withModel($this->dashboardModel);
+        $this->dashboardClass = new DashboardClass($this->dashboardModel);
     }
 
+    /**
+     * Renderizza la pagina principale (Home/Index) della dashboard amministrativa.
+     *
+     * @return string La vista HTML complessiva della dashboard.
+     */
     public function index()
     {
         $this->data['action'] = 'index';
