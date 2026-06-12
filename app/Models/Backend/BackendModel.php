@@ -14,12 +14,16 @@ use App\Models\BaseModel;
 abstract class BackendModel extends BaseModel
 {
 	/**
-	 * @var string|null Identificativo del modulo di backend corrente (es. 'admins').
+	 * Identificativo del modulo di backend corrente (es. 'admins').
+	 * 
+	 * @var string|null 
 	 */
 	protected ?string $module = null;
 
 	/**
-	 * @var string|null Query SQL predefinita per la selezione dei record principali.
+	 * Query SQL predefinita per la selezione dei record principali.
+	 *
+	 * @var string|null
 	 */
 	protected ?string $getDataQuery = null;
 
