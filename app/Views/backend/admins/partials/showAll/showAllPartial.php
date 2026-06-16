@@ -80,16 +80,7 @@
 
                                         <!-- Definisco un default se non c'é immagine -->
                                         <?php $cover = ($admin->cover ?? null); ?>
-
-                                        <!-- Definisco lo stile dello status dipendendo dalla sua attivazione o meno -->
-                                        <?php
-                                            if($admin->status === '1'):
-                                                $class = ' text-success fw-bold';
-                                            elseif($admin->status === '2'):
-                                                $class = ' text-danger fw-bold';
-                                            endif;
-                                        ?>
-
+                                        
                                         <tr>
                                             <!-- Cella allegati -->
                                             <td rowspan="2" class="align-middle text-center border-end fw-bold">
@@ -152,7 +143,7 @@
                                                     <!-- Pulsante Dettaglio -->
                                                     <li>
                                                         <a class="dropdown-item" href="<?= base_url('backend/admins/show/' . esc($admin->uuid)); ?>">
-                                                            <i class="fa-solid fa-circle-info"></i> <?= lang('backend/admins.actions.show'); ?>
+                                                            <i class="fa-solid fa-user"></i> <?= lang('backend/admins.actions.show'); ?>
                                                         </a>
                                                     </li>
                                                     <li><hr class="dropdown-divider"></li>
@@ -160,7 +151,7 @@
                                                     <!-- Pulsante Aggiorna -->
                                                     <li>
                                                         <a class="dropdown-item" href="<?= base_url('backend/admins/edit/' . esc($admin->uuid)); ?>">
-                                                            <i class="fa-solid fa-pen-to-square"></i> <?= lang('backend/admins.actions.edit'); ?>
+                                                            <i class="fa-solid fa-user-pen"></i> <?= lang('backend/admins.actions.edit'); ?>
                                                         </a>
                                                     </li>
                                                     <li><hr class="dropdown-divider"></li>

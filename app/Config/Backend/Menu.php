@@ -13,27 +13,33 @@ use CodeIgniter\Config\BaseConfig;
 class Menu extends BaseConfig
 {
     /**
-     * @var array Elenco delle voci di menu configurate per la sezione superiore destra (es. utilità utente).
+     * Elenco delle voci di menu configurate per la sezione superiore destra (es. utilità utente).
+     * 
+     * @var array 
      */
     public array $topRight = [];
 
     /**
-     * @var array Elenco delle voci di menu configurate per la sezione inferiore sinistra (es. navigazione principale).
+     * Elenco delle voci di menu configurate per la sezione inferiore sinistra (es. navigazione principale).
+     * 
+     * @var array 
      */
     public array $bottomLeft = [];
 
     /**
-     * @var array Elenco delle voci di menu configurate per la sezione inferiore destra (es. strumenti e impostazioni).
+     * Elenco delle voci di menu configurate per la sezione inferiore destra (es. strumenti e impostazioni).
+     * 
+     * @var array 
      */
     public array $bottomRight = [];
 
+    /**
+     * Costruttore della classe.
+     * Inizializza gli array dei menu traducendo dinamicamente le etichette tramite il servizio lang()
+     * e definendo rotte, elementi grafici (icone) e controller associati a ciascuna voce.
+     */
     public function __construct()
     {
-        /**
-         * Costruttore della classe.
-         * Inizializza gli array dei menu traducendo dinamicamente le etichette tramite il servizio lang()
-         * e definendo rotte, elementi grafici (icone) e controller associati a ciascuna voce.
-         */
         parent::__construct();
 
         $this->topRight = [

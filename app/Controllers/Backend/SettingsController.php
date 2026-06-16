@@ -18,12 +18,16 @@ use App\Controllers\Backend\BackendController;
 class SettingsController extends BackendController 
 {
     /**
-     * @var SettingsModel Istanza del modello dedicato alla persistenza delle impostazioni di sistema.
+     * Istanza del modello dedicato alla persistenza delle impostazioni di sistema.
+     * 
+     * @var SettingsModel 
      */
     protected SettingsModel $settingsModel;
 
     /**
-     * @var SettingsClass Istanza della libreria logica per l'elaborazione delle configurazioni.
+     * Istanza della libreria logica per l'elaborazione delle configurazioni.
+     * 
+     * @var SettingsClass 
      */
     protected SettingsClass $settingsClass;
 
@@ -55,7 +59,7 @@ class SettingsController extends BackendController
         $this->data['action'] = 'index';
         
         $this->data['title'] = lang('backend/settings.titles.index');
-        $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
+        $this->data['icon'] = '<i class="fa-solid fa-sliders"></i>';
 
         return $this->render('backend/settings/indexView', $this->data);
     }

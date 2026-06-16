@@ -20,12 +20,16 @@ use App\Controllers\Backend\BackendController;
 class AuthController extends BackendController 
 {
     /**
-     * @var AuthModel Istanza del modello dedicato alla persistenza e validazione dei dati di autenticazione.
+     * Istanza del modello dedicato alla persistenza e validazione dei dati di autenticazione.
+     * 
+     * @var AuthModel 
      */
     protected AuthModel $authModel;
 
     /**
-     * @var AuthClass Istanza della libreria logica per l'elaborazione dei flussi di sicurezza.
+     * Istanza della libreria logica per l'elaborazione dei flussi di sicurezza.
+     * 
+     * @var AuthClass 
      */
     protected AuthClass $authClass;
 
@@ -58,7 +62,7 @@ class AuthController extends BackendController
         $this->data['action'] = 'index';
         
         $this->data['title'] = lang('backend/auth.titles.index');
-        $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
+        $this->data['icon'] = '<i class="fa-solid fa-handshake-angle"></i>';
 
         $this->data['sections'] = [
             'login' => [
@@ -113,7 +117,7 @@ class AuthController extends BackendController
         $this->data['action'] = 'login';
         
         $this->data['title'] = lang('backend/auth.titles.login');
-        $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
+        $this->data['icon'] = '<i class="fa-solid fa-right-to-bracket"></i>';
 
         return $this->render('backend/auth/loginView', $this->data);
     }
@@ -149,7 +153,7 @@ class AuthController extends BackendController
         $this->data['action'] = 'resetPassword';
         
         $this->data['title'] = lang('backend/auth.titles.resetPassword');
-        $this->data['icon'] = '<i class="fa-solid fa-lock"></i>';
+        $this->data['icon'] = '<i class="fa-solid fa-unlock"></i>';
 
         return $this->render('backend/auth/resetPasswordView', $this->data);
     }
@@ -176,7 +180,7 @@ class AuthController extends BackendController
             /* Imposta i dati in sessione per la pagina di destinazione */
             session()->setFlashdata('message', $json['message']);
             session()->setFlashdata('class', 'success');
-            session()->setFlashdata('icon', '<i class="fa-solid fa-check"></i>');
+            session()->setFlashdata('icon', '<i class="fa-solid fa-key"></i>');
 
             /* Restituisce l'ok al Javascript */
             return $this->response->setJSON($json);

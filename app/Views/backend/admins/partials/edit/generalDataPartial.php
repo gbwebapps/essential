@@ -1,4 +1,5 @@
 <div class="card-body">
+
     <!-- Nome e Cognome -->
     <div class="row">
         <div class="col-6">
@@ -17,6 +18,7 @@
             </div>
         </div>
     </div>
+    <!-- End Nome e Cognome -->
 
     <!-- Email e Telefono -->
     <div class="row">
@@ -35,6 +37,7 @@
             </div>
         </div>
     </div>
+    <!-- End Email e Telefono -->
 
     <!-- Stato Attivazione -->
     <div class="row">
@@ -49,6 +52,7 @@
             </div>
         </div>
     </div>
+    <!-- End Stato Attivazione -->
 
     <!-- Note Aggiuntive -->
     <div class="row">
@@ -60,4 +64,6 @@
             </div>
         </div>
     </div>
+    <!-- End Note Aggiuntive -->
+
 </div>

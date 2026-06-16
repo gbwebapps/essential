@@ -12,7 +12,7 @@ return [
 		'generalData' => 'Dati generali', 
 		'metaData' => 'Meta dati', 
 		'permissions' => 'Permessi', 
-		'tokens' => 'Sessioni'
+		'tokens' => 'Accessi'
 	],
 	'linksBar' => [
 		'index' => 'Dati', 
@@ -34,6 +34,8 @@ return [
 		'selectAll' => 'Seleziona tutti'
 	],
 	'labels' => [
+		'id' => 'ID', 
+		'uuid' => 'UUID', 
 		'firstname' => 'Nome', 
 		'lastname' => 'Cognome', 
 		'email' => 'Email', 
@@ -58,7 +60,7 @@ return [
 		'typeToken' => 'Tipo', 
 		'session' => 'Sessione',
         'activation' => 'Attivazione',
-        'rememberMe' => 'Ricordami',
+        'rememberMe' => 'Ricordami', 
 	],
 	'placeholders' => [
 		'firstname' => 'Inserisci nome...', 
@@ -86,6 +88,12 @@ return [
 		'print' => 'Stampa', 
 		'export' => 'Esporta'
 	],
+	'errors' => [
+		'uuid' => 'UUID non conforme.', 
+		'context' => 'Contesto non conforme.', 
+		'id' => 'ID non conforme.', 
+		'permission' => 'Permesso non conforme.', 
+	], 
 	'messages' => [
 		'areYouSureResetData' => 'Sei sicuro di voler resettare i dati?', 
 		'areYouSureRefreshData' => 'Sei sicuro di voler ricaricare i dati?', 
@@ -94,9 +102,10 @@ return [
 		'areYouSureDelete' => 'Sei sicuro di eliminare  %s %s?', 
 		'areYouSureChangePermission' => 'Sei sicuro di modificare il permesso di %s %s?', 
 		'areYouSureDeleteToken' => 'Sei sicuro di eliminare il token di  %s %s?', 
-		'noRecordsFound' => 'Non sono presenti amministratori.', 
-		'noTokensFound' => 'Non sono presenti tokens.', 
+		'noAdminsFound' => 'Non sono presenti amministratori.', 
+		'noTokensFound' => 'Non sono presenti accessi.', 
 		'validationErrors' => 'Errori di validazione.', 
+		'validateToastErrors' => '%s', 
 		'addSuccess' => 'Amministratore %s %s aggiunto con successo.', 
 		'addSuccessNoEmail' => 'Amministratore %s %s aggiunto con successo, ma la mail non è stata inviata. Contattare amministratore.', 
 		'addError' => 'Aggiunta amministratore non andata a buon fine.', 

@@ -273,20 +273,29 @@ export class ListManager {
 
             const data = await response.json();
 
-            /* 1. Controllo per utente non loggato (filtro MasterFilter) */
+            /* Controllo per utente non loggato (filtro MasterFilter) */
             if (data.result === 'no_current_user_logged') {
                 window.location.href = `${urlbase}backend/auth`;
                 return;
             }
 
-            /* 2. Gestione errori di validazione (CORRETTA) */
+            /* Recupero centralizzato dell'elemento del DOM */
+            const showAllEl = document.getElementById(this.config.containerId);
+
+            /* Controllo errori di validazione */
             if (data.errors) {
                 if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
                 if (data.message && typeof showToast === 'function') showToast('danger', data.message);
+                
+                /* Se presente l'elemento, svuota la tabella mostrando l'errore centralizzato */
+                if (showAllEl && data.message) {
+                    const errorTemplate = `<div class="text-center text-danger py-3 fw-bold">${data.message}</div>`;
+                    smoothReplace(showAllEl, errorTemplate);
+                }
                 return;
             }
 
-            /* 3. Controllo fallimento logico generico */
+            /* Controllo fallimento logico generico */
             if (data.result === false) {
                 if (data.message && typeof showToast === 'function') {
                     showToast('danger', data.message);
@@ -294,11 +303,9 @@ export class ListManager {
                 return;
             }
 
-            /* 4. Successo */
+            /* Successo (data.result === true) */
             if (data.result === true) {
-
-                const showAllEl = document.getElementById(this.config.containerId);
-                if (showAllEl) {
+                if (showAllEl && data.output) {
                     smoothReplace(showAllEl, data.output);
                 }
 
@@ -947,20 +954,13 @@ export class DeleteManager {
 
             const data = await response.json();
 
-            /* 1. Controllo per utente non loggato (filtro MasterFilter) */
+            /* Controllo per utente non loggato (filtro MasterFilter) */
             if (data.result === 'no_current_user_logged') {
                 window.location.href = `${urlbase}backend/auth`;
                 return;
             }
 
-            /* 2. Gestione errori di validazione */
-            if (data.errors) {
-                if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
-                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
-                return;
-            }
-
-            /* 3. Gestione fallimento logico generico */
+            /* Gestione fallimento logico generico */
             if (data.result === false) {
                 if (data.message && typeof showToast === 'function') {
                     showToast('danger', data.message);
@@ -968,7 +968,7 @@ export class DeleteManager {
                 return;
             }
 
-            /* 4. Caso successo */
+            /* Caso successo */
             if (data.result === true) {
                 const listManager = this.config.listManager;
                 
@@ -1091,26 +1091,19 @@ export class ChangeStatusManager {
 
             const data = await response.json();
 
-            /* 1. Controllo per utente non loggato */
+            /* Controllo per utente non loggato */
             if (data.result === 'no_current_user_logged') {
                 window.location.href = `${urlbase}backend/auth`;
                 return;
             }
 
-            /* 2. Gestione errori di validazione (CORRETTA) */
-            if (data.errors) {
-                if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
-                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
-                return;
-            }
-
-            /* 3. Gestione fallimento logico generico */
+             /* Gestione fallimento logico generico */
             if (data.result === false) {
                 if (data.message && typeof showToast === 'function') showToast('danger', data.message);
                 return;
             }
 
-            /* 4. Caso successo */
+            /* Caso successo */
             if (data.result === true) {
                 if (data.message && typeof showToast === 'function') {
                     showToast('success', data.message);
@@ -1196,26 +1189,19 @@ export class GeneralDataManager {
 
             const data = await response.json();
 
-            /* 1. Controllo per utente non loggato */
+            /* Controllo per utente non loggato */
             if (data.result === 'no_current_user_logged') {
                 window.location.href = `${urlbase}backend/auth`;
                 return;
             }
 
-            /* 2. Gestione errori di validazione (UNIFORMATA) */
-            if (data.errors) {
-                if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
-                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
-                return;
-            }
-
-            /* 3. Gestione fallimento logico generico */
+            /* Gestione fallimento logico generico */
             if (data.result === false) {
                 if (data.message && typeof showToast === 'function') showToast('danger', data.message);
                 return;
             }
 
-            /* 4. Caso successo */
+            /* Caso successo */
             if (data.result === true) {
                 if (data.message && typeof showToast === 'function') {
                     showToast('success', data.message);
@@ -1305,26 +1291,19 @@ export class MetaDataManager {
 
             const data = await response.json();
 
-            /* 1. Controllo per utente non loggato (filtro MasterFilter) */
+            /* Controllo per utente non loggato (filtro MasterFilter) */
             if (data.result === 'no_current_user_logged') {
                 window.location.href = `${urlbase}backend/auth`;
                 return;
             }
 
-            /* 2. Gestione errori di validazione */
-            if (data.errors) {
-                if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
-                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
-                return;
-            }
-
-            /* 3. Gestione fallimento logico generico */
+            /* Gestione fallimento logico generico */
             if (data.result === false) {
                 if (data.message && typeof showToast === 'function') showToast('danger', data.message);
                 return;
             }
 
-            /* 4. Caso successo */
+            /* Caso successo */
             if (data.result === true) {
                 if (data.message && typeof showToast === 'function') {
                     showToast('success', data.message);

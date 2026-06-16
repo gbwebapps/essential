@@ -20,4 +20,23 @@ return [
 		'resetPassword' => 'Reset password', 
 		'security' => 'Sicurezza'
 	],
+	'labels' => [
+		'firstname' => 'Nome', 
+		'lastname' => 'Cognome', 
+		'email' => 'Email', 
+		'phone' => 'Telefono', 
+		'assigned' => 'Assegnato', 
+		'notAssigned' => 'Non assegnato', 
+	], 
+	'placeholders' => [
+		'firstname' => 'Inserisci nome...', 
+		'lastname' => 'Inserisci cognome...', 
+		'email' => 'Inserisci email...', 
+		'phone' => 'Inserisci telefono...', 
+	], 
+	'buttons' => [
+		'sendData' => 'Invia dati', 
+		'refreshData' => 'Ricarica dati', 
+		'reload' => 'Ricarica pannello', 
+	], 
 ];

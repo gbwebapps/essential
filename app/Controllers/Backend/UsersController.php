@@ -19,12 +19,16 @@ use App\Controllers\Backend\BackendController;
 class UsersController extends BackendController 
 {
     /**
-     * @var UsersModel Istanza del modello dedicato alla persistenza e alla gestione dei dati degli utenti.
+     * Istanza del modello dedicato alla persistenza e alla gestione dei dati degli utenti.
+     * 
+     * @var UsersModel 
      */
     protected UsersModel $usersModel;
 
     /**
-     * @var UsersClass Istanza della libreria logica per l'elaborazione delle funzionalità del modulo utenti.
+     * Istanza della libreria logica per l'elaborazione delle funzionalità del modulo utenti.
+     * 
+     * @var UsersClass 
      */
     protected UsersClass $usersClass;
 

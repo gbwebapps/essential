@@ -14,7 +14,9 @@ use Config\Database;
 abstract class BaseModel 
 {
 	/**
-	 * @var BaseConnection Istanza della connessione al database nativa di CodeIgniter.
+	 * Istanza della connessione al database nativa di CodeIgniter.
+	 * 
+	 * @var BaseConnection 
 	 */
 	protected BaseConnection $db;
 

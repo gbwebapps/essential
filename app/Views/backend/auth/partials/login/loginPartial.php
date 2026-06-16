@@ -9,6 +9,7 @@
                 <input type="text" id="email" name="email" value="gbwebapps@gmail.com" class="form-control" placeholder="<?= lang('backend/auth.placeholders.email'); ?>">
                 <div class="error_email text-danger fw-bold small pt-1">&nbsp;</div>
             </div>
+            <!-- End Campo email -->
 
             <!-- Campo password -->
             <div class="mb-2">
@@ -16,8 +17,10 @@
                 <input type="password" id="password" name="password" value="06Febbraio69@" class="form-control" placeholder="<?= lang('backend/auth.placeholders.password'); ?>">
                 <div class="error_password text-danger fw-bold small pt-1">&nbsp;</div>
             </div>
+            <!-- End Campo password -->
 
             <div class="d-flex justify-content-between align-items-center">
+
                 <!-- Checkbox remember me -->
                 <div class="form-check text-start my-3">
                     <input class="form-check-input" type="checkbox" name="rememberMe" id="rememberMe">
@@ -25,8 +28,12 @@
                         <?= lang('backend/auth.labels.rememberMe'); ?>
                     </label>
                 </div>
+                <!-- End Checkbox remember me -->
+
                 <!-- Pulsante invio dati -->
                 <button type="submit" class="btn btn-sm btn-secondary"><i class="fa-solid fa-floppy-disk"></i><?= lang('backend/auth.buttons.login'); ?></button>
+                <!-- End Pulsante invio dati -->
+
             </div>
 
         </form>

@@ -18,12 +18,16 @@ use App\Controllers\Backend\BackendController;
 class ToolsController extends BackendController 
 {
     /**
-     * @var ToolsModel Istanza del modello dedicato alla persistenza e gestione dei dati degli strumenti.
+     * Istanza del modello dedicato alla persistenza e gestione dei dati degli strumenti.
+     * 
+     * @var ToolsModel 
      */
     protected ToolsModel $toolsModel;
 
     /**
-     * @var ToolsClass Istanza della libreria logica per l'esecuzione dei tool di utilità del sistema.
+     * Istanza della libreria logica per l'esecuzione dei tool di utilità del sistema.
+     * 
+     * @var ToolsClass 
      */
     protected ToolsClass $toolsClass;
 
@@ -55,7 +59,7 @@ class ToolsController extends BackendController
         $this->data['action'] = 'index';
         
         $this->data['title'] = lang('backend/tools.titles.index');
-        $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
+        $this->data['icon'] = '<i class="fa-solid fa-screwdriver-wrench"></i>';
 
         return $this->render('backend/tools/indexView', $this->data);
     }

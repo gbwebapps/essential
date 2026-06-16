@@ -12,6 +12,7 @@
                 <input type="password" id="password" name="password" class="form-control" placeholder="<?= lang('backend/auth.placeholders.newPassword'); ?>">
                 <div class="error_password text-danger fw-bold small pt-1">&nbsp;</div>
             </div>
+            <!-- End Campo password -->
 
             <!-- Campo conferma password -->
             <div class="mb-2">
@@ -19,11 +20,13 @@
                 <input type="password" id="password-confirm" name="confirmPassword" class="form-control" placeholder="<?= lang('backend/auth.placeholders.confirmNewPassword'); ?>">
                 <div class="error_confirmPassword text-danger fw-bold small pt-1">&nbsp;</div>
             </div>
+            <!-- End Campo conferma password -->
 
             <!-- Pulsante invio dati -->
             <div class="d-flex justify-content-end">
                 <button type="submit" class="btn btn-sm btn-secondary"><i class="fa-solid fa-floppy-disk"></i><?= lang('backend/auth.buttons.setPassword'); ?></button>
             </div>
+            <!-- End Pulsante invio dati -->
 
         </form>
 

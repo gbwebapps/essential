@@ -2,18 +2,28 @@
 
 <?= $this->section('content') ?>
 
-<div class="row">
+    <div class="row">
 
-    <div class="col-2">
-        <?= $this->include('backend/account/partials/common/leftMenuPartial'); ?>
-    </div>
-
-    <div class="col-10">
-        <div id="edit-account-container">
-            <?= $this->include('backend/account/partials/edit/editPartial'); ?>
+        <div class="col-2">
+            <?= $this->include('backend/account/partials/common/leftMenuPartial'); ?>
         </div>
+
+        <div class="col-7 offset-1">
+            <div class="card mt-3 mt-lg-0">
+                <div class="card-header">
+                    <h2 class="card-title text-center text-lg-start mb-0">
+                        <?= $sections['edit']['icon']; ?>
+                        <?= lang('backend/account.titles.edit'); ?>
+                    </h2>
+                </div>
+                <div id="edit-account-container">
+                    <?= $this->include('backend/account/partials/edit/editPartial'); ?>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-2"></div>
+        
     </div>
-    
-</div>
     
 <?= $this->endSection() ?>

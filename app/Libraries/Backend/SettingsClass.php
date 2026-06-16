@@ -4,16 +4,41 @@ namespace App\Libraries\Backend;
 
 use App\Models\Backend\SettingsModel;
 
+/**
+ * Componente di logica applicativa dedicato alla gestione, configurazione e personalizzazione dei parametri di sistema.
+ *
+ * Questa classe accentra le strutture di controllo dell'interfaccia per la sezione impostazioni del backend.
+ * Si occupa di definire dinamicamente i menu contestuali di opzioni, mappare le barre di navigazione
+ * secondarie (linksBar) per il collegamento con gli strumenti di manutenzione (tools) e gestire
+ * l'iniezione dei componenti d'asset necessari alla configurazione globale dell'applicazione.
+ */
 class SettingsClass 
 {
+	/**
+	 * Modello di persistenza dedicato alla lettura, aggiornamento e archiviazione delle chiavi di configurazione sul database.
+	 *
+	 * @var SettingsModel
+	 */
 	protected SettingsModel $settingsModel;
 
+	/**
+	 * Inizializza il componente iniettando il modello necessario alla manipolazione dei parametri di configurazione.
+	 *
+	 * @param SettingsModel $settingsModel Istanza del modello per l'accesso e la scrittura delle impostazioni.
+	 */
 	public function __construct(SettingsModel $settingsModel) 
 	{
 		$this->settingsModel = $settingsModel;
 	}
 
-	/* Array delle options della sezione index */
+	/**
+	 * Genera l'elenco delle opzioni contestuali e dei comandi di salvataggio per la schermata principale delle impostazioni.
+	 *
+	 * Restituisce un array di configurazione strutturato per popolare i controlli di interfaccia,
+	 * permettendo la categorizzazione o il ripristino dei parametri globali di sistema.
+	 *
+	 * @return array
+	 */
 	public function getOptionsIndex()
 	{
 		return 
@@ -26,7 +51,14 @@ class SettingsClass
 
 	/* ------------------------------------------------------------------------------------------------- */
 
-	/* Array della linksBar della sezione index */
+	/**
+	 * Costruisce la barra di navigazione secondaria per la sezione index delle impostazioni.
+	 *
+	 * Mappa i flussi operativi correlati alla manutenzione, inserendo link diretti provvisti di icone
+	 * Font Awesome verso i pannelli di diagnostica o gli strumenti di amministrazione avanzati.
+	 *
+	 * @return array
+	 */
 	public function getLinksBarIndex()
 	{
 		return 
@@ -37,6 +69,14 @@ class SettingsClass
 
 	/* ------------------------------------------------------------------------------------------------- */
 
+	/**
+	 * Restituisce la configurazione dei file JavaScript specifici per la manipolazione dei moduli delle impostazioni.
+	 *
+	 * Definisce i percorsi e le dipendenze degli script necessari alla validazione dei campi in tempo reale,
+	 * alla gestione delle interfacce dinamiche o al salvataggio asincrono dei parametri modificati.
+	 *
+	 * @return array
+	 */
 	/*public function getJsIndex(): array
 	{
 	    return [
@@ -46,6 +86,14 @@ class SettingsClass
 
 	/* ------------------------------------------------------------------------------------------------- */
 
+	/**
+	 * Restituisce la configurazione dei fogli di stile CSS specifici per la resa grafica del pannello impostazioni.
+	 *
+	 * Mappa i file grafici necessari alla corretta formattazione dei moduli di input, delle tabelle
+	 * di configurazione e delle sezioni a schede (tabs) presenti nella vista di gestione.
+	 *
+	 * @return array
+	 */
 	/*public function getCssIndex(): array
 	{
 	    return [

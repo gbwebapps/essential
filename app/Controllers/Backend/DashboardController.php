@@ -19,12 +19,16 @@ use App\Controllers\Backend\BackendController;
 class DashboardController extends BackendController 
 {
     /**
-     * @var DashboardModel Istanza del modello dedicato alla gestione dei dati della dashboard.
+     * Istanza del modello dedicato alla gestione dei dati della dashboard.
+     * 
+     * @var DashboardModel 
      */
     protected DashboardModel $dashboardModel;
 
     /**
-     * @var DashboardClass Istanza della libreria logica associata per l'elaborazione dei dati del modulo.
+     * Istanza della libreria logica associata per l'elaborazione dei dati del modulo.
+     * 
+     * @var DashboardClass 
      */
     protected DashboardClass $dashboardClass;
 

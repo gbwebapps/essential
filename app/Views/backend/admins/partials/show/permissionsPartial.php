@@ -21,11 +21,11 @@
 
                                 <?php
                                     if(in_array($k, $perms)):
-                                        $perm_text = lang('backend/admins.labels.assigned');
-                                        $perm_class="btn btn-link text-success fw-bold shadow-none";
-                                    elseif( ! in_array($k, $perms)):
-                                        $perm_text = lang('backend/admins.labels.notAssigned');
-                                        $perm_class="btn btn-link text-danger fw-bold shadow-none";
+                                        $permText = lang('backend/admins.labels.assigned');
+                                        $permClass="btn btn-link text-success fw-bold shadow-none";
+                                    else:
+                                        $permText = lang('backend/admins.labels.notAssigned');
+                                        $permClass="btn btn-link text-danger fw-bold shadow-none";
                                     endif;
                                 ?>
 
@@ -33,8 +33,8 @@
                                     <form class="changePermission" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureChangePermission'), esc($admin->firstname), esc($admin->lastname)); ?>">
                                         <input type="hidden" name="permission" value="<?= $k; ?>">
                                         <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
-                                        <button type="submit" class="<?= $perm_class; ?>">
-                                            <?= $perm_text; ?>
+                                        <button type="submit" class="<?= $permClass; ?>">
+                                            <?= $permText; ?>
                                         </button>
                                     </form>
                                 </li>

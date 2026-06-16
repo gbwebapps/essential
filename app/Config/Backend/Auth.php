@@ -13,12 +13,16 @@ use CodeIgniter\Config\BaseConfig;
 class Auth extends BaseConfig
 {
     /**
-     * @var string Chiave binaria utilizzata per le operazioni di hashing e validazione dei dati.
+     * Chiave binaria utilizzata per le operazioni di hashing e validazione dei dati.
+     * 
+     * @var string 
      */
 	public string $hashKey = '';
 
     /**
-     * @var string Chiave binaria utilizzata per la cifratura e protezione della sessione.
+     * Chiave binaria utilizzata per la cifratura e protezione della sessione.
+     * 
+     * @var string 
      */
 	public string $sessionCryptoKey = '';
 
@@ -48,42 +52,58 @@ class Auth extends BaseConfig
     }
 
     /**
-     * @var bool Abilita o disabilita il controllo sul limite dei tentativi di login falliti.
+     * Abilita o disabilita il controllo sul limite dei tentativi di login falliti.
+     * 
+     * @var bool 
      */
     public bool $attempts = true;
 
     /**
-     * @var int Intervallo di tempo (in secondi) in cui monitorare e vincolare i tentativi di accesso.
+     * Intervallo di tempo (in secondi) in cui monitorare e vincolare i tentativi di accesso.
+     * 
+     * @var int 
      */
     public int $attemptsInterval = 600;
 
     /**
-     * @var int Numero massimo di tentativi di login errati consentiti prima del blocco temporaneo.
+     * Numero massimo di tentativi di login errati consentiti prima del blocco temporaneo.
+     * 
+     * @var int 
      */
     public int $attemptsLimit = 3; 
 
     /**
-     * @var bool Stato di attivazione globale per l'autenticazione a due fattori (2FA).
+     * Stato di attivazione globale per l'autenticazione a due fattori (2FA).
+     * 
+     * @var bool 
      */
     public bool $twoFactor = false;
 
     /**
-     * @var int Durata di validità (in secondi) della persistenza dell'accesso tramite cookie "Remember Me".
+     * Durata di validità (in secondi) della persistenza dell'accesso tramite cookie "Remember Me".
+     * 
+     * @var int 
      */
     public int $rememberMeTime = 86400;
 
     /**
-     * @var int Durata massima di inattività (in secondi) prima della scadenza della sessione di backend.
+     * Durata massima di inattività (in secondi) prima della scadenza della sessione di backend.
+     * 
+     * @var int 
      */
     public int $sessionTime = 1200;
 
     /**
-     * @var int Finestra temporale di validità (in secondi) dei token di attivazione o ripristino account.
+     * Finestra temporale di validità (in secondi) dei token di attivazione o ripristino account.
+     * 
+     * @var int 
      */
     public int $activationTime = 21600;
 
     /**
-     * @var string Espressione regolare (Regex) utilizzata per validare i requisiti minimi di sicurezza delle password.
+     * Espressione regolare (Regex) utilizzata per validare i requisiti minimi di sicurezza delle password.
+     * 
+     * @var string 
      */
     public string $passwordRegex = '/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/';
 }

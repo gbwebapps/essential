@@ -14,7 +14,7 @@
                 </div>
                 <div class="col-6 text-end">
                     <a href="#" class="select-all" data-controller="<?= $permission['controller']; ?>">
-                        <i class="fa-solid fa-check-double"></i>
+                        <i class="fa-solid fa-square-check"></i>
                         <?= lang('backend/admins.links.selectAll'); ?>
                     </a>
                 </div>
@@ -45,7 +45,7 @@
 
         <?php endforeach; ?>
 
-        <div class="error_permissions text-danger text-center fw-bold pt-2">&nbsp;</div>
+        <div class="error_permissions text-danger text-center small fw-bold pt-2">&nbsp;</div>
     </div>
 
 </div>

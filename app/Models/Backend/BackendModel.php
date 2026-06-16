@@ -28,57 +28,79 @@ abstract class BackendModel extends BaseModel
 	protected ?string $getDataQuery = null;
 
 	/**
-	 * @var string|null Query SQL per il recupero di un record tramite il suo UUID.
+	 * Query SQL per il recupero di un record tramite il suo UUID.
+	 * 
+	 * @var string|null 
 	 */
 	protected ?string $getUUIDQuery = null;
 
 	/**
-	 * @var string|null Query SQL per il conteggio totale dei record presenti nel modulo.
+	 * Query SQL per il conteggio totale dei record presenti nel modulo.
+	 * 
+	 * @var string|null 
 	 */
 	protected ?string $getNumRowsQuery = null;
 
 	/**
-	 * @var string|null Colonna di ordinamento predefinita applicata alle query.
+	 * Colonna di ordinamento predefinita applicata alle query.
+	 * 
+	 * @var string|null 
 	 */
 	protected ?string $defaultColumn = null;
 
 	/**
-	 * @var array Elenco dei campi da confrontare per verificare se i dati hanno subito variazioni.
+	 * Elenco dei campi da confrontare per verificare se i dati hanno subito variazioni.
+	 * 
+	 * @var array 
 	 */
 	protected array $toCompare = [];
 
 	/**
-	 * @var array Campi della tabella consentiti per la visualizzazione nell'elenco generale.
+	 * Campi della tabella consentiti per la visualizzazione nell'elenco generale.
+	 * 
+	 * @var array 
 	 */
 	protected array $showAllAllowedFields = [];
 
 	/**
-	 * @var array Campi della tabella consentiti durante l'operazione di inserimento (Add).
+	 * Campi della tabella consentiti durante l'operazione di inserimento (Add).
+	 * 
+	 * @var array 
 	 */
 	protected array $addAllowedFields = [];
 
 	/**
-	 * @var array Campi della tabella consentiti durante l'operazione di modifica (Edit).
+	 * Campi della tabella consentiti durante l'operazione di modifica (Edit).
+	 * 
+	 * @var array 
 	 */
 	protected array $editAllowedFields = [];
 
 	/**
-	 * @var array Campi della tabella consentiti per la gestione della cancellazione (Delete).
+	 * Campi della tabella consentiti per la gestione della cancellazione (Delete).
+	 * 
+	 * @var array 
 	 */
 	protected array $delAllowedFields = [];
 
 	/**
-	 * @var array Campi della tabella consentiti per la variazione rapida dello stato (Status).
+	 * Campi della tabella consentiti per la variazione rapida dello stato (Status).
+	 * 
+	 * @var array 
 	 */
 	protected array $changeStatusAllowedFields = [];
 
 	/**
-	 * @var array Colonne sulle quali il sistema permette l'ordinamento dei dati (Order BY).
+	 * Colonne sulle quali il sistema permette l'ordinamento dei dati (Order BY).
+	 *  
+	 * @var array 
 	 */
 	protected array $allowedOrderColumns = [];
 
 	/**
-	 * @var array Elenco dei campi su cui è autorizzata l'esecuzione di filtri di ricerca.
+	 * Elenco dei campi su cui è autorizzata l'esecuzione di filtri di ricerca.
+	 *  
+	 * @var array 
 	 */
 	protected array $showAllSearchAllowedFields = [];
 	

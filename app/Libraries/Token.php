@@ -11,7 +11,9 @@ namespace App\Libraries;
 class Token
 {
     /**
-     * @var string Il valore stringa del token grezzo.
+     * Il valore stringa del token grezzo.
+     * 
+     * @var string 
      */
     protected string $token;
 

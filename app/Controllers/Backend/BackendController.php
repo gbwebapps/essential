@@ -21,42 +21,58 @@ use App\Libraries\RegExp;
 abstract class BackendController extends BaseController 
 {
     /**
-     * @var array Elenco degli helper nativi di CodeIgniter caricati automaticamente.
+     * Elenco degli helper nativi di CodeIgniter caricati automaticamente.
+     * 
+     * @var array 
      */
     protected $helpers = ['date', 'array', 'cookie'];
 
     /**
-     * @var array Array centralizzato contenente tutti i dati passati globalmente alle viste.
+     * Array centralizzato contenente tutti i dati passati globalmente alle viste.
+     * 
+     * @var array 
      */
     protected array $data = [];
 
     /**
-     * @var Session Istanza del servizio di gestione della sessione utente.
+     * Istanza del servizio di gestione della sessione utente.
+     * 
+     * @var Session 
      */
     protected Session $session;
 
     /**
-     * @var BackendClass Istanza della libreria di utilità di backend per la manipolazione degli asset.
+     * Istanza della libreria di utilità di backend per la manipolazione degli asset.
+     * 
+     * @var BackendClass 
      */
     protected BackendClass $backendClass;
 
     /**
-     * @var RegExp Istanza della libreria personalizzata per la gestione delle espressioni regolari.
+     * Istanza della libreria personalizzata per la gestione delle espressioni regolari.
+     * 
+     * @var RegExp 
      */
     protected RegExp $regexp;
 
     /**
-     * @var array Elenco dei file CSS extra inseriti dinamicamente dai singoli controller.
+     * Elenco dei file CSS extra inseriti dinamicamente dai singoli controller.
+     * 
+     * @var array 
      */
     protected array $customCss = [];
 
     /**
-     * @var array Elenco dei file JavaScript extra inseriti dinamicamente dai singoli controller.
+     * Elenco dei file JavaScript extra inseriti dinamicamente dai singoli controller.
+     * 
+     * @var array 
      */
     protected array $customJs  = [];
 
     /**
-     * @var object|null Informazioni e dati dell'utente amministratore attualmente loggato.
+     * Informazioni e dati dell'utente amministratore attualmente loggato.
+     * 
+     * @var object|null 
      */
     protected ?object $currentAdmin;
 

@@ -19,12 +19,16 @@ use App\Controllers\Backend\BackendController;
 class MessagesController extends BackendController 
 {
     /**
-     * @var MessagesModel Istanza del modello dedicato alla persistenza e alla gestione dei messaggi.
+     * Istanza del modello dedicato alla persistenza e alla gestione dei messaggi.
+     * 
+     * @var MessagesModel 
      */
     protected MessagesModel $messagesModel;
 
     /**
-     * @var MessagesClass Istanza della libreria logica per l'elaborazione delle funzionalità del modulo messaggi.
+     * Istanza della libreria logica per l'elaborazione delle funzionalità del modulo messaggi.
+     * 
+     * @var MessagesClass 
      */
     protected MessagesClass $messagesClass;
 

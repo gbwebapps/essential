@@ -5,6 +5,7 @@ namespace App\Controllers\Backend;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use CodeIgniter\HTTP\UserAgent;
 
 use App\Models\Backend\AccountModel;
 use App\Libraries\Backend\AccountClass;
@@ -19,12 +20,16 @@ use App\Controllers\Backend\BackendController;
 class AccountController extends BackendController 
 {
     /**
-     * @var AccountModel Istanza del modello dedicato alla persistenza dei dati del profilo utente.
+     * Istanza del modello dedicato alla persistenza dei dati del profilo utente.
+     * 
+     * @var AccountModel 
      */
     protected AccountModel $accountModel;
 
     /**
-     * @var AccountClass Istanza della libreria logica per l'elaborazione delle funzionalità dell'account.
+     * Istanza della libreria logica per l'elaborazione delle funzionalità dell'account.
+     * 
+     * @var AccountClass 
      */
     protected AccountClass $accountClass;
 
@@ -41,6 +46,9 @@ class AccountController extends BackendController
         parent::initController($request, $response, $logger);
 
         $this->data['controller'] = 'account';
+
+        $this->data['icon'] = '<i class="fa-solid fa-user-gear"></i>';
+        $this->data['title'] = lang('backend/account.titles.index');
 
         $this->accountModel = model(AccountModel::class);
         $this->accountClass = new AccountClass($this->accountModel);
@@ -106,9 +114,6 @@ class AccountController extends BackendController
     public function index()
     {
         $this->data['action'] = 'index';
-        
-        $this->data['title'] = lang('backend/account.titles.index');
-        $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
 
         $this->data['centerContent'] = true;
 
@@ -124,9 +129,6 @@ class AccountController extends BackendController
     {
         $this->data['action'] = 'general';
 
-        $this->data['title'] = lang('backend/account.titles.general');
-        $this->data['icon'] = '<i class="fa-solid fa-id-card"></i>';
-
         return $this->render('backend/account/generalView', $this->data);
     }
 
@@ -138,9 +140,6 @@ class AccountController extends BackendController
     public function edit()
     {
         $this->data['action'] = 'edit';
-
-        $this->data['title'] = lang('backend/account.titles.edit');
-        $this->data['icon'] = '<i class="fa-solid fa-user-edit"></i>';
 
         return $this->render('backend/account/editView', $this->data);
     }
@@ -154,8 +153,8 @@ class AccountController extends BackendController
     {
         $this->data['action'] = 'permissions';
 
-        $this->data['title'] = lang('backend/account.titles.permissions');
-        $this->data['icon'] = '<i class="fa-solid fa-check-circle"></i>';
+        $this->data['perms'] = $this->getFlatPermissions($this->currentAdmin->uuid);
+        $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
 
         return $this->render('backend/account/permissionsView', $this->data);
     }
@@ -169,9 +168,6 @@ class AccountController extends BackendController
     {
         $this->data['action'] = 'images';
 
-        $this->data['title'] = lang('backend/account.titles.images');
-        $this->data['icon'] = '<i class="fa-solid fa-images"></i>';
-
         return $this->render('backend/account/imagesView', $this->data);
     }
 
@@ -184,8 +180,8 @@ class AccountController extends BackendController
     {
         $this->data['action'] = 'tokens';
 
-        $this->data['title'] = lang('backend/account.titles.tokens');
-        $this->data['icon'] = '<i class="fa-solid fa-chain"></i>';
+        $this->data['userAgent'] = new UserAgent();
+        $this->data['tokens'] = $this->accountModel->getTokens($this->currentAdmin->uuid);
 
         return $this->render('backend/account/tokensView', $this->data);
     }
@@ -199,9 +195,6 @@ class AccountController extends BackendController
     {
         $this->data['action'] = 'resetPassword';
 
-        $this->data['title'] = lang('backend/account.titles.resetPassword');
-        $this->data['icon'] = '<i class="fa-solid fa-unlock"></i>';
-
         return $this->render('backend/account/resetPasswordView', $this->data);
     }
 
@@ -214,9 +207,20 @@ class AccountController extends BackendController
     {
         $this->data['action'] = 'security';
         
-        $this->data['title'] = lang('backend/account.titles.security');
-        $this->data['icon'] = '<i class="fa-solid fa-shield"></i>';
-
         return $this->render('backend/account/securityView', $this->data);
+    }
+
+    /**
+     * Estrae e normalizza in un array lineare monodimensionale i permessi attivi associati a un determinato amministratore.
+     *
+     * @param string $uuid L'identificativo univoco dell'amministratore.
+     * @return array Elenco sequenziale dei permessi dell'utente.
+     */
+    private function getFlatPermissions(string $uuid): array
+    {
+        $rawPermissions = $this->accountModel->getPermissions($uuid);
+        return array_map(function($perm) {
+            return $perm->permission;
+        }, $rawPermissions);
     }
 }

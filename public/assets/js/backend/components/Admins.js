@@ -64,26 +64,19 @@ export class GetPermissionsManager {
 
             const data = await response.json();
 
-            /* 1. Controllo per utente non loggato */
+            /* Controllo per utente non loggato */
             if (data.result === 'no_current_user_logged') {
                 window.location.href = `${urlbase}backend/auth`;
                 return;
             }
 
-            /* 2. Gestione errori di validazione (UNIFORMATA) */
-            if (data.errors) {
-                if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
-                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
-                return;
-            }
-
-            /* 3. Gestione fallimento logico generico */
+            /* Gestione fallimento logico generico */
             if (data.result === false) {
                 if (data.message && typeof showToast === 'function') showToast('danger', data.message);
                 return;
             }
 
-            /* 4. Caso successo */
+            /* Caso successo */
             if (data.result === true) {
                 if (data.message && typeof showToast === 'function') {
                     showToast('success', data.message);
@@ -186,26 +179,19 @@ export class ChangePermissionManager {
 
             const data = await response.json();
 
-            /* 1. Controllo per utente non loggato */
+            /* Controllo per utente non loggato */
             if (data.result === 'no_current_user_logged') {
                 window.location.href = `${urlbase}backend/auth`;
                 return;
             }
 
-            /* 2. Gestione errori di validazione (CORRETTA) */
-            if (data.errors) {
-                if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
-                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
-                return;
-            }
-
-            /* 3. Gestione fallimento logico generico */
+            /* Gestione fallimento logico generico */
             if (data.result === false) {
                 if (data.message && typeof showToast === 'function') showToast('danger', data.message);
                 return;
             }
 
-            /* 4. Caso successo */
+            /* Caso successo */
             if (data.result === true) {
                 if (data.message && typeof showToast === 'function') {
                     showToast('success', data.message);
@@ -297,26 +283,19 @@ export class GetTokensManager {
 
             const data = await response.json();
 
-            /* 1. Controllo per utente non loggato */
+            /* Controllo per utente non loggato */
             if (data.result === 'no_current_user_logged') {
                 window.location.href = `${urlbase}backend/auth`;
                 return;
             }
 
-            /* 2. Gestione errori di validazione (UNIFORMATA) */
-            if (data.errors) {
-                if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
-                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
-                return;
-            }
-
-            /* 3. Gestione fallimento logico generico */
+            /* Gestione fallimento logico generico */
             if (data.result === false) {
                 if (data.message && typeof showToast === 'function') showToast('danger', data.message);
                 return;
             }
 
-            /* 4. Caso successo */
+            /* Caso successo */
             if (data.result === true) {
                 if (data.message && typeof showToast === 'function') {
                     showToast('success', data.message);
@@ -419,26 +398,19 @@ export class DeleteTokenManager {
 
             const data = await response.json();
 
-            /* 1. Controllo per utente non loggato */
+            /* Controllo per utente non loggato */
             if (data.result === 'no_current_user_logged') {
                 window.location.href = `${urlbase}backend/auth`;
                 return;
             }
 
-            /* 2. Gestione errori di validazione (CORRETTA) */
-            if (data.errors) {
-                if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
-                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
-                return;
-            }
-
-            /* 3. Gestione fallimento logico generico */
+            /* Gestione fallimento logico generico */
             if (data.result === false) {
                 if (data.message && typeof showToast === 'function') showToast('danger', data.message);
                 return;
             }
 
-            /* 4. Caso successo */
+            /* Caso successo */
             if (data.result === true) {
                 if (data.message && typeof showToast === 'function') {
                     showToast('success', data.message);

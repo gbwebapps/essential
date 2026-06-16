@@ -17,7 +17,7 @@
             <!-- Form identificato per la gestione AJAX -->
             <form id="admins_edit">
 
-                <!-- Sezione: Dati Anagrafici e Contatti -->
+                <!-- General Data -->
                 <div class="card-header rounded-0 d-flex justify-content-between align-items-center">
                     <h2 class="card-title text-start mb-0"><?= lang('backend/admins.panels.generalData'); ?></h2>
                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>" form="getGeneralData">
@@ -29,8 +29,9 @@
                 <div id="generalData">
                     <?= $this->include('backend/admins/partials/edit/generalDataPartial', $this->data); ?>
                 </div>
+                <!-- End General Data -->
 
-                <!-- Sezione: Dati Anagrafici e Contatti -->
+                <!-- Permissions -->
                 <div class="card-header rounded-0 d-flex justify-content-between align-items-center" style="border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);">
                     <h2 class="card-title text-start mb-0"><?= lang('backend/admins.panels.permissions'); ?></h2>
                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>" form="getPermissions">
@@ -42,18 +43,21 @@
                 <div id="permissions">
                     <?= $this->include('backend/admins/partials/edit/permissionsPartial'); ?>
                 </div>
+                <!-- End Permissions -->
 
                 <!-- Sezione: Upload e Preview Immagini Profilo -->
-                <div id="upload_preview">
+                <div id="uploadPreview">
                     <!-- Inclusione del componente per la preview delle immagini -->
                     <!-- $this->include('backend/components/uploadPreviewImg/uploadPreviewImg_view'); -->
                 </div>
+                <!-- Fine Sezione: Upload e Preview Immagini Profilo -->
 
                 <!-- Sezione: Caricamento Documentazione Allegata -->
-                <div id="upload_documents">
+                <div id="uploadDocuments">
                     <!-- Inclusione del componente per la gestione dei documenti -->
                     <!-- $this->include('backend/components/uploadPreviewDoc/uploadPreviewDoc_view'); -->
                 </div>
+                <!-- Fine Sezione: Caricamento Documentazione Allegata -->
 
                 <!-- Meta Data -->
                 <div class="card-header rounded-0 d-flex justify-content-between align-items-center" style="border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);">

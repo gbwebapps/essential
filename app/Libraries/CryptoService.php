@@ -11,12 +11,16 @@ namespace App\Libraries;
 class CryptoService
 {
     /**
-     * @var string Chiave crittografica segreta utilizzata per le operazioni di cifratura e decifratura.
+     * Chiave crittografica segreta utilizzata per le operazioni di cifratura e decifratura.
+     * 
+     * @var string 
      */
     protected string $key;
 
     /**
-     * @var string Metodo e modalità dell'algoritmo crittografico impostato (predefinito: 'aes-256-gcm').
+     * Metodo e modalità dell'algoritmo crittografico impostato (predefinito: 'aes-256-gcm').
+     * 
+     * @var string 
      */
     protected string $cipher = 'aes-256-gcm';
 

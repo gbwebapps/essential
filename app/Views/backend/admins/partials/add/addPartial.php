@@ -7,7 +7,7 @@
             <!-- Form identificato per la gestione AJAX -->
             <form id="admins_add">
 
-                <!-- Sezione: Dati Anagrafici e Contatti -->
+                <!-- General Data -->
                 <div id="generalData">
 
                     <div class="card-header">
@@ -15,6 +15,7 @@
                     </div>
 
                     <div class="card-body">
+
                         <!-- Nome e Cognome -->
                         <div class="row">
                             <div class="col-6">
@@ -33,6 +34,7 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- End Nome e Cognome -->
 
                         <!-- Email e Telefono -->
                         <div class="row">
@@ -51,6 +53,7 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- End Email e Telefono -->
 
                         <!-- Stato Attivazione -->
                         <div class="row">
@@ -67,6 +70,7 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- End Stato Attivazione -->
 
                         <!-- Note Aggiuntive -->
                         <div class="row">
@@ -78,26 +82,32 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- End Note Aggiuntive -->
+
                     </div>
 
                 </div>
+                <!-- End General Data -->
 
                 <!-- Permessi -->
                 <div id="permissionsData">
                     <?= $this->include('backend/admins/partials/add/permissionsPartial'); ?>
                 </div>
+                <!-- End Permessi -->
 
                 <!-- Sezione: Upload e Preview Immagini Profilo -->
-                <div id="upload_preview">
+                <div id="uploadPreview">
                     <!-- Inclusione del componente per la preview delle immagini -->
                     <!-- $this->include('backend/components/uploadPreviewImg/uploadPreviewImgView'); -->
                 </div>
+                <!-- End Sezione: Upload e Preview Immagini Profilo -->
 
                 <!-- Sezione: Caricamento Documentazione Allegata -->
-                <div id="upload_documents">
+                <div id="uploadDocuments">
                     <!-- Inclusione del componente per la gestione dei documenti -->
                     <!-- $this->include('backend/components/uploadPreviewDoc/uploadPreviewDocView'); -->
                 </div>
+                <!-- End Sezione: Caricamento Documentazione Allegata -->
 
             </form>
 

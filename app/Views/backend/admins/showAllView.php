@@ -12,17 +12,17 @@
                     <!-- Inizio testata lista -->
                     <div class="card-header">
                         <div class="row">
-                            <div class="col-12 col-md-2">
 
-                                <!-- Select per il numero delle righe da mostrare -->
+                            <!-- Select per il numero delle righe da mostrare -->
+                            <div class="col-12 col-md-2">
                                 <select id="changeNumRows" class="form-select">
                                     <option value="5">5</option>
                                     <option value="10">10</option>
                                     <option value="15">15</option>
                                     <option value="20">20</option>
                                 </select>
-
                             </div>
+                            <!-- End Select per il numero delle righe da mostrare -->
 
                             <div class="col-12 col-md-10">
                                 <div class="pt-2 d-flex flex-column flex-md-row align-items-center justify-content-md-end">
@@ -36,27 +36,32 @@
                                         class="mb-2 mb-md-0 me-0 me-md-2 bar-link">
                                         <b><i class="fa-solid fa-filter"></i> <?= lang('backend/admins.links.filters'); ?></b>
                                     </a>
+                                    <!-- End Apertura/chiusura parte filtri -->
 
                                     <!-- Reset filtri e ordinamento -->
                                     <a href="#" id="link-reset-search" class="mb-2 mb-md-0 mx-0 mx-md-2 bar-link">
                                         <b><i class="fa-solid fa-filter-circle-xmark"></i> <?= lang('backend/admins.links.resetFilters'); ?></b>
                                     </a>
+                                    <!-- End Reset filtri e ordinamento -->
 
                                     <!-- Reset solo ordinamento -->
                                     <a href="#" id="reset-sorting-link" class="mb-2 mb-md-0 mx-0 mx-md-2 bar-link">
                                         <b><i class="fa-solid fa-sort"></i> <?= lang('backend/admins.links.resetSorting'); ?></b>
                                     </a>
+                                    <!-- End Reset solo ordinamento -->
 
                                     <!-- Semplice ricarica lista -->
                                     <a href="#" id="refresh-list" class="mb-md-0 ms-0 ms-md-2 bar-link">
                                         <b><i class="fa-solid fa-arrows-rotate"></i> <?= lang('backend/admins.links.reloadList'); ?></b>
                                     </a>
+                                    <!-- End Semplice ricarica lista -->
 
                                 </div>
                             </div>
 
                         </div>
                     </div>
+                    <!-- Fine testata lista -->
 
                     <!-- Inizio parte filtri -->
                     <div id="search-bar" class="collapse">
@@ -73,6 +78,7 @@
                                     <div class="error_firstname text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
+                            <!-- End Ricerca avanzata per nome -->
 
                             <!-- Ricerca avanzata per cognome -->
                             <div class="col-md-3">
@@ -85,6 +91,7 @@
                                     <div class="error_lastname text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
+                            <!-- End Ricerca avanzata per cognome -->
 
                             <!-- Ricerca avanzata per email -->
                             <div class="col-md-3">
@@ -97,6 +104,7 @@
                                     <div class="error_email text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
+                            <!-- End Ricerca avanzata per email -->
 
                             <!-- Ricerca avanzata per phone -->
                             <div class="col-md-3">
@@ -109,6 +117,7 @@
                                     <div class="error_phone text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
+                            <!-- End Ricerca avanzata per phone -->
 
                         </div>
                     </div>

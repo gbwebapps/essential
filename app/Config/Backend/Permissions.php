@@ -13,10 +13,15 @@ use CodeIgniter\Config\BaseConfig;
 class Permissions extends BaseConfig
 {
 	/**
-	 * @var array Elenco strutturato dei permessi di sicurezza configurati nell'applicazione.
+	 * Elenco strutturato dei permessi di sicurezza configurati nell'applicazione.
+	 * 
+	 * @var array 
 	 */
 	public array $permissions = [];
 
+	/**
+	 * Costruttore della classe.
+	 */
 	public function __construct()
     {
         parent::__construct();
