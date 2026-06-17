@@ -131,7 +131,7 @@ class AdminsController extends BackendController
      */
     public function add(): string|ResponseInterface
     {
-        $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
+        $this->data['groups'] = $this->adminsModel->getGroups();
 
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -144,10 +144,7 @@ class AdminsController extends BackendController
             $rules = $this->adminsModel->addValidationRules();
 
             if ( ! $this->validateData($posts, $rules)):
-
-                $formattedErrors = removeDotPermissions('permissions', $this->validator->getErrors());
-
-                return $this->response->setJSON(['errors' => $formattedErrors, 'message' => lang('backend/admins.messages.validationErrors')]);
+                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
             endif;
 
             $json = $this->adminsModel->add($posts, $this->request);
@@ -173,14 +170,17 @@ class AdminsController extends BackendController
     }
 
     /**
-     * Gestisce la maschera di modifica di un amministratore (GET), il refresh parziale dei dati (AJAX) e il salvataggio in database (POST AJAX).
+     * Gestisce la maschera di modifica di un amministratore esistente (GET), il refresh parziale (AJAX) e il salvataggio dei dati (POST AJAX).
      *
-     * @param string|null $uuid L'identificativo univoco dell'amministratore da modificare.
-     * @return string|ResponseInterface La vista HTML completa, un reindirizzamento di errore o la risposta JSON parziale.
+     * @param string|null $uuid L'identificativo unico dell'amministratore da modificare (richiesto per GET).
+     * @return string|ResponseInterface La vista HTML completa o la risposta JSON parziale con l'esito dell'operazione.
      */
     public function edit(string $uuid = null): string|ResponseInterface
     {
         $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
+
+        /* Recupero la lista dei gruppi disponibili per la select */
+        $this->data['groups'] = $this->adminsModel->getGroups();
 
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -199,7 +199,9 @@ class AdminsController extends BackendController
             /* Caso 1: Refresh della vista parziale */
             if (isset($posts['action']) && $posts['action'] === 'refresh'):
 
-                $this->data['perms'] = $this->getFlatPermissions($posts['uuid']);
+                /* Carico sia i permessi del gruppo sia le eccezioni dell'utente */
+                $this->data['group_perms'] = $this->adminsModel->getGroupPermissions((int) $admin['row']->group_id);
+                $this->data['user_exceptions'] = $this->adminsModel->getUserExceptions($posts['uuid']);
                 $this->data['admin'] = $admin['row'];
 
                 return $this->response->setJSON(['result' => true,'output' => view('backend/admins/partials/edit/editPartial', $this->data)]);
@@ -208,20 +210,20 @@ class AdminsController extends BackendController
             $rules = $this->adminsModel->editValidationRules($posts);
             
             if ( ! $this->validateData($posts, $rules)):
-
-                $formattedErrors = removeDotPermissions('permissions', $this->validator->getErrors());
-
-                return $this->response->setJSON(['errors' => $formattedErrors, 'message' => lang('backend/admins.messages.validationErrors')]);
+                /* Rimossa la rimozione dei dot-permissions sui vecchi permessi piatti */
+                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
             endif;
 
             $result = $this->adminsModel->edit($posts);
 
             $json = ['result'  => $result['result'], 'message' => $result['message']];
 
-            /* Caso 2: Salvataggio riuscito (Query eliminata, riuso i dati in memoria) */
+            /* Caso 2: Salvataggio riuscito */
             if ($result['result'] === true):
                 $this->data['admin'] = $result['row'];
-                $this->data['perms'] = $posts['permissions'] ?? [];
+                /* Rigenero i dati corretti per la matrice aggiornata interpellando il Model */
+                $this->data['group_perms'] = $this->adminsModel->getGroupPermissions((int) $result['row']->group_id);
+                $this->data['user_exceptions'] = $this->adminsModel->getUserExceptions($posts['uuid']);
                 
                 $json['output'] = view('backend/admins/partials/edit/editPartial', $this->data);
             endif;
@@ -248,24 +250,11 @@ class AdminsController extends BackendController
         $this->data['admin'] = $admin['row'] ?? null;
         $this->data['uuid'] = $uuid;
 
-        /* Caso Caricamento standard */
-        $this->data['perms'] = $this->getFlatPermissions($uuid);
+        /* Caso Caricamento standard: passo le matrici separate alla vista */
+        $this->data['group_perms'] = $this->adminsModel->getGroupPermissions((int) $admin['row']->group_id);
+        $this->data['user_exceptions'] = $this->adminsModel->getUserExceptions($uuid);
 
         return $this->render('backend/admins/editView', $this->data);
-    }
-
-    /**
-     * Estrae e normalizza in un array lineare monodimensionale i permessi attivi associati a un determinato amministratore.
-     *
-     * @param string $uuid L'identificativo univoco dell'amministratore.
-     * @return array Elenco sequenziale dei permessi dell'utente.
-     */
-    private function getFlatPermissions(string $uuid): array
-    {
-        $rawPermissions = $this->adminsModel->getPermissions($uuid);
-        return array_map(function($perm) {
-            return $perm->permission;
-        }, $rawPermissions);
     }
 
     /**

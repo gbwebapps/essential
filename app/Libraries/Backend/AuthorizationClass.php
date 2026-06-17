@@ -172,7 +172,7 @@ class AuthorizationClass
      */
     private function getAdmin(string $uuid): ?object
     {
-        /* 1. Recupero dei dati base dell'utente */
+        /* 1. Recupero dei dati base dell'utente includendo group_id */
         $sql = "select 
                     uuid, 
                     firstname, 
@@ -181,6 +181,7 @@ class AuthorizationClass
                     phone, 
                     status, 
                     master, 
+                    group_id, 
                     created_at, 
                     updated_at, 
                     suspended_at, 
@@ -206,17 +207,39 @@ class AuthorizationClass
             /* Bypass: il master riceve una proprietà universale */
             $data->permissions->all = true;
         else:
-            /* Interroga il database restituendo un array di oggetti */
-            $sqlPerms = "select permission from admins_permissions where admin_uuid = ?";
-            $permsResult = $this->db->query($sqlPerms, [$uuid])->getResultObject();
-            
-            if ($permsResult):
-                foreach ($permsResult as $row):
-                    /* Crea dinamicamente la proprietà (es. $data->permissions->users_index) */
-                    $permName = $row->permission;
-                    $data->permissions->{$permName} = true;
+            /* Array temporaneo per mappare i permessi finali */
+            $finalPermissions = [];
+
+            /* Estraggo i permessi base associati al gruppo dell'utente */
+            $sqlGroupPerms = "select permission from admins_group_permissions where group_id = ?";
+            $groupPerms = $this->db->query($sqlGroupPerms, [$data->group_id])->getResultObject();
+
+            if ($groupPerms):
+                foreach ($groupPerms as $row):
+                    $finalPermissions[$row->permission] = true;
                 endforeach;
             endif;
+
+            /* Estraggo le eccezioni specifiche dell'utente (colonna allow) */
+            $sqlUserPerms = "select permission, allow from admins_permissions where admin_uuid = ?";
+            $userPerms = $this->db->query($sqlUserPerms, [$uuid])->getResultObject();
+
+            if ($userPerms):
+                foreach ($userPerms as $row):
+                    if ((int) $row->allow === 1):
+                        /* Eccezione positiva: aggiungo o confermo il permesso */
+                        $finalPermissions[$row->permission] = true;
+                    else:
+                        /* Eccezione negativa: revoco il permesso ereditato dal gruppo */
+                        unset($finalPermissions[$row->permission]);
+                    endif;
+                endforeach;
+            endif;
+
+            /* Converto l'array finale in proprietà dinamiche dell'oggetto permissions */
+            foreach ($finalPermissions as $permName => $value):
+                $data->permissions->{$permName} = true;
+            endforeach;
         endif;
 
         return $data;

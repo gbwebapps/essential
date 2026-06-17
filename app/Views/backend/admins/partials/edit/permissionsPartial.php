@@ -20,13 +20,26 @@
 
                     <?php foreach($permission['perms'] as $k => $v): ?>
 
+                        <?php 
+                            /* Determino lo stato del checkbox combinando gruppo ed eccezioni */
+                            $isChecked = false;
+                            
+                            if (array_key_exists($k, $user_exceptions)):
+                                /* Se esiste un'eccezione, comanda il flag allow (1 = checked, 0 = unchecked) */
+                                $isChecked = ($user_exceptions[$k] === 1);
+                            else:
+                                /* Altrimenti l'utente eredita direttamente lo stato del suo gruppo */
+                                $isChecked = in_array($k, $group_perms);
+                            endif;
+                        ?>
+
                         <div class="col-3 text-center py-1">
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item">
                                     <label for="<?= $k; ?>"><?= $v; ?></label>
                                 </li>
                                 <li class="list-group-item">
-                                    <input type="checkbox" class="<?= $permission['controller']; ?>" name="permissions[]" value="<?= $k; ?>" id="<?= $k; ?>"<?= (in_array($k, $perms)) ? ' checked' : null; ?>>
+                                    <input type="checkbox" class="<?= $permission['controller']; ?>" name="permissions[]" value="<?= $k; ?>" id="<?= $k; ?>"<?= ($isChecked) ? ' checked' : ''; ?>>
                                 </li>
                             </ul>
                         </div>

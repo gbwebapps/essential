@@ -223,7 +223,7 @@
 
             <!-- ...altrimenti visualizzo messaggio adeguato. -->
             <?php else: ?>
-                <div class="text-center text-danger py-3 fw-bold"><?= lang('backend/admins.messages.noRecordsFound'); ?></div>
+                <div class="text-center text-danger py-3 fw-bold"><?= lang('backend/admins.messages.noAdminsFound'); ?></div>
             <?php endif; ?>
         </div>
     </div>

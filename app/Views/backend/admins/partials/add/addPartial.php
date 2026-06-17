@@ -55,8 +55,23 @@
                         </div>
                         <!-- End Email e Telefono -->
 
-                        <!-- Stato Attivazione -->
+                        <!-- Gruppo e Stato Attivazione -->
                         <div class="row">
+                            <div class="col-6">
+                                <div class="mb-2">
+                                    <label for="group_id" class="form-label">
+                                        <i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.group'); ?>
+                                    </label>
+                                    <select name="group_id" class="form-select" id="group_id">
+                                        <?php if (! empty($groups)): ?>
+                                            <?php foreach ($groups as $group): ?>
+                                                <option value="<?= $group->id; ?>"><?= esc($group->name); ?></option>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </select>
+                                    <div class="error_group_id text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                                </div>
+                            </div>
                             <div class="col-6">
                                 <div class="mb-2">
                                     <label for="status" class="form-label">
@@ -88,12 +103,6 @@
 
                 </div>
                 <!-- End General Data -->
-
-                <!-- Permessi -->
-                <div id="permissionsData">
-                    <?= $this->include('backend/admins/partials/add/permissionsPartial'); ?>
-                </div>
-                <!-- End Permessi -->
 
                 <!-- Sezione: Upload e Preview Immagini Profilo -->
                 <div id="uploadPreview">

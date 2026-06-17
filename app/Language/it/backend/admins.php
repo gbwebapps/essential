@@ -41,6 +41,7 @@ return [
 		'email' => 'Email', 
 		'phone' => 'Telefono', 
 		'status' => 'Stato', 
+		'group' => 'Gruppo', 
 		'active' => 'Attivo', 
 		'unactive' => 'Inattivo', 
 		'noImage' => 'Nessuna immagine', 

@@ -41,14 +41,14 @@ class AdminsModel extends BackendModel
      *
      * @var array
      */
-    protected array $addAllowedFields = ['firstname', 'lastname', 'email', 'phone', 'status', 'note', 'permissions', 'images', 'documents'];
+    protected array $addAllowedFields = ['firstname', 'lastname', 'email', 'phone', 'status', 'note', 'group_id', 'images', 'documents'];
 
     /**
      * Elenco dei campi consentiti per la persistenza dei dati durante la fase di aggiornamento di un profilo esistente.
      *
      * @var array
      */
-    protected array $editAllowedFields = ['uuid', 'firstname', 'lastname', 'email', 'phone', 'status', 'note', 'permissions', 'images', 'documents'];
+    protected array $editAllowedFields = ['uuid', 'firstname', 'lastname', 'email', 'phone', 'status', 'note', 'group_id', 'permissions', 'images', 'documents'];
 
     /**
      * Campi di input autorizzati per l'identificazione e l'esecuzione della procedura di cancellazione.
@@ -122,7 +122,7 @@ class AdminsModel extends BackendModel
      *
      * @var string|null
      */
-    protected ?string $getUUIDQuery = "select uuid, firstname, lastname, email, phone, status, master, note, created_at, updated_at, suspended_at, resetted_at from admins where uuid = ? limit 1";
+    protected ?string $getUUIDQuery = "select uuid, firstname, lastname, email, phone, status, master, group_id, note, created_at, updated_at, suspended_at, resetted_at from admins where uuid = ? limit 1";
 
     /**
      * Stringa SQL ottimizzata per il conteggio totale dei record presenti, utile al calcolo dell'impaginazione.
@@ -235,16 +235,13 @@ class AdminsModel extends BackendModel
                 'label' => lang('backend/admins.labels.note'),
                 'rules' => ['permit_empty', 'trim', 'max_length[500]', 'safeText'],
                 'errors' => [
-                    'safeText' => 'caratteri non ammessi'
+                    'safeText' => 'Caratteri non ammessi.'
                 ]
             ],
-            'permissions.*' => [
-                'label' => lang('backend/admins.labels.permissions'), 
-                'rules' => ['permit_empty', 'alpha_dash'], 
-                'errors' => [
-                    'alpha_dash' => lang('backend/admins.messages.wrongPermissionsFormat')
-                ]
-            ]
+            'group_id' => [
+                'label' => lang('backend/admins.labels.group'),
+                'rules' => ['required', 'is_natural_no_zero', 'is_not_unique[admins_groups.id]'],
+            ],
         ];
     }
 
@@ -289,13 +286,10 @@ class AdminsModel extends BackendModel
                 'label' => lang('backend/admins.labels.note'),
                 'rules' => ['permit_empty','max_length[500]','regex_match[/^[^<>\x60]*$/su]'],
             ],
-            'permissions.*' => [
-                'label' => lang('backend/admins.labels.permissions'), 
-                'rules' => ['permit_empty', 'alpha_dash'], 
-                'errors' => [
-                    'alpha_dash' => lang('backend/admins.messages.wrongPermissionsFormat')
-                ]
-            ]
+            'group_id' => [
+                'label' => lang('backend/admins.labels.group'),
+                'rules' => ['required', 'is_natural_no_zero', 'is_not_unique[admins_groups.id]'],
+            ],
         ];
     }
 
@@ -645,18 +639,86 @@ class AdminsModel extends BackendModel
     }
 
     /**
-     * Esegue la pipeline atomica di registrazione e inizializzazione di un nuovo amministratore.
+     * Recupera l'elenco completo dei gruppi amministrativi disponibili nel sistema.
      *
-     * Filtra i dati di input mediante whitelisting, genera un UUID univoco e acquisisce i metadati ambientali 
-     * del client. Avvia una transazione database isolando le query di inserimento dell'anagrafica base, 
-     * l'iniezione dei privilegi espliciti, la generazione con hashing del token di attivazione (activation) 
-     * e la pre-configurazione del secondo fattore di autenticazione (2FA via email di default). 
-     * A transazione conclusa con successo, delega al servizio email l'invio della notifica di sblocco, 
-     * differenziando la risposta in base all'esito del server SMTP.
+     * Il metodo esegue una query diretta sulla tabella `admins_groups` per prelevare tutti
+     * i record dei ruoli censiti. Viene utilizzato principalmente nei moduli di gestione
+     * degli amministratori (es. maschere di inserimento e modifica) per popolare i componenti
+     * di selezione (select) dell'interfaccia utente.
      *
-     * @param array $posts Dataset grezzo dei parametri inviati dal modulo di inserimento.
-     * @param \CodeIgniter\HTTP\IncomingRequest $request Oggetto della richiesta HTTP corrente per l'audit dei metadati.
-     * @return array Esito dell'operazione contenente lo stato logico e il messaggio localizzato per l'interfaccia.
+     * @return array Elenco di oggetti rappresentanti le righe della tabella dei gruppi.
+     */
+    public function getGroups(): array
+    {
+        $sql = "select * from admins_groups";
+        return $this->db->query($sql)->getResult();
+    }
+
+    /**
+     * Recupera l'elenco piatto dei permessi associati a un determinato gruppo.
+     *
+     * Interroga la tabella `admins_group_permissions` per estrarre tutti i codici
+     * di permesso assegnati al gruppo specificato. Il risultato viene appiattito
+     * in un array di stringhe per facilitare la comparazione con i permessi dell'utente.
+     *
+     * @param int $groupId L'ID del gruppo amministrativo.
+     * @return array Un array piatto contenente i codici dei permessi (es. ['users_index', 'users_show']).
+     */
+    public function getGroupPermissions(int $groupId): array
+    {
+        $sql = "select permission from admins_group_permissions where group_id = ?";
+        $result = $this->db->query($sql, [$groupId])->getResultObject();
+
+        if ( ! $result):
+            return [];
+        endif;
+
+        /* Appiattisco l'array di oggetti in un array di stringhe */
+        return array_map(function($row) {
+            return $row->permission;
+        }, $result);
+    }
+
+    /**
+     * Recupera le eccezioni sui permessi specifiche per un determinato amministratore.
+     *
+     * Interroga la tabella `admins_permissions` per raccogliere le personalizzazioni
+     * introdotte sull'utente (permessi extra concessi o permessi del gruppo revocati).
+     * Il risultato viene strutturato come array associativo per ottimizzare le performance di lettura.
+     *
+     * @param string $uuid L'UUID dell'amministratore.
+     * @return array Array associativo dove la chiave è il codice permesso e il valore è lo stato 'allow' (0 o 1).
+     */
+    public function getUserExceptions(string $uuid): array
+    {
+        $sql = "select permission, allow from admins_permissions where admin_uuid = ?";
+        $result = $this->db->query($sql, [$uuid])->getResultObject();
+
+        if ( ! $result):
+            return [];
+        endif;
+
+        $exceptions = [];
+        foreach ($result as $row):
+            /* Mappo il nome del permesso come chiave e il valore di allow (0 o 1) come stato dell'eccezione */
+            $exceptions[$row->permission] = (int) $row->allow;
+        endforeach;
+
+        return $exceptions;
+    }
+
+    /**
+     * Gestisce la logica di business e la transazione per l'inserimento di un nuovo amministratore.
+     *
+     * Il metodo esegue la pulizia dei dati in ingresso tramite `checkAllowedFields` e avvia una 
+     * transazione database. Registra l'utente nella tabella `admins` associandolo al gruppo specificato, 
+     * scrive il token di attivazione in `admins_tokens`, configura il metodo 2FA predefinito via email 
+     * in `admins_2fa` e, in caso di successo complessivo, delega a `EmailService` l'invio dell'email 
+     * di attivazione. Gestisce il rollback automatico in caso di anomalie o fallimenti SQL.
+     *
+     * @param array $posts I dati provenienti dal form di inserimento.
+     * @param \CodeIgniter\HTTP\IncomingRequest $request L'oggetto della richiesta HTTP corrente.
+     * @return array Esito dell'operazione con flag 'result' e stringa informativa 'message'.
      */
     public function add(array $posts, \CodeIgniter\HTTP\IncomingRequest $request): array
     {
@@ -668,7 +730,7 @@ class AdminsModel extends BackendModel
             /* Genero uuid */
             $uuid = $this->generateUUID();
 
-            /* Istanzio la classe request (prima mancava) per ricavare User Agent e IP */
+            /* Istanzio la classe request per ricavare User Agent e IP */
             $request = service('request');
             $userAgent = $request->getUserAgent()->getAgentString();
             $ip = $request->getIPAddress();
@@ -676,14 +738,9 @@ class AdminsModel extends BackendModel
             /* 1. Avvio la transazione PRIMA di eseguire qualsiasi query */
             $this->db->transBegin();
 
-            /* Inserimento dati nella tabella principale */
-            $sql = "insert into admins (uuid, firstname, lastname, email, phone, status, note, created_at) values (?, ?, ?, ?, ?, ?, ?, ?)";
-            $this->db->query($sql, [$uuid, $posts['firstname'], $posts['lastname'], $posts['email'], $posts['phone'], $posts['status'], $posts['note'], date('Y-m-d H:i:s')]);
-
-            /* Gestione dei permessi se esistenti */
-            if ( ! empty($posts['permissions'])):
-                $this->insertPermissions($posts['permissions'], $uuid);
-            endif;
+            /* Inserimento dati nella tabella principale con l'aggiunta di group_id */
+            $sql = "insert into admins (uuid, firstname, lastname, email, phone, status, group_id, note, created_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $this->db->query($sql, [$uuid, $posts['firstname'], $posts['lastname'], $posts['email'], $posts['phone'], $posts['status'], $posts['group_id'], $posts['note'], date('Y-m-d H:i:s')]);
 
             /* Generazione token di attivazione */
             $token = new \App\Libraries\Token();
@@ -708,7 +765,7 @@ class AdminsModel extends BackendModel
                 return ['result' => false, 'message' => lang('backend/admins.messages.addError')];
             endif;
 
-            /* Se le 3 query sono andate a buon fine, salvo definitivamente */
+            /* Se le query sono andate a buon fine, salvo definitivamente */
             $this->db->transCommit();
 
             /* Recupero dati utente appena inseriti */
@@ -734,7 +791,7 @@ class AdminsModel extends BackendModel
         $template = 'emailCreateAdminPartial';
         $subjectLangKey = 'backend/email.admins.createAdmin.subjectCreateAdminEmail';
 
-        /* Chiamata al metodo con i nuovi parametri separati */
+        /* Chiamata al metodo con i parametri separati */
         if ( ! $emailService->sendActivationEmail($data['row'], $token->getValue(), $module, $template, $subjectLangKey)):
 
             $message = sprintf(lang('backend/admins.messages.addSuccessNoEmail'), esc($data['row']->firstname), esc($data['row']->lastname));
@@ -749,22 +806,21 @@ class AdminsModel extends BackendModel
     }
 
     /**
-     * Gestisce la procedura transazionale di aggiornamento dei dati anagrafici e dei privilegi applicativi.
+     * Gestisce l'aggiornamento dei dati anagrafici, del gruppo e delle eccezioni sui permessi di un amministratore.
      *
-     * Esegue il whitelisting dei parametri in ingresso e recupera lo stato storico dell'entità per verificare,
-     * tramite comparazione dei campi significativi, l'effettiva presenza di variazioni rispetto ai dati memorizzati.
-     * In caso di modifiche rilevate, avvia una transazione sul database aggiornando i record anagrafici principali
-     * ed eseguendo il riallineamento distruttivo e sequenziale delle autorizzazioni esplicite (pattern delete-and-insert).
-     * Al completamento positivo del commit, riallinea l'oggetto entità in memoria prima di restituirlo al controller.
+     * Il metodo avvia una transazione database. Aggiorna la tabella principale `admins` inserendo il nuovo `group_id`
+     * e, successivamente, esegue il calcolo differenziale dei permessi. Rimuove le vecchie eccezioni e inserisce in
+     * `admins_permissions` solo i record relativi a revoche esplicite (permessi del gruppo deselezionati, `allow = 0`)
+     * o concessioni extra (permessi fuori dal gruppo selezionati, `allow = 1`). In caso di anomalie effettua il rollback.
      *
-     * @param array $posts Dataset dei parametri modificati ricevuti dal modulo di interfaccia.
-     * @return array Matrice di risposta contenente l'esito logico, il messaggio localizzato e l'istanza aggiornata.
+     * @param array $posts I dati provenienti dal form di modifica.
+     * @return array Esito dell'operazione con il flag 'result', la stringa 'message' e l'oggetto 'row' aggiornato.
      */
     public function edit(array $posts): array
     {
         try 
         {
-            /* Match dei posts con i campi consentiti */
+            /* Match dei posts con i campi consentiti (ricordati di inserire group_id ed eliminare permissions in $editAllowedFields) */
             $posts = $this->checkAllowedFields($posts, $this->editAllowedFields);
 
             /* Recupero i dati dell'utente prima dell'aggiornamento */
@@ -774,7 +830,7 @@ class AdminsModel extends BackendModel
                 return ['result' => false, 'message' => $data['message']];
             endif;
 
-            /* Se non è stato effettuato alcun cambio... */
+            /* Se non è stato effettuato alcun cambio sui dati gestiti, interrompiamo subito */
             if( ! $this->hasAdminChanged($posts, $data['row'])):
                 return ['result' => false, 'message' => lang('backend/admins.messages.noDataChanged')];
             endif;
@@ -783,16 +839,37 @@ class AdminsModel extends BackendModel
 
             $this->db->transBegin();
 
-            /* Aggiorno la tabella principale dell'utente */
-            $sql = 'update admins set firstname = ?, lastname = ?, email = ?, phone = ?, status = ?, note = ?, updated_at = ? where uuid = ?';
-            $this->db->query($sql, [$posts['firstname'], $posts['lastname'], $posts['email'], $posts['phone'], $posts['status'], $posts['note'], $updated_at, $posts['uuid']]);
+            /* Aggiorno la tabella principale dell'utente includendo il group_id */
+            $sql = 'update admins set firstname = ?, lastname = ?, email = ?, phone = ?, status = ?, group_id = ?, note = ?, updated_at = ? where uuid = ?';
+            $this->db->query($sql, [$posts['firstname'], $posts['lastname'], $posts['email'], $posts['phone'], $posts['status'], $posts['group_id'], $posts['note'], $updated_at, $posts['uuid']]);
 
-            /* Gestione Permessi: Eliminazione incondizionata seguita da eventuale reinserimento */
+            /* Eliminazione incondizionata delle vecchie eccezioni dell'utente */
             $this->deletePermissions($posts['uuid']);
 
-            if ( ! empty($posts['permissions'])):
-                /* Sfruttiamo il metodo ottimizzato che accetta array piatto e UUID */
-                $this->insertPermissions($posts['permissions'], $posts['uuid']);
+            /* Recupero i permessi nativi del gruppo appena assegnato per calcolare le eccezioni */
+            $groupPermissions = $this->getGroupPermissions((int)$posts['group_id']);
+            $submittedPermissions = $posts['permissions'] ?? [];
+
+            /* 1. Calcolo eccezioni positive (Permessi extra): presenti nel form MA non nel gruppo */
+            $extraPermissions = array_diff($submittedPermissions, $groupPermissions);
+
+            /* 2. Calcolo eccezioni negative (Revoche): presenti nel gruppo MA non nel form */
+            $revokedPermissions = array_diff($groupPermissions, $submittedPermissions);
+
+            /* Scrittura delle eccezioni positive (allow = 1) */
+            if ( ! empty($extraPermissions)):
+                foreach ($extraPermissions as $perm):
+                    $sqlInsert = "insert into admins_permissions (permission, admin_uuid, allow) values (?, ?, 1)";
+                    $this->db->query($sqlInsert, [$perm, $posts['uuid']]);
+                endforeach;
+            endif;
+
+            /* Scrittura delle eccezioni negative (allow = 0) */
+            if ( ! empty($revokedPermissions)):
+                foreach ($revokedPermissions as $perm):
+                    $sqlInsert = "insert into admins_permissions (permission, admin_uuid, allow) values (?, ?, 0)";
+                    $this->db->query($sqlInsert, [$perm, $posts['uuid']]);
+                endforeach;
             endif;
 
             if ($this->db->transStatus() === false):
@@ -803,12 +880,13 @@ class AdminsModel extends BackendModel
 
             $this->db->transCommit();
 
-            /* Aggiornamento dell'oggetto in memoria */
+            /* Aggiornamento dell'oggetto in memoria da restituire alla vista */
             $data['row']->firstname  = $posts['firstname'];
             $data['row']->lastname   = $posts['lastname'];
             $data['row']->email      = $posts['email'];
             $data['row']->phone      = $posts['phone'];
             $data['row']->status     = $posts['status'];
+            $data['row']->group_id   = $posts['group_id'];
             $data['row']->note       = $posts['note'];
             $data['row']->updated_at = $updated_at;
 
@@ -1015,82 +1093,6 @@ class AdminsModel extends BackendModel
     }
 
     /**
-     * Gestisce la commutazione transazionale dello stato operativo (attivo/inattivo) di un profilo.
-     *
-     * Filtra i parametri in ingresso tramite whitelisting ed estrae l'entità storica per valutarne lo stato corrente.
-     * Implementa una logica condizionale binaria: se l'utente è disattivato (0), ne forza l'attivazione (1) azzerando
-     * il flag di sospensione; se è attivo (1), ne esegue la disattivazione (0) storicizzando il timestamp corrente
-     * nella colonna `suspended_at`. Alimenta infine una transazione atomica per aggiornare permanentemente il record 
-     * sul database e riallinea l'oggetto entità in memoria prima della restituzione.
-     *
-     * @param array $posts Dataset contenente l'identificativo univoco dell'amministratore da variare.
-     * @return array Matrice di risposta contenente l'esito logico, il messaggio localizzato e l'istanza aggiornata.
-     */
-    public function changeStatus(array $posts): array
-    {
-        try 
-        {
-            /* Match dei posts con i campi consentiti */
-            $posts = $this->checkAllowedFields($posts, $this->changeStatusAllowedFields);
-
-            /* Recupero i dati dell'utente prima dell'eliminazione */
-            $data = $this->getByUUID($posts['uuid']);
-
-            if($data['result'] === false):
-                return ['result' => false, 'message' => $data['message']];
-            endif;
-
-            $currentStatus = (int) $data['row']->status;
-
-            /* Converte il risultato in un intero (0 o 1) per MySQL */
-            if($currentStatus === 0):
-
-                $newStatus = 1;
-                $suspendedAt = null;
-                $data['row']->status = 1;
-                $data['row']->suspended_at = null;
-
-            elseif($currentStatus === 1):
-
-                $newStatus = 0;
-                $suspendedAt = date('Y-m-d H:i:s');
-                $data['row']->status = 0;
-                $data['row']->suspended_at = $suspendedAt;
-
-            endif;
-
-            $updatedAt = date('Y-m-d H:i:s');
-            $data['row']->updated_at = $updatedAt;
-
-            $this->db->transBegin();
-
-            /* cambio status utente */
-            $sql = "update admins set status = ?, updated_at = ?, suspended_at = ? where uuid = ?";
-            $this->db->query($sql, [$newStatus, $updatedAt, $suspendedAt, $posts['uuid']]);
-
-            if ($this->db->transStatus() === false):
-
-                $this->db->transRollback();
-                log_message('error', lang('backend/admins.messages.changeStatusError'));
-
-                return ['result' => false, 'message' => lang('backend/admins.messages.changeStatusError')];
-            endif;
-
-            $this->db->transCommit();
-            return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.changeStatusSuccess'), esc($data['row']->firstname), esc($data['row']->lastname)), 'admin' => $data['row']];
-
-        } catch (\Throwable $e) {
-
-            /* Rollback incondizionato: se c'è un'eccezione, si annulla sempre */
-            $this->db->transRollback();
-
-            log_message('error', lang('backend/admins.messages.changeStatusError') . ' - ' . $e);
-            return ['result' => false, 'message' => lang('backend/admins.messages.changeStatusError')];
-
-        }
-    }
-
-    /**
      * Esegue la commutazione asincrona e transazionale (toggle) di un singolo privilegio utente.
      *
      * Filtra i dati in ingresso tramite whitelisting e verifica l'esistenza del profilo amministrativo. 
@@ -1204,38 +1206,6 @@ class AdminsModel extends BackendModel
             return ['result' => false, 'message' => lang('backend/admins.messages.deleteTokenError')];
 
         }
-    }
-
-    /**
-     * Esegue l'inserimento massivo (batch insert) dei privilegi espliciti sul database.
-     *
-     * Ottimizza le prestazioni di scrittura aggregando l'elenco dei permessi in un'unica query SQL nativa.
-     * Scompone il vettore delle autorizzazioni per generare dinamicamente i placeholder dei parametri,
-     * associando sequenzialmente ciascuna chiave testuale all'UUID dell'amministratore designato per 
-     * minimizzare i tempi di esecuzione e l'overhead di comunicazione con il database.
-     *
-     * @param array $permissions Elenco lineare delle chiavi testuali dei permessi da associare.
-     * @param string $uuid Identificativo univoco dell'amministratore bersaglio.
-     * @return void
-     */
-    protected function insertPermissions(array $permissions, string $uuid): void
-    {
-        if (empty($permissions)):
-            return;
-        endif;
-
-        $rows = [];
-        $params = [];
-
-        /* Costruisco la query dinamicamente unendo il permesso e l'UUID passato */
-        foreach ($permissions as $permission):
-            $rows[] = "(?, ?)";
-            $params[] = $permission;
-            $params[] = $uuid;
-        endforeach;
-
-        $sql = "insert into admins_permissions (permission, admin_uuid) values " . implode(", ", $rows);
-        $this->db->query($sql, $params);
     }
 
     /**
