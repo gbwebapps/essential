@@ -20,12 +20,23 @@
                                 </li>
 
                                 <?php
-                                    if(in_array($k, $perms)):
+                                    /* Calcolo dello stato combinato */
+                                    $isAssigned = false;
+                                    
+                                    if (array_key_exists($k, $user_exceptions)):
+                                        /* Se c'è un'eccezione, comanda il valore dell'eccezione */
+                                        $isAssigned = ($user_exceptions[$k] === 1);
+                                    else:
+                                        /* Se non c'è un'eccezione, comanda l'appartenenza al gruppo */
+                                        $isAssigned = in_array($k, $group_perms);
+                                    endif;
+
+                                    if ($isAssigned):
                                         $permText = lang('backend/admins.labels.assigned');
-                                        $permClass="btn btn-link text-success fw-bold shadow-none";
+                                        $permClass = "btn btn-link text-success fw-bold shadow-none";
                                     else:
                                         $permText = lang('backend/admins.labels.notAssigned');
-                                        $permClass="btn btn-link text-danger fw-bold shadow-none";
+                                        $permClass = "btn btn-link text-danger fw-bold shadow-none";
                                     endif;
                                 ?>
 

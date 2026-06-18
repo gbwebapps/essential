@@ -88,6 +88,7 @@ $routes->group('backend', function($routes) {
             $routes->post('getTokens', '\App\Controllers\Backend\AdminsController::getTokens');
             
             $routes->post('changePermission', '\App\Controllers\Backend\AdminsController::changePermission');
+            $routes->post('changeGroup', '\App\Controllers\Backend\AdminsController::changeGroup');
             $routes->post('deleteToken', '\App\Controllers\Backend\AdminsController::deleteToken');
         });
     });

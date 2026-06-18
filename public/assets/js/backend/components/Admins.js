@@ -1,6 +1,121 @@
 /* Import delle utility risalendo di un livello */
 import { urlbase, apiFetch, toggleLoader, showToast, askConfirm, smoothReplace, handleValidationErrors } from '../backend.js';
 
+export class ChangeGroupManager {
+    constructor(config = {}, hooks = {})
+    {
+        this.config = Object.assign({
+            url: '', /* L'endpoint generato dalla rotta changeGroup */
+        }, config);
+
+        this.hooks = Object.assign({
+            onGroupBefore: null,
+            onGroupAfter: null,
+            onGroupError: null
+        }, hooks);
+
+        this.eventsBound = false;
+        this.isSubmitting = false;
+    }
+
+    init() {
+        this.bindEvents();
+    }
+
+    bindEvents() {
+        if (this.eventsBound) return;
+        this.eventsBound = true;
+
+        /* Memorizzo il valore iniziale al caricamento della pagina, se presente */
+        const initialGroup = document.getElementById('group_id');
+        let previousGroupId = initialGroup ? initialGroup.value : '';
+
+        /* Agganciamo il listener al document: sopravvive a qualsiasi rimpiazzo HTML */
+        document.addEventListener('change', async e => {
+            const selectEl = e.target.closest('#group_id');
+            if ( ! selectEl) return; /* Se non è la nostra select, ignora l'evento */
+
+            /* Intercettiamo la conferma dell'utente prima di aggiornare lo stato */
+            const message = selectEl.dataset.message;
+            const ok = await askConfirm(message);
+
+            if ( ! ok) {
+                /* Se l'utente annulla, ripristino visivamente il gruppo precedente sulla select e blocco il flusso */
+                selectEl.value = previousGroupId;
+                return;
+            }
+
+            const groupId = selectEl.value;
+            const uuidEl = document.getElementById('uuid');
+            const uuid = uuidEl ? uuidEl.value : '';
+
+            if (!groupId || !uuid) return;
+
+            /* Aggiorno il vecchio valore con quello nuovo solo dopo la conferma */
+            previousGroupId = groupId;
+
+            const formData = new FormData();
+            formData.append('group_id', groupId);
+            formData.append('uuid', uuid);
+
+            this.changeGroup(formData);
+        });
+    }
+
+    async changeGroup(formData) {
+        if (this.isSubmitting) return;
+        this.isSubmitting = true;
+
+        if (typeof this.hooks.onGroupBefore === 'function') {
+            const stop = this.hooks.onGroupBefore(formData);
+            if (stop === false) {
+                this.isSubmitting = false;
+                return;
+            }
+        }
+
+        try {
+            const response = await apiFetch(this.config.url, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.result === 'no_current_user_logged') {
+                window.location.href = `${urlbase}backend/auth`;
+                return;
+            }
+
+            if (data.result === false) {
+                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
+                return;
+            }
+
+            if (data.result === true) {
+
+                /* Aggiorno chirurgicamente solo il contenitore dei permessi parziali */
+                const permissionsEl = document.getElementById('permissions');
+                if (permissionsEl && data.output) {
+                    smoothReplace(permissionsEl, data.output);
+                }
+
+                if (typeof this.hooks.onGroupAfter === 'function') {
+                    this.hooks.onGroupAfter(data);
+                }
+            }
+
+        } catch (error) {
+            if (typeof this.hooks.onGroupError === 'function') {
+                this.hooks.onGroupError(error);
+            }
+            console.error("Errore ChangeGroup:", error);
+        } finally {
+            this.isSubmitting = false;
+        }
+    }
+}
+
 export class GetPermissionsManager {
     constructor(config = {}, hooks = {}) {
         this.config = Object.assign({

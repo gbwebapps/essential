@@ -46,8 +46,8 @@
                 <label for="group_id" class="form-label">
                     <i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.group'); ?>
                 </label>
-                <select name="group_id" class="form-select" id="group_id">
-                    <?php if (! empty($groups)): ?>
+                <select name="group_id" class="form-select" id="group_id" data-message="<?= lang('backend/admins.messages.areYouSureChangeGroup'); ?>">
+                    <?php if ( ! empty($groups)): ?>
                         <?php foreach ($groups as $group): ?>
                             <option value="<?= $group->id; ?>"<?= ($group->id == $admin->group_id) ? ' selected' : ''; ?>><?= esc($group->name); ?></option>
                         <?php endforeach; ?>

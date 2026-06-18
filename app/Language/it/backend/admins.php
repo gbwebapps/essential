@@ -103,6 +103,7 @@ return [
 		'areYouSureDelete' => 'Sei sicuro di eliminare  %s %s?', 
 		'areYouSureChangePermission' => 'Sei sicuro di modificare il permesso di %s %s?', 
 		'areYouSureDeleteToken' => 'Sei sicuro di eliminare il token di  %s %s?', 
+		'areYouSureChangeGroup' => 'Il cambio gruppo modificherà temporaneamente la visualizzazione dei permessi. Se confermerai e salverai la pagina, le vecchie eccezioni verranno eliminate dal database. Procedere con il cambio visivo?', 
 		'noAdminsFound' => 'Non sono presenti amministratori.', 
 		'noTokensFound' => 'Non sono presenti accessi.', 
 		'validationErrors' => 'Errori di validazione.', 
