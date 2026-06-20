@@ -1,5 +1,5 @@
 /* Import delle costanti e utility da backend.js */
-import { urlbase, controller, action, apiFetch, showToast, askConfirm, smoothReplace } from './backend.js';
+import { urlbase, controller, action } from './backend.js';
 
 /* Import dei componenti dalla sottocartella */
 import { ListManager, AddManager, EditManager, DeleteManager, ChangeStatusManager, GeneralDataManager, MetaDataManager } from './components/Crud.js';

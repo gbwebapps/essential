@@ -275,7 +275,7 @@ export function showToast(type, message)
             </div>
         </div>`;
 
-    /* Aggiungi il toast al container */
+    /* Aggiungi il toast al container */ 
     const toastContainer = document.getElementById('toast-container');
     const toastElement = document.createElement('div');
     toastElement.innerHTML = toastHTML.trim();
