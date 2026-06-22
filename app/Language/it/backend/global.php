@@ -4,6 +4,7 @@ return [
     'menu' => [
         'topRight' => [
             'admins' => 'Amministratori',
+            'groups' => 'Gruppi',
             'account' => 'Profilo',
             'logout' => 'Esci'
         ],

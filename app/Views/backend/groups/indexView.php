@@ -17,9 +17,7 @@
                             </button>
                         </h2>
                         <div id="main_collapse_add" class="accordion-collapse collapse" aria-labelledby="main_heading_add" data-bs-parent="#mainGroupsDashboard">
-                            <div id="add-groups-container" class="accordion-body bg-white border-top mb-0">
-                                <?= $this->include('backend/groups/partials/index/addGroupPartial'); ?>
-                            </div>
+                            <div id="add-groups-container" class="accordion-body bg-white border-top mb-0"></div>
                         </div>
                     </div>
 

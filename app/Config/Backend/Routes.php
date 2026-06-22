@@ -69,6 +69,10 @@ $routes->group('backend', function($routes) {
             $routes->get('/', '\App\Controllers\Backend\GroupsController::index');
             $routes->post('getGroups', '\App\Controllers\Backend\GroupsController::getGroups');
             $routes->post('getGroup', '\App\Controllers\Backend\GroupsController::getGroup'); 
+            $routes->post('openAdd', '\App\Controllers\Backend\GroupsController::openAdd'); 
+            $routes->post('add', '\App\Controllers\Backend\GroupsController::add'); 
+            $routes->post('edit', '\App\Controllers\Backend\GroupsController::edit'); 
+            $routes->post('del', '\App\Controllers\Backend\GroupsController::del'); 
         });
 
         /* Modulo Admins: gestione totale (CRUD), stati operativi e configurazione granulare dei permessi degli amministratori */

@@ -274,39 +274,59 @@ class AdminsModel extends BackendModel
      */
     public function editValidationRules(array $posts): array
     {
+        /* Recuperiamo l'array multidimensionale dalla configurazione per estrarre le chiavi valide */
+        $rawPermissions = config(\Config\Backend\Permissions::class)->getPermissions();
+
+        $validKeys = [];
+        foreach ($rawPermissions as $group):
+            $validKeys = array_merge($validKeys, array_keys($group['perms']));
+        endforeach;
+
+        $inListString = implode(',', $validKeys);
+
         return [
             'uuid' => [
                 'label' => lang('backend/admins.labels.uuid'),
-                'rules' => ['required', "is_unique[admins.uuid,uuid,{$posts['uuid']}, 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]']"],
+                'rules' => ['required', "is_unique[admins.uuid,uuid,{$posts['uuid']}]", 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
             ],
             'firstname' => [
                 'label' => lang('backend/admins.labels.firstname'),
-                'rules' => ['required', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'],
             ],
             'lastname' => [
                 'label' => lang('backend/admins.labels.lastname'),
-                'rules' => ['required', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'],
             ],
             'email' => [
                 'label' => lang('backend/admins.labels.email'),
-                'rules' => ['required', 'valid_email'],
+                'rules' => ['required', 'trim', 'valid_email', 'max_length[255]', "is_unique[admins.email,uuid,{$posts['uuid']}]"],
             ],
             'phone' => [
                 'label' => lang('backend/admins.labels.phone'),
-                'rules' => ['required', "is_unique[admins.phone,uuid,{$posts['uuid']},'regex_match[/^[0-9]{9,10}$/]']" 
-                ],
+                'rules' => ['required', "is_unique[admins.phone,uuid,{$posts['uuid']}]", 'regex_match[/^\+?[0-9]{9,15}$/]'],
             ],
             'status' => [
                 'label' => lang('backend/admins.labels.status'),
                 'rules' => ['required', 'in_list[0,1]'],
             ],
-            'notes' => [
+            'note' => [
                 'label' => lang('backend/admins.labels.note'),
-                'rules' => ['permit_empty','max_length[500]','regex_match[/^[^<>\x60]*$/su]'],
+                'rules' => ['permit_empty', 'trim', 'max_length[500]', 'safeText'],
+                'errors' => [
+                    'safeText' => 'Caratteri non ammessi.'
+                ]
             ],
             'group_id' => [
                 'label' => lang('backend/admins.labels.group'),
                 'rules' => ['required', 'is_natural_no_zero', 'is_not_unique[admins_groups.id]'],
+            ],
+            /* Validazione di ogni singolo elemento contenuto nell'array delle eccezioni */
+            'permissions.*' => [
+                'label' => lang('backend/admins.labels.permissions'),
+                'rules' => ['permit_empty', 'in_list[' . $inListString . ']'],
+                'errors' => [
+                    'in_list' => lang('Backend/admins.errors.permission')
+                ]
             ],
         ];
     }
@@ -697,7 +717,7 @@ class AdminsModel extends BackendModel
     /**
      * Recupera l'elenco piatto dei permessi associati a un determinato gruppo.
      *
-     * Interroga la tabella `admins_group_permissions` per estrarre tutti i codici
+     * Interroga la tabella `admins_groups_permissions` per estrarre tutti i codici
      * di permesso assegnati al gruppo specificato. Il risultato viene appiattito
      * in un array di stringhe per facilitare la comparazione con i permessi dell'utente.
      *
@@ -706,7 +726,7 @@ class AdminsModel extends BackendModel
      */
     public function getGroupPermissions(int $groupId): array
     {
-        $sql = "select permission from admins_group_permissions where group_id = ?";
+        $sql = "select permission from admins_groups_permissions where group_id = ?";
         $result = $this->db->query($sql, [$groupId])->getResultObject();
 
         if ( ! $result):

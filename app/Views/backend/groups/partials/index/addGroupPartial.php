@@ -57,11 +57,15 @@
 			<div class="error_permissions text-danger text-center small fw-bold pb-2">&nbsp;</div>
 
 			<div class="row">
-				<div class="col-12 d-flex align-middle justify-content-center">
-					<input type="submit" class="btn btn-danger btn-sm me-1" value="Reset">
-					<input type="submit" class="btn btn-success btn-sm ms-1" value="Salva">
-				</div>
-			</div>
+                <div class="col-12 d-flex align-middle justify-content-center">
+                	<button type="reset" class="btn btn-danger btn-sm me-1">
+                	    <i class="fa-solid fa-refresh me-1"></i>Resetta dati
+                	</button>
+                    <button type="submit" class="btn btn-success btn-sm ms-1">
+                        <i class="fa-solid fa-floppy-disk me-1"></i>Invia dati
+                    </button>
+                </div>
+            </div>
 
 		</form>
 	</div>

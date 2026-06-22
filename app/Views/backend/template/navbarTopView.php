@@ -30,7 +30,7 @@
                                 $visibleItems = [];
                                 foreach ($menuTopRight as $item):
                                     /* Se l'utente non è master, nascondi le voci relative alla gestione utenti */
-                                    if ( ! ((int) $currentAdmin->master === 1) && $item['controller'] === 'admins'):
+                                    if ( ! ((int) $currentAdmin->master === 1) && in_array($item['controller'], ['admins', 'groups'])):
                                         continue;
                                     endif;
                                     $visibleItems[] = $item;

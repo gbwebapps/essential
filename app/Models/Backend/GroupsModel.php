@@ -35,20 +35,6 @@ class GroupsModel extends BackendModel
     protected array $delAllowedFields = ['id'];
 
     /**
-     * Stringa SQL per l'estrazione massiva dei gruppi.
-     *
-     * @var string|null
-     */
-    protected ?string $getDataQuery = "select id, name, description, created_at from admins_groups order by name asc";
-
-    /**
-     * Stringa SQL per il recupero puntuale dei dettagli di un gruppo.
-     *
-     * @var string|null
-     */
-    protected ?string $getUUIDQuery = "";
-
-    /**
 	 * Inizializza il modello eseguendo le configurazioni di base ereditate dalla classe madre.
 	 *
 	 * Sincronizza lo stato del modello impostando le dipendenze native e i driver di connessione
@@ -70,15 +56,33 @@ class GroupsModel extends BackendModel
 	 */
 	public function addValidationRules(): array
 	{
+        /* Recuperiamo l'array multidimensionale dalla configurazione per estrarre le chiavi valide */
+        $rawPermissions = config(\Config\Backend\Permissions::class)->getPermissions();
+
+        $validKeys = [];
+        foreach ($rawPermissions as $group):
+            $validKeys = array_merge($validKeys, array_keys($group['perms']));
+        endforeach;
+
+        $inListString = implode(',', $validKeys);
+
 	    return [
 	        'name' => [
 	            'label' => lang('backend/groups.labels.name'),
-	            'rules' => ['required', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+	            'rules' => ['required', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
 	        ],
 	        'description' => [
 	            'label' => lang('backend/groups.labels.description'),
-	            'rules' => ['required', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+	            'rules' => ['required', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
 	        ],
+            /* Validazione di ogni singolo elemento contenuto nell'array delle eccezioni */
+            'permissions.*' => [
+                'label' => lang('backend/admins.labels.permissions'),
+                'rules' => ['permit_empty', 'in_list[' . $inListString . ']'],
+                'errors' => [
+                    'in_list' => lang('Backend/admins.errors.permission')
+                ]
+            ],
 	    ];
 	}
 
@@ -93,6 +97,16 @@ class GroupsModel extends BackendModel
      */
     public function editValidationRules(array $posts): array
     {
+        /* Recuperiamo l'array multidimensionale dalla configurazione per estrarre le chiavi valide */
+        $rawPermissions = config(\Config\Backend\Permissions::class)->getPermissions();
+
+        $validKeys = [];
+        foreach ($rawPermissions as $group):
+            $validKeys = array_merge($validKeys, array_keys($group['perms']));
+        endforeach;
+
+        $inListString = implode(',', $validKeys);
+
         return [
             'id' => [
                 'label' => lang('backend/groups.labels.id'),
@@ -100,11 +114,19 @@ class GroupsModel extends BackendModel
             ],
             'name' => [
                 'label' => lang('backend/groups.labels.name'),
-                'rules' => ['required', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+                'rules' => ['required', "is_unique[admins_groups.name,id,{$posts['id']}]", 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
             ],
             'description' => [
                 'label' => lang('backend/groups.labels.description'),
-                'rules' => ['required', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+                'rules' => ['required', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+            ],
+            /* Validazione di ciascun permesso inviato nell'array del gruppo */
+            'permissions.*' => [
+                'label' => lang('backend/groups.labels.permissions'),
+                'rules' => ['permit_empty', 'in_list[' . $inListString . ']'],
+                'errors' => [
+                    'in_list' => lang('backend/groups.errors.permission')
+                ]
             ],
         ];
     }
@@ -135,7 +157,9 @@ class GroupsModel extends BackendModel
     {
         try 
         {
-            $query = $this->db->query($this->getDataQuery);
+            $sql = 'select id, name, description from admins_groups order by created_at desc';
+            $query = $this->db->query($sql);
+
             return $query->getResult();
         } 
         catch (\Throwable $e) 
@@ -155,7 +179,7 @@ class GroupsModel extends BackendModel
     {
         try 
         {
-            $sql = "select permission from admins_group_permissions where group_id = ?";
+            $sql = "select permission from admins_groups_permissions where group_id = ?";
             $query = $this->db->query($sql, [$groupId]);
             
             $result = $query->getResultArray();
@@ -190,21 +214,169 @@ class GroupsModel extends BackendModel
         }
     }
 
-    /* Aggiunge un gruppo */
+    /**
+     * Registra un nuovo gruppo di amministratori e associa i relativi permessi.
+     *
+     * @param array $posts Dataset dei parametri validati.
+     * @return array Esito dell'operazione per la risposta JSON.
+     */
     public function add(array $posts): array
     {
+        try 
+        {
+            /* Filtro campi post ammessi tramite metodo centralizzato */
+            $posts = $this->checkAllowedFields($posts, $this->addAllowedFields);
 
+            $this->db->transBegin();
+
+            /* Inserimento anagrafica del gruppo */
+            $sqlGroup = "insert into admins_groups (name, description, created_at) values (?, ?, ?)";
+            $this->db->query($sqlGroup, [$posts['name'], $posts['description'], date('Y-m-d H:i:s')]);
+
+            $groupId = $this->db->insertID();
+
+            /* Inserimento permessi associati (se selezionati) */
+            if ( ! empty($posts['permissions']) && is_array($posts['permissions'])):
+
+                /* Inserimento permessi associati tramite un'unica Bulk Insert */
+                if ( ! empty($posts['permissions']) && is_array($posts['permissions'])):
+
+                    $queriesValues = [];
+                    $binds = [];
+
+                    foreach ($posts['permissions'] as $permission):
+                        $queriesValues[] = "(?, ?)";
+                        $binds[] = $groupId;
+                        $binds[] = $permission;
+                    endforeach;
+
+                    /* Uniamo i segnaposto con la virgola: (?, ?), (?, ?), (?, ?) */
+                    $sqlPerm = "insert into admins_groups_permissions (group_id, permission) values " . implode(', ', $queriesValues);
+                    
+                    /* Eseguiamo una sola query passando tutti i bind accumulati */
+                    $this->db->query($sqlPerm, $binds);
+
+                endif;
+
+            endif;
+
+            /* Verifichiamo lo stato prima di consolidare i dati */
+            if ($this->db->transStatus() === false):
+                $this->db->transRollback();
+                return ['result' => false, 'message' => lang('backend/groups.messages.addError')];
+            endif;
+
+            $this->db->transCommit();
+
+            return ['result' => true, 'message' => lang('backend/groups.messages.addSuccess')];
+        } 
+        catch (\Throwable $e) 
+        {
+            $this->db->transRollback();
+            log_message('error', 'Errore inserimento gruppo: ' . $e);
+            
+            return ['result' => false, 'message' => lang('backend/groups.messages.addError')];
+        }
     }
 
-    /* Aggiorna un gruppo */
+    /**
+     * Aggiorna l'anagrafica di un gruppo esistente e ne risincronizza i permessi associati.
+     *
+     * @param array $posts Dataset dei parametri inviati dal modulo di modifica.
+     * @return array Esito dell'operazione per la risposta JSON.
+     */
     public function edit(array $posts): array
     {
+        try 
+        {
+            /* Filtro campi post ammessi tramite metodo centralizzato */
+            $posts = $this->checkAllowedFields($posts, $this->editAllowedFields);
 
+            $this->db->transBegin();
+
+            /* 1. Aggiornamento anagrafica del gruppo */
+            $sqlGroup = "update admins_groups set name = ?, description = ? where id = ?";
+            $this->db->query($sqlGroup, [$posts['name'], $posts['description'], $posts['id']]);
+
+            /* 2. Rimozione totale dei vecchi permessi per evitare duplicati o disallineamenti */
+            $sqlDeletePerms = "delete from admins_groups_permissions where group_id = ?";
+            $this->db->query($sqlDeletePerms, [$posts['id']]);
+
+            /* 3. Inserimento nuovi permessi associati tramite un'unica Bulk Insert (se selezionati) */
+            if ( ! empty($posts['permissions']) && is_array($posts['permissions'])):
+
+                $queriesValues = [];
+                $binds = [];
+
+                foreach ($posts['permissions'] as $permission):
+                    $queriesValues[] = "(?, ?)";
+                    $binds[] = $posts['id'];
+                    $binds[] = $permission;
+                endforeach;
+
+                /* Uniamo i segnaposto con la virgola: (?, ?), (?, ?) */
+                $sqlPerm = "insert into admins_groups_permissions (group_id, permission) values " . implode(', ', $queriesValues);
+                
+                /* Eseguiamo una sola query passando tutti i bind accumulati */
+                $this->db->query($sqlPerm, $binds);
+
+            endif;
+
+            /* Verifichiamo lo stato prima di consolidare i dati */
+            if ($this->db->transStatus() === false):
+                $this->db->transRollback();
+                return ['result' => false, 'message' => lang('backend/groups.messages.editError')];
+            endif;
+
+            $this->db->transCommit();
+
+            return ['result' => true, 'message' => lang('backend/groups.messages.editSuccess')];
+        } 
+        catch (\Throwable $e) 
+        {
+            $this->db->transRollback();
+            log_message('error', 'Errore aggiornamento gruppo: ' . $e);
+            
+            return ['result' => false, 'message' => lang('backend/groups.messages.editError')];
+        }
     }
+    
 
     /* Elimina un gruppo */
     public function del(array $posts): array
     {
+        try {
 
+            /* Filtro campi post ammessi tramite metodo centralizzato */
+            $posts = $this->checkAllowedFields($posts, $this->delAllowedFields);
+
+            $this->db->transBegin();
+
+            /* Rimozione totale dei permessi */
+            $sql = "delete from admins_groups_permissions where group_id = ?";
+            $this->db->query($sql, [$posts['id']]);
+
+            /* Rimozione del gruppo */
+            $sql = "delete from admins_groups where id = ?";
+            $this->db->query($sql, [$posts['id']]);
+
+            /* Verifichiamo lo stato prima di consolidare i dati */
+            if ($this->db->transStatus() === false):
+                $this->db->transRollback();
+                return ['result' => false, 'message' => lang('backend/groups.messages.delError')];
+            endif;
+
+            $this->db->transCommit();
+
+            return ['result' => true, 'message' => lang('backend/groups.messages.delSuccess')];
+
+        } catch (\Throwable $e) {
+
+            $this->db->transRollback();
+            log_message('error', 'Errore aggiornamento gruppo: ' . $e);
+            
+            return ['result' => false, 'message' => lang('backend/groups.messages.delError')];
+
+        }
     }
 }

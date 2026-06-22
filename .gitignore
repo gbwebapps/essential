@@ -126,6 +126,6 @@ _modules/*
 /phpunit*.xml
 
 node_modules/
-guide/
-.doctume_cache/
+public/guide/
+.doctum_cache/
 tests/

@@ -208,10 +208,15 @@ class AdminsController extends BackendController
             endif;
 
             $rules = $this->adminsModel->editValidationRules($posts);
-            
+                        
             if ( ! $this->validateData($posts, $rules)):
-                /* Rimossa la rimozione dei dot-permissions sui vecchi permessi piatti */
-                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/admins.messages.validationErrors')]);
+                /* Catturiamo gli errori grezzi (compresi eventuali permissions.0, permissions.1) */
+                $rawErrors = $this->validator->getErrors();
+
+                /* Raggruppiamo i dot-permissions sotto la chiave unica 'permissions' per il DOM */
+                $cleanErrors = removeDotPermissions('permissions', $rawErrors);
+
+                return $this->response->setJSON(['errors' => $cleanErrors, 'message' => lang('backend/admins.messages.validationErrors')]);
             endif;
 
             $result = $this->adminsModel->edit($posts);

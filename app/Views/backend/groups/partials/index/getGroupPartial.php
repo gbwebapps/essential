@@ -6,13 +6,13 @@
 
             <div class="row mb-4">
                 <div class="col-4">
-                    <label for="name_<?= $group->id; ?>" class="pb-1">Nome gruppo</label>
-                    <input type="text" name="name" id="name_<?= $group->id; ?>" class="form-control" placeholder="Inserisci nome..." value="<?= esc($group->name); ?>">
+                    <label Kharma for="name" class="pb-1">Nome gruppo</label>
+                    <input type="text" name="name" id="name" class="form-control" placeholder="Inserisci nome..." value="<?= esc($group->name); ?>">
                     <div class="error_name text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                 </div>
                 <div class="col-8">
-                    <label for="description_<?= $group->id; ?>" class="pb-1">Descrizione gruppo</label>
-                    <input type="text" name="description" id="description_<?= $group->id; ?>" class="form-control" placeholder="Inserisci descrizione..." value="<?= esc($group->description); ?>">
+                    <label for="description" class="pb-1">Descrizione gruppo</label>
+                    <input type="text" name="description" id="description" class="form-control" placeholder="Inserisci descrizione..." value="<?= esc($group->description); ?>">
                     <div class="error_description text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                 </div>
             </div>
@@ -24,7 +24,7 @@
                         <h5><?= $permission['icon']; ?> <?= ucfirst($permission['title']); ?></h5>
                     </div>
                     <div class="col-6 text-end">
-                        <a href="#" class="select-all-edit" data-controller="<?= $permission['controller']; ?>_<?= $group->id; ?>">
+                        <a href="#" class="select-all" data-controller="<?= $permission['controller']; ?>">
                             <i class="fa-solid fa-square-check"></i>
                             <?= lang('backend/groups.links.selectAll'); ?>
                         </a>
@@ -45,10 +45,10 @@
                                 <div class="col-3 text-center py-1">
                                     <ul class="list-group list-group-flush">
                                         <li class="list-group-item">
-                                            <label for="<?= $k; ?>_<?= $group->id; ?>"><?= $v; ?></label>
+                                            <label for="<?= $k; ?>"><?= $v; ?></label>
                                         </li>
                                         <li class="list-group-item">
-                                            <input type="checkbox" class="<?= $permission['controller']; ?>_<?= $group->id; ?>" name="permissions[]" value="<?= $k; ?>" id="<?= $k; ?>_<?= $group->id; ?>" <?= $isChecked; ?>>
+                                            <input type="checkbox" class="<?= $permission['controller']; ?>" name="permissions[]" value="<?= $k; ?>" id="<?= $k; ?>" <?= $isChecked; ?>>
                                         </li>
                                     </ul>
                                 </div>
@@ -65,11 +65,11 @@
 
             <div class="row mt-3">
                 <div class="col-12 d-flex align-middle justify-content-center">
-                    <button type="button" class="btn btn-outline-danger btn-sm me-1 btn-delete-group" data-id="<?= $group->id; ?>">
+                    <button type="button" class="btn btn-danger btn-sm me-1 btn-delete-group" data-id="<?= $group->id; ?>">
                         <i class="fa-solid fa-trash-can me-1"></i>Elimina
                     </button>
                     <button type="submit" class="btn btn-success btn-sm ms-1">
-                        <i class="fa-solid fa-floppy-disk me-1"></i>Salva modifiche
+                        <i class="fa-solid fa-floppy-disk me-1"></i>Invia dati
                     </button>
                 </div>
             </div>

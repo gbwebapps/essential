@@ -60,10 +60,21 @@ class GroupsController extends BackendController
         $this->data['title'] = lang('backend/groups.titles.index');
         $this->data['icon'] = '<i class="fa-solid fa-user-shield"></i>';
 
-        /* Servono subito per stampare la matrice vuota in addPartial */
-        $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
-
         return $this->render('backend/groups/indexView', $this->data);
+    }
+
+    public function openAdd(): ResponseInterface
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
+
+            /* Generiamo la vista parziale che contiene il form per creare un nuovo gruppo */
+            $output = view('backend/groups/partials/index/addGroupPartial', $this->data);
+
+            return $this->response->setJSON(['result' => true, 'output' => $output]);
+
+        endif;
     }
 
     /**
@@ -93,21 +104,23 @@ class GroupsController extends BackendController
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
+            // qui va fatto il controllo posts
+
             $groupId = (int) $this->request->getPost('id');
 
-            /* 1. Recuperiamo i dati del gruppo (nome e descrizione) */
+            /* Recuperiamo i dati del gruppo (nome e descrizione) */
             $group = $this->groupsModel->getGroupById($groupId);
             if ( ! $group):
                 return $this->response->setJSON(['result' => false, 'message' => 'Gruppo non trovato.']);
-            endif;
+            endif; 
 
             $this->data['group'] = $group;
 
-            /* 2. Recuperiamo la mappa globale dei permessi e i permessi attivi di questo gruppo */
+            /* Recuperiamo la mappa globale dei permessi e i permessi attivi di questo gruppo */
             $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
             $this->data['group_perms'] = $this->groupsModel->getGroup($groupId);
 
-            /* 3. Generiamo il sotto-parziale di modifica */
+            /* Generiamo il sotto-parziale di modifica */
             $output = view('backend/groups/partials/index/getGroupPartial', $this->data);
 
             return $this->response->setJSON(['result' => true, 'output' => $output]);
@@ -120,7 +133,25 @@ class GroupsController extends BackendController
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
-            // code here
+            /* Raccolta dati e regole per la validazione standardizzata */ 
+            $posts = $this->request->getPost();
+            $rules = $this->groupsModel->addValidationRules();
+
+            /* Validazione dei posts */
+            if ( ! $this->validateData($posts, $rules)):
+                /* Catturiamo gli errori grezzi (compresi eventuali permissions.0, permissions.1) */
+                $rawErrors = $this->validator->getErrors();
+
+                /* Raggruppiamo i dot-permissions sotto la chiave unica 'permissions' per il DOM */
+                $cleanErrors = removeDotPermissions('permissions', $rawErrors);
+
+                return $this->response->setJSON(['errors' => $cleanErrors, 'message' => lang('backend/groups.messages.validationErrors')]);
+            endif;
+
+            /* Esecuzione della logica di inserimento con sbarramento interno */
+            $result = $this->groupsModel->add($posts);
+
+            return $this->response->setJSON($result);
 
         endif;
     }
@@ -130,7 +161,25 @@ class GroupsController extends BackendController
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
-            // code here
+            /* Raccolta dati e regole per la validazione standardizzata */ 
+            $posts = $this->request->getPost();
+            $rules = $this->groupsModel->editValidationRules($posts);
+
+            /* Validazione dei posts */
+            if ( ! $this->validateData($posts, $rules)):
+                /* Catturiamo gli errori grezzi (compresi eventuali permissions.0, permissions.1) */
+                $rawErrors = $this->validator->getErrors();
+
+                /* Raggruppiamo i dot-permissions sotto la chiave unica 'permissions' per il DOM */
+                $cleanErrors = removeDotPermissions('permissions', $rawErrors);
+
+                return $this->response->setJSON(['errors' => $cleanErrors, 'message' => lang('backend/groups.messages.validationErrors')]);
+            endif;
+
+            /* Esecuzione della logica di inserimento con sbarramento interno */
+            $result = $this->groupsModel->edit($posts);
+
+            return $this->response->setJSON($result);
 
         endif;
     }
@@ -140,7 +189,20 @@ class GroupsController extends BackendController
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
-            // code here
+            /* Raccolta dati e regole per la validazione standardizzata */ 
+            $posts = $this->request->getPost();
+            $rules = $this->groupsModel->delValidationRules($posts);
+
+            /* Validazione dei posts */
+            if ( ! $this->validateData($posts, $rules)):
+                $errorMessage = implode('<br>', $this->validator->getErrors());
+                return $this->response->setJSON(['result' => false, 'message' => sprintf(lang('backend/admins.messages.validateToastErrors'), $errorMessage)]);
+            endif;
+
+            /* Esecuzione della logica di inserimento con sbarramento interno */
+            $result = $this->groupsModel->del($posts);
+
+            return $this->response->setJSON($result);
 
         endif;
     }
