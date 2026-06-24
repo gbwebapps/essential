@@ -65,10 +65,13 @@
 
             <div class="row mt-3">
                 <div class="col-12 d-flex align-middle justify-content-center">
-                    <button type="button" class="btn btn-danger btn-sm me-1 btn-delete-group" data-id="<?= $group->id; ?>">
+                    <button type="button" class="btn btn-outline-danger btn-sm btn-delete-group" data-id="<?= $group->id; ?>" data-message="Sei sicuro di voler eliminare questo gruppo?">
                         <i class="fa-solid fa-trash-can me-1"></i>Elimina
                     </button>
-                    <button type="submit" class="btn btn-success btn-sm ms-1">
+                    <button type="button" class="btn btn-danger btn-sm btn-refresh-group mx-2" data-id="<?= $group->id; ?>" data-message="Sei sicuro di voler ricaricare i dati?">
+                        <i class="fa-solid fa-refresh me-1"></i>Ricarica dati
+                    </button>
+                    <button type="submit" class="btn btn-success btn-sm">
                         <i class="fa-solid fa-floppy-disk me-1"></i>Invia dati
                     </button>
                 </div>

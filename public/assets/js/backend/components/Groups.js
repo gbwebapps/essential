@@ -1,5 +1,5 @@
 /* Import delle utility risalendo di un livello */
-import { urlbase, apiFetch, toggleLoader, showToast, askConfirm, smoothReplace, handleValidationErrors } from '../backend.js';
+import { urlbase, apiFetch, showToast, askConfirm, smoothReplace, handleValidationErrors } from '../backend.js';
 
 export class GroupManager {
     constructor(config = {}) {
@@ -23,44 +23,7 @@ export class GroupManager {
 
     /* Gestione dei listener sugli elementi generati dinamicamente via AJAX */
     bindDynamicEvents() {
-        /* 1. Intercettiamo l'apertura dei sotto-accordion dei singoli gruppi */
-        document.addEventListener('show.bs.collapse', async e => {
-            /* Se l'evento non arriva dal sotto-accordion dei gruppi, ignoralo */
-            const subCollapse = e.target.closest('#groupsAccordion .accordion-collapse');
-            if ( ! subCollapse) return;
-
-            /* Blocchiamo il bubbling per evitare che risalga al macro-accordion */
-            e.stopPropagation();
-
-            const bodyContainer = subCollapse.querySelector('.template-container');
-            /* Se ha già dell'HTML dentro, non rifacciamo la chiamata */
-            if ( ! bodyContainer || bodyContainer.innerHTML.trim() !== '') return;
-
-            /* Recuperiamo il bottone corretto associato a QUESTO pannello */
-            const toggleBtn = document.querySelector(`[data-bs-target="#${subCollapse.id}"]`);
-            if ( ! toggleBtn) return;
-
-            const groupId = toggleBtn.dataset.id;
-
-            try {
-                const formData = new FormData();
-                formData.append('id', groupId);
-
-                const response = await apiFetch(this.config.getGroup, {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-
-                if (data.result === true) {
-                    smoothReplace(bodyContainer, data.output);
-                }
-            } catch (error) {
-                console.error("Errore caricamento form edit gruppo:", error);
-            }
-        });
-
-        /* 2. Intercettiamo la CHIUSURA del singolo gruppo per svuotarlo */
+        /* 1. Intercettiamo solo la CHIUSURA del singolo gruppo per svuotarlo */
         document.addEventListener('hidden.bs.collapse', e => {
             const subCollapse = e.target.closest('#groupsAccordion .accordion-collapse');
             if ( ! subCollapse) return;
@@ -74,14 +37,14 @@ export class GroupManager {
             }
         });
 
-        /* 1. Intercettiamo il submit del form di aggiunta nuovo gruppo */
+        /* 2. Intercettiamo il submit del form di aggiunta nuovo gruppo */
         document.addEventListener('submit', e => {
             if (e.target && e.target.id === 'new-group') {
                 this.handleAddGroup(e);
             }
         });
 
-        /* 2. Intercettiamo il submit dei form di edit generati dinamicamente */
+        /* 3. Intercettiamo il submit dei form di edit generati dinamicamente */
         document.addEventListener('submit', e => {
             const editForm = e.target.closest('.edit-group-form');
             if (editForm) {
@@ -89,7 +52,16 @@ export class GroupManager {
             }
         });
 
-        /* 4. Intercettiamo il click sul pulsante elimina del gruppo */
+        /* 4. Intercettiamo il click sul pulsante ripristino (refresh) del gruppo */
+        document.addEventListener('click', e => {
+            const refreshBtn = e.target.closest('.btn-refresh-group');
+            if (refreshBtn) {
+                e.preventDefault();
+                this.handleRefreshGroup(refreshBtn);
+            }
+        });
+
+        /* 5. Intercettiamo il click sul pulsante elimina del gruppo */
         document.addEventListener('click', e => {
             const deleteBtn = e.target.closest('.btn-delete-group');
             if (deleteBtn) {
@@ -98,26 +70,52 @@ export class GroupManager {
             }
         });
 
-        /* 5. Intercettiamo il reset del form di aggiunta per pulire gli errori visivi */
-        document.addEventListener('reset', e => {
-            if (e.target && e.target.id === 'new-group') {
-                document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
+        /* 6. Intercettiamo il reset del form di aggiunta */
+        document.addEventListener('click', e => {
+            const resetBtn = e.target.closest('.btn-reset-group');
+            if (resetBtn) {
+                e.preventDefault();
+                this.handleResetGroup(resetBtn);
             }
         });
+    }
+
+    /**
+     * Esegue la fetch asincrona per recuperare i dettagli di un singolo gruppo (Sotto-gruppo)
+     * e inietta l'output nel contenitore designato.
+     */
+    async loadSingleGroupData(groupId, bodyContainer) {
+        try {
+            const formData = new FormData();
+            formData.append('id', groupId);
+
+            const response = await apiFetch(this.config.getGroup, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+
+            if (data.result === true) {
+                smoothReplace(bodyContainer, data.output);
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error("Errore caricamento form edit gruppo:", error);
+            return false;
+        }
     }
 
     /* Gestisce l'invio asincrono del form per la creazione di un nuovo gruppo */
     async handleAddGroup(e) {
         e.preventDefault();
 
-        /* Blocco esecuzione se c'è già una chiamata in corso */
         if (this.isSubmitting) return;
         this.isSubmitting = true;
 
         const formEl = e.target;
         const formData = new FormData(formEl);
 
-        /* Pulizia immediata di tutti gli errori visivi prima dell'invio */
         document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
 
         try {
@@ -127,13 +125,6 @@ export class GroupManager {
             });
             const data = await response.json();
 
-            /* 1. Controllo per utente non loggato (filtro MasterFilter) */
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth`;
-                return;
-            }
-
-            /* 2. Gestione Errori di Validazione */
             if (data.errors) {
                 if (typeof handleValidationErrors === 'function') {
                     handleValidationErrors(data.errors);
@@ -144,7 +135,6 @@ export class GroupManager {
                 return;
             }
 
-            /* 3. Errore generico gestito dal backend */
             if (data.result === false) {
                 if (data.message && typeof showToast === 'function') {
                     showToast('danger', data.message);
@@ -152,7 +142,6 @@ export class GroupManager {
                 return;
             }
 
-            /* 4. Caso successo */
             if (data.result === true) {
                 if (data.message && typeof showToast === 'function') {
                     showToast('success', data.message);
@@ -160,7 +149,6 @@ export class GroupManager {
                 
                 formEl.reset();
 
-                /* Forza il ricaricamento asincrono della lista se la sezione è aperta, mostrando il record reale */
                 this.isListLoaded = false;
                 const mainCollapseList = document.getElementById('main_collapse_list');
                 if (mainCollapseList && mainCollapseList.classList.contains('show')) {
@@ -170,7 +158,42 @@ export class GroupManager {
         } catch (error) {
             console.error("Errore durante l'invio del form nuovo gruppo:", error);
         } finally {
-            /* Rilascia sempre il blocco anti-doppio click al termine del ciclo */
+            this.isSubmitting = false;
+        }
+    }
+
+    async handleResetGroup(btnEl) {
+        if (this.isSubmitting) return;
+
+        const message = btnEl.dataset.message;
+        const ok = await askConfirm(message);
+        if ( ! ok) return;
+
+        this.isSubmitting = true;
+        
+        const container = document.getElementById('add-groups-container');
+        if ( ! container) {
+            this.isSubmitting = false;
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('action', 'reset');
+
+            const response = await apiFetch(urlbase + 'backend/groups/add', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+
+            if (data.result === true && data.output) {
+                smoothReplace(container, data.output);
+            }
+
+        } catch (error) {
+            console.error("Errore durante il ripristino dei dati del gruppo:", error);
+        } finally {
             this.isSubmitting = false;
         }
     }
@@ -179,14 +202,12 @@ export class GroupManager {
     async handleEditGroup(e) {
         e.preventDefault();
 
-        /* Blocco esecuzione se c'è già una chiamata in corso */
         if (this.isSubmitting) return;
         this.isSubmitting = true;
 
         const formEl = e.target;
         const formData = new FormData(formEl);
 
-        /* Pulizia immediata di tutti gli errori visivi prima dell'invio */
         document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
 
         try {
@@ -196,13 +217,6 @@ export class GroupManager {
             });
             const data = await response.json();
 
-            /* 1. Controllo per utente non loggato (filtro MasterFilter) */
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth`;
-                return;
-            }
-
-            /* 2. Gestione Errori di Validazione */
             if (data.errors) {
                 if (typeof handleValidationErrors === 'function') {
                     handleValidationErrors(data.errors);
@@ -213,7 +227,6 @@ export class GroupManager {
                 return;
             }
 
-            /* 3. Errore generico gestito dal backend */
             if (data.result === false) {
                 if (data.message && typeof showToast === 'function') {
                     showToast('danger', data.message);
@@ -221,13 +234,11 @@ export class GroupManager {
                 return;
             }
 
-            /* 4. Caso successo */
             if (data.result === true) {
                 if (data.message && typeof showToast === 'function') {
                     showToast('success', data.message);
                 }
 
-                /* Aggiorna dinamicamente il titolo dell'accordion con il nuovo nome inserito */
                 const groupId = formEl.dataset.id;
                 const toggleBtnSpan = document.querySelector(`[data-bs-target="#collapse_group_${groupId}"] span`);
                 const nameInput = formEl.querySelector('input[name="name"]');
@@ -238,17 +249,67 @@ export class GroupManager {
         } catch (error) {
             console.error("Errore durante l'invio del form modifica gruppo:", error);
         } finally {
-            /* Rilascia sempre il blocco anti-doppio click al termine del ciclo */
+            this.isSubmitting = false;
+        }
+    }
+
+    /* Richiede al backend i dati originali del gruppo e ripristina lo stato del form */
+    async handleRefreshGroup(btnEl) {
+        if (this.isSubmitting) return;
+
+        const message = btnEl.dataset.message;
+        const ok = await askConfirm(message);
+        if ( ! ok) return;
+
+        this.isSubmitting = true;
+        const groupId = btnEl.dataset.id;
+        
+        const formEl = document.querySelector(`.edit-group-form[data-id="${groupId}"]`);
+        if ( ! formEl) {
+            this.isSubmitting = false;
+            return;
+        }
+        
+        const container = formEl.closest('.accordion-body .template-container');
+        if ( ! container) {
+            this.isSubmitting = false;
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('id', groupId);
+            formData.append('action', 'refresh');
+
+            const response = await apiFetch(urlbase + 'backend/groups/edit', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+
+            if (data.result === false) {
+                if (data.message && typeof showToast === 'function') {
+                    showToast('danger', data.message);
+                }
+                return;
+            }
+
+            if (data.result === true && data.output) {
+                smoothReplace(container, data.output);
+            }
+
+        } catch (error) {
+            console.error("Errore durante il ripristino dei dati del gruppo:", error);
+        } finally {
             this.isSubmitting = false;
         }
     }
 
     /* Gestisce l'eliminazione asincrona di un gruppo previa conferma dell'utente */
     async handleDeleteGroup(btnEl) {
-        /* Blocco esecuzione se c'è già una chiamata in corso */
         if (this.isSubmitting) return;
 
-        const message = btnEl.dataset.message || "Sei sicuro di voler eliminare questo gruppo?";
+        const message = btnEl.dataset.message;
         const ok = await askConfirm(message);
         if ( ! ok) return;
 
@@ -265,13 +326,6 @@ export class GroupManager {
             });
             const data = await response.json();
 
-            /* 1. Controllo per utente non loggato (filtro MasterFilter) */
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth`;
-                return;
-            }
-
-            /* 2. Gestione Errori di Validazione */
             if (data.errors) {
                 if (data.message && typeof showToast === 'function') {
                     showToast('danger', data.message);
@@ -279,7 +333,6 @@ export class GroupManager {
                 return;
             }
 
-            /* 3. Errore generico gestito dal backend */
             if (data.result === false) {
                 if (data.message && typeof showToast === 'function') {
                     showToast('danger', data.message);
@@ -287,13 +340,11 @@ export class GroupManager {
                 return;
             }
 
-            /* 4. Caso successo */
             if (data.result === true) {
                 if (data.message && typeof showToast === 'function') {
                     showToast('success', data.message);
                 }
 
-                /* Forza il ricaricamento asincrono dell'intero blocco per aggiornare il DOM */
                 this.isListLoaded = false;
                 const mainCollapseList = document.getElementById('main_collapse_list');
                 if (mainCollapseList && mainCollapseList.classList.contains('show')) {
@@ -303,7 +354,6 @@ export class GroupManager {
         } catch (error) {
             console.error("Errore durante l'eliminazione del gruppo:", error);
         } finally {
-            /* Rilascia sempre il blocco anti-doppio click al termine del ciclo */
             this.isSubmitting = false;
         }
     }
@@ -369,8 +419,6 @@ export class GroupManager {
     /* Carica lo scheletro iniziale del pannello eccezioni (Terzo livello) */
     async loadExceptionsPanel() {
         if (this.isExceptionsLoaded) return;
-        
-        /* Qui gestiremo la logica della select con autocompletamento */
         this.isExceptionsLoaded = true;
     }
 }

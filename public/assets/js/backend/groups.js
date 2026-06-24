@@ -1,5 +1,5 @@
 /* Import delle costanti e utility da backend.js */
-import { urlbase, action} from './backend.js';
+import { urlbase, action } from './backend.js';
 
 /* Import della classe logica */
 import { GroupManager } from './components/Groups.js';
@@ -7,21 +7,39 @@ import { GroupManager } from './components/Groups.js';
 const actions = {
     index: function() {
 
-    	const groupManager = new GroupManager({
-	        getGroups: urlbase + 'backend/groups/getGroups',
-	        getGroup: urlbase + 'backend/groups/getGroup',
-	        urlGetExceptions: urlbase + 'backend/groups/getAdmins'
-	    });
+        const groupManager = new GroupManager({
+            getGroups: urlbase + 'backend/groups/getGroups',
+            getGroup: urlbase + 'backend/groups/getGroup',
+            urlGetExceptions: urlbase + 'backend/groups/getAdmins'
+        });
 
-        /* Listener per il primo macro-accordion (Aggiungi Gruppo) */
+        /* --- 1. GESTIONE MANUALE E FLUIDA: Aggiungi Gruppo --- */
+        const triggerAddBtn = document.querySelector('.btn-trigger-add-group');
         const mainCollapseAdd = document.getElementById('main_collapse_add');
-        if (mainCollapseAdd) {
-            
-            mainCollapseAdd.addEventListener('show.bs.collapse', (e) => {
-                /* Assicuriamoci che l'evento sia del macro-panel e non dei figli */
-                if (e.target === mainCollapseAdd) {
-                    groupManager.loadAddGroupPanel();
+
+        if (triggerAddBtn && mainCollapseAdd) {
+            const bsCollapseAdd = new bootstrap.Collapse(mainCollapseAdd, { toggle: false });
+
+            triggerAddBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+
+                if (mainCollapseAdd.classList.contains('show') || mainCollapseAdd.classList.contains('collapsing')) {
+                    bsCollapseAdd.hide();
+                    return;
                 }
+
+                const container = document.getElementById('add-groups-container');
+                if (container && container.innerHTML.trim() !== '') {
+                    bsCollapseAdd.show();
+                    return;
+                }
+
+                await groupManager.loadAddGroupPanel();
+                
+                triggerAddBtn.disabled = false;
+                triggerAddBtn.classList.remove('disabled');
+                
+                bsCollapseAdd.show();
             });
 
             mainCollapseAdd.addEventListener('hidden.bs.collapse', (e) => {
@@ -31,37 +49,91 @@ const actions = {
             });
         }
 
-	    /* Listener per il secondo macro-accordion (Lista Gruppi) */
+        /* --- 2. GESTIONE MANUALE E FLUIDA: Lista Gruppi --- */
+        const triggerListBtn = document.querySelector('[data-bs-target="#main_collapse_list"]');
         const mainCollapseList = document.getElementById('main_collapse_list');
-        if (mainCollapseList) {
+
+        if (triggerListBtn && mainCollapseList) {
+            triggerListBtn.removeAttribute('data-bs-toggle');
             
-            mainCollapseList.addEventListener('show.bs.collapse', (e) => {
-                /* Assicuriamoci che l'evento sia del macro-panel e non dei figli */
-                if (e.target === mainCollapseList) {
-                    groupManager.loadGroupsList();
+            const bsCollapseList = new bootstrap.Collapse(mainCollapseList, { toggle: false });
+
+            triggerListBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+
+                if (mainCollapseList.classList.contains('show') || mainCollapseList.classList.contains('collapsing')) {
+                    bsCollapseList.hide();
+                    return;
                 }
+
+                const container = document.getElementById('showAll-groups-container');
+                if (container && container.innerHTML.trim() !== '') {
+                    bsCollapseList.show();
+                    return;
+                }
+
+                await groupManager.loadGroupsList();
+                
+                triggerListBtn.disabled = false;
+                triggerListBtn.classList.remove('disabled');
+                
+                bsCollapseList.show();
             });
 
             mainCollapseList.addEventListener('hidden.bs.collapse', (e) => {
-                /* Assicuriamoci che l'evento sia del macro-panel e non dei figli */
                 if (e.target === mainCollapseList) {
                     groupManager.resetListContainer();
                 }
             });
         }
 
-	    /* Listener per il terzo macro-accordion (Eccezioni) */
-	    const mainCollapseExceptions = document.getElementById('main_collapse_exceptions');
-	    if (mainCollapseExceptions) {
-	        mainCollapseExceptions.addEventListener('show.bs.collapse', () => {
-	            groupManager.loadExceptionsPanel();
-	        });
-	    }
+        /* --- 3. GESTIONE MANUALE E FLUIDA: Sotto-gruppi (Elementi del foreach) --- */
+        document.addEventListener('click', async (e) => {
+            const subTriggerBtn = e.target.closest('.group-toggle-btn');
+            if ( ! subTriggerBtn) return;
 
+            const targetId = subTriggerBtn.getAttribute('data-bs-target');
+            const subCollapseEl = document.querySelector(targetId);
+            if ( ! subCollapseEl || ! subCollapseEl.closest('#groupsAccordion')) return;
+
+            /* Gestione del toggle manuale */
+            let bsSubCollapse = bootstrap.Collapse.getInstance(subCollapseEl);
+            if ( ! bsSubCollapse) {
+                bsSubCollapse = new bootstrap.Collapse(subCollapseEl, { toggle: false });
+            }
+
+            if (subCollapseEl.classList.contains('show') || subCollapseEl.classList.contains('collapsing')) {
+                bsSubCollapse.hide();
+                return;
+            }
+
+            const bodyContainer = subCollapseEl.querySelector('.template-container');
+            if (bodyContainer && bodyContainer.innerHTML.trim() !== '') {
+                bsSubCollapse.show();
+                return;
+            }
+
+            /* Chiamata asincrona al nuovo metodo della classe */
+            await groupManager.loadSingleGroupData(subTriggerBtn.dataset.id, bodyContainer);
+
+            /* Ripristino dello sblocco del loader ed esecuzione animazione */
+            subTriggerBtn.disabled = false;
+            subTriggerBtn.classList.remove('disabled');
+            
+            bsSubCollapse.show();
+        });
+
+        /* --- 4. Resto dei listener standard (Eccezioni) --- */
+        const mainCollapseExceptions = document.getElementById('main_collapse_exceptions');
+        if (mainCollapseExceptions) {
+            mainCollapseExceptions.addEventListener('show.bs.collapse', () => {
+                groupManager.loadExceptionsPanel();
+            });
+        }
     }
 };
 
-/* Listener per il link select all nei form add ed edit per selezionare tutti i check box dei permessi */
+/* Listener per il link select all nei form add ed edit */
 document.addEventListener('click', function(e) {
     if (e.target.matches('.select-all')) {
         e.preventDefault();
@@ -73,7 +145,6 @@ document.addEventListener('click', function(e) {
     }
 });
 
-/* Se esiste una funzione per l'azione corrente, eseguila */
 if (actions[action]) {
     actions[action]();
 } else {

@@ -135,6 +135,15 @@ class GroupsController extends BackendController
 
             /* Raccolta dati e regole per la validazione standardizzata */ 
             $posts = $this->request->getPost();
+
+            if (isset($posts['action']) && $posts['action'] === 'reset'):
+                
+                $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
+                $output = view('backend/groups/partials/index/addGroupPartial', $this->data);
+
+                return $this->response->setJSON(['result' => true, 'output' => $output]);
+            endif;
+
             $rules = $this->groupsModel->addValidationRules();
 
             /* Validazione dei posts */
@@ -163,6 +172,29 @@ class GroupsController extends BackendController
 
             /* Raccolta dati e regole per la validazione standardizzata */ 
             $posts = $this->request->getPost();
+
+            /* CASO 1: Ripristino dei dati originali dal database (Refresh) */
+            if (isset($posts['action']) && $posts['action'] === 'refresh'):
+
+                /* Recuperiamo i record freschi dal Model usando l'ID del gruppo */
+                $groupRow = $this->groupsModel->getGroupById((int) $posts['id']);
+                
+                if ( ! $groupRow):
+                    return $this->response->setJSON(['result' => false, 'message' => lang('backend/groups.messages.notFound')]);
+                endif;
+
+                $this->data['group'] = $groupRow;
+                $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
+                $this->data['group_perms'] = $this->groupsModel->getGroup((int) $groupRow->id);
+
+                /* Rigeneriamo lo stesso parziale HTML usato per il caricamento iniziale */
+                $output = view('backend/groups/partials/index/getGroupPartial', $this->data);
+
+                return $this->response->setJSON(['result' => true, 'output' => $output]);
+
+            endif;
+
+            /* CASO 2: Salvataggio standard dei dati */
             $rules = $this->groupsModel->editValidationRules($posts);
 
             /* Validazione dei posts */
@@ -176,7 +208,7 @@ class GroupsController extends BackendController
                 return $this->response->setJSON(['errors' => $cleanErrors, 'message' => lang('backend/groups.messages.validationErrors')]);
             endif;
 
-            /* Esecuzione della logica di inserimento con sbarramento interno */
+            /* Esecuzione della logica di modifica con sbarramento interno */
             $result = $this->groupsModel->edit($posts);
 
             return $this->response->setJSON($result);

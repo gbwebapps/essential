@@ -11,7 +11,6 @@
                             <button class="accordion-button collapsed shadow-none bg-light text-secondary group-toggle-btn" 
                                     type="button" 
                                     data-id="<?= $group->id; ?>" 
-                                    data-bs-toggle="collapse" 
                                     data-bs-target="#collapse_group_<?= $group->id; ?>" 
                                     aria-expanded="false" 
                                     aria-controls="collapse_group_<?= $group->id; ?>">

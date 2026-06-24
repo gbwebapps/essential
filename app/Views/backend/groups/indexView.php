@@ -10,7 +10,7 @@
 
                     <div class="accordion-item mb-3 border">
                         <h2 class="accordion-header" id="main_heading_add">
-                            <button class="accordion-button collapsed shadow-none bg-light text-secondary py-3" type="button" data-bs-toggle="collapse" data-bs-target="#main_collapse_add" aria-expanded="false" aria-controls="main_collapse_add">
+                            <button class="accordion-button collapsed shadow-none bg-light text-secondary py-3 btn-trigger-add-group" type="button" aria-expanded="false" aria-controls="main_collapse_add">
                                 <h2 class="card-title mb-0 fs-5">
                                     <i class="fa-solid fa-plus-circle me-2"></i>Aggiungi gruppo
                                 </h2>

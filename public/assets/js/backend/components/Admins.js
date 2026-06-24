@@ -82,11 +82,6 @@ export class ChangeGroupManager {
 
             const data = await response.json();
 
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth`;
-                return;
-            }
-
             if (data.result === false) {
                 if (data.message && typeof showToast === 'function') showToast('danger', data.message);
                 return;
@@ -178,12 +173,6 @@ export class GetPermissionsManager {
             });
 
             const data = await response.json();
-
-            /* Controllo per utente non loggato */
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth`;
-                return;
-            }
 
             /* Gestione fallimento logico generico */
             if (data.result === false) {
@@ -294,12 +283,6 @@ export class ChangePermissionManager {
 
             const data = await response.json();
 
-            /* Controllo per utente non loggato */
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth`;
-                return;
-            }
-
             /* Gestione fallimento logico generico */
             if (data.result === false) {
                 if (data.message && typeof showToast === 'function') showToast('danger', data.message);
@@ -397,12 +380,6 @@ export class GetTokensManager {
             });
 
             const data = await response.json();
-
-            /* Controllo per utente non loggato */
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth`;
-                return;
-            }
 
             /* Gestione fallimento logico generico */
             if (data.result === false) {
@@ -512,12 +489,6 @@ export class DeleteTokenManager {
             });
 
             const data = await response.json();
-
-            /* Controllo per utente non loggato */
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth`;
-                return;
-            }
 
             /* Gestione fallimento logico generico */
             if (data.result === false) {

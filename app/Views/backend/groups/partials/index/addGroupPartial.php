@@ -58,7 +58,7 @@
 
 			<div class="row">
                 <div class="col-12 d-flex align-middle justify-content-center">
-                	<button type="reset" class="btn btn-danger btn-sm me-1">
+                	<button type="button" class="btn btn-danger btn-sm me-1 btn-reset-group" data-message="Sei sicuro di voler azzerare i dati?">
                 	    <i class="fa-solid fa-refresh me-1"></i>Resetta dati
                 	</button>
                     <button type="submit" class="btn btn-success btn-sm ms-1">

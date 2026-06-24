@@ -35,6 +35,13 @@ class GroupsModel extends BackendModel
     protected array $delAllowedFields = ['id'];
 
     /**
+     * Elenco delle proprietà principali utilizzate per la comparazione dei dati storici o per il tracciamento dei log.
+     *
+     * @var array
+     */
+    protected array $toCompare = ['name', 'description'];
+
+    /**
 	 * Inizializza il modello eseguendo le configurazioni di base ereditate dalla classe madre.
 	 *
 	 * Sincronizza lo stato del modello impostando le dipendenze native e i driver di connessione
@@ -292,6 +299,17 @@ class GroupsModel extends BackendModel
             /* Filtro campi post ammessi tramite metodo centralizzato */
             $posts = $this->checkAllowedFields($posts, $this->editAllowedFields);
 
+            /* 1. Recupero il record originale del gruppo dal DB per il confronto */
+            $originalGroup = $this->getGroupById((int) $posts['id']);
+            if ( ! $originalGroup):
+                return ['result' => false, 'message' => lang('backend/groups.messages.notFound')];
+            endif;
+
+            /* 2. Controllo di sbarramento: se non è cambiato nulla, interrompo subito */
+            if ( ! $this->hasGroupChanged($posts, $originalGroup)):
+                return ['result' => false, 'message' => lang('backend/groups.messages.noDataChanged')];
+            endif;
+
             $this->db->transBegin();
 
             /* 1. Aggiornamento anagrafica del gruppo */
@@ -378,5 +396,30 @@ class GroupsModel extends BackendModel
             return ['result' => false, 'message' => lang('backend/groups.messages.delError')];
 
         }
+    }
+
+    private function hasGroupChanged(array $posts, object $original): bool
+    {
+        /* 1. Controllo i campi base della tabella admins_groups (name, description) via metodo globale */
+        if ($this->hasDataChanged($posts, $original)):
+            return true;
+        endif;
+
+        /* 2. Recupero i permessi attualmente salvati nel DB per questo gruppo */
+        $oldPermissions = $this->getGroup((int) $original->id);
+
+        /* 3. Preparo i nuovi permessi inviati dal form (se vuoti, array vuoto) */
+        $newPermissions = $posts['permissions'] ?? [];
+
+        /* 4. Ordino entrambi gli array per evitare falsi positivi dovuti all'ordine di selezione */
+        sort($oldPermissions);
+        sort($newPermissions);
+
+        /* 5. Confronto finale: se gli array differiscono, qualcosa è cambiato */
+        if ($newPermissions !== $oldPermissions):
+            return true;
+        endif;
+
+        return false;
     }
 }

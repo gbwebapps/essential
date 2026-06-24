@@ -273,12 +273,6 @@ export class ListManager {
 
             const data = await response.json();
 
-            /* Controllo per utente non loggato (filtro MasterFilter) */
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth`;
-                return;
-            }
-
             /* Recupero centralizzato dell'elemento del DOM */
             const showAllEl = document.getElementById(this.config.containerId);
 
@@ -429,12 +423,6 @@ export class AddManager {
 
             const data = await response.json();
 
-            /* 1. Controllo per utente non loggato (filtro MasterFilter) - UNIFORMATO SULLA NUOVA ROTTA */
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth`;
-                return;
-            }
-
             /* 2. Gestione Errori di Validazione */
             if (data.errors) {
                 if (typeof handleValidationErrors === 'function') {
@@ -538,12 +526,6 @@ export class AddManager {
             });
 
             const data = await response.json();
-
-            /* 1. Controllo per utente non loggato (filtro MasterFilter) - UNIFORMATO SULLA NUOVA ROTTA */
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth`;
-                return;
-            }
 
             /* 2. Gestione fallimento reset */
             if (data.result === false) {
@@ -706,12 +688,6 @@ export class EditManager {
 
             const data = await response.json();
 
-            /* Controllo per utente non loggato (filtro MasterFilter) */
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth`;
-                return;
-            }
-
             /* Visualizza eventuali errori di validazione */
             if (data.errors) {
                 if (typeof handleValidationErrors === 'function') {
@@ -808,12 +784,6 @@ export class EditManager {
             });
 
             const data = await response.json();
-
-            /* Controllo per utente non loggato (filtro MasterFilter) - UNIFORMATO */
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth`;
-                return;
-            }
 
             /* Caso errore generico */
             if (data.result === false) {
@@ -954,12 +924,6 @@ export class DeleteManager {
 
             const data = await response.json();
 
-            /* Controllo per utente non loggato (filtro MasterFilter) */
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth`;
-                return;
-            }
-
             /* Gestione fallimento logico generico */
             if (data.result === false) {
                 if (data.message && typeof showToast === 'function') {
@@ -1091,12 +1055,6 @@ export class ChangeStatusManager {
 
             const data = await response.json();
 
-            /* Controllo per utente non loggato */
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth`;
-                return;
-            }
-
              /* Gestione fallimento logico generico */
             if (data.result === false) {
                 if (data.message && typeof showToast === 'function') showToast('danger', data.message);
@@ -1188,12 +1146,6 @@ export class GeneralDataManager {
             });
 
             const data = await response.json();
-
-            /* Controllo per utente non loggato */
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth`;
-                return;
-            }
 
             /* Gestione fallimento logico generico */
             if (data.result === false) {
@@ -1290,12 +1242,6 @@ export class MetaDataManager {
             });
 
             const data = await response.json();
-
-            /* Controllo per utente non loggato (filtro MasterFilter) */
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = `${urlbase}backend/auth`;
-                return;
-            }
 
             /* Gestione fallimento logico generico */
             if (data.result === false) {

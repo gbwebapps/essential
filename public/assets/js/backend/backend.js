@@ -40,17 +40,13 @@ export function toggleLoader(show) {
     }
 }
 
-/* --- Chiamata fetch generica aggiornata --- */
+/* --- Chiamata fetch generica ottimizzata (Interfaccia Response preservata) --- */
 export async function apiFetch(input, init = {}) {
-    toggleLoader(true); /* Attiva loader */
+    toggleLoader(true);
 
-    /* 1. Definiamo le intestazioni di base */
     const defaultHeaders = { 'X-Requested-With': 'XMLHttpRequest' };
-
-    /* 2. Controlliamo il metodo (se non specificato, di default è GET) */
     const method = (init.method || 'GET').toUpperCase();
 
-    /* 3. Se il metodo richiede protezione, preleviamo il token dal meta tag */
     if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
         const csrfMeta = document.querySelector('meta[name="csrf-token"]');
         if (csrfMeta) {
@@ -58,61 +54,53 @@ export async function apiFetch(input, init = {}) {
         }
     }
 
-    /* 4. Uniamo le intestazioni di default con quelle passate localmente */
     init.headers = Object.assign({}, defaultHeaders, init.headers || {});
 
     try {
         const response = await fetch(input, init);
         
-        /* Se la risposta non è OK (gestisce tutti gli errori: 403, 500, 404) */
-        if ( ! response.ok) {
-            /* Passiamo la response direttamente al catch */
-            throw response; 
-        }
+        /* 1. Gestione dei casi con Status 200 OK */
+        if (response.ok) {
+            /* Consumiamo lo stream una volta sola qui dentro */
+            const data = await response.json();
 
-        /* Cloniamo la risposta per leggere il JSON senza consumare lo stream originale */
-        const clone = response.clone();
-        const data = await clone.json();
-
-        /* Se il server ha inviato un nuovo token, aggiorniamo il meta tag */
-        if (data.csrf) {
-            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-            if (csrfMeta) {
-                csrfMeta.setAttribute('content', data.csrf);
+            /* Sbarramento Sessione Scaduta */
+            if (data && data.result === 'no_current_user_logged') {
+                window.location.href = `${urlbase}backend/auth`;
+                return new Promise(() => {});
             }
-        }
-        
-        return response;
-        
-    } catch (error) {
-        /* Se l'errore è una risposta del server ed è un 403 */
-        if (error instanceof Response && error.status === 403) {
-            /* Cloniamo la risposta di errore per lo stesso motivo */
-            const cloneError = error.clone();
-            const errorJson = await cloneError.json().catch(() => ({}));
-            
-            /* Aggiorniamo il token se presente nel payload di errore */
-            if (errorJson.csrf) {
+
+            /* Aggiornamento automatico del token CSRF se presente nel payload */
+            if (data && data.csrf) {
                 const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-                if (csrfMeta) {
-                    csrfMeta.setAttribute('content', errorJson.csrf);
-                }
+                if (csrfMeta) csrfMeta.setAttribute('content', data.csrf);
             }
 
-            const serverMessage = errorJson.message || "Errore di sicurezza (CSRF).";
-            
-            handleAjaxError({ status: 403 }, serverMessage, null);
-        } else {
-            /* Altri errori di sistema o di rete */
-            const status = error.status || 0;
-            const statusText = error.statusText || error.message;
-            handleAjaxError({ status: status }, statusText, error);
+            /* Ricreiamo e restituiamo un oggetto Response fresco per non rompere il codice a valle */
+            return Response.json(data);
         }
-        
-        throw error; /* Rilancia per bloccare l'esecuzione dello script del form */
 
+        /* 2. Gestione degli errori del server (es. 403, 500, 404) */
+        const errorJson = await response.json().catch(() => ({}));
+        
+        if (response.status === 403 && errorJson.csrf) {
+            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+            if (csrfMeta) csrfMeta.setAttribute('content', errorJson.csrf);
+        }
+
+        const serverMessage = errorJson.message || `Errore server (${response.status})`;
+        handleAjaxError({ status: response.status }, serverMessage, null);
+        
+        throw response;
+
+    } catch (error) {
+        if ( ! (error instanceof Response)) {
+            /* Errori di rete puri (es. assenza di connessione) */
+            handleAjaxError({ status: 0 }, error.message, error);
+        }
+        throw error;
     } finally {
-        toggleLoader(false); /* Disattiva loader */
+        toggleLoader(false);
     }
 }
 
