@@ -130,7 +130,7 @@ abstract class BackendModel extends BaseModel
 
 			$params = [];
 
-			$posts['order'] = (isset($posts['order']) && $posts['order'] === 'asc') ? 'desc' : 'asc';
+			$posts['order'] = (isset($posts['order']) && $posts['order'] === 'desc') ? 'asc' : 'desc';
 
 			$posts['column'] = (isset($posts['column']) && in_array($posts['column'], $this->allowedOrderColumns)) ? $posts['column'] : $this->defaultColumn;
 

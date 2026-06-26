@@ -6,13 +6,16 @@ export class GroupManager {
         this.config = Object.assign({
             getGroups: '',
             getGroup: '',
-            urlGetExceptions: ''
+            urlGetExceptions: '' /* Questo punterà al metodo di ricerca, es: backend/groups/searchAdmins */
         }, config);
 
         /* Variabili di stato per evitare ricaricamenti inutili */
         this.isListLoaded = false;
         this.isExceptionsLoaded = false; 
         this.isAddLoaded = false;
+        
+        /* Proprietà per il controllo del debounce */
+        this.searchTimeout = null;
         
         this.init();
     }
@@ -76,6 +79,47 @@ export class GroupManager {
             if (resetBtn) {
                 e.preventDefault();
                 this.handleResetGroup(resetBtn);
+            }
+        });
+
+        /* 7. Intercettiamo la digitazione nel campo di ricerca amministratori */
+        document.addEventListener('input', e => {
+            if (e.target && e.target.id === 'search-admin') {
+                this.handleAdminSearch(e.target);
+            }
+        });
+
+        /* 8. Intercettiamo il click sulla selezione dell'amministratore dal dropdown */
+        document.addEventListener('click', e => {
+            const adminBtn = e.target.closest('.btn-select-admin');
+            if (adminBtn) {
+                e.preventDefault();
+                this.handleSelectAdmin(adminBtn);
+            }
+        });
+
+        /* 9. Intercettiamo il submit del form eccezioni permessi dell'amministratore */
+        document.addEventListener('submit', e => {
+            if (e.target && e.target.id === 'edit-admin-exceptions-form') {
+                this.handleSaveAdminPermissions(e);
+            }
+        });
+
+        /* 10. Intercettiamo il click sul pulsante ricarica dati delle eccezioni dell'amministratore */
+        document.addEventListener('click', e => {
+            const refreshAdminBtn = e.target.closest('.btn-refresh-admin-perms');
+            if (refreshAdminBtn) {
+                e.preventDefault();
+                this.handleRefreshAdminPermissions(refreshAdminBtn);
+            }
+        });
+
+        /* 11. Intercettiamo il click sul pulsante X per svuotare la ricerca amministratori */
+        document.addEventListener('click', e => {
+            const resetSearchBtn = e.target.closest('.reset-search-field');
+            if (resetSearchBtn) {
+                e.preventDefault();
+                this.handleResetAdminSearch(resetSearchBtn);
             }
         });
     }
@@ -419,6 +463,224 @@ export class GroupManager {
     /* Carica lo scheletro iniziale del pannello eccezioni (Terzo livello) */
     async loadExceptionsPanel() {
         if (this.isExceptionsLoaded) return;
-        this.isExceptionsLoaded = true;
+
+        const container = document.getElementById('exceptions-groups-container');
+        if ( ! container) return;
+
+        try {
+            const response = await apiFetch(urlbase + 'backend/groups/openExceptions', { method: 'POST' });
+            const data = await response.json();
+
+            if (data.result === true) {
+                smoothReplace(container, data.output);
+                this.isExceptionsLoaded = true;
+            }
+        } catch (error) {
+            console.error("Errore durante il caricamento del form aggiunta gruppo:", error);
+        }
+    }
+
+    /* Svuota il container alla chiusura del pannello per distruggere il form dal DOM */
+    resetExceptionsContainer() {
+        const container = document.getElementById('exceptions-groups-container');
+        if (container) {
+            container.innerHTML = '';
+            this.isExceptionsLoaded = false; 
+        }
+    }
+
+    handleAdminSearch(inputEl) {
+
+        /* Cancella il timeout precedente se l'utente sta ancora digitando */
+        clearTimeout(this.searchTimeout);
+
+        /* Gestione visibilità della X al volo */
+        const resetBtn = inputEl.closest('.input-group')?.querySelector('.reset-search-field');
+        if (resetBtn) {
+            resetBtn.style.display = inputEl.value.length > 0 ? 'flex' : 'none';
+        }
+
+        /* Rimuove la griglia dei permessi appena si digitano caratteri */
+        const permissionsGrid = document.getElementById('admin-permissions-container');
+        if (permissionsGrid) permissionsGrid.innerHTML = '';
+
+        const query = inputEl.value.trim();
+        const container = document.getElementById('dropdownAdmins');
+        if (!container) return;
+
+        /* Se la query è inferiore a 3 caratteri svuotiamo il dropdown e ci fermiamo */
+        if (query.length < 3) {
+            container.innerHTML = '';
+            return;
+        }
+
+        /* Avviamo il timer di 500ms */
+        this.searchTimeout = setTimeout(async () => {
+            try {
+                const formData = new FormData();
+                formData.append('query', query);
+
+                const response = await apiFetch(this.config.urlGetExceptions, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.result === true && data.output) {
+                    smoothReplace(container, data.output);
+                } else {
+                    container.innerHTML = '';
+                }
+            } catch (error) {
+                console.error("Errore durante la ricerca degli amministratori:", error);
+            }
+        }, 500);
+    }
+
+    /**
+     * Gestisce il click sull'amministratore dal dropdown, aggiorna il campo testo,
+     * distrugge il dropdown e carica via AJAX la griglia dei permessi/eccezioni.
+     */
+    async handleSelectAdmin(btnEl) {
+        const adminUuid = btnEl.dataset.id;
+        const adminIdentity = btnEl.dataset.identity;
+
+        const searchInput = document.getElementById('search-admin');
+        if (searchInput) {
+            searchInput.value = adminIdentity;
+        }
+
+        const dropdownContainer = document.getElementById('dropdownAdmins');
+        if (dropdownContainer) {
+            dropdownContainer.innerHTML = '';
+        }
+
+        const permissionsContainer = document.getElementById('admin-permissions-container');
+        if (!permissionsContainer) return;
+
+        try {
+            const formData = new FormData();
+            formData.append('uuid', adminUuid);
+
+            const response = await apiFetch(urlbase + 'backend/groups/getAdminPermissions', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+
+            if (data.result === true && data.output) {
+                smoothReplace(permissionsContainer, data.output);
+            } else if (data.message && typeof showToast === 'function') {
+                showToast('danger', data.message);
+            }
+        } catch (error) {
+            console.error("Errore caricamento permessi:", error);
+        }
+    }
+
+    /* Gestisce l'invio asincrono del form delle eccezioni permessi per il salvataggio */
+    async handleSaveAdminPermissions(e) {
+        e.preventDefault();
+
+        if (this.isSubmitting) return;
+        this.isSubmitting = true;
+
+        const formEl = e.target;
+        const formData = new FormData(formEl);
+
+        const errorDiv = formEl.querySelector('.error_exceptions');
+        if (errorDiv) errorDiv.innerHTML = '\u00A0';
+
+        try {
+            const response = await apiFetch(urlbase + 'backend/groups/saveExceptions', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+
+            if (data.errors) {
+                if (typeof handleValidationErrors === 'function') {
+                    handleValidationErrors(data.errors);
+                }
+                if (data.message && typeof showToast === 'function') {
+                    showToast('danger', data.message);
+                }
+                return;
+            }
+
+            if (data.result === false) {
+                if (data.message && typeof showToast === 'function') {
+                    showToast('danger', data.message);
+                }
+                return;
+            }
+
+            if (data.result === true) {
+                if (data.message && typeof showToast === 'function') {
+                    showToast('success', data.message);
+                }
+            }
+        } catch (error) {
+            console.error("Errore durante il salvataggio delle eccezioni:", error);
+        } finally {
+            this.isSubmitting = false;
+        }
+    }
+
+    /* Ricarica ed esegue il refresh della griglia permessi dell'amministratore selezionato */
+    async handleRefreshAdminPermissions(btnEl) {
+        if (this.isSubmitting) return;
+
+        const message = btnEl.dataset.message;
+        const ok = await askConfirm(message);
+        if ( ! ok) return;
+
+        this.isSubmitting = true;
+        const adminUuid = btnEl.dataset.uuid;
+
+        const permissionsContainer = document.getElementById('admin-permissions-container');
+        if (!permissionsContainer) {
+            this.isSubmitting = false;
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('uuid', adminUuid);
+
+            const response = await apiFetch(urlbase + 'backend/groups/getAdminPermissions', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+
+            if (data.result === true && data.output) {
+                smoothReplace(permissionsContainer, data.output);
+            }
+        } catch (error) {
+            console.error("Errore durante il ripristino delle eccezioni:", error);
+        } finally {
+            this.isSubmitting = false;
+        }
+    }
+
+    /* Svuota il campo di testo ricerca, nasconde la X e azzera il DOM dei risultati e dei permessi */
+    handleResetAdminSearch(btnEl) {
+        const inputGroup = btnEl.closest('.input-group');
+        const searchInput = inputGroup?.querySelector('#search-admin');
+        
+        if (searchInput) {
+            searchInput.value = '';
+        }
+
+        /* Nascondiamo la X */
+        btnEl.style.display = 'none';
+
+        /* Svuotiamo dropdown e griglia permessi */
+        const dropdownContainer = document.getElementById('dropdownAdmins');
+        if (dropdownContainer) dropdownContainer.innerHTML = '';
+
+        const permissionsContainer = document.getElementById('admin-permissions-container');
+        if (permissionsContainer) permissionsContainer.innerHTML = '';
     }
 }

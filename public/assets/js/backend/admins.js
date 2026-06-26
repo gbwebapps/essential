@@ -79,9 +79,25 @@ const actions = {
         });
         editManager.init();
 
+        // const generalDataManager = new GeneralDataManager({
+        //     url: urlbase + 'backend/admins/getGeneralData', 
+        //     formSelector: '#getGeneralData'
+        // });
+        // generalDataManager.init();
+
         const generalDataManager = new GeneralDataManager({
             url: urlbase + 'backend/admins/getGeneralData', 
             formSelector: '#getGeneralData'
+        }, {
+            onGeneralDataAfter: (data) => {
+                /* Se il server restituisce la doppia vista dell'anagrafica, sincronizziamo il pannello */
+                if (data.permissions_output) {
+                    const permissionsEl = document.getElementById('permissions');
+                    if (permissionsEl) {
+                        smoothReplace(permissionsEl, data.permissions_output);
+                    }
+                }
+            }
         });
         generalDataManager.init();
 

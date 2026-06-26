@@ -44,8 +44,6 @@ class Permissions extends BaseConfig
 		        'perms' => [
 		            'users_index' => lang('backend/permissions.users.index'),
 		            'users_showall' => lang('backend/permissions.users.showAll'),
-		            'users_add' => lang('backend/permissions.users.add'),
-		            'users_edit' => lang('backend/permissions.users.edit'),
 		            'users_show' => lang('backend/permissions.users.show'),
 		            'users_delete' => lang('backend/permissions.users.delete'),
 		        ]
@@ -57,8 +55,6 @@ class Permissions extends BaseConfig
 		        'perms' => [
 		            'messages_index' => lang('backend/permissions.messages.index'),
 		            'messages_showall' => lang('backend/permissions.messages.showAll'),
-		            'messages_add' => lang('backend/permissions.messages.add'),
-		            'messages_edit' => lang('backend/permissions.messages.edit'),
 		            'messages_show' => lang('backend/permissions.messages.show'),
 		            'messages_delete' => lang('backend/permissions.messages.delete'),
 		        ]

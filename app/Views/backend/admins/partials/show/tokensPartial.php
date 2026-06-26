@@ -2,12 +2,18 @@
     <?php if(count($tokens)): ?>
         <table class="table table-bordered align-middle mb-0">
             <thead>
-            <tr>
-                <th class="text-left" style="width: 37.5%;"><?= lang('backend/admins.labels.createdToken'); ?></th>
-                <th class="text-left" style="width: 37.5%;"><?= lang('backend/admins.labels.expiredToken'); ?></th>
-                <th class="text-left" style="width: 20%;"><?= lang('backend/admins.labels.typeToken'); ?></th>
-                <th class="text-center" style="width: 5%;">&nbsp;</th>
-            </tr>
+                <tr>
+                    <th class="text-left" style="width: 37.5%;">
+                        <i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.createdToken'); ?>
+                    </th>
+                    <th class="text-left" style="width: 37.5%;">
+                        <i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.expiredToken'); ?>
+                    </th>
+                    <th class="text-left" style="width: 20%;">
+                        <i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.typeToken'); ?>
+                    </th>
+                    <th class="text-center" style="width: 5%;">&nbsp;</th>
+                </tr>
             </thead>
             <tbody>
             <?php foreach($tokens as $token): ?>
@@ -26,9 +32,9 @@
 
                     /* Confrontiamo i due oggetti DateTime in modo nativo e sicuro */
                     if ($now < $dateExpire):
-                        $expireDate = '<span class="text-success">' . convertDate($dateExpire->format('Y-m-d H:i:s')) . '</span>';
+                        $expireDate = '<span class="text-success fw-bold">' . convertDate($dateExpire->format('Y-m-d H:i:s')) . '</span>';
                     else:
-                        $expireDate = '<span class="text-danger"><s>' . convertDate($dateExpire->format('Y-m-d H:i:s')) . '</s></span>';
+                        $expireDate = '<span class="text-danger fw-bold"><s>' . convertDate($dateExpire->format('Y-m-d H:i:s')) . '</s></span>';
                     endif;
 
                     /* Identificazione del tipo con fallback di sicurezza finale */
@@ -45,7 +51,7 @@
                 ?>
 
                 <tr>
-                    <td class="text-left"><?= convertDate(esc($token->token_create)); ?></td>
+                    <td class="text-left fw-bold"><?= convertDate(esc($token->token_create)); ?></td>
                     <td class="text-left"><?= $expireDate; ?></td>
                     <td class="text-left">
                         <span class="text-success fw-bold"><?= $tokenType; ?></span>

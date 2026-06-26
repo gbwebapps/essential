@@ -749,7 +749,7 @@ class AdminsModel extends BackendModel
      * @param string $uuid L'UUID dell'amministratore.
      * @return array Array associativo dove la chiave è il codice permesso e il valore è lo stato 'allow' (0 o 1).
      */
-    public function getUserExceptions(string $uuid): array
+    public function getAdminExceptions(string $uuid): array
     {
         $sql = "select permission, allow from admins_permissions where admin_uuid = ?";
         $result = $this->db->query($sql, [$uuid])->getResultObject();
@@ -982,7 +982,7 @@ class AdminsModel extends BackendModel
         $groupPerms = $this->getGroupPermissions((int) $original->group_id);
 
         /* 3. Recupero le eccezioni attuali dell'utente dal database */
-        $userExceptions = $this->getUserExceptions($original->uuid);
+        $userExceptions = $this->getAdminExceptions($original->uuid);
 
         /* 4. Calcolo la lista reale e attiva dei permessi attuali dell'utente */
         $oldPermissions = [];
@@ -1272,7 +1272,7 @@ class AdminsModel extends BackendModel
 
             /* 1. Recuperiamo lo stato nativo del gruppo e le eccezioni attuali */
             $groupPerms = $this->getGroupPermissions((int) $admin->group_id);
-            $userExceptions = $this->getUserExceptions($admin->uuid);
+            $userExceptions = $this->getAdminExceptions($admin->uuid);
 
             $isBelongingToGroup = in_array($permissionCode, $groupPerms);
             $hasException = array_key_exists($permissionCode, $userExceptions);
@@ -1384,7 +1384,7 @@ class AdminsModel extends BackendModel
      * @param string $admin_uuid Identificativo univoco dell'amministratore da ripulire.
      * @return void
      */
-    protected function deletePermissions($admin_uuid)
+    public function deletePermissions($admin_uuid)
     {
         $sql = "delete from admins_permissions where admin_uuid = ?";
         $this->db->query($sql, [$admin_uuid]);

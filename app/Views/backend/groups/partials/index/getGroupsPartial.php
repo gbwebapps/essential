@@ -25,7 +25,7 @@
                 <?php endforeach; ?>
             <?php else: ?>
                 <div class="text-center text-muted py-3">
-                    Nessun gruppo presente nel sistema.
+                    <?= lang('backend/groups.messages.noGroupFound'); ?>
                 </div>
             <?php endif; ?>
 

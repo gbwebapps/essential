@@ -38,7 +38,7 @@ class AdminsClass
 	 *
 	 * @return array
 	 */
-	public function getOptionsIndex()
+	public function getOptionsIndex(): array
 	{
 		return 
 		[
@@ -56,7 +56,7 @@ class AdminsClass
 	 *
 	 * @return array
 	 */
-	public function getOptionsShowAll()
+	public function getOptionsShowAll(): array
 	{
 		return 
 		[
@@ -74,7 +74,7 @@ class AdminsClass
 	 *
 	 * @return array
 	 */
-	public function getOptionsAdd()
+	public function getOptionsAdd(): array
 	{
 		return 
 		[
@@ -92,7 +92,7 @@ class AdminsClass
 	 *
 	 * @return array
 	 */
-	public function getOptionsEdit()
+	public function getOptionsEdit(): array
 	{
 		return 
 		[
@@ -110,7 +110,7 @@ class AdminsClass
 	 *
 	 * @return array
 	 */
-	public function getOptionsShow()
+	public function getOptionsShow(): array
 	{
 		return 
 		[
@@ -130,7 +130,7 @@ class AdminsClass
 	 *
 	 * @return array
 	 */
-	public function getLinksBarIndex()
+	public function getLinksBarIndex(): array
 	{
 		return 
 		[
@@ -146,7 +146,7 @@ class AdminsClass
 	 *
 	 * @return array
 	 */
-	public function getLinksBarShowAll()
+	public function getLinksBarShowAll(): array
 	{
 		return 
 		[
@@ -162,7 +162,7 @@ class AdminsClass
 	 *
 	 * @return array
 	 */
-	public function getLinksBarAdd()
+	public function getLinksBarAdd(): array
 	{
 		return 
 		[
@@ -180,8 +180,11 @@ class AdminsClass
 	 * @param string|null $uuid Identificativo univoco dell'amministratore in fase di modifica.
 	 * @return array
 	 */
-	public function getLinksBarEdit(?string $uuid = null)
+	public function getLinksBarEdit(?string $uuid = null): array
 	{
+		/* Se non c'è l'uuid, restituiamo un array senza i link specifici o gestiamo l'errore */
+		if ( ! $uuid) return [];
+
 		return 
 		[
             ['icon' => '<i class="fa-solid fa-chart-simple"></i>', 'label' => lang('backend/admins.linksBar.index'), 'route' => 'backend/admins'],
@@ -200,7 +203,7 @@ class AdminsClass
 	 * @param string|null $uuid Identificativo univoco dell'amministratore da visualizzare.
 	 * @return array
 	 */
-	public function getLinksBarShow(?string $uuid = null)
+	public function getLinksBarShow(?string $uuid = null): array
 	{
 		/* Se non c'è l'uuid, restituiamo un array senza i link specifici o gestiamo l'errore */
 		if ( ! $uuid) return [];

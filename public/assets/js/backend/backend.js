@@ -367,6 +367,24 @@ export async function askConfirm(message, options = {}) {
     });
 }
 
+// export function smoothReplace(container, newHtml) {
+//     container.innerHTML = newHtml;
+// }
+
 export function smoothReplace(container, newHtml) {
+    if (!container) return;
+
+    // 1. Applichiamo subito l'opacità zero (nascosto) senza transizione
+    container.style.transition = 'none';
+    container.style.opacity = '0';
+
+    // 2. Sostituiamo immediatamente il contenuto HTML
     container.innerHTML = newHtml;
+
+    // 3. Forziamo il reflow del browser (obbliga a registrare lo stato opacità = 0)
+    container.offsetHeight;
+
+    // 4. Ripristiniamo la transizione CSS e portiamo l'opacità a 1 per avviare il fade-in
+    container.style.transition = 'opacity 0.25s ease-in-out';
+    container.style.opacity = '1';
 }

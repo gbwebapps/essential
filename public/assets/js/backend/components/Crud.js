@@ -147,8 +147,7 @@ export class ListManager {
             if ( ! inputEl) return;
 
             /* Digitando nell'input */
-            inputEl.addEventListener('keyup', (e) => {
-                if (['Shift', 'Control', 'Alt', 'AltGraph', 'CapsLock', 'Tab', 'Escape'].includes(e.key)) return;
+            inputEl.addEventListener('input', (e) => {
 
                 const value = inputEl.value;
                 localStorage.setItem(`${this.config.controller}_${field}`, value);

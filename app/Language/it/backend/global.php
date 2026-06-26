@@ -18,6 +18,9 @@ return [
             'tools' => 'Strumenti',
         ],
     ],
+    'links' => [
+        'selectAll' => 'Seleziona tutti'
+    ], 
     'buttons' => [
         'modules' => 'Moduli',
         'services' => 'Servizi',

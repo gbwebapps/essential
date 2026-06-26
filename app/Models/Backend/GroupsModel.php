@@ -35,6 +35,13 @@ class GroupsModel extends BackendModel
     protected array $delAllowedFields = ['id'];
 
     /**
+     * Campi di input autorizzati per il salvataggio delle eccezioni.
+     *
+     * @var array
+     */
+    protected array $saveExceptionsAllowedFields = ['uuid', 'permissions'];
+
+    /**
      * Elenco delle proprietà principali utilizzate per la comparazione dei dati storici o per il tracciamento dei log.
      *
      * @var array
@@ -87,7 +94,7 @@ class GroupsModel extends BackendModel
                 'label' => lang('backend/admins.labels.permissions'),
                 'rules' => ['permit_empty', 'in_list[' . $inListString . ']'],
                 'errors' => [
-                    'in_list' => lang('Backend/admins.errors.permission')
+                    'in_list' => lang('Backend/groups.errors.permission')
                 ]
             ],
 	    ];
@@ -153,6 +160,46 @@ class GroupsModel extends BackendModel
                 'rules' => ['required', 'is_natural_no_zero', 'is_not_unique[admins_groups.id]'],
             ],
         ];
+    }
+
+    /**
+     * Valida i parametri per il salvataggio delle eccezioni.
+     *
+     * Assicura che l'id fornito per l'eliminazione dell'amministratore sia presente.
+     *
+     * @return array Criteri di validazione per la revoca e rimozione del record.
+     */
+    public function saveExceptionsValidationRules(): array
+    {
+        /* Recuperiamo l'array multidimensionale dalla configurazione per estrarre le chiavi valide */
+        $rawPermissions = config(\Config\Backend\Permissions::class)->getPermissions();
+
+        $validKeys = [];
+        foreach ($rawPermissions as $group):
+            $validKeys = array_merge($validKeys, array_keys($group['perms']));
+        endforeach;
+
+        $inListString = implode(',', $validKeys);
+
+        return [
+            'uuid' => [
+                'label' => lang('backend/groups.labels.uuid'),
+                'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'], 
+                'errors' => [
+                    'required' => lang('Backend/groups.errors.uuid'), 
+                    'regex_match' => lang('Backend/groups.errors.uuid') 
+                ]
+            ],
+            /* Validazione di ogni singolo elemento contenuto nell'array delle eccezioni */
+            'permissions.*' => [
+                'label' => lang('backend/groups.labels.permissions'),
+                'rules' => ['permit_empty', 'in_list[' . $inListString . ']'],
+                'errors' => [
+                    'in_list' => lang('Backend/groups.errors.permission')
+                ]
+            ],
+        ];
+
     }
 
     /**
@@ -302,7 +349,7 @@ class GroupsModel extends BackendModel
             /* 1. Recupero il record originale del gruppo dal DB per il confronto */
             $originalGroup = $this->getGroupById((int) $posts['id']);
             if ( ! $originalGroup):
-                return ['result' => false, 'message' => lang('backend/groups.messages.notFound')];
+                return ['result' => false, 'message' => lang('backend/groups.messages.noGroupFound')];
             endif;
 
             /* 2. Controllo di sbarramento: se non è cambiato nulla, interrompo subito */
@@ -421,5 +468,165 @@ class GroupsModel extends BackendModel
         endif;
 
         return false;
+    }
+
+    /**
+     * Recupera l'elenco degli amministratori filtrati per nome/username
+     * per il dropdown delle eccezioni permessi.
+     */
+    public function getDropdownAdmins(string $searchQuery): array
+    {
+        try 
+        {
+            /* Rimuoviamo eventuali spazi vuoti iniziali o finali e convertiamo in minuscolo */
+            $cleanQuery = trim(strtolower($searchQuery));
+            $bindValue = '%' . $cleanQuery . '%';
+
+            /* Utilizziamo lower() per rendere la ricerca totalmente case-insensitive 
+               e cambiamo il separatore del concat usando le funzioni standard SQL 
+            */
+            $sql = 'select uuid, concat(firstname, " ", lastname) as identity  
+                    from admins 
+                    where lower(firstname) like ? or lower(lastname) like ? and master <> 1';
+            
+            $query = $this->db->query($sql, [$bindValue, $bindValue]);
+
+            return $query->getResultArray();
+        } 
+        catch (\Throwable $e) 
+        {
+            log_message('error', 'Errore recupero amministratori: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Recupera i dati di base di un amministratore tramite il suo UUID.
+     */
+    public function getAdminByUuid(string $uuid): ?array
+    {
+        $sql = 'select uuid, group_id, name 
+                from admins 
+                join admins_groups 
+                on admins_groups.id = admins.group_id 
+                where admins.uuid = ?';
+                
+        return $this->db->query($sql, [$uuid])->getRowArray();
+    }
+
+    /**
+     * Restituisce un array piatto contenente solo le stringhe dei permessi del gruppo.
+     */
+    public function getGroupPermissionsArray(int $groupId): array
+    {
+        $sql = 'select permission from admins_groups_permissions where group_id = ?';
+        $res = $this->db->query($sql, [$groupId])->getResultArray();
+        return array_column($res, 'permission');
+    }
+
+    /**
+     * Restituisce un array associativo [permission => allow] delle eccezioni dell'admin.
+     */
+    public function getAdminExceptionsArray(string $adminUuid): array
+    {
+        $sql = 'select permission, allow from admins_permissions where admin_uuid = ?';
+        $res = $this->db->query($sql, [$adminUuid])->getResultArray();
+        
+        $exceptions = [];
+        foreach ($res as $row):
+            $exceptions[$row['permission']] = (int)$row['allow'];
+        endforeach;
+        
+        return $exceptions;
+    }
+
+    public function saveExceptions(array $posts): array
+    {
+        try 
+        {
+            $posts = $this->checkAllowedFields($posts, $this->saveExceptionsAllowedFields);
+
+            $sql = 'select group_id from admins where uuid = ?';
+            $admin = $this->db->query($sql, [$posts['uuid']])->getRow();
+            
+            if ( ! $admin):
+                return ['result' => false, 'message' => lang('backend/groups.messages.noAdminFound')];
+            endif;
+
+            /* 1. Recuperiamo la situazione ATTUALE sul database prima di fare modifiche */
+            $groupPermissions = $this->getGroupPermissionsArray((int) $admin->group_id);
+            
+            /* getAdminExceptionsArray deve restituire la visualizzazione reale (es: array associativo o lista di permessi attivi) */
+            $currentExceptions = $this->getAdminExceptionsArray($posts['uuid']); 
+            $submittedPermissions = $posts['permissions'] ?? [];
+
+            /* 2. Calcoliamo la matrice dei permessi attualmente attivi per l'utente sul DB */
+            $currentActivePermissions = $groupPermissions;
+            foreach ($currentExceptions as $perm => $allow):
+                if ($allow === 1 && ! in_array($perm, $currentActivePermissions)):
+                    $currentActivePermissions[] = $perm;
+                elseif ($allow === 0):
+                    $currentActivePermissions = array_diff($currentActivePermissions, [$perm]);
+                endif;
+            endforeach;
+            $currentActivePermissions = array_values($currentActivePermissions);
+
+            /* 3. CONTROLLO DI SBARRAMENTO
+                Se i permessi inviati sono identici (sia in quantità che in contenuto) a quelli già attivi, 
+                allora non è stato cambiato nulla. 
+            */
+            sort($submittedPermissions);
+            sort($currentActivePermissions);
+            
+            if ($submittedPermissions === $currentActivePermissions):
+                return ['result' => false, 'message' => lang('backend/groups.messages.noDataChanged')];
+            endif;
+
+            /* --- Da qui in poi eseguiamo le modifiche perché qualcosa è cambiato --- */
+            $this->db->transBegin();
+
+            /* Istanziamo AdminsModel al volo e richiamiamo il suo metodo nativo */
+            model(\App\Models\Backend\AdminsModel::class)->deletePermissions($posts['uuid']);
+
+            $extraPermissions = array_diff($submittedPermissions, $groupPermissions);
+            $revokedPermissions = array_diff($groupPermissions, $submittedPermissions);
+
+            /* Scrittura delle eccezioni positive (allow = 1) */
+            $bulkData = [];
+            $valuesSql = [];
+
+            /* Raccogliamo le eccezioni positive */
+            foreach ($extraPermissions as $perm):
+                $valuesSql[] = "(?, ?, 1)";
+                array_push($bulkData, $perm, $posts['uuid']);
+            endforeach;
+
+            /* Raccogliamo le eccezioni negative */
+            foreach ($revokedPermissions as $perm):
+                $valuesSql[] = "(?, ?, 0)";
+                array_push($bulkData, $perm, $posts['uuid']);
+            endforeach;
+
+            /* Se ci sono dati da scrivere, eseguiamo un'unica query massiva */
+            if ( ! empty($valuesSql)):
+                $sqlInsert = "insert into admins_permissions (permission, admin_uuid, allow) values " . implode(', ', $valuesSql);
+                $this->db->query($sqlInsert, $bulkData);
+            endif;
+
+            if ($this->db->transStatus() === false):
+                $this->db->transRollback();
+                return ['result' => false, 'message' => lang('backend/groups.messages.saveExceptionsError')];
+            endif;
+
+            $this->db->transCommit();
+            return ['result' => true, 'message' => lang('backend/groups.messages.saveExceptionsSuccess')];
+
+        } catch (\Exception $e) {
+            if ($this->db->transStatus() === false):
+                $this->db->transRollback();
+            endif;
+            log_message('error', $e->getMessage());
+            return ['result' => false, 'message' => lang('backend/groups.messages.saveExceptionsError')];
+        }
     }
 }

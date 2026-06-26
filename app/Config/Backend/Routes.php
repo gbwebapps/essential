@@ -73,6 +73,10 @@ $routes->group('backend', function($routes) {
             $routes->post('add', '\App\Controllers\Backend\GroupsController::add'); 
             $routes->post('edit', '\App\Controllers\Backend\GroupsController::edit'); 
             $routes->post('del', '\App\Controllers\Backend\GroupsController::del'); 
+            $routes->post('openExceptions', '\App\Controllers\Backend\GroupsController::openExceptions'); 
+            $routes->post('getDropdownAdmins', '\App\Controllers\Backend\GroupsController::getDropdownAdmins'); 
+            $routes->post('getAdminPermissions', '\App\Controllers\Backend\GroupsController::getAdminPermissions'); 
+            $routes->post('saveExceptions', '\App\Controllers\Backend\GroupsController::saveExceptions'); 
         });
 
         /* Modulo Admins: gestione totale (CRUD), stati operativi e configurazione granulare dei permessi degli amministratori */

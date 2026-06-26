@@ -201,7 +201,7 @@ class AdminsController extends BackendController
 
                 /* Carico sia i permessi del gruppo sia le eccezioni dell'utente */
                 $this->data['group_perms'] = $this->adminsModel->getGroupPermissions((int) $admin['row']->group_id);
-                $this->data['user_exceptions'] = $this->adminsModel->getUserExceptions($posts['uuid']);
+                $this->data['admin_exceptions'] = $this->adminsModel->getAdminExceptions($posts['uuid']);
                 $this->data['admin'] = $admin['row'];
 
                 return $this->response->setJSON(['result' => true,'output' => view('backend/admins/partials/edit/editPartial', $this->data)]);
@@ -228,7 +228,7 @@ class AdminsController extends BackendController
                 $this->data['admin'] = $result['row'];
                 /* Rigenero i dati corretti per la matrice aggiornata interpellando il Model */
                 $this->data['group_perms'] = $this->adminsModel->getGroupPermissions((int) $result['row']->group_id);
-                $this->data['user_exceptions'] = $this->adminsModel->getUserExceptions($posts['uuid']);
+                $this->data['admin_exceptions'] = $this->adminsModel->getAdminExceptions($posts['uuid']);
                 
                 $json['output'] = view('backend/admins/partials/edit/editPartial', $this->data);
             endif;
@@ -249,6 +249,7 @@ class AdminsController extends BackendController
         endif;
         
         $this->data['action'] = 'edit';
+        
         $this->data['title'] = lang('backend/admins.titles.edit');
         $this->data['icon'] = '<i class="fa-solid fa-user-pen"></i>';
 
@@ -257,7 +258,7 @@ class AdminsController extends BackendController
 
         /* Caso Caricamento standard: passo le matrici separate alla vista */
         $this->data['group_perms'] = $this->adminsModel->getGroupPermissions((int) $admin['row']->group_id);
-        $this->data['user_exceptions'] = $this->adminsModel->getUserExceptions($uuid);
+        $this->data['admin_exceptions'] = $this->adminsModel->getAdminExceptions($uuid);
 
         return $this->render('backend/admins/editView', $this->data);
     }
@@ -289,10 +290,17 @@ class AdminsController extends BackendController
             /* 2. Recuperiamo i permessi nativi associati unicamente al nuovo gruppo selezionato */
             $this->data['group_perms'] = $this->adminsModel->getGroupPermissions((int) $posts['group_id']);
 
-            /* 3. Svuotiamo le eccezioni dell'utente: il nuovo gruppo deve mostrare la sua configurazione pulita */
-            $this->data['user_exceptions'] = [];
+            /* 3. Controllo di sbarramento: recuperiamo i veri dati dell'admin dal DB */
+            $dbAdmin = $this->adminsModel->getByUUID($posts['uuid']);
+            
+            if ($dbAdmin['result'] === true && (int) $dbAdmin['row']->group_id === (int) $posts['group_id']):
+                /* Se il gruppo selezionato è quello di partenza, ricarichiamo le sue vere eccezioni */
+                $this->data['admin_exceptions'] = $this->adminsModel->getAdminExceptions($posts['uuid']);
+            else:
+                /* Se il gruppo è cambiato, mostriamo la configurazione pulita del nuovo gruppo */
+                $this->data['admin_exceptions'] = [];
+            endif;
 
-            /* Generiamo il JSON di risposta contenente il partial HTML aggiornato */
             return $this->response->setJSON(['result' => true, 'output' => view('backend/admins/partials/edit/permissionsPartial', $this->data)]);
 
         endif;
@@ -317,17 +325,17 @@ class AdminsController extends BackendController
         endif;
         
         $this->data['action'] = 'show';
+
         $this->data['title'] = lang('backend/admins.titles.show');
         $this->data['icon'] = '<i class="fa-solid fa-user"></i>';
 
-        $adminRow = $admin['row'];
-        $this->data['admin'] = $adminRow;
+        $this->data['admin'] = $admin['row'] ?? null;
         $this->data['uuid'] = $uuid;
 
         /* Struttura per mappare i gruppi e le eccezioni */
         $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
-        $this->data['group_perms'] = $this->adminsModel->getGroupPermissions((int) $adminRow->group_id);
-        $this->data['user_exceptions'] = $this->adminsModel->getUserExceptions($adminRow->uuid);
+        $this->data['group_perms'] = $this->adminsModel->getGroupPermissions((int) $admin['row']->group_id);
+        $this->data['admin_exceptions'] = $this->adminsModel->getAdminExceptions($admin['row']->uuid);
 
         $this->data['userAgent'] = new UserAgent();
         $this->data['tokens'] = $this->adminsModel->getTokens($uuid);
@@ -454,7 +462,7 @@ class AdminsController extends BackendController
             /* Ricarichiamo la situazione aggiornata dopo l'operazione sul database */
             $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
             $this->data['group_perms'] = $this->adminsModel->getGroupPermissions((int) $adminRow->group_id);
-            $this->data['user_exceptions'] = $this->adminsModel->getUserExceptions($adminRow->uuid);
+            $this->data['admin_exceptions'] = $this->adminsModel->getAdminExceptions($adminRow->uuid);
 
             $json['permissionsView'] = view('backend/admins/partials/show/permissionsPartial', $this->data);
             $json['metaView'] = view('backend/admins/partials/common/metaDataPartial', $this->data); 
@@ -480,8 +488,7 @@ class AdminsController extends BackendController
 
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                
-                return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/admins.messages.validateToastErrors'), $errorMessage)]);
+                return $this->response->setJSON(['result' => false, 'message' => sprintf(lang('backend/admins.messages.validateToastErrors'), $errorMessage)]);
             endif;
 
             $record = $this->adminsModel->getByUUID($posts['uuid']);
@@ -489,7 +496,6 @@ class AdminsController extends BackendController
             if($record['result'] === true):
 
                 $json = ['result' => true];
-
                 $this->data['admin'] = $record['row'];
 
                 if(isset($posts['context']) && $posts['context'] === 'show'):
@@ -499,6 +505,13 @@ class AdminsController extends BackendController
                 if(isset($posts['context']) && $posts['context'] === 'edit'):
                     $this->data['groups'] = $this->adminsModel->getGroups();
                     $json['output'] = view('backend/admins/partials/edit/generalDataPartial', $this->data);
+
+                    /* Generiamo i dati completi e la vista anche per il pannello permessi */
+                    $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
+                    $this->data['group_perms'] = $this->adminsModel->getGroupPermissions((int) $record['row']->group_id);
+                    $this->data['admin_exceptions'] = $this->adminsModel->getAdminExceptions($posts['uuid']);
+                    
+                    $json['permissions_output'] = view('backend/admins/partials/edit/permissionsPartial', $this->data);
                 endif;
 
             else:
@@ -586,7 +599,7 @@ class AdminsController extends BackendController
                 $this->data['group_perms'] = $this->adminsModel->getGroupPermissions((int) $adminRow->group_id);
 
                 /* 3. Recuperiamo le eccezioni specifiche memorizzate nel DB per questo utente */
-                $this->data['user_exceptions'] = $this->adminsModel->getUserExceptions($adminRow->uuid);
+                $this->data['admin_exceptions'] = $this->adminsModel->getAdminExceptions($adminRow->uuid);
 
                 /* Renderizzazione differenziata in base al contesto della richiesta */
                 if (isset($posts['context']) && $posts['context'] === 'show'):

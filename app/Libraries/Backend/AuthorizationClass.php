@@ -211,7 +211,7 @@ class AuthorizationClass
             $finalPermissions = [];
 
             /* Estraggo i permessi base associati al gruppo dell'utente */
-            $sqlGroupPerms = "select permission from admins_group_permissions where group_id = ?";
+            $sqlGroupPerms = "select permission from admins_groups_permissions where group_id = ?";
             $groupPerms = $this->db->query($sqlGroupPerms, [$data->group_id])->getResultObject();
 
             if ($groupPerms):

@@ -199,6 +199,7 @@ class GroupsController extends BackendController
 
             /* Validazione dei posts */
             if ( ! $this->validateData($posts, $rules)):
+                
                 /* Catturiamo gli errori grezzi (compresi eventuali permissions.0, permissions.1) */
                 $rawErrors = $this->validator->getErrors();
 
@@ -235,6 +236,103 @@ class GroupsController extends BackendController
             $result = $this->groupsModel->del($posts);
 
             return $this->response->setJSON($result);
+
+        endif;
+    }
+
+    public function openExceptions(): ResponseInterface
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            /* Generiamo la vista parziale che contiene il campo per cercare un utente */
+            $output = view('backend/groups/partials/index/exceptionsPartial', $this->data);
+
+            return $this->response->setJSON(['result' => true, 'output' => $output]);
+
+        endif;
+    }
+
+    public function getDropdownAdmins(): ResponseInterface
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            /* Recuperiamo la stringa digitata dall'utente inviata tramite FormData */
+            $searchQuery = $this->request->getPost('query');
+
+            /* Carichiamo gli amministratori filtrati dal model passando la query */
+            $this->data['admins'] = $this->groupsModel->getDropdownAdmins($searchQuery);
+
+            /* Generiamo la vista parziale che conterrà il ciclo foreach per il dropdown */
+            $output = view('backend/groups/partials/index/getDropdownAdminsPartial', $this->data);
+
+            return $this->response->setJSON(['result' => true, 'output' => $output]);
+
+        endif;
+    }
+
+    public function getAdminPermissions(): ResponseInterface
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            /* Recuperiamo l'UUID dell'amministratore selezionato */
+            $uuid = $this->request->getPost('uuid');
+
+            /* Recuperiamo i dettagli dell'amministratore (ci servirà il suo group_id) */
+            $admin = $this->groupsModel->getAdminByUuid($uuid);
+            if ( ! $admin):
+                return $this->response->setJSON(['result' => false, 'message' => 'Amministratore non trovato.']);
+            endif;
+
+            $this->data['uuid'] = $uuid;
+
+            $this->data['name'] = $admin['name'];
+            
+            /* 1. Mappa globale dei permessi dal file di configurazione */
+            $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
+            
+            /* 2. Permessi che il suo gruppo possiede già di base sul database */
+            $this->data['group_perms'] = $this->groupsModel->getGroupPermissionsArray((int)$admin['group_id']);
+            
+            /* 3. Eccezioni specifiche già salvate per questo amministratore sul database */
+            $this->data['admin_exceptions'] = $this->groupsModel->getAdminExceptionsArray($uuid);
+
+            /* Generiamo la vista parziale con la griglia completa */
+            $output = view('backend/groups/partials/index/getAdminPermissionsPartial', $this->data);
+
+            return $this->response->setJSON(['result' => true, 'output' => $output]);
+
+        endif;
+    }
+
+    public function saveExceptions(): ResponseInterface
+    {
+        /* Verifichiamo che la richiesta sia esclusivamente AJAX e POST */
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            $posts = $this->request->getPost();
+
+            /* Validazione preliminare dell'UUID dell'amministratore */
+            if (( ! isset($posts['uuid'])) || ( ! $this->regexp->validateUUID($posts['uuid']))):
+                return $this->response->setJSON(['result' => false, 'message' => lang('backend/global.messages.wrongUUIDFormat')]);
+            endif;
+
+            /* Recuperiamo le regole di validazione specifiche per le eccezioni dal Model */
+            $rules = $this->groupsModel->saveExceptionsValidationRules($posts);
+            
+            if ( ! $this->validateData($posts, $rules)):
+
+                $rawErrors = $this->validator->getErrors();
+
+                /* Raggruppiamo i dot-errors di 'permissions.*' sotto la chiave unica per il DOM */
+                $cleanErrors = removeDotPermissions('permissions', $rawErrors);
+
+                return $this->response->setJSON(['errors' => $cleanErrors, 'message' => lang('backend/global.messages.validationErrors')]);
+            endif;
+
+            /* Eseguiamo il salvataggio dei delta sul database tramite il Model */
+            $result = $this->groupsModel->saveExceptions($posts);
+
+            return $this->response->setJSON(['result'  => $result['result'], 'message' => $result['message']]);
 
         endif;
     }

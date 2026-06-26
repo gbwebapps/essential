@@ -10,7 +10,7 @@ const actions = {
         const groupManager = new GroupManager({
             getGroups: urlbase + 'backend/groups/getGroups',
             getGroup: urlbase + 'backend/groups/getGroup',
-            urlGetExceptions: urlbase + 'backend/groups/getAdmins'
+            urlGetExceptions: urlbase + 'backend/groups/getDropdownAdmins'
         });
 
         /* --- 1. GESTIONE MANUALE E FLUIDA: Aggiungi Gruppo --- */
@@ -123,14 +123,44 @@ const actions = {
             bsSubCollapse.show();
         });
 
-        /* --- 4. Resto dei listener standard (Eccezioni) --- */
+        /* --- 4. GESTIONE MANUALE E FLUIDA: Apri pannello eccezioni --- */
+        const triggerExceptionsBtn = document.querySelector('.btn-trigger-exceptions-group');
         const mainCollapseExceptions = document.getElementById('main_collapse_exceptions');
-        if (mainCollapseExceptions) {
-            mainCollapseExceptions.addEventListener('show.bs.collapse', () => {
-                groupManager.loadExceptionsPanel();
+
+        if (triggerExceptionsBtn && mainCollapseExceptions) {
+            const bsCollapseExceptions = new bootstrap.Collapse(mainCollapseExceptions, { toggle: false });
+
+            triggerExceptionsBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+
+                if (mainCollapseExceptions.classList.contains('show') || mainCollapseExceptions.classList.contains('collapsing')) {
+                    bsCollapseExceptions.hide();
+                    return;
+                }
+
+                const container = document.getElementById('exceptions-groups-container');
+                if (container && container.innerHTML.trim() !== '') {
+                    bsCollapseExceptions.show();
+                    return;
+                }
+
+                await groupManager.loadExceptionsPanel();
+                
+                triggerExceptionsBtn.disabled = false;
+                triggerExceptionsBtn.classList.remove('disabled');
+                
+                bsCollapseExceptions.show();
+            });
+
+            /* Rimosso il listener duplicato 'show.bs.collapse' che causava l'errore */
+
+            mainCollapseExceptions.addEventListener('hidden.bs.collapse', (e) => {
+                if (e.target === mainCollapseExceptions) {
+                    groupManager.resetExceptionsContainer();
+                }
             });
         }
-    }
+    } // Fine index
 };
 
 /* Listener per il link select all nei form add ed edit */

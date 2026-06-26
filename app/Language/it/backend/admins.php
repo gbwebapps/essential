@@ -31,7 +31,6 @@ return [
 		'resetFilters' => 'Resetta filtri', 
 		'resetSorting' => 'Resetta ordinamento', 
 		'reloadList' => 'Ricarica lista', 
-		'selectAll' => 'Seleziona tutti'
 	],
 	'labels' => [
 		'id' => 'ID', 
@@ -62,6 +61,8 @@ return [
 		'session' => 'Sessione',
         'activation' => 'Attivazione',
         'rememberMe' => 'Ricordami', 
+        'assignedToGroup' => 'Assegnato al GRUPPO', 
+        'notAssignedToGroup' => 'Non assegnato al GRUPPO'
 	],
 	'placeholders' => [
 		'firstname' => 'Inserisci nome...', 

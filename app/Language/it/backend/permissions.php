@@ -3,20 +3,16 @@
 return [
     'messages' => [
         'title' => 'Messaggi',
-        'index' => 'Dati',
-        'showAll' => 'Lista',
-        'add' => 'Aggiungi',
-        'edit' => 'Aggiorna',
-        'show' => 'Mostra',
-        'delete' => 'Elimina',
+        'index' => 'Dati messaggi',
+        'showAll' => 'Lista messaggi',
+        'show' => 'Mostra messaggio',
+        'delete' => 'Elimina messaggio',
     ], 
     'users' => [
         'title' => 'Utenti',
-        'index' => 'Dati',
-        'showAll' => 'Lista',
-        'add' => 'Aggiungi',
-        'edit' => 'Aggiorna',
-        'show' => 'Mostra',
-        'delete' => 'Elimina',
+        'index' => 'Dati utenti',
+        'showAll' => 'Lista utenti',
+        'show' => 'Mostra utente',
+        'delete' => 'Elimina utente',
     ]
 ];
