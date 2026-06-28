@@ -890,6 +890,11 @@ class AdminsModel extends BackendModel
                 return ['result' => false, 'message' => $data['message']];
             endif;
 
+            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
+            if ((int) $data['row']->master === 1):
+                return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
+            endif;
+
             /* Se non è stato effettuato alcun cambio sui dati gestiti, interrompiamo subito */
             if( ! $this->hasAdminChanged($posts, $data['row'])):
                 return ['result' => false, 'message' => lang('backend/admins.messages.noDataChanged')];
@@ -1047,6 +1052,11 @@ class AdminsModel extends BackendModel
                 return ['result' => false, 'message' => $data['message']];
             endif;
 
+            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
+            if ((int) $data['row']->master === 1):
+                return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
+            endif;
+
             $this->db->transBegin();
 
             /* Eliminazione utente */
@@ -1101,6 +1111,11 @@ class AdminsModel extends BackendModel
 
             if($data['result'] === false):
                 return ['result' => false, 'message' => $data['message']];
+            endif;
+
+            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
+            if ((int) $data['row']->master === 1):
+                return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
             endif;
 
             $userAgent = $request->getUserAgent()->getAgentString();
@@ -1190,6 +1205,11 @@ class AdminsModel extends BackendModel
                 return ['result' => false, 'message' => $data['message']];
             endif;
 
+            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
+            if ((int) $data['row']->master === 1):
+                return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
+            endif;
+
             $currentStatus = (int) $data['row']->status;
 
             /* Converte il risultato in un intero (0 o 1) per MySQL */
@@ -1263,8 +1283,14 @@ class AdminsModel extends BackendModel
             $posts = $this->checkAllowedFields($posts, $this->changePermissionAllowedFields);
 
             $data = $this->getByUUID($posts['uuid']);
+
             if ($data['result'] === false):
                 return ['result' => false, 'message' => $data['message']];
+            endif;
+
+            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
+            if ((int) $data['row']->master === 1):
+                return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
             endif;
 
             $admin = $data['row'];
@@ -1354,6 +1380,11 @@ class AdminsModel extends BackendModel
 
             if($data['result'] === false):
                 return ['result' => false, 'message' => $data['message']];
+            endif;
+
+            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
+            if ((int) $data['row']->master === 1):
+                return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
             endif;
 
             /* Query per eliminare il token */

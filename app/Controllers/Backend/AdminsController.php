@@ -196,6 +196,11 @@ class AdminsController extends BackendController
                 return $this->response->setJSON(['result' => false, 'message' => $admin['message']]);
             endif;
 
+            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
+            if ((int) $admin['row']->master === 1):
+                return $this->response->setJSON(['result' => false, 'message' => lang('backend/admins.messages.protectedAdmin')]);
+            endif;
+
             /* Caso 1: Refresh della vista parziale */
             if (isset($posts['action']) && $posts['action'] === 'refresh'):
 
@@ -246,6 +251,11 @@ class AdminsController extends BackendController
 
         if($admin['result'] === false):
             return redirect()->to(base_url('backend/admins/showAll'))->with('message', $admin['message'])->with('class', 'danger');
+        endif;
+
+        /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
+        if ((int) $admin['row']->master === 1):
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.protectedAdmin'))->with('class', 'danger')->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
         endif;
         
         $this->data['action'] = 'edit';
@@ -322,6 +332,11 @@ class AdminsController extends BackendController
 
         if ($admin['result'] === false):
             return redirect()->to(base_url('backend/admins/showAll'))->with('message', $admin['message'])->with('class', 'danger');
+        endif;
+
+        /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
+        if ((int) $admin['row']->master === 1):
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.protectedAdmin'))->with('class', 'danger')->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
         endif;
         
         $this->data['action'] = 'show';
@@ -607,6 +622,10 @@ class AdminsController extends BackendController
                 endif;
 
                 if (isset($posts['context']) && $posts['context'] === 'edit'):
+
+                    /* Inseriamo l'ID del gruppo reale corrente nel JSON di risposta per sincronizzare la select lato JS */
+                    $json['group_id'] = (int) $adminRow->group_id;
+
                     $json['output'] = view('backend/admins/partials/edit/permissionsPartial', $this->data);
                 endif;
 

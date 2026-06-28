@@ -46,16 +46,16 @@ $routes->group('backend', function($routes) {
 
         /* Modulo Messages: visualizzazione e consultazione della messaggistica di sistema */
         $routes->group('messages', ['filter' => 'authorization'], function($routes) {
-            $routes->get('/', '\App\Controllers\Backend\MessagesController::index');
-            $routes->get('showAll', '\App\Controllers\Backend\MessagesController::showAll');
-            $routes->get('show', '\App\Controllers\Backend\MessagesController::show');
+            $routes->get('/', '\App\Controllers\Backend\MessagesController::index', ['filter' => 'permission:messages_show']);
+            $routes->get('showAll', '\App\Controllers\Backend\MessagesController::showAll', ['filter' => 'permission:messages_show']);
+            $routes->get('show', '\App\Controllers\Backend\MessagesController::show', ['filter' => 'permission:messages_show']);
         });
 
         /* Modulo Users: consultazione ed elenco degli utenti della piattaforma pubblica */
         $routes->group('users', ['filter' => 'authorization'], function($routes) {
-            $routes->get('/', '\App\Controllers\Backend\UsersController::index');
-            $routes->get('showAll', '\App\Controllers\Backend\UsersController::showAll');
-            $routes->get('show', '\App\Controllers\Backend\UsersController::show');
+            $routes->get('/', '\App\Controllers\Backend\UsersController::index', ['filter' => 'permission:users_index']);
+            $routes->get('showAll', '\App\Controllers\Backend\UsersController::showAll', ['filter' => 'permission:users_showall']);
+            $routes->get('show', '\App\Controllers\Backend\UsersController::show', ['filter' => 'permission:users_show']);
         });
     });
 

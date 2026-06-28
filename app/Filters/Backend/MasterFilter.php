@@ -32,13 +32,13 @@ class MasterFilter implements FilterInterface
         endif;
 
         /* Impostazione sessione di errore per accesso negato */
-        session()->setFlashdata('message', sprintf(lang('backend/auth.messages.forbiddenArea'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)));
+        session()->setFlashdata('message', sprintf(lang('backend/global.messages.permissionDenied'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)));
         session()->setFlashdata('class', 'danger');
-        session()->setFlashdata('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
+        session()->setFlashdata('icon', '<i class="fa-solid fa-ban"></i>');
 
         /* Blocco AJAX: restituisce esito negativo e messaggio */
         if ($request->isAJAX() && $request->is('post')):
-            return service('response')->setJSON(['result' => false, 'message' => lang('backend/auth.messages.forbiddenArea')]);
+            return service('response')->setJSON(['result' => false, 'message' => lang('backend/global.messages.permissionDenied')]);
         endif;
 
         /* Blocco Standard: reindirizza alla dashboard */

@@ -43,7 +43,6 @@ return [
 		'checkAuthError' => 'Codice di autenticazione non valido oppure scaduto.', 
 		'tooMAnyAttempts' => 'Sono stati effettuati troppi tentativi.', 
 	    'currentSessionOn' => '%s %s sessione ancora in corso.', 
-	    'forbiddenArea' => '%s %s accesso non consentito.', 
 		'validationErrors' => 'Errori di validazione.', 
 		'subjectResetPasswordEmail' => '%s %s - Essential reset password'
 	]

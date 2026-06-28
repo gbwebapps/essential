@@ -38,6 +38,7 @@ return [
     'messages' => [
         'getDataError' => 'Errore durante operazione di recupero lista.',
         'getUUIDError' => 'Errore durante operazione di recupero dettaglio.', 
-        'UUIDNotFound' => 'Record non trovato.'
+        'UUIDNotFound' => 'Record non trovato.', 
+        'permissionDenied' => 'Accesso negato.'
     ]
 ];

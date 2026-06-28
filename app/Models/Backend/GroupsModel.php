@@ -487,7 +487,7 @@ class GroupsModel extends BackendModel
             */
             $sql = 'select uuid, concat(firstname, " ", lastname) as identity  
                     from admins 
-                    where lower(firstname) like ? or lower(lastname) like ? and master <> 1';
+                    where (lower(firstname) like ? or lower(lastname) like ?) and master <> 1';
             
             $query = $this->db->query($sql, [$bindValue, $bindValue]);
 

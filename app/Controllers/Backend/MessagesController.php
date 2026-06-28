@@ -49,4 +49,39 @@ class MessagesController extends BackendController
         $this->messagesModel = model(MessagesModel::class);
         $this->messagesClass = new MessagesClass($this->messagesModel);
     }
+
+    /**
+     * Renderizza la pagina principale del modulo di gestione dei messaggi.
+     *
+     * @return string La vista HTML iniziale dell'indice.
+     */
+    public function index(): string
+    {
+        $this->data['action'] = 'index';
+        
+        $this->data['title'] = lang('backend/messages.titles.index');
+        $this->data['icon'] = '<i class="fa-solid fa-chart-simple"></i>';
+
+        return $this->render('backend/messages/indexView', $this->data);
+    }
+
+    public function showAll(): string
+    {
+        $this->data['action'] = 'showAll';
+        
+        $this->data['title'] = lang('backend/messages.titles.showAll');
+        $this->data['icon'] = '<i class="fa-solid fa-list"></i>';
+
+        return $this->render('backend/messages/indexView', $this->data);
+    }
+
+    public function show(): string
+    {
+        $this->data['action'] = 'show';
+        
+        $this->data['title'] = lang('backend/messages.titles.show');
+        $this->data['icon'] = '<i class="fa-solid fa-file"></i>';
+
+        return $this->render('backend/messages/indexView', $this->data);
+    }
 }

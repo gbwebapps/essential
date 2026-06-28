@@ -125,5 +125,6 @@ return [
 		'resetPasswordSuccess' => 'Password amministratore %s %s resettata con successo.', 
 		'changePermissionError' => 'Modifica permesso amministratore non andato a buon fine.', 
 		'changePermissionSuccess' => 'Modifica permesso %s %s effettuato con successo.', 
+		'protectedAdmin' => 'Protetto da modifiche.'
 	]
 ];

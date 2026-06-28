@@ -49,4 +49,39 @@ class UsersController extends BackendController
         $this->usersModel = model(UsersModel::class);
         $this->usersClass = new UsersClass($this->usersModel);
     }
+
+    /**
+     * Renderizza la pagina principale del modulo di gestione degli utenti.
+     *
+     * @return string La vista HTML iniziale dell'indice.
+     */
+    public function index(): string
+    {
+        $this->data['action'] = 'index';
+        
+        $this->data['title'] = lang('backend/users.titles.index');
+        $this->data['icon'] = '<i class="fa-solid fa-chart-simple"></i>';
+
+        return $this->render('backend/users/indexView', $this->data);
+    }
+
+    public function showAll(): string
+    {
+        $this->data['action'] = 'showAll';
+        
+        $this->data['title'] = lang('backend/users.titles.showAll');
+        $this->data['icon'] = '<i class="fa-solid fa-list"></i>';
+
+        return $this->render('backend/users/indexView', $this->data);
+    }
+
+    public function show(): string
+    {
+        $this->data['action'] = 'show';
+        
+        $this->data['title'] = lang('backend/users.titles.show');
+        $this->data['icon'] = '<i class="fa-solid fa-file"></i>';
+
+        return $this->render('backend/users/indexView', $this->data);
+    }
 }

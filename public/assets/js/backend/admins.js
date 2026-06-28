@@ -1,5 +1,5 @@
 /* Import delle costanti e utility da backend.js */
-import { urlbase, controller, action } from './backend.js';
+import { urlbase, controller, action, smoothReplace } from './backend.js';
 
 /* Import dei componenti dalla sottocartella */
 import { ListManager, AddManager, EditManager, DeleteManager, ChangeStatusManager, GeneralDataManager, MetaDataManager } from './components/Crud.js';
@@ -79,12 +79,6 @@ const actions = {
         });
         editManager.init();
 
-        // const generalDataManager = new GeneralDataManager({
-        //     url: urlbase + 'backend/admins/getGeneralData', 
-        //     formSelector: '#getGeneralData'
-        // });
-        // generalDataManager.init();
-
         const generalDataManager = new GeneralDataManager({
             url: urlbase + 'backend/admins/getGeneralData', 
             formSelector: '#getGeneralData'
@@ -109,6 +103,16 @@ const actions = {
         const permissionsManager = new GetPermissionsManager({
             url: urlbase + 'backend/admins/getPermissions', 
             formSelector: '#getPermissions'
+        }, {
+            onPermissionsAfter: (data) => {
+                /* Se il server restituisce il group_id reale, riallineiamo la select dell'anagrafica */
+                if (data.group_id !== undefined) {
+                    const selectGroup = document.getElementById('group_id');
+                    if (selectGroup) {
+                        selectGroup.value = data.group_id;
+                    }
+                }
+            }
         });
         permissionsManager.init();
 
