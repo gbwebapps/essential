@@ -139,6 +139,39 @@ class AccountController extends BackendController
      */
     public function edit()
     {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            $posts = $this->request->getPost();
+
+            if (isset($posts['action']) && $posts['action'] === 'refresh'):
+                return $this->response->setJSON(['result' => true, 'output' => view('backend/account/partials/edit/editPartial', $this->data)]);
+            endif;
+
+            /* Passiamo l'UUID sicuro ricavato dall'oggetto dell'admin loggato */
+            $rules = $this->accountModel->editValidationRules($this->currentAdmin->uuid);
+
+            if ( ! $this->validateData($posts, $rules)):
+                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/account.messages.validationErrors')]);
+            endif;
+
+            $json = $this->accountModel->edit($posts, $this->currentAdmin);
+
+            if ($json['result'] === false):
+                return $this->response->setJSON(['result' => false, 'message' => $json['message']]);
+            endif;
+
+            if ($json['result'] === true):
+                $this->data['currentAdmin'] = $json['currentAdmin'];
+                $json['output'] = view('backend/account/partials/edit/editPartial', $this->data);
+
+                /* Inserisco anche la vista del menu in alto nel caso admin corrente abbia modificato il nome o il cognome */
+                $json['navBarTop'] = view('backend/template/navbarTopView', $this->data);
+            endif;
+
+            return $this->response->setJSON($json);
+
+        endif;
+
         $this->data['action'] = 'edit';
 
         return $this->render('backend/account/editView', $this->data);
@@ -147,14 +180,34 @@ class AccountController extends BackendController
     /**
      * Mostra l'elenco e il riepilogo dei permessi RBAC associati e attivi per l'operatore corrente.
      *
-     * @return string La vista HTML della schermata dei permessi.
+     * @return string|\CodeIgniter\HTTP\Response La vista HTML o la risposta JSON per AJAX.
      */
     public function permissions()
     {
-        $this->data['action'] = 'permissions';
+        /* Se la richiesta è AJAX e in POST, gestiamo il rinfresco asincrono */
+        if ($this->request->isAJAX() && $this->request->is('post')):
 
-        $this->data['perms'] = $this->getFlatPermissions($this->currentAdmin->uuid);
+            /* Svuotiamo la cache del Service e riassegniamo la proprietà del controller con l'istanza fresca */
+            $this->currentAdmin = service('authorization')->refresh()->currentAdmin();
+            $this->data['currentAdmin'] = $this->currentAdmin;
+
+            /* Ricarichiamo i dati necessari per la vista parziale */
+            $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
+            $this->data['group_perms'] = $this->accountModel->getGroupPermissions((int) $this->currentAdmin->group_id);
+            $this->data['admin_exceptions'] = $this->accountModel->getAdminExceptions($this->currentAdmin->uuid);
+
+            return $this->response->setJSON([
+                'result' => true,
+                'output' => view('backend/account/partials/permissions/permissionsPartial', $this->data)
+            ]);
+
+        endif;
+
+        /* Flusso standard al primo caricamento sincrono (GET) */
+        $this->data['action'] = 'permissions';
         $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
+        $this->data['group_perms'] = $this->accountModel->getGroupPermissions((int) $this->currentAdmin->group_id);
+        $this->data['admin_exceptions'] = $this->accountModel->getAdminExceptions($this->currentAdmin->uuid);
 
         return $this->render('backend/account/permissionsView', $this->data);
     }
@@ -208,19 +261,5 @@ class AccountController extends BackendController
         $this->data['action'] = 'security';
         
         return $this->render('backend/account/securityView', $this->data);
-    }
-
-    /**
-     * Estrae e normalizza in un array lineare monodimensionale i permessi attivi associati a un determinato amministratore.
-     *
-     * @param string $uuid L'identificativo univoco dell'amministratore.
-     * @return array Elenco sequenziale dei permessi dell'utente.
-     */
-    private function getFlatPermissions(string $uuid): array
-    {
-        $rawPermissions = $this->accountModel->getPermissions($uuid);
-        return array_map(function($perm) {
-            return $perm->permission;
-        }, $rawPermissions);
     }
 }

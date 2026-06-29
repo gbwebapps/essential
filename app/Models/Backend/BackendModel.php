@@ -254,11 +254,21 @@ abstract class BackendModel extends BaseModel
 	protected function hasDataChanged(array $posts, object $original): bool
 	{
 	    /* 1. Controllo dei campi nativi della tabella (Valido per TUTTI i moduli) */
-	    foreach ($this->toCompare as $field):
-	        if (isset($posts[$field]) && $posts[$field] !== $original->$field):
-	            return true;
-	        endif;
-	    endforeach;
+        foreach ($this->toCompare as $field):
+            
+            /* Se il campo è presente nel POST, normalizziamo il confronto a stringa */
+            if (isset($posts[$field])):
+                
+                /* Recuperiamo il valore originale gestendo il possibile NULL dal DB */
+                $originalValue = $original->$field ?? '';
+
+                /* Il cast a (string) azzera la differenza tra null e "" senza toccare i dati reali */
+                if ((string)$posts[$field] !== (string)$originalValue):
+                    return true;
+                endif;
+
+            endif;
+        endforeach;
 
 	    /* 2. Controllo dei file caricati (Valido per TUTTI i moduli che accettano allegati) */
 	    foreach (['images', 'documents'] as $type):

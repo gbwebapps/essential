@@ -800,7 +800,7 @@ class AdminsModel extends BackendModel
 
             /* Inserimento dati nella tabella principale con l'aggiunta di group_id */
             $sql = "insert into admins (uuid, firstname, lastname, email, phone, status, group_id, note, created_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            $this->db->query($sql, [$uuid, $posts['firstname'], $posts['lastname'], $posts['email'], $posts['phone'], $posts['status'], $posts['group_id'], $posts['note'], date('Y-m-d H:i:s')]);
+            $this->db->query($sql, [$uuid, $posts['firstname'], $posts['lastname'], $posts['email'], $posts['phone'], $posts['status'], $posts['group_id'], (trim($posts['note']) !== '' ? $posts['note'] : null), date('Y-m-d H:i:s')]);
 
             /* Generazione token di attivazione */
             $token = new \App\Libraries\Token();
@@ -906,7 +906,7 @@ class AdminsModel extends BackendModel
 
             /* Aggiorno la tabella principale dell'utente includendo il group_id */
             $sql = 'update admins set firstname = ?, lastname = ?, email = ?, phone = ?, status = ?, group_id = ?, note = ?, updated_at = ? where uuid = ?';
-            $this->db->query($sql, [$posts['firstname'], $posts['lastname'], $posts['email'], $posts['phone'], $posts['status'], $posts['group_id'], $posts['note'], $updated_at, $posts['uuid']]);
+            $this->db->query($sql, [$posts['firstname'], $posts['lastname'], $posts['email'], $posts['phone'], $posts['status'], $posts['group_id'], (trim($posts['note']) !== '' ? $posts['note'] : null), $updated_at, $posts['uuid']]);
 
             /* Eliminazione incondizionata delle vecchie eccezioni dell'utente */
             $this->deletePermissions($posts['uuid']);

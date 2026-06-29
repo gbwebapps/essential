@@ -16,7 +16,7 @@
                         <?= lang('backend/account.titles.permissions'); ?>
                     </h2>
                     <div>
-                        <form id="getPermissionsData">
+                        <form id="getPermissions">
                             <button type="submit" class="btn btn-sm btn-secondary">
                                 <i class="fa-solid fa-arrows-rotate"></i> <?= lang('backend/account.buttons.reload'); ?>
                             </button>

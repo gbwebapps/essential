@@ -179,7 +179,8 @@ class AuthorizationClass
                     lastname, 
                     email, 
                     phone, 
-                    status, 
+                    status,
+                    note,  
                     master, 
                     group_id, 
                     created_at, 
@@ -243,5 +244,17 @@ class AuthorizationClass
         endif;
 
         return $data;
+    }
+
+    /**
+     * Svuota la cache interna dell'utente loggato per forzare il ricaricamento dei dati.
+     *
+     * @return self
+     */
+    public function refresh(): self
+    {
+        $this->currentAdminCache = null;
+
+        return $this;
     }
 }

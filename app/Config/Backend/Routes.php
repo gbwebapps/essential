@@ -36,8 +36,8 @@ $routes->group('backend', function($routes) {
         $routes->group('account', function($routes) {
             $routes->get('/', '\App\Controllers\Backend\AccountController::index');
             $routes->get('general', '\App\Controllers\Backend\AccountController::general');
-            $routes->get('edit', '\App\Controllers\Backend\AccountController::edit');
-            $routes->get('permissions', '\App\Controllers\Backend\AccountController::permissions');
+            $routes->match(['GET', 'POST'], 'edit', '\App\Controllers\Backend\AccountController::edit');
+            $routes->match(['GET', 'POST'], 'permissions', '\App\Controllers\Backend\AccountController::permissions');
             $routes->get('images', '\App\Controllers\Backend\AccountController::images');
             $routes->get('tokens', '\App\Controllers\Backend\AccountController::tokens');
             $routes->get('resetPassword', '\App\Controllers\Backend\AccountController::resetPassword');

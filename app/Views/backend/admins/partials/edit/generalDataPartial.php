@@ -74,7 +74,7 @@
         <div class="col-12">
             <div class="mb-2">
                 <label for="note"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.note'); ?></label>
-                <textarea name="note" id="note" rows="7" class="form-control"><?= esc($admin->note); ?></textarea>
+                <textarea name="note" id="note" rows="7" class="form-control" placeholder="<?= lang('backend/admins.placeholders.note'); ?>"><?= esc($admin->note); ?></textarea>
                 <div class="error_note text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
             </div>
         </div>

@@ -41,5 +41,17 @@
         </div>
         <!-- End Email e Phone -->
 
+        <!-- Note Aggiuntive -->
+        <div class="row">
+            <div class="col-12">
+                <div class="mb-2">
+                    <label for="note"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/account.labels.note'); ?></label>
+                    <textarea name="note" id="note" rows="7" class="form-control" placeholder="<?= lang('backend/account.placeholders.note'); ?>"><?= esc($currentAdmin->note); ?></textarea>
+                    <div class="error_note text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                </div>
+            </div>
+        </div>
+        <!-- End Note Aggiuntive -->
+
     </div>
 </form>
