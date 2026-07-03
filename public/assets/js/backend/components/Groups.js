@@ -1,13 +1,13 @@
 /* Import delle utility risalendo di un livello */
-import { urlbase, apiFetch, showToast, askConfirm, smoothReplace, handleValidationErrors } from '../backend.js';
+import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace, handleValidationErrors } from '../backend.js';
 
-export class GroupManager {
-    constructor(config = {}) {
-        this.config = Object.assign({
-            getGroups: '',
-            getGroup: '',
-            urlGetExceptions: '' /* Questo punterà al metodo di ricerca, es: backend/groups/searchAdmins */
-        }, config);
+export class GroupsManager {
+    constructor() {
+
+        /* Parametri di configurazione della sezione dedicati e hardcoded */
+        this.getGroupsUrl = urlbase + 'backend/groups/getGroups';
+        this.getGroupUrl = urlbase + 'backend/groups/getGroup';
+        this.urlGetExceptions = urlbase + 'backend/groups/getDropdownAdmins';
 
         /* Variabili di stato per evitare ricaricamenti inutili */
         this.isListLoaded = false;
@@ -17,6 +17,9 @@ export class GroupManager {
         /* Proprietà per il controllo del debounce */
         this.searchTimeout = null;
         
+        /* Variabile di stato per la sicurezza */
+        this.isSubmitting = false;
+
         this.init();
     }
 
@@ -26,6 +29,7 @@ export class GroupManager {
 
     /* Gestione dei listener sugli elementi generati dinamicamente via AJAX */
     bindDynamicEvents() {
+
         /* 1. Intercettiamo solo la CHIUSURA del singolo gruppo per svuotarlo */
         document.addEventListener('hidden.bs.collapse', e => {
             const subCollapse = e.target.closest('#groupsAccordion .accordion-collapse');
@@ -133,13 +137,20 @@ export class GroupManager {
             const formData = new FormData();
             formData.append('id', groupId);
 
-            const response = await apiFetch(this.config.getGroup, {
+            const response = await apiFetch(this.getGroupUrl, {
                 method: 'POST',
                 body: formData
             });
+
             const data = await response.json();
 
-            if (data.result === true) {
+            /* Controllo per fallimento logico (es. token scaduto o invalido) */
+            if (data.result === false) {
+                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+                return;
+            }
+
+            if (data.result === true && data.output) {
                 smoothReplace(bodyContainer, data.output);
                 return true;
             }
@@ -173,22 +184,23 @@ export class GroupManager {
                 if (typeof handleValidationErrors === 'function') {
                     handleValidationErrors(data.errors);
                 }
-                if (data.message && typeof showToast === 'function') {
-                    showToast('danger', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
                 }
                 return;
             }
 
             if (data.result === false) {
-                if (data.message && typeof showToast === 'function') {
-                    showToast('danger', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
                 }
                 return;
             }
 
             if (data.result === true) {
-                if (data.message && typeof showToast === 'function') {
-                    showToast('success', data.message);
+                
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('success', data.message);
                 }
                 
                 formEl.reset();
@@ -229,6 +241,7 @@ export class GroupManager {
                 method: 'POST',
                 body: formData
             });
+
             const data = await response.json();
 
             if (data.result === true && data.output) {
@@ -259,28 +272,30 @@ export class GroupManager {
                 method: 'POST',
                 body: formData
             });
+
             const data = await response.json();
 
             if (data.errors) {
                 if (typeof handleValidationErrors === 'function') {
                     handleValidationErrors(data.errors);
                 }
-                if (data.message && typeof showToast === 'function') {
-                    showToast('danger', data.message);
+                
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
                 }
                 return;
             }
 
             if (data.result === false) {
-                if (data.message && typeof showToast === 'function') {
-                    showToast('danger', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
                 }
                 return;
             }
 
             if (data.result === true) {
-                if (data.message && typeof showToast === 'function') {
-                    showToast('success', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('success', data.message);
                 }
 
                 const groupId = formEl.dataset.id;
@@ -289,6 +304,8 @@ export class GroupManager {
                 if (toggleBtnSpan && nameInput) {
                     toggleBtnSpan.textContent = nameInput.value;
                 }
+
+                this.isListLoaded = false;
             }
         } catch (error) {
             console.error("Errore durante l'invio del form modifica gruppo:", error);
@@ -329,11 +346,12 @@ export class GroupManager {
                 method: 'POST',
                 body: formData
             });
+
             const data = await response.json();
 
             if (data.result === false) {
-                if (data.message && typeof showToast === 'function') {
-                    showToast('danger', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
                 }
                 return;
             }
@@ -368,25 +386,19 @@ export class GroupManager {
                 method: 'POST',
                 body: formData
             });
+
             const data = await response.json();
 
-            if (data.errors) {
-                if (data.message && typeof showToast === 'function') {
-                    showToast('danger', data.message);
-                }
-                return;
-            }
-
             if (data.result === false) {
-                if (data.message && typeof showToast === 'function') {
-                    showToast('danger', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
                 }
                 return;
             }
 
             if (data.result === true) {
-                if (data.message && typeof showToast === 'function') {
-                    showToast('success', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('success', data.message);
                 }
 
                 this.isListLoaded = false;
@@ -404,21 +416,25 @@ export class GroupManager {
 
     /* Carica lo scheletro iniziale del pannello di aggiunta nuovo gruppo (Primo livello) */
     async loadAddGroupPanel() {
-        if (this.isAddLoaded) return;
+        if (this.isAddLoaded) return false;
 
         const container = document.getElementById('add-groups-container');
-        if ( ! container) return;
+        if ( ! container) return false;
 
         try {
             const response = await apiFetch(urlbase + 'backend/groups/openAdd', { method: 'POST' });
+
             const data = await response.json();
 
             if (data.result === true) {
                 smoothReplace(container, data.output);
                 this.isAddLoaded = true;
+                return true;
             }
+            return false;
         } catch (error) {
             console.error("Errore durante il caricamento del form aggiunta gruppo:", error);
+            return false;
         }
     }
 
@@ -433,21 +449,25 @@ export class GroupManager {
 
     /* Carica l'elenco dei gruppi (Primo livello AJAX) */
     async loadGroupsList() {
-        if (this.isListLoaded) return;
+        if (this.isListLoaded) return false;
 
         const container = document.getElementById('showAll-groups-container');
-        if ( ! container) return;
+        if ( ! container) return false;
 
         try {
-            const response = await apiFetch(this.config.getGroups, { method: 'POST' });
+            const response = await apiFetch(this.getGroupsUrl, { method: 'POST' });
+
             const data = await response.json();
 
             if (data.result === true) {
                 smoothReplace(container, data.output);
                 this.isListLoaded = true;
+                return true;
             }
+            return false;
         } catch (error) {
             console.error("Errore caricamento lista gruppi:", error);
+            return false;
         }
     }
 
@@ -462,21 +482,25 @@ export class GroupManager {
 
     /* Carica lo scheletro iniziale del pannello eccezioni (Terzo livello) */
     async loadExceptionsPanel() {
-        if (this.isExceptionsLoaded) return;
+        if (this.isExceptionsLoaded) return false;
 
         const container = document.getElementById('exceptions-groups-container');
-        if ( ! container) return;
+        if ( ! container) return false;
 
         try {
             const response = await apiFetch(urlbase + 'backend/groups/openExceptions', { method: 'POST' });
+
             const data = await response.json();
 
             if (data.result === true) {
                 smoothReplace(container, data.output);
                 this.isExceptionsLoaded = true;
+                return true;
             }
+            return false;
         } catch (error) {
             console.error("Errore durante il caricamento del form aggiunta gruppo:", error);
+            return false;
         }
     }
 
@@ -490,7 +514,6 @@ export class GroupManager {
     }
 
     handleAdminSearch(inputEl) {
-
         /* Cancella il timeout precedente se l'utente sta ancora digitando */
         clearTimeout(this.searchTimeout);
 
@@ -520,11 +543,19 @@ export class GroupManager {
                 const formData = new FormData();
                 formData.append('query', query);
 
-                const response = await apiFetch(this.config.urlGetExceptions, {
+                const response = await apiFetch(this.urlGetExceptions, {
                     method: 'POST',
                     body: formData
                 });
+
                 const data = await response.json();
+
+                if (data.result === false) {
+                    if (data.message && typeof showAlert === 'function') {
+                        showAlert('danger', data.message);
+                    }
+                    return;
+                }
 
                 if (data.result === true && data.output) {
                     smoothReplace(container, data.output);
@@ -566,12 +597,13 @@ export class GroupManager {
                 method: 'POST',
                 body: formData
             });
+
             const data = await response.json();
 
             if (data.result === true && data.output) {
                 smoothReplace(permissionsContainer, data.output);
-            } else if (data.message && typeof showToast === 'function') {
-                showToast('danger', data.message);
+            } else if (data.message && typeof showAlert === 'function') {
+                showAlert('danger', data.message);
             }
         } catch (error) {
             console.error("Errore caricamento permessi:", error);
@@ -588,36 +620,36 @@ export class GroupManager {
         const formEl = e.target;
         const formData = new FormData(formEl);
 
-        const errorDiv = formEl.querySelector('.error_exceptions');
-        if (errorDiv) errorDiv.innerHTML = '\u00A0';
+        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
 
         try {
             const response = await apiFetch(urlbase + 'backend/groups/saveExceptions', {
                 method: 'POST',
                 body: formData
             });
+
             const data = await response.json();
 
             if (data.errors) {
                 if (typeof handleValidationErrors === 'function') {
                     handleValidationErrors(data.errors);
                 }
-                if (data.message && typeof showToast === 'function') {
-                    showToast('danger', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
                 }
                 return;
             }
 
             if (data.result === false) {
-                if (data.message && typeof showToast === 'function') {
-                    showToast('danger', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
                 }
                 return;
             }
 
             if (data.result === true) {
-                if (data.message && typeof showToast === 'function') {
-                    showToast('success', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('success', data.message);
                 }
             }
         } catch (error) {
@@ -639,7 +671,7 @@ export class GroupManager {
         const adminUuid = btnEl.dataset.uuid;
 
         const permissionsContainer = document.getElementById('admin-permissions-container');
-        if (!permissionsContainer) {
+        if ( ! permissionsContainer) {
             this.isSubmitting = false;
             return;
         }
@@ -652,6 +684,7 @@ export class GroupManager {
                 method: 'POST',
                 body: formData
             });
+
             const data = await response.json();
 
             if (data.result === true && data.output) {

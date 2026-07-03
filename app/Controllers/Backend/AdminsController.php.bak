@@ -624,8 +624,6 @@ class AdminsController extends BackendController
                 endif;
 
                 if (isset($posts['context']) && $posts['context'] === 'edit'):
-					/* Inseriamo l'ID del gruppo reale corrente nel JSON di risposta per sincronizzare la select lato JS */
-                    $json['group_id'] = (int) $adminRow->group_id;
                     $json['output'] = view('backend/admins/partials/edit/permissionsPartial', $this->data);
                 endif;
 

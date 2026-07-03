@@ -63,6 +63,7 @@ class GroupsController extends BackendController
         return $this->render('backend/groups/indexView', $this->data);
     }
 
+    /* Effettua la chiamata asincrona per l'apertura del pannello di aggiunta nuovo gruppo */
     public function openAdd(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -104,12 +105,17 @@ class GroupsController extends BackendController
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
-            // qui va fatto il controllo posts
+            $posts = $this->request->getPost();
+            $rules = $this->groupsModel->getGroupByIdValidationRules(); 
 
-            $groupId = (int) $this->request->getPost('id');
+            /* Validazione dei posts */
+            if ( ! $this->validateData($posts, $rules)):
+                $errorMessage = implode('<br>', $this->validator->getErrors());
+                return $this->response->setJSON(['result' => false, 'message' => sprintf(lang('backend/groups.messages.validateToastErrors'), $errorMessage)]);
+            endif;
 
             /* Recuperiamo i dati del gruppo (nome e descrizione) */
-            $group = $this->groupsModel->getGroupById($groupId);
+            $group = $this->groupsModel->getGroupById($posts);
             if ( ! $group):
                 return $this->response->setJSON(['result' => false, 'message' => 'Gruppo non trovato.']);
             endif; 
@@ -118,7 +124,7 @@ class GroupsController extends BackendController
 
             /* Recuperiamo la mappa globale dei permessi e i permessi attivi di questo gruppo */
             $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
-            $this->data['group_perms'] = $this->groupsModel->getGroup($groupId);
+            $this->data['group_perms'] = $this->groupsModel->getGroup((int) $posts['id']);
 
             /* Generiamo il sotto-parziale di modifica */
             $output = view('backend/groups/partials/index/getGroupPartial', $this->data);
@@ -177,7 +183,7 @@ class GroupsController extends BackendController
             if (isset($posts['action']) && $posts['action'] === 'refresh'):
 
                 /* Recuperiamo i record freschi dal Model usando l'ID del gruppo */
-                $groupRow = $this->groupsModel->getGroupById((int) $posts['id']);
+                $groupRow = $this->groupsModel->getGroupById($posts);
                 
                 if ( ! $groupRow):
                     return $this->response->setJSON(['result' => false, 'message' => lang('backend/groups.messages.notFound')]);
@@ -217,19 +223,18 @@ class GroupsController extends BackendController
         endif;
     }
 
-    /* Gestisce la chiamata ajax per l'eliminazione di un gruppo, poi vediamo cosa fargli restituire */
+    /* Gestisce la chiamata ajax per l'eliminazione di un gruppo */
     public function del(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
-            /* Raccolta dati e regole per la validazione standardizzata */ 
             $posts = $this->request->getPost();
-            $rules = $this->groupsModel->delValidationRules($posts);
+            $rules = $this->groupsModel->delValidationRules();
 
             /* Validazione dei posts */
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->response->setJSON(['result' => false, 'message' => sprintf(lang('backend/admins.messages.validateToastErrors'), $errorMessage)]);
+                return $this->response->setJSON(['result' => false, 'message' => sprintf(lang('backend/groups.messages.validateToastErrors'), $errorMessage)]);
             endif;
 
             /* Esecuzione della logica di inserimento con sbarramento interno */
@@ -240,6 +245,7 @@ class GroupsController extends BackendController
         endif;
     }
 
+    /* Chiamata asincrona con click sulla barra Eccezioni per visualizzare il campo di autocomplete per la ricerca di un admin  */
     public function openExceptions(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -256,11 +262,17 @@ class GroupsController extends BackendController
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
-            /* Recuperiamo la stringa digitata dall'utente inviata tramite FormData */
-            $searchQuery = $this->request->getPost('query');
+            $posts = $this->request->getPost();
+            $rules = $this->groupsModel->dropdownAdminsRules();
+
+            /* Validazione dei posts */
+            if ( ! $this->validateData($posts, $rules)):
+                $errorMessage = implode('<br>', $this->validator->getErrors());
+                return $this->response->setJSON(['result' => false, 'message' => sprintf(lang('backend/groups.messages.validateToastErrors'), $errorMessage)]);
+            endif;
 
             /* Carichiamo gli amministratori filtrati dal model passando la query */
-            $this->data['admins'] = $this->groupsModel->getDropdownAdmins($searchQuery);
+            $this->data['admins'] = $this->groupsModel->getDropdownAdmins($posts);
 
             /* Generiamo la vista parziale che conterrà il ciclo foreach per il dropdown */
             $output = view('backend/groups/partials/index/getDropdownAdminsPartial', $this->data);
@@ -274,16 +286,22 @@ class GroupsController extends BackendController
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
-            /* Recuperiamo l'UUID dell'amministratore selezionato */
-            $uuid = $this->request->getPost('uuid');
+            $posts = $this->request->getPost();
+            $rules = $this->groupsModel->adminPermissionsValidationRules();
+
+            /* Validazione dei posts */
+            if ( ! $this->validateData($posts, $rules)):
+                $errorMessage = implode('<br>', $this->validator->getErrors());
+                return $this->response->setJSON(['result' => false, 'message' => sprintf(lang('backend/groups.messages.validateToastErrors'), $errorMessage)]);
+            endif;
 
             /* Recuperiamo i dettagli dell'amministratore (ci servirà il suo group_id) */
-            $admin = $this->groupsModel->getAdminByUuid($uuid);
+            $admin = $this->groupsModel->getAdminByUuid($posts);
             if ( ! $admin):
                 return $this->response->setJSON(['result' => false, 'message' => 'Amministratore non trovato.']);
             endif;
 
-            $this->data['uuid'] = $uuid;
+            $this->data['uuid'] = $posts['uuid'];
 
             $this->data['name'] = $admin['name'];
             
@@ -291,10 +309,10 @@ class GroupsController extends BackendController
             $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
             
             /* 2. Permessi che il suo gruppo possiede già di base sul database */
-            $this->data['group_perms'] = $this->groupsModel->getGroupPermissionsArray((int)$admin['group_id']);
+            $this->data['group_perms'] = $this->groupsModel->getGroupPermissionsArray((int) $admin['group_id']);
             
             /* 3. Eccezioni specifiche già salvate per questo amministratore sul database */
-            $this->data['admin_exceptions'] = $this->groupsModel->getAdminExceptionsArray($uuid);
+            $this->data['admin_exceptions'] = $this->groupsModel->getAdminExceptionsArray($posts['uuid']);
 
             /* Generiamo la vista parziale con la griglia completa */
             $output = view('backend/groups/partials/index/getAdminPermissionsPartial', $this->data);

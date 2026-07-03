@@ -140,11 +140,6 @@ class AuthController extends BackendController
 
             $json = $this->authModel->resetPassword($posts, $this->request);
 
-            /* Imposta i dati in sessione per la pagina di destinazione */
-            session()->setFlashdata('message', $json['message']);
-            session()->setFlashdata('class', 'success');
-            session()->setFlashdata('icon', '<i class="fa-solid fa-check"></i>');
-
             /* Restituisce l'ok al Javascript */
             return $this->response->setJSON($json);
 
@@ -176,11 +171,6 @@ class AuthController extends BackendController
             endif;
 
             $json = $this->authModel->setPassword($posts);
-
-            /* Imposta i dati in sessione per la pagina di destinazione */
-            session()->setFlashdata('message', $json['message']);
-            session()->setFlashdata('class', 'success');
-            session()->setFlashdata('icon', '<i class="fa-solid fa-key"></i>');
 
             /* Restituisce l'ok al Javascript */
             return $this->response->setJSON($json);

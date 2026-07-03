@@ -18,8 +18,6 @@ label {
     font-weight: 700;
 }
 
-.classe-sbagl {}
-
 a {
     color: RGBA(var(--bs-secondary-rgb), var(--bs-bg-opacity, 1)) !important;
     text-decoration: none;
@@ -34,7 +32,7 @@ textarea {
 }
 
 /* Bootstrap's override */
-.dropdown-menu, .btn, .alert, .navbar, .card {
+.dropdown-menu, .btn, .navbar, .card {
     /* border-radius: 0!Important; */
     box-shadow: 0 0 0 rgb(0 0 0 / 10%), 0 0 .15rem rgb(0 0 0 / 10%);
 }
@@ -89,6 +87,18 @@ textarea {
 
 .page-link, .page-link:hover {
     color: var(--bs-secondary);
+}
+
+/* Customizzazione layout e posizionamento Alert per Essential */
+#alert-container {
+    /* Sposta l'intero contenitore verso il basso rispetto al top dello schermo */
+    margin-top: 3.3rem; 
+}
+
+#alert-container .alert {
+    width: 51.25rem;
+    max-width: 90vw; 
+    box-shadow: 0 0 0 rgb(0 0 0 / 50%), 0 0 .25rem rgb(0 0 0 / 50%);
 }
 
 /* Font Awesome override */

@@ -2,12 +2,18 @@
     <?php if(count($tokens)): ?>
         <table class="table table-bordered align-middle mb-0">
             <thead>
-            <tr>
-                <th class="text-left" style="width: 37.5%;"><?= lang('backend/admins.labels.createdToken'); ?></th>
-                <th class="text-left" style="width: 37.5%;"><?= lang('backend/admins.labels.expiredToken'); ?></th>
-                <th class="text-left" style="width: 20%;"><?= lang('backend/admins.labels.typeToken'); ?></th>
-                <th class="text-center" style="width: 5%;">&nbsp;</th>
-            </tr>
+                <tr>
+                    <th class="text-left" style="width: 37.5%;">
+                        <i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/account.labels.createdToken'); ?>
+                    </th>
+                    <th class="text-left" style="width: 37.5%;">
+                        <i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/account.labels.expiredToken'); ?>
+                    </th>
+                    <th class="text-left" style="width: 20%;">
+                        <i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/account.labels.typeToken'); ?>
+                    </th>
+                    <th class="text-center" style="width: 5%;">&nbsp;</th>
+                </tr>
             </thead>
             <tbody>
             <?php foreach($tokens as $token): ?>
@@ -26,34 +32,33 @@
 
                     /* Confrontiamo i due oggetti DateTime in modo nativo e sicuro */
                     if ($now < $dateExpire):
-                        $expireDate = '<span class="text-success">' . convertDate($dateExpire->format('Y-m-d H:i:s')) . '</span>';
+                        $expireDate = '<span class="text-success fw-bold">' . convertDate($dateExpire->format('Y-m-d H:i:s')) . '</span>';
                     else:
-                        $expireDate = '<span class="text-danger"><s>' . convertDate($dateExpire->format('Y-m-d H:i:s')) . '</s></span>';
+                        $expireDate = '<span class="text-danger fw-bold"><s>' . convertDate($dateExpire->format('Y-m-d H:i:s')) . '</s></span>';
                     endif;
 
                     /* Identificazione del tipo con fallback di sicurezza finale */
                     $tokenType = '';
                     if ($token->token_type === 'session'):
-                        $tokenType = lang('backend/admins.labels.session');
+                        $tokenType = lang('backend/account.labels.session');
                     elseif ($token->token_type === 'activation'):
-                        $tokenType = lang('backend/admins.labels.activation');
+                        $tokenType = lang('backend/account.labels.activation');
                     elseif ($token->token_type === 'cookie'):
-                        $tokenType = lang('backend/admins.labels.remember_me');
+                        $tokenType = lang('backend/account.labels.remember_me');
                     else:
-                        $tokenType = lang('backend/admins.labels.unknown');
+                        $tokenType = lang('backend/account.labels.unknown');
                     endif;
                 ?>
 
                 <tr>
-                    <td class="text-left"><?= convertDate(esc($token->token_create)); ?></td>
+                    <td class="text-left fw-bold"><?= convertDate(esc($token->token_create)); ?></td>
                     <td class="text-left"><?= $expireDate; ?></td>
                     <td class="text-left">
                         <span class="text-success fw-bold"><?= $tokenType; ?></span>
                     </td>
                     <td class="text-center" rowspan="2">
-                        <form class="deleteToken" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureDeleteToken'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)); ?>">
+                        <form class="deleteToken" data-message="<?= sprintf(lang('backend/account.messages.areYouSureDeleteToken'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)); ?>">
                             <input type="hidden" name="id" value="<?= esc($token->id); ?>">
-                            <input type="hidden" name="uuid" value="<?= esc($currentAdmin->uuid); ?>">
                             <button type="submit" class="btn btn-link text-danger fw-bold shadow-none">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
@@ -71,23 +76,23 @@
 
                             <?php
                                 /* Inizializzazione corretta della variabile in camelCase */
-                                $agentText = lang('backend/admins.labels.operatingSystem') . ' <span class="text-primary">' . $userAgent->getPlatform() . '</span>';
+                                $agentText = lang('backend/account.labels.operatingSystem') . ' <span class="text-primary">' . $userAgent->getPlatform() . '</span>';
                             ?>
 
                             <?php
                                 /* Valutazione con metodi nativi in camelCase di CodeIgniter 4 */
                                 if($userAgent->isBrowser()):
-                                    $agentText .= ' &bull; ' . lang('backend/admins.labels.browser') . ' <span class="text-primary">' . $userAgent->getBrowser() . '</span>';
+                                    $agentText .= ' &bull; ' . lang('backend/account.labels.browser') . ' <span class="text-primary">' . $userAgent->getBrowser() . '</span>';
                                 elseif($userAgent->isMobile()):
-                                    $agentText .= ' &bull; ' . lang('backend/admins.labels.mobile') . ' <span class="text-primary">' . $userAgent->getMobile() . '</span>';
+                                    $agentText .= ' &bull; ' . lang('backend/account.labels.mobile') . ' <span class="text-primary">' . $userAgent->getMobile() . '</span>';
                                 elseif($userAgent->isRobot()):
-                                    $agentText .= ' &bull; ' . lang('backend/admins.labels.robot') . ' Robot <span class="text-primary">' . $userAgent->getRobot() . '</span>';
+                                    $agentText .= ' &bull; ' . lang('backend/account.labels.robot') . ' Robot <span class="text-primary">' . $userAgent->getRobot() . '</span>';
                                 endif;
                             ?>
 
                             <?= $agentText; ?>
                             &nbsp;&bull;&nbsp;
-                            <span><?= lang('backend/admins.labels.ipAddress'); ?></span>
+                            <span><?= lang('backend/account.labels.ipAddress'); ?></span>
                             <span class="text-primary"><?= esc($token->ip); ?></span>
                         </small>
                     </td>
@@ -97,7 +102,7 @@
         </table>
     <?php else: ?>
         <div class="text-center text-danger fw-bold">
-            <?= lang('backend/admins.messages.noTokensFound'); ?>
+            <?= lang('backend/account.messages.noTokensFound'); ?>
         </div>
     <?php endif; ?>
 </div>

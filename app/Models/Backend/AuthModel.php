@@ -15,6 +15,13 @@ use App\Models\Backend\BackendModel;
 class AuthModel extends BackendModel
 {
     /**
+     * Identificativo testuale del modulo associato la gestione della autenticazione.
+     *
+     * @var string|null
+     */
+    protected ?string $module = 'auth';
+
+    /**
      * Espressione regolare per la validazione della complessità strutturale delle password.
      *
      * @var string
@@ -150,7 +157,9 @@ class AuthModel extends BackendModel
         {
             /* 1. Inizializzazione variabili e parametri di configurazione */
             $posts = $this->checkAllowedFields($posts, $this->loginAllowedFields);
+
             $rememberMe = (isset($posts['rememberMe']) && $posts['rememberMe']) ? true : false;
+
             $ip = $request->getIPAddress();
 
             /* Lettura centralizzata delle configurazioni per evitare chiamate ridondanti */
@@ -210,6 +219,7 @@ class AuthModel extends BackendModel
 
             /* 5. Gestione del Secondo Fattore di Autenticazione (2FA) */
             if ($allowTwoFactor):
+
                 $sql = "select method, secret from admins_2fa where admin_uuid = ? and enabled = 1 limit 1";
                 $twofaQuery = $this->db->query($sql, [$admin->uuid]);
                 $twofa = $twofaQuery->getRow();
@@ -223,6 +233,7 @@ class AuthModel extends BackendModel
 
                     return ['result' => '2fa_required', 'method' => $twofa->method, 'admin_uuid' => $admin->uuid, 'remember_me' => $rememberMe];
                 endif;
+
             endif;
 
             /* 6. Fase finale del Login (Password e 2FA superati con successo) */
@@ -337,15 +348,14 @@ class AuthModel extends BackendModel
     }
 
     /**
-     * Avvia il flusso di ripristino credenziali generando un token di attivazione temporaneo.
+     * Applica la nuova password associata a un token di attivazione valido e verificato.
      *
-     * Verifica l'esistenza dell'account; se presente, avvia una transazione sul database per marcare il reset,
-     * elimina precedenti token pendenti e inserisce il nuovo token di tipo 'activation'. Compila la vista HTML
-     * dedicata e distribuisce l'email mediante il servizio SMTP nativo, bloccando l'operazione in caso di fallimento di invio.
+     * Risolve l'identità dell'utente attraverso l'hash del token fornito. In caso di riscontro, esegue una
+     * transazione per aggiornare l'hash della password (PASSWORD_DEFAULT), azzera la data di reset e
+     * revoca il token di attivazione utilizzato per impedire riutilizzi fraudolenti.
      *
-     * @param array $posts Dati contenenti l'indirizzo email del richiedente.
-     * @param \CodeIgniter\HTTP\IncomingRequest $request Richiesta HTTP per l'acquisizione dei dati ambientali del client.
-     * @return array Esito dell'invio e messaggio localizzato per l'interfaccia utente.
+     * @param array $posts Array di input contenente la nuova password e il token di sblocco.
+     * @return array Array di risposta con l'esito dell'operazione e il messaggio per il client.
      */
     public function resetPassword(array $posts, \CodeIgniter\HTTP\IncomingRequest $request): array
     {
@@ -371,19 +381,12 @@ class AuthModel extends BackendModel
                 $sql = "update admins set resetted_at = ? where uuid = ?";
                 $this->db->query($sql, [date('Y-m-d H:i:s'), $admin->uuid]);
 
+                /* Eliminiamo eventuali token di attivazione precedenti ancora attivi o scaduti per questo specifico admin */
                 $sql = "delete from admins_tokens where admin_uuid = ? and token_type = ?";
                 $this->db->query($sql, [$admin->uuid, 'activation']);
 
                 $sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, token_expire, token_type, user_agent, ip) values(?,?,?,?,?,?,?)";
-                $this->db->query($sql, [
-                    $admin->uuid,
-                    $tokenHash,
-                    $tokenCreate,
-                    $tokenExpire,
-                    'activation',
-                    $request->getUserAgent()->getAgentString(),
-                    $request->getIPAddress()
-                ]);
+                $this->db->query($sql, [$admin->uuid,$tokenHash, $tokenCreate, $tokenExpire, 'activation', $request->getUserAgent()->getAgentString(), $request->getIPAddress()]);
 
                 if ($this->db->transStatus() === false):
                     $this->db->transRollback();
@@ -394,41 +397,36 @@ class AuthModel extends BackendModel
                 $this->db->transCommit();
 
             } catch (\Throwable $e) {
-
-                if ($this->db->transStatus() === false):
-                    $this->db->transRollback();
-                endif;
-
+                $this->db->transRollback();
                 log_message('error', lang('backend/auth.messages.resetPasswordFailed') . ' - ' . $e);
                 return ['result' => false, 'message' => lang('backend/auth.messages.resetPasswordFailed')];
             }
 
-            /* 2. Integrazione classe nativa Email e compilazione della vista */
-            $emailData = [
-                'firstname' => esc($admin->firstname),
-                'lastname'  => esc($admin->lastname),
-                'email'     => esc($admin->email),
-                'token'     => $token->getValue()
-            ];
-            $emailHTML = view('backend/auth/partials/email/emailResetPasswordPartial', $emailData);
+            /* 2. Istanzio il servizio email dedicato e tento l'invio */
+            $emailService = new \App\Libraries\EmailService();
 
-            $emailService = \Config\Services::email();
-            $emailService->setTo(esc($admin->email));
-            $emailService->setSubject(sprintf(lang('backend/email.auth.resetPassword.subjectResetPasswordEmail'), esc($admin->firstname), esc($admin->lastname)));
-            $emailService->setMessage($emailHTML);
+            /* Configuro i parametri dinamici per questa specifica chiamata */
+            $module = $this->module;
+            $template = 'emailResetPasswordPartial';
+            $subjectLangKey = 'backend/email.auth.resetPassword.subjectResetPasswordEmail';
 
-            /* 3. Coerenza invio fallito: blocca il redirect se la mail non parte */
-            if (! $emailService->send()):
+            /* Chiamata al metodo con i nuovi parametri separati e gestione dei ritorni */
+            if ( ! $emailService->sendActivationEmail($admin, $token->getValue(), $module, $template, $subjectLangKey)):
 
-                $debugger = $emailService->printDebugger(['headers']);
-                log_message('error', 'Errore SMTP: ' . $debugger);
-
-                return ['result' => false, 'message' => lang('backend/email.messages.sendingEmailFailed')];
+                $message = sprintf(lang('backend/auth.messages.resetPasswordSuccessNoEmail'), esc($admin->firstname), esc($admin->lastname));
+                return ['result' => false, 'message' => $message];
+                
+            else:
+                
+                $message = sprintf(lang('backend/auth.messages.resetPasswordSuccess'), esc($admin->firstname), esc($admin->lastname));
+                return ['result' => true, 'message' => $message];
+                
             endif;
 
         endif;
 
-        return ['result' => true, 'message' => lang('backend/email.messages.sendingEmailSuccess')];
+        /* Fallback di sicurezza se l'admin non viene trovato nel database */
+        return ['result' => false, 'message' => lang('backend/auth.messages.resetPasswordFailed')];
     }
 
     /**
@@ -443,7 +441,7 @@ class AuthModel extends BackendModel
      */
     public function setPassword(array $posts): array
     {
-        try 
+        try
         {
             $posts = $this->checkAllowedFields($posts, $this->setPasswordAllowedFields);
 
@@ -483,14 +481,14 @@ class AuthModel extends BackendModel
             return ['result' => false, 'message' => lang('backend/auth.messages.setPasswordFailed')];
 
         } catch (\Throwable $e) {
-            
+
             /* 5. Rollback di sicurezza solo se la transazione era effettivamente in corso */
             if ($this->db->transStatus() !== true):
                 $this->db->transRollback();
             endif;
 
             log_message('error', lang('backend/auth.messages.setPasswordError') . ' - ' . $e);
-            
+
             /* Modificato false in 'setPasswordFailed' per coerenza con le aspettative del Controller */
             return ['result' => false, 'message' => lang('backend/auth.messages.setPasswordError')];
         }

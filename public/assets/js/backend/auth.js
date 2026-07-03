@@ -8,37 +8,19 @@ const actions = {
     index: function(){},
     login: function() {
         
-        /* Istanzia il manager passando le configurazioni necessarie */
-        const loginManager = new LoginManager({
-            formId: 'login_form',
-            url: urlbase + 'backend/auth/login'
-        });
-
+        const loginManager = new LoginManager();
         loginManager.init();
     }, 
 
     resetPassword: function() {
         
-        /* Istanzia il manager passando le configurazioni necessarie */
-        const resetPasswordManager = new ResetPasswordManager({
-            formId: 'reset_password_form',                  /* ID del form nella pagina pubblica */
-            url: urlbase + 'backend/auth/resetPassword',    /* Endpoint del controller Auth */
-            redirectUrl: urlbase + 'backend/auth',          /* Redirect al login dopo il successo */ 
-            showSuccessToast: false
-        });
-
+        const resetPasswordManager = new ResetPasswordManager();
         resetPasswordManager.init();
     }, 
 
     setPassword: function() {
         
-        /* Istanzia il manager passando le configurazioni necessarie */
-        const setPasswordManager = new SetPasswordManager({
-            formId: 'set_password_form',                  /* ID del form */
-            url: urlbase + 'backend/auth/setPassword',    /* Endpoint del controller */
-            redirectUrl: urlbase + 'backend/auth'         /* Redirect al login dopo il successo */
-        });
-
+        const setPasswordManager = new SetPasswordManager();
         setPasswordManager.init();
     },
 }

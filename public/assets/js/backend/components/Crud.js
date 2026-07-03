@@ -1,5 +1,5 @@
 /* Import delle utility risalendo di un livello */
-import { urlbase, apiFetch, toggleLoader, showToast, askConfirm, smoothReplace, handleValidationErrors, handleValidationImages, handleValidationDocuments } from '../backend.js';
+import { urlbase, apiFetch, toggleLoader, showAlert, askConfirm, smoothReplace, handleValidationErrors, handleValidationImages, handleValidationDocuments } from '../backend.js';
 
 /* Import degli altri componenti (nella stessa cartella) */
 import { UploadPreviewImgManager } from './UploadPreviewImgManager.js';
@@ -10,6 +10,7 @@ import { GalleryOneDocManager } from './GalleryOneDocManager.js';
 /* --- LIST MANAGER (Custom SSR) --- */
 export class ListManager {
     constructor(config = {}, hooks = {}) {
+
         this.config = Object.assign({
             controller: '',
             url: '',
@@ -161,6 +162,7 @@ export class ListManager {
 
                 clearTimeout(this.debounceTimer);
                 this.debounceTimer = setTimeout(() => {
+
                     /* Spostato nel timer: pulisce l'errore in concomitanza col reload */
                     if ( ! value) {
                         const errorDiv = document.querySelector(`.error_${field}`);
@@ -278,26 +280,29 @@ export class ListManager {
             /* Controllo errori di validazione */
             if (data.errors) {
                 if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
-                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
                 
                 /* Se presente l'elemento, svuota la tabella mostrando l'errore centralizzato */
                 if (showAllEl && data.message) {
                     const errorTemplate = `<div class="text-center text-danger py-3 fw-bold">${data.message}</div>`;
                     smoothReplace(showAllEl, errorTemplate);
                 }
+
+                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+
                 return;
             }
 
             /* Controllo fallimento logico generico */
             if (data.result === false) {
-                if (data.message && typeof showToast === 'function') {
-                    showToast('danger', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
                 }
                 return;
             }
 
             /* Successo (data.result === true) */
             if (data.result === true) {
+
                 if (showAllEl && data.output) {
                     smoothReplace(showAllEl, data.output);
                 }
@@ -308,12 +313,14 @@ export class ListManager {
             }
 
         } catch (error) {
+
             /* Qui finiscono solo gli errori di rete o i crash del server */
             if (typeof this.hooks.onShowError === 'function') {
                 this.hooks.onShowError(error);
             }
             console.error("Errore ListManager:", error);
         } finally {
+
             /* NUOVO: Rilascia sempre il blocco */
             this.isLoading = false;
         }
@@ -322,10 +329,11 @@ export class ListManager {
 
 export class AddManager {
     constructor(config = {}, hooks = {}) {
+
         this.config = Object.assign({
-            formSelector: '', /* <--- Es: '#admins_add' */
+            formSelector: '', 
             url: '',
-            resetSelector: '', /* <--- Es: '#add_reset' */
+            resetSelector: '', 
             containerId: '', 
             imagePreviewManager: null,
             galleryOneImgManager: null,
@@ -385,7 +393,7 @@ export class AddManager {
         if (this.isSubmitting) return;
         this.isSubmitting = true;
 
-        /* Hook opzionale prima dell'invio: UNIFORMATO (mantiene stop per interruzione preventiva) */
+        /* Hook opzionale prima dell'invio */
         if (typeof this.hooks.onAddBefore === 'function') {
             const stop = this.hooks.onAddBefore(formData);
             if (stop === false) {
@@ -422,7 +430,7 @@ export class AddManager {
 
             const data = await response.json();
 
-            /* 2. Gestione Errori di Validazione */
+            /* Gestione Errori di Validazione */
             if (data.errors) {
                 if (typeof handleValidationErrors === 'function') {
                     handleValidationErrors(data.errors);
@@ -436,28 +444,26 @@ export class AddManager {
                     handleValidationDocuments(data.errors);
                 }
                 
-                if (data.message && typeof showToast === 'function') {
-                    showToast('danger', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
                 }
                 
                 return;
             }
 
-            /* 3. Errore generico gestito dal backend (es. fallimento email o DB) */
+            /* Errore generico gestito dal backend */
             if (data.result === false) {
-                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
+                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
                 return;
             }
 
-            /* 4. Caso successo */
+            /* Caso successo */
             if (data.result === true) {
-                /* TIMING FIX: Mostra subito il messaggio di successo prima di lanciare il reset asincrono */
-                if (data.message && typeof showToast === 'function') showToast('success', data.message);
 
-                /* NUOVO: Sblocca manualmente prima di chiamare il reset */
+				/* NUOVO: Sblocca manualmente prima di chiamare il reset */
                 this.isSubmitting = false;
                 
-                /* Chiama il metodo reset in modo pulito per aggiornare il DOM */
+                /* Esegue il reset attendendo il rendering del DOM prima di sbloccare la sottomissione */
                 await this.reset();
 
                 /* Refresh gallery se presente */
@@ -470,19 +476,19 @@ export class AddManager {
                     this.config.galleryOneDocManager.refresh();
                 }
 
-                /* Hook opzionale post-successo: UNIFORMATO (puro, senza stop/return ridondanti) */
                 if (typeof this.hooks.onAddAfter === 'function') {
                     this.hooks.onAddAfter(data);
                 }
+
+                if (data.message && typeof showAlert === 'function') showAlert('success', data.message);
             }
         } catch (error) {
-            /* Hook errore: UNIFORMATO (puro, senza stop/return ridondanti) */
             if (typeof this.hooks.onAddError === 'function') {
                 this.hooks.onAddError(error);
             }
             console.error("Errore AddManager (add):", error);
         } finally {
-            /* Rilascia sempre il blocco al termine dell'operazione */
+            /* Rilascia il blocco solo adesso, a fine transazione */
             this.isSubmitting = false;
         }
     }
@@ -528,14 +534,15 @@ export class AddManager {
 
             /* 2. Gestione fallimento reset */
             if (data.result === false) {
-                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
+                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
                 return;
             }
 
             /* 3. Caso successo reset */
             if (data.result === true) {
+
                 const showDataEl = document.getElementById(this.config.containerId);
-                if (showDataEl) {
+                if (showDataEl && data.output) {
                     smoothReplace(showDataEl, data.output);
                 }
 
@@ -581,11 +588,12 @@ export class AddManager {
 
 export class EditManager {
     constructor(config = {}, hooks = {}) {
+
         /* Inizializza la configurazione di base con i selettori dinamici */
         this.config = Object.assign({
-            formSelector: '', /* <--- Es: '#admins_edit' */
+            formSelector: '', 
             url: '',
-            refreshSelector: '', /* <--- Es: '#edit_refresh' */
+            refreshSelector: '', 
             containerId: '', 
             imagePreviewManager: null,
             galleryOneImgManager: null,
@@ -609,6 +617,7 @@ export class EditManager {
     }
 
     init() {
+
         /* Unico punto di aggancio tramite delegazione globale */
         this.bindEvents();
     }
@@ -701,8 +710,8 @@ export class EditManager {
                     handleValidationDocuments(data.errors);
                 }
                 
-                if (data.message && typeof showToast === 'function') {
-                    showToast('danger', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
                 }
                 
                 return;
@@ -710,20 +719,13 @@ export class EditManager {
 
             /* Errore generico gestito dal backend */
             if (data.result === false) {
-                if (typeof showToast === 'function') showToast('danger', data.message);
+                if (typeof showAlert === 'function') showAlert('danger', data.message);
                 return;
             }
 
             /* Caso positivo: salvataggio riuscito */
             if (data.result === true) {
-                /* Mostra toast di successo */
-                if (typeof showToast === 'function') showToast('success', data.message);
-
-                /* Hook personalizzato dopo il salvataggio */
-                if (typeof this.hooks.onEditAfter === 'function') {
-                    this.hooks.onEditAfter(data);
-                }
-
+                
                 /* Recupera il form di refresh reale dal DOM per popolare correttamente i dati */
                 const refreshFormEl = document.querySelector(this.config.refreshSelector);
                 const refreshData = refreshFormEl ? new FormData(refreshFormEl) : new FormData();
@@ -734,11 +736,19 @@ export class EditManager {
                     refreshData.append('uuid', uuidEl.value);
                 }
 
-                /* NUOVO: Sblocca manualmente prima di chiamare il refresh */
+				/* NUOVO: Sblocca manualmente prima di chiamare il refresh */
                 this.isSubmitting = false;
 
                 /* Esegue il refresh dei dati */
-                await this.refresh(refreshData);
+                await this.refresh(refreshData); 
+
+                /* Hook personalizzato dopo il salvataggio */
+                if (typeof this.hooks.onEditAfter === 'function') {
+                    this.hooks.onEditAfter(data);
+                }
+
+                /* Mostra toast di successo */
+                if (typeof showAlert === 'function') showAlert('success', data.message);
             }
         } catch (error) {
             if (typeof this.hooks.onEditError === 'function') {
@@ -786,14 +796,13 @@ export class EditManager {
 
             /* Caso errore generico */
             if (data.result === false) {
-                if (typeof showToast === 'function') showToast('danger', data.message);
+                if (typeof showAlert === 'function') showAlert('danger', data.message);
                 return;
             }
 
             /* Caso positivo: rigenera markup e reinizializza componenti */
             if (data.result === true) {
-                const showDataEl = document.getElementById(this.config.containerId);
-
+                
                 /* Distrugge vecchie istanze di preview e gallery */
                 if (this.config.imagePreviewManager) this.config.imagePreviewManager.destroy();
                 if (this.config.galleryOneImgManager) this.config.galleryOneImgManager.destroy();
@@ -803,7 +812,8 @@ export class EditManager {
                 if (this.config.galleryOneDocManager) this.config.galleryOneDocManager.destroy();
 
                 /* Sostituisce il DOM e reinizializza i componenti */
-                if (showDataEl) {
+                const showDataEl = document.getElementById(this.config.containerId);
+                if (showDataEl && data.output) {
                     smoothReplace(showDataEl, data.output);
                 }
 
@@ -844,6 +854,7 @@ export class EditManager {
             }
             console.error("Errore EditManager (refresh):", error);
         } finally {
+
             /* NUOVO: Rilascia sempre il blocco */
             this.isSubmitting = false;
         }
@@ -851,8 +862,8 @@ export class EditManager {
 }
 
 export class DeleteManager {
-    constructor(config = {}, hooks = {})
-    {
+    constructor(config = {}, hooks = {}){
+
         this.config = Object.assign({
             controller: '',
             url: '',
@@ -891,7 +902,7 @@ export class DeleteManager {
 
             const ok = await askConfirm(message);
             if (ok) {
-                this.deleteRecord(formData);
+                await this.deleteRecord(formData);
             }
         });
     }
@@ -911,9 +922,6 @@ export class DeleteManager {
             }
         }
 
-        /* Pulizia immediata degli errori visivi prima dell'invio */
-        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
-
         try {
             /* Chiamata POST all'endpoint */
             const response = await apiFetch(this.config.url, {
@@ -925,8 +933,8 @@ export class DeleteManager {
 
             /* Gestione fallimento logico generico */
             if (data.result === false) {
-                if (data.message && typeof showToast === 'function') {
-                    showToast('danger', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
                 }
                 return;
             }
@@ -949,11 +957,6 @@ export class DeleteManager {
                     }
                 }
 
-                /* Messaggio di successo */
-                if (data.message && typeof showToast === 'function') {
-                    showToast('success', data.message);
-                }
-
                 /* Ricarica la lista */
                 if (listManager && typeof listManager.showAll === 'function') {
                     listManager.showAll();
@@ -962,6 +965,11 @@ export class DeleteManager {
                 /* Hook opzionale post-successo corretta */
                 if (typeof this.hooks.onDeleteAfter === 'function') {
                     this.hooks.onDeleteAfter(data);
+                }
+
+                /* Messaggio di successo */
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('success', data.message);
                 }
             }
 
@@ -979,8 +987,8 @@ export class DeleteManager {
 }
 
 export class ChangeStatusManager {
-    constructor(config = {}, hooks = {})
-    {
+    constructor(config = {}, hooks = {}) {
+
         this.config = Object.assign({
             controller: '',
             url: '',
@@ -1019,13 +1027,14 @@ export class ChangeStatusManager {
             const ok = await askConfirm(message);
 
             if ( ! ok) {
+
                 /* Se l'utente annulla la conferma, interrompiamo semplicemente il flusso */
                 return;
             }
 
             /* Recuperiamo i dati dal form e li passiamo alla funzione */
             const formData = new FormData(formEl);
-            this.changeStatus(formData);
+            await this.changeStatus(formData);
         });
     }
 
@@ -1043,9 +1052,6 @@ export class ChangeStatusManager {
             }
         }
 
-        /* Pulizia immediata degli errori visivi prima dell'invio */
-        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
-
         try {
             const response = await apiFetch(this.config.url, {
                 method: 'POST',
@@ -1056,18 +1062,19 @@ export class ChangeStatusManager {
 
              /* Gestione fallimento logico generico */
             if (data.result === false) {
-                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
+                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
                 return;
             }
 
             /* Caso successo */
             if (data.result === true) {
-                if (data.message && typeof showToast === 'function') {
-                    showToast('success', data.message);
-                }
 
                 if (typeof this.hooks.onStatusAfter === 'function') {
                     this.hooks.onStatusAfter(data);
+                }
+
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('success', data.message);
                 }
             }
 
@@ -1085,6 +1092,7 @@ export class ChangeStatusManager {
 
 export class GeneralDataManager {
     constructor(config = {}, hooks = {}) {
+
         this.config = Object.assign({
             url: '', 
             formSelector: ''
@@ -1135,9 +1143,6 @@ export class GeneralDataManager {
             }
         }
 
-        /* Pulizia immediata degli errori visivi prima dell'invio */
-        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
-
         try {
             const response = await apiFetch(this.config.url, {
                 method: 'POST',
@@ -1148,23 +1153,24 @@ export class GeneralDataManager {
 
             /* Gestione fallimento logico generico */
             if (data.result === false) {
-                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
+                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
                 return;
             }
 
             /* Caso successo */
             if (data.result === true) {
-                if (data.message && typeof showToast === 'function') {
-                    showToast('success', data.message);
-                }
-
-                const generalDataEl = document.getElementById('generalData');
-                if (generalDataEl) {
+               
+               const generalDataEl = document.getElementById('generalData');
+                if (generalDataEl && data.output) {
                     smoothReplace(generalDataEl, data.output);
                 }
 
                 if (typeof this.hooks.onGeneralDataAfter === 'function') {
                     this.hooks.onGeneralDataAfter(data);
+                }
+
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('success', data.message);
                 }
             }
 
@@ -1174,6 +1180,7 @@ export class GeneralDataManager {
             }
             console.error("Errore GeneralDataManager:", error);
         } finally {
+
             /* NUOVO: Rilascia sempre il blocco */
             this.isSubmitting = false;
         }
@@ -1182,6 +1189,7 @@ export class GeneralDataManager {
 
 export class MetaDataManager {
     constructor(config = {}, hooks = {}) {
+        
         this.config = Object.assign({
             url: '', 
             formSelector: '#getMetaData'
@@ -1210,8 +1218,8 @@ export class MetaDataManager {
 
         document.addEventListener('submit', async e => {
             if ( ! e.target.matches(this.config.formSelector)) return;
-
             e.preventDefault();
+
             const formData = new FormData(e.target);
             await this.getMetaData(formData);
         });
@@ -1231,9 +1239,6 @@ export class MetaDataManager {
             }
         }
 
-        /* Pulizia immediata degli errori visivi prima dell'invio */
-        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
-
         try {
             const response = await apiFetch(this.config.url, {
                 method: 'POST',
@@ -1244,19 +1249,16 @@ export class MetaDataManager {
 
             /* Gestione fallimento logico generico */
             if (data.result === false) {
-                if (data.message && typeof showToast === 'function') showToast('danger', data.message);
+                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
                 return;
             }
 
             /* Caso successo */
             if (data.result === true) {
-                if (data.message && typeof showToast === 'function') {
-                    showToast('success', data.message);
-                }
-
+                
                 /* Gestione del DOM interna come concordato per elementi ad ID fisso */
                 const metaDataEl = document.getElementById('metaData');
-                if (metaDataEl) {
+                if (metaDataEl && data.output) {
                     smoothReplace(metaDataEl, data.output);
                 }
 

@@ -34,6 +34,7 @@ return [
             'usernameReminder' => 'Ti ricordiamo che il tuo nome utente è <strong>%s</strong>',
             'setPasswordButton' => 'Imposta password',
             'ignoreNotice' => 'Se non hai richiesto la creazione di questo profilo, puoi ignorare questa email.', 
+            'subjectCreateAdminEmail' => 'Creazione amministratore %s %s'
         ],
         'resetPassword' => [
             'greeting' => 'Ciao <strong>%s</strong>,',

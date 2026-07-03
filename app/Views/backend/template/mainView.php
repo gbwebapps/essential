@@ -29,7 +29,7 @@
     <div id="show-loader"></div>
 
     <!-- Contenitore globale per le notifiche Toast di Bootstrap -->
-    <div class="toast-container position-fixed top-0 end-0 p-3" id="toast-container"></div>
+    <div class="alert-container position-fixed top-0 start-50 translate-middle-x p-3" id="alert-container" style="z-index: 1080;"></div>
 
     <main class="container-fluid">
         <div class="row">

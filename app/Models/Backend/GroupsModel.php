@@ -35,11 +35,32 @@ class GroupsModel extends BackendModel
     protected array $delAllowedFields = ['id'];
 
     /**
+     * Campi di input autorizzati per il recupero di un gruppo.
+     *
+     * @var array
+     */
+    protected array $getGroupByIdAllowedFields = ['id'];
+
+    /**
      * Campi di input autorizzati per il salvataggio delle eccezioni.
      *
      * @var array
      */
     protected array $saveExceptionsAllowedFields = ['uuid', 'permissions'];
+
+    /**
+     * Campi di input autorizzati per la ricerca di un admin.
+     *
+     * @var array
+     */
+    protected array $dropdownAdminsFields = ['query'];
+
+    /**
+     * Campi di input autorizzati per l'identificazione e l'esecuzione della procedura di cancellazione.
+     *
+     * @var array
+     */
+    protected array $getAdminByUuidFields = ['uuid'];
 
     /**
      * Elenco delle proprietà principali utilizzate per la comparazione dei dati storici o per il tracciamento dei log.
@@ -56,10 +77,10 @@ class GroupsModel extends BackendModel
 	 *
 	 * @return void
 	 */
-	protected function initModel(): void 
-	{
-		parent::initModel();
-	}
+	// protected function initModel(): void 
+	// {
+	// 	parent::initModel();
+	// }
 
 	/**
 	 * Stabilisce i criteri di validazione per la registrazione iniziale di un nuovo gruppo.
@@ -94,11 +115,28 @@ class GroupsModel extends BackendModel
                 'label' => lang('backend/admins.labels.permissions'),
                 'rules' => ['permit_empty', 'in_list[' . $inListString . ']'],
                 'errors' => [
-                    'in_list' => lang('Backend/groups.errors.permission')
+                    'in_list' => lang('backend/groups.errors.permission')
                 ]
             ],
 	    ];
 	}
+
+    /**
+     * Valida i parametri per il recupero del gruppo.
+     *
+     * Assicura che l'id fornito per il recupero del gruppo sia presente.
+     *
+     * @return array Criteri di validazione per il recupero del gruppo.
+     */
+    public function getGroupByIdValidationRules(): array
+    {
+        return [
+            'id' => [
+                'label' => lang('backend/groups.labels.id'),
+                'rules' => ['required', 'is_natural_no_zero', 'is_not_unique[admins_groups.id]'],
+            ],
+        ];
+    }
 
 	/**
      * Configura i vincoli di convalida per l'aggiornamento dei gruppi esistenti.
@@ -186,8 +224,8 @@ class GroupsModel extends BackendModel
                 'label' => lang('backend/groups.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'], 
                 'errors' => [
-                    'required' => lang('Backend/groups.errors.uuid'), 
-                    'regex_match' => lang('Backend/groups.errors.uuid') 
+                    'required' => lang('backend/groups.errors.uuid'), 
+                    'regex_match' => lang('backend/groups.errors.uuid') 
                 ]
             ],
             /* Validazione di ogni singolo elemento contenuto nell'array delle eccezioni */
@@ -195,11 +233,34 @@ class GroupsModel extends BackendModel
                 'label' => lang('backend/groups.labels.permissions'),
                 'rules' => ['permit_empty', 'in_list[' . $inListString . ']'],
                 'errors' => [
-                    'in_list' => lang('Backend/groups.errors.permission')
+                    'in_list' => lang('backend/groups.errors.permission')
                 ]
             ],
         ];
+    }
 
+    public function dropdownAdminsRules()
+    {
+        return [
+            'query' => [
+                'label' => lang('backend/groups.labels.query'),
+                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+            ],
+        ];
+    }
+
+    public function adminPermissionsValidationRules()
+    {
+        return [
+            'uuid' => [
+                'label' => lang('backend/groups.labels.uuid'),
+                'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'], 
+                'errors' => [
+                    'required' => lang('backend/groups.errors.uuid'), 
+                    'regex_match' => lang('backend/groups.errors.uuid') 
+                ]
+            ],
+        ];
     }
 
     /**
@@ -211,7 +272,7 @@ class GroupsModel extends BackendModel
     {
         try 
         {
-            $sql = 'select id, name, description from admins_groups order by created_at desc';
+            $sql = 'select id, name from admins_groups order by created_at desc';
             $query = $this->db->query($sql);
 
             return $query->getResult();
@@ -252,12 +313,15 @@ class GroupsModel extends BackendModel
      * @param int $id ID del gruppo.
      * @return object|null I dati del gruppo o null se non trovato.
      */
-    public function getGroupById(int $id): ?object
+    public function getGroupById(array $posts): ?object
     {
         try 
         {
+            /* Filtro campi post ammessi tramite metodo centralizzato */
+            $posts = $this->checkAllowedFields($posts, $this->getGroupByIdAllowedFields);
+
             $sql = "select id, name, description from admins_groups where id = ? limit 1";
-            $query = $this->db->query($sql, [$id]);
+            $query = $this->db->query($sql, [$posts['id']]);
             
             return $query->getRow() ?: null;
         } 
@@ -289,28 +353,23 @@ class GroupsModel extends BackendModel
 
             $groupId = $this->db->insertID();
 
-            /* Inserimento permessi associati (se selezionati) */
+            /* Inserimento permessi associati tramite un'unica Bulk Insert */
             if ( ! empty($posts['permissions']) && is_array($posts['permissions'])):
 
-                /* Inserimento permessi associati tramite un'unica Bulk Insert */
-                if ( ! empty($posts['permissions']) && is_array($posts['permissions'])):
+                $queriesValues = [];
+                $binds = [];
 
-                    $queriesValues = [];
-                    $binds = [];
+                foreach ($posts['permissions'] as $permission):
+                    $queriesValues[] = "(?, ?)";
+                    $binds[] = $groupId;
+                    $binds[] = $permission;
+                endforeach;
 
-                    foreach ($posts['permissions'] as $permission):
-                        $queriesValues[] = "(?, ?)";
-                        $binds[] = $groupId;
-                        $binds[] = $permission;
-                    endforeach;
-
-                    /* Uniamo i segnaposto con la virgola: (?, ?), (?, ?), (?, ?) */
-                    $sqlPerm = "insert into admins_groups_permissions (group_id, permission) values " . implode(', ', $queriesValues);
-                    
-                    /* Eseguiamo una sola query passando tutti i bind accumulati */
-                    $this->db->query($sqlPerm, $binds);
-
-                endif;
+                /* Uniamo i segnaposto con la virgola: (?, ?), (?, ?), (?, ?) */
+                $sqlPerm = "insert into admins_groups_permissions (group_id, permission) values " . implode(', ', $queriesValues);
+                
+                /* Eseguiamo una sola query passando tutti i bind accumulati */
+                $this->db->query($sqlPerm, $binds);
 
             endif;
 
@@ -347,7 +406,7 @@ class GroupsModel extends BackendModel
             $posts = $this->checkAllowedFields($posts, $this->editAllowedFields);
 
             /* 1. Recupero il record originale del gruppo dal DB per il confronto */
-            $originalGroup = $this->getGroupById((int) $posts['id']);
+            $originalGroup = $this->getGroupById($posts);
             if ( ! $originalGroup):
                 return ['result' => false, 'message' => lang('backend/groups.messages.noGroupFound')];
             endif;
@@ -405,7 +464,6 @@ class GroupsModel extends BackendModel
             return ['result' => false, 'message' => lang('backend/groups.messages.editError')];
         }
     }
-    
 
     /* Elimina un gruppo */
     public function del(array $posts): array
@@ -416,10 +474,6 @@ class GroupsModel extends BackendModel
             $posts = $this->checkAllowedFields($posts, $this->delAllowedFields);
 
             $this->db->transBegin();
-
-            /* Rimozione totale dei permessi */
-            $sql = "delete from admins_groups_permissions where group_id = ?";
-            $this->db->query($sql, [$posts['id']]);
 
             /* Rimozione del gruppo */
             $sql = "delete from admins_groups where id = ?";
@@ -474,12 +528,15 @@ class GroupsModel extends BackendModel
      * Recupera l'elenco degli amministratori filtrati per nome/username
      * per il dropdown delle eccezioni permessi.
      */
-    public function getDropdownAdmins(string $searchQuery): array
+    public function getDropdownAdmins(array $posts): array
     {
         try 
         {
+            /* Filtro campi post ammessi tramite metodo centralizzato */
+            $posts = $this->checkAllowedFields($posts, $this->dropdownAdminsFields);
+
             /* Rimuoviamo eventuali spazi vuoti iniziali o finali e convertiamo in minuscolo */
-            $cleanQuery = trim(strtolower($searchQuery));
+            $cleanQuery = trim(strtolower($posts['query']));
             $bindValue = '%' . $cleanQuery . '%';
 
             /* Utilizziamo lower() per rendere la ricerca totalmente case-insensitive 
@@ -495,7 +552,7 @@ class GroupsModel extends BackendModel
         } 
         catch (\Throwable $e) 
         {
-            log_message('error', 'Errore recupero amministratori: ' . $e->getMessage());
+            log_message('error', 'Errore recupero amministratori: ' . $e);
             return [];
         }
     }
@@ -503,15 +560,25 @@ class GroupsModel extends BackendModel
     /**
      * Recupera i dati di base di un amministratore tramite il suo UUID.
      */
-    public function getAdminByUuid(string $uuid): ?array
+    public function getAdminByUuid(array $posts): ?array
     {
-        $sql = 'select uuid, group_id, name 
-                from admins 
-                join admins_groups 
-                on admins_groups.id = admins.group_id 
-                where admins.uuid = ?';
-                
-        return $this->db->query($sql, [$uuid])->getRowArray();
+        try {
+
+            /* Filtro campi post ammessi tramite metodo centralizzato */
+            $posts = $this->checkAllowedFields($posts, $this->getAdminByUuidFields);
+
+            $sql = 'select uuid, group_id, name 
+                    from admins 
+                    join admins_groups 
+                    on admins_groups.id = admins.group_id 
+                    where admins.uuid = ?';
+                    
+            return $this->db->query($sql, [$posts['uuid']])->getRowArray();
+
+        } catch(\Throwable $e) {
+            log_message('error', 'Errore recupero amministratore: ' . $e);
+            return [];
+        }
     }
 
     /**
@@ -621,11 +688,9 @@ class GroupsModel extends BackendModel
             $this->db->transCommit();
             return ['result' => true, 'message' => lang('backend/groups.messages.saveExceptionsSuccess')];
 
-        } catch (\Exception $e) {
-            if ($this->db->transStatus() === false):
-                $this->db->transRollback();
-            endif;
-            log_message('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            $this->db->transRollback();
+            log_message('error', $e);
             return ['result' => false, 'message' => lang('backend/groups.messages.saveExceptionsError')];
         }
     }

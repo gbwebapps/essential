@@ -7,11 +7,25 @@ use App\Models\Backend\BackendModel;
 class AccountModel extends BackendModel
 {
 	/**
+	 * Identificativo testuale del modulo associato al profilo del profilo corrente.
+	 *
+	 * @var string|null
+	 */
+	protected ?string $module = 'account';
+
+	/**
 	 * Elenco dei campi consentiti per la persistenza dei dati durante la fase di aggiornamento del profilo corrente.
 	 *
 	 * @var array
 	 */
 	protected array $editAllowedFields = ['firstname', 'lastname', 'email', 'phone', 'note'];
+
+	/**
+	 * Campi consentiti per l'identificazione e la revoca forzata di un token memorizzato.
+	 *
+	 * @var array
+	 */
+	protected array $deleteTokenAllowedFields = ['id'];
 
 	/**
      * Elenco delle proprietà anagrafiche utilizzate per la comparazione dei dati storici o per il tracciamento dei log.
@@ -49,6 +63,28 @@ class AccountModel extends BackendModel
 	            'rules' => ['permit_empty', 'trim', 'max_length[500]', 'safeText'],
 	            'errors' => [
 	                'safeText' => 'Caratteri non ammessi.'
+	            ]
+	        ],
+	    ];
+	}
+
+	/**
+	 * Controlla i parametri necessari alla revoca immediata di un token dal database.
+	 *
+	 * Richiede obbligatoriamente l'UUID dell'utente e l'indice intero sequenziale (id) del record token
+	 * per l'esecuzione della cancellazione atomica.
+	 *
+	 * @return array Criteri per l'eliminazione mirata delle sessioni.
+	 */
+	public function deleteTokenValidationRules(): array
+	{
+	    return [
+	        'id' => [
+	            'label' => lang('backend/account.labels.id'),
+	            'rules' => ['required', 'is_natural_no_zero'],
+	            'errors' => [
+	                'required' => lang('backend/account.errors.id'), 
+	                'is_natural_no_zero' => lang('backend/account.errors.id') 
 	            ]
 	        ],
 	    ];
@@ -107,6 +143,22 @@ class AccountModel extends BackendModel
 	    return $exceptions;
 	}
 
+	/**
+	 * Recupera lo storico e lo stato dei token di sessione, persistenza o attivazione emessi per l'utente.
+	 *
+	 * Esegue un'estrazione mirata sulla tabella dei token per raccogliere i dati di tracciamento ambientali
+	 * quali gli indirizzi IP, gli User Agent e i relativi formati DATETIME di creazione e scadenza.
+	 *
+	 * @param string $uuid Identificativo univoco dell'amministratore.
+	 * @return array Lista dei token associati all'anagrafica.
+	 */
+	public function getTokens(string $uuid): array
+	{
+	    /* Estrazione log dei tokens di sessione o reset */
+	    $sql = "select * from admins_tokens where admin_uuid = ?";
+	    return $this->db->query($sql, [$uuid])->getResult();
+	}
+
 	public function edit(array $posts, \stdClass $currentAdmin): array 
 	{
 	    try {
@@ -151,5 +203,129 @@ class AccountModel extends BackendModel
 	        log_message('error', lang('backend/account.messages.editError') . ' - ' . $e->getMessage() . ' | File: ' . $e->getFile() . ' | Riga: ' . $e->getLine());
 	        return ['result' => false, 'message' => lang('backend/account.messages.editError')];
 	    }
+	}
+
+	/**
+	 * Revoca ed elimina permanentemente un singolo token identificativo (sessione o persistenza) dal database.
+	 *
+	 * Filtra i dati in ingresso tramite whitelisting ed esegue la verifica preventiva sull'esistenza dell'account.
+	 * Interroga la tabella dei token per cancellare il record corrispondente all'UUID dell'amministratore e all'ID 
+	 * incrementale fornito. Valida l'esito dell'operazione basandosi sul conteggio delle righe effettivamente coinvolte 
+	 * dalla query (`affectedRows`), confermando l'avvenuta disconnessione forzata del dispositivo associato.
+	 *
+	 * @param array $posts Dataset contenente l'UUID dell'amministratore e l'ID sequenziale del token da revocare.
+	 * @return array Matrice di risposta contenente l'esito logico dell'epurazione e il messaggio per l'interfaccia.
+	 */
+	public function deleteToken(array $posts, \stdClass $currentAdmin): array
+	{
+	    /* Match dei posts con i campi consentiti */
+	    $posts = $this->checkAllowedFields($posts, $this->deleteTokenAllowedFields);
+
+	    try {
+
+	        /* Query per eliminare il token */
+	        $sql = "delete from admins_tokens where admin_uuid = ? and id = ?";
+	        $this->db->query($sql, [$currentAdmin->uuid, $posts['id']]);
+
+	        if($this->db->affectedRows() > 0):
+	            return ['result' => true, 'message' => sprintf(lang('backend/account.messages.deleteTokenSuccess'), esc($currentAdmin->firstname), esc($currentAdmin->lastname))];
+	        endif;
+
+	        return ['result' => false, 'message' => lang('backend/account.messages.deleteTokenError')];
+
+	    } catch(\Throwable $e) {
+
+	        log_message('error', lang('backend/account.messages.deleteTokenError') . ' - ' . $e);
+	        return ['result' => false, 'message' => lang('backend/account.messages.deleteTokenError')];
+
+	    }
+	}
+
+	public function resetPassword(\stdClass $currentAdmin, \CodeIgniter\HTTP\IncomingRequest $request): array
+	{
+	    try 
+	    {
+	        $userAgent = $request->getUserAgent()->getAgentString();
+	        $ip = $request->getIPAddress();
+
+	        /* Generazione token di attivazione */
+	        $token = new \App\Libraries\Token();
+	        $tokenHash = $token->getHash(config(\Config\Backend\Auth::class)->hashKey);
+
+	        /* 2. Calcolo corretto della scadenza lavorando sui secondi (timestamp) */
+	        $expireTime = date('Y-m-d H:i:s', time() + config(\Config\Backend\Auth::class)->activationTime);
+
+	        $this->db->transBegin();
+
+	        /* Scrittura Data di Reset nella tabella admins */
+	        $sql = "update admins set resetted_at = ? where uuid = ?";
+	        $this->db->query($sql, [date('Y-m-d H:i:s'), $currentAdmin->uuid]);
+
+	        /* Eliminiamo eventuali token di attivazione precedenti ancora attivi o scaduti per questo specifico admin */
+	        $sql = "delete from admins_tokens where admin_uuid = ? and token_type = ?";
+	        $this->db->query($sql, [$currentAdmin->uuid, 'activation']);
+
+	        /* Scrittura del token di attivazione */
+	        $sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, token_expire, token_type, user_agent, ip) values (?, ?, ?, ?, ?, ?, ?)";
+	        $this->db->query($sql, [$currentAdmin->uuid, $tokenHash, date('Y-m-d H:i:s'), $expireTime, 'activation', $userAgent, $ip]);
+
+	        if ($this->db->transStatus() === false):
+
+	            $this->db->transRollback();
+	            log_message('error', lang('backend/account.messages.resetPasswordError'));
+
+	            return ['result' => false, 'message' => lang('backend/account.messages.resetPasswordError')];
+	        endif;
+
+	        $this->db->transCommit();
+
+	    } catch (\Throwable $e) {
+
+	        $this->db->transRollback();
+
+	        log_message('error', lang('backend/account.messages.resetPasswordError') . ' - ' . $e);
+	        return ['result' => false, 'message' => lang('backend/account.messages.resetPasswordError')];
+
+	    }
+
+	    /* Istanzio il servizio email dedicato e tento l'invio */
+	    $emailService = new \App\Libraries\EmailService();
+
+	    /* Configuro i parametri dinamici per questa specifica chiamata */
+	    $module = $this->module;
+	    $template = 'emailResetPasswordAdminPartial';
+	    $subjectLangKey = 'backend/email.account.resetPassword.subjectResetPasswordEmail';
+
+	    /* Chiamata al metodo con i nuovi parametri separati */
+	    if ( ! $emailService->sendActivationEmail($currentAdmin, $token->getValue(), $module, $template, $subjectLangKey)):
+
+	        $message = sprintf(lang('backend/account.messages.resetPasswordSuccessNoEmail'), esc($currentAdmin->firstname), esc($currentAdmin->lastname));
+	        return ['result' => 'db_committed_no_email', 'message' => $message];
+	        
+	    else:
+	        
+	        $message = sprintf(lang('backend/account.messages.resetPasswordSuccess'), esc($currentAdmin->firstname), esc($currentAdmin->lastname));
+	        return ['result' => true, 'message' => $message];
+	        
+	    endif;
+	}
+
+	public function getExpiringDate(\stdClass $currentAdmin): string
+	{
+	    $expiringDate = '';
+
+	    $sql = 'select token_expire from admins_tokens where admin_uuid = ? and token_type = ? order by token_expire desc limit 1';
+	    
+	    if($token = $this->db->query($sql, [$currentAdmin->uuid, 'activation'])->getRow()):
+
+		    if (date('Y-m-d H:i:s') < $token->token_expire):
+		        $expiringDate = '<span class="text-success">' . convertDate($token->token_expire) . '</span>';
+		    else:
+		        $expiringDate = '<span class="text-danger"><s>' . convertDate($token->token_expire) . '</s></span>';
+		    endif;
+
+		endif;
+
+	    return $expiringDate;
 	}
 }

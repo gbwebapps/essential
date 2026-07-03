@@ -3,8 +3,7 @@ import { urlbase, controller, action, smoothReplace } from './backend.js';
 
 /* Import dei componenti dalla sottocartella */
 import { ListManager, AddManager, EditManager, DeleteManager, ChangeStatusManager, GeneralDataManager, MetaDataManager } from './components/Crud.js';
-import { ResetPasswordManager } from './components/Auth.js';
-import { ChangeGroupManager, GetPermissionsManager, ChangePermissionManager, GetTokensManager, DeleteTokenManager } from './components/Admins.js';
+import { ChangeGroupManager, GetPermissionsManager, ChangePermissionManager, GetTokensManager, DeleteTokenManager, ResetPasswordManager } from './components/Admins.js';
 
 import { GalleryOneImgManager } from './components/GalleryOneImgManager.js';
 import { UploadPreviewImgManager } from './components/UploadPreviewImgManager.js';
@@ -16,7 +15,7 @@ const actions = {
     showAll: function() {
 
         const adminsManager = new ListManager({
-            controller: controller,
+            controller: 'admins',
             url: urlbase + 'backend/admins/showAll',
             containerId: 'showAll-admins-container',
             searchFields: ['firstname', 'lastname', 'email', 'phone']
@@ -24,14 +23,14 @@ const actions = {
         adminsManager.init();
 
         const deleteManager = new DeleteManager({
-            controller: controller,
+            controller: 'admins',
             url: urlbase + 'backend/admins/delete',
             listManager: adminsManager
         });
         deleteManager.init();
 
         const changeStatusManager = new ChangeStatusManager({
-            controller: controller,
+            controller: 'admins',
             url: urlbase + 'backend/admins/changeStatus'
         }, {
             onStatusAfter: data => {
@@ -43,9 +42,9 @@ const actions = {
         changeStatusManager.init();
 
         const adminResetManager = new ResetPasswordManager({
-            formSelector: '.resetAdmin',
-            url: `${urlbase}backend/admins/resetPassword`,
-            listManager: adminsManager /* Passo l'istanza per ricaricare la tabella */
+            onResetAfter: data => {
+                adminsManager.showAll();
+            }
         });
         adminResetManager.init();
     },
@@ -95,15 +94,10 @@ const actions = {
         });
         generalDataManager.init();
 
-        const changeGroupManager = new ChangeGroupManager({
-            url: urlbase + 'backend/admins/changeGroup', 
-        });
+        const changeGroupManager = new ChangeGroupManager();
         changeGroupManager.init();
 
         const permissionsManager = new GetPermissionsManager({
-            url: urlbase + 'backend/admins/getPermissions', 
-            formSelector: '#getPermissions'
-        }, {
             onPermissionsAfter: (data) => {
                 /* Se il server restituisce il group_id reale, riallineiamo la select dell'anagrafica */
                 if (data.group_id !== undefined) {
@@ -138,7 +132,7 @@ const actions = {
         metaDataManager.init();
 
         const changeStatusManager = new ChangeStatusManager({
-            controller: controller, 
+            controller: 'admins', 
             url: urlbase + 'backend/admins/changeStatus'
         }, {
             onStatusAfter: data => {
@@ -151,28 +145,16 @@ const actions = {
         });
         changeStatusManager.init();
 
-        const changePermissionManager = new ChangePermissionManager({
-            controller: controller,
-            url: urlbase + 'backend/admins/changePermission'
-        });
+        const changePermissionManager = new ChangePermissionManager();
         changePermissionManager.init();
 
-        const permissionsManager = new GetPermissionsManager({
-            url: urlbase + 'backend/admins/getPermissions', 
-            formSelector: '#getPermissions'
-        });
+        const permissionsManager = new GetPermissionsManager();
         permissionsManager.init();
 
-        const tokensManager = new GetTokensManager({
-            url: urlbase + 'backend/admins/getTokens', 
-            formSelector: '#getTokens'
-        });
+        const tokensManager = new GetTokensManager();
         tokensManager.init();
 
-        const deleteTokenManager = new DeleteTokenManager({
-            controller: controller,
-            url: urlbase + 'backend/admins/deleteToken',
-        });
+        const deleteTokenManager = new DeleteTokenManager();
         deleteTokenManager.init();
 
         // const galleryOneImgManager = new GalleryOneImgManager('#images_data');

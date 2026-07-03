@@ -849,7 +849,7 @@ class AdminsModel extends BackendModel
         /* Configuro i parametri dinamici per questa specifica chiamata */
         $module = $this->module;
         $template = 'emailCreateAdminPartial';
-        $subjectLangKey = 'backend/email.admins.createAdmin.subjectCreateAdminEmail';
+        $subjectLangKey = 'backend/email.admins.add.subjectCreateAdminEmail';
 
         /* Chiamata al metodo con i parametri separati */
         if ( ! $emailService->sendActivationEmail($data['row'], $token->getValue(), $module, $template, $subjectLangKey)):
@@ -1134,6 +1134,10 @@ class AdminsModel extends BackendModel
             $sql = "update admins set resetted_at = ? where uuid = ?";
             $this->db->query($sql, [date('Y-m-d H:i:s'), $posts['uuid']]);
 
+            /* Eliminiamo eventuali token di attivazione precedenti ancora attivi o scaduti per questo specifico admin */
+            $sql = "delete from admins_tokens where admin_uuid = ? and token_type = ?";
+            $this->db->query($sql, [$posts['uuid'], 'activation']);
+
             /* Scrittura del token di attivazione */
             $sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, token_expire, token_type, user_agent, ip) values (?, ?, ?, ?, ?, ?, ?)";
             $this->db->query($sql, [$posts['uuid'], $tokenHash, date('Y-m-d H:i:s'), $expireTime, 'activation', $userAgent, $ip]);
@@ -1163,7 +1167,7 @@ class AdminsModel extends BackendModel
         /* Configuro i parametri dinamici per questa specifica chiamata */
         $module = $this->module;
         $template = 'emailResetPasswordAdminPartial';
-        $subjectLangKey = 'backend/email.admins.resetPasswordAdmin.subjectResetPasswordAdminEmail';
+        $subjectLangKey = 'backend/email.admins.resetPassword.subjectResetPasswordEmail';
 
         /* Chiamata al metodo con i nuovi parametri separati */
         if ( ! $emailService->sendActivationEmail($data['row'], $token->getValue(), $module, $template, $subjectLangKey)):

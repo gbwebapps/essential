@@ -1,5 +1,5 @@
 /* Import delle utility risalendo di un livello */
-import { urlbase, apiFetch, showToast, handleValidationErrors, handleValidationImages, handleValidationDocuments } from '../backend.js';
+import { urlbase, apiFetch, showAlert, handleValidationErrors, handleValidationImages, handleValidationDocuments } from '../backend.js';
 
 export class GalleryOneDocManager {
     constructor(containerId = '#documents_data') {
@@ -56,7 +56,7 @@ export class GalleryOneDocManager {
             .then(data => this.handleResponse(data, false))
             .catch(err => {
                 console.error(err);
-                showToast('danger', 'Errore di rete');
+                showAlert('danger', 'Errore di rete');
             });
     }
 
@@ -70,7 +70,7 @@ export class GalleryOneDocManager {
             .then(data => this.handleResponse(data, true))
             .catch(err => {
                 console.error(err);
-                showToast('danger', 'Errore di rete');
+                showAlert('danger', 'Errore di rete');
             });
     }
 
@@ -80,12 +80,12 @@ export class GalleryOneDocManager {
         } else if (data.result === '404') {
             window.location.href = urlbase + 'admin/404';
         } else if (data.result === false) {
-            showToast('danger', data.message);
+            showAlert('danger', data.message);
         } else if (data.errors) {
-            showToast('danger', data.errors);
+            showAlert('danger', data.errors);
         } else if (data.result === true) {
             if (showSuccess) {
-                showToast('success', data.message);
+                showAlert('success', data.message);
             }
             if (this.container) {
                 smoothReplace(this.container, data.output);

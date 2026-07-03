@@ -2,16 +2,13 @@
 import { urlbase, action } from './backend.js';
 
 /* Import della classe logica */
-import { GroupManager } from './components/Groups.js';
+import { GroupsManager } from './components/Groups.js';
 
 const actions = {
     index: function() {
 
-        const groupManager = new GroupManager({
-            getGroups: urlbase + 'backend/groups/getGroups',
-            getGroup: urlbase + 'backend/groups/getGroup',
-            urlGetExceptions: urlbase + 'backend/groups/getDropdownAdmins'
-        });
+        /* Istanziazione pulita senza parametri passed dall'esterno */
+        const groupManager = new GroupsManager();
 
         /* --- 1. GESTIONE MANUALE E FLUIDA: Aggiungi Gruppo --- */
         const triggerAddBtn = document.querySelector('.btn-trigger-add-group');
@@ -34,7 +31,9 @@ const actions = {
                     return;
                 }
 
-                await groupManager.loadAddGroupPanel();
+                /* Interrompe l'apertura del collapsable se il metodo ritorna false (utente non loggato) */
+                const success = await groupManager.loadAddGroupPanel();
+                if (success === false) return;
                 
                 triggerAddBtn.disabled = false;
                 triggerAddBtn.classList.remove('disabled');
@@ -72,7 +71,9 @@ const actions = {
                     return;
                 }
 
-                await groupManager.loadGroupsList();
+                /* Interrompe l'apertura del collapsable se il metodo ritorna false (utente non loggato) */
+                const success = await groupManager.loadGroupsList();
+                if (success === false) return;
                 
                 triggerListBtn.disabled = false;
                 triggerListBtn.classList.remove('disabled');
@@ -113,8 +114,9 @@ const actions = {
                 return;
             }
 
-            /* Chiamata asincrona al nuovo metodo della classe */
-            await groupManager.loadSingleGroupData(subTriggerBtn.dataset.id, bodyContainer);
+            /* Chiamata asincrona con controllo sbarramento (interrompe se ritorna false) */
+            const success = await groupManager.loadSingleGroupData(subTriggerBtn.dataset.id, bodyContainer);
+            if (success === false) return;
 
             /* Ripristino dello sblocco del loader ed esecuzione animazione */
             subTriggerBtn.disabled = false;
@@ -144,7 +146,9 @@ const actions = {
                     return;
                 }
 
-                await groupManager.loadExceptionsPanel();
+                /* Interrompe l'apertura del collapsable se il metodo ritorna false (utente non loggato) */
+                const success = await groupManager.loadExceptionsPanel();
+                if (success === false) return;
                 
                 triggerExceptionsBtn.disabled = false;
                 triggerExceptionsBtn.classList.remove('disabled');
@@ -152,15 +156,13 @@ const actions = {
                 bsCollapseExceptions.show();
             });
 
-            /* Rimosso il listener duplicato 'show.bs.collapse' che causava l'errore */
-
             mainCollapseExceptions.addEventListener('hidden.bs.collapse', (e) => {
                 if (e.target === mainCollapseExceptions) {
                     groupManager.resetExceptionsContainer();
                 }
             });
         }
-    } // Fine index
+    }
 };
 
 /* Listener per il link select all nei form add ed edit */

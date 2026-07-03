@@ -75,13 +75,13 @@ class AccountController extends BackendController
                 'icon_3x' => '<i class="fa-solid fa-check-circle fa-3x"></i>',
                 'route' => 'backend/account/permissions',
             ],
-            'images' => [
+            /* 'images' => [
                 'title' => lang('backend/account.leftMenu.images'),
                 'class' => 'col-4',
                 'icon' => '<i class="fa-solid fa-images"></i>',
                 'icon_3x' => '<i class="fa-solid fa-images fa-3x"></i>',
                 'route' => 'backend/account/images',
-            ],
+            ], */
             'tokens' => [
                 'title' => lang('backend/account.leftMenu.tokens'),
                 'class' => 'col-4',
@@ -96,13 +96,13 @@ class AccountController extends BackendController
                 'icon_3x' => '<i class="fa-solid fa-unlock fa-3x"></i>',
                 'route' => 'backend/account/resetPassword',
             ],
-            'security' => [
+            /*'security' => [
                 'title' => lang('backend/account.leftMenu.security'),
                 'class' => 'col-4',
                 'icon' => '<i class="fa-solid fa-shield"></i>',
                 'icon_3x' => '<i class="fa-solid fa-shield fa-3x"></i>',
                 'route' => 'backend/account/security',
-            ],
+            ],*/
         ];
     }
 
@@ -137,7 +137,7 @@ class AccountController extends BackendController
      *
      * @return string La vista HTML del form di modifica.
      */
-    public function edit()
+    public function edit(): string|ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -182,7 +182,7 @@ class AccountController extends BackendController
      *
      * @return string|\CodeIgniter\HTTP\Response La vista HTML o la risposta JSON per AJAX.
      */
-    public function permissions()
+    public function permissions(): string|ResponseInterface
     {
         /* Se la richiesta è AJAX e in POST, gestiamo il rinfresco asincrono */
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -217,36 +217,109 @@ class AccountController extends BackendController
      *
      * @return string La vista HTML della gestione immagini.
      */
-    public function images()
-    {
-        $this->data['action'] = 'images';
+    // public function images()
+    // {
+    //     $this->data['action'] = 'images';
 
-        return $this->render('backend/account/imagesView', $this->data);
-    }
+    //     return $this->render('backend/account/imagesView', $this->data);
+    // }
 
     /**
      * Mostra l'elenco, lo stato di validità e la cronologia dei token di sicurezza legati all'account.
      *
      * @return string La vista HTML della sezione token.
      */
-    public function tokens()
+    public function tokens(): string|ResponseInterface
     {
-        $this->data['action'] = 'tokens';
-
         $this->data['userAgent'] = new UserAgent();
         $this->data['tokens'] = $this->accountModel->getTokens($this->currentAdmin->uuid);
+
+        /* Se la richiesta è AJAX e in POST, gestiamo il rinfresco asincrono */
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            return $this->response->setJSON([
+                'result' => true,
+                'output' => view('backend/account/partials/tokens/tokensPartial', $this->data)
+            ]);
+
+        endif;
+
+        $this->data['action'] = 'tokens';
 
         return $this->render('backend/account/tokensView', $this->data);
     }
 
     /**
-     * Mostra la maschera per l'aggiornamento guidato delle credenziali d'accesso (Password) dell'utente.
+     * Revoca e rimuove in modo permanente un determinato token (sessione o cookie persistente) associato all'amministratore corrente.
      *
-     * @return string La vista HTML del form di cambio password.
+     * @return ResponseInterface Risposta JSON con l'esito e la tabella parziale dei token aggiornata.
      */
-    public function resetPassword()
+    public function deleteToken(): ResponseInterface
     {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            $posts = $this->request->getPost();
+            $rules = $this->accountModel->deleteTokenValidationRules();
+
+            if ( ! $this->validateData($posts, $rules)):
+                $errorMessage = implode('<br>', $this->validator->getErrors());
+                
+                return $this->response->setJSON(['result' => false, 'message' => sprintf(lang('backend/account.messages.validateToastErrors'), $errorMessage)]);
+            endif;
+
+            $result = $this->accountModel->deleteToken($posts, $this->currentAdmin);
+
+            if($result['result'] === true):
+
+                $this->data['userAgent'] = new UserAgent();
+                $this->data['tokens'] = $this->accountModel->getTokens($this->currentAdmin->uuid);
+
+                $json = ['result' => true, 'message' => $result['message']];
+                $json['output'] = view('backend/account/partials/tokens/tokensPartial', $this->data);
+
+            else:
+
+                $json = ['result' => false, 'message' => $result['message']];
+
+            endif;
+
+            return $this->response->setJSON($json);
+
+        endif;
+    }
+
+    /**
+     * Avvia la procedura amministrativa di invio o rigenerazione guidata della password di un operatore.
+     *
+     * @return ResponseInterface Risposta JSON con l'esito dell'operazione.
+     */
+    public function resetPassword(): string|ResponseInterface
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            $result = $this->accountModel->resetPassword($this->currentAdmin, $this->request);
+
+            $this->data['expiringDate'] = $this->accountModel->getExpiringDate($this->currentAdmin);
+
+            if($result['result'] === false):
+
+                $json = ['result' => $result['result'], 'message' => $result['message']];
+
+            else:
+
+                $output = view('backend/account/partials/resetPassword/resetPasswordPartial', $this->data);
+                $json = ['result' => $result['result'], 'message' => $result['message'], 'output' => $output];
+
+            endif;
+
+
+            return $this->response->setJSON($json);
+
+        endif;
+
         $this->data['action'] = 'resetPassword';
+
+        $this->data['expiringDate'] = $this->accountModel->getExpiringDate($this->currentAdmin);
 
         return $this->render('backend/account/resetPasswordView', $this->data);
     }
@@ -256,10 +329,10 @@ class AccountController extends BackendController
      *
      * @return string La vista HTML della sezione sicurezza.
      */
-    public function security()
-    {
-        $this->data['action'] = 'security';
+    // public function security()
+    // {
+    //     $this->data['action'] = 'security';
         
-        return $this->render('backend/account/securityView', $this->data);
-    }
+    //     return $this->render('backend/account/securityView', $this->data);
+    // }
 }

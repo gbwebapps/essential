@@ -217,7 +217,7 @@ export function handleAjaxError(jqXHR, textStatus, errorThrown) {
     }
 
     /* Mostra il messaggio in un toast */
-    showToast('danger', message);
+    showAlert('danger', message);
 
     /* Logga comunque il messaggio completo in console per il debug dello sviluppatore */
     console.error('Dettagli errore AJAX:', {
@@ -227,61 +227,43 @@ export function handleAjaxError(jqXHR, textStatus, errorThrown) {
     });
 }
 
-export function showToast(type, message)
+export function showAlert(type, message, icon = '')
 {
-    /* Determina la classe di stile in base al tipo */
-    let bgClass;
+    /* Determina la classe Alert di Bootstrap per lo stile */
+    let alertClass;
     switch (type) {
-        case 'success':
-            bgClass = 'bg-success text-white';
-            break;
-        case 'danger':
-            bgClass = 'bg-danger text-white';
-            break;
-        case 'info':
-            bgClass = 'bg-info text-white';
-            break;
-        case 'warning':
-            bgClass = 'bg-warning text-dark';
-            break;
-        case 'primary':
-            bgClass = 'bg-primary text-white';
-            break;
-        default:
-            bgClass = 'bg-secondary text-white';
+        case 'success': alertClass = 'alert-success'; break;
+        case 'danger': alertClass = 'alert-danger'; break;
+        case 'info': alertClass = 'alert-info'; break;
+        case 'warning': alertClass = 'alert-warning'; break;
+        case 'primary': alertClass = 'alert-primary'; break;
+        default: alertClass = 'alert-secondary';
     }
 
-    /* Crea il markup del toast */
-    const toastHTML = `
-        <div class="toast ${bgClass}" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true">
-            <div class="toast-header">
-                <strong class="me-auto">Essential</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    /* Prepariamo lo spazio per l'icona se passata */
+        const iconHTML = icon ? `${icon} ` : '';
+
+    /* Markup Alert puro con chiusura manuale (data-bs-dismiss="alert") */
+    const alertHTML = `
+        <div class="alert ${alertClass} alert-dismissible fade show border-0 d-flex align-items-center p-3" role="alert">
+            <div class="w-100 text-center p-0 ms-4">
+                ${iconHTML}${message}
             </div>
-            <div class="toast-body">
-                ${message}
-            </div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>`;
 
-    /* Aggiungi il toast al container */ 
-    const toastContainer = document.getElementById('toast-container');
-    const toastElement = document.createElement('div');
-    toastElement.innerHTML = toastHTML.trim();
-    toastContainer.appendChild(toastElement.firstChild);
+    const alertContainer = document.getElementById('alert-container');
+    if ( ! alertContainer) return;
 
-    /* Inizializza e mostra il toast */
-    const toast = new bootstrap.Toast(toastContainer.lastChild);
-    toast.show();
+    const alertElement = document.createElement('div');
+    alertElement.innerHTML = alertHTML.trim();
+    const currentAlert = alertElement.firstChild;
+    
+    alertContainer.appendChild(currentAlert);
 
-    /* Rimuovi il toast dal DOM dopo la chiusura */
-    toastContainer.lastChild.addEventListener('hidden.bs.toast', function () {
+    /* Rimuove l'elemento dal DOM automaticamente dopo l'animazione di chiusura di Bootstrap */
+    currentAlert.addEventListener('closed.bs.alert', function () {
         this.remove();
-        /*document.querySelectorAll('[class^="error_"], .error-msg, .error_status').forEach(el => {
-            el.classList.remove('error-show'); // fade-out
-            setTimeout(() => {
-                el.innerHTML = '\u00A0'; // mantieni spazio e padding
-            }, 150); // stessa durata della transizione CSS
-        });*/
     });
 }
 

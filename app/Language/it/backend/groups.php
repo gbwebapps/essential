@@ -23,7 +23,8 @@ return [
 		'admins' => 'Cerca amministratore', 
 		'name' => 'Nome gruppo',
 		'description' => 'Descrizione gruppo',
-		'permissions' => 'Permessi'
+		'permissions' => 'Permessi', 
+		'query' => 'Campo ricerca'
 	], 
 	'placeholders' => [
 		'groupName' => 'Inserisci nome gruppo...', 

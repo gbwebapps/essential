@@ -1,5 +1,5 @@
 /* Import delle utility risalendo di un livello */
-import { urlbase, apiFetch, showToast, handleValidationErrors, handleValidationImages, handleValidationDocuments } from '../backend.js';
+import { urlbase, apiFetch, showAlert, handleValidationErrors, handleValidationImages, handleValidationDocuments } from '../backend.js';
 
 export class UploadPreviewDocManager {
     constructor(inputSelector, previewSelector, triggerSelector, galleryOneDocManager = null) {
@@ -185,7 +185,7 @@ export class UploadPreviewDocManager {
         const files = this.getFiles();
         if (files.length === 0) {
             const msg = this.previewContainer.dataset.requiredText;
-            showToast('danger', msg);
+            showAlert('danger', msg);
             return;
         }
         files.forEach(file => {
@@ -206,15 +206,15 @@ export class UploadPreviewDocManager {
                     if (data.errors) {
                         handleValidationErrors(data.errors);
                         handleValidationDocuments(data.errors);
-                        showToast('danger', data.message);
+                        showAlert('danger', data.message);
                     } else if (data.result === false) {
-                        showToast('danger', data.message);
+                        showAlert('danger', data.message);
                     } else if (data.result === true) {
                         if (this.galleryOneDocManager) {
                             this.galleryOneDocManager.refresh(form_data);
                         }
                         this.reset();
-                        showToast('success', data.message);
+                        showAlert('success', data.message);
                     }
                 }
             })
