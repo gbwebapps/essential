@@ -10,14 +10,13 @@
             $msgContent = $message ?? session()->getFlashdata('message');
             $msgIcon = $message_icon ?? session()->getFlashdata('icon') ?? '';
 
-            /* Mappatura rapida per garantire le classi native alert-* di Bootstrap */
             if ($msgClass) :
                 $alertClass = (in_array($msgClass, ['success', 'danger', 'info', 'warning', 'primary', 'secondary'])) ? 'alert-' . $msgClass : 'alert-secondary';
             endif;
 
             if ($msgClass && $msgContent): 
         ?>
-            <div class="alert <?= $alertClass; ?> alert-dismissible fade show border-0 d-flex align-items-center p-3" role="alert">
+            <div class="alert <?= $alertClass; ?> alert-sessione alert-dismissible fade show border-0 d-flex align-items-center p-3" role="alert">
                 <div class="w-100 text-center p-0 ms-4">
                     <?= $msgIcon; ?> <?= $msgContent; ?>
                 </div>

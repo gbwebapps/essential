@@ -91,10 +91,7 @@ export class LoginManager {
             }
             console.error("Errore LoginManager:", error);
         } finally {
-
-            if (!window.location.href.includes(this.url)) {
-                this.isSubmitting = false;
-            }
+            this.isSubmitting = false;
         }
     }
 }

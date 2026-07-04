@@ -227,23 +227,42 @@ export function handleAjaxError(jqXHR, textStatus, errorThrown) {
     });
 }
 
-export function showAlert(type, message, icon = '')
+export function showAlert(type, message, customIcon = '')
 {
-    /* Determina la classe Alert di Bootstrap per lo stile */
     let alertClass;
+    let defaultIcon;
+
+    /* Determina classe e icona di default in base al tipo */
     switch (type) {
-        case 'success': alertClass = 'alert-success'; break;
-        case 'danger': alertClass = 'alert-danger'; break;
-        case 'info': alertClass = 'alert-info'; break;
-        case 'warning': alertClass = 'alert-warning'; break;
-        case 'primary': alertClass = 'alert-primary'; break;
-        default: alertClass = 'alert-secondary';
+        case 'success':
+            alertClass = 'alert-success';
+            defaultIcon = '<i class="fa-solid fa-circle-check"></i>';
+            break;
+        case 'danger':
+            alertClass = 'alert-danger';
+            defaultIcon = '<i class="fa-solid fa-triangle-exclamation"></i>';
+            break;
+        case 'info':
+            alertClass = 'alert-info';
+            defaultIcon = '<i class="fa-solid fa-circle-info"></i>';
+            break;
+        case 'warning':
+            alertClass = 'alert-warning';
+            defaultIcon = '<i class="fa-solid fa-triangle-exclamation"></i>';
+            break;
+        case 'primary':
+            alertClass = 'alert-primary';
+            defaultIcon = '<i class="fa-solid fa-circle-info"></i>';
+            break;
+        default:
+            alertClass = 'alert-secondary';
+            defaultIcon = '';
     }
 
-    /* Prepariamo lo spazio per l'icona se passata */
-        const iconHTML = icon ? `${icon} ` : '';
+    /* Usa l'icona custom se passata, altrimenti quella di default */
+    const finalIcon = customIcon || defaultIcon;
+    const iconHTML = finalIcon ? `${finalIcon} ` : '';
 
-    /* Markup Alert puro con chiusura manuale (data-bs-dismiss="alert") */
     const alertHTML = `
         <div class="alert ${alertClass} alert-dismissible fade show border-0 d-flex align-items-center p-3" role="alert">
             <div class="w-100 text-center p-0 ms-4">
@@ -253,7 +272,7 @@ export function showAlert(type, message, icon = '')
         </div>`;
 
     const alertContainer = document.getElementById('alert-container');
-    if ( ! alertContainer) return;
+    if (!alertContainer) return;
 
     const alertElement = document.createElement('div');
     alertElement.innerHTML = alertHTML.trim();
@@ -261,7 +280,6 @@ export function showAlert(type, message, icon = '')
     
     alertContainer.appendChild(currentAlert);
 
-    /* Rimuove l'elemento dal DOM automaticamente dopo l'animazione di chiusura di Bootstrap */
     currentAlert.addEventListener('closed.bs.alert', function () {
         this.remove();
     });

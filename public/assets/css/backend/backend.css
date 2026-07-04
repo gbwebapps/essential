@@ -89,16 +89,38 @@ textarea {
     color: var(--bs-secondary);
 }
 
-/* Customizzazione layout e posizionamento Alert per Essential */
-#alert-container {
-    /* Sposta l'intero contenitore verso il basso rispetto al top dello schermo */
-    margin-top: 3.3rem; 
+/* ==========================================================================
+    Gestione Alert Globali (JS e Sessioni)
+   ========================================================================== */
+
+/* Proprietà grafiche comuni e condivise */
+#alert-container .alert,
+.alert-sessione {
+    width: 51.25rem;
+    max-width: 90vw;
+    box-shadow: 0 0 0 rgb(0 0 0 / 50%), 0 0 .25rem rgb(0 0 0 / 50%);
 }
 
-#alert-container .alert {
-    width: 51.25rem;
-    max-width: 90vw; 
-    box-shadow: 0 0 0 rgb(0 0 0 / 50%), 0 0 .25rem rgb(0 0 0 / 50%);
+/* Contenitore per gli Alert generati da JavaScript */
+#alert-container {
+    margin-top: 3.5rem;
+}
+
+/* Alert generato da PHP (Sessione): ancorato fisso in alto nello stesso identico punto */
+.alert-sessione {
+    position: fixed;
+    top: 4.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1080; /* Stesso z-index dell'alert-container */
+}
+
+/* Correzione pulsante di chiusura per l'alert con d-flex */
+.alert-sessione .btn-close {
+    position: relative !important;
+    top: auto;
+    right: auto;
+    padding: 0;
 }
 
 /* Font Awesome override */
