@@ -328,4 +328,117 @@ class AccountModel extends BackendModel
 
 	    return $expiringDate;
 	}
+
+	/**
+	 * Recupera il metodo 2FA attualmente attivo per l'amministratore corrente.
+	 *
+	 * @param string $adminUuid L'UUID dell'amministratore corrente.
+	 * @return string Il nome del metodo attivo ('none', 'email', 'totp').
+	 */
+	public function getActiveMethod(string $adminUuid): string
+	{
+	    $sql = "select method from admins_2fa where admin_uuid = ? and enabled = 1 limit 1";
+	    $row = $this->db->query($sql, [$adminUuid])->getRow();
+
+	    if ( ! $row):
+	        return 'none';
+	    endif;
+
+	    return $row->method;
+	}
+
+	public function setBasicMethod(string $adminUuid, string $method): bool
+    {
+        try {
+            $this->db->transBegin();
+
+            /* Disattivo tutti i metodi esistenti per l'utente */
+            $sqlDisable = "update admins_2fa set enabled = 0 where admin_uuid = ?";
+            $this->db->query($sqlDisable, [$adminUuid]);
+
+            /* Se il metodo è email, eseguo l'upsert per attivarlo */
+            if ($method === 'email') :
+                $sqlUpsert = "insert into admins_2fa (admin_uuid, method, enabled) values (?, 'email', 1) on duplicate key update enabled = 1";
+                $this->db->query($sqlUpsert, [$adminUuid]);
+            endif;
+
+            $this->db->transCommit();
+            return true;
+
+        } catch (\Throwable $e) {
+            $this->db->transRollback();
+            log_message('error', 'Errore nel salvataggio del metodo 2FA base: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+	/**
+     * Salva nel database il secret TOTP temporaneo in stato disattivato.
+     *
+     * @param string $adminUuid L'UUID dell'amministratore.
+     * @param string $secret Il codice segreto generato per il TOTP.
+     * @return bool True in caso di successo, false altrimenti.
+     */
+    public function saveTemporarySecret(string $adminUuid, string $secret): bool
+    {
+        try {
+
+            $sql = "insert into admins_2fa (admin_uuid, method, secret, enabled) values (?, 'totp', ?, 0) on duplicate key update secret = ?, enabled = 0";
+            
+            $this->db->query($sql, [$adminUuid, $secret, $secret]);
+            return true;
+
+        } catch (\Throwable $e) {
+            log_message('error', 'Errore nel salvataggio del secret TOTP temporaneo: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+	/**
+     * Recupera il secret TOTP temporaneo non ancora attivato per la verifica.
+     *
+     * @param string $adminUuid L'UUID dell'amministratore.
+     * @return string|null Il codice segreto se trovato, altrimenti null.
+     */
+    public function getTemporarySecret(string $adminUuid): ?string
+    {
+        $sql = "select secret from admins_2fa where admin_uuid = ? and method = 'totp' and enabled = 0 limit 1";
+        $row = $this->db->query($sql, [$adminUuid])->getRow();
+
+        if ( ! $row) :
+            return null;
+        endif;
+
+        return (string) $row->secret;
+    }
+
+	/**
+     * Attiva definitivamente il metodo TOTP e disattiva gli altri canali 2FA.
+     *
+     * @param string $adminUuid L'UUID dell'amministratore.
+     * @return bool True in caso di successo, false altrimenti.
+     */
+    public function activateTotpMethod(string $adminUuid): bool
+    {
+        try {
+        	
+            $this->db->transBegin();
+
+            /* Disattivo l'eventuale metodo email attivo */
+            $sqlDisableEmail = "update admins_2fa set enabled = 0 where admin_uuid = ? and method = 'email'";
+            $this->db->query($sqlDisableEmail, [$adminUuid]);
+
+            /* Attivo definitivamente il metodo TOTP esistente */
+            $sqlActivateTotp = "update admins_2fa set enabled = 1 where admin_uuid = ? and method = 'totp'";
+            $this->db->query($sqlActivateTotp, [$adminUuid]);
+
+            $this->db->transCommit();
+            return true;
+
+        } catch (\Throwable $e) {
+            $this->db->transRollback();
+            log_message('error', 'Errore durante l\'attivazione definitiva del TOTP: ' . $e->getMessage());
+            return false;
+        }
+    }
 }

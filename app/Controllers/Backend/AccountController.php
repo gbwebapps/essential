@@ -96,13 +96,13 @@ class AccountController extends BackendController
                 'icon_3x' => '<i class="fa-solid fa-unlock fa-3x"></i>',
                 'route' => 'backend/account/resetPassword',
             ],
-            /*'security' => [
+            'security' => [
                 'title' => lang('backend/account.leftMenu.security'),
                 'class' => 'col-4',
-                'icon' => '<i class="fa-solid fa-shield"></i>',
-                'icon_3x' => '<i class="fa-solid fa-shield fa-3x"></i>',
+                'icon' => '<i class="fa-solid fa-shield-halved"></i>',
+                'icon_3x' => '<i class="fa-solid fa-shield-halved fa-3x"></i>',
                 'route' => 'backend/account/security',
-            ],*/
+            ],
         ];
     }
 
@@ -329,10 +329,142 @@ class AccountController extends BackendController
      *
      * @return string La vista HTML della sezione sicurezza.
      */
-    // public function security()
-    // {
-    //     $this->data['action'] = 'security';
+    public function security()
+    {
+        $this->data['action'] = 'security';
+
+        $this->data['activeMethod'] = $this->accountModel->getActiveMethod($this->currentAdmin->uuid);
         
-    //     return $this->render('backend/account/securityView', $this->data);
-    // }
+        return $this->render('backend/account/securityView', $this->data);
+    }
+
+    public function saveBasicMethod()
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')) :
+
+            $method = (string) $this->request->getPost('twoFactorMethod');
+            $allowedMethods = config(\Config\Backend\Auth::class)->twoFactorMethods;
+
+            /* Validazione dell'input */
+            if ( ! in_array($method, $allowedMethods, true) || $method === 'totp') :
+                return $this->response->setJSON(['result' => false, 'message' => 'Metodo non valido o non supportato.']);
+            endif;
+
+            /* Eseguo l'aggiornamento nel Model */
+            $updated = $this->accountModel->setBasicMethod($this->currentAdmin->uuid, $method);
+
+            if ( ! $updated) :
+                return $this->response->setJSON(['result' => false, 'message' => 'Impossibile aggiornare le impostazioni di sicurezza.']);
+            endif;
+
+            return $this->response->setJSON(['result' => true, 'message' => 'Impostazioni di sicurezza aggiornate con successo.']);
+
+        endif;
+    }
+
+    /**
+     * Inizializza la configurazione del secondo fattore tramite TOTP.
+     * * Genera un codice segreto univoco e temporaneo, lo registra nel database
+     * in uno stato non ancora attivo (enabled = 0) e restituisce la vista parziale
+     * contenente il QR Code e il secret in chiaro per l'applicazione di autenticazione.
+     *
+     * @return \CodeIgniter\HTTP\ResponseInterface Risposta JSON con l'esito dell'operazione e il codice HTML della vista parziale.
+     */
+    public function setupTotp()
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            $adminUuid = $this->currentAdmin->uuid;
+
+            /* Istanzio il servizio per la gestione dei codici OTP */
+            $otpService = new \App\Libraries\AppOtpService();
+            $secret = $otpService->generateSecret();
+
+            /* Salvo il secret temporaneo nel DB (imposta enabled = 0) */
+            $saved = $this->accountModel->saveTemporarySecret($adminUuid, $secret);
+
+            if ( ! $saved) :
+                return $this->response->setJSON(['result' => false, 'message' => 'Impossibile inizializzare la configurazione TOTP.']);
+            endif;
+
+            /* Genero l'URI stringa usando il servizio esistente */
+            $uri = $otpService->getProvisioningUri($secret, $this->currentAdmin->email);
+            
+            /* Sintassi ufficiale Endroid v6: parametri passati direttamente nel costruttore */
+            $builder = new \Endroid\QrCode\Builder\Builder(
+                writer: new \Endroid\QrCode\Writer\PngWriter(),
+                data: $uri,
+                size: 250,
+                margin: 0
+            );
+
+            $result = $builder->build();
+
+            $data['qrCode'] = $result->getDataUri();
+            $data['totpSecret'] = $secret;
+
+            /* Renderizzo la vista parziale per l'attivazione del TOTP */
+            $output = view('backend/account/partials/security/totpSetupPartial', $data);
+
+            return $this->response->setJSON(['result' => true, 'output' => $output]);
+
+        endif;
+    }
+
+    /**
+     * Valida il codice di verifica OTP e attiva definitivamente il metodo TOTP.
+     * * Recupera il secret temporaneo associato all'amministratore (enabled = 0), 
+     * ne verifica la validità tramite il codice inviato dall'utente e, in caso di 
+     * esito positivo, attiva il TOTP (enabled = 1) disattivando gli altri canali.
+     *
+     * @return \CodeIgniter\HTTP\ResponseInterface Risposta JSON con l'esito dell'operazione.
+     */
+    public function confirmTotp()
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')) :
+
+            /* Definisco i soli campi consentiti in questa richiesta */
+            $allowedFields = ['otp'];
+            
+            /* Sanifico l'input filtrando l'array $_POST */
+            $posts = array_intersect_key($this->request->getPost(), array_flip($allowedFields));
+
+            /* Sbarramento: Validazione sui soli dati autorizzati */
+            $rules = ['otp' => 'required|is_natural_no_zero|exact_length[6]'];
+
+            if ( ! $this->validateData($posts, $rules)) :
+                return $this->response->setJSON([
+                    'result'  => false, 
+                    'message' => lang('backend/account.messages.validationErrors')
+                ]);
+            endif;
+
+            /* Da qui in poi lavoriamo solo sul parametro sanificato e validato */
+            $otpCode = (string) $posts['otp'];
+            $adminUuid = $this->currentAdmin->uuid;
+
+            /* Recupero il secret temporaneo */
+            $secret = $this->accountModel->getTemporarySecret($adminUuid);
+
+            if ( ! $secret) :
+                return $this->response->setJSON(['result' => false, 'message' => 'Nessuna sessione di configurazione TOTP attiva o scaduta.']);
+            endif;
+
+            /* Istanzio il servizio e valido il codice */
+            $otpService = new \App\Libraries\AppOtpService();
+            if ( ! $otpService->verify($secret, $otpCode)) :
+                return $this->response->setJSON(['result' => false, 'message' => 'Il codice inserito non è valido. Riprova.']);
+            endif;
+
+            /* Attivo definitivamente il TOTP nel DB */
+            $activated = $this->accountModel->activateTotpMethod($adminUuid);
+
+            if ( ! $activated) :
+                return $this->response->setJSON(['result' => false, 'message' => 'Impossibile attivare l\'autenticazione TOTP.']);
+            endif;
+
+            return $this->response->setJSON(['result' => true, 'message' => 'L\'applicazione di autenticazione è stata configurata con successo.']);
+
+        endif;
+    }
 }

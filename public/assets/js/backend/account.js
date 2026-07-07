@@ -2,7 +2,7 @@
 import { urlbase, controller, action, smoothReplace } from './backend.js';
 
 /* Import dei componenti dalla sottocartella */
-import { EditManager, GetPermissionsManager, GetTokensManager, DeleteTokenManager, ResetPasswordManager } from './components/Account.js';
+import { EditManager, GetPermissionsManager, GetTokensManager, DeleteTokenManager, ResetPasswordManager, SecurityManager } from './components/Account.js';
 
 const actions = {
     edit: function() {
@@ -32,6 +32,12 @@ const actions = {
         resetPasswordManager.init();
 
     },
+    security: function() {
+
+        const securityManager = new SecurityManager();
+        securityManager.init();
+
+    }
 };
 
 /* Se esiste una funzione per l'azione corrente, eseguila */

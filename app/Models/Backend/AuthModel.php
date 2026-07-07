@@ -65,6 +65,12 @@ class AuthModel extends BackendModel
     protected array $setPasswordAllowedFields = ['password', 'token'];
 
     /**
+     * Elenco dei campi di input autorizzati per la verifica del secondo fattore di autenticazione.
+     * @var array
+     */
+    protected array $verifyAllowedFields = ['code'];
+
+    /**
      * Definisce le regole rigide di validazione per il modulo di autenticazione iniziale.
      *
      * Restituisce i vincoli per i campi email e password, applicando la regex di complessità
@@ -140,6 +146,22 @@ class AuthModel extends BackendModel
     }
 
     /**
+     * Definisce le regole di validazione per la verifica del codice del secondo fattore di autenticazione.
+     * Imposta i vincoli di obbligatorietà, di essere un numero e di avere una lunghezza esatta di 6 cifre.
+     * @return array Mappa delle regole di validazione per il codice.
+     */
+    public function validateVerifyRules(): array
+    {
+        return [
+            'code' => [
+                'label' => 'Codice',
+                /* CORRETTO: exact_length blocca la stringa a 6 caratteri, is_natural permette i numeri interi */
+                'rules' => ['required', 'is_natural', 'exact_length[6]'], 
+            ],
+        ];
+    }
+
+    /**
      * Esegue la pipeline di controllo per l'autenticazione dell'amministratore nel sistema.
      *
      * Isola i campi consentiti, analizza i limiti di Brute Force basati sull'intervallo temporale,
@@ -155,20 +177,18 @@ class AuthModel extends BackendModel
     {
         try 
         {
-            /* 1. Inizializzazione variabili e parametri di configurazione */
+            /* Inizializzazione variabili e parametri di configurazione */
             $posts = $this->checkAllowedFields($posts, $this->loginAllowedFields);
 
             $rememberMe = (isset($posts['rememberMe']) && $posts['rememberMe']) ? true : false;
-
             $ip = $request->getIPAddress();
 
             /* Lettura centralizzata delle configurazioni per evitare chiamate ridondanti */
             $allowAttempts = (bool) config(\Config\Backend\Auth::class)->attempts;
             $allowTwoFactor = (bool) config(\Config\Backend\Auth::class)->twoFactor;
 
-            /* 2. Costruzione della query di lettura iniziale dell'utente */
+            /* Costruzione della query di lettura iniziale dell'utente */
             if ($allowAttempts):
-                /* Genera la data passata nel formato corretto per il database */
                 $secondsInterval = (int) config(\Config\Backend\Auth::class)->attemptsInterval;
                 $attemptsInterval = date('Y-m-d H:i:s', time() - $secondsInterval);
                 
@@ -194,14 +214,14 @@ class AuthModel extends BackendModel
                 return ['result' => false, 'message' => lang('backend/auth.messages.loginFailed')];
             endif;
 
-            /* 3. Controllo immediato del blocco tentativi (senza effettuare ulteriori scritture) */
+            /* Controllo immediato del blocco tentativi */
             if ($allowAttempts && isset($admin->times)):
                 if ($admin->times >= (int) config(\Config\Backend\Auth::class)->attemptsLimit):
                     return ['result' => false, 'message' => lang('backend/auth.messages.tooMAnyAttempts')];
                 endif;
             endif;
 
-            /* 4. Verifica della password */
+            /* Verifica della password */
             if ( ! password_verify($posts['password'], $admin->password_hash)):
                 
                 /* La transazione si apre solo ora, poiché dobbiamo effettuare una scrittura sul DB */
@@ -217,40 +237,47 @@ class AuthModel extends BackendModel
                 
             endif;
 
-            /* 5. Gestione del Secondo Fattore di Autenticazione (2FA) */
+            /* Gestione del Secondo Fattore di Autenticazione (2FA) */
             if ($allowTwoFactor):
 
                 $sql = "select method, secret from admins_2fa where admin_uuid = ? and enabled = 1 limit 1";
-                $twofaQuery = $this->db->query($sql, [$admin->uuid]);
-                $twofa = $twofaQuery->getRow();
+                $twofa = $this->db->query($sql, [$admin->uuid])->getRow();
 
                 if ($twofa):
-                    /* Se il 2FA è richiesto, interrompiamo qui il flusso prima di azzerare i tentativi.
-                       I tentativi verranno azzerati solo dopo la corretta verifica dell'OTP */
+                    /* IMPLEMENTAZIONE SICURA: Scrittura dei dati sensibili in sessione server protetta */
+                    session()->set('auth_2fa_pending', ['admin_uuid'  => $admin->uuid, 'rememberMe' => $rememberMe, 'method' => $twofa->method]);
+
+                    /* Eliminazione preventiva di eventuali codici presenti in admins_2fa_codes per l'utente corrente */
+                    $sql = "delete from admins_2fa_codes where admin_uuid = ?";
+                    $this->db->query($sql, [$admin->uuid]);
+
                     if ($twofa->method === 'email'):
-                        (new EmailOtpService($this->app))->send($admin->uuid);
+                        /* Servizio core che implementeremo nel prossimo step */
+                        (new \App\Libraries\EmailOtpService())->send($admin->uuid);
                     endif;
 
-                    return ['result' => '2fa_required', 'method' => $twofa->method, 'admin_uuid' => $admin->uuid, 'remember_me' => $rememberMe];
+                    /* Il client riceve solo la notifica del successo parziale senza dati sensibili esposti */
+                    return ['result' => '2fa_required', 'method' => $twofa->method];
                 endif;
 
             endif;
 
-            /* 6. Fase finale del Login (Password e 2FA superati con successo) */
+            /* Fase finale del Login (Password e 2FA non richiesto) */
             $this->db->transBegin();
 
-            /* Pulizia della tabella tentativi solo ad autenticazione completamente avvenuta */
             if ($allowAttempts):
                 $sql = "delete from admins_attempts where admin_uuid = ?";
                 $this->db->query($sql, [$admin->uuid]);
             endif;
 
+            /* Chiusura della transazione prima del passaggio di consegne */
+            $this->db->transCommit();
+
             /* Delega la finalizzazione (creazione sessioni/cookie) al metodo interno */
             return $this->innerLogin($admin, $rememberMe, $request);
 
         } catch (\Throwable $e) {
-
-            /* Verifica se una transazione è attiva prima di effettuare il rollback */
+            /* In CodeIgniter 4 si esegue il rollback sicuro verificando lo stato interno del database */
             if ($this->db->transStatus() === false):
                 $this->db->transRollback();
             endif;
@@ -529,6 +556,144 @@ class AuthModel extends BackendModel
         } catch (\Throwable $e) {
             log_message('error', lang('backend/auth.messages.AuthTokenError') . ' - ' . $e);
             return false;
+        }
+    }
+
+    /**
+     * Controlla e valida il codice del secondo fattore (2FA).
+     *
+     * Funzionamento del metodo:
+     * -> Verifica se il secondo fattore (2FA) è attivo nel sistema.
+     * -> Controlla se la sessione temporanea dell'utente è ancora valida.
+     * -> Blocca i tentativi continui di inserimento per evitare attacchi forzati (Brute-Force).
+     * -> Verifica se il codice inserito esiste (per Email) o corrisponde alla chiave (per TOTP).
+     * -> Controlla se il codice è scaduto (distinguendo tra codice sbagliato e scaduto nel tempo).
+     * -> Se il codice è corretto, pulisce i dati temporanei e completa il login dell'utente.
+     *
+     * @param array $posts I dati inviati dal modulo (contiene il codice inserito dall'utente).
+     * @param \CodeIgniter\HTTP\IncomingRequest $request La richiesta del browser (serve per prendere l'IP dell'utente).
+     * @return array Restituisce un array con le chiavi 'result' (bool) e 'message' (string).
+     * @throws \CodeIgniter\Exceptions\PageNotFoundException Mostra un errore 404 se il 2FA è disattivato.
+     */
+    public function verify(array $posts, \CodeIgniter\HTTP\IncomingRequest $request): array
+    {
+        try 
+        {
+            $posts = $this->checkAllowedFields($posts, $this->verifyAllowedFields);
+
+            $config = config(\Config\Backend\Auth::class);
+            $ip = $request->getIPAddress();
+
+            /* Recupero e validazione immediata della sessione protetta temporanea */
+            $sessionData = session()->get('auth_2fa_pending');
+            if ((empty($sessionData)) || ( ! isset($sessionData['admin_uuid']))):
+                return ['result' => false, 'message' => lang('backend/auth.messages.sessionExpired')];
+            endif;
+
+            $adminUuid  = (string) $sessionData['admin_uuid'];
+            $method     = (string) $sessionData['method'];
+            $rememberMe = (bool) $sessionData['rememberMe'];
+
+            /* Recupero l'oggetto anagrafico dell'admin per il login finale */
+            $admin = $this->db->query("select * from admins where uuid = ? and status = 1 limit 1", [$adminUuid])->getRow();
+            if ( ! $admin):
+                return ['result' => false, 'message' => lang('backend/auth.messages.verifyFailed')];
+            endif;
+
+            /* Controllo Throttling Anti Brute-Force (2FA) */
+            $cutoffTime = date('Y-m-d H:i:s', time() - (int)$config->twoFactorTime);
+
+            /* Conteggio tentativi falliti */
+            $sql = "select COUNT(id) as cnt from admins_2fa_attempts 
+                    where admin_uuid = ? and method = ? and timestamp > ?";
+            $cntRow = $this->db->query($sql, [$adminUuid, $method, $cutoffTime])->getRow();
+
+            if ($cntRow && (int) $cntRow->cnt >= (int) $config->twoFactorLimit):
+                
+                $this->db->transBegin();
+
+                /* Aggiorna il timestamp dell'ultimo tentativo fallito per mantenere attivo il blocco */
+                $sql = "select MAX(timestamp) as last_ts from admins_2fa_attempts 
+                        where admin_uuid = ? and method = ? and timestamp > ?";
+                $row = $this->db->query($sql, [$adminUuid, $method, $cutoffTime])->getRow();
+
+                if ($row && $row->last_ts):
+                    $sql = "update admins_2fa_attempts set timestamp = ? 
+                            where admin_uuid = ? and method = ? and timestamp = ?";
+                    $this->db->query($sql, [date('Y-m-d H:i:s'), $adminUuid, $method, $row->last_ts]);
+                endif;
+
+                $this->db->transCommit();
+                return ['result' => false, 'message' => lang('backend/auth.messages.tooManyAttempts')];
+            endif;
+
+            /* Validazione del codice OTP (TOTP o Email) */
+            $isValidCode = false;
+            $isExpired = false; 
+
+            if ($method === 'totp'):
+                $sql = "select secret from admins_2fa where admin_uuid = ? and method = 'totp' and enabled = 1 limit 1";
+                $row = $this->db->query($sql, [$adminUuid])->getRow();
+
+                if ($row && ! empty($row->secret)):
+                    $isValidCode = (new \App\Libraries\AppOtpService())->verify($row->secret, $posts['code']);
+                endif;
+
+            elseif ($method === 'email'):
+                /* Prima query: controlliamo solo se il codice inserito esiste per questo utente */
+                $sql = "select expires_at from admins_2fa_codes where admin_uuid = ? and code = ? limit 1";
+                $row = $this->db->query($sql, [$adminUuid, $posts['code']])->getRow();
+
+                if ( ! $row):
+                    /* Il codice non esiste nel DB: è sbagliato */
+                    $isValidCode = false;
+                else:
+                    /* Il codice esiste! Adesso controlliamo se è scaduto rispetto a questo momento */
+                    if (date('Y-m-d H:i:s') > $row->expires_at):
+                        $isValidCode = false;
+                        $isExpired = true; /* Segnaliamo che il problema è il tempo */
+                    else:
+                        $isValidCode = true;
+                    endif;
+                endif;
+            endif;
+
+            /* Gestione Esito Validazione */
+            $this->db->transBegin();
+
+            if ( ! $isValidCode):
+                /* Qualsiasi fallimento conta come tentativo errato per la sicurezza */
+                $sql = "insert into admins_2fa_attempts (admin_uuid, method, ip, timestamp) values (?, ?, ?, ?)";
+                $this->db->query($sql, [$adminUuid, $method, $ip, date('Y-m-d H:i:s')]);
+
+                $this->db->transCommit();
+
+                /* Scegliamo il messaggio specifico in base allo stato */
+                $errorMessage = $isExpired ? lang('backend/auth.messages.expiredCode') : lang('backend/auth.messages.wrongCode');
+
+                return ['result' => false, 'message' => $errorMessage];
+            endif;
+
+            /* Codice Corretto: Pulizia tabelle temporanee dell'utente */
+            $sql = "delete from admins_2fa_attempts where admin_uuid = ? and method = ?";
+            $this->db->query($sql, [$adminUuid, $method]);
+
+            $sql = "delete from admins_2fa_codes where admin_uuid = ?";
+            $this->db->query($sql, [$adminUuid]);
+
+            $this->db->transCommit();
+
+            /* Rimozione tassativa della sessione temporanea e Finalizzazione Login */
+            session()->remove('auth_2fa_pending');
+
+            return $this->innerLogin($admin, $rememberMe, $request);
+
+        } catch (\Throwable $e) {
+            /* Forza tassativamente il rollback se c'è una transazione attiva al momento del crash */
+            $this->db->transRollback();
+
+            log_message('error', 'Errore nel metodo verify 2FA: ' . $e->getMessage());
+            return ['result' => false, 'message' => lang('backend/auth.messages.verifyError')];
         }
     }
 

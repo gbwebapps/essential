@@ -2,7 +2,7 @@
 import { urlbase, action } from './backend.js';
 
 /* Import dei componenti dalla sottocartella */
-import { LoginManager, ResetPasswordManager, SetPasswordManager } from './components/Auth.js';
+import { LoginManager, ResetPasswordManager, SetPasswordManager, VerifyManager } from './components/Auth.js';
 
 const actions = {
     index: function(){},
@@ -22,6 +22,12 @@ const actions = {
         
         const setPasswordManager = new SetPasswordManager();
         setPasswordManager.init();
+    },
+
+    verify: function() {
+        
+        const verifyManager = new VerifyManager();
+        verifyManager.init();
     },
 }
 

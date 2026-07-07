@@ -583,3 +583,266 @@ export class ResetPasswordManager {
         }
     }
 }
+
+export class SecurityManager {
+    constructor(hooks = {}) {
+
+        /* Parametri di configurazione e selettori hardcoded */
+        this.wrapperId = 'totp-setup-wrapper';
+        this.saveBasicUrl = urlbase + 'backend/account/saveBasicMethod';
+        this.setupTotpUrl = urlbase + 'backend/account/setupTotp';
+        this.confirmTotpUrl = urlbase + 'backend/account/confirmTotp';
+
+        this.hooks = Object.assign({
+            onSecurityBefore: null,
+            onSecurityAfter: null,
+            onSecurityError: null
+        }, hooks);
+
+        /* Variabili di stato */
+        this.eventsBound = false;
+        this.isSubmitting = false;
+
+        /* Rileva il metodo inizialmente attivo nel DB al caricamento della pagina */
+        const activeRadio = document.querySelector('.twofactor-method-trigger:checked');
+        this.currentActiveMethod = activeRadio ? activeRadio.value : 'none';
+    }
+
+    init() {
+
+        /* Impedisce duplicazioni dei listener */
+        if (this.eventsBound) return;
+        this.eventsBound = true;
+
+        this.bindEvents();
+    }
+
+    bindEvents() {
+
+        /* Intercetta il cambio di selezione sui radio button del metodo 2FA */
+        document.addEventListener('change', async e => {
+            if (! e.target.matches('.twofactor-method-trigger')) return;
+            
+            const method = e.target.value;
+            const wrapper = document.getElementById(this.wrapperId);
+            if (wrapper) wrapper.innerHTML = ''; /* Reset sotto-form TOTP */
+
+            if (method === 'totp') {
+                await this.requestTotpSetup();
+                return;
+            }
+
+            /* Chiediamo conferma per None o Email leggendo il data-message dal radio */
+            const message = e.target.dataset.message;
+            if (message) {
+                const ok = await askConfirm(message);
+                if (! ok) {
+                    /* Rollback dinamico sul metodo precedentemente attivo */
+                    const previousRadio = document.querySelector(`.twofactor-method-trigger[value="${this.currentActiveMethod}"]`);
+                    if (previousRadio) previousRadio.checked = true;
+                    return;
+                }
+            }
+
+            /* Se conferma, salva immediatamente la preferenza */
+            await this.saveBasicMethod(method);
+
+            /* Aggiorno lo stile del metodo salvato */
+            this.updateVisualBorder(method);
+            
+            /* Aggiorno lo stato del metodo corrente attivo */
+            this.currentActiveMethod = method; 
+        });
+
+        /* Intercetta l'invio del codice di verifica del TOTP caricato dinamicamente */
+        document.addEventListener('submit', async e => {
+
+            if ( ! e.target.matches('#confirm-totp-form')) return;
+
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            await this.initTotpConfirmation(formData);
+        });
+
+        /* Gestione della visibilità della chiave segreta TOTP */
+        document.addEventListener('click', e => {
+            if (! e.target.closest('#toggle-secret-visibility')) return;
+
+            const input = document.getElementById('totp-secret-field');
+            const icon = document.getElementById('toggle-secret-icon');
+            
+            if (input && icon) {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.replace('fa-eye', 'fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.replace('fa-eye-slash', 'fa-eye');
+                }
+            }
+        });
+    }
+
+    async saveBasicMethod(method) {
+        if (this.isSubmitting) return;
+        this.isSubmitting = true;
+
+        const formData = new FormData();
+        formData.append('twoFactorMethod', method);
+
+        if (typeof this.hooks.onSecurityBefore === 'function') {
+            const stop = this.hooks.onSecurityBefore(formData);
+            if (stop === false) {
+                this.isSubmitting = false;
+                return;
+            }
+        }
+
+        try {
+            const response = await apiFetch(this.saveBasicUrl, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.result === false) {
+                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+                return;
+            }
+
+            if (data.result === true) {
+                if (typeof showAlert === 'function' && data.message) showAlert('success', data.message);
+
+                if (typeof this.hooks.onSecurityAfter === 'function') {
+                    this.hooks.onSecurityAfter(data);
+                }
+            }
+
+        } catch (error) {
+            if (typeof this.hooks.onSecurityError === 'function') {
+                this.hooks.onSecurityError(error);
+            }
+            console.error("Errore SecurityManager (saveBasicMethod):", error);
+        } finally {
+            this.isSubmitting = false;
+        }
+    }
+
+    async requestTotpSetup() {
+        if (this.isSubmitting) return;
+        this.isSubmitting = true;
+
+        const formData = new FormData();
+
+        if (typeof this.hooks.onSecurityBefore === 'function') {
+            const stop = this.hooks.onSecurityBefore(formData);
+            if (stop === false) {
+                this.isSubmitting = false;
+                return;
+            }
+        }
+
+        try {
+            const response = await apiFetch(this.setupTotpUrl, {
+                method: 'POST'
+            });
+
+            const data = await response.json();
+
+            if (data.result === false) {
+                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+                return;
+            }
+
+            if (data.result === true) {
+                
+                const wrapper = document.getElementById(this.wrapperId);
+                if (data.output) smoothReplace(wrapper, data.output);
+
+                if (typeof this.hooks.onSecurityAfter === 'function') {
+                    this.hooks.onSecurityAfter(data);
+                }
+            }
+
+        } catch (error) {
+            if (typeof this.hooks.onSecurityError === 'function') {
+                this.hooks.onSecurityError(error);
+            }
+            console.error("Errore SecurityManager (requestTotpSetup):", error);
+        } finally {
+            this.isSubmitting = false;
+        }
+    }
+
+    async initTotpConfirmation(formData) {
+        if (this.isSubmitting) return;
+        this.isSubmitting = true;
+
+        if (typeof this.hooks.onSecurityBefore === 'function') {
+            const stop = this.hooks.onSecurityBefore(formData);
+            if (stop === false) {
+                this.isSubmitting = false;
+                return;
+            }
+        }
+
+        try {
+            const response = await apiFetch(this.confirmTotpUrl, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.result === false) {
+                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+                return;
+            }
+
+            if (data.result === true) {
+                
+                this.currentActiveMethod = 'totp';
+                this.updateVisualBorder('totp');
+
+                if (typeof showAlert === 'function' && data.message) showAlert('success', data.message);
+                
+                const wrapper = document.getElementById(this.wrapperId);
+                if (wrapper) wrapper.innerHTML = ''; /* Svuota il QR code ad attivazione completata */
+
+                if (typeof this.hooks.onSecurityAfter === 'function') {
+                    this.hooks.onSecurityAfter(data);
+                }
+            }
+
+        } catch (error) {
+            if (typeof this.hooks.onSecurityError === 'function') {
+                this.hooks.onSecurityError(error);
+            }
+            console.error("Errore SecurityManager (initTotpConfirmation):", error);
+        } finally {
+            this.isSubmitting = false;
+        }
+    }
+
+    updateVisualBorder(newMethod) {
+
+        /* 1. Rimuovo le classi attive da TUTTE le card dei metodi */
+        document.querySelectorAll('.twofactor-method-trigger').forEach(radio => {
+            const card = radio.closest('.card');
+            if (card) {
+                card.classList.remove('border-primary', 'bg-light');
+            }
+        });
+
+        /* 2. Aggiungo le classi attive solo alla card del nuovo metodo */
+        const activeRadio = document.getElementById(`method-${newMethod}`);
+        if (activeRadio) {
+            const card = activeRadio.closest('.card');
+            if (card) {
+                card.classList.add('border-primary', 'bg-light');
+            }
+        }
+    }
+}

@@ -72,6 +72,14 @@ export class LoginManager {
                 return;
             }
 
+            /* NUOVO: Controllo per Secondo Fattore Richiesto (2FA) */
+            if (data.result === '2fa_required') {
+                /* Effettua il reindirizzamento pulito alla pagina di verifica.
+                   Il server saprà già quale utente validare leggendolo dalla sessione. */
+                window.location.href = urlbase + 'backend/auth/verify';
+                return;
+            }
+
             /* Login avvenuto con successo */
             if (data.result === true) {
                 if (typeof this.hooks.onLoginAfter === 'function') {
@@ -291,6 +299,99 @@ export class SetPasswordManager {
         } finally {
             
             /* Rilascia sempre il blocco */
+            this.isSubmitting = false;
+        }
+    }
+}
+
+export class VerifyManager {
+    constructor(hooks = {}) {
+
+        /* Configurazione dedicata alla sezione di verifica OTP */
+        this.formId = 'verify_form';
+        this.url = urlbase + 'backend/auth/verify';
+
+        this.hooks = Object.assign({
+            onVerifyBefore: null,
+            onVerifyAfter: null,
+            onVerifyError: null
+        }, hooks);
+
+        /* Variabili di stato per la sicurezza */
+        this.eventsBound = false;
+        this.isSubmitting = false;
+    }
+    
+    init() {
+        const form = document.getElementById(this.formId);
+        if ( ! form) return;
+
+        /* Impedisce cloni dei listener */
+        if (this.eventsBound) return;
+        this.eventsBound = true;
+
+        form.addEventListener('submit', async e => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            await this.verify(formData, form);
+        });
+    }
+    
+    async verify(formData, form) {
+        
+        /* Se c'è già una richiesta in corso, blocca */
+        if (this.isSubmitting) return;
+        this.isSubmitting = true;
+
+        if (typeof this.hooks.onVerifyBefore === 'function') {
+            const stop = this.hooks.onVerifyBefore(formData);
+            if (stop === false) {
+                this.isSubmitting = false;
+                return;
+            }
+        }
+
+        /* Reset immediato degli errori visivi */
+        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
+
+        try {
+            const response = await apiFetch(this.url, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            
+            /* Controllo per gli errori di input (Validazione formale del codice) */
+            if (data.errors) {
+                if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
+                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+                return;
+            }
+
+            /* Controllo per codice errato o tentativi falliti */
+            if (data.result === false) {
+                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+                return;
+            }
+
+            /* Verifica superata con successo */
+            if (data.result === true) {
+                if (typeof this.hooks.onVerifyAfter === 'function') {
+                    this.hooks.onVerifyAfter(data);
+                }
+                
+                window.location.href = urlbase + 'backend/dashboard';
+            }
+
+        } catch (error) {
+
+            /* Errori di rete o crash del server */
+            if (typeof this.hooks.onVerifyError === 'function') {
+                this.hooks.onVerifyError(error);
+            }
+            console.error("Errore VerifyManager:", error);
+        } finally {
             this.isSubmitting = false;
         }
     }

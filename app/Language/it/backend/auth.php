@@ -5,7 +5,8 @@ return [
 		'index' => 'Benvenuto', 
 		'login' => 'Accedi', 
 		'resetPassword' => 'Resetta password', 
-		'setPassword' => 'Imposta password'
+		'setPassword' => 'Imposta password', 
+		'verify' => 'Verifica OTP'
 	],
 	'labels' => [
 		'email' => 'Email', 
@@ -13,19 +14,23 @@ return [
 		'password' => 'Password', 
 		'rememberMe' => 'Ricordami', 
 		'newPassword' => 'Inserisci password', 
-		'confirmNewPassword' => 'Conferma password'
+		'confirmNewPassword' => 'Conferma password', 
+		'code' => 'Codice OTP'
 	], 
 	'placeholders' => [
 		'email' => 'Inserisci qui indirizzo email...', 
 		'username' => 'Inserisci qui username...', 
 		'password' => 'Inserisci qui password...', 
 		'newPassword' => 'Inserisci qui password...', 
-		'confirmNewPassword' => 'Conferma password'
+		'confirmNewPassword' => 'Conferma password', 
+		'code' => 'Inserisci qui codice OTP...', 
 	], 
 	'buttons' => [
 		'login' => 'Accedi', 
 		'resetPassword' => 'Resetta password', 
-		'setPassword' => 'Resetta password'
+		'setPassword' => 'Imposta password', 
+		'verify' => 'Verifica OTP'
+
 	], 
 	'links' => [
 		'login' => 'Accedi', 

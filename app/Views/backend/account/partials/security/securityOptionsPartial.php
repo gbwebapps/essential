@@ -1,0 +1,44 @@
+<div class="card-body">
+
+    <div class="row mb-3 g-0 bg-light pt-2 ps-2 pe-2 border rounded-1">
+        <div class="col-12 text-start">
+            <h5><?= lang('backend/account.titles.twoFactor'); ?></h5>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <?php foreach (config(\Config\Backend\Auth::class)->twoFactorMethods as $method) : ?>
+            <div class="col-12 col-md-4">
+                <div class="card h-100 border <?php if ($activeMethod === $method) : ?>border-primary bg-light<?php endif; ?>">
+                    <div class="card-body d-flex align-items-start p-3">
+                        <div class="form-check w-100 m-0">
+                            <input class="form-check-input twofactor-method-trigger" 
+                                   type="radio" 
+                                   name="twoFactorMethod" 
+                                   id="method-<?= esc($method); ?>" 
+                                   value="<?= esc($method); ?>" 
+                                   data-message="Sei sicuro di voler cambiare il metodo del secondo fattore di autenticazione?" 
+                                   <?php if ($activeMethod === $method) : ?>checked<?php endif; ?>>
+                            <label class="form-check-label d-block ms-2 cursor-pointer" for="method-<?= esc($method); ?>">
+                                <span class="d-block fw-bold mb-1">
+                                    <?php if ($method === 'email') : ?>
+                                        <i class="fa-solid fa-envelope me-1"></i>
+                                    <?php elseif ($method === 'totp') : ?>
+                                        <i class="fa-solid fa-mobile-screen me-1"></i>
+                                    <?php endif; ?>
+                                    <?= lang('backend/account.labels.method' . ucfirst($method) . 'Title'); ?>
+                                </span>
+                                <small class="text-muted d-block"><?= lang('backend/account.labels.method' . ucfirst($method) . 'Desc'); ?></small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+
+    </div>
+
+    <div id="totp-setup-wrapper" class="mt-4"></div>
+
+</div>

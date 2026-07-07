@@ -22,9 +22,10 @@ return [
         ],
         '2fa' => [
             'greeting' => 'Ciao <strong>%s</strong>,',
-            'code_notice' => 'Il tuo codice 2FA è <strong>%s</strong> e scade tra <strong>%d %s</strong>',
-            'expiryMnute' => 'minuto',
+            'codeNotice' => 'Il tuo codice 2FA è <strong>%s</strong> e scade tra <strong>%d %s</strong>',
+            'expiryMinute' => 'minuto',
             'expiryMinutes' => 'minuti', 
+            'subjectVerifyCodeEmail' => 'Il tuo codice di verifica',
         ]
     ],
     'admins' => [

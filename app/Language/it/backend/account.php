@@ -9,7 +9,9 @@ return [
 		'images' => 'Immagini', 
 		'tokens' => 'Accessi', 
 		'resetPassword' => 'Reset password', 
-		'security' => 'Sicurezza'
+		'security' => 'Sicurezza', 
+		'twoFactor' => 'Autenticazione a 2 fattori', 
+		'totpSetupTitle' => 'Configura l\'applicazione di autenticazione',
 	],
 	'leftMenu' => [
 		'general' => 'Dati generali', 
@@ -35,7 +37,16 @@ return [
 		'expiredToken' => 'Data scadenza', 
 		'typeToken' => 'Tipo', 
 		'session' => 'Sessione',
-        'activation' => 'Attivazione',
+        'activation' => 'Attivazione', 
+        'methodNoneTitle' => 'Nessuno', 
+        'methodEmailTitle' => 'Email', 
+        'methodTotpTitle' => 'Authenticator app', 
+        'methodNoneDesc'  => 'Disattiva la verifica in due passaggi. L\'accesso avverrà inserendo solo email e password.',
+        'methodEmailDesc' => 'Ricevi un codice di sicurezza usa e getta a 6 cifre direttamente sulla tua casella email aziendale.',
+        'methodTotpDesc'  => 'Scansiona il codice QR con app come Google Authenticator, Authy o Microsoft Authenticator per generare codici temporanei istantanei.',
+        'totpSetupDesc' => 'Scansiona il codice QR con la tua app di autenticazione (es. Google Authenticator) o inserisci la chiave manualmente per iniziare a ricevere i codici di sicurezza.',
+        'totpSecretKey'      => 'Chiave segreta (configurazione manuale)',
+		'enterOtpCode' => 'Inserisci il codice a 6 cifre',
 	], 
 	'placeholders' => [
 		'firstname' => 'Inserisci nome...', 
@@ -49,6 +60,7 @@ return [
 		'refreshData' => 'Ricarica dati', 
 		'reload' => 'Ricarica pannello', 
 		'resetPassword' => 'Procedi al reset della password',
+		'verifyAndActivate'  => 'Verifica e attiva',
 	], 
 	'errors' => [
 		'id' => 'ID non conforme.', 

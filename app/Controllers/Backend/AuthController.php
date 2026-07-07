@@ -194,6 +194,50 @@ class AuthController extends BackendController
     }
 
     /**
+     * Gestisce la pagina e la verifica del codice di sicurezza (2FA).
+     * Come funziona:
+     * -> Se l'utente ha appena cliccato "Invia", controlla che il codice sia scritto bene.
+     * -> Invia il codice al database per vedere se è quello corretto e non è scaduto.
+     * -> Se il codice è giusto, effettua il login definitivo ed entra nel pannello.
+     * -> Se l'utente sta solo guardando la pagina (senza cliccare), mostra la maschera di inserimento.
+     * @return  string|\CodeIgniter\HTTP\Response La pagina HTML da mostrare oppure una risposta JSON con l'esito del controllo.
+     */
+    public function verify()
+    {
+        /* SBARRAMENTO GLOBALE: Se la feature 2FA è spenta, la rotta non esiste */
+        if ( ! config(\Config\Backend\Auth::class)->twoFactor):
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        endif;
+
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            $posts = $this->request->getPost();
+            $rules = $this->authModel->validateVerifyRules();
+
+            if ( ! $this->validateData($posts, $rules)):
+                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validationErrors')]);
+            endif;
+
+            /* Il controllo sul database, l'eventuale blocco brute-force e la pulizia della 
+               sessione in caso di successo avverranno tutti atomicamente dentro il Model */
+            $json = $this->authModel->verify($posts, $this->request);
+
+            return $this->response->setJSON($json);
+
+        endif;
+
+        if (empty(session()->get('auth_2fa_pending'))):
+            return redirect()->to(base_url('backend/auth'));
+        endif;
+
+        $this->data['action'] = 'verify';
+        $this->data['title'] = lang('backend/auth.titles.verify');
+        $this->data['icon'] = '<i class="fa-solid fa-mobile-screen"></i>';
+
+        return $this->render('backend/auth/verifyView', $this->data);
+    }
+
+    /**
      * Esegue la disconnessione completa dell'amministratore corrente, invalidando in sicurezza cookie o sessioni attive.
      *
      * @return ResponseInterface Oggetto di redirect verso la radice di autenticazione con cookie aggiornati.

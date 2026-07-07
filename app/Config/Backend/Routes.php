@@ -21,7 +21,8 @@ $routes->group('backend', function($routes) {
         $routes->match(['GET', 'POST'], 'login', '\App\Controllers\Backend\AuthController::login');
         $routes->match(['GET', 'POST'], 'resetPassword', '\App\Controllers\Backend\AuthController::resetPassword');
         $routes->get('setPassword/(:token)', '\App\Controllers\Backend\AuthController::setPassword/$1');
-        $routes->match(['GET', 'POST'], 'setPassword', '\App\Controllers\Backend\AuthController::setPassword');
+        $routes->post('setPassword', '\App\Controllers\Backend\AuthController::setPassword');
+        $routes->match(['GET', 'POST'], 'verify', '\App\Controllers\Backend\AuthController::verify');
     });
 
     /* LOGOUT (AUTHORIZED) */
@@ -45,7 +46,11 @@ $routes->group('backend', function($routes) {
             $routes->post('deleteToken', '\App\Controllers\Backend\AccountController::deleteToken');
             
             $routes->match(['GET', 'POST'], 'resetPassword', '\App\Controllers\Backend\AccountController::resetPassword');
-            // $routes->get('security', '\App\Controllers\Backend\AccountController::security');
+
+            $routes->get('security', '\App\Controllers\Backend\AccountController::security');
+            $routes->post('saveBasicMethod', '\App\Controllers\Backend\AccountController::saveBasicMethod');
+            $routes->post('setupTotp', '\App\Controllers\Backend\AccountController::setupTotp');
+            $routes->post('confirmTotp', '\App\Controllers\Backend\AccountController::confirmTotp');
         });
 
         /* MESSAGES */

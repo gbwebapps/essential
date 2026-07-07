@@ -11,7 +11,9 @@
     },
     "require": {
         "php": "^8.2",
-        "codeigniter4/framework": "^4.7"
+        "codeigniter4/framework": "^4.7",
+        "endroid/qr-code": "^6.0",
+        "spomky-labs/otphp": "^11.5"
     },
     "require-dev": {
         "code-lts/doctum": "^5.6",

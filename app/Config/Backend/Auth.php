@@ -56,7 +56,7 @@ class Auth extends BaseConfig
      * 
      * @var bool 
      */
-    public bool $attempts = true;
+    public bool $attempts = false;
 
     /**
      * Intervallo di tempo (in secondi) in cui monitorare e vincolare i tentativi di accesso.
@@ -74,10 +74,69 @@ class Auth extends BaseConfig
 
     /**
      * Stato di attivazione globale per l'autenticazione a due fattori (2FA).
-     * 
      * @var bool 
      */
-    public bool $twoFactor = false;
+    public bool $twoFactor = true;
+
+    /**
+     * Canale di autenticazione predefinito in caso di mancata specifica.
+     * @var string
+     */
+    public string $twoFactorMethod = 'email';
+
+    /**
+     * Numero massimo di tentativi errati di inserimento OTP prima del blocco temporaneo.
+     * @var int
+     */
+    public int $twoFactorLimit = 3;
+
+    /**
+     * Finestra temporale di monitoraggio (in secondi) per il calcolo del brute-force.
+     * @var int
+     */
+    public int $twoFactorTime = 600;
+
+    /**
+     * Nome dell'applicazione che apparirà all'utente all'interno dell'app di autenticazione.
+     * @var string
+     */
+    public string $twoFactorIssuer = 'Essential';
+
+    /**
+     * Numero di cifre che compongono il codice OTP generato.
+     * @var int
+     */
+    public int $twoFactorDigits = 6;
+
+    /**
+     * Finestra di tolleranza temporale per i codici TOTP per compensare disallineamenti di orologio.
+     * @var int
+     */
+    public int $twoFactorWindow = 1;
+
+    /**
+     * Durata di validità (in secondi) del codice OTP inviato tramite e-mail.
+     * @var int
+     */
+    public int $twoFactorEmailExpiry = 60;
+
+    /**
+     * Indirizzo e-mail del mittente utilizzato per l'invio dei codici di verifica.
+     * @var string
+     */
+    public string $twoFactorEmailFrom = 'master@essential.it';
+
+    /**
+     * Intervallo di rigenerazione (Time-To-Live in secondi) del codice base per l'algoritmo TOTP.
+     * @var int
+     */
+    public int $twoFactorTotpTtl = 60;
+
+    /**
+     * Elenco dei metodi di autenticazione a due fattori supportati dal sistema.
+     * @var array
+     */
+    public array $twoFactorMethods = ['none', 'email', 'totp'];
 
     /**
      * Durata di validità (in secondi) della persistenza dell'accesso tramite cookie "Remember Me".
