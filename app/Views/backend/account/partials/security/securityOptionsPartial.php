@@ -18,7 +18,7 @@
                                    name="twoFactorMethod" 
                                    id="method-<?= esc($method); ?>" 
                                    value="<?= esc($method); ?>" 
-                                   data-message="Sei sicuro di voler cambiare il metodo del secondo fattore di autenticazione?" 
+                                   data-message="<?= lang('backend/account.messages.areYouSureChangeMethod'); ?>" 
                                    <?php if ($activeMethod === $method) : ?>checked<?php endif; ?>>
                             <label class="form-check-label d-block ms-2 cursor-pointer" for="method-<?= esc($method); ?>">
                                 <span class="d-block fw-bold mb-1">

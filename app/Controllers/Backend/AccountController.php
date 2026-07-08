@@ -347,17 +347,17 @@ class AccountController extends BackendController
 
             /* Validazione dell'input */
             if ( ! in_array($method, $allowedMethods, true) || $method === 'totp') :
-                return $this->response->setJSON(['result' => false, 'message' => 'Metodo non valido o non supportato.']);
+                return $this->response->setJSON(['result' => false, 'message' => lang('backend/account.messages.methodNotValid')]);
             endif;
 
             /* Eseguo l'aggiornamento nel Model */
             $updated = $this->accountModel->setBasicMethod($this->currentAdmin->uuid, $method);
 
             if ( ! $updated) :
-                return $this->response->setJSON(['result' => false, 'message' => 'Impossibile aggiornare le impostazioni di sicurezza.']);
+                return $this->response->setJSON(['result' => false, 'message' => lang('backend/account.messages.updateSecuritySettingsError')]);
             endif;
 
-            return $this->response->setJSON(['result' => true, 'message' => 'Impostazioni di sicurezza aggiornate con successo.']);
+            return $this->response->setJSON(['result' => true, 'message' => lang('backend/account.messages.updateSecuritySettingsSuccess')]);
 
         endif;
     }
@@ -384,7 +384,7 @@ class AccountController extends BackendController
             $saved = $this->accountModel->saveTemporarySecret($adminUuid, $secret);
 
             if ( ! $saved) :
-                return $this->response->setJSON(['result' => false, 'message' => 'Impossibile inizializzare la configurazione TOTP.']);
+                return $this->response->setJSON(['result' => false, 'message' => lang('backend/account.messages.configurationInitializeError')]);
             endif;
 
             /* Genero l'URI stringa usando il servizio esistente */
@@ -429,14 +429,8 @@ class AccountController extends BackendController
             /* Sanifico l'input filtrando l'array $_POST */
             $posts = array_intersect_key($this->request->getPost(), array_flip($allowedFields));
 
-            /* Sbarramento: Validazione sui soli dati autorizzati */
-            $rules = ['otp' => 'required|is_natural_no_zero|exact_length[6]'];
-
-            if ( ! $this->validateData($posts, $rules)) :
-                return $this->response->setJSON([
-                    'result'  => false, 
-                    'message' => lang('backend/account.messages.validationErrors')
-                ]);
+            if ( ! $this->validateData($posts, ['otp' => 'required|is_natural_no_zero|exact_length[6]'])) :
+                return $this->response->setJSON(['result'  => false, 'message' => lang('backend/account.messages.validationErrors')]);
             endif;
 
             /* Da qui in poi lavoriamo solo sul parametro sanificato e validato */
@@ -447,23 +441,23 @@ class AccountController extends BackendController
             $secret = $this->accountModel->getTemporarySecret($adminUuid);
 
             if ( ! $secret) :
-                return $this->response->setJSON(['result' => false, 'message' => 'Nessuna sessione di configurazione TOTP attiva o scaduta.']);
+                return $this->response->setJSON(['result' => false, 'message' => lang('backend/account.messages.noConfigurationSession')]);
             endif;
 
             /* Istanzio il servizio e valido il codice */
             $otpService = new \App\Libraries\AppOtpService();
             if ( ! $otpService->verify($secret, $otpCode)) :
-                return $this->response->setJSON(['result' => false, 'message' => 'Il codice inserito non è valido. Riprova.']);
+                return $this->response->setJSON(['result' => false, 'message' => lang('backend/account.messages.wrongCode')]);
             endif;
 
             /* Attivo definitivamente il TOTP nel DB */
             $activated = $this->accountModel->activateTotpMethod($adminUuid);
 
             if ( ! $activated) :
-                return $this->response->setJSON(['result' => false, 'message' => 'Impossibile attivare l\'autenticazione TOTP.']);
+                return $this->response->setJSON(['result' => false, 'message' => lang('backend/account.messages.totpActivationNotPossible')]);
             endif;
 
-            return $this->response->setJSON(['result' => true, 'message' => 'L\'applicazione di autenticazione è stata configurata con successo.']);
+            return $this->response->setJSON(['result' => true, 'message' => lang('backend/account.messages.totpConfigurationSuccess')]);
 
         endif;
     }

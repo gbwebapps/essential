@@ -240,7 +240,7 @@ class AuthModel extends BackendModel
             /* Gestione del Secondo Fattore di Autenticazione (2FA) */
             if ($allowTwoFactor):
 
-                $sql = "select method, secret from admins_2fa where admin_uuid = ? and enabled = 1 limit 1";
+                $sql = "select method from admins_2fa where admin_uuid = ? and enabled = 1 limit 1";
                 $twofa = $this->db->query($sql, [$admin->uuid])->getRow();
 
                 if ($twofa):
@@ -252,7 +252,6 @@ class AuthModel extends BackendModel
                     $this->db->query($sql, [$admin->uuid]);
 
                     if ($twofa->method === 'email'):
-                        /* Servizio core che implementeremo nel prossimo step */
                         (new \App\Libraries\EmailOtpService())->send($admin->uuid);
                     endif;
 

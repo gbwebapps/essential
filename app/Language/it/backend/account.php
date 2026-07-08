@@ -81,5 +81,14 @@ return [
 		'deleteTokenSuccess' => 'Il token di %s %s è stato eliminato con successo.', 
 		'deleteTokenError' => 'Eliminazione token non andata a buon fine', 
 		'expiringDate' => '<div class="pb-3">Hai richiesto il reset della password.</div><div class="pb-3">Verifica la tua email e completa l\'operazione.</div>Hai tempo fino al %s</div>',
+		'methodNotValid' => 'Metodo non valido o non supportato.', 
+		'updateSecuritySettingsError' => 'Impossibile aggiornare le impostazioni di sicurezza.', 
+		'updateSecuritySettingsSuccess' => 'Impostazioni di sicurezza aggiornate con successo.', 
+		'configurationInitializeError' => 'Impossibile inizializzare la configurazione TOTP.', 
+		'noConfigurationSession' => 'Nessuna sessione di configurazione TOTP attiva o scaduta.', 
+		'wrongCode' => 'Il codice inserito non è valido. Riprova.', 
+		'totpActivationNotPossible' => 'Impossibile attivare l\'autenticazione TOTP.', 
+		'totpConfigurationSuccess' => 'L\'applicazione di autenticazione è stata configurata con successo.', 
+		'areYouSureChangeMethod' => 'Sei sicuro di voler cambiare il metodo del secondo fattore di autenticazione?'
 	]
 ];

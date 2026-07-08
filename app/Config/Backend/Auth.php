@@ -79,12 +79,6 @@ class Auth extends BaseConfig
     public bool $twoFactor = true;
 
     /**
-     * Canale di autenticazione predefinito in caso di mancata specifica.
-     * @var string
-     */
-    public string $twoFactorMethod = 'email';
-
-    /**
      * Numero massimo di tentativi errati di inserimento OTP prima del blocco temporaneo.
      * @var int
      */
@@ -125,12 +119,6 @@ class Auth extends BaseConfig
      * @var string
      */
     public string $twoFactorEmailFrom = 'master@essential.it';
-
-    /**
-     * Intervallo di rigenerazione (Time-To-Live in secondi) del codice base per l'algoritmo TOTP.
-     * @var int
-     */
-    public int $twoFactorTotpTtl = 60;
 
     /**
      * Elenco dei metodi di autenticazione a due fattori supportati dal sistema.
