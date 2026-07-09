@@ -22,6 +22,8 @@ class AdminsModel extends BackendModel
      */
     protected ?string $module = 'admins';
 
+    protected ?string $entity = 'admins';
+
     /**
      * Colonna di ordinamento predefinita utilizzata nelle query di estrazione se non specificata.
      *
@@ -260,6 +262,10 @@ class AdminsModel extends BackendModel
                 'label' => lang('backend/admins.labels.group'),
                 'rules' => ['required', 'is_natural_no_zero', 'is_not_unique[admins_groups.id]'],
             ],
+            'images' => [
+                'label' => lang('backend/admins.labels.images'),
+                'rules' => ['permit_empty', 'checkImages[size:2048,ext:png|jpg|jpeg|webp]']
+            ]
         ];
     }
 
@@ -328,6 +334,10 @@ class AdminsModel extends BackendModel
                     'in_list' => lang('Backend/admins.errors.permission')
                 ]
             ],
+            'images' => [
+                'label' => lang('backend/admins.labels.images'),
+                'rules' => ['permit_empty', 'checkImages[size:2048,ext:png|jpg|jpeg|webp]']
+            ]
         ];
     }
 
@@ -817,6 +827,16 @@ class AdminsModel extends BackendModel
             $sql = "insert into admins_2fa (admin_uuid, method, secret, enabled) values (?, 'email', NULL, 1)";
             $this->db->query($sql, [$uuid]);
 
+            /* Gestione Upload e Scrittura Immagini nel flusso transazionale */
+            if ( ! empty($posts['images'])):
+                $uploadService = new \App\Libraries\Backend\Upload();
+                $filenames = $uploadService->doUpload($posts['images'], $this->entity, $uuid);
+                
+                if ($filenames):
+                    $this->insertImages($filenames, $uuid, $this->entity, 'add');
+                endif;
+            endif;
+
             /* 3. Verifico eventuali errori SQL prima di fare il commit */
             if ($this->db->transStatus() === false):
                 $this->db->transRollback();
@@ -844,7 +864,7 @@ class AdminsModel extends BackendModel
         }
 
         /* Istanzio il servizio email dedicato e tento l'invio */
-        $emailService = new \App\Libraries\EmailService();
+        $emailService = new \App\Libraries\Backend\EmailService();
 
         /* Configuro i parametri dinamici per questa specifica chiamata */
         $module = $this->module;
@@ -935,6 +955,16 @@ class AdminsModel extends BackendModel
                     $sqlInsert = "insert into admins_permissions (permission, admin_uuid, allow) values (?, ?, 0)";
                     $this->db->query($sqlInsert, [$perm, $posts['uuid']]);
                 endforeach;
+            endif;
+
+            /* Gestione Upload e Scrittura Immagini nel flusso transazionale */
+            if ( ! empty($posts['images'])):
+                $uploadService = new \App\Libraries\Backend\Upload();
+                $filenames = $uploadService->doUpload($posts['images'], $this->entity, $posts['uuid']);
+                
+                if ($filenames):
+                    $this->insertImages($filenames, $posts['uuid'], $this->entity, 'edit');
+                endif;
             endif;
 
             if ($this->db->transStatus() === false):
@@ -1063,6 +1093,10 @@ class AdminsModel extends BackendModel
             $sql = "delete from admins where uuid = ?";
             $this->db->query($sql, [$posts['uuid']]);
 
+            /* Eliminazione immagini dal database */
+            $sql = "delete from images where entity_uuid = ?";
+            $this->db->query($sql, [$posts['uuid']]);
+
             if ($this->db->transStatus() === false):
 
                 $this->db->transRollback();
@@ -1072,6 +1106,9 @@ class AdminsModel extends BackendModel
             endif;
 
             $this->db->transCommit();
+
+            \App\Libraries\ImageFileSystemService::removeAllImages('admins', $posts['uuid']);
+
             return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.delSuccess'), esc($data['row']->firstname), esc($data['row']->lastname))];
 
         } catch (\Throwable $e) {
@@ -1162,7 +1199,7 @@ class AdminsModel extends BackendModel
         }
 
         /* Istanzio il servizio email dedicato e tento l'invio */
-        $emailService = new \App\Libraries\EmailService();
+        $emailService = new \App\Libraries\Backend\EmailService();
 
         /* Configuro i parametri dinamici per questa specifica chiamata */
         $module = $this->module;

@@ -20,6 +20,8 @@ abstract class BackendModel extends BaseModel
 	 */
 	protected ?string $module = null;
 
+	protected ?string $entity = null;
+
 	/**
 	 * Query SQL predefinita per la selezione dei record principali.
 	 *
@@ -284,35 +286,68 @@ abstract class BackendModel extends BaseModel
 	    return false;
 	}
 
-	protected function insertImages(Array $filenames, String $uuid, String $entity, String $action = 'add'): Void 
+	protected function insertImages(array $filenames, string $uuid, string $entity, string $action = 'add'): void
 	{
+	    $dataImage = [];
+	    $flag = false;
 
+	    if ($action === 'edit'):
+	        $sql = "select 1 from images where entity_uuid = ? and is_cover = ? and entity = ? limit 1";
+	        $result = $this->db->query($sql, [$uuid, '1', $entity])->getRow();
+	        $flag = $result ? true : false;
+	    endif;
+
+	    foreach ($filenames as $k => $v):
+	        $dataImage[$k]['entity'] = $entity;
+	        $dataImage[$k]['entity_uuid'] = $uuid;
+	        $dataImage[$k]['filename'] = $v;
+	        
+	        if ($flag):
+	            $dataImage[$k]['is_cover'] = '0';
+	        else:
+	            $dataImage[$k]['is_cover'] = ($k === 0) ? '1' : '0';
+	        endif;
+	    endforeach;
+
+	    $placeholders = [];
+	    $bind = [];
+	    $now = date('Y-m-d H:i:s');
+
+	    foreach ($dataImage as $row):
+	        $placeholders[] = "(?, ?, ?, ?, ?)";
+	        $bind[] = $row['entity'];
+	        $bind[] = $row['entity_uuid'];
+	        $bind[] = $row['filename'];
+	        $bind[] = $row['is_cover'];
+	        $bind[] = $now;
+	    endforeach;
+
+	    $sql = "insert into images (entity, entity_uuid, filename, is_cover, created_at) values " . implode(", ", $placeholders);
+	    $this->db->query($sql, $bind);
 	}
 
-	protected function insertDocuments(array $filenames, string $uuid, string $entity): void 
-	{
+	/**
+     * Rimozione ricorsiva di una directory e di tutto il suo contenuto.
+     */
+    protected function rrmdir(string $dir): void
+    {
+        if ( ! is_dir($dir)):
+            return;
+        endif;
 
-	}
+        $files = array_diff(scandir($dir), ['.', '..']);
 
-	protected function removeImages(string $entity, string $uuid): void 
-	{
+        foreach ($files as $file):
+            $full = $dir . DIRECTORY_SEPARATOR . $file;
+            if (is_dir($full)):
+                $this->rrmdir($full);
+            else:
+                @unlink($full);
+            endif;
+        endforeach;
 
-	}
-
-	protected function removeImage(string $entity, string $entity_uuid, string $filename): void 
-	{
-
-	}
-
-	protected function removeDocuments(string $entity, string $uuid): void 
-	{
-
-	}
-
-	protected function rrmdir(string $dir): void 
-	{
-
-	}
+        @rmdir($dir);
+    }
 
 	/**
 	 * Genera un identificativo univoco crittograficamente sicuro conforme allo standard UUID versione 4.

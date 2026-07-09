@@ -9,6 +9,9 @@
 <!-- Form per aggiornamento permessi -->
 <form id="getPermissions"></form>
 
+<!-- Form per aggiornamento immagini -->
+<form id="getImages"></form>
+
 <div class="row">
     <div class="col-8 offset-2">
 
@@ -47,17 +50,24 @@
 
                 <!-- Sezione: Upload e Preview Immagini Profilo -->
                 <div id="uploadPreview">
-                    <!-- Inclusione del componente per la preview delle immagini -->
-                    <!-- $this->include('backend/components/uploadPreviewImg/uploadPreviewImg_view'); -->
+                    <?= $this->include('backend/components/uploadPreviewImg/uploadPreviewImgView'); ?>
                 </div>
                 <!-- Fine Sezione: Upload e Preview Immagini Profilo -->
 
-                <!-- Sezione: Caricamento Documentazione Allegata -->
-                <div id="uploadDocuments">
-                    <!-- Inclusione del componente per la gestione dei documenti -->
-                    <!-- $this->include('backend/components/uploadPreviewDoc/uploadPreviewDoc_view'); -->
+                <!-- Gallery One -->
+                <div class="card-header rounded-0 d-flex justify-content-between align-items-center" style="border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);">
+                    <h2 class="card-title text-start mb-0"><?= lang('backend/components/galleryOneImg.panel'); ?></h2>
+                    <input form="getImages" type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
+                    <input form="getImages" type="hidden" name="entity" value="<?= esc($entity); ?>">
+                    <input form="getImages" type="hidden" name="context" value="<?= esc($context); ?>">
+                    <button form="getImages" type="submit" class="btn btn-sm btn-secondary">
+                        <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/components/galleryOneImg.reload'); ?>
+                    </button>
                 </div>
-                <!-- Fine Sezione: Caricamento Documentazione Allegata -->
+                <div id="galleryOne">
+                    <?= $this->include('backend/components/galleryOneImg/galleryOneImgView', $this->data); ?>
+                </div>
+                <!-- End Gallery One -->
 
                 <!-- Meta Data -->
                 <div class="card-header rounded-0 d-flex justify-content-between align-items-center" style="border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);">

@@ -10,6 +10,7 @@ use CodeIgniter\Validation\StrictRules\Rules;
 
 use App\Validation\Backend\AuthRules;
 use App\Validation\Backend\AdminsRules;
+use App\Validation\Backend\ImagesRules;
 
 class Validation extends BaseConfig
 {
@@ -29,7 +30,8 @@ class Validation extends BaseConfig
         FileRules::class,
         CreditCardRules::class, 
         AuthRules::class, 
-        AdminsRules::class
+        AdminsRules::class, 
+        ImagesRules::class
     ];
 
     /**

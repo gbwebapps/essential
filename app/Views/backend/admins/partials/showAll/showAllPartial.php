@@ -93,7 +93,7 @@
                                                 <?php if(is_null($cover)): ?>
                                                     <span class="fw-bold text-danger"><?= lang('backend/admins.labels.noImage'); ?></span>
                                                 <?php else: ?>
-                                                    <img src="<?= base_url('images/admins/' . esc($admin->uuid) . '/small/' . $cover); ?>" class="img-polaroid" alt="">
+                                                    <img src="<?= base_url('images/backend/admins/' . esc($admin->uuid) . '/small/' . $cover); ?>" class="img-polaroid" alt="">
                                                 <?php endif; ?>
                                             </td>
 

@@ -1,11 +1,8 @@
 /* Import delle utility risalendo di un livello */
-import { urlbase, apiFetch, toggleLoader, showAlert, askConfirm, smoothReplace, handleValidationErrors, handleValidationImages, handleValidationDocuments } from '../backend.js';
+import { urlbase, apiFetch, toggleLoader, showAlert, askConfirm, smoothReplace, handleValidationErrors, handleValidationImages } from '../backend.js';
 
 /* Import degli altri componenti (nella stessa cartella) */
 import { UploadPreviewImgManager } from './UploadPreviewImgManager.js';
-import { GalleryOneImgManager } from './GalleryOneImgManager.js';
-import { UploadPreviewDocManager } from './UploadPreviewDocManager.js';
-import { GalleryOneDocManager } from './GalleryOneDocManager.js';
 
 /* --- LIST MANAGER (Custom SSR) --- */
 export class ListManager {
@@ -336,9 +333,6 @@ export class AddManager {
             resetSelector: '', 
             containerId: '', 
             imagePreviewManager: null,
-            galleryOneImgManager: null,
-            docPreviewManager: null,
-            galleryOneDocManager: null
         }, config);
 
         this.hooks = Object.assign({
@@ -360,6 +354,7 @@ export class AddManager {
     }
 
     bindEvents() {
+        
         /* Impedisce l'accumulo di listener multipli sul document globale */
         if (this.eventsBound) return;
         this.eventsBound = true;
@@ -410,14 +405,6 @@ export class AddManager {
             });
         }
 
-        /* Se presente, aggiunge i documenti selezionati */
-        if (this.config.docPreviewManager) {
-            const files = this.config.docPreviewManager.files;
-            files.forEach(({ id, file }) => {
-                formData.append(`documents[${id}]`, file);
-            });
-        }
-
         /* Pulizia immediata degli errori visivi prima dell'invio */
         document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
 
@@ -438,10 +425,6 @@ export class AddManager {
                 
                 if (this.config.imagePreviewManager && typeof handleValidationImages === 'function') {
                     handleValidationImages(data.errors);
-                }
-                
-                if (this.config.docPreviewManager && typeof handleValidationDocuments === 'function') {
-                    handleValidationDocuments(data.errors);
                 }
                 
                 if (data.message && typeof showAlert === 'function') {
@@ -465,16 +448,6 @@ export class AddManager {
                 
                 /* Esegue il reset attendendo il rendering del DOM prima di sbloccare la sottomissione */
                 await this.reset();
-
-                /* Refresh gallery se presente */
-                if (this.config.galleryOneImgManager) {
-                    this.config.galleryOneImgManager.refresh();
-                }
-
-                /* Refresh documents se presente */
-                if (this.config.galleryOneDocManager) {
-                    this.config.galleryOneDocManager.refresh();
-                }
 
                 if (typeof this.hooks.onAddAfter === 'function') {
                     this.hooks.onAddAfter(data);
@@ -546,40 +519,26 @@ export class AddManager {
                     smoothReplace(showDataEl, data.output);
                 }
 
-                /* Rimuove istanze precedenti dei preview manager */
-                if (this.config.imagePreviewManager) this.config.imagePreviewManager.destroy();
-                if (this.config.docPreviewManager) this.config.docPreviewManager.destroy();
-                
-                /* Reinstanzia UploadPreviewImgManager */
-                const input = document.querySelector('#inputImages');
-                const preview = document.querySelector('#preview_images');
-                const button = document.querySelector('#buttonImages');
-
-                if (input && preview && button) {
-                    this.config.imagePreviewManager = new UploadPreviewImgManager('#inputImages', '#preview_images', '#buttonImages');
+                /* Struttura Professionale: Al gestore immagini diciamo solo di resettare lo stato interno. */
+                /* Sarà lui, grazie alla delegazione degli eventi, a funzionare immediatamente sul nuovo HTML. */
+                if (this.config.imagePreviewManager) {
+                    this.config.imagePreviewManager.reset();
                 }
 
-                /* Reinstanzia UploadPreviewDocManager */
-                const inputDoc = document.querySelector('#inputDocuments');
-                const previewDoc = document.querySelector('#preview_documents');
-                const buttonDoc = document.querySelector('#buttonDocuments');
-
-                if (inputDoc && previewDoc && buttonDoc) {
-                    this.config.docPreviewManager = new UploadPreviewDocManager('#inputDocuments', '#preview_documents', '#buttonDocuments');
-                }
-
-                /* Hook dopo il completamento del reset: UNIFORMATO (puro, senza stop/return ridondanti) */
                 if (typeof this.hooks.onResetAfter === 'function') {
                     this.hooks.onResetAfter(data);
                 }
             }
+
         } catch (error) {
+
             /* Hook errore: UNIFORMATO (puro, senza stop/return ridondanti) */
             if (typeof this.hooks.onResetError === 'function') {
                 this.hooks.onResetError(error);
             }
             console.error("Errore AddManager (reset):", error);
         } finally {
+            
             /* Rilascia sempre il blocco al termine dell'operazione */
             this.isSubmitting = false;
         }
@@ -596,9 +555,7 @@ export class EditManager {
             refreshSelector: '', 
             containerId: '', 
             imagePreviewManager: null,
-            galleryOneImgManager: null,
-            docPreviewManager: null,
-            galleryOneDocManager: null
+            galleryOneImgManager: null
         }, config);
 
         /* Inizializza eventuali callback esterni da eseguire in momenti chiave */
@@ -611,7 +568,7 @@ export class EditManager {
             onRefreshError: null,
         }, hooks);
 
-        /* NUOVO: Variabili di stato per la sicurezza */
+        /* Variabili di stato per la sicurezza */
         this.eventsBound = false;
         this.isSubmitting = false;
     }
@@ -624,14 +581,14 @@ export class EditManager {
 
     bindEvents() {
 
-        /* NUOVO: Impedisce l'accumulo di listener multipli */
+        /* Impedisce l'accumulo di listener multipli */
         if (this.eventsBound) return;
         this.eventsBound = true;
 
         /* Gestione Invio Form Edit tramite delegazione */
         document.addEventListener('submit', async e => {
             const formEl = e.target.closest(this.config.formSelector);
-            if ( ! formEl) return;
+            if (!formEl) return;
 
             e.preventDefault();
             const formData = new FormData(formEl);
@@ -641,7 +598,7 @@ export class EditManager {
         /* Gestione Submit Form di Refresh (Annulla) tramite delegazione */
         document.addEventListener('submit', async e => {
             const refreshFormEl = e.target.closest(this.config.refreshSelector);
-            if ( ! refreshFormEl) return;
+            if (!refreshFormEl) return;
 
             e.preventDefault();
             const message = refreshFormEl.dataset.message;
@@ -655,7 +612,7 @@ export class EditManager {
 
     async edit(formData) {
 
-        /* NUOVO: Se c'è già una richiesta in corso, blocca */
+        /* Se c'è già una richiesta in corso, blocca */
         if (this.isSubmitting) return;
         this.isSubmitting = true;
 
@@ -663,7 +620,7 @@ export class EditManager {
         if (typeof this.hooks.onEditBefore === 'function') {
             const stop = this.hooks.onEditBefore(formData);
             if (stop === false) {
-                this.isSubmitting = false; /* <--- NUOVO RILASCIO */
+                this.isSubmitting = false;
                 return;
             }
         }
@@ -676,18 +633,11 @@ export class EditManager {
             });
         }
 
-        /* Se presente, aggiunge i documenti dal preview documents */
-        if (this.config.docPreviewManager) {
-            const files = this.config.docPreviewManager.files;
-            files.forEach(({ id, file }) => {
-                formData.append(`documents[${id}]`, file);
-            });
-        }
-
         /* Pulizia immediata degli errori visivi prima dell'invio */
         document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
 
         try {
+
             /* Invio al backend */
             const response = await apiFetch(this.config.url, {
                 method: 'POST',
@@ -705,11 +655,7 @@ export class EditManager {
                 if (this.config.imagePreviewManager && typeof handleValidationImages === 'function') {
                     handleValidationImages(data.errors);
                 }
-                
-                if (this.config.docPreviewManager && typeof handleValidationDocuments === 'function') {
-                    handleValidationDocuments(data.errors);
-                }
-                
+
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('danger', data.message);
                 }
@@ -725,18 +671,18 @@ export class EditManager {
 
             /* Caso positivo: salvataggio riuscito */
             if (data.result === true) {
-                
+
                 /* Recupera il form di refresh reale dal DOM per popolare correttamente i dati */
                 const refreshFormEl = document.querySelector(this.config.refreshSelector);
                 const refreshData = refreshFormEl ? new FormData(refreshFormEl) : new FormData();
 
-                /* Se manca l'uuid nei dati del form (es. elemento non presente), lo recupera come fallback */
+                /* Se manca l'uuid nei dati del form, lo recupera come fallback */
                 const uuidEl = document.getElementById('uuid');
                 if (uuidEl && !refreshData.has('uuid')) {
                     refreshData.append('uuid', uuidEl.value);
                 }
 
-				/* NUOVO: Sblocca manualmente prima di chiamare il refresh */
+                /* Sblocca manualmente prima di chiamare il refresh */
                 this.isSubmitting = false;
 
                 /* Esegue il refresh dei dati */
@@ -756,15 +702,13 @@ export class EditManager {
             }
             console.error("Errore EditManager (edit):", error);
         } finally {
-
-            /* NUOVO: Rilascia sempre il blocco */
             this.isSubmitting = false;
         }
     }
 
     async refresh(formData) {
-
-        /* NUOVO: Se c'è già una richiesta in corso, blocca */
+        
+        /* Se c'è già una richiesta in corso, blocca */
         if (this.isSubmitting) return;
         this.isSubmitting = true;
 
@@ -781,7 +725,7 @@ export class EditManager {
         if (typeof this.hooks.onRefreshBefore === 'function') {
             const stop = this.hooks.onRefreshBefore(formData);
             if (stop === false) {
-                this.isSubmitting = false; /* <--- NUOVO RILASCIO */
+                this.isSubmitting = false;
                 return;
             }
         }
@@ -800,47 +744,16 @@ export class EditManager {
                 return;
             }
 
-            /* Caso positivo: rigenera markup e reinizializza componenti */
+            /* Caso positivo: rigenera markup e resetta lo stato dei componenti */
             if (data.result === true) {
-                
-                /* Distrugge vecchie istanze di preview e gallery */
-                if (this.config.imagePreviewManager) this.config.imagePreviewManager.destroy();
-                if (this.config.galleryOneImgManager) this.config.galleryOneImgManager.destroy();
-
-                /* Distrugge vecchie istanze di uploadManager e galleryOneDoc */
-                if (this.config.docPreviewManager) this.config.docPreviewManager.destroy();
-                if (this.config.galleryOneDocManager) this.config.galleryOneDocManager.destroy();
-
-                /* Sostituisce il DOM e reinizializza i componenti */
                 const showDataEl = document.getElementById(this.config.containerId);
                 if (showDataEl && data.output) {
                     smoothReplace(showDataEl, data.output);
                 }
 
-                const input = document.querySelector('#inputImages');
-                const preview = document.querySelector('#preview_images');
-                const button = document.querySelector('#buttonImages');
-                const gallery = document.querySelector('#images_data');
-
-                if (input && preview && button) {
-                    this.config.imagePreviewManager = new UploadPreviewImgManager('#inputImages', '#preview_images', '#buttonImages');
-                }
-
-                if (gallery) {
-                    this.config.galleryOneImgManager = new GalleryOneImgManager('#images_data');
-                }
-
-                const inputDoc = document.querySelector('#inputDocuments');
-                const previewDoc = document.querySelector('#preview_documents');
-                const buttonDoc = document.querySelector('#buttonDocuments');
-                const galleryDoc = document.querySelector('#documents_data');
-
-                if (inputDoc && previewDoc && buttonDoc) {
-                    this.config.docPreviewManager = new UploadPreviewDocManager('#inputDocuments', '#preview_documents', '#buttonDocuments');
-                }
-
-                if (galleryDoc) {
-                    this.config.galleryOneDocManager = new GalleryOneDocManager('#documents_data');
+                /* Ripristina lo stato interno del gestore di anteprime per svuotare la coda dei file */
+                if (this.config.imagePreviewManager) {
+                    this.config.imagePreviewManager.reset();
                 }
 
                 /* Hook dopo il completamento del refresh */
@@ -854,8 +767,6 @@ export class EditManager {
             }
             console.error("Errore EditManager (refresh):", error);
         } finally {
-
-            /* NUOVO: Rilascia sempre il blocco */
             this.isSubmitting = false;
         }
     }

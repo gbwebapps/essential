@@ -66,6 +66,14 @@ $routes->group('backend', function($routes) {
             $routes->get('showAll', '\App\Controllers\Backend\UsersController::showAll', ['filter' => 'permission:users_showall']);
             $routes->get('show', '\App\Controllers\Backend\UsersController::show', ['filter' => 'permission:users_show']);
         });
+
+        /* GALLERY ONE */
+        $routes->group('galleryOneImg', ['filter' => 'authorization'], function($routes) {
+            $routes->post('showGallery', '\App\Controllers\Backend\Components\GalleryOneController::showGallery');
+            $routes->post('deleteImage', '\App\Controllers\Backend\Components\GalleryOneController::deleteImage');
+            $routes->post('removeCover', '\App\Controllers\Backend\Components\GalleryOneController::removeCover');
+            $routes->post('setCover', '\App\Controllers\Backend\Components\GalleryOneController::setCover');
+        });
     });
 
     /* MASTER */

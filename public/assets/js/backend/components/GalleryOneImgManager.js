@@ -1,106 +1,112 @@
 /* Import delle utility risalendo di un livello */
-import { urlbase, apiFetch, showAlert, handleValidationErrors, handleValidationImages, handleValidationDocuments } from '../backend.js';
+import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace } from '../backend.js';
 
 export class GalleryOneImgManager {
-    constructor(containerId = '#images_data') {
+    constructor(containerId = '#imagesData') {
+        this.containerId = containerId;
         this.container = document.querySelector(containerId);
-        this._onSubmit = this._onSubmit.bind(this); // 🔧 salva riferimento per add/remove
+        this.onSubmit = this.onSubmit.bind(this);
+        this.onClick = this.onClick.bind(this);
+        
+        /* Variabile di stato per evitare listener multipli sul document */
+        this.eventsBound = false;
+        
         this.bindEvents();
     }
 
     bindEvents() {
-        if ( ! this.container) return;
+        if (this.eventsBound) return;
+        this.eventsBound = true;
 
-        // 🔧 listener globale con riferimento a _onSubmit
-        document.addEventListener('submit', this._onSubmit);
-
-        this.container.addEventListener('click', async e => {
-            const btn = e.target.closest('.galleryOneImgAction');
-            if ( ! btn) return;
-
-            e.preventDefault();
-
-            const wrapper = btn.closest('.gallery-one-container-image');
-            if ( ! wrapper) return;
-
-            const form_data = new FormData();
-            form_data.append(wrapper.dataset.csrfName, wrapper.dataset.csrfValue);
-
-            ['id', 'uuid', 'entity', 'context'].forEach(key => {
-                form_data.append(key, wrapper.dataset[key]);
-            });
-
-            const ok = await askConfirm(btn.dataset.message);
-            if (ok) {
-                this.handleAction(btn.dataset.action, form_data);
-            }
-        });
+        /* Listener globale per il submit del form di reload */
+        document.addEventListener('submit', this.onSubmit);
+        
+        /* SOLUZIONE 2: Spostiamo il listener del click sul document globale */
+        document.addEventListener('click', this.onClick);
     }
 
-    // 🔧 nuovo metodo interno usato da add/removeEventListener
-    _onSubmit(e) {
-        if (e.target.matches('#get_images')) {
-            e.preventDefault();
-            const form_data = new FormData(e.target);
-            this.refresh(form_data);
+    async onClick(e) {
+        const btn = e.target.closest('.galleryOneImgAction');
+        if (!btn) return;
+
+        e.preventDefault();
+
+        const wrapper = btn.closest('.preview-item');
+        if (!wrapper) return;
+
+        const formData = new FormData();
+        ['id', 'uuid', 'entity', 'context', 'filename'].forEach(key => {
+            formData.append(key, wrapper.dataset[key]);
+        });
+
+        const ok = await askConfirm(btn.dataset.message);
+        if (ok) {
+            this.handleAction(btn.dataset.action, formData);
         }
     }
 
-    refresh(form_data) {
-        apiFetch(urlbase + 'admin/galleryOneImg/show', {
-            method: 'POST',
-            headers: { 'X-CSRF-Token': form_data.get('csrf_token') },
-            body: form_data
-        })
-            .then(r => r.json())
-            .then(data => this.handleResponse(data, false))
-            .catch(err => {
-                console.error(err);
-                showAlert('danger', 'Errore di rete');
-            });
+    onSubmit(e) {
+        if (e.target.matches('#getImages')) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            this.refresh(formData);
+        }
     }
 
-    handleAction(action, form_data) {
-        apiFetch(urlbase + 'admin/galleryOneImg/' + action, {
-            method: 'POST',
-            headers: { 'X-CSRF-Token': form_data.get('csrf_token') },
-            body: form_data
-        })
-            .then(r => r.json())
-            .then(data => this.handleResponse(data, true))
-            .catch(err => {
-                console.error(err);
-                showAlert('danger', 'Errore di rete');
+    async refresh(formData) {
+        try {
+            const response = await apiFetch(urlbase + 'backend/galleryOneImg/showGallery', {
+                method: 'POST',
+                body: formData
             });
+            const data = await response.json();
+            this.handleResponse(data, false);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    async handleAction(action, formData) {
+        try {
+            const response = await apiFetch(urlbase + 'backend/galleryOneImg/' + action, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            this.handleResponse(data, true);
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     handleResponse(data, showSuccess) {
         if (data.result === 'no_current_user_logged') {
-            window.location.href = urlbase + 'admin/auth/login';
-        } else if (data.result === '404') {
-            window.location.href = urlbase + 'admin/404';
-        } else if (data.result === false) {
+            window.location.href = urlbase + 'backend/auth/login';
+            return;
+        }
+
+        if (data.result === false) {
             showAlert('danger', data.message);
-        } else if (data.errors) {
-            showAlert('danger', data.errors);
-        } else if (data.result === true) {
+            return;
+        }
+
+        if (data.result === true) {
             if (showSuccess) {
                 showAlert('success', data.message);
             }
+            
+            /* Aggiornato: esegue solo il rimpiazzo HTML, i listener sul document non muoiono */
             if (this.container) {
                 smoothReplace(this.container, data.output);
+                
+                /* Mantiene aggiornato il riferimento al nuovo elemento nel DOM */
+                this.container = document.querySelector(this.containerId);
             }
         }
     }
 
     destroy() {
-        // 🔧 rimuove il listener globale quando distruggi l'istanza
-        document.removeEventListener('submit', this._onSubmit);
-
-        if (this.container && this.container.parentNode) {
-            const clone = this.container.cloneNode(true);
-            this.container.parentNode.replaceChild(clone, this.container);
-            this.container = clone;
-        }
+        document.removeEventListener('submit', this.onSubmit);
+        document.removeEventListener('click', this.onClick);
     }
 }

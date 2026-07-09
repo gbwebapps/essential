@@ -12,6 +12,8 @@ use App\Models\Backend\AdminsModel;
 use App\Libraries\Backend\AdminsClass;
 use App\Controllers\Backend\BackendController; 
 
+use App\Models\Backend\Components\GalleryOneImgModel;
+
 /**
  * Class AdminsController
  *
@@ -35,6 +37,8 @@ class AdminsController extends BackendController
      */
     protected AdminsClass $adminsClass;
 
+    protected GalleryOneImgModel $galleryOneImgModel;
+
     /**
      * Inizializza il controller impostando il contesto del modulo e istanziando modello e libreria specifici.
      *
@@ -48,9 +52,12 @@ class AdminsController extends BackendController
         parent::initController($request, $response, $logger);
 
         $this->data['controller'] = 'admins';
+        $this->data['entity'] = 'admins';
 
         $this->adminsModel = model(AdminsModel::class);
         $this->adminsClass = new AdminsClass($this->adminsModel);
+
+        $this->galleryOneImgModel = model(GalleryOneImgModel::class);
     }
 
     /**
@@ -135,7 +142,7 @@ class AdminsController extends BackendController
 
         if ($this->request->isAJAX() && $this->request->is('post')):
 
-            $posts = array_merge($this->request->getPost(), ['images' => $this->request->getFileMultiple('images') ?? []], ['documents' => $this->request->getFileMultiple('documents') ?? []]);
+            $posts = array_merge($this->request->getPost(), ['images' => $this->request->getFileMultiple('images') ?? []]);
 
             if (isset($posts['action']) && $posts['action'] === 'reset'):
                 return $this->response->setJSON(['result' => true,'output' => view('backend/admins/partials/add/addPartial', $this->data)]);
@@ -184,7 +191,7 @@ class AdminsController extends BackendController
 
         if ($this->request->isAJAX() && $this->request->is('post')):
 
-            $posts = array_merge($this->request->getPost(), ['images' => $this->request->getFileMultiple('images') ?? []], ['documents' => $this->request->getFileMultiple('documents') ?? []]);
+            $posts = array_merge($this->request->getPost(), ['images' => $this->request->getFileMultiple('images') ?? []]);
 
             if(( ! isset($posts['uuid'])) || ( ! $this->regexp->validateUUID($posts['uuid']))):
                 return $this->response->setJSON(['result' => false, 'message' => lang('backend/admins.global.wrongUUIDFormat')]);
@@ -207,7 +214,12 @@ class AdminsController extends BackendController
                 /* Carico sia i permessi del gruppo sia le eccezioni dell'utente */
                 $this->data['group_perms'] = $this->adminsModel->getGroupPermissions((int) $admin['row']->group_id);
                 $this->data['admin_exceptions'] = $this->adminsModel->getAdminExceptions($posts['uuid']);
-                $this->data['admin'] = $admin['row'];
+
+                $this->data['admin'] = $admin['row'] ?? null;
+                $this->data['uuid'] = $posts['uuid'];
+
+                $this->data['context'] = 'edit';
+                $this->data['images'] = $this->galleryOneImgModel->getImages('admins', $posts['uuid']);
 
                 return $this->response->setJSON(['result' => true,'output' => view('backend/admins/partials/edit/editPartial', $this->data)]);
             endif;
@@ -230,10 +242,16 @@ class AdminsController extends BackendController
 
             /* Caso 2: Salvataggio riuscito */
             if ($result['result'] === true):
-                $this->data['admin'] = $result['row'];
-                /* Rigenero i dati corretti per la matrice aggiornata interpellando il Model */
+
+                /* Carico sia i permessi del gruppo sia le eccezioni dell'utente */
                 $this->data['group_perms'] = $this->adminsModel->getGroupPermissions((int) $result['row']->group_id);
                 $this->data['admin_exceptions'] = $this->adminsModel->getAdminExceptions($posts['uuid']);
+
+                $this->data['admin'] = $result['row'];
+                $this->data['uuid'] = $posts['uuid'];
+
+                $this->data['context'] = 'edit';
+                $this->data['images'] = $this->galleryOneImgModel->getImages('admins', $posts['uuid']);
                 
                 $json['output'] = view('backend/admins/partials/edit/editPartial', $this->data);
             endif;
@@ -265,6 +283,9 @@ class AdminsController extends BackendController
 
         $this->data['admin'] = $admin['row'] ?? null;
         $this->data['uuid'] = $uuid;
+
+        $this->data['context'] = 'edit';
+        $this->data['images'] = $this->galleryOneImgModel->getImages('admins', $uuid);
 
         /* Caso Caricamento standard: passo le matrici separate alla vista */
         $this->data['group_perms'] = $this->adminsModel->getGroupPermissions((int) $admin['row']->group_id);
@@ -349,6 +370,9 @@ class AdminsController extends BackendController
         $this->data['admin'] = $admin['row'] ?? null;
         $this->data['uuid'] = $uuid;
 
+        $this->data['context'] = 'show';
+        $this->data['images'] = $this->galleryOneImgModel->getImages('admins', $uuid);
+
         /* Struttura per mappare i gruppi e le eccezioni */
         $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
         $this->data['group_perms'] = $this->adminsModel->getGroupPermissions((int) $admin['row']->group_id);
@@ -359,8 +383,8 @@ class AdminsController extends BackendController
 
         return $this->render('backend/admins/showView', $this->data);
     }
-
     /**
+
      * Esegue la rimozione o cancellazione di un amministratore tramite richiesta asincrona.
      *
      * @return ResponseInterface Risposta JSON contenente l'esito dell'operazione.

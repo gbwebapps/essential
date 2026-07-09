@@ -257,6 +257,72 @@ textarea {
     visibility: visible;
 }
 
+/* Container dell'immagine */
+.preview-item {
+    position: relative;
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   Componente UploadPreviewImg
+   ========================================================================== */
+
+/* Overlay nero in fade, nascosto di default */
+.preview-item .preview-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    pointer-events: none; /* Evita di bloccare il cursore */
+}
+
+/* ==========================================================================
+   Componente GalleryOneImg
+   ========================================================================== */
+
+/* Overlay della galleria: nascosto di default */
+.preview-item .gallery-one-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Sfondo scuro trasparente */
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+/* Mostra l'overlay all'hover sul riquadro */
+.preview-item:hover .gallery-one-overlay {
+    opacity: 1;
+}
+
+/* Stile per le icone cliccabili della galleria */
+.galleryOneImgAction {
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+/* Effetto ingrandimento all'hover sulle singole icone */
+.galleryOneImgAction:hover {
+    transform: scale(1.2);
+}
+
+/* Mostra l'overlay al passaggio del mouse */
+.preview-item:hover .preview-overlay {
+    opacity: 1;
+    pointer-events: auto; /* Attiva i click sui pulsanti interni */
+}
+
+/* Spazio fisso per l'errore sotto la miniatura per evitare scatti di layout */
+.error-msg {
+    min-height: 21px;
+}
+
 @media (max-width: 991px) {
     .pagination-left, .pagination-right {
         display: none;

@@ -106,17 +106,9 @@
 
                 <!-- Sezione: Upload e Preview Immagini Profilo -->
                 <div id="uploadPreview">
-                    <!-- Inclusione del componente per la preview delle immagini -->
-                    <!-- $this->include('backend/components/uploadPreviewImg/uploadPreviewImgView'); -->
+                    <?= $this->include('backend/components/uploadPreviewImg/uploadPreviewImgView'); ?>
                 </div>
                 <!-- End Sezione: Upload e Preview Immagini Profilo -->
-
-                <!-- Sezione: Caricamento Documentazione Allegata -->
-                <div id="uploadDocuments">
-                    <!-- Inclusione del componente per la gestione dei documenti -->
-                    <!-- $this->include('backend/components/uploadPreviewDoc/uploadPreviewDocView'); -->
-                </div>
-                <!-- End Sezione: Caricamento Documentazione Allegata -->
 
             </form>
 

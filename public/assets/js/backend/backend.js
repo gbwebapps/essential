@@ -151,49 +151,22 @@ export function handleValidationErrors(errors) {
     });
 }
 
-/* Funzione per gestire gli errori per le immagini */
+/* Funzione per gestire gli errori per le immagini adattata a CI4 */
+/* Funzione per gestire gli errori per le immagini adattata a CI4 */
 export function handleValidationImages(errors) {
-    if ( ! errors.images) return;
+    Object.entries(errors).forEach(([key, message]) => {
+        
+        /* Intercettiamo le chiavi che iniziano con "images." */
+        if (key.startsWith('images.')) {
 
-    if (errors.images.required) {
-        const preview = document.querySelector('#preview_images');
-        if (preview) {
-            preview.innerHTML = `<div class="text-danger text-center fw-bold error-show">${errors.images.required}</div>`;
-        }
-        return;
-    }
-
-    Object.entries(errors.images).forEach(([id, message]) => {
-        const item = document.querySelector(`.preview-item[data-id="${id}"]`);
-        if (item) {
-            const errorBox = item.querySelector('.error-msg');
+            /* Estraiamo l'ID JS dopo il punto (es. "mrcesmbk5w52f") */
+            const id = key.split('.')[1];
+            
+            /* Cerchiamo direttamente l'ID del div di errore che è fuori dal preview-item */
+            const errorBox = document.getElementById(`error-img-${id}`);
+            
             if (errorBox) {
                 errorBox.textContent = Array.isArray(message) ? message.join(', ') : String(message);
-                errorBox.classList.add('error-show'); // fade-in
-            }
-        }
-    });
-}
-
-/* Funzione per gestire gli errori per i documenti */
-export function handleValidationDocuments(errors) {
-    if ( ! errors.documents) return;
-
-    if (errors.documents.required) {
-        const preview = document.querySelector('#preview_documents');
-        if (preview) {
-            preview.innerHTML = `<div class="text-danger text-center fw-bold error-show">${errors.documents.required}</div>`;
-        }
-        return;
-    }
-
-    Object.entries(errors.documents).forEach(([id, message]) => {
-        const item = document.querySelector(`.preview-doc[data-id="${id}"]`);
-        if (item) {
-            const errorBox = item.querySelector('.error-msg');
-            if (errorBox) {
-                errorBox.textContent = Array.isArray(message) ? message.join(', ') : String(message);
-                errorBox.classList.add('error-show'); // fade-in
             }
         }
     });
@@ -366,10 +339,6 @@ export async function askConfirm(message, options = {}) {
         globalConfirmModal.show();
     });
 }
-
-// export function smoothReplace(container, newHtml) {
-//     container.innerHTML = newHtml;
-// }
 
 export function smoothReplace(container, newHtml) {
     if (!container) return;

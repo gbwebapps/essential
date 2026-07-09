@@ -429,7 +429,7 @@ class AuthModel extends BackendModel
             }
 
             /* 2. Istanzio il servizio email dedicato e tento l'invio */
-            $emailService = new \App\Libraries\EmailService();
+            $emailService = new \App\Libraries\Backend\EmailService();
 
             /* Configuro i parametri dinamici per questa specifica chiamata */
             $module = $this->module;

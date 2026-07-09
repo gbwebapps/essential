@@ -5,10 +5,8 @@ import { urlbase, controller, action, smoothReplace } from './backend.js';
 import { ListManager, AddManager, EditManager, DeleteManager, ChangeStatusManager, GeneralDataManager, MetaDataManager } from './components/Crud.js';
 import { ChangeGroupManager, GetPermissionsManager, ChangePermissionManager, GetTokensManager, DeleteTokenManager, ResetPasswordManager } from './components/Admins.js';
 
-import { GalleryOneImgManager } from './components/GalleryOneImgManager.js';
 import { UploadPreviewImgManager } from './components/UploadPreviewImgManager.js';
-import { GalleryOneDocManager } from './components/GalleryOneDocManager.js';
-import { UploadPreviewDocManager } from './components/UploadPreviewDocManager.js';
+import { GalleryOneImgManager } from './components/GalleryOneImgManager.js';
 
 const actions = {
     index: function(){},
@@ -50,31 +48,30 @@ const actions = {
     },
     add: function() {
 
-        // const imagePreviewManager = new UploadPreviewImgManager('#inputImages', '#preview_images', '#buttonImages');
-        // const docPreviewManager = new UploadPreviewDocManager('#inputDocuments', '#preview_documents', '#buttonDocuments');
+        const imagePreviewManager = new UploadPreviewImgManager('#inputImages', '#previewImages', '#buttonImages');
 
         const addManager = new AddManager({
             url: urlbase + 'backend/admins/add',
-            formSelector: '#admins_add', /* <--- Passiamo il selettore */
-            resetSelector: '#add_reset', /* <--- Passiamo il selettore del pulsante */
+            formSelector: '#admins_add',
+            resetSelector: '#add_reset', 
             containerId: 'add-admins-container', 
+            imagePreviewManager: imagePreviewManager
         });
         addManager.init();
 
     },
     edit: function() {
 
-        // const galleryOneImgManager = new GalleryOneImgManager('#images_data');
-        // const imagePreviewManager = new UploadPreviewImgManager('#inputImages', '#preview_images', '#buttonImages');
-
-        // const galleryOneDocManager = new GalleryOneDocManager('#documents_data');
-        // const docPreviewManager = new UploadPreviewDocManager('#inputDocuments', '#preview_documents', '#buttonDocuments');
+        const imagePreviewManager = new UploadPreviewImgManager('#inputImages', '#previewImages', '#buttonImages');
+        const galleryOneImgManager = new GalleryOneImgManager('#imagesData');
 
         const editManager = new EditManager({
             formSelector: '#admins_edit',
             url: urlbase + 'backend/admins/edit',
             refreshSelector: '#edit_refresh',
             containerId: 'edit-admins-container', 
+            imagePreviewManager: imagePreviewManager,
+            galleryOneImgManager: galleryOneImgManager
         });
         editManager.init();
 
@@ -125,6 +122,8 @@ const actions = {
         });
         generalDataManager.init();
 
+        const galleryOneImgManager = new GalleryOneImgManager('#imagesData');
+
         const metaDataManager = new MetaDataManager({
             url: urlbase + 'backend/admins/getMetaData', 
             formSelector: '#getMetaData'
@@ -158,7 +157,6 @@ const actions = {
         deleteTokenManager.init();
 
         // const galleryOneImgManager = new GalleryOneImgManager('#images_data');
-        // const galleryOneDocManager = new GalleryOneDocManager('#documents_data');
     }
 };
 
