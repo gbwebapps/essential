@@ -108,7 +108,7 @@ return [
 		'noAdminsFound' => 'Non sono presenti amministratori.', 
 		'noTokensFound' => 'Non sono presenti accessi.', 
 		'validationErrors' => 'Errori di validazione.', 
-		'validateToastErrors' => '%s', 
+		'validationToastErrors' => '%s', 
 		'addSuccess' => 'Amministratore %s %s aggiunto con successo.', 
 		'addSuccessNoEmail' => 'Amministratore %s %s aggiunto con successo, ma la mail non è stata inviata. Contattare amministratore.', 
 		'addError' => 'Aggiunta amministratore non andata a buon fine.', 

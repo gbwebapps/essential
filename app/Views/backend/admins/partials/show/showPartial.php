@@ -51,13 +51,13 @@
 
             <!-- Gallery One -->
             <div class="card-header rounded-0 d-flex justify-content-between align-items-center" style="border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);">
-                <h2 class="card-title text-start mb-0"><?= lang('backend/components/galleryOneImg.panel'); ?></h2>
+                <h2 class="card-title text-start mb-0"><?= lang('backend/components/galleryOneImg.title'); ?></h2>
                 <form id="getImages">
                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
                     <input type="hidden" name="entity" value="<?= esc($entity); ?>">
                     <input type="hidden" name="context" value="<?= esc($context); ?>">
                     <button type="submit" class="btn btn-sm btn-secondary">
-                        <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/components/galleryOneImg.reload'); ?>
+                        <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/components/galleryOneImg.buttons.reload'); ?>
                     </button>
                 </form>
             </div>

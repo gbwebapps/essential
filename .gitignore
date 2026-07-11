@@ -127,5 +127,6 @@ _modules/*
 
 node_modules/
 public/guide/
+public/images/
 .doctum_cache/
 tests/

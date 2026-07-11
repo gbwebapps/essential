@@ -2,9 +2,9 @@
 import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace } from '../backend.js';
 
 export class GalleryOneImgManager {
-    constructor(containerId = '#imagesData') {
-        this.containerId = containerId;
-        this.container = document.querySelector(containerId);
+    constructor() {
+        this.containerId = '#imagesData';
+        this.container = document.querySelector(this.containerId);
         this.onSubmit = this.onSubmit.bind(this);
         this.onClick = this.onClick.bind(this);
         

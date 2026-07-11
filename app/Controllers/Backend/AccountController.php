@@ -11,6 +11,8 @@ use App\Models\Backend\AccountModel;
 use App\Libraries\Backend\AccountClass;
 use App\Controllers\Backend\BackendController; 
 
+use App\Models\Backend\Components\GalleryOneImgModel;
+
 /**
  * Class AccountController
  *
@@ -33,6 +35,8 @@ class AccountController extends BackendController
      */
     protected AccountClass $accountClass;
 
+    protected GalleryOneImgModel $galleryOneImgModel;
+
     /**
      * Inizializza il controller impostando l'albero di navigazione interno (sub-menu) e istanziando i relativi componenti core.
      *
@@ -46,12 +50,15 @@ class AccountController extends BackendController
         parent::initController($request, $response, $logger);
 
         $this->data['controller'] = 'account';
+        $this->data['entity'] = 'admins';
 
         $this->data['icon'] = '<i class="fa-solid fa-user-gear"></i>';
         $this->data['title'] = lang('backend/account.titles.index');
 
         $this->accountModel = model(AccountModel::class);
         $this->accountClass = new AccountClass($this->accountModel);
+
+        $this->galleryOneImgModel = model(GalleryOneImgModel::class);
 
         $this->data['sections'] = [
             'general' => [
@@ -75,13 +82,13 @@ class AccountController extends BackendController
                 'icon_3x' => '<i class="fa-solid fa-check-circle fa-3x"></i>',
                 'route' => 'backend/account/permissions',
             ],
-            /* 'images' => [
+             'images' => [
                 'title' => lang('backend/account.leftMenu.images'),
                 'class' => 'col-4',
                 'icon' => '<i class="fa-solid fa-images"></i>',
                 'icon_3x' => '<i class="fa-solid fa-images fa-3x"></i>',
                 'route' => 'backend/account/images',
-            ], */
+            ], 
             'tokens' => [
                 'title' => lang('backend/account.leftMenu.tokens'),
                 'class' => 'col-4',
@@ -217,12 +224,18 @@ class AccountController extends BackendController
      *
      * @return string La vista HTML della gestione immagini.
      */
-    // public function images()
-    // {
-    //     $this->data['action'] = 'images';
+    public function images()
+    {
+        $this->data['action'] = 'images';
 
-    //     return $this->render('backend/account/imagesView', $this->data);
-    // }
+        $this->data['context'] = 'edit';
+        $this->data['images'] = $this->galleryOneImgModel->getImages(['entity' => 'admins', 'uuid' => $this->currentAdmin->uuid]);
+
+        $this->data['saveImages'] = true;
+        $this->data['uuid'] = $this->currentAdmin->uuid;
+
+        return $this->render('backend/account/imagesView', $this->data);
+    }
 
     /**
      * Mostra l'elenco, lo stato di validità e la cronologia dei token di sicurezza legati all'account.

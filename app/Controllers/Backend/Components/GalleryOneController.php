@@ -23,14 +23,19 @@ class GalleryOneController extends Controller
         if ($this->request->isAJAX() && $this->request->is('post')):
 
 	        $posts = $this->request->getPost();
+	    	$rules = $this->galleryModel->getImagesValidateFields();
 
-	    	// sbarramento
+	    	/* Validazione campi nascosti */
+	    	if ( ! $this->validateData($posts, $rules)) :
+	    	    $errorMessage = implode('<br>', $this->validator->getErrors());
+	    	    return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/components/galleryOneImg.messages.validationToastErrors'), $errorMessage)]);
+	    	endif;
 
 	        $data = [
 	            'entity'  => $posts['entity'],
 	            'uuid'    => $posts['uuid'],
 	            'context' => $posts['context'],
-	            'images'  => $this->galleryModel->getImages($posts['entity'], $posts['uuid']) ?? []
+	            'images'  => $this->galleryModel->getImages($posts) ?? []
 	        ];
 
 	        $output = view('backend/components/galleryOneImg/galleryOneImgView', $data);
@@ -48,10 +53,16 @@ class GalleryOneController extends Controller
         if ($this->request->isAJAX() && $this->request->is('post')):
 
 	        $posts = $this->request->getPost();
-	        $id = (int) $posts['id'];
+	    	$rules = $this->galleryModel->deleteImageValidateFields();
 
-	        if ( ! $this->galleryModel->deleteImage($id, $posts['entity'], $posts['uuid'], $posts['filename'])):
-	            return $this->response->setJSON(['result'  => false, 'message' => lang('backend/components/galleryOneImg.deleteError')]);
+	    	/* Validazione campi nascosti */
+	    	if ( ! $this->validateData($posts, $rules)) :
+	    	    $errorMessage = implode('<br>', $this->validator->getErrors());
+	    	    return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/components/galleryOneImg.messages.validationToastErrors'), $errorMessage)]);
+	    	endif;
+
+	        if ( ! $this->galleryModel->deleteImage($posts)):
+	            return $this->response->setJSON(['result' => false, 'message' => lang('backend/components/galleryOneImg.messages.deleteError')]);
 	        endif;
 
 	        $data = [
@@ -59,12 +70,12 @@ class GalleryOneController extends Controller
 	            'uuid'    => $posts['uuid'],
 	            'context' => $posts['context'],
 	            'filename' => $posts['filename'], 
-	            'images'  => $this->galleryModel->getImages($posts['entity'], $posts['uuid']) ?? []
+	            'images'  => $this->galleryModel->getImages($posts) ?? []
 	        ];
 
 	        $output = view('backend/components/galleryOneImg/galleryOneImgView', $data);
 
-	        return $this->response->setJSON(['result'  => true, 'message' => lang('backend/components/galleryOneImg.deleteSuccess'), 'output'  => $output]);
+	        return $this->response->setJSON(['result' => true, 'message' => lang('backend/components/galleryOneImg.messages.deleteSuccess'), 'output'  => $output]);
 
 		endif;
     }
@@ -77,22 +88,28 @@ class GalleryOneController extends Controller
         if ($this->request->isAJAX() && $this->request->is('post')):
 
 	        $posts = $this->request->getPost();
-	        $id = (int) $posts['id'];
+	    	$rules = $this->galleryModel->coverValidateFields();
 
-	        if ( ! $this->galleryModel->setCover($id, $posts['entity'], $posts['uuid'])):
-	            return $this->response->setJSON(['result' => false, 'message' => lang('backend/components/galleryOneImg.setCoverError')]);
+	    	/* Validazione campi nascosti */
+	    	if ( ! $this->validateData($posts, $rules)) :
+	    	    $errorMessage = implode('<br>', $this->validator->getErrors());
+	    	    return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/components/galleryOneImg.messages.validationToastErrors'), $errorMessage)]);
+	    	endif;
+
+	        if ( ! $this->galleryModel->setCover($posts)):
+	            return $this->response->setJSON(['result' => false, 'message' => lang('backend/components/galleryOneImg.messages.setCoverError')]);
 	        endif;
 
 	        $data = [
 	            'entity'  => $posts['entity'],
 	            'uuid'    => $posts['uuid'],
 	            'context' => $posts['context'],
-	            'images'  => $this->galleryModel->getImages($posts['entity'], $posts['uuid']) ?? []
+	            'images'  => $this->galleryModel->getImages($posts) ?? []
 	        ];
 
 	        $output = view('backend/components/galleryOneImg/galleryOneImgView', $data);
 
-	        return $this->response->setJSON(['result'  => true, 'message' => lang('backend/components/galleryOneImg.setCoverSuccess'), 'output'  => $output ]);
+	        return $this->response->setJSON(['result'  => true, 'message' => lang('backend/components/galleryOneImg.messages.setCoverSuccess'), 'output'  => $output ]);
 
 	    endif;
     }
@@ -105,22 +122,28 @@ class GalleryOneController extends Controller
         if ($this->request->isAJAX() && $this->request->is('post')):
 
 	        $posts = $this->request->getPost();
-	        $id    = (int) $posts['id'];
+	    	$rules = $this->galleryModel->coverValidateFields();
 
-	        if ( ! $this->galleryModel->removeCover($id, $posts['entity'], $posts['uuid'])):
-	            return $this->response->setJSON(['result'  => false, 'message' => lang('backend/components/galleryOneImg.removeCoverError') ]);
+	    	/* Validazione campi nascosti */
+	    	if ( ! $this->validateData($posts, $rules)) :
+	    	    $errorMessage = implode('<br>', $this->validator->getErrors());
+	    	    return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/components/galleryOneImg.messages.validationToastErrors'), $errorMessage)]);
+	    	endif;
+
+	        if ( ! $this->galleryModel->removeCover($posts)):
+	            return $this->response->setJSON(['result'  => false, 'message' => lang('backend/components/galleryOneImg.messages.removeCoverError') ]);
 	        endif;
 
 	        $data = [
 	            'entity'  => $posts['entity'],
 	            'uuid'    => $posts['uuid'],
 	            'context' => $posts['context'],
-	            'images'  => $this->galleryModel->getImages($posts['entity'], $posts['uuid']) ?? []
+	            'images'  => $this->galleryModel->getImages($posts) ?? []
 	        ];
 
 	        $output = view('backend/components/galleryOneImg/galleryOneImgView', $data);
 
-	        return $this->response->setJSON(['result'  => true, 'message' => lang('backend/components/galleryOneImg.removeCoverSuccess'), 'output'  => $output ]);
+	        return $this->response->setJSON(['result'  => true, 'message' => lang('backend/components/galleryOneImg.messages.removeCoverSuccess'), 'output'  => $output ]);
 
 	    endif;
     }

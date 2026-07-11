@@ -1,12 +1,19 @@
+/* Import delle utility risalendo di un livello */
+import { apiFetch, urlbase, handleValidationImages, showAlert } from '../backend.js';
+
 export class UploadPreviewImgManager {
-    constructor(inputSelector, previewSelector, triggerSelector, galleryOneImgManager = null) {
+    constructor(galleryOneImgManager = null) {
 
         /* Salviamo i selettori stringa, NON i nodi del DOM, così rimangono validi per sempre */
-        this.inputSelector = inputSelector;
-        this.previewSelector = previewSelector;
-        this.triggerSelector = triggerSelector;
+        this.inputSelector = '#inputImages';
+        this.previewSelector = '#previewImages';
+        this.triggerSelector = '#buttonImages';
         this.galleryOneImgManager = galleryOneImgManager;
-        this.files = []; /* [{id, file}] */
+        this.files = []; 
+
+        /* Variabili di stato coerenti con l'architettura dei tuoi Manager */
+        this.eventsBound = false;
+        this.isSubmitting = false; 
 
         this.bindEvents();
     }
@@ -88,6 +95,24 @@ export class UploadPreviewImgManager {
             this.files = this.files.filter(f => f.id !== id);
             this.removePreview(id);
         });
+
+        /* 4. Submit del Form "Salva Immagini" autonomo */
+        document.addEventListener('submit', async e => {
+            if (!e.target.matches('#saveImages')) return;
+
+            e.preventDefault();
+
+            if (this.isSubmitting) return;
+            this.isSubmitting = true;
+
+            try {
+                await this.saveImages(e.target);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                this.isSubmitting = false;
+            }
+        });
     }
 
     /* Generazione anteprima locale */
@@ -150,6 +175,73 @@ export class UploadPreviewImgManager {
         const previewContainer = document.querySelector(this.previewSelector);
         if (previewContainer) {
             previewContainer.innerHTML = ''; /* Collassa istantaneamente lo spazio a zero */
+        }
+    }
+
+    /* Invio asincrono dei file accumulati al Controller */
+    async saveImages(formElement) {
+        try {
+
+            /* Costruiamo il FormData qui dentro */
+            const formData = new FormData(formElement);
+
+            /* Iniettiamo i file con i loro ID reali prima dell'invio */
+            this.files.forEach(({ id, file }) => {
+                formData.append(`images[${id}]`, file);
+            });
+                    
+            const response = await apiFetch(urlbase + 'backend/uploadPreviewImg/saveImages', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            /* Controllo sessione scaduta */
+            if (data.result === 'no_current_user_logged') {
+                window.location.href = urlbase + 'backend/auth/login';
+                return;
+            }
+
+            /* Gestione Errori di Validazione */
+            if (data.imagesErrors) {
+
+                if (typeof handleValidationImages === 'function') {
+                    handleValidationImages(data.imagesErrors);
+                }
+                
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+                
+                return;
+            }
+
+            /* Gestione errore di validazione server-side */
+            if (data.result === false) {
+                showAlert('danger', data.message);
+                return;
+            }
+
+            /* Caso di successo totale */
+            if (data.result === true) {
+                showAlert('success', data.message);
+                
+                /* Svuota l'anteprima locale e azzera l'array dei file */
+                this.reset();
+
+                /* Aggiornamento automatico della galleria esistente (Decoupling) */
+                if (this.galleryOneImgManager) {
+                    /* Recuperiamo il form di reload nascosto della galleria (#getImages) */
+                    const galleryForm = document.querySelector('#getImages');
+                    if (galleryForm) {
+                        const reloadData = new FormData(galleryForm);
+                        await this.galleryOneImgManager.refresh(reloadData);
+                    }
+                }
+            }
+        } catch (err) {
+            console.error('Errore durante il salvataggio delle immagini:', err);
         }
     }
 }

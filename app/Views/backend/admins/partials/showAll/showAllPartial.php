@@ -85,7 +85,6 @@
                                             <!-- Cella allegati -->
                                             <td rowspan="2" class="align-middle text-center border-end fw-bold">
                                                 <span class="badge bg-info"><?= $admin->images_num; ?></span>
-                                                <span class="badge bg-secondary"><?= $admin->docs_num; ?></span>
                                             </td>
 
                                             <!-- Cella immagine -->

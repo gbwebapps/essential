@@ -48,7 +48,7 @@ const actions = {
     },
     add: function() {
 
-        const imagePreviewManager = new UploadPreviewImgManager('#inputImages', '#previewImages', '#buttonImages');
+        const imagePreviewManager = new UploadPreviewImgManager();
 
         const addManager = new AddManager({
             url: urlbase + 'backend/admins/add',
@@ -62,8 +62,8 @@ const actions = {
     },
     edit: function() {
 
-        const imagePreviewManager = new UploadPreviewImgManager('#inputImages', '#previewImages', '#buttonImages');
-        const galleryOneImgManager = new GalleryOneImgManager('#imagesData');
+        const imagePreviewManager = new UploadPreviewImgManager();
+        const galleryOneImgManager = new GalleryOneImgManager();
 
         const editManager = new EditManager({
             formSelector: '#admins_edit',
@@ -122,7 +122,7 @@ const actions = {
         });
         generalDataManager.init();
 
-        const galleryOneImgManager = new GalleryOneImgManager('#imagesData');
+        const galleryOneImgManager = new GalleryOneImgManager();
 
         const metaDataManager = new MetaDataManager({
             url: urlbase + 'backend/admins/getMetaData', 

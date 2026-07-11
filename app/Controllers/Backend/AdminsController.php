@@ -90,7 +90,7 @@ class AdminsController extends BackendController
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 
-                return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/admins.messages.validateToastErrors'), $errorMessage)]);
+                return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/admins.messages.validationToastErrors'), $errorMessage)]);
             endif;
 
             $rules = $this->adminsModel->showAllSearchValidationRules();
@@ -219,7 +219,7 @@ class AdminsController extends BackendController
                 $this->data['uuid'] = $posts['uuid'];
 
                 $this->data['context'] = 'edit';
-                $this->data['images'] = $this->galleryOneImgModel->getImages('admins', $posts['uuid']);
+                $this->data['images'] = $this->galleryOneImgModel->getImages(['entity' => 'admins', 'uuid' => $posts['uuid']]);
 
                 return $this->response->setJSON(['result' => true,'output' => view('backend/admins/partials/edit/editPartial', $this->data)]);
             endif;
@@ -251,7 +251,7 @@ class AdminsController extends BackendController
                 $this->data['uuid'] = $posts['uuid'];
 
                 $this->data['context'] = 'edit';
-                $this->data['images'] = $this->galleryOneImgModel->getImages('admins', $posts['uuid']);
+                $this->data['images'] = $this->galleryOneImgModel->getImages(['entity' => 'admins', 'uuid' => $posts['uuid']]);
                 
                 $json['output'] = view('backend/admins/partials/edit/editPartial', $this->data);
             endif;
@@ -285,7 +285,7 @@ class AdminsController extends BackendController
         $this->data['uuid'] = $uuid;
 
         $this->data['context'] = 'edit';
-        $this->data['images'] = $this->galleryOneImgModel->getImages('admins', $uuid);
+        $this->data['images'] = $this->galleryOneImgModel->getImages(['entity' => 'admins', 'uuid' => $uuid]);
 
         /* Caso Caricamento standard: passo le matrici separate alla vista */
         $this->data['group_perms'] = $this->adminsModel->getGroupPermissions((int) $admin['row']->group_id);
@@ -312,7 +312,7 @@ class AdminsController extends BackendController
 
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->response->setJSON(['result' => false, 'message' => sprintf(lang('backend/admins.messages.validateToastErrors'), $errorMessage)]);
+                return $this->response->setJSON(['result' => false, 'message' => sprintf(lang('backend/admins.messages.validationToastErrors'), $errorMessage)]);
             endif;
 
             /* 1. Recuperiamo la configurazione globale di tutti i permessi atomici esistenti */
@@ -371,7 +371,7 @@ class AdminsController extends BackendController
         $this->data['uuid'] = $uuid;
 
         $this->data['context'] = 'show';
-        $this->data['images'] = $this->galleryOneImgModel->getImages('admins', $uuid);
+        $this->data['images'] = $this->galleryOneImgModel->getImages(['entity' => 'admins', 'uuid' => $uuid]);
 
         /* Struttura per mappare i gruppi e le eccezioni */
         $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
@@ -399,7 +399,7 @@ class AdminsController extends BackendController
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 
-                return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/admins.messages.validateToastErrors'), $errorMessage)]);
+                return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/admins.messages.validationToastErrors'), $errorMessage)]);
             endif;
 
             $json = $this->adminsModel->del($posts);
@@ -424,7 +424,7 @@ class AdminsController extends BackendController
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 
-                return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/admins.messages.validateToastErrors'), $errorMessage)]);
+                return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/admins.messages.validationToastErrors'), $errorMessage)]);
             endif;
 
             $json = $this->adminsModel->resetPassword($posts, $this->request);
@@ -449,7 +449,7 @@ class AdminsController extends BackendController
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 
-                return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/admins.messages.validateToastErrors'), $errorMessage)]);
+                return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/admins.messages.validationToastErrors'), $errorMessage)]);
             endif;
 
             $json = $this->adminsModel->changeStatus($posts);
@@ -488,7 +488,7 @@ class AdminsController extends BackendController
 
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->response->setJSON(['result' => false, 'message' => sprintf(lang('backend/admins.messages.validateToastErrors'), $errorMessage)]);
+                return $this->response->setJSON(['result' => false, 'message' => sprintf(lang('backend/admins.messages.validationToastErrors'), $errorMessage)]);
             endif;
 
             $json = $this->adminsModel->changePermission($posts);
@@ -529,7 +529,7 @@ class AdminsController extends BackendController
 
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->response->setJSON(['result' => false, 'message' => sprintf(lang('backend/admins.messages.validateToastErrors'), $errorMessage)]);
+                return $this->response->setJSON(['result' => false, 'message' => sprintf(lang('backend/admins.messages.validationToastErrors'), $errorMessage)]);
             endif;
 
             $record = $this->adminsModel->getByUUID($posts['uuid']);
@@ -582,7 +582,7 @@ class AdminsController extends BackendController
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 
-                return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/admins.messages.validateToastErrors'), $errorMessage)]);
+                return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/admins.messages.validationToastErrors'), $errorMessage)]);
             endif;
 
             $record = $this->adminsModel->getByUUID($posts['uuid']);
@@ -621,7 +621,7 @@ class AdminsController extends BackendController
 
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->response->setJSON(['result' => false, 'message' => sprintf(lang('backend/admins.messages.validateToastErrors'), $errorMessage)]);
+                return $this->response->setJSON(['result' => false, 'message' => sprintf(lang('backend/admins.messages.validationToastErrors'), $errorMessage)]);
             endif;
 
             $record = $this->adminsModel->getByUUID($posts['uuid']);
@@ -679,7 +679,7 @@ class AdminsController extends BackendController
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 
-                return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/admins.messages.validateToastErrors'), $errorMessage)]);
+                return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/admins.messages.validationToastErrors'), $errorMessage)]);
             endif;
 
             $record = $this->adminsModel->getByUUID($posts['uuid']);
@@ -722,7 +722,7 @@ class AdminsController extends BackendController
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 
-                return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/admins.messages.validateToastErrors'), $errorMessage)]);
+                return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/admins.messages.validationToastErrors'), $errorMessage)]);
             endif;
 
             $result = $this->adminsModel->deleteToken($posts);

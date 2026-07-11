@@ -43,14 +43,14 @@ class AdminsModel extends BackendModel
      *
      * @var array
      */
-    protected array $addAllowedFields = ['firstname', 'lastname', 'email', 'phone', 'status', 'note', 'group_id', 'images', 'documents'];
+    protected array $addAllowedFields = ['firstname', 'lastname', 'email', 'phone', 'status', 'note', 'group_id', 'images'];
 
     /**
      * Elenco dei campi consentiti per la persistenza dei dati durante la fase di aggiornamento di un profilo esistente.
      *
      * @var array
      */
-    protected array $editAllowedFields = ['uuid', 'firstname', 'lastname', 'email', 'phone', 'status', 'note', 'group_id', 'permissions', 'images', 'documents'];
+    protected array $editAllowedFields = ['uuid', 'firstname', 'lastname', 'email', 'phone', 'status', 'note', 'group_id', 'permissions', 'images'];
 
     /**
      * Campi di input autorizzati per l'identificazione e l'esecuzione della procedura di cancellazione.
@@ -115,8 +115,7 @@ class AdminsModel extends BackendModel
      */
     protected ?string $getDataQuery = "select uuid, firstname, lastname, email, phone, status, created_at, updated_at, resetted_at, suspended_at,
                                         (select images.filename from images where images.entity_uuid = admins.uuid and images.entity = 'admins' and images.is_cover = 1 limit 1) as cover, 
-                                        (select count(*) from images where images.entity_uuid = admins.uuid and images.entity = 'admins') as images_num, 
-                                        (select count(*) from documents where documents.entity_uuid = admins.uuid and documents.entity = 'admins') as docs_num 
+                                        (select count(*) from images where images.entity_uuid = admins.uuid and images.entity = 'admins') as images_num 
                                         from admins where master <> ? and uuid <> ?";
 
     /**

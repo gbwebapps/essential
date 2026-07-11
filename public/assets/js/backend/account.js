@@ -4,6 +4,10 @@ import { urlbase, controller, action, smoothReplace } from './backend.js';
 /* Import dei componenti dalla sottocartella */
 import { EditManager, GetPermissionsManager, GetTokensManager, DeleteTokenManager, ResetPasswordManager, SecurityManager } from './components/Account.js';
 
+/* Import componenti immagini */
+import { UploadPreviewImgManager } from './components/UploadPreviewImgManager.js';
+import { GalleryOneImgManager } from './components/GalleryOneImgManager.js';
+
 const actions = {
     edit: function() {
 
@@ -16,6 +20,12 @@ const actions = {
         const permissionsManager = new GetPermissionsManager();
         permissionsManager.init();
         
+    }, 
+    images: function() {
+
+        const galleryOneImgManager = new GalleryOneImgManager();
+        const imagePreviewManager = new UploadPreviewImgManager(galleryOneImgManager);
+
     }, 
     tokens: function() {
 

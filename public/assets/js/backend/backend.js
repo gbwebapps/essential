@@ -146,12 +146,11 @@ export function handleValidationErrors(errors) {
     Object.entries(errors).forEach(([key, value]) => {
         document.querySelectorAll('.error_' + key).forEach(el => {
             el.textContent = value;
-            el.classList.add('error-show'); // fade-in
+            // el.classList.add('error-show'); // fade-in
         });
     });
 }
 
-/* Funzione per gestire gli errori per le immagini adattata a CI4 */
 /* Funzione per gestire gli errori per le immagini adattata a CI4 */
 export function handleValidationImages(errors) {
     Object.entries(errors).forEach(([key, message]) => {
@@ -246,6 +245,9 @@ export function showAlert(type, message, customIcon = '')
 
     const alertContainer = document.getElementById('alert-container');
     if (!alertContainer) return;
+
+    /* Svuota il contenitore rimuovendo l'alert precedente prima di inserire il nuovo */
+    alertContainer.innerHTML = '';
 
     const alertElement = document.createElement('div');
     alertElement.innerHTML = alertHTML.trim();

@@ -40,7 +40,7 @@ $routes->group('backend', function($routes) {
             $routes->get('general', '\App\Controllers\Backend\AccountController::general');
             $routes->match(['GET', 'POST'], 'edit', '\App\Controllers\Backend\AccountController::edit');
             $routes->match(['GET', 'POST'], 'permissions', '\App\Controllers\Backend\AccountController::permissions');
-            // $routes->get('images', '\App\Controllers\Backend\AccountController::images');
+            $routes->get('images', '\App\Controllers\Backend\AccountController::images');
 
             $routes->match(['GET', 'POST'], 'tokens', '\App\Controllers\Backend\AccountController::tokens');
             $routes->post('deleteToken', '\App\Controllers\Backend\AccountController::deleteToken');
@@ -65,6 +65,11 @@ $routes->group('backend', function($routes) {
             $routes->get('/', '\App\Controllers\Backend\UsersController::index', ['filter' => 'permission:users_index']);
             $routes->get('showAll', '\App\Controllers\Backend\UsersController::showAll', ['filter' => 'permission:users_showall']);
             $routes->get('show', '\App\Controllers\Backend\UsersController::show', ['filter' => 'permission:users_show']);
+        });
+
+        /* IMAGES PREVIEW */
+        $routes->group('uploadPreviewImg', ['filter' => 'authorization'], function($routes) {
+            $routes->post('saveImages', '\App\Controllers\Backend\Components\UploadPreviewController::saveImages');
         });
 
         /* GALLERY ONE */

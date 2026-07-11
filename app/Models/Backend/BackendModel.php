@@ -273,7 +273,7 @@ abstract class BackendModel extends BaseModel
         endforeach;
 
 	    /* 2. Controllo dei file caricati (Valido per TUTTI i moduli che accettano allegati) */
-	    foreach (['images', 'documents'] as $type):
+	    foreach (['images'] as $type):
 	        if (isset($posts[$type]) && is_array($posts[$type])):
 	            foreach ($posts[$type] as $file):
 	                if ($file instanceof \CodeIgniter\HTTP\Files\UploadedFile && $file->isValid() && ! $file->hasMoved()):
