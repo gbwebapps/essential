@@ -8,7 +8,7 @@
 
     <div class="row">
 
-        <?php foreach (config(\Config\Backend\Auth::class)->twoFactorMethods as $method) : ?>
+        <?php foreach (setting('Backend\Auth')->twoFactorMethods as $method) : ?>
             <div class="col-12 col-md-4">
                 <div class="card h-100 border <?php if ($activeMethod === $method) : ?>border-primary bg-light<?php endif; ?>">
                     <div class="card-body d-flex align-items-start p-3">

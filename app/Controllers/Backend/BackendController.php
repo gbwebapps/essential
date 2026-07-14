@@ -25,7 +25,7 @@ abstract class BackendController extends BaseController
      * 
      * @var array 
      */
-    protected $helpers = ['date', 'array', 'cookie'];
+    protected $helpers = ['date', 'array', 'cookie', 'settings'];
 
     /**
      * Array centralizzato contenente tutti i dati passati globalmente alle viste.

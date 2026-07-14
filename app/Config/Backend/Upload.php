@@ -13,4 +13,8 @@ class Upload extends BaseConfig
 	public int $resizeMediumY = 540;
 	public int $resizeSmallX = 96;
 	public int $resizeSmallY = 54;
+	public int $maxFileSize = 8000;
+	public int $maxImageX = 4500;
+	public int $maxImageY = 4001;
+	public string $allowedExtensions = 'png|jpg|jpeg|webp';
 }

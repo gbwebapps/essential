@@ -114,6 +114,8 @@ abstract class BackendModel extends BaseModel
 	protected function initModel(): void 
 	{
 		parent::initModel();
+
+		helper('settings');
 	}
 
 	/**

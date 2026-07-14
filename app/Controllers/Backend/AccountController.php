@@ -106,8 +106,8 @@ class AccountController extends BackendController
             'security' => [
                 'title' => lang('backend/account.leftMenu.security'),
                 'class' => 'col-4',
-                'icon' => '<i class="fa-solid fa-shield-halved"></i>',
-                'icon_3x' => '<i class="fa-solid fa-shield-halved fa-3x"></i>',
+                'icon' => '<i class="fa-solid fa-user-shield"></i>',
+                'icon_3x' => '<i class="fa-solid fa-user-shield fa-3x"></i>',
                 'route' => 'backend/account/security',
             ],
         ];
@@ -356,7 +356,7 @@ class AccountController extends BackendController
         if ($this->request->isAJAX() && $this->request->is('post')) :
 
             $method = (string) $this->request->getPost('twoFactorMethod');
-            $allowedMethods = config(\Config\Backend\Auth::class)->twoFactorMethods;
+            $allowedMethods = setting('Backend\Auth')->twoFactorMethods;
 
             /* Validazione dell'input */
             if ( ! in_array($method, $allowedMethods, true) || $method === 'totp') :

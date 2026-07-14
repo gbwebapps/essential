@@ -205,7 +205,7 @@ class AuthController extends BackendController
     public function verify()
     {
         /* SBARRAMENTO GLOBALE: Se la feature 2FA è spenta, la rotta non esiste */
-        if ( ! config(\Config\Backend\Auth::class)->twoFactor):
+        if ( ! setting('Backend\Auth')->twoFactor):
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         endif;
 

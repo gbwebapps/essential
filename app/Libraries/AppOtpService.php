@@ -6,6 +6,11 @@ use OTPHP\TOTP;
 
 class AppOtpService
 {
+    public function __construct()
+    {
+        helper('settings');
+    }
+
     /**
      * Genera una chiave segreta (secret) univoca in formato Base32 per l'utente.
      * Come funziona:
@@ -28,7 +33,7 @@ class AppOtpService
      */
     public function getProvisioningUri(string $secret, string $label): string
     {
-        $config = config(\Config\Backend\Auth::class);
+        $config = setting('Backend\Auth');
 
         /* Crea l'istanza TOTP impostando la durata standard (30s), l'algoritmo e il numero di cifre */
         $totp = TOTP::create($secret, 30, 'sha1', $config->twoFactorDigits);
@@ -49,7 +54,7 @@ class AppOtpService
      */
     public function verify(string $secret, string $code): bool
     {
-        $config = config(\Config\Backend\Auth::class);
+        $config = setting('Backend\Auth');
         
         /* CORREZIONE: Inizializzo l'oggetto con le stesse identiche configurazioni del QR Code */
         $totp = TOTP::create($secret, 30, 'sha1', $config->twoFactorDigits);

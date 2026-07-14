@@ -85,7 +85,14 @@ $routes->group('backend', function($routes) {
     $routes->group('', ['filter' => ['authorization', 'master']], function($routes) {
         
         /* SETTINGS */
-        $routes->get('settings', '\App\Controllers\Backend\SettingsController::index');
+        $routes->group('settings', function($routes) {
+            $routes->get('/', '\App\Controllers\Backend\SettingsController::index');
+
+            $routes->post('openSettings', '\App\Controllers\Backend\SettingsController::openSettings');
+            $routes->post('saveSettings', '\App\Controllers\Backend\SettingsController::saveSettings');
+            $routes->post('deleteSettings', '\App\Controllers\Backend\SettingsController::deleteSettings');
+            $routes->post('getSettings', '\App\Controllers\Backend\SettingsController::getSettings');
+        });
 
         /* TOOLS */
         $routes->get('tools', '\App\Controllers\Backend\ToolsController::index');

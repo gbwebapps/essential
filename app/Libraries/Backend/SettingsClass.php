@@ -59,13 +59,13 @@ class SettingsClass
 	 *
 	 * @return array
 	 */
-	public function getLinksBarIndex()
-	{
-		return 
-		[
-            ['icon' => '<i class="fa-solid fa-screwdriver-wrench"></i>', 'label' => lang('backend/settings.linksBar.tools'), 'route' => 'backend/tools'],
-        ];
-	}
+	// public function getLinksBarIndex()
+	// {
+	// 	return 
+	// 	[
+    //         ['icon' => '<i class="fa-solid fa-screwdriver-wrench"></i>', 'label' => lang('backend/settings.linksBar.tools'), 'route' => 'backend/tools'],
+    //     ];
+	// }
 
 	/* ------------------------------------------------------------------------------------------------- */
 
@@ -77,12 +77,12 @@ class SettingsClass
 	 *
 	 * @return array
 	 */
-	/*public function getJsIndex(): array
+	public function getJsIndex(): array
 	{
 	    return [
-	        ['id' => 'datatables-js', 'path' => 'assets/js/backend/datatables.js', 'position' => 'before', 'target' => 'backend-js']
+	        ['id' => 'tom-select-js', 'path' => 'assets/vendor/tom-select/js/tom-select.complete.min.js', 'position' => 'before', 'target' => 'settings-js']
 	    ];
-	}*/
+	}
 
 	/* ------------------------------------------------------------------------------------------------- */
 
@@ -94,10 +94,10 @@ class SettingsClass
 	 *
 	 * @return array
 	 */
-	/*public function getCssIndex(): array
+	public function getCssIndex(): array
 	{
 	    return [
-	        ['id' => 'datatables-css', 'path' => 'assets/css/backend/datatables.css', 'position' => 'before', 'target' => 'backend-css']
+	        ['id' => 'tom-select-css', 'path' => 'assets/vendor/tom-select/css/tom-select.bootstrap5.min.css', 'position' => 'before', 'target' => 'backend-css']
 	    ];
-	}*/
+	}
 }

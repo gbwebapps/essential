@@ -30,10 +30,10 @@ class EmailOtpService
      */
     public function send(string $adminUuid): bool
     {
-        $config = config(\Config\Backend\Auth::class);
+        $config = setting('Backend\Auth');
         
         /* Genera un codice numerico casuale della lunghezza configurata */
-        $code = str_pad((string)random_int(0, 999999), $config->twoFactorDigits, '0', STR_PAD_LEFT);
+        $code = str_pad((string)random_int(0, 999999), (int)$config->twoFactorDigits, '0', STR_PAD_LEFT);
         
         /* Calcola la data di scadenza per il formato DATETIME */
         $expiresAt = date('Y-m-d H:i:s', time() + (int)$config->twoFactorEmailExpiry);

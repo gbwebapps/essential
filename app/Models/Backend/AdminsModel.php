@@ -263,7 +263,7 @@ class AdminsModel extends BackendModel
             ],
             'images' => [
                 'label' => lang('backend/admins.labels.images'),
-                'rules' => ['permit_empty', 'checkImages[size:2048,ext:png|jpg|jpeg|webp]']
+                'rules' => ['permit_empty', 'checkImages']
             ]
         ];
     }
@@ -813,10 +813,10 @@ class AdminsModel extends BackendModel
 
             /* Generazione token di attivazione */
             $token = new \App\Libraries\Token();
-            $tokenHash = $token->getHash(config(\Config\Backend\Auth::class)->hashKey);
+            $tokenHash = $token->getHash(setting('Backend\Auth')->hashKey);
 
             /* 2. Calcolo corretto della scadenza lavorando sui secondi (timestamp) */
-            $expireTime = date('Y-m-d H:i:s', time() + config(\Config\Backend\Auth::class)->activationTime);
+            $expireTime = date('Y-m-d H:i:s', time() + setting('Backend\Auth')->activationTime);
 
             /* Scrittura del token di attivazione */
             $sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, token_expire, token_type, user_agent, ip) values (?, ?, ?, ?, ?, ?, ?)";
@@ -1159,10 +1159,10 @@ class AdminsModel extends BackendModel
 
             /* Generazione token di attivazione */
             $token = new \App\Libraries\Token();
-            $tokenHash = $token->getHash(config(\Config\Backend\Auth::class)->hashKey);
+            $tokenHash = $token->getHash(setting('Backend\Auth')->hashKey);
 
             /* 2. Calcolo corretto della scadenza lavorando sui secondi (timestamp) */
-            $expireTime = date('Y-m-d H:i:s', time() + config(\Config\Backend\Auth::class)->activationTime);
+            $expireTime = date('Y-m-d H:i:s', time() + setting('Backend\Auth')->activationTime);
 
             $this->db->transBegin();
 

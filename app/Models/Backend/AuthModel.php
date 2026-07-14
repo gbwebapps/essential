@@ -14,19 +14,14 @@ use App\Models\Backend\BackendModel;
  */
 class AuthModel extends BackendModel
 {
+    private object $config;
+
     /**
      * Identificativo testuale del modulo associato la gestione della autenticazione.
      *
      * @var string|null
      */
     protected ?string $module = 'auth';
-
-    /**
-     * Espressione regolare per la validazione della complessità strutturale delle password.
-     *
-     * @var string
-     */
-    private string $passwordRegex;
 
     /**
      * Inizializza il modello ereditando i comportamenti base e caricando le configurazioni di sicurezza.
@@ -40,7 +35,7 @@ class AuthModel extends BackendModel
     {
         parent::initModel();
 
-        $this->passwordRegex = config(\Config\Backend\Auth::class)->passwordRegex;
+        $this->config = setting('Backend\Auth');
     }
 
     /**
@@ -87,7 +82,7 @@ class AuthModel extends BackendModel
             ], 
             'password' => [
                 'label' => 'Password',
-                'rules' => ['required', 'min_length[8]', 'max_length[255]', "regex_match[{$this->passwordRegex}]"],
+                'rules' => ['required', 'min_length[8]', 'max_length[255]', "regex_match[{$this->config->passwordRegex}]"],
                 'errors' => [
                     'regex_match' => 'La password non rispetta i requisiti di sicurezza.'
                 ]
@@ -126,7 +121,7 @@ class AuthModel extends BackendModel
         return [
             'password' => [
                 'label' => 'Password',
-                'rules' => ['required', "regex_match[{$this->passwordRegex}]"],
+                'rules' => ['required', "regex_match[{$this->config->passwordRegex}]"],
                 'errors' => [
                     'regex_match' => 'La password non rispetta i requisiti di sicurezza.'
                 ]
@@ -184,12 +179,12 @@ class AuthModel extends BackendModel
             $ip = $request->getIPAddress();
 
             /* Lettura centralizzata delle configurazioni per evitare chiamate ridondanti */
-            $allowAttempts = (bool) config(\Config\Backend\Auth::class)->attempts;
-            $allowTwoFactor = (bool) config(\Config\Backend\Auth::class)->twoFactor;
+            $allowAttempts = (bool) $this->config->attempts;
+            $allowTwoFactor = (bool) $this->config->twoFactor;
 
             /* Costruzione della query di lettura iniziale dell'utente */
             if ($allowAttempts):
-                $secondsInterval = (int) config(\Config\Backend\Auth::class)->attemptsInterval;
+                $secondsInterval = (int) $this->config->attemptsInterval;
                 $attemptsInterval = date('Y-m-d H:i:s', time() - $secondsInterval);
                 
                 $sql = "select admins.uuid, admins.firstname, admins.lastname, admins.email, admins.password_hash, COUNT(admins_attempts.id) as times
@@ -216,7 +211,24 @@ class AuthModel extends BackendModel
 
             /* Controllo immediato del blocco tentativi */
             if ($allowAttempts && isset($admin->times)):
-                if ($admin->times >= (int) config(\Config\Backend\Auth::class)->attemptsLimit):
+                if ($admin->times >= (int) $this->config->attemptsLimit):
+                    
+                    $this->db->transBegin();
+
+                    /* Recuperiamo il timestamp dell'ultimo tentativo per questo specifico admin all'interno della finestra */
+                    $sql = "select MAX(timestamp) as last_ts from admins_attempts 
+                            where admin_uuid = ? and timestamp > ?";
+                    $row = $this->db->query($sql, [$admin->uuid, $attemptsInterval])->getRow();
+
+                    /* Se troviamo l'ultimo tentativo, ne aggiorniamo l'orario a questo istante per far slittare il blocco */
+                    if ($row && $row->last_ts) :
+                        $sql = "update admins_attempts set timestamp = ? 
+                                where admin_uuid = ? and timestamp = ?";
+                        $this->db->query($sql, [date('Y-m-d H:i:s'), $admin->uuid, $row->last_ts]);
+                    endif;
+
+                    $this->db->transCommit();
+
                     return ['result' => false, 'message' => lang('backend/auth.messages.tooMAnyAttempts')];
                 endif;
             endif;
@@ -301,15 +313,15 @@ class AuthModel extends BackendModel
     private function innerLogin(object $admin, bool $rememberMe, \CodeIgniter\HTTP\IncomingRequest $request): array
     {
         if ($rememberMe):
-            $time = (int) config(\Config\Backend\Auth::class)->rememberMeTime;
+            $time = (int) $this->config->rememberMeTime;
             $tokenType = 'cookie';
         else:
-            $time = (int) config(\Config\Backend\Auth::class)->sessionTime;
+            $time = (int) $this->config->sessionTime;
             $tokenType = 'session';
         endif;
 
         $token = new \App\Libraries\Token();
-        $tokenHash = $token->getHash(config(\Config\Backend\Auth::class)->hashKey);
+        $tokenHash = $token->getHash($this->config->hashKey);
 
         /* Generazione delle stringhe DATETIME corrette per admins_tokens */
         $tokenCreate = date('Y-m-d H:i:s');
@@ -395,9 +407,9 @@ class AuthModel extends BackendModel
             /* 1. Transazione avviata solo se l'utente esiste (Ottimizzazione DB) */
             try {
                 $token = new \App\Libraries\Token();
-                $tokenHash = $token->getHash(config(\Config\Backend\Auth::class)->hashKey);
+                $tokenHash = $token->getHash($this->config->hashKey);
 
-                $time = (int) config(\Config\Backend\Auth::class)->activationTime;
+                $time = (int) $this->config->activationTime;
 
                 $tokenCreate = date('Y-m-d H:i:s');
                 $tokenExpire = date('Y-m-d H:i:s', time() + $time);
@@ -473,7 +485,7 @@ class AuthModel extends BackendModel
 
             /* 1. Recupero il token passato dal form (il nome deve combaciare con l'input hidden) */
             $token = new \App\Libraries\Token($posts['token']);
-            $tokenHash = $token->getHash(config(\Config\Backend\Auth::class)->hashKey);
+            $tokenHash = $token->getHash($this->config->hashKey);
 
             /* 2. Sostituito fetch() con getRow() */
             $sql = "select uuid, firstname, lastname from admins as u join admins_tokens as t on u.uuid = t.admin_uuid where t.token_hash = ? and t.token_type = ? limit 1";
@@ -534,7 +546,7 @@ class AuthModel extends BackendModel
         try 
         {
             $tokenObj = new \App\Libraries\Token($token);
-            $tokenHash = $tokenObj->getHash(config(\Config\Backend\Auth::class)->hashKey);
+            $tokenHash = $tokenObj->getHash($this->config->hashKey);
 
             $sql = "select t.token_expire, t.admin_uuid, u.password_hash, u.email  
                 from admins as u 
@@ -580,7 +592,7 @@ class AuthModel extends BackendModel
         {
             $posts = $this->checkAllowedFields($posts, $this->verifyAllowedFields);
 
-            $config = config(\Config\Backend\Auth::class);
+            $config = $this->config;
             $ip = $request->getIPAddress();
 
             /* Recupero e validazione immediata della sessione protetta temporanea */
@@ -714,7 +726,7 @@ class AuthModel extends BackendModel
                 /* Recupera il token in chiaro dalla sessione */
                 $sessionValue = session()->get('backendSession');
                 $token = new \App\Libraries\Token($sessionValue);
-                $tokenHash = $token->getHash(config(\Config\Backend\Auth::class)->hashKey);
+                $tokenHash = $token->getHash($this->config->hashKey);
 
                 /* Elimina il record dal database */
                 $sql = "delete from admins_tokens where token_hash = ? and token_type = ?";
@@ -749,7 +761,7 @@ class AuthModel extends BackendModel
             if ($decryptedValue):
                 /* Ricava l'hash dal token decifrato */
                 $token = new \App\Libraries\Token($decryptedValue);
-                $tokenHash = $token->getHash(config(\Config\Backend\Auth::class)->hashKey);
+                $tokenHash = $token->getHash($this->config->hashKey);
 
                 /* Elimina il record dal database */
                 $sql = "delete from admins_tokens where token_hash = ? and token_type = ?";

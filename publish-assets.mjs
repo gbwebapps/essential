@@ -21,6 +21,14 @@ const assetsToCopy = [
         from: 'node_modules/@fortawesome/fontawesome-free/webfonts',
         to: 'public/assets/vendor/fontawesome/webfonts'
     },
+    {
+        from: 'node_modules/tom-select/dist/css/tom-select.bootstrap5.min.css',
+        to: 'public/assets/vendor/tom-select/css/tom-select.bootstrap5.min.css'
+    },
+    {
+        from: 'node_modules/tom-select/dist/js/tom-select.complete.min.js',
+        to: 'public/assets/vendor/tom-select/js/tom-select.complete.min.js'
+    },
 ];
 
 assetsToCopy.forEach(asset => {

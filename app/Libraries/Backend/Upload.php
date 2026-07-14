@@ -7,11 +7,15 @@ use CodeIgniter\HTTP\Files\UploadedFile;
 
 class Upload
 {
-    private BaseConfig $config;
+    /**
+     * @var object
+     */
+    private object $config;
 
     public function __construct()
     {
-        $this->config = config(\Config\Backend\Upload::class);
+        /* Sostituiamo il caricamento nativo con l'helper globale */
+        $this->config = setting('Backend\Upload');
     }
 
     /**

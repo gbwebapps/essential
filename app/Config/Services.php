@@ -50,7 +50,7 @@ class Services extends BaseService
         endif;
 
         /* Inietta la chiave di cifratura recuperata dalla configurazione */
-        $key = config(\Config\Backend\Auth::class)->sessionCryptoKey;
+        $key = setting('Backend\Auth')->sessionCryptoKey;
 
         return new \App\Libraries\CryptoService($key);
     }

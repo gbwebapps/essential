@@ -250,10 +250,10 @@ class AccountModel extends BackendModel
 
 	        /* Generazione token di attivazione */
 	        $token = new \App\Libraries\Token();
-	        $tokenHash = $token->getHash(config(\Config\Backend\Auth::class)->hashKey);
+	        $tokenHash = $token->getHash(setting('Backend\Auth')->hashKey);
 
 	        /* 2. Calcolo corretto della scadenza lavorando sui secondi (timestamp) */
-	        $expireTime = date('Y-m-d H:i:s', time() + config(\Config\Backend\Auth::class)->activationTime);
+	        $expireTime = date('Y-m-d H:i:s', time() + setting('Backend\Auth')->activationTime);
 
 	        $this->db->transBegin();
 
