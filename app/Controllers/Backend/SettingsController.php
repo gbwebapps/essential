@@ -33,7 +33,7 @@ class SettingsController extends BackendController
      *
      * @var array
      */
-    protected array $allowedEnvs = ['auth', 'upload'];
+    protected array $allowedEnvs = ['auth', 'upload', 'email'];
 
     /**
      * Inizializza il controller impostando il contesto operativo.
@@ -58,10 +58,6 @@ class SettingsController extends BackendController
         
         $this->data['title'] = lang('backend/settings.titles.index');
         $this->data['icon'] = '<i class="fa-solid fa-sliders"></i>';
-
-        /* Caricamento iniziale sicuro dei gruppi espliciti */
-        $this->data['authSettings'] = $this->settingsModel->getSettings('Backend\Auth');
-        $this->data['uploadSettings'] = $this->settingsModel->getSettings('Backend\Upload');
 
         return $this->render('backend/settings/indexView', $this->data);
     }
@@ -175,7 +171,11 @@ class SettingsController extends BackendController
             $namespace = 'Backend\\' . ucfirst($env);
 
             /* Elimina interamente la sezione configurata */
-            $this->settingsModel->deleteSettings($namespace);
+            $deleted = $this->settingsModel->deleteSettings($namespace);
+
+            if ( ! $deleted) :
+                return $this->response->setJSON(['result'  => false, 'message' => lang('backend/settings.messages.alreadyDefault')]);
+            endif;
 
             return $this->response->setJSON(['result'  => true, 'message' => lang('backend/settings.messages.deleteSuccess')]);
 

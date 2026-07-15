@@ -29,7 +29,7 @@ class SettingsModel extends BackendModel
         'activationTime',
     ];
 
-    /*
+    /**
      * Elenco dei campi POST autorizzati per la configurazione Upload.
      * Evita tentativi di mass-assignment (assegnazione massiva).
      *
@@ -47,6 +47,28 @@ class SettingsModel extends BackendModel
         'maxImageX', 
         'maxImageY', 
         'allowedExtensions'
+    ];
+
+    /**
+     * Elenco dei campi POST autorizzati per la configurazione email.
+     * Evita tentativi di mass-assignment (assegnazione massiva).
+     *
+     * @var array
+     */
+    private array $allowedEmailFields = [
+        'fromEmail',
+        'fromName',
+        'recipients',
+        'protocol',
+        'SMTPHost',
+        'SMTPPort',
+        'SMTPCrypto',
+        'SMTPUser',
+        'SMTPPass',
+        'SMTPAuthMethod',
+        'mailType',
+        'charset',
+        'priority',
     ];
 
     /**
@@ -127,6 +149,7 @@ class SettingsModel extends BackendModel
             ],
         ];
     }
+
     /*
      * Ritorna le regole di validazione specifiche per il form Upload Settings.
      *
@@ -186,6 +209,69 @@ class SettingsModel extends BackendModel
         ];
     }
 
+    /*
+     * Ritorna le regole di validazione specifiche per il form Email Settings.
+     *
+     * @return array
+     */
+    public function emailSettingsValidateRules(): array
+    {
+        return [
+            'fromEmail' => [
+                'label' => lang('backend/settings.labels.fromEmail'),
+                'rules' => ['required', 'valid_email', 'max_length[255]'],
+            ],
+            'fromName' => [
+                'label' => lang('backend/settings.labels.fromName'),
+                'rules' => ['required', 'max_length[255]'],
+            ],
+            'recipients' => [
+                'label' => lang('backend/settings.labels.recipients'),
+                'rules' => ['permit_empty', 'valid_emails', 'max_length[500]'],
+            ],
+            'protocol' => [
+                'label' => lang('backend/settings.labels.protocol'),
+                'rules' => ['required', 'in_list[smtp,mail,sendmail]'],
+            ],
+            'SMTPHost' => [
+                'label' => lang('backend/settings.labels.SMTPHost'),
+                'rules' => ['required_if_field[protocol,smtp]', 'permit_empty', 'regex_match[/^[a-zA-Z0-9.-]+$/]', 'max_length[255]'],
+            ],
+            'SMTPPort' => [
+                'label' => lang('backend/settings.labels.SMTPPort'),
+                'rules' => ['required_if_field[protocol,smtp]', 'permit_empty', 'is_natural_no_zero', 'less_than_equal_to[65535]'],
+            ],
+            'SMTPCrypto' => [
+                'label' => lang('backend/settings.labels.SMTPCrypto'),
+                'rules' => ['required_if_field[protocol,smtp]', 'permit_empty', 'in_list[none,tls,ssl]'],
+            ],
+            'SMTPUser' => [
+                'label' => lang('backend/settings.labels.SMTPUser'),
+                'rules' => ['permit_empty', 'max_length[255]'],
+            ],
+            'SMTPPass' => [
+                'label' => lang('backend/settings.labels.SMTPPass'),
+                'rules' => ['permit_empty', 'max_length[255]'],
+            ],
+            'SMTPAuthMethod' => [
+                'label' => lang('backend/settings.labels.SMTPAuthMethod'),
+                'rules' => ['required_if_field[protocol,smtp]', 'permit_empty', 'in_list[LOGIN,PLAIN]'],
+            ],
+            'mailType' => [
+                'label' => lang('backend/settings.labels.mailType'),
+                'rules' => ['required', 'in_list[html,text]'],
+            ],
+            'charset' => [
+                'label' => lang('backend/settings.labels.charset'),
+                'rules' => ['required', 'max_length[30]'],
+            ],
+            'priority' => [
+                'label' => lang('backend/settings.labels.priority'),
+                'rules' => ['required', 'in_list[1,3,5]'],
+            ],
+        ];
+    }
+
     /**
      * Recupera le impostazioni combinando il Database con i valori di default dei file Config.
      * Sfrutta una variabile interna come cache al volo per la singola richiesta HTTP.
@@ -237,6 +323,21 @@ class SettingsModel extends BackendModel
     }
 
     /**
+     * Verifica se esistono già record salvati nel database per il namespace specificato.
+     *
+     * @param string $namespace Es. 'Backend\Auth'
+     * @return bool
+     */
+    public function hasDatabaseSettings(string $namespace): bool
+    {
+        $sql = "SELECT COUNT(*) as total FROM `settings` WHERE `class` = ?";
+        $query = $this->db->query($sql, [$namespace]);
+        $row = $query->getRowArray();
+
+        return isset($row['total']) && (int) $row['total'] > 0;
+    }
+
+    /**
      * Salva o aggiorna le impostazioni nel database e svuota la cache in-memory del gruppo.
      */
     public function saveSettings(string $namespace, array $posts): ?array
@@ -249,9 +350,15 @@ class SettingsModel extends BackendModel
         /* 2. Filtriamo immediatamente l'input lasciando solo i campi autorizzati */
         $posts = $this->checkAllowedFields($posts, $allowedFields);
 
-        /* 3. Controllo di sbarramento: se non è cambiato nulla, interrompiamo subito */
-        if ( ! $this->hasSettingsChanged($namespace, $posts)) :
-            return ['result' => false, 'message' => lang('backend/settings.messages.noDataChanged')];
+        /* 
+           3. Controllo di sbarramento: 
+              Se esistono già record a DB, controlliamo se è cambiato qualcosa.
+              Se NON esistono record a DB, saltiamo il controllo ed eseguiamo l'insert.
+        */
+        if ($this->hasDatabaseSettings($namespace)) :
+            if ( ! $this->hasSettingsChanged($namespace, $posts)) :
+                return ['result' => false, 'message' => lang('backend/settings.messages.noDataChanged')];
+            endif;
         endif;
 
         /* 4. Svuota la cache locale poiché i dati stanno per cambiare */
@@ -284,17 +391,28 @@ class SettingsModel extends BackendModel
 
     /**
      * Rimuove tutti i settaggi del rispettivo namespace e ne svuota la cache in-memory.
+     * Ritorna true se i record sono stati eliminati, false se non era presente nulla a DB.
+     *
+     * @param string $namespace Es. 'Backend\Auth'
+     * @return bool
      */
-    public function deleteSettings(string $namespace): void
+    public function deleteSettings(string $namespace): bool
     {
+        /* Verifica preliminare se ci sono effettivamente dati da cancellare */
+        if ( ! $this->hasDatabaseSettings($namespace)) :
+            return false;
+        endif;
+
         /* Svuota la cache locale in memoria per questo namespace */
         if (isset($this->settingsCache[$namespace])) :
             unset($this->settingsCache[$namespace]);
         endif;
 
         /* Esegue l'eliminazione globale del namespace */
-        $sql = "DELETE FROM `settings` WHERE `class` = ?";
+        $sql = "delete from `settings` where `class` = ?";
         $this->db->query($sql, [$namespace]);
+
+        return true;
     }
 
     /* 

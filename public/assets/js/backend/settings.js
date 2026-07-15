@@ -6,9 +6,10 @@ import { SettingsManager } from './components/Settings.js';
 
 const actions = {
     index: function() {
+        /* Istanziamo il manager UNA SOLA VOLTA globalmente per tutti i pannelli */
+        const manager = new SettingsManager('backend/settings/openSettings', 'backend/settings/saveSettings', 'backend/settings/deleteSettings');
 
-        /* --- GESTIONE FLUIDA E PARAMETRIZZATA DEI PANNELLI --- */
-        /* Selezioniamo tutti i pulsanti della testata dell'accordion che recano l'attributo data-env */
+        /* Gestione dell'apertura visiva e del caricamento dinamico dei pannelli */
         const triggerButtons = document.querySelectorAll('.accordion-header button[data-env]');
 
         triggerButtons.forEach(btn => {
@@ -16,8 +17,6 @@ const actions = {
             const mainCollapse = document.getElementById(`main_collapse_${env}`);
 
             if (mainCollapse) {
-                /* Istanzia il manager passando le nuove rotte comuni e l'ID del form (es. auth-settings) */
-                const manager = new SettingsManager('backend/settings/openSettings', 'backend/settings/saveSettings', 'backend/settings/deleteSettings', `${env}-settings`);
                 const bsCollapse = new bootstrap.Collapse(mainCollapse, { toggle: false });
 
                 btn.addEventListener('click', async (e) => {
@@ -34,13 +33,12 @@ const actions = {
                         return;
                     }
 
-                    /* Passiamo il valore env nel corpo della richiesta modificando leggermente il loadPanel nel file manager */
+                    /* Chiamiamo il metodo del manager globale */
                     const success = await manager.loadPanel(`${env}-settings-container`, env);
                     if (success === false) return;
 
                     btn.disabled = false;
                     btn.classList.remove('disabled');
-
                     bsCollapse.show();
                 });
 
@@ -54,7 +52,6 @@ const actions = {
     }
 };
 
-/* Esecuzione dell'azione corrente in base al contesto del controller */
 if (actions[action]) {
     actions[action]();
 } else {

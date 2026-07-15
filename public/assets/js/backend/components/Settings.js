@@ -2,50 +2,49 @@
 import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace, handleValidationErrors, initTomSelects } from '../backend.js';
 
 export class SettingsManager {
-    constructor(loadRoute, saveRoute, deleteRoute, formId) {
+    constructor(loadRoute, saveRoute, deleteRoute) {
         this.loadUrl = urlbase + loadRoute;
         this.saveUrl = urlbase + saveRoute;
         this.deleteUrl = urlbase + deleteRoute;
-        this.formId = formId;
         this.isSubmitting = false;
 
         this.init();
     }
 
     init() {
-        this.bindDynamicEvents();
+        this.bindGlobalEvents();
     }
 
-    bindDynamicEvents() {
+    bindGlobalEvents() {
+        /* Registriamo i listener sul document UNA SOLA VOLTA globalmente */
 
-        /* 1. Intercettiamo il submit del form associato */
+        /* 1. Gestione Submit Form */
         document.addEventListener('submit', e => {
-            if (e.target && e.target.id === this.formId) {
-                /* Estraiamo l'ambiente (auth o upload) direttamente dall'ID del form */
+            if (e.target && e.target.id.endsWith('-settings')) {
                 const env = e.target.id.replace('-settings', '');
                 this.save(e, e.target, env);
             }
         });
 
-        /* 2. Intercettiamo il click sul pulsante ripristino (refresh) */
+        /* 2. Gestione Click Pulsanti (Refresh e Delete) */
         document.addEventListener('click', e => {
+            /* Verifica pulsante Refresh */
             const refreshBtn = e.target.closest('[class*="btn-refresh-"]');
             if (refreshBtn) {
                 const form = refreshBtn.closest('form');
-                if (form && form.id === this.formId) {
+                if (form) {
                     e.preventDefault();
                     const env = form.id.replace('-settings', '');
                     this.refresh(refreshBtn, env);
                 }
+                return;
             }
-        });
 
-        /* 3. Intercettiamo il click sul pulsante ripristino valori predefiniti (delete/restore) */
-        document.addEventListener('click', e => {
+            /* Verifica pulsante Delete/Restore */
             const deleteBtn = e.target.closest('[class*="btn-delete-"]');
             if (deleteBtn) {
                 const form = deleteBtn.closest('form');
-                if (form && form.id === this.formId) {
+                if (form) {
                     e.preventDefault();
                     const env = form.id.replace('-settings', '');
                     this.deleteSettings(deleteBtn, env);
@@ -54,7 +53,7 @@ export class SettingsManager {
         });
     }
 
-    /* Carica lo scheletro iniziale (Chiamata alla rotta open dedicata) */
+    /* Carica lo scheletro iniziale */
     async loadPanel(containerId, env) {
         const container = document.getElementById(containerId);
         if ( ! container) return false;
@@ -89,7 +88,7 @@ export class SettingsManager {
         }
     }
 
-    /* Salva i dati usando la rotta save dedicata */
+    /* Salva i dati */
     async save(e, form, env) {
         e.preventDefault();
 
@@ -100,7 +99,6 @@ export class SettingsManager {
         formData.append('env', env);
 
         const container = form.closest('.accordion-body');
-
         form.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
 
         try {
@@ -134,7 +132,7 @@ export class SettingsManager {
         }
     }
 
-    /* Esegue il refresh richiamando la rotta open pulita */
+    /* Esegue il refresh */
     async refresh(btnEl, env) {
         if (this.isSubmitting) return;
 
@@ -167,7 +165,7 @@ export class SettingsManager {
         }
     }
 
-    /* Elimina le personalizzazioni a DB e ripristina i default dei file */
+    /* Elimina le personalizzazioni a DB */
     async deleteSettings(btnEl, env) {
         if (this.isSubmitting) return;
 
@@ -191,8 +189,6 @@ export class SettingsManager {
 
             if (data.result === true) {
                 if (data.message && typeof showAlert === 'function') showAlert('success', data.message);
-                
-                /* Dopo la cancellazione con successo, ricarichiamo il pannello per mostrare i fallback */
                 await this.loadPanel(container.id, env);
             } else {
                 if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);

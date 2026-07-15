@@ -5,8 +5,8 @@ import { urlbase, controller, action, smoothReplace } from './backend.js';
 import { EditManager, GetPermissionsManager, GetTokensManager, DeleteTokenManager, ResetPasswordManager, SecurityManager } from './components/Account.js';
 
 /* Import componenti immagini */
-import { UploadPreviewImgManager } from './components/UploadPreviewImgManager.js';
-import { GalleryOneImgManager } from './components/GalleryOneImgManager.js';
+import { UploadPreviewImgManager } from './components/UploadPreview.js';
+import { GalleryOneImgManager } from './components/GalleryOne.js';
 
 const actions = {
     edit: function() {

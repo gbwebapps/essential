@@ -8,13 +8,16 @@
                 
                 <div class="accordion" id="mainSettingsDashboard">
 
-                    <?php foreach(['auth', 'upload'] as $env): ?>
+                    <?php foreach(['auth', 'upload', 'email'] as $env): ?>
 
                         <div class="accordion-item mb-3 border">
                             <h2 class="accordion-header" id="main_heading_<?= $env; ?>">
                                 <button class="accordion-button collapsed shadow-none bg-light text-secondary py-3 btn-trigger-<?= $env; ?>-settings" data-env="<?= $env; ?>" type="button" aria-expanded="false" aria-controls="main_collapse_<?= $env; ?>">
                                     <h2 class="card-title mb-0 fs-5">
-                                        <i class="fa-solid <?= $env === 'auth' ? 'fa-shield-halved' : 'fa-upload'; ?> me-2"></i><?= lang('backend/settings.panels.' . $env . 'Setting'); ?>
+
+                                        <?php if($env === 'auth'): $icon = 'fa-shield-halved'; elseif($env === 'upload'): $icon = 'fa-upload'; elseif($env === 'email'): $icon = 'fa-envelope'; endif; ?>
+
+                                        <i class="fa-solid <?= $icon; ?> me-2"></i><?= lang('backend/settings.panels.' . $env . 'Setting'); ?>
                                     </h2>
                                 </button>
                             </h2>

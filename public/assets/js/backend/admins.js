@@ -5,8 +5,8 @@ import { urlbase, controller, action, smoothReplace } from './backend.js';
 import { ListManager, AddManager, EditManager, DeleteManager, ChangeStatusManager, GeneralDataManager, MetaDataManager } from './components/Crud.js';
 import { ChangeGroupManager, GetPermissionsManager, ChangePermissionManager, GetTokensManager, DeleteTokenManager, ResetPasswordManager } from './components/Admins.js';
 
-import { UploadPreviewImgManager } from './components/UploadPreviewImgManager.js';
-import { GalleryOneImgManager } from './components/GalleryOneImgManager.js';
+import { UploadPreviewImgManager } from './components/UploadPreview.js';
+import { GalleryOneImgManager } from './components/GalleryOne.js';
 
 const actions = {
     index: function(){},

@@ -2,8 +2,6 @@
 
 namespace App\Validation\Backend;
 
-use App\Models\Backend\AdminsModel;
-
 /**
  * Class AdminsRules
  *
