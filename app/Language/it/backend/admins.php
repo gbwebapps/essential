@@ -62,7 +62,11 @@ return [
         'activation' => 'Attivazione',
         'rememberMe' => 'Ricordami', 
         'assignedToGroup' => 'Assegnato al GRUPPO', 
-        'notAssignedToGroup' => 'Non assegnato al GRUPPO'
+        'notAssignedToGroup' => 'Non assegnato al GRUPPO', 
+        'username' => 'Username', 
+        'action' => 'Azione', 
+        'section' => 'Sezione', 
+        'details' => 'Operazione'
 	],
 	'placeholders' => [
 		'firstname' => 'Inserisci nome...', 
@@ -73,7 +77,11 @@ return [
 		'searchFirstname' => 'Cerca per nome...', 
 		'searchLastname' => 'Cerca per cognome...', 
 		'searchEmail' => 'Cerca per email...', 
-		'searchPhone' => 'Cerca per telefono...'
+		'searchPhone' => 'Cerca per telefono...', 
+		'searchUsername' => 'Cerca per username...', 
+		'searchAction' => 'Cerca per azione...', 
+		'searchSection' => 'Cerca per sezione...', 
+		'searchDetails' => 'Cerca per operazione...', 
 	], 
 	'actions' => [
 		'show' => 'Dettaglio', 

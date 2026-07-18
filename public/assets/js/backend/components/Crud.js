@@ -11,8 +11,9 @@ export class ListManager {
         this.config = Object.assign({
             controller: '',
             url: '',
-            searchFields: [],
-            containerId: ''
+            containerId: '', 
+            searchFields: [], 
+            searchDates: []
         }, config);
 
         this.hooks = Object.assign({
@@ -26,7 +27,9 @@ export class ListManager {
             order: localStorage.getItem(`${this.config.controller}_order`) || 'asc',
             page: localStorage.getItem(`${this.config.controller}_page`) || 1,
             rows: localStorage.getItem(`${this.config.controller}_rows`) || 5,
-            searchFields: {}
+
+            searchFields: {},
+            searchDates: {}
         };
 
         this.debounceTimer = null;
@@ -50,13 +53,29 @@ export class ListManager {
 
     /* --- INIZIALIZZAZIONE --- */
     initFilters() {
-        this.config.searchFields.forEach(field => {
-            const key = `${this.config.controller}_${field}`;
-            const value = localStorage.getItem(key) || '';
-            this.state.searchFields[field] = value;
 
-            /* L'HTML usa id come "admins-firstname" */
-            const inputEl = document.getElementById(`${this.config.controller}-${field}`);
+        /* Unifichiamo i campi per iterare sulla UI all'avvio */
+        const allFields = [];
+
+        /* I campi testo rimangono standard */
+        this.config.searchFields.forEach(f => {
+            allFields.push({ name: f, type: 'searchFields', isDate: false });
+        });
+
+        /* Per ogni colonna data, generiamo automaticamente le due varianti from e to */
+        this.config.searchDates.forEach(f => {
+            allFields.push({ name: `${f}-from`, type: 'searchDates', isDate: true });
+            allFields.push({ name: `${f}-to`, type: 'searchDates', isDate: true });
+        });
+
+        allFields.forEach(field => {
+            const key = `${this.config.controller}_${field.name}`;
+            const value = localStorage.getItem(key) || '';
+            
+            /* Salva il valore nell'oggetto di stato corretto */
+            this.state[field.type][field.name] = value;
+
+            const inputEl = document.getElementById(`${this.config.controller}-${field.name}`);
             if (inputEl) {
                 inputEl.value = value;
                 if (value !== '') {
@@ -139,59 +158,73 @@ export class ListManager {
             this.showAll();
         });
 
-        /* Input Ricerca */
-        this.config.searchFields.forEach(field => {
-            const inputEl = document.getElementById(`${this.config.controller}-${field}`);
+        /* Input Ricerca (Generazione dinamica dei canali per testo e date) */
+        const allFields = [];
+
+        this.config.searchFields.forEach(f => {
+            allFields.push({ name: f, type: 'searchFields', isDate: false });
+        });
+
+        this.config.searchDates.forEach(f => {
+            allFields.push({ name: `${f}-from`, type: 'searchDates', isDate: true });
+            allFields.push({ name: `${f}-to`, type: 'searchDates', isDate: true });
+        });
+
+        allFields.forEach(field => {
+            const inputEl = document.getElementById(`${this.config.controller}-${field.name}`);
             if ( ! inputEl) return;
 
-            /* Digitando nell'input */
-            inputEl.addEventListener('input', (e) => {
-
+            const handleSearchUpdate = (useDebounce) => {
                 const value = inputEl.value;
-                localStorage.setItem(`${this.config.controller}_${field}`, value);
-                this.state.searchFields[field] = value;
+                localStorage.setItem(`${this.config.controller}_${field.name}`, value);
+                this.state[field.type][field.name] = value;
 
                 const resetBtn = inputEl.closest('.input-group')?.querySelector('.reset-search-field');
                 if (resetBtn) resetBtn.style.display = value ? 'flex' : 'none';
 
-                /* Se il campo è stato svuotato manualmente, pulisci l'errore associato */
                 this.updateActiveSearchIndicator();
 
-                clearTimeout(this.debounceTimer);
-                this.debounceTimer = setTimeout(() => {
-
-                    /* Spostato nel timer: pulisce l'errore in concomitanza col reload */
+                const triggerSearch = () => {
                     if ( ! value) {
-                        const errorDiv = document.querySelector(`.error_${field}`);
+                        const errorDiv = document.querySelector(`.error_${this.config.controller}-${field.name}`);
                         if (errorDiv) errorDiv.innerHTML = '&nbsp;';
                     }
-                    
                     this.resetSortingAndPagination();
                     this.showAll();
-                }, 500);
-            });
+                };
 
-            /* Click sulla "X" per svuotare il singolo campo */
+                if (useDebounce) {
+                    clearTimeout(this.debounceTimer);
+                    this.debounceTimer = setTimeout(triggerSearch, 500);
+                } else {
+                    triggerSearch();
+                }
+            };
+
+            if (field.isDate) {
+                inputEl.addEventListener('change', () => handleSearchUpdate(false));
+            } else {
+                inputEl.addEventListener('input', () => handleSearchUpdate(true));
+            }
+
             const resetBtn = inputEl.closest('.input-group')?.querySelector('.reset-search-field');
             if (resetBtn) {
-                resetBtn.addEventListener('click', () => {
-                    inputEl.value = '';
-                    localStorage.setItem(`${this.config.controller}_${field}`, '');
-                    
-                    this.state.searchFields[field] = '';
-                    resetBtn.style.display = 'none';
-                                        
-                    /* Pulisci l'errore associato a questo campo */
-                    const errorDiv = document.querySelector(`.error_${field}`);
-                    if (errorDiv) errorDiv.innerHTML = '&nbsp;';
+                resetBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
 
-                    this.updateActiveSearchIndicator();
-                    this.resetSortingAndPagination();
-                    this.showAll();
+                    const fp = inputEl._flatpickr || inputEl.closest('.input-group')?._flatpickr;
+
+                    if (fp) {
+                        fp.clear();
+                    } else {
+                        inputEl.value = '';
+                        handleSearchUpdate(false);
+                    }
                 });
             }
         });
-    }
+    } 
 
     /* --- METODI OPERATIVI --- */
     updateState(key, value) {
@@ -200,20 +233,38 @@ export class ListManager {
     }
 
     resetFilters() {
-        this.config.searchFields.forEach(field => {
-            const inputEl = document.getElementById(`${this.config.controller}-${field}`);
+        const allFields = [];
+
+        this.config.searchFields.forEach(f => {
+            allFields.push({ name: f, type: 'searchFields' });
+        });
+
+        this.config.searchDates.forEach(f => {
+            allFields.push({ name: `${f}-from`, type: 'searchDates' });
+            allFields.push({ name: `${f}-to`, type: 'searchDates' });
+        });
+
+        allFields.forEach(field => {
+            const inputEl = document.getElementById(`${this.config.controller}-${field.name}`);
             if (inputEl) {
-                inputEl.value = '';
-                const resetBtn = inputEl.closest('.input-group')?.querySelector('.reset-search-field');
-                if (resetBtn) resetBtn.style.display = 'none';
+                const fp = inputEl._flatpickr || inputEl.closest('.input-group')?._flatpickr;
+
+                if (fp) {
+                    fp.clear();
+                } else {
+                    inputEl.value = '';
+                    const resetBtn = inputEl.closest('.input-group')?.querySelector('.reset-search-field');
+                    if (resetBtn) resetBtn.style.display = 'none';
+                }
             }
-            localStorage.setItem(`${this.config.controller}_${field}`, '');
-            this.state.searchFields[field] = '';
             
-            /* Pulisci tutti gli errori iterando sui campi */
-            const errorDiv = document.querySelector(`.error_${field}`);
+            localStorage.setItem(`${this.config.controller}_${field.name}`, '');
+            this.state[field.type][field.name] = '';
+            
+            const errorDiv = document.querySelector(`.error_${this.config.controller}-${field.name}`);
             if (errorDiv) errorDiv.innerHTML = '&nbsp;';
         });
+        
         this.updateActiveSearchIndicator();
     }
 
@@ -227,24 +278,29 @@ export class ListManager {
         const linkSearch = document.getElementById('link-search');
         if ( ! linkSearch) return;
 
-        const hasFilters = Object.values(this.state.searchFields).some(val => val?.trim() !== '');
-        linkSearch.classList.toggle('text-danger', hasFilters);
+        const hasTextFields = Object.values(this.state.searchFields).some(val => val?.trim() !== '');
+        const hasDateFields = Object.values(this.state.searchDates).some(val => val?.trim() !== '');
+        
+        linkSearch.classList.toggle('text-danger', hasTextFields || hasDateFields);
     }
 
     /* --- COMUNICAZIONE SERVER --- */
     async showAll() {
 
-        /* NUOVO: Impedisce sovrapposizioni di chiamate */
         if (this.isLoading) return;
         this.isLoading = true;
 
         const urlParams = new URLSearchParams();
 
-        /* Costruzione dinamica parametri */
+        /* Costruzione dinamica parametri dividendo i due array strutturati */
         Object.keys(this.state).forEach(key => {
             if (key === 'searchFields') {
                 Object.entries(this.state.searchFields).forEach(([subKey, val]) => {
                     urlParams.append(`searchFields[${subKey}]`, val);
+                });
+            } else if (key === 'searchDates') {
+                Object.entries(this.state.searchDates).forEach(([subKey, val]) => {
+                    urlParams.append(`searchDates[${subKey}]`, val);
                 });
             } else {
                 urlParams.append(key, this.state[key]);

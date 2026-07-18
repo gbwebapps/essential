@@ -64,6 +64,8 @@ abstract class BackendModel extends BaseModel
 	 */
 	protected array $showAllAllowedFields = [];
 
+	protected array $showAllAllowedDates = [];
+
 	/**
 	 * Campi della tabella consentiti durante l'operazione di inserimento (Add).
 	 * 
@@ -114,8 +116,8 @@ abstract class BackendModel extends BaseModel
 	protected function initModel(): void 
 	{
 		parent::initModel();
-
-		helper('settings');
+		
+		helper('audits');
 	}
 
 	/**
@@ -128,26 +130,31 @@ abstract class BackendModel extends BaseModel
 	{
 		try
 		{
-			$posts = $this->checkAllowedFields($posts, $this->showAllAllowedFields);
-
-			$paramsFilter = [];
+			$posts = $this->checkAllowedFields($posts, array_merge($this->showAllAllowedFields, ['searchDates']));
 
 			$params = [];
+			$paramsFilter = [];
 
 			$posts['order'] = (isset($posts['order']) && $posts['order'] === 'desc') ? 'asc' : 'desc';
-
 			$posts['column'] = (isset($posts['column']) && in_array($posts['column'], $this->allowedOrderColumns)) ? $posts['column'] : $this->defaultColumn;
 
 			$sql = $this->getDataQuery;
 
 			if($this->module === 'admins'):
-			    $params[] = 1;
-			    $params[] = service('authorization')->currentAdmin()->uuid;
+				$params[] = 1;
+				$params[] = service('authorization')->currentAdmin()->uuid;
 			endif;
 
+			/* 1. Filtri di testo standard (Esistente) */
 			if ( ! empty(array_filter($posts['searchFields']))):
-			    $sql .= $this->buildFilters($posts['searchFields'], $params);
-			    $paramsFilter['searchFields'] = $posts['searchFields'];
+				$sql .= $this->buildFilters($posts['searchFields'], $params);
+				$paramsFilter['searchFields'] = $posts['searchFields'];
+			endif;
+
+			/* 2. NUOVO: Filtri per i range di date (Aggiunto) */
+			if ( ! empty(array_filter($posts['searchDates']))):
+				$sql .= $this->buildDateFilters($posts['searchDates'], $params);
+				$paramsFilter['searchDates'] = $posts['searchDates'];
 			endif;
 
 			$sql .= ' order by ' . $posts['column'] . ' ' . $posts['order'];
@@ -172,7 +179,7 @@ abstract class BackendModel extends BaseModel
 
 		} catch (\Throwable $e) {
 
-			log_message('error', lang('backend/global.messages.getDataError') . ' - ' . $e->getMessage());
+			log_message('error', lang('backend/global.messages.getDataError') . ' - ' . $e);
 			return ['result' => false, 'message' => lang('backend/global.messages.getDataError')];
 
 		}
@@ -191,15 +198,19 @@ abstract class BackendModel extends BaseModel
 		$sql = $this->getNumRowsQuery;
 
 		if($this->module === 'admins'):
-		    $params[] = 1;
-		    $params[] = service('authorization')->currentAdmin()->uuid;
+			$params[] = 1;
+			$params[] = service('authorization')->currentAdmin()->uuid;
 		endif;
 
 		if (isset($paramsFilter['searchFields']) && is_array($paramsFilter['searchFields'])):
-		    $sql .= $this->buildFilters($paramsFilter['searchFields'], $params);
+			$sql .= $this->buildFilters($paramsFilter['searchFields'], $params);
 		endif;
 
-		return (int) $this->db->query($sql, $params)->getRow()->num;
+		if (isset($paramsFilter['searchDates']) && is_array($paramsFilter['searchDates'])):
+			$sql .= $this->buildDateFilters($paramsFilter['searchDates'], $params);
+		endif;
+
+		return (int) $this->db->query($sql, $params)->getRow()->count;
 	}
 
 	/**
@@ -222,6 +233,29 @@ abstract class BackendModel extends BaseModel
 
 		return $whereClause;
 	}
+
+	private function buildDateFilters(array $searchDates, array &$params): string
+		{
+			$whereClause = '';
+
+			foreach ($this->showAllSearchAllowedDates as $dbColumn):
+				/* 1. Controllo e binding per il limite inferiore (Da / >=) */
+				$fromKey = $dbColumn . '-from';
+				if (isset($searchDates[$fromKey]) && trim($searchDates[$fromKey]) !== ''):
+					$whereClause .= " and " . $dbColumn . " >= ?";
+					$params[] = $searchDates[$fromKey];
+				endif;
+
+				/* 2. Controllo e binding per il limite superiore (A / <=) */
+				$toKey = $dbColumn . '-to';
+				if (isset($searchDates[$toKey]) && trim($searchDates[$toKey]) !== ''):
+					$whereClause .= " and " . $dbColumn . " <= ?";
+					$params[] = $searchDates[$toKey];
+				endif;
+			endforeach;
+
+			return $whereClause;
+		}
 
 	/**
 	 * Recupera un singolo record specifico estraendolo tramite il valore UUID.

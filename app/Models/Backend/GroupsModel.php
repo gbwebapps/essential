@@ -77,10 +77,10 @@ class GroupsModel extends BackendModel
 	 *
 	 * @return void
 	 */
-	// protected function initModel(): void 
-	// {
-	// 	parent::initModel();
-	// }
+	protected function initModel(): void 
+	{
+		parent::initModel();
+	}
 
 	/**
 	 * Stabilisce i criteri di validazione per la registrazione iniziale di un nuovo gruppo.
@@ -381,6 +381,8 @@ class GroupsModel extends BackendModel
 
             $this->db->transCommit();
 
+            log_admin_activity('ADD_GROUP', 'groups', 'Aggiunta gruppo.');
+
             return ['result' => true, 'message' => lang('backend/groups.messages.addSuccess')];
         } 
         catch (\Throwable $e) 
@@ -454,6 +456,8 @@ class GroupsModel extends BackendModel
 
             $this->db->transCommit();
 
+            log_admin_activity('EDIT_GROUP', 'groups', 'Aggiornamento gruppo.');
+
             return ['result' => true, 'message' => lang('backend/groups.messages.editSuccess')];
         } 
         catch (\Throwable $e) 
@@ -486,6 +490,8 @@ class GroupsModel extends BackendModel
             endif;
 
             $this->db->transCommit();
+
+            log_admin_activity('DELETE_GROUP', 'groups', 'Eliminazione gruppo.');
 
             return ['result' => true, 'message' => lang('backend/groups.messages.delSuccess')];
 
@@ -686,6 +692,9 @@ class GroupsModel extends BackendModel
             endif;
 
             $this->db->transCommit();
+
+            log_admin_activity('SAVE_EXCEPTIONS', 'groups', 'Inserimento eccezione.');
+
             return ['result' => true, 'message' => lang('backend/groups.messages.saveExceptionsSuccess')];
 
         } catch (\Throwable $e) {

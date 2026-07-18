@@ -386,6 +386,8 @@ class SettingsModel extends BackendModel
 
         $this->db->query($sql, $params);
 
+        log_admin_activity('SAVE_SETTINGS', 'settings', 'Salvataggio impostazioni.');
+
         return ['result' => true, 'message' => lang('backend/settings.messages.saveSuccess')];
     }
 
@@ -411,6 +413,8 @@ class SettingsModel extends BackendModel
         /* Esegue l'eliminazione globale del namespace */
         $sql = "delete from `settings` where `class` = ?";
         $this->db->query($sql, [$namespace]);
+
+        log_admin_activity('DELETE_SETTINGS', 'settings', 'Eliminazione impostazioni.');
 
         return true;
     }

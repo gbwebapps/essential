@@ -97,16 +97,24 @@
                                             </td>
 
                                             <!-- Cella firstname -->
-                                            <td class="align-middle"><b><?= esc($admin->firstname); ?></b></td>
+                                            <td class="align-middle">
+                                                <span class="fw-bold"><?= esc($admin->firstname); ?></span>
+                                            </td>
 
                                             <!-- Cella lastname -->
-                                            <td class="align-middle"><b><?= esc($admin->lastname); ?></b></td>
+                                            <td class="align-middle">
+                                                <span class="fw-bold"><?= esc($admin->lastname); ?></span>
+                                            </td>
 
                                             <!-- Cella email -->
-                                            <td class="align-middle"><b><?= esc($admin->email); ?></b></td>
+                                            <td class="align-middle">
+                                                <span class="fw-bold"><?= esc($admin->email); ?></span>
+                                            </td>
 
                                             <!-- Cella phone -->
-                                            <td class="align-middle"><b><?= esc($admin->phone); ?></b></td>
+                                            <td class="align-middle">
+                                                <span class="fw-bold"><?= esc($admin->phone); ?></span>
+                                            </td>
 
                                             <!-- Cella status -->
                                             <td class="align-middle text-center">
@@ -182,27 +190,27 @@
 
                                         <!-- Riga inferiore -->
                                         <tr>
-                                            <td colspan="7" class="align-middle">
+                                            <td colspan="7" class="align-middle small">
 
                                                 <!-- Parte creato -->
-                                                <small><?= lang('backend/admins.labels.createdAt'); ?> <span class="fw-bold"><?= convertDate(esc($admin->created_at)); ?></span></small>
+                                                <?= lang('backend/admins.labels.createdAt'); ?> <span class="fw-bold"><?= convertDate(esc($admin->created_at)); ?></span>
 
                                                 <!-- Parte aggiornato -->
                                                 <?php if( ! is_null($admin->updated_at)): ?>
                                                     &nbsp;&bull;&nbsp;
-                                                    <small><?= lang('backend/admins.labels.updatedAt'); ?> <span class="fw-bold"><?= convertDate(esc($admin->updated_at)); ?></span></small>
+                                                    <?= lang('backend/admins.labels.updatedAt'); ?> <span class="fw-bold"><?= convertDate(esc($admin->updated_at)); ?></span>
                                                 <?php endif; ?>
 
                                                 <!-- Parte sospeso -->
                                                 <?php if( ! is_null($admin->suspended_at)): ?>
                                                     &nbsp;&bull;&nbsp;
-                                                    <small><?= lang('backend/admins.labels.suspendedAt'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->suspended_at)); ?></span></small>
+                                                    <?= lang('backend/admins.labels.suspendedAt'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->suspended_at)); ?></span>
                                                 <?php endif; ?>
 
                                                 <!-- Parte resettato -->
                                                 <?php if( ! is_null($admin->resetted_at)): ?>
                                                     &nbsp;&bull;&nbsp;
-                                                    <small><?= lang('backend/admins.labels.resettedAt'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->resetted_at)); ?></span></small>
+                                                    <?= lang('backend/admins.labels.resettedAt'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->resetted_at)); ?></span>
                                                 <?php endif; ?>
 
                                             </td>

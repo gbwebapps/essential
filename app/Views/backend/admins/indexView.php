@@ -1,6 +1,6 @@
-<?= $this->extend('backend/template/mainView') ?>
+<?= $this->extend('backend/template/mainView'); ?>
 
-<?= $this->section('content') ?>
+<?= $this->section('content'); ?>
 
     <div class="row">
         <div class="col-12">
@@ -10,4 +10,4 @@
         </div>
     </div>
     
-<?= $this->endSection() ?>
+<?= $this->endSection(); ?>

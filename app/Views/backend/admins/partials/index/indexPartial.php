@@ -1,1 +1,1 @@
-indexView.php
+<p>Data</p>

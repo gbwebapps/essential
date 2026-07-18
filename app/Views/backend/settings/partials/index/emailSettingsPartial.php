@@ -135,9 +135,9 @@
                     <div class="col-md-4 mb-3">
                         <label for="email_priority" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.priority'); ?></label>
                         <select id="email_priority" name="priority" class="form-select shadow-none">
-                            <option value="1" <?= $emailSettings['priority'] == 1 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.priority1'); ?></option>
-                            <option value="3" <?= $emailSettings['priority'] == 3 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.priority3'); ?></option>
-                            <option value="5" <?= $emailSettings['priority'] == 5 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.priority5'); ?></option>
+                            <option value="1" <?= (int) $emailSettings['priority'] === 1 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.priority1'); ?></option>
+                            <option value="3" <?= (int) $emailSettings['priority'] === 3 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.priority3'); ?></option>
+                            <option value="5" <?= (int) $emailSettings['priority'] === 5 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.priority5'); ?></option>
                         </select>
                         <div class="error_priority text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>

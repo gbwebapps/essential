@@ -29,6 +29,18 @@ const assetsToCopy = [
         from: 'node_modules/tom-select/dist/js/tom-select.complete.min.js',
         to: 'public/assets/vendor/tom-select/js/tom-select.complete.min.js'
     },
+    {
+        from: 'node_modules/flatpickr/dist/flatpickr.min.js',
+        to: 'public/assets/vendor/flatpickr/js/flatpickr.min.js'
+    },
+    {
+        from: 'node_modules/flatpickr/dist/l10n/it.js',
+        to: 'public/assets/vendor/flatpickr/js/it.js'
+    },
+    {
+        from: 'node_modules/flatpickr/dist/flatpickr.min.css',
+        to: 'public/assets/vendor/flatpickr/css/flatpickr.min.css'
+    },
 ];
 
 assetsToCopy.forEach(asset => {

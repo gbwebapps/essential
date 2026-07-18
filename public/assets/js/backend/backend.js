@@ -375,3 +375,62 @@ export function initTomSelects() {
         });
     });
 }
+
+/**
+ * Inizializza un singolo campo data/ora senza vincoli di intervallo
+ * @param {string} containerSelector - Il selettore del contenitore (es. '.input-group' o '#id-parent')
+ */
+export function initSingleDatePicker(containerSelector) {
+    if (typeof flatpickr === 'undefined') return;
+
+    return flatpickr(containerSelector, {
+        locale: flatpickr.l10ns.it,
+        enableTime: true,
+        time_24hr: true,
+        dateFormat: "Y-m-d H:i",
+        altInput: true,
+        altFormat: "d/m/Y H:i",
+        allowInput: true,
+        wrap: true
+    });
+}
+
+/**
+ * Inizializza una coppia di campi data/ora relazionati tra loro (Range)
+ * @param {string} fromContainerSelector - Il selettore del contenitore "Da"
+ * @param {string} toContainerSelector - Il selettore del contenitore "A"
+ */
+export function initRangeDatePicker(fromContainerSelector, toContainerSelector) {
+    if (typeof flatpickr === 'undefined') return { pickerFrom: null, pickerTo: null };
+
+    const baseConfig = {
+        locale: flatpickr.l10ns.it,
+        enableTime: true,
+        time_24hr: true,
+        dateFormat: "Y-m-d H:i",
+        altInput: true,
+        altFormat: "d/m/Y H:i",
+        allowInput: true,
+        wrap: true
+    };
+
+    const pickerFrom = flatpickr(fromContainerSelector, {
+        ...baseConfig,
+        onChange: function(selectedDates, dateStr, instance) {
+            if (pickerTo) pickerTo.set("minDate", dateStr);
+            const input = instance.element.querySelector('input') || instance.element;
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    });
+
+    const pickerTo = flatpickr(toContainerSelector, {
+        ...baseConfig,
+        onChange: function(selectedDates, dateStr, instance) {
+            if (pickerFrom) pickerFrom.set("maxDate", dateStr);
+            const input = instance.element.querySelector('input') || instance.element;
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    });
+
+    return { pickerFrom, pickerTo };
+}

@@ -4,38 +4,14 @@ namespace App\Models\Backend;
 
 use App\Models\Backend\BackendModel;
 
-/**
- * Modello di gestione e persistenza delle anagrafiche e dei privilegi degli amministratori.
- *
- * Questa classe estende le funzionalità base del backend model per governare il ciclo di vita completo
- * (CRUD) degli utenti amministrativi. Gestisce la mappatura dei campi autorizzati per ogni singola
- * operazione, isola i criteri di ricerca e ordinamento per le visualizzazioni tabellari, orchestra
- * le sotto-query per il recupero degli asset polimorfi (immagini e documenti) e centralizza le query
- * native per l'estrazione dei record al netto delle eccezioni di sicurezza.
- */
 class AdminsModel extends BackendModel
 {
-    /**
-     * Identificativo testuale del modulo associato per la gestione dei permessi e delle rotte.
-     *
-     * @var string|null
-     */
     protected ?string $module = 'admins';
 
     protected ?string $entity = 'admins';
 
-    /**
-     * Colonna di ordinamento predefinita utilizzata nelle query di estrazione se non specificata.
-     *
-     * @var string|null
-     */
     protected ?string $defaultColumn = 'created_at';
 
-    /**
-     * Elenco dei parametri di input autorizzati per il filtraggio e l'impaginazione della vista tabellare globale.
-     *
-     * @var array
-     */
     protected array $showAllAllowedFields = ['column', 'order', 'page', 'rows', 'searchFields'];
 
     /**
@@ -148,7 +124,7 @@ class AdminsModel extends BackendModel
      *
      * @var string|null
      */
-    protected ?string $getNumRowsQuery = 'select count(*) as num from admins where master <> ? and uuid <> ?';
+    protected ?string $getNumRowsQuery = 'select count(*) as count from admins where master <> ? and uuid <> ?';
 
     /**
      * Inizializza il modello eseguendo le configurazioni di base ereditate dalla classe madre.
@@ -487,13 +463,6 @@ class AdminsModel extends BackendModel
         ];
     }
 
-    /**
-     * Valida i requisiti per l'estrazione dei metadati di tracciamento e storicizzazione.
-     *
-     * Fornisce i criteri per isolare i record di audit log basandosi sull'identificativo univoco dell'amministratore.
-     *
-     * @return array Criteri per il recupero dei metadati.
-     */
     public function metaDataValidationRules(): array
     {
         return [
@@ -643,15 +612,6 @@ class AdminsModel extends BackendModel
         return $this->db->query($sql, [$uuid])->getResult();
     }
 
-    /**
-     * Estrae il registro cronologico dei tentativi di autenticazione falliti legati all'anagrafica.
-     *
-     * Raccoglie i metadati di audit relativi agli errori di login standard, utili alla diagnostica di sicurezza
-     * e al calcolo dei blocchi temporanei per la mitigazione degli attacchi Brute Force.
-     *
-     * @param string $uuid Identificativo univoco dell'amministratore.
-     * @return array Storico dei record di errore memorizzati per l'accesso base.
-     */
     public function getAttempts(string $uuid): array
     {
         /* Estrazione log dei tentativi di accesso standard */
@@ -659,15 +619,6 @@ class AdminsModel extends BackendModel
         return $this->db->query($sql, [$uuid])->getResult();
     }
 
-    /**
-     * Recupera il registro cronologico dei tentativi falliti durante la fase di verifica del secondo fattore (2FA).
-     *
-     * Isola i record di audit specifici per gli errori nell'inserimento dei codici OTP o delle chiavi di sicurezza,
-     * garantendo il monitoraggio separato rispetto alla pipeline di autenticazione primaria.
-     *
-     * @param string $uuid Identificativo univoco dell'amministratore.
-     * @return array Storico dei record di errore memorizzati per il secondo fattore.
-     */
     public function getTwoFaAttempts(string $uuid): array
     {
         /* Estrazione log dei tentativi di accesso 2FA */
@@ -847,6 +798,8 @@ class AdminsModel extends BackendModel
             /* Se le query sono andate a buon fine, salvo definitivamente */
             $this->db->transCommit();
 
+            log_admin_activity('ADD_ADMIN', 'admins', 'Aggiunta admin.');
+
             /* Recupero dati utente appena inseriti */
             $data = $this->getByUUID($uuid);
 
@@ -973,6 +926,8 @@ class AdminsModel extends BackendModel
             endif;
 
             $this->db->transCommit();
+
+            log_admin_activity('EDIT_ADMIN', 'admins', 'Aggiornamento admin.');
 
             /* Aggiornamento dell'oggetto in memoria da restituire alla vista */
             $data['row']->firstname  = $posts['firstname'];
@@ -1106,6 +1061,8 @@ class AdminsModel extends BackendModel
 
             $this->db->transCommit();
 
+            log_admin_activity('DELETE_ADMIN', 'admins', 'Eliminazione admin.');
+
             \App\Libraries\ImageFileSystemService::removeAllImages('admins', $posts['uuid']);
 
             return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.delSuccess'), esc($data['row']->firstname), esc($data['row']->lastname))];
@@ -1187,6 +1144,8 @@ class AdminsModel extends BackendModel
             endif;
 
             $this->db->transCommit();
+
+            log_admin_activity('RESET_PASSWORD', 'admins', 'Reset password.');
 
         } catch (\Throwable $e) {
 
@@ -1287,6 +1246,9 @@ class AdminsModel extends BackendModel
             endif;
 
             $this->db->transCommit();
+
+            log_admin_activity('CHANGE_STATUS', 'admins', 'Aggiornamento status.');
+
             return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.changeStatusSuccess'), esc($data['row']->firstname), esc($data['row']->lastname)), 'admin' => $data['row']];
 
         } catch (\Throwable $e) {
@@ -1382,6 +1344,8 @@ class AdminsModel extends BackendModel
 
             $this->db->transCommit();
 
+            log_admin_activity('CHANGE_PERMISSION', 'admins', 'Aggiornamento permesso.');
+
             $admin->updated_at = $updatedAt;
 
             return [
@@ -1432,6 +1396,9 @@ class AdminsModel extends BackendModel
             $this->db->query($sql, [$posts['uuid'], $posts['id']]);
 
             if($this->db->affectedRows() > 0):
+
+                log_admin_activity('DELETE_TOKEN', 'admins', 'Eliminazione token.');
+
                 return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.deleteTokenSuccess'), esc($data['row']->firstname), esc($data['row']->lastname)), 'admin' => $data['row']];
             endif;
 

@@ -364,7 +364,7 @@ class AccountController extends BackendController
             endif;
 
             /* Eseguo l'aggiornamento nel Model */
-            $updated = $this->accountModel->setBasicMethod($this->currentAdmin->uuid, $method);
+            $updated = $this->accountModel->setBasicMethod($this->currentAdmin, $method);
 
             if ( ! $updated) :
                 return $this->response->setJSON(['result' => false, 'message' => lang('backend/account.messages.updateSecuritySettingsError')]);

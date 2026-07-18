@@ -5,6 +5,7 @@ return [
         'topRight' => [
             'admins' => 'Amministratori',
             'groups' => 'Gruppi',
+            'audits' => 'Registro attività', 
             'account' => 'Profilo',
             'logout' => 'Esci'
         ],

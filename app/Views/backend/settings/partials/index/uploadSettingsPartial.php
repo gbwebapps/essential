@@ -16,8 +16,8 @@
                     <div class="col-md-4 mb-3">
                         <label for="upload_renameImages" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.renameImages'); ?></label>
                         <select id="upload_renameImages" name="renameImages" class="form-select shadow-none">
-                            <option value="0" <?= $uploadSettings['renameImages'] == 0 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.disabled'); ?></option>
-                            <option value="1" <?= $uploadSettings['renameImages'] == 1 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.enabled'); ?></option>
+                            <option value="0" <?= (int) $uploadSettings['renameImages'] === 0 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.disabled'); ?></option>
+                            <option value="1" <?= (int) $uploadSettings['renameImages'] === 1 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.enabled'); ?></option>
                         </select>
                         <div class="error_renameImages text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
@@ -25,8 +25,8 @@
                     <div class="col-md-4 mb-3">
                         <label for="upload_overwriteImages" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.overwriteImages'); ?></label>
                         <select id="upload_overwriteImages" name="overwriteImages" class="form-select shadow-none">
-                            <option value="0" <?= $uploadSettings['overwriteImages'] == 0 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.disabled'); ?></option>
-                            <option value="1" <?= $uploadSettings['overwriteImages'] == 1 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.enabled'); ?></option>
+                            <option value="0" <?= (int) $uploadSettings['overwriteImages'] === 0 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.disabled'); ?></option>
+                            <option value="1" <?= (int) $uploadSettings['overwriteImages'] === 1 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.enabled'); ?></option>
                         </select>
                         <div class="error_overwriteImages text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
@@ -34,8 +34,8 @@
                     <div class="col-md-4 mb-3">
                         <label for="upload_cropCenter" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.cropCenter'); ?></label>
                         <select id="upload_cropCenter" name="cropCenter" class="form-select shadow-none">
-                            <option value="0" <?= $uploadSettings['cropCenter'] == 0 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.disabled'); ?></option>
-                            <option value="1" <?= $uploadSettings['cropCenter'] == 1 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.enabled'); ?></option>
+                            <option value="0" <?= (int) $uploadSettings['cropCenter'] === 0 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.disabled'); ?></option>
+                            <option value="1" <?= (int) $uploadSettings['cropCenter'] === 1 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.enabled'); ?></option>
                         </select>
                         <div class="error_cropCenter text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>

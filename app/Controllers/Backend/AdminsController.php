@@ -65,7 +65,7 @@ class AdminsController extends BackendController
      *
      * @return string La vista HTML iniziale dell'indice.
      */
-    public function index(): string
+    public function index(): string|ResponseInterface
     {
         $this->data['action'] = 'index';
         
@@ -89,15 +89,16 @@ class AdminsController extends BackendController
             $rules = $this->adminsModel->showAllValidationRules();
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                
                 return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/admins.messages.validationToastErrors'), $errorMessage)]);
             endif;
 
+            $posts['searchFields'] = $posts['searchFields'] ?? [];
+            $posts['searchDates']  = $posts['searchDates']  ?? [];
+
             $rules = $this->adminsModel->showAllSearchValidationRules();
             if ( ! $this->validateData($posts, $rules)):
-
                 $formattedErrors = removeDot('searchFields.', $this->validator->getErrors());
-
+                $formattedErrors = removeDot('searchDates.', $formattedErrors);
                 return $this->response->setJSON(['errors' => $formattedErrors, 'message' => lang('backend/admins.messages.validationErrors')]);
             endif;
             

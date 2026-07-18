@@ -45,6 +45,7 @@ class Menu extends BaseConfig
         $this->topRight = [
             ['label' => lang('backend/global.menu.topRight.admins'), 'route' => 'backend/admins/showAll', 'icon' => '<i class="fa-solid fa-users"></i>', 'controller' => 'admins'],
             ['label' => lang('backend/global.menu.topRight.groups'), 'route' => 'backend/groups', 'icon' => '<i class="fa-solid fa-user-shield"></i>', 'controller' => 'groups'],
+            ['label' => lang('backend/global.menu.topRight.audits'), 'route' => 'backend/audits', 'icon' => '<i class="fa-solid fa-clock-rotate-left"></i>', 'controller' => 'audits'],
             ['label' => lang('backend/global.menu.topRight.account'), 'route' => 'backend/account', 'icon' => '<i class="fa-solid fa-user-gear"></i>', 'controller' => 'account'],
             ['label' => lang('backend/global.menu.topRight.logout'), 'route' => 'backend/auth/logout', 'icon' => '<i class="fa-solid fa-right-to-bracket"></i>', 'controller' => 'auth'],
         ];

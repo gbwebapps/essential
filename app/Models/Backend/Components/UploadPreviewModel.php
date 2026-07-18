@@ -59,6 +59,8 @@ class UploadPreviewModel extends BackendModel
 		            endif;
 		        endif;
 
+		        log_admin_activity('SAVE_IMAGES', 'upload preview', 'Salvataggio immagini.');
+
 		        return ['result' => true, 'message' => lang('backend/components/uploadPreviewImg.messages.saveImagesSuccess')];
 
 		    endif;

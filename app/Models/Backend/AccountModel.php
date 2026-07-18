@@ -192,6 +192,8 @@ class AccountModel extends BackendModel
 	        /* Ricarichiamo l'istanza dell'admin aggiornata per passarla al controller */
 	        $updatedAdmin = service('authorization')->refresh()->currentAdmin();
 
+	        log_admin_activity('UPDATE_DATA', 'account', 'Aggiornamento dati generali.');
+
 	        return [
 	            'result' => true, 
 	            'message' => sprintf(lang('backend/account.messages.editSuccess'), esc($updatedAdmin->firstname), esc($updatedAdmin->lastname)), 
@@ -228,6 +230,9 @@ class AccountModel extends BackendModel
 	        $this->db->query($sql, [$currentAdmin->uuid, $posts['id']]);
 
 	        if($this->db->affectedRows() > 0):
+	        	
+	        	log_admin_activity('DELETE_TOKEN', 'account', 'Eliminazione token.');
+
 	            return ['result' => true, 'message' => sprintf(lang('backend/account.messages.deleteTokenSuccess'), esc($currentAdmin->firstname), esc($currentAdmin->lastname))];
 	        endif;
 
@@ -278,6 +283,8 @@ class AccountModel extends BackendModel
 	        endif;
 
 	        $this->db->transCommit();
+
+	        log_admin_activity('RESET_PASSWORD', 'account', 'Reset password.');
 
 	    } catch (\Throwable $e) {
 
@@ -347,22 +354,25 @@ class AccountModel extends BackendModel
 	    return $row->method;
 	}
 
-	public function setBasicMethod(string $adminUuid, string $method): bool
+	public function setBasicMethod(\stdClass $currentAdmin, string $method,): bool
     {
         try {
             $this->db->transBegin();
 
             /* Disattivo tutti i metodi esistenti per l'utente */
             $sqlDisable = "update admins_2fa set enabled = 0 where admin_uuid = ?";
-            $this->db->query($sqlDisable, [$adminUuid]);
+            $this->db->query($sqlDisable, [$currentAdmin->uuid]);
 
             /* Se il metodo è email, eseguo l'upsert per attivarlo */
             if ($method === 'email') :
                 $sqlUpsert = "insert into admins_2fa (admin_uuid, method, enabled) values (?, 'email', 1) on duplicate key update enabled = 1";
-                $this->db->query($sqlUpsert, [$adminUuid]);
+                $this->db->query($sqlUpsert, [$currentAdmin->uuid]);
             endif;
 
             $this->db->transCommit();
+
+            log_admin_activity('ACTIVATE_' . strtoupper($method), 'account', 'Impostazione metodo secondo fattore.');
+
             return true;
 
         } catch (\Throwable $e) {
@@ -433,6 +443,9 @@ class AccountModel extends BackendModel
             $this->db->query($sqlActivateTotp, [$adminUuid]);
 
             $this->db->transCommit();
+
+            log_admin_activity('ACTIVATE_TOTP', 'account', 'Attivazione metodo secondo fattore.');
+
             return true;
 
         } catch (\Throwable $e) {

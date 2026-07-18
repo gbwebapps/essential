@@ -109,6 +109,8 @@ class GalleryOneImgModel extends BackendModel
         /* Elimini il file fisico */
         ImageFileSystemService::removeSingleImage($posts['entity'], $posts['uuid'], $posts['filename']);
 
+        log_admin_activity('DELETE_IMAGE', 'gallery one', 'Eliminazione immagine.');
+
         return $this->db->affectedRows() > 0;
     }
 
@@ -137,6 +139,9 @@ class GalleryOneImgModel extends BackendModel
             endif;
 
             $this->db->transCommit();
+
+            log_admin_activity('SET_COVER', 'gallery one', 'Impostazione cover.');
+
             return true;
 
         } catch (\Exception $e) {
@@ -155,6 +160,8 @@ class GalleryOneImgModel extends BackendModel
 
         $sql = "update images set is_cover = 0 where id = ? and entity = ? and entity_uuid = ?";
         $this->db->query($sql, [(int) $posts['id'], $posts['entity'], $posts['uuid']]);
+
+        log_admin_activity('REMOVE_COVER', 'gallery one', 'Rimozione cover.');
 
         return $this->db->affectedRows() > 0;
     }

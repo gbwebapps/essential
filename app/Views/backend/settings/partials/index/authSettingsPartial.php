@@ -16,8 +16,8 @@
                     <div class="col-md-4 mb-3">
                         <label for="auth_attempts" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.attempts'); ?></label>
                         <select id="auth_attempts" name="attempts" class="form-select shadow-none">
-                            <option value="0" <?= $authSettings['attempts'] == 0 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.disabled'); ?></option>
-                            <option value="1" <?= $authSettings['attempts'] == 1 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.enabled'); ?></option>
+                            <option value="0" <?= (int) $authSettings['attempts'] === 0 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.disabled'); ?></option>
+                            <option value="1" <?= (int) $authSettings['attempts'] === 1 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.enabled'); ?></option>
                         </select>
                         <div class="error_attempts text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
@@ -48,8 +48,8 @@
                     <div class="col-md-4 mb-3">
                         <label for="auth_twoFactor" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.twoFactor'); ?></label>
                         <select id="auth_twoFactor" name="twoFactor" class="form-select shadow-none">
-                            <option value="0" <?= $authSettings['twoFactor'] == 0 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.disabled'); ?></option>
-                            <option value="1" <?= $authSettings['twoFactor'] == 1 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.enabled'); ?></option>
+                            <option value="0" <?= (int) $authSettings['twoFactor'] === 0 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.disabled'); ?></option>
+                            <option value="1" <?= (int) $authSettings['twoFactor'] === 1 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.enabled'); ?></option>
                         </select>
                         <div class="error_twoFactor text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>

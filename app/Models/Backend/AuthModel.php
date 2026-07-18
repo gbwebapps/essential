@@ -229,6 +229,8 @@ class AuthModel extends BackendModel
 
                     $this->db->transCommit();
 
+                    log_admin_activity('LOGIN_BLOCKED', 'auth', 'Tentativo di accesso rifiutato (account temporaneamente bloccato).');
+
                     return ['result' => false, 'message' => lang('backend/auth.messages.tooMAnyAttempts')];
                 endif;
             endif;
@@ -245,6 +247,9 @@ class AuthModel extends BackendModel
                 endif;
 
                 $this->db->transCommit();
+
+                log_admin_activity('LOGIN_FAILED', 'auth', 'Tentativo di accesso fallito (password errata).');
+
                 return ['result' => false, 'message' => lang('backend/auth.messages.loginFailed')];
                 
             endif;
@@ -266,6 +271,8 @@ class AuthModel extends BackendModel
                     if ($twofa->method === 'email'):
                         (new \App\Libraries\EmailOtpService())->send($admin->uuid);
                     endif;
+
+                    log_admin_activity('2FA_REQUIRED', 'auth', 'Richiesto codice di verifica 2FA (' . $twofa->method . ')');
 
                     /* Il client riceve solo la notifica del successo parziale senza dati sensibili esposti */
                     return ['result' => '2fa_required', 'method' => $twofa->method];
@@ -351,6 +358,8 @@ class AuthModel extends BackendModel
         /* Chiude la transazione aperta nel metodo principale prima di impostare gli stati del client */
         $this->db->transCommit();
 
+        log_admin_activity('LOGIN_SUCCESS', 'auth', 'Accesso effettuato con successo.');
+
         /* 5. Rigenerazione dell'ID di sessione per prevenire Session Fixation */
         session()->regenerate(true);
 
@@ -434,6 +443,8 @@ class AuthModel extends BackendModel
 
                 $this->db->transCommit();
 
+                log_admin_activity('RESET_PASSWORD', 'auth', 'Reset password.');
+
             } catch (\Throwable $e) {
                 $this->db->transRollback();
                 log_message('error', lang('backend/auth.messages.resetPasswordFailed') . ' - ' . $e);
@@ -509,6 +520,8 @@ class AuthModel extends BackendModel
                 endif;
 
                 $this->db->transCommit();
+
+                log_admin_activity('SET_PASSWORD', 'auth', 'Impostazione password password.');
 
                 $message = sprintf(lang('backend/auth.messages.setPasswordSuccess'), esc($admin->firstname), esc($admin->lastname));
 
@@ -635,6 +648,9 @@ class AuthModel extends BackendModel
                 endif;
 
                 $this->db->transCommit();
+
+                log_admin_activity('2FA_BLOCKED', 'auth', 'Blocco 2FA.');
+
                 return ['result' => false, 'message' => lang('backend/auth.messages.tooManyAttempts')];
             endif;
 
@@ -678,6 +694,8 @@ class AuthModel extends BackendModel
                 $this->db->query($sql, [$adminUuid, $method, $ip, date('Y-m-d H:i:s')]);
 
                 $this->db->transCommit();
+
+                log_admin_activity('2FA_FAILED', 'auth', 'Codice 2FA errato o scaduto.');
 
                 /* Scegliamo il messaggio specifico in base allo stato */
                 $errorMessage = $isExpired ? lang('backend/auth.messages.expiredCode') : lang('backend/auth.messages.wrongCode');

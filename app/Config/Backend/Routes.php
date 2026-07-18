@@ -112,6 +112,10 @@ $routes->group('backend', function($routes) {
             $routes->post('saveExceptions', '\App\Controllers\Backend\GroupsController::saveExceptions'); 
         });
 
+        $routes->group('audits', function($routes) {
+            $routes->match(['GET', 'POST'], '/', '\App\Controllers\Backend\AuditsController::index');
+        });
+
         /* ADMINS */
         $routes->group('admins', function($routes) {
             $routes->get('/', '\App\Controllers\Backend\AdminsController::index');

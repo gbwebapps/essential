@@ -155,8 +155,6 @@ const actions = {
 
         const deleteTokenManager = new DeleteTokenManager();
         deleteTokenManager.init();
-
-        // const galleryOneImgManager = new GalleryOneImgManager('#images_data');
     }
 };
 

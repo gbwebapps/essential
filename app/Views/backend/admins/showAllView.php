@@ -65,7 +65,7 @@
 
                     <!-- Inizio parte filtri -->
                     <div id="search-bar" class="collapse">
-                        <div class="row card-body">
+                        <div class="row card-body pb-0">
 
                             <!-- Ricerca avanzata per nome -->
                             <div class="col-md-3">
