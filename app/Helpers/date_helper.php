@@ -16,7 +16,7 @@ if (! function_exists('convertDate')):
      * @param string      $format Il formato ICU di destinazione per la localizzazione.
      * @return string La stringa della data formattata, oppure vuota/originale in caso di errore o valore nullo.
      */
-    function convertDate(?string $date, string $format = 'd MMMM yyyy HH:mm'): string
+    function convertDate(?string $date, string $format = 'd MMMM yyyy HH:mm:ss'): string
     {
         if (empty($date)):
             return '';

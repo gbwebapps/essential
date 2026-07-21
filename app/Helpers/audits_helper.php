@@ -11,11 +11,11 @@ if ( ! function_exists('log_admin_activity')) :
      * @param string|null $details Dettagli aggiuntivi, preferibilmente in formato JSON o testo descrittivo
      * @return bool Ritorna true se l'inserimento è andato a buon fine, altrimenti false
      */
-    function log_admin_activity(string $action, string $section, ?string $details = null): bool 
+    function log_admin_activity(string $action, string $section, string $details, ?object $currentAdmin = null): bool 
     {
         /* Istanziamo il modello che contiene la logica fisica di scrittura con la query nativa */
         $auditsModel = model(AuditsModel::class);
         
-        return $auditsModel->logActivity($action, $section, $details);
+        return $auditsModel->logActivity($action, $section, $details, $currentAdmin);
     }
 endif;

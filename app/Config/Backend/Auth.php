@@ -56,7 +56,7 @@ class Auth extends BaseConfig
      * 
      * @var bool 
      */
-    public bool $attempts = false;
+    public bool $attempts = true;
 
     /**
      * Intervallo di tempo (in secondi) in cui monitorare e vincolare i tentativi di accesso.

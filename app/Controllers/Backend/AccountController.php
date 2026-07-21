@@ -464,7 +464,7 @@ class AccountController extends BackendController
             endif;
 
             /* Attivo definitivamente il TOTP nel DB */
-            $activated = $this->accountModel->activateTotpMethod($adminUuid);
+            $activated = $this->accountModel->activateTotpMethod($adminUuid, $this->currentAdmin);
 
             if ( ! $activated) :
                 return $this->response->setJSON(['result' => false, 'message' => lang('backend/account.messages.totpActivationNotPossible')]);

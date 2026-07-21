@@ -244,7 +244,7 @@ class AuthController extends BackendController
      */
     public function logout()
     {
-        $cookie = service('request')->getCookie('backendRememberMe');
+        $cookie = $this->request->getCookie('backendRememberMe');
 
         /* 1. Legge i dati utente PRIMA di scollegarlo */
         $firstname = $this->currentAdmin->firstname ?? '';
@@ -259,6 +259,9 @@ class AuthController extends BackendController
 
         /* 3. Prepara il messaggio di saluto utilizzando i dati appena salvati */
         $message = sprintf(lang('backend/auth.messages.goodbye'), $firstname, $lastname);
+
+        /* Questo flag dirà alla vista di login che siamo in fase di disconnessione */
+        session()->setFlashdata('isLogout', true);
 
         /* 4. Imposta i flashdata nativi di CI4 */
         $this->session->setFlashdata('message', $message);

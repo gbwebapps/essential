@@ -21,16 +21,21 @@
                         <?php $isActive = (isset($controller) && in_array($controller, ['users', 'account'])); ?>
                         
                         <a class="nav-link dropdown-toggle<?= $isActive ? ' active fw-bold' : ''; ?>" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fa-solid fa-user-circle"></i> <?= esc($currentAdmin->firstname); ?> <?= esc($currentAdmin->lastname); ?>
+                            <i class="fa-solid fa-user-circle"></i> <?= esc($currentAdmin->firstname ?? ''); ?> <?= esc($currentAdmin->lastname ?? ''); ?>
                         </a>
                         
                         <ul class="dropdown-menu dropdown-menu-end"> 
                             <?php
+
                                 /* 1. Preparazione lista visibile: filtraggio in base ai permessi master */
                                 $visibleItems = [];
                                 foreach ($menuTopRight as $item):
+
+                                    /* Verifica di sicurezza sul controller per evitare errori se non definito */
+                                    $itemController = $item['controller'] ?? '';
+
                                     /* Se l'utente non è master, nascondi le voci relative alla gestione utenti */
-                                    if ( ! ((int) $currentAdmin->master === 1) && in_array($item['controller'], ['admins', 'groups'])):
+                                    if ( ! ((int) ($currentAdmin->master ?? 0) === 1) && in_array($itemController, ['admins', 'groups', 'audits'])):
                                         continue;
                                     endif;
                                     $visibleItems[] = $item;
@@ -39,19 +44,28 @@
                                 /* 2. Rendering degli elementi del menu filtrati */
                                 $total = count($visibleItems);
                                 foreach ($visibleItems as $index => $ele): 
-                                    $activeClass = (isset($controller) && $controller === $ele['controller']) ? ' active' : '';
-                                    $href = isset($ele['route']) ? base_url($ele['route']) : '#'; 
-                            ?>
-                                    <li>
-                                        <a class="dropdown-item<?= $activeClass; ?>" href="<?= $href; ?>">
-                                            <?= $ele['icon'] ?? ''; ?> <span class="ms-1"><?= $ele['label'] ?? ''; ?></span>
-                                        </a>
-                                    </li>
 
-                                    <!-- Aggiunge un separatore tra le voci, evitando di inserirlo dopo l'ultima -->
-                                    <?php if ($index < $total - 1): ?>
-                                        <li><hr class="dropdown-divider"></li>
-                                    <?php endif; ?>
+                                    /* Controllo sicuro per evitare notice se il controller manca */
+                                    $eleController = $ele['controller'] ?? '';
+                                    $activeClass = (isset($controller) && $controller === $eleController) ? ' active' : '';
+                                    
+                                    /* Gestione dinamica dell'indirizzo o dell'identificativo */
+                                    $href = isset($ele['route']) ? base_url($ele['route']) : '#'; 
+                                    $dataIdAttr = isset($ele['id']) ? ' data-id="' . esc($ele['id']) . '"' : '';
+
+                                    /* Gestione dinamica del messaggio di conferma */
+                                    $dataMessageAttr = isset($ele['message']) ? ' data-message="' . esc($ele['message']) . '"' : '';
+                            ?>
+                                <li>
+                                    <a class="dropdown-item<?= $activeClass; ?>" href="<?= $href; ?>"<?= $dataIdAttr; ?><?= $dataMessageAttr; ?>>
+                                        <?= $ele['icon'] ?? ''; ?> <span class="ms-1"><?= $ele['label'] ?? ''; ?></span>
+                                    </a>
+                                </li>
+
+                                <!-- Aggiunge un separatore tra le voci, evitando di inserirlo dopo l'ultima -->
+                                <?php if ($index < $total - 1): ?>
+                                    <li><hr class="dropdown-divider"></li>
+                                <?php endif; ?>
                             <?php endforeach; ?>
                         </ul>
                     </li>

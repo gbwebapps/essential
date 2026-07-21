@@ -87,6 +87,8 @@
             src="<?= base_url($js['path']); ?>">
         </script>
     <?php endforeach; endif; ?>
+
+    <?php if(isset($_SESSION)): echo '<pre>' . print_r($_SESSION, true) . '</pre>'; endif; ?>
     
 </body>
 

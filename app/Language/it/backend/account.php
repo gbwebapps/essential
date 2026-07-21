@@ -47,6 +47,7 @@ return [
         'totpSetupDesc' => 'Scansiona il codice QR con la tua app di autenticazione (es. Google Authenticator) o inserisci la chiave manualmente per iniziare a ricevere i codici di sicurezza.',
         'totpSecretKey'      => 'Chiave segreta (configurazione manuale)',
 		'enterOtpCode' => 'Inserisci il codice a 6 cifre',
+		'rememberMe' => 'Ricordami', 
 	], 
 	'placeholders' => [
 		'firstname' => 'Inserisci nome...', 

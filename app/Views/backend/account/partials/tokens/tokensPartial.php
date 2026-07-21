@@ -39,7 +39,7 @@
                     elseif ($token->token_type === 'activation'):
                         $tokenType = lang('backend/account.labels.activation');
                     elseif ($token->token_type === 'cookie'):
-                        $tokenType = lang('backend/account.labels.remember_me');
+                        $tokenType = lang('backend/account.labels.rememberMe');
                     else:
                         $tokenType = lang('backend/account.labels.unknown');
                     endif;

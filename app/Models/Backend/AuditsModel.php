@@ -127,13 +127,12 @@ class AuditsModel extends BackendModel
         ];
     }
 
-    public function logActivity(string $action, string $section, ?string $details = null): bool
+    public function logActivity(string $action, string $section, string $details, ?object $identity = null): bool
     {
         $request = \Config\Services::request();
-        $currentAdmin = service('authorization')->currentAdmin();
 
-        $adminUuid = $currentAdmin ? ($currentAdmin->uuid ?: null) : null;
-        $username = $currentAdmin ? ($currentAdmin->email ?: 'Ospite') : 'Ospite';
+        $adminUuid = $identity ? ($identity->uuid ?: null) : null;
+        $username = $identity ? ($identity->email ?: 'Ospite') : 'Ospite';
         $ipAddress = $request->getIPAddress();
         $userAgent = (string) $request->getUserAgent();
         $createdAt = date('Y-m-d H:i:s');

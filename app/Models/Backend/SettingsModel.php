@@ -386,7 +386,8 @@ class SettingsModel extends BackendModel
 
         $this->db->query($sql, $params);
 
-        log_admin_activity('SAVE_SETTINGS', 'settings', 'Salvataggio impostazioni.');
+        $currentAdmin = service('authorization')->currentAdmin();
+        log_admin_activity('SAVE_SETTINGS', 'settings', 'Salvataggio impostazioni.', $currentAdmin);
 
         return ['result' => true, 'message' => lang('backend/settings.messages.saveSuccess')];
     }
@@ -401,7 +402,7 @@ class SettingsModel extends BackendModel
     public function deleteSettings(string $namespace): bool
     {
         /* Verifica preliminare se ci sono effettivamente dati da cancellare */
-        if ( ! $this->hasDatabaseSettings($namespace)) :
+        if ( ! $this->hasDatabaseSettings($namespace)):
             return false;
         endif;
 
@@ -414,7 +415,8 @@ class SettingsModel extends BackendModel
         $sql = "delete from `settings` where `class` = ?";
         $this->db->query($sql, [$namespace]);
 
-        log_admin_activity('DELETE_SETTINGS', 'settings', 'Eliminazione impostazioni.');
+        $currentAdmin = service('authorization')->currentAdmin();
+        log_admin_activity('DELETE_SETTINGS', 'settings', 'Eliminazione impostazioni.', $currentAdmin);
 
         return true;
     }

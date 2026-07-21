@@ -381,7 +381,8 @@ class GroupsModel extends BackendModel
 
             $this->db->transCommit();
 
-            log_admin_activity('ADD_GROUP', 'groups', 'Aggiunta gruppo.');
+            $currentAdmin = service('authorization')->currentAdmin();
+            log_admin_activity('ADD_GROUP', 'groups', sprintf('Aggiunta gruppo %s ', esc($posts['name'])), $currentAdmin);
 
             return ['result' => true, 'message' => lang('backend/groups.messages.addSuccess')];
         } 
@@ -456,7 +457,8 @@ class GroupsModel extends BackendModel
 
             $this->db->transCommit();
 
-            log_admin_activity('EDIT_GROUP', 'groups', 'Aggiornamento gruppo.');
+            $currentAdmin = service('authorization')->currentAdmin();
+            log_admin_activity('EDIT_GROUP', 'groups', sprintf('Aggiornamento gruppo %s ', esc($posts['name'])), $currentAdmin);
 
             return ['result' => true, 'message' => lang('backend/groups.messages.editSuccess')];
         } 
@@ -479,6 +481,10 @@ class GroupsModel extends BackendModel
 
             $this->db->transBegin();
 
+            /* Recupero nome del gruppo */
+            $sql = 'select name from admins_groups where id = ?';
+            $group = $this->db->query($sql, [$posts['id']])->getRow();
+
             /* Rimozione del gruppo */
             $sql = "delete from admins_groups where id = ?";
             $this->db->query($sql, [$posts['id']]);
@@ -491,7 +497,8 @@ class GroupsModel extends BackendModel
 
             $this->db->transCommit();
 
-            log_admin_activity('DELETE_GROUP', 'groups', 'Eliminazione gruppo.');
+            $currentAdmin = service('authorization')->currentAdmin();
+            log_admin_activity('DELETE_GROUP', 'groups', sprintf('Eliminazione gruppo %s ', esc($group->name)), $currentAdmin);
 
             return ['result' => true, 'message' => lang('backend/groups.messages.delSuccess')];
 
@@ -619,7 +626,7 @@ class GroupsModel extends BackendModel
         {
             $posts = $this->checkAllowedFields($posts, $this->saveExceptionsAllowedFields);
 
-            $sql = 'select group_id from admins where uuid = ?';
+            $sql = 'select group_id, firstname, lastname from admins where uuid = ?';
             $admin = $this->db->query($sql, [$posts['uuid']])->getRow();
             
             if ( ! $admin):
@@ -693,7 +700,8 @@ class GroupsModel extends BackendModel
 
             $this->db->transCommit();
 
-            log_admin_activity('SAVE_EXCEPTIONS', 'groups', 'Inserimento eccezione.');
+            $currentAdmin = service('authorization')->currentAdmin();
+            log_admin_activity('SAVE_EXCEPTIONS', 'groups', sprintf('Inserimento eccezione %s %s ', esc($admin->firstname), esc($admin->lastname)), $currentAdmin);
 
             return ['result' => true, 'message' => lang('backend/groups.messages.saveExceptionsSuccess')];
 

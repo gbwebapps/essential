@@ -13,21 +13,30 @@
                 </button>
 
                 <ul class="dropdown-menu">
-                    <?php
-                        /* Ciclo di generazione delle voci del menu moduli */
-                        $totalLeft = count($menuBottomLeft);
-                        foreach ($menuBottomLeft as $index => $ele): 
-                            $active = (isset($controller) && $controller === $ele['controller']) ? ' active' : '';
-                    ?>
-                        <li>
-                            <a class="dropdown-item<?= $active; ?>" href="<?= base_url($ele['route']); ?>">
-                                <span class="me-2"><?= $ele['icon'] ?? ''; ?></span> <?= $ele['label'] ?? ''; ?>
-                            </a>
-                        </li>
-                        <?php /* Inserimento del divisore se non è l'ultimo elemento */ ?>
-                        <?php if ($index < $totalLeft - 1): ?>
-                            <li><hr class="dropdown-divider"></li>
-                        <?php endif; ?>
+                <?php
+
+                    /* Ciclo di generazione delle voci del menu moduli */
+                    $totalLeft = count($menuBottomLeft);
+                    foreach ($menuBottomLeft as $index => $ele): 
+
+                        /* Controllo sicuro per evitare notice se il controller manca */
+                        $eleController = $ele['controller'] ?? '';
+                        $active = (isset($controller) && $controller === $eleController) ? ' active' : '';
+                        
+                        /* Gestione dinamica dell'indirizzo o dell'identificativo */
+                        $href = isset($ele['route']) ? base_url($ele['route']) : '#'; 
+                        $dataIdAttr = isset($ele['id']) ? ' data-id="' . esc($ele['id']) . '"' : '';
+                ?>
+                    <li>
+                        <a class="dropdown-item<?= $active; ?>" href="<?= $href; ?>"<?= $dataIdAttr; ?>>
+                            <span class="me-2"><?= $ele['icon'] ?? ''; ?></span> <?= $ele['label'] ?? ''; ?>
+                        </a>
+                    </li>
+                    
+                    <!-- Inserimento del divisore se non è l'ultimo elemento -->
+                    <?php if ($index < $totalLeft - 1): ?>
+                        <li><hr class="dropdown-divider"></li>
+                    <?php endif; ?>
                     <?php endforeach; ?>
                 </ul>
             </div>
@@ -39,29 +48,39 @@
 
             <!-- Sezione Destra: Menu Servizi (visibile solo agli utenti Master) -->
             <?php if ((int) $currentAdmin->master === 1): ?>
-                <div class="btn-group dropup ms-auto">
-                    <button type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa-solid fa-gears"></i> 
-                        <span class="d-none d-md-inline"><?= lang('backend/global.buttons.services'); ?></span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <?php
-                            /* Ciclo di generazione delle voci del menu servizi */
-                            $totalRight = count($menuBottomRight);
-                            foreach ($menuBottomRight as $index => $ele): 
-                                $active = (isset($controller) && $controller === $ele['controller']) ? ' active' : '';
-                        ?>
-                            <li>
-                                <a class="dropdown-item<?= $active; ?>" href="<?= base_url($ele['route']); ?>">
-                                    <span class="me-2"><?= $ele['icon'] ?? ''; ?></span> <?= $ele['label'] ?? ''; ?>
-                                </a>
-                            </li>
-                            <?php if ($index < $totalRight - 1): ?>
-                                <li><hr class="dropdown-divider"></li>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
+            <div class="btn-group dropup ms-auto">
+                <button type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa-solid fa-gears"></i> 
+                    <span class="d-none d-md-inline"><?= lang('backend/global.buttons.services'); ?></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                <?php
+
+                    /* Ciclo di generazione delle voci del menu servizi */
+                    $totalRight = count($menuBottomRight);
+                    foreach ($menuBottomRight as $index => $ele): 
+
+                        /* Controllo sicuro per evitare notice se il controller manca */
+                        $eleController = $ele['controller'] ?? '';
+                        $active = (isset($controller) && $controller === $eleController) ? ' active' : '';
+                        
+                        /* Gestione dinamica dell'indirizzo o dell'identificativo */
+                        $href = isset($ele['route']) ? base_url($ele['route']) : '#'; 
+                        $dataIdAttr = isset($ele['id']) ? ' data-id="' . esc($ele['id']) . '"' : '';
+                ?>
+                    <li>
+                        <a class="dropdown-item<?= $active; ?>" href="<?= $href; ?>"<?= $dataIdAttr; ?>>
+                            <span class="me-2"><?= $ele['icon'] ?? ''; ?></span> <?= $ele['label'] ?? ''; ?>
+                        </a>
+                    </li>
+                    
+                    <!-- Inserimento del divisore se non è l'ultimo elemento -->
+                    <?php if ($index < $totalRight - 1): ?>
+                        <li><hr class="dropdown-divider"></li>
+                    <?php endif; ?>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
             <?php else: ?>
                 <!-- Spacer tecnico per mantenere la simmetria del flexbox quando il menu Servizi è nascosto -->
                 <div class="ms-auto" style="width: 40px;">&nbsp;</div>

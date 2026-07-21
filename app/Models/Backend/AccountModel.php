@@ -190,14 +190,13 @@ class AccountModel extends BackendModel
 	        $this->db->transCommit();
 
 	        /* Ricarichiamo l'istanza dell'admin aggiornata per passarla al controller */
-	        $updatedAdmin = service('authorization')->refresh()->currentAdmin();
-
-	        log_admin_activity('UPDATE_DATA', 'account', 'Aggiornamento dati generali.');
+	        $currentAdmin = service('authorization')->refresh()->currentAdmin();
+	        log_admin_activity('UPDATE_DATA', 'account', sprintf('Aggiornamento dati generali %s %s', esc($currentAdmin->firstname), esc($currentAdmin->lastname)), $currentAdmin);
 
 	        return [
 	            'result' => true, 
-	            'message' => sprintf(lang('backend/account.messages.editSuccess'), esc($updatedAdmin->firstname), esc($updatedAdmin->lastname)), 
-	            'currentAdmin' => $updatedAdmin
+	            'message' => sprintf(lang('backend/account.messages.editSuccess'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)), 
+	            'currentAdmin' => $currentAdmin
 	        ];
 
 	    } catch(\Throwable $e) {
@@ -231,7 +230,7 @@ class AccountModel extends BackendModel
 
 	        if($this->db->affectedRows() > 0):
 	        	
-	        	log_admin_activity('DELETE_TOKEN', 'account', 'Eliminazione token.');
+	        	log_admin_activity('DELETE_TOKEN', 'account', sprintf('Eliminazione token %s %s', esc($currentAdmin->firstname), esc($currentAdmin->lastname)), $currentAdmin);
 
 	            return ['result' => true, 'message' => sprintf(lang('backend/account.messages.deleteTokenSuccess'), esc($currentAdmin->firstname), esc($currentAdmin->lastname))];
 	        endif;
@@ -284,7 +283,7 @@ class AccountModel extends BackendModel
 
 	        $this->db->transCommit();
 
-	        log_admin_activity('RESET_PASSWORD', 'account', 'Reset password.');
+	        log_admin_activity('RESET_PASSWORD', 'account', sprintf('Reset password %s %s', esc($currentAdmin->firstname), esc($currentAdmin->lastname)), $currentAdmin);
 
 	    } catch (\Throwable $e) {
 
@@ -371,7 +370,7 @@ class AccountModel extends BackendModel
 
             $this->db->transCommit();
 
-            log_admin_activity('ACTIVATE_' . strtoupper($method), 'account', 'Impostazione metodo secondo fattore.');
+            log_admin_activity('ACTIVATE_' . strtoupper($method), 'account', sprintf('Impostazione metodo 2Fa %s %s', esc($currentAdmin->firstname), esc($currentAdmin->lastname)), $currentAdmin);
 
             return true;
 
@@ -428,7 +427,7 @@ class AccountModel extends BackendModel
      * @param string $adminUuid L'UUID dell'amministratore.
      * @return bool True in caso di successo, false altrimenti.
      */
-    public function activateTotpMethod(string $adminUuid): bool
+    public function activateTotpMethod(string $adminUuid, \stdClass $currentAdmin): bool
     {
         try {
         	
@@ -444,7 +443,7 @@ class AccountModel extends BackendModel
 
             $this->db->transCommit();
 
-            log_admin_activity('ACTIVATE_TOTP', 'account', 'Attivazione metodo secondo fattore.');
+            log_admin_activity('ACTIVATE_TOTP', 'account', sprintf('Impostazione metodo 2Fa %s %s', esc($currentAdmin->firstname), esc($currentAdmin->lastname)), $currentAdmin);
 
             return true;
 

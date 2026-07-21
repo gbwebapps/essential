@@ -38,7 +38,7 @@
                                         </th>
 
                                         <!-- Colonna section -->
-                                        <th style="width: 15%;">
+                                        <th style="width: 13%;">
                                             <a class="sort" href="#" data-column="section" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'section') ? 'asc' : 'desc'); ?>">
                                                 <?= lang('backend/audits.labels.section'); ?>&nbsp;<?= (($posts['column'] == 'section') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
@@ -52,7 +52,7 @@
                                         </th>
 
                                         <!-- Colonna created At -->
-                                        <th style="width: 10%;">
+                                        <th style="width: 12%;">
                                             <a class="sort" href="#" data-column="created_at" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'created_at') ? 'asc' : 'desc'); ?>">
                                                 <?= lang('backend/audits.labels.createdAt'); ?>&nbsp;<?= (($posts['column'] == 'created_at') ? '&nbsp;' . $icon : ''); ?>
                                             </a>

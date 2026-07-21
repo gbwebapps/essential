@@ -195,9 +195,7 @@ class AuthModel extends BackendModel
                         group by admins.uuid limit 1";
                 $params = [$attemptsInterval, $posts['email']];
             else:
-                $sql = "select uuid, firstname, lastname, email, password_hash 
-                        from admins 
-                        where email = ? and status = 1 and suspended_at is null limit 1";
+                $sql = "select uuid, firstname, lastname, email, password_hash from admins where email = ? and status = 1 and suspended_at is null limit 1";
                 $params = [$posts['email']];
             endif;
 
@@ -206,6 +204,7 @@ class AuthModel extends BackendModel
 
             /* Se l'utente non esiste, esce immediatamente con errore generico (sicurezza) */
             if ( ! $admin):
+                log_admin_activity(null, 'LOGIN_FAILED', 'auth', 'Tentativo di accesso con account inesistente');
                 return ['result' => false, 'message' => lang('backend/auth.messages.loginFailed')];
             endif;
 
@@ -216,20 +215,18 @@ class AuthModel extends BackendModel
                     $this->db->transBegin();
 
                     /* Recuperiamo il timestamp dell'ultimo tentativo per questo specifico admin all'interno della finestra */
-                    $sql = "select MAX(timestamp) as last_ts from admins_attempts 
-                            where admin_uuid = ? and timestamp > ?";
+                    $sql = "select MAX(timestamp) as last_ts from admins_attempts where admin_uuid = ? and timestamp > ?";
                     $row = $this->db->query($sql, [$admin->uuid, $attemptsInterval])->getRow();
 
                     /* Se troviamo l'ultimo tentativo, ne aggiorniamo l'orario a questo istante per far slittare il blocco */
                     if ($row && $row->last_ts) :
-                        $sql = "update admins_attempts set timestamp = ? 
-                                where admin_uuid = ? and timestamp = ?";
+                        $sql = "update admins_attempts set timestamp = ? where admin_uuid = ? and timestamp = ?";
                         $this->db->query($sql, [date('Y-m-d H:i:s'), $admin->uuid, $row->last_ts]);
                     endif;
 
                     $this->db->transCommit();
 
-                    log_admin_activity('LOGIN_BLOCKED', 'auth', 'Tentativo di accesso rifiutato (account temporaneamente bloccato).');
+                    log_admin_activity('LOGIN_BLOCKED', 'auth', sprintf('Accesso rifiutato, account bloccato %s %s', esc($admin->firstname), esc($admin->lastname)), $admin);
 
                     return ['result' => false, 'message' => lang('backend/auth.messages.tooMAnyAttempts')];
                 endif;
@@ -248,7 +245,7 @@ class AuthModel extends BackendModel
 
                 $this->db->transCommit();
 
-                log_admin_activity('LOGIN_FAILED', 'auth', 'Tentativo di accesso fallito (password errata).');
+                log_admin_activity('LOGIN_FAILED', 'auth', sprintf('Tentativo di accesso fallito %s %s', esc($admin->firstname), esc($admin->lastname)), $admin);
 
                 return ['result' => false, 'message' => lang('backend/auth.messages.loginFailed')];
                 
@@ -259,6 +256,11 @@ class AuthModel extends BackendModel
 
                 $sql = "select method from admins_2fa where admin_uuid = ? and enabled = 1 limit 1";
                 $twofa = $this->db->query($sql, [$admin->uuid])->getRow();
+
+                if ($allowAttempts):
+                    $sqlClearAttempts = "delete from admins_attempts where admin_uuid = ?";
+                    $this->db->query($sqlClearAttempts, [$admin->uuid]);
+                endif;
 
                 if ($twofa):
                     /* IMPLEMENTAZIONE SICURA: Scrittura dei dati sensibili in sessione server protetta */
@@ -272,7 +274,7 @@ class AuthModel extends BackendModel
                         (new \App\Libraries\EmailOtpService())->send($admin->uuid);
                     endif;
 
-                    log_admin_activity('2FA_REQUIRED', 'auth', 'Richiesto codice di verifica 2FA (' . $twofa->method . ')');
+                    log_admin_activity('2FA_REQUIRED', 'auth', sprintf('Richiesto codice di verifica 2FA (' . $twofa->method . ') %s %s', esc($admin->firstname), esc($admin->lastname)), $admin);
 
                     /* Il client riceve solo la notifica del successo parziale senza dati sensibili esposti */
                     return ['result' => '2fa_required', 'method' => $twofa->method];
@@ -358,7 +360,7 @@ class AuthModel extends BackendModel
         /* Chiude la transazione aperta nel metodo principale prima di impostare gli stati del client */
         $this->db->transCommit();
 
-        log_admin_activity('LOGIN_SUCCESS', 'auth', 'Accesso effettuato con successo.');
+        log_admin_activity('LOGIN_SUCCESS', 'auth', sprintf('Accesso effettuato %s %s ', esc($admin->firstname), esc($admin->lastname)), $admin);
 
         /* 5. Rigenerazione dell'ID di sessione per prevenire Session Fixation */
         session()->regenerate(true);
@@ -443,7 +445,7 @@ class AuthModel extends BackendModel
 
                 $this->db->transCommit();
 
-                log_admin_activity('RESET_PASSWORD', 'auth', 'Reset password.');
+                log_admin_activity('RESET_PASSWORD', 'auth', sprintf('Reset password %s %s ', esc($admin->firstname), esc($admin->lastname)), $admin);
 
             } catch (\Throwable $e) {
                 $this->db->transRollback();
@@ -521,7 +523,7 @@ class AuthModel extends BackendModel
 
                 $this->db->transCommit();
 
-                log_admin_activity('SET_PASSWORD', 'auth', 'Impostazione password password.');
+                log_admin_activity('SET_PASSWORD', 'auth', sprintf('Impostazione password %s %s ', esc($admin->firstname), esc($admin->lastname)), $admin);
 
                 $message = sprintf(lang('backend/auth.messages.setPasswordSuccess'), esc($admin->firstname), esc($admin->lastname));
 
@@ -621,6 +623,7 @@ class AuthModel extends BackendModel
             /* Recupero l'oggetto anagrafico dell'admin per il login finale */
             $admin = $this->db->query("select * from admins where uuid = ? and status = 1 limit 1", [$adminUuid])->getRow();
             if ( ! $admin):
+                log_admin_activity(null, 'VERIFY_FAILED', 'auth', 'Tentativo di accesso con account inesistente');
                 return ['result' => false, 'message' => lang('backend/auth.messages.verifyFailed')];
             endif;
 
@@ -628,8 +631,7 @@ class AuthModel extends BackendModel
             $cutoffTime = date('Y-m-d H:i:s', time() - (int)$config->twoFactorTime);
 
             /* Conteggio tentativi falliti */
-            $sql = "select COUNT(id) as cnt from admins_2fa_attempts 
-                    where admin_uuid = ? and method = ? and timestamp > ?";
+            $sql = "select COUNT(id) as cnt from admins_2fa_attempts where admin_uuid = ? and method = ? and timestamp > ?";
             $cntRow = $this->db->query($sql, [$adminUuid, $method, $cutoffTime])->getRow();
 
             if ($cntRow && (int) $cntRow->cnt >= (int) $config->twoFactorLimit):
@@ -637,19 +639,17 @@ class AuthModel extends BackendModel
                 $this->db->transBegin();
 
                 /* Aggiorna il timestamp dell'ultimo tentativo fallito per mantenere attivo il blocco */
-                $sql = "select MAX(timestamp) as last_ts from admins_2fa_attempts 
-                        where admin_uuid = ? and method = ? and timestamp > ?";
+                $sql = "select MAX(timestamp) as last_ts from admins_2fa_attempts where admin_uuid = ? and method = ? and timestamp > ?";
                 $row = $this->db->query($sql, [$adminUuid, $method, $cutoffTime])->getRow();
 
                 if ($row && $row->last_ts):
-                    $sql = "update admins_2fa_attempts set timestamp = ? 
-                            where admin_uuid = ? and method = ? and timestamp = ?";
+                    $sql = "update admins_2fa_attempts set timestamp = ? where admin_uuid = ? and method = ? and timestamp = ?";
                     $this->db->query($sql, [date('Y-m-d H:i:s'), $adminUuid, $method, $row->last_ts]);
                 endif;
 
                 $this->db->transCommit();
 
-                log_admin_activity('2FA_BLOCKED', 'auth', 'Blocco 2FA.');
+                log_admin_activity('2FA_BLOCKED', 'auth', sprintf('Blocco 2FA %s %s ', esc($admin->firstname), esc($admin->lastname)), $admin);
 
                 return ['result' => false, 'message' => lang('backend/auth.messages.tooManyAttempts')];
             endif;
@@ -695,7 +695,7 @@ class AuthModel extends BackendModel
 
                 $this->db->transCommit();
 
-                log_admin_activity('2FA_FAILED', 'auth', 'Codice 2FA errato o scaduto.');
+                log_admin_activity('2FA_FAILED', 'auth', sprintf('Codice 2FA errato o scaduto %s %s ', esc($admin->firstname), esc($admin->lastname)), $admin);
 
                 /* Scegliamo il messaggio specifico in base allo stato */
                 $errorMessage = $isExpired ? lang('backend/auth.messages.expiredCode') : lang('backend/auth.messages.wrongCode');
@@ -749,9 +749,6 @@ class AuthModel extends BackendModel
                 /* Elimina il record dal database */
                 $sql = "delete from admins_tokens where token_hash = ? and token_type = ?";
                 $this->db->query($sql, [$tokenHash, 'session']);
-
-                /* Pulisce e distrugge la sessione */
-                session()->remove('backendSession');
 
             endif;
         } catch (\Throwable $e) {
