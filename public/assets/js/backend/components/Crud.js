@@ -1,5 +1,5 @@
 /* Import delle utility risalendo di un livello */
-import { urlbase, apiFetch, toggleLoader, showAlert, askConfirm, smoothReplace, handleValidationErrors, handleValidationImages } from '../backend.js';
+import { apiFetch, showAlert, askConfirm, smoothReplace, handleValidationErrors, handleValidationImages } from '../backend.js';
 
 /* Import degli altri componenti (nella stessa cartella) */
 import { UploadPreviewImgManager } from './UploadPreview.js';

@@ -2,10 +2,10 @@
 import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace, handleValidationErrors, initTomSelects } from '../backend.js';
 
 export class SettingsManager {
-    constructor(loadRoute, saveRoute, deleteRoute) {
-        this.loadUrl = urlbase + loadRoute;
-        this.saveUrl = urlbase + saveRoute;
-        this.deleteUrl = urlbase + deleteRoute;
+    constructor() {
+        this.loadUrl = urlbase + 'backend/settings/openSettings';
+        this.saveUrl = urlbase + 'backend/settings/saveSettings';
+        this.deleteUrl = urlbase + 'backend/settings/deleteSettings';
         this.isSubmitting = false;
 
         this.init();
@@ -27,13 +27,18 @@ export class SettingsManager {
         });
 
         /* 2. Gestione Click Pulsanti (Refresh e Delete) */
-        document.addEventListener('click', e => {
+        document.addEventListener('click', async (e) => {
             /* Verifica pulsante Refresh */
             const refreshBtn = e.target.closest('[class*="btn-refresh-"]');
             if (refreshBtn) {
                 const form = refreshBtn.closest('form');
                 if (form) {
                     e.preventDefault();
+
+                    const message = refreshBtn.dataset.message;
+                    const ok = await askConfirm(message);
+                    if ( ! ok) return;
+
                     const env = form.id.replace('-settings', '');
                     this.refresh(refreshBtn, env);
                 }
@@ -46,6 +51,11 @@ export class SettingsManager {
                 const form = deleteBtn.closest('form');
                 if (form) {
                     e.preventDefault();
+
+                    const message = deleteBtn.dataset.message;
+                    const ok = await askConfirm(message);
+                    if ( ! ok) return;
+
                     const env = form.id.replace('-settings', '');
                     this.deleteSettings(deleteBtn, env);
                 }
@@ -132,34 +142,22 @@ export class SettingsManager {
         }
     }
 
-    /* Esegue il refresh */
+    /* Esegue il refresh in SettingsManager */
     async refresh(btnEl, env) {
+
         if (this.isSubmitting) return;
-
-        const message = btnEl.dataset.message || 'Ripristinare i dati originali?';
-        const ok = await askConfirm(message);
-        if (!ok) return;
-
         this.isSubmitting = true;
-        const form = btnEl.closest('form');
-        const container = form.closest('.accordion-body');
-
-        const formData = new FormData();
-        formData.append('env', env);
 
         try {
-            const response = await apiFetch(this.loadUrl, { 
-                method: 'POST',
-                body: formData
-            });
-            const data = await response.json();
+            const containerId = `${env}-settings-container`;
+            const success = await this.loadPanel(containerId, env);
 
-            if (data.result === true && data.output) {
-                smoothReplace(container, data.output);
+            /* Re-inizializzazione locale e isolata dopo il ricaricamento */
+            if (success && typeof initTomSelects === 'function') {
                 initTomSelects();
             }
         } catch (error) {
-            console.error("Errore durante il ripristino delle impostazioni:", error);
+            /* Errore durante il ripristino delle impostazioni */
         } finally {
             this.isSubmitting = false;
         }
@@ -167,13 +165,10 @@ export class SettingsManager {
 
     /* Elimina le personalizzazioni a DB */
     async deleteSettings(btnEl, env) {
+
         if (this.isSubmitting) return;
-
-        const message = btnEl.dataset.message || 'Ripristinare i valori dei files?';
-        const ok = await askConfirm(message);
-        if (!ok) return;
-
         this.isSubmitting = true;
+
         const form = btnEl.closest('form');
         const container = form.closest('.accordion-body');
 
@@ -185,6 +180,7 @@ export class SettingsManager {
                 method: 'POST',
                 body: formData
             });
+            
             const data = await response.json();
 
             if (data.result === true) {

@@ -95,7 +95,19 @@ $routes->group('backend', function($routes) {
         });
 
         /* TOOLS */
-        $routes->get('tools', '\App\Controllers\Backend\ToolsController::index');
+        $routes->group('tools', function($routes) {
+            $routes->get('/', '\App\Controllers\Backend\ToolsController::index');
+
+            $routes->post('openTools', '\App\Controllers\Backend\ToolsController::openTools');
+
+            $routes->post('deleteAudits', '\App\Controllers\Backend\ToolsController::deleteAudits');
+            $routes->post('exportAudits', '\App\Controllers\Backend\ToolsController::exportAudits');
+            $routes->get('downloadExport/(:any)', '\App\Controllers\Backend\ToolsController::downloadExport/$1');
+            $routes->post('validateAuditsDateRequest', '\App\Controllers\Backend\ToolsController::validateAuditsDateRequest');
+
+            $routes->post('dbMaintenance', '\App\Controllers\Backend\ToolsController::dbMaintenance');
+            $routes->post('backup', '\App\Controllers\Backend\ToolsController::backup');
+        });
 
         /* GROUPS */
         $routes->group('groups', function($routes) {

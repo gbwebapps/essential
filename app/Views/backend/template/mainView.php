@@ -5,7 +5,7 @@
     <!-- Configurazione meta e charset -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="<?= csrf_hash() ?>">
+    <meta id="csrf-meta" name="<?= csrf_token(); ?>" content="<?= csrf_hash(); ?>">
 
     <!-- Titolo della pagina dinamico -->
     <title><?= esc($title); ?> | <?= esc($siteName); ?></title>
@@ -87,8 +87,6 @@
             src="<?= base_url($js['path']); ?>">
         </script>
     <?php endforeach; endif; ?>
-
-    <?php if(isset($_SESSION)): echo '<pre>' . print_r($_SESSION, true) . '</pre>'; endif; ?>
     
 </body>
 

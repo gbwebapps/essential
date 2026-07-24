@@ -31,6 +31,12 @@ textarea {
     resize: none;
 }
 
+/* Mostra il cursore pointer sull'icona nativa degli input date e time */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+}
+
 /* Bootstrap's override */
 .dropdown-menu, .btn, .navbar, .card {
     /* border-radius: 0!Important; */

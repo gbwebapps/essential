@@ -151,20 +151,20 @@ class AccountController extends BackendController
             $posts = $this->request->getPost();
 
             if (isset($posts['action']) && $posts['action'] === 'refresh'):
-                return $this->response->setJSON(['result' => true, 'output' => view('backend/account/partials/edit/editPartial', $this->data)]);
+                return $this->jsonResponse(['result' => true, 'output' => view('backend/account/partials/edit/editPartial', $this->data)]);
             endif;
 
             /* Passiamo l'UUID sicuro ricavato dall'oggetto dell'admin loggato */
             $rules = $this->accountModel->editValidationRules($this->currentAdmin->uuid);
 
             if ( ! $this->validateData($posts, $rules)):
-                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/account.messages.validationErrors')]);
+                return $this->jsonResponse(['errors' => $this->validator->getErrors(), 'message' => lang('backend/account.messages.validationErrors')]);
             endif;
 
             $json = $this->accountModel->edit($posts, $this->currentAdmin);
 
             if ($json['result'] === false):
-                return $this->response->setJSON(['result' => false, 'message' => $json['message']]);
+                return $this->jsonResponse(['result' => false, 'message' => $json['message']]);
             endif;
 
             if ($json['result'] === true):
@@ -175,7 +175,7 @@ class AccountController extends BackendController
                 $json['navBarTop'] = view('backend/template/navbarTopView', $this->data);
             endif;
 
-            return $this->response->setJSON($json);
+            return $this->jsonResponse($json);
 
         endif;
 
@@ -203,7 +203,7 @@ class AccountController extends BackendController
             $this->data['group_perms'] = $this->accountModel->getGroupPermissions((int) $this->currentAdmin->group_id);
             $this->data['admin_exceptions'] = $this->accountModel->getAdminExceptions($this->currentAdmin->uuid);
 
-            return $this->response->setJSON([
+            return $this->jsonResponse([
                 'result' => true,
                 'output' => view('backend/account/partials/permissions/permissionsPartial', $this->data)
             ]);
@@ -250,7 +250,7 @@ class AccountController extends BackendController
         /* Se la richiesta è AJAX e in POST, gestiamo il rinfresco asincrono */
         if ($this->request->isAJAX() && $this->request->is('post')):
 
-            return $this->response->setJSON([
+            return $this->jsonResponse([
                 'result' => true,
                 'output' => view('backend/account/partials/tokens/tokensPartial', $this->data)
             ]);
@@ -277,7 +277,7 @@ class AccountController extends BackendController
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 
-                return $this->response->setJSON(['result' => false, 'message' => sprintf(lang('backend/account.messages.validateToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/account.messages.validateToastErrors'), $errorMessage)]);
             endif;
 
             $result = $this->accountModel->deleteToken($posts, $this->currentAdmin);
@@ -296,7 +296,7 @@ class AccountController extends BackendController
 
             endif;
 
-            return $this->response->setJSON($json);
+            return $this->jsonResponse($json);
 
         endif;
     }
@@ -326,7 +326,7 @@ class AccountController extends BackendController
             endif;
 
 
-            return $this->response->setJSON($json);
+            return $this->jsonResponse($json);
 
         endif;
 
@@ -360,17 +360,17 @@ class AccountController extends BackendController
 
             /* Validazione dell'input */
             if ( ! in_array($method, $allowedMethods, true) || $method === 'totp') :
-                return $this->response->setJSON(['result' => false, 'message' => lang('backend/account.messages.methodNotValid')]);
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/account.messages.methodNotValid')]);
             endif;
 
             /* Eseguo l'aggiornamento nel Model */
             $updated = $this->accountModel->setBasicMethod($this->currentAdmin, $method);
 
             if ( ! $updated) :
-                return $this->response->setJSON(['result' => false, 'message' => lang('backend/account.messages.updateSecuritySettingsError')]);
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/account.messages.updateSecuritySettingsError')]);
             endif;
 
-            return $this->response->setJSON(['result' => true, 'message' => lang('backend/account.messages.updateSecuritySettingsSuccess')]);
+            return $this->jsonResponse(['result' => true, 'message' => lang('backend/account.messages.updateSecuritySettingsSuccess')]);
 
         endif;
     }
@@ -397,7 +397,7 @@ class AccountController extends BackendController
             $saved = $this->accountModel->saveTemporarySecret($adminUuid, $secret);
 
             if ( ! $saved) :
-                return $this->response->setJSON(['result' => false, 'message' => lang('backend/account.messages.configurationInitializeError')]);
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/account.messages.configurationInitializeError')]);
             endif;
 
             /* Genero l'URI stringa usando il servizio esistente */
@@ -419,7 +419,7 @@ class AccountController extends BackendController
             /* Renderizzo la vista parziale per l'attivazione del TOTP */
             $output = view('backend/account/partials/security/totpSetupPartial', $data);
 
-            return $this->response->setJSON(['result' => true, 'output' => $output]);
+            return $this->jsonResponse(['result' => true, 'output' => $output]);
 
         endif;
     }
@@ -443,7 +443,7 @@ class AccountController extends BackendController
             $posts = array_intersect_key($this->request->getPost(), array_flip($allowedFields));
 
             if ( ! $this->validateData($posts, ['otp' => 'required|is_natural_no_zero|exact_length[6]'])) :
-                return $this->response->setJSON(['result'  => false, 'message' => lang('backend/account.messages.validationErrors')]);
+                return $this->jsonResponse(['result'  => false, 'message' => lang('backend/account.messages.validationErrors')]);
             endif;
 
             /* Da qui in poi lavoriamo solo sul parametro sanificato e validato */
@@ -454,23 +454,23 @@ class AccountController extends BackendController
             $secret = $this->accountModel->getTemporarySecret($adminUuid);
 
             if ( ! $secret) :
-                return $this->response->setJSON(['result' => false, 'message' => lang('backend/account.messages.noConfigurationSession')]);
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/account.messages.noConfigurationSession')]);
             endif;
 
             /* Istanzio il servizio e valido il codice */
             $otpService = new \App\Libraries\AppOtpService();
             if ( ! $otpService->verify($secret, $otpCode)) :
-                return $this->response->setJSON(['result' => false, 'message' => lang('backend/account.messages.wrongCode')]);
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/account.messages.wrongCode')]);
             endif;
 
             /* Attivo definitivamente il TOTP nel DB */
             $activated = $this->accountModel->activateTotpMethod($adminUuid, $this->currentAdmin);
 
             if ( ! $activated) :
-                return $this->response->setJSON(['result' => false, 'message' => lang('backend/account.messages.totpActivationNotPossible')]);
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/account.messages.totpActivationNotPossible')]);
             endif;
 
-            return $this->response->setJSON(['result' => true, 'message' => lang('backend/account.messages.totpConfigurationSuccess')]);
+            return $this->jsonResponse(['result' => true, 'message' => lang('backend/account.messages.totpConfigurationSuccess')]);
 
         endif;
     }

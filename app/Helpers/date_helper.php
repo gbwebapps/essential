@@ -7,7 +7,7 @@
  * formattazione e localizzazione (i18n) delle date nel sistema.
  */
 
-if (! function_exists('convertDate')):
+if ( ! function_exists('convertDate')):
     
     /**
      * Converte una stringa data in un formato localizzato (i18n) basato sulla lingua impostata nell'applicazione.

@@ -10,23 +10,8 @@
         </div>
     </div>
 
-    <?php
+    <?php if (session()->getFlashdata('isLogout')): ?>
+        <script>localStorage.clear();</script>
+    <?php session()->destroy(); endif; ?>
 
-        /* Verifichiamo se siamo atterrati qui a seguito di un logout */
-        if (session()->getFlashdata('isLogout')): 
-    ?>
-        <script>
-
-            /* Pulizia totale e profonda del Local Storage client */
-            localStorage.clear();
-
-        </script>
-    <?php
-
-        /* Vaporizza la vecchia sessione con i dati dell'utente loggato */
-        session()->destroy();
-
-        endif; 
-    ?>
-    
 <?= $this->endSection() ?>

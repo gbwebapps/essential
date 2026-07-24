@@ -67,7 +67,7 @@ class AuditsController extends BackendController
             $rules = $this->auditsModel->showAllValidationRules();
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/audits.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/audits.messages.validationToastErrors'), $errorMessage)]);
             endif;
 
             $posts['searchFields'] = $posts['searchFields'] ?? [];
@@ -77,7 +77,7 @@ class AuditsController extends BackendController
             if ( ! $this->validateData($posts, $rules)):
                 $formattedErrors = removeDot('searchFields.', $this->validator->getErrors());
                 $formattedErrors = removeDot('searchDates.', $formattedErrors);
-                return $this->response->setJSON(['errors' => $formattedErrors, 'message' => lang('backend/audits.messages.validationErrors')]);
+                return $this->jsonResponse(['errors' => $formattedErrors, 'message' => lang('backend/audits.messages.validationErrors')]);
             endif;
 
             /* Attiviamo il contesto audit e lasciamo che getData() faccia tutto il lavoro pesante */
@@ -103,7 +103,7 @@ class AuditsController extends BackendController
 
             endif;
 
-            return $this->response->setJSON($json);
+            return $this->jsonResponse($json);
 
         endif;
 

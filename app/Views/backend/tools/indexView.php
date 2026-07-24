@@ -2,10 +2,41 @@
 
 <?= $this->section('content') ?>
 
-    <div class="row">
-        <div class="col-12">
-            <div id="index-tools-container">
-                <?= $this->include('backend/tools/partials/index/indexPartial'); ?>
+    <div class="container">
+        <div class="row g-0">
+            <div class="col-12">
+                
+                <div class="accordion" id="mainToolsDashboard">
+
+                    <?php foreach(['manageAudits', 'dbMaintenance', 'backup'] as $env): ?>
+
+                        <?php
+                            /* Assegnazione icona specifica per ciascun pannello */
+                            $icon = match($env) {
+                                'manageAudits' => 'fa-clock-rotate-left',
+                                'dbMaintenance' => 'fa-database',
+                                'backup' => 'fa-box-archive',
+                                default => 'fa-wrench'
+                            };
+                        ?>
+
+                        <div class="accordion-item mb-3 border">
+                            <h2 class="accordion-header" id="main_heading_<?= $env; ?>">
+                                <button class="accordion-button collapsed shadow-none bg-light text-secondary py-3 btn-trigger-<?= $env; ?>-tools" data-env="<?= $env; ?>" type="button" aria-expanded="false" aria-controls="main_collapse_<?= $env; ?>">
+                                    <h2 class="card-title mb-0 fs-5">
+                                        <i class="fa-solid <?= $icon; ?> me-2"></i><?= lang('backend/tools.panels.' . $env); ?>
+                                    </h2>
+                                </button>
+                            </h2>
+                            <div id="main_collapse_<?= $env; ?>" class="accordion-collapse collapse" aria-labelledby="main_heading_<?= $env; ?>" data-bs-parent="#mainToolsDashboard">
+                                <div id="<?= $env; ?>-tools-container" class="accordion-body bg-white border-top mb-0"></div>
+                            </div>
+                        </div>
+
+                    <?php endforeach; ?>
+
+                </div>
+
             </div>
         </div>
     </div>

@@ -1,0 +1,2 @@
+id,admin_uuid,username,action,section,details,ip_address,user_agent,created_at
+142,e4eaaaf2-d142-4f8b-8cf6-4d8a1fc27b31,gbwebapps@gmail.com,DELETE_AUDITS,tools,"Eliminazione audits dal 2026-07-01 15:45:12:00 al 2026-07-31 15:45:18:00",127.0.0.1,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36","2026-07-24 15:45:24"

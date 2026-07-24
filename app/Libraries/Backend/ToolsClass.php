@@ -39,15 +39,15 @@ class ToolsClass
 	 *
 	 * @return array
 	 */
-	public function getOptionsIndex()
-	{
-		return 
-		[
-		    ['label' => lang('backend/tools.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/tools.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/tools.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		];
-	}
+	// public function getOptionsIndex()
+	// {
+	// 	return 
+	// 	[
+	// 	    ['label' => lang('backend/tools.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/tools.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/tools.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	];
+	// }
 
 	/* ------------------------------------------------------------------------------------------------- */
 
@@ -59,13 +59,13 @@ class ToolsClass
 	 *
 	 * @return array
 	 */
-	public function getLinksBarIndex()
-	{
-		return 
-		[
-            ['icon' => '<i class="fa-solid fa-sliders"></i>', 'label' => lang('backend/tools.linksBar.settings'), 'route' => 'backend/settings'],
-        ];
-	}
+	// public function getLinksBarIndex()
+	// {
+	// 	return 
+	// 	[
+    //         ['icon' => '<i class="fa-solid fa-sliders"></i>', 'label' => lang('backend/tools.linksBar.settings'), 'route' => 'backend/settings'],
+    //     ];
+	// }
 
 	/* ------------------------------------------------------------------------------------------------- */
 
@@ -77,12 +77,13 @@ class ToolsClass
 	 *
 	 * @return array
 	 */
-	/*public function getJsIndex(): array
+	public function getJsIndex(): array
 	{
 	    return [
-	        ['id' => 'datatables-js', 'path' => 'assets/js/backend/datatables.js', 'position' => 'before', 'target' => 'backend-js']
+	        ['id' => 'flatpickr-js', 'path' => 'assets/vendor/flatpickr/js/flatpickr.min.js', 'position' => 'before', 'target' => 'audits-js'], 
+	        ['id' => 'it-js', 'path' => 'assets/vendor/flatpickr/js/it.js', 'position' => 'after', 'target' => 'flatpickr-js']
 	    ];
-	}*/
+	}
 
 	/* ------------------------------------------------------------------------------------------------- */
 
@@ -94,10 +95,10 @@ class ToolsClass
 	 *
 	 * @return array
 	 */
-	/*public function getCssIndex(): array
+	public function getCssIndex(): array
 	{
 	    return [
-	        ['id' => 'datatables-css', 'path' => 'assets/css/backend/datatables.css', 'position' => 'before', 'target' => 'backend-css']
+	        ['id' => 'flatpickr-css', 'path' => 'assets/vendor/flatpickr/css/flatpickr.min.css', 'position' => 'before', 'target' => 'backend-css']
 	    ];
-	}*/
+	}
 }

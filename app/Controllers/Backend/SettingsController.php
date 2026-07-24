@@ -73,7 +73,7 @@ class SettingsController extends BackendController
 
             /* Protezione: Blocco immediato se l'ambiente non è rigorosamente autorizzato */
             if ( ! in_array($env, $this->allowedEnvs, true)):
-                return $this->response->setJSON(['result' => false, 'message' => lang('backend/settings.messages.validationErrors')]);
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/settings.messages.validationErrors')]);
             endif;
 
             $namespace = 'Backend\\' . ucfirst($env);
@@ -81,7 +81,7 @@ class SettingsController extends BackendController
             /* Estrazione globale dell'intero gruppo */
             $this->data[$env . 'Settings'] = $this->settingsModel->getSettings($namespace);
 
-            return $this->response->setJSON(['result' => true, 'output' => view('backend/settings/partials/index/' . $env . 'SettingsPartial', $this->data)]);
+            return $this->jsonResponse(['result' => true, 'output' => view('backend/settings/partials/index/' . $env . 'SettingsPartial', $this->data)]);
 
         endif;
     }
@@ -98,7 +98,7 @@ class SettingsController extends BackendController
 
             /* Utilizzo della proprietà centralizzata per la whitelist */
             if ( ! in_array($env, $this->allowedEnvs, true)):
-                return $this->response->setJSON(['result' => false, 'message' => lang('backend/settings.messages.validationErrors')]);
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/settings.messages.validationErrors')]);
             endif;
 
             /* Generazione dinamica sicura del metodo di validazione dopo il controllo in whitelist */
@@ -106,7 +106,7 @@ class SettingsController extends BackendController
             $rules = $this->settingsModel->{$method}();
 
             if ( ! $this->validateData($posts, $rules)):
-                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/settings.messages.validationErrors')]);
+                return $this->jsonResponse(['errors' => $this->validator->getErrors(), 'message' => lang('backend/settings.messages.validationErrors')]);
             endif;
 
             $namespace = 'Backend\\' . ucfirst($env);
@@ -116,14 +116,14 @@ class SettingsController extends BackendController
 
             /* 2. Se il salvataggio restituisce un esito negativo (es. sbarramento nessuna modifica), lo restituiamo subito */
             if ($saveResult !== null && $saveResult['result'] === false) :
-                return $this->response->setJSON(['result'  => false, 'message' => $saveResult['message']]);
+                return $this->jsonResponse(['result'  => false, 'message' => $saveResult['message']]);
             endif;
 
             /* 3. Ricarica i settaggi aggiornati (ora puliti e rinfrescati) per la vista */
             $this->data[$env . 'Settings'] = $this->settingsModel->getSettings($namespace);
 
             /* 4. Restituisci la risposta di successo con il partial aggiornato */
-            return $this->response->setJSON(['result'  => true, 'message' => lang('backend/settings.messages.saveSuccess'), 'output'  => view('backend/settings/partials/index/' . $env . 'SettingsPartial', $this->data)]);
+            return $this->jsonResponse(['result'  => true, 'message' => lang('backend/settings.messages.saveSuccess'), 'output'  => view('backend/settings/partials/index/' . $env . 'SettingsPartial', $this->data)]);
 
         endif;
     }
@@ -140,7 +140,7 @@ class SettingsController extends BackendController
 
             /* Protezione: Impedisce l'estrazione di informazioni da namespace di sistema non autorizzati */
             if ( ! in_array($env, $this->allowedEnvs, true)):
-                return $this->response->setJSON(['result' => false, 'message' => lang('backend/settings.messages.validationErrors')]);
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/settings.messages.validationErrors')]);
             endif;
 
             $namespace = 'Backend\\' . ucfirst($env);
@@ -148,7 +148,7 @@ class SettingsController extends BackendController
 
             $this->data[$env . 'Settings'] = $this->settingsModel->getSettings($namespace, $keysFilter);
 
-            return $this->response->setJSON(['result' => true, 'data' => $this->data[$env . 'Settings']]);
+            return $this->jsonResponse(['result' => true, 'data' => $this->data[$env . 'Settings']]);
 
         endif;
     }
@@ -165,7 +165,7 @@ class SettingsController extends BackendController
 
             /* Protezione: Impedisce la cancellazione arbitraria di dati sul database tramite manipolazione di env */
             if ( ! in_array($env, $this->allowedEnvs, true)) :
-                return $this->response->setJSON(['result'  => false, 'message' => lang('backend/settings.messages.validationErrors')]);
+                return $this->jsonResponse(['result'  => false, 'message' => lang('backend/settings.messages.validationErrors')]);
             endif;
 
             $namespace = 'Backend\\' . ucfirst($env);
@@ -174,10 +174,10 @@ class SettingsController extends BackendController
             $deleted = $this->settingsModel->deleteSettings($namespace);
 
             if ( ! $deleted) :
-                return $this->response->setJSON(['result'  => false, 'message' => lang('backend/settings.messages.alreadyDefault')]);
+                return $this->jsonResponse(['result'  => false, 'message' => lang('backend/settings.messages.alreadyDefault')]);
             endif;
 
-            return $this->response->setJSON(['result'  => true, 'message' => lang('backend/settings.messages.deleteSuccess')]);
+            return $this->jsonResponse(['result'  => true, 'message' => lang('backend/settings.messages.deleteSuccess')]);
 
         endif;
     }

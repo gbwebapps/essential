@@ -96,7 +96,7 @@ class AuthController extends BackendController
             $rules = $this->authModel->validateLoginRules();
 
             if (! $this->validateData($posts, $rules)):
-                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validationErrors')]);
+                return $this->jsonResponse(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validationErrors')]);
             endif;
 
             $json = $this->authModel->login($posts, $this->request);
@@ -110,7 +110,7 @@ class AuthController extends BackendController
             /* Aggiunge la destinazione alla risposta per far eseguire il redirect al JS */
             $json['redirect'] = $redirectUrl;
 
-            return $this->response->setJSON($json);
+            return $this->jsonResponse($json);
 
         endif;
 
@@ -135,13 +135,13 @@ class AuthController extends BackendController
             $rules = $this->authModel->validateResetPasswordRules();
 
             if( ! $this->validateData($posts, $rules)):
-                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validationErrors')]);
+                return $this->jsonResponse(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validationErrors')]);
             endif;
 
             $json = $this->authModel->resetPassword($posts, $this->request);
 
             /* Restituisce l'ok al Javascript */
-            return $this->response->setJSON($json);
+            return $this->jsonResponse($json);
 
         endif;
 
@@ -167,13 +167,13 @@ class AuthController extends BackendController
             $rules = $this->authModel->validateSetPasswordRules();
 
             if( ! $this->validateData($posts, $rules)):
-                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validationErrors')]);
+                return $this->jsonResponse(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validationErrors')]);
             endif;
 
             $json = $this->authModel->setPassword($posts);
 
             /* Restituisce l'ok al Javascript */
-            return $this->response->setJSON($json);
+            return $this->jsonResponse($json);
 
         endif;
 
@@ -215,14 +215,14 @@ class AuthController extends BackendController
             $rules = $this->authModel->validateVerifyRules();
 
             if ( ! $this->validateData($posts, $rules)):
-                return $this->response->setJSON(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validationErrors')]);
+                return $this->jsonResponse(['errors' => $this->validator->getErrors(), 'message' => lang('backend/auth.messages.validationErrors')]);
             endif;
 
             /* Il controllo sul database, l'eventuale blocco brute-force e la pulizia della 
                sessione in caso di successo avverranno tutti atomicamente dentro il Model */
             $json = $this->authModel->verify($posts, $this->request);
 
-            return $this->response->setJSON($json);
+            return $this->jsonResponse($json);
 
         endif;
 

@@ -1,13 +1,14 @@
 /* Import delle costanti e utility da backend.js */
-import { urlbase, action } from './backend.js';
+import { action } from './backend.js';
 
 /* Import della classe logica polivalente */
 import { SettingsManager } from './components/Settings.js';
 
 const actions = {
     index: function() {
+        
         /* Istanziamo il manager UNA SOLA VOLTA globalmente per tutti i pannelli */
-        const manager = new SettingsManager('backend/settings/openSettings', 'backend/settings/saveSettings', 'backend/settings/deleteSettings');
+        const manager = new SettingsManager();
 
         /* Gestione dell'apertura visiva e del caricamento dinamico dei pannelli */
         const triggerButtons = document.querySelectorAll('.accordion-header button[data-env]');

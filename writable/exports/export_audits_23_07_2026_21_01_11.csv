@@ -1,0 +1,4 @@
+id,admin_uuid,username,action,section,details,ip_address,user_agent,created_at
+130,e4eaaaf2-d142-4f8b-8cf6-4d8a1fc27b31,gbwebapps@gmail.com,LOGIN_SUCCESS,auth,"Accesso effettuato Giorgio Alessandro Barone ",127.0.0.1,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36","2026-07-23 16:50:17"
+131,e4eaaaf2-d142-4f8b-8cf6-4d8a1fc27b31,gbwebapps@gmail.com,SAVE_SETTINGS,settings,"Salvataggio impostazioni.",127.0.0.1,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36","2026-07-23 17:22:39"
+132,e4eaaaf2-d142-4f8b-8cf6-4d8a1fc27b31,gbwebapps@gmail.com,LOGIN_SUCCESS,auth,"Accesso effettuato Giorgio Alessandro Barone ",127.0.0.1,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36","2026-07-23 20:30:17"

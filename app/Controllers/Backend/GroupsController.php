@@ -73,7 +73,7 @@ class GroupsController extends BackendController
             /* Generiamo la vista parziale che contiene il form per creare un nuovo gruppo */
             $output = view('backend/groups/partials/index/addGroupPartial', $this->data);
 
-            return $this->response->setJSON(['result' => true, 'output' => $output]);
+            return $this->jsonResponse(['result' => true, 'output' => $output]);
 
         endif;
     }
@@ -92,7 +92,7 @@ class GroupsController extends BackendController
             /* Generiamo la vista parziale che contiene l'elenco dei soli macro-bottoni dell'accordion */
             $output = view('backend/groups/partials/index/getGroupsPartial', $this->data);
 
-            return $this->response->setJSON(['result' => true, 'output' => $output]);
+            return $this->jsonResponse(['result' => true, 'output' => $output]);
 
         endif;
     }
@@ -111,13 +111,13 @@ class GroupsController extends BackendController
             /* Validazione dei posts */
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->response->setJSON(['result' => false, 'message' => sprintf(lang('backend/groups.messages.validateToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/groups.messages.validateToastErrors'), $errorMessage)]);
             endif;
 
             /* Recuperiamo i dati del gruppo (nome e descrizione) */
             $group = $this->groupsModel->getGroupById($posts);
             if ( ! $group):
-                return $this->response->setJSON(['result' => false, 'message' => 'Gruppo non trovato.']);
+                return $this->jsonResponse(['result' => false, 'message' => 'Gruppo non trovato.']);
             endif; 
 
             $this->data['group'] = $group;
@@ -129,7 +129,7 @@ class GroupsController extends BackendController
             /* Generiamo il sotto-parziale di modifica */
             $output = view('backend/groups/partials/index/getGroupPartial', $this->data);
 
-            return $this->response->setJSON(['result' => true, 'output' => $output]);
+            return $this->jsonResponse(['result' => true, 'output' => $output]);
 
         endif;
     }
@@ -147,7 +147,7 @@ class GroupsController extends BackendController
                 $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
                 $output = view('backend/groups/partials/index/addGroupPartial', $this->data);
 
-                return $this->response->setJSON(['result' => true, 'output' => $output]);
+                return $this->jsonResponse(['result' => true, 'output' => $output]);
             endif;
 
             $rules = $this->groupsModel->addValidationRules();
@@ -160,13 +160,13 @@ class GroupsController extends BackendController
                 /* Raggruppiamo i dot-permissions sotto la chiave unica 'permissions' per il DOM */
                 $cleanErrors = removeDotPermissions('permissions', $rawErrors);
 
-                return $this->response->setJSON(['errors' => $cleanErrors, 'message' => lang('backend/groups.messages.validationErrors')]);
+                return $this->jsonResponse(['errors' => $cleanErrors, 'message' => lang('backend/groups.messages.validationErrors')]);
             endif;
 
             /* Esecuzione della logica di inserimento con sbarramento interno */
             $result = $this->groupsModel->add($posts);
 
-            return $this->response->setJSON($result);
+            return $this->jsonResponse($result);
 
         endif;
     }
@@ -186,7 +186,7 @@ class GroupsController extends BackendController
                 $groupRow = $this->groupsModel->getGroupById($posts);
                 
                 if ( ! $groupRow):
-                    return $this->response->setJSON(['result' => false, 'message' => lang('backend/groups.messages.notFound')]);
+                    return $this->jsonResponse(['result' => false, 'message' => lang('backend/groups.messages.notFound')]);
                 endif;
 
                 $this->data['group'] = $groupRow;
@@ -196,7 +196,7 @@ class GroupsController extends BackendController
                 /* Rigeneriamo lo stesso parziale HTML usato per il caricamento iniziale */
                 $output = view('backend/groups/partials/index/getGroupPartial', $this->data);
 
-                return $this->response->setJSON(['result' => true, 'output' => $output]);
+                return $this->jsonResponse(['result' => true, 'output' => $output]);
 
             endif;
 
@@ -212,13 +212,13 @@ class GroupsController extends BackendController
                 /* Raggruppiamo i dot-permissions sotto la chiave unica 'permissions' per il DOM */
                 $cleanErrors = removeDotPermissions('permissions', $rawErrors);
 
-                return $this->response->setJSON(['errors' => $cleanErrors, 'message' => lang('backend/groups.messages.validationErrors')]);
+                return $this->jsonResponse(['errors' => $cleanErrors, 'message' => lang('backend/groups.messages.validationErrors')]);
             endif;
 
             /* Esecuzione della logica di modifica con sbarramento interno */
             $result = $this->groupsModel->edit($posts);
 
-            return $this->response->setJSON($result);
+            return $this->jsonResponse($result);
 
         endif;
     }
@@ -234,13 +234,13 @@ class GroupsController extends BackendController
             /* Validazione dei posts */
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->response->setJSON(['result' => false, 'message' => sprintf(lang('backend/groups.messages.validateToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/groups.messages.validateToastErrors'), $errorMessage)]);
             endif;
 
             /* Esecuzione della logica di inserimento con sbarramento interno */
             $result = $this->groupsModel->del($posts);
 
-            return $this->response->setJSON($result);
+            return $this->jsonResponse($result);
 
         endif;
     }
@@ -253,7 +253,7 @@ class GroupsController extends BackendController
             /* Generiamo la vista parziale che contiene il campo per cercare un utente */
             $output = view('backend/groups/partials/index/exceptionsPartial', $this->data);
 
-            return $this->response->setJSON(['result' => true, 'output' => $output]);
+            return $this->jsonResponse(['result' => true, 'output' => $output]);
 
         endif;
     }
@@ -268,7 +268,7 @@ class GroupsController extends BackendController
             /* Validazione dei posts */
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->response->setJSON(['result' => false, 'message' => sprintf(lang('backend/groups.messages.validateToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/groups.messages.validateToastErrors'), $errorMessage)]);
             endif;
 
             /* Carichiamo gli amministratori filtrati dal model passando la query */
@@ -277,7 +277,7 @@ class GroupsController extends BackendController
             /* Generiamo la vista parziale che conterrà il ciclo foreach per il dropdown */
             $output = view('backend/groups/partials/index/getDropdownAdminsPartial', $this->data);
 
-            return $this->response->setJSON(['result' => true, 'output' => $output]);
+            return $this->jsonResponse(['result' => true, 'output' => $output]);
 
         endif;
     }
@@ -292,13 +292,13 @@ class GroupsController extends BackendController
             /* Validazione dei posts */
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->response->setJSON(['result' => false, 'message' => sprintf(lang('backend/groups.messages.validateToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/groups.messages.validateToastErrors'), $errorMessage)]);
             endif;
 
             /* Recuperiamo i dettagli dell'amministratore (ci servirà il suo group_id) */
             $admin = $this->groupsModel->getAdminByUuid($posts);
             if ( ! $admin):
-                return $this->response->setJSON(['result' => false, 'message' => 'Amministratore non trovato.']);
+                return $this->jsonResponse(['result' => false, 'message' => 'Amministratore non trovato.']);
             endif;
 
             $this->data['uuid'] = $posts['uuid'];
@@ -317,7 +317,7 @@ class GroupsController extends BackendController
             /* Generiamo la vista parziale con la griglia completa */
             $output = view('backend/groups/partials/index/getAdminPermissionsPartial', $this->data);
 
-            return $this->response->setJSON(['result' => true, 'output' => $output]);
+            return $this->jsonResponse(['result' => true, 'output' => $output]);
 
         endif;
     }
@@ -331,7 +331,7 @@ class GroupsController extends BackendController
 
             /* Validazione preliminare dell'UUID dell'amministratore */
             if (( ! isset($posts['uuid'])) || ( ! $this->regexp->validateUUID($posts['uuid']))):
-                return $this->response->setJSON(['result' => false, 'message' => lang('backend/global.messages.wrongUUIDFormat')]);
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/global.messages.wrongUUIDFormat')]);
             endif;
 
             /* Recuperiamo le regole di validazione specifiche per le eccezioni dal Model */
@@ -344,13 +344,13 @@ class GroupsController extends BackendController
                 /* Raggruppiamo i dot-errors di 'permissions.*' sotto la chiave unica per il DOM */
                 $cleanErrors = removeDotPermissions('permissions', $rawErrors);
 
-                return $this->response->setJSON(['errors' => $cleanErrors, 'message' => lang('backend/global.messages.validationErrors')]);
+                return $this->jsonResponse(['errors' => $cleanErrors, 'message' => lang('backend/global.messages.validationErrors')]);
             endif;
 
             /* Eseguiamo il salvataggio dei delta sul database tramite il Model */
             $result = $this->groupsModel->saveExceptions($posts);
 
-            return $this->response->setJSON(['result'  => $result['result'], 'message' => $result['message']]);
+            return $this->jsonResponse(['result'  => $result['result'], 'message' => $result['message']]);
 
         endif;
     }

@@ -1,5 +1,5 @@
 /* Import delle utility risalendo di un livello */
-import { urlbase, apiFetch, toggleLoader, showAlert, askConfirm, smoothReplace, handleValidationErrors } from '../backend.js';
+import { urlbase, apiFetch, showAlert, handleValidationErrors } from '../backend.js';
 
 export class LoginManager {
     constructor(hooks = {}) {

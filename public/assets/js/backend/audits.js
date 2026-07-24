@@ -1,5 +1,5 @@
 /* Import delle costanti e utility da backend.js */
-import { urlbase, controller, action, initRangeDatePicker } from './backend.js';
+import { urlbase, action, initRangeDatePicker } from './backend.js';
 
 /* Import dei componenti dalla sottocartella */
 import { ListManager } from './components/Crud.js';

@@ -40,18 +40,29 @@ export function toggleLoader(show) {
     }
 }
 
+/* Coda di esecuzione per evitare Race Conditions sulle chiamate simultanee */
+let fetchQueue = Promise.resolve();
+
 /* --- Chiamata fetch generica ottimizzata (Interfaccia Response preservata) --- */
 export async function apiFetch(input, init = {}) {
+
+    /* Concateniamo la chiamata per eseguirle in sequenza e mantenere coerente il CSRF */
+    fetchQueue = fetchQueue.then(() => executeFetch(input, init));
+    return fetchQueue;
+}
+
+async function executeFetch(input, init = {}) {
     toggleLoader(true);
 
     const defaultHeaders = { 'X-Requested-With': 'XMLHttpRequest' };
     const method = (init.method || 'GET').toUpperCase();
 
-    if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
-        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-        if (csrfMeta) {
-            defaultHeaders['X-CSRF-TOKEN'] = csrfMeta.getAttribute('content');
-        }
+    /* Selezione dinamica del meta tag CSRF presente nella pagina */
+    const csrfMeta = document.getElementById('csrf-meta');
+
+    /* Iniezione dell'header CSRF su tutte le chiamate non-GET */
+    if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method) && csrfMeta) {
+        defaultHeaders['X-CSRF-TOKEN'] = csrfMeta.getAttribute('content');
     }
 
     init.headers = Object.assign({}, defaultHeaders, init.headers || {});
@@ -61,7 +72,6 @@ export async function apiFetch(input, init = {}) {
         
         /* 1. Gestione dei casi con Status 200 OK */
         if (response.ok) {
-            /* Consumiamo lo stream una volta sola qui dentro */
             const data = await response.json();
 
             /* Sbarramento Sessione Scaduta */
@@ -70,10 +80,10 @@ export async function apiFetch(input, init = {}) {
                 return new Promise(() => {});
             }
 
-            /* Aggiornamento automatico del token CSRF se presente nel payload */
-            if (data && data.csrf) {
-                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-                if (csrfMeta) csrfMeta.setAttribute('content', data.csrf);
+            /* Aggiornamento automatico del token CSRF leggendo csrfHash o csrf */
+            const newHash = data?.csrfHash || data?.csrf;
+            if (newHash && csrfMeta) {
+                csrfMeta.setAttribute('content', newHash);
             }
 
             /* Ricreiamo e restituiamo un oggetto Response fresco per non rompere il codice a valle */
@@ -83,9 +93,10 @@ export async function apiFetch(input, init = {}) {
         /* 2. Gestione degli errori del server (es. 403, 500, 404) */
         const errorJson = await response.json().catch(() => ({}));
         
-        if (response.status === 403 && errorJson.csrf) {
-            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-            if (csrfMeta) csrfMeta.setAttribute('content', errorJson.csrf);
+        /* Aggiornamento del token CSRF anche in caso di risposta d'errore HTTP */
+        const errorHash = errorJson?.csrfHash || errorJson?.csrf;
+        if (errorHash && csrfMeta) {
+            csrfMeta.setAttribute('content', errorHash);
         }
 
         const serverMessage = errorJson.message || `Errore server (${response.status})`;
@@ -95,6 +106,7 @@ export async function apiFetch(input, init = {}) {
 
     } catch (error) {
         if ( ! (error instanceof Response)) {
+            
             /* Errori di rete puri (es. assenza di connessione) */
             handleAjaxError({ status: 0 }, error.message, error);
         }

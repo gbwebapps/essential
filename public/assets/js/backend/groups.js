@@ -1,5 +1,5 @@
 /* Import delle costanti e utility da backend.js */
-import { urlbase, action } from './backend.js';
+import { action } from './backend.js';
 
 /* Import della classe logica */
 import { GroupsManager } from './components/Groups.js';

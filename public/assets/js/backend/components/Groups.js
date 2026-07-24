@@ -52,9 +52,15 @@ export class GroupsManager {
         });
 
         /* 3. Intercettiamo il submit dei form di edit generati dinamicamente */
-        document.addEventListener('submit', e => {
+        document.addEventListener('submit', async (e) => {
             const editForm = e.target.closest('.edit-group-form');
             if (editForm) {
+                e.preventDefault();
+
+                const message = editForm.dataset.message;
+                const ok = await askConfirm(message);
+                if ( ! ok) return;
+
                 this.handleEditGroup(e);
             }
         });
@@ -69,19 +75,29 @@ export class GroupsManager {
         });
 
         /* 5. Intercettiamo il click sul pulsante elimina del gruppo */
-        document.addEventListener('click', e => {
+        document.addEventListener('click', async (e) => {
             const deleteBtn = e.target.closest('.btn-delete-group');
             if (deleteBtn) {
                 e.preventDefault();
+
+                const message = deleteBtn.dataset.message;
+                const ok = await askConfirm(message);
+                if ( ! ok) return;
+
                 this.handleDeleteGroup(deleteBtn);
             }
         });
 
         /* 6. Intercettiamo il reset del form di aggiunta */
-        document.addEventListener('click', e => {
+        document.addEventListener('click', async (e) => {
             const resetBtn = e.target.closest('.btn-reset-group');
             if (resetBtn) {
                 e.preventDefault();
+
+                const message = resetBtn.dataset.message;
+                const ok = await askConfirm(message);
+                if ( ! ok) return;
+
                 this.handleResetGroup(resetBtn);
             }
         });
@@ -110,10 +126,15 @@ export class GroupsManager {
         });
 
         /* 10. Intercettiamo il click sul pulsante ricarica dati delle eccezioni dell'amministratore */
-        document.addEventListener('click', e => {
+        document.addEventListener('click', async (e) => {
             const refreshAdminBtn = e.target.closest('.btn-refresh-admin-perms');
             if (refreshAdminBtn) {
                 e.preventDefault();
+
+                const message = refreshAdminBtn.dataset.message;
+                const ok = await askConfirm(message);
+                if ( ! ok) return;
+                
                 this.handleRefreshAdminPermissions(refreshAdminBtn);
             }
         });
@@ -219,12 +240,8 @@ export class GroupsManager {
     }
 
     async handleResetGroup(btnEl) {
+
         if (this.isSubmitting) return;
-
-        const message = btnEl.dataset.message;
-        const ok = await askConfirm(message);
-        if ( ! ok) return;
-
         this.isSubmitting = true;
         
         const container = document.getElementById('add-groups-container');
@@ -257,7 +274,6 @@ export class GroupsManager {
 
     /* Gestisce l'invio asincrono del form per la modifica di un gruppo esistente */
     async handleEditGroup(e) {
-        e.preventDefault();
 
         if (this.isSubmitting) return;
         this.isSubmitting = true;
@@ -316,13 +332,10 @@ export class GroupsManager {
 
     /* Richiede al backend i dati originali del gruppo e ripristina lo stato del form */
     async handleRefreshGroup(btnEl) {
+
         if (this.isSubmitting) return;
-
-        const message = btnEl.dataset.message;
-        const ok = await askConfirm(message);
-        if ( ! ok) return;
-
         this.isSubmitting = true;
+
         const groupId = btnEl.dataset.id;
         
         const formEl = document.querySelector(`.edit-group-form[data-id="${groupId}"]`);
@@ -369,13 +382,10 @@ export class GroupsManager {
 
     /* Gestisce l'eliminazione asincrona di un gruppo previa conferma dell'utente */
     async handleDeleteGroup(btnEl) {
+
         if (this.isSubmitting) return;
-
-        const message = btnEl.dataset.message;
-        const ok = await askConfirm(message);
-        if ( ! ok) return;
-
         this.isSubmitting = true;
+
         const groupId = btnEl.dataset.id;
 
         try {
@@ -529,7 +539,7 @@ export class GroupsManager {
 
         const query = inputEl.value.trim();
         const container = document.getElementById('dropdownAdmins');
-        if (!container) return;
+        if ( ! container) return;
 
         /* Se la query è inferiore a 3 caratteri svuotiamo il dropdown e ci fermiamo */
         if (query.length < 3) {
@@ -661,13 +671,10 @@ export class GroupsManager {
 
     /* Ricarica ed esegue il refresh della griglia permessi dell'amministratore selezionato */
     async handleRefreshAdminPermissions(btnEl) {
+
         if (this.isSubmitting) return;
-
-        const message = btnEl.dataset.message;
-        const ok = await askConfirm(message);
-        if ( ! ok) return;
-
         this.isSubmitting = true;
+
         const adminUuid = btnEl.dataset.uuid;
 
         const permissionsContainer = document.getElementById('admin-permissions-container');
