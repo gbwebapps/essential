@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1); 
 
 namespace App\Cells;
 
@@ -47,11 +47,11 @@ class BackendButtonsCell
                     'id_output' => 'add_reset',
                     'text_left' => lang('backend/' . $controller . '.buttons.resetData'),
                     'icon_left' => '<i class="fa-solid fa-refresh d-none d-sm-inline"></i>',
-                    'btn_left' => 'btn-danger btn-sm',
+                    'btn_left' => 'btn btn-danger btn-sm me-2',
                     'message' => lang('backend/' . $controller . '.messages.areYouSureResetData'),
                     'text_right' => lang('backend/' . $controller . '.buttons.sendData'),
                     'icon_right' => '<i class="fa-solid fa-floppy-disk d-none d-sm-inline"></i>',
-                    'btn_right' => 'btn-success btn-sm',
+                    'btn_right' => 'btn btn-success btn-sm ms-2',
                 ];
 
             case 'edit':
@@ -59,11 +59,11 @@ class BackendButtonsCell
                     'id_output' => 'edit_refresh',
                     'text_left' => lang('backend/' . $controller . '.buttons.refreshData'),
                     'icon_left' => '<i class="fa-solid fa-refresh d-none d-sm-inline"></i>',
-                    'btn_left' => 'btn-danger btn-sm',
+                    'btn_left' => 'btn btn-danger btn-sm me-2',
                     'message' => lang('backend/' . $controller . '.messages.areYouSureRefreshData'),
                     'text_right' => lang('backend/' . $controller . '.buttons.sendData'),
                     'icon_right' => '<i class="fa-solid fa-floppy-disk d-none d-sm-inline"></i>',
-                    'btn_right' => 'btn-success btn-sm',
+                    'btn_right' => 'btn btn-success btn-sm ms-2',
                 ];
 
             case 'show':
@@ -71,10 +71,10 @@ class BackendButtonsCell
                     'id_output' => 'print',
                     'text_left' => lang('backend/' . $controller . '.buttons.print'),
                     'icon_left' => '<i class="fa-solid fa-print d-none d-sm-inline"></i>',
-                    'btn_left' => 'btn-primary btn-sm',
+                    'btn_left' => 'btn btn-primary btn-sm me-2',
                     'message' => '',
                     'text_right' => lang('backend/' . $controller . '.buttons.export'),
-                    'btn_right' => 'btn-primary btn-sm',
+                    'btn_right' => 'btn btn-primary btn-sm ms-2',
                     'icon_right' => '<i class="fa-solid fa-file-export d-none d-sm-inline"></i>',
                 ];
 
@@ -82,11 +82,11 @@ class BackendButtonsCell
                 return [
                     'id_output' => 'edit_refresh',
                     'text_left' => lang('backend/' . $controller . '.buttons.reloadData'),
-                    'btn_left' => 'btn-danger btn-sm',
+                    'btn_left' => 'btn btn-danger btn-sm me-2',
                     'icon_left' => '<i class="fa-solid fa-refresh"></i>',
                     'message' => lang('backend/' . $controller . '.messages.areYouSureRefreshData'),
                     'text_right' => lang('backend/' . $controller . '.buttons.sendData'),
-                    'btn_right' => 'btn-success btn-sm',
+                    'btn_right' => 'btn btn-success btn-sm ms-2',
                     'icon_right' => '<i class="fa-solid fa-floppy-disk"></i>',
                 ];
 

@@ -69,13 +69,13 @@
 
             <div class="row mt-3">
                 <div class="col-12 d-flex align-middle justify-content-center">
-                    <button type="button" class="btn btn-outline-danger btn-sm btn-delete-group" data-id="<?= $group->id; ?>" data-message="<?= lang('backend/groups.messages.areYouSureDeleteGroup'); ?>">
+                    <button type="button" class="btn btn-outline-danger btn-sm btn-delete-group me-2" data-id="<?= $group->id; ?>" data-message="<?= lang('backend/groups.messages.areYouSureDeleteGroup'); ?>">
                         <i class="fa-solid fa-trash-can me-1"></i><?= lang('backend/groups.buttons.delete'); ?>
                     </button>
                     <button type="button" class="btn btn-danger btn-sm btn-refresh-group mx-2" data-id="<?= $group->id; ?>" data-message="<?= lang('backend/groups.messages.areYouSureToReload'); ?>">
                         <i class="fa-solid fa-refresh me-1"></i><?= lang('backend/groups.buttons.refreshData'); ?>
                     </button>
-                    <button type="submit" class="btn btn-success btn-sm">
+                    <button type="submit" class="btn btn-success btn-sm ms-2">
                         <i class="fa-solid fa-floppy-disk me-1"></i><?= lang('backend/groups.buttons.sendData'); ?>
                     </button>
                 </div>

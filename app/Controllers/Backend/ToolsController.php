@@ -37,7 +37,7 @@ class ToolsController extends BackendController
      *
      * @var array
      */
-    protected array $allowedEnvs = ['manageAudits', 'dbMaintenance', 'backup'];
+    protected array $allowedEnvs = ['manageAudits', 'dbMaintenance', 'backups'];
 
     /**
      * Inizializza il controller impostando il contesto operativo e istanziando modello e libreria specifici.
@@ -86,10 +86,16 @@ class ToolsController extends BackendController
                 return $this->jsonResponse(['result' => false, 'message' => lang('backend/tools.messages.validationErrors')]);
             endif;
 
+            /* Ottimizzazione: uso di if / elseif per evitare controlli a vuoto */
             if ($env === 'manageAudits'):
                 $this->data['minAuditYear'] = $this->toolsModel->getMinAuditYear();
                 $this->data['stats'] = $this->toolsModel->getAuditsStats(); 
                 $this->data['columns'] = $this->toolsModel->getAuditColumns();
+            elseif ($env === 'dbMaintenance'):
+                $this->data['database'] = $this->toolsModel->getDatabase();
+                $this->data['tables'] = $this->toolsModel->getTablesStatus();
+            elseif ($env === 'backups'):
+                $this->data['backups'] = $this->toolsModel->getBackups();
             endif;
 
             return $this->jsonResponse(['result' => true, 'output' => view('backend/tools/partials/index/' . $env . 'ToolsPartial', $this->data)]);
@@ -182,11 +188,33 @@ class ToolsController extends BackendController
     /**
      * Esegue le operazioni di manutenzione sul database e le tabelle.
      */
-    public function dbMaintenance(): ResponseInterface
+    public function optimizeTable(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
+            
+            $table = $this->request->getPost('table');
 
-            // some code here...
+            $ruleKey = is_array($table) ? 'table.*' : 'table';
+            
+            $rules = [
+                $ruleKey => 'required|regex_match[/^[a-zA-Z0-9_]+$/]'
+            ];
+
+            if ( ! $this->validateData($this->request->getPost(), $rules)):
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/tools.messages.validationErrors')]);
+            endif;
+
+            $optimizationResult = $this->toolsModel->runOptimization($table);
+
+            if ($optimizationResult === false):
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/tools.messages.optimizeError')]);
+            endif;
+
+            /* Scegliamo il messaggio corretto */
+            $message = is_array($table) ? lang('backend/tools.messages.optimizeAllSuccess') : lang('backend/tools.messages.optimizeSuccess');
+
+            /* tableData conterrà sempre un array (di 1 elemento o di N elementi) */
+            return $this->jsonResponse(['result' => true, 'message'   => $message, 'tableData' => $optimizationResult]);
 
         endif;
     }
@@ -194,12 +222,83 @@ class ToolsController extends BackendController
     /**
      * Esegue la generazione del backup per DB e/o file.
      */
-    public function backup(): ResponseInterface
+    public function backups()
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
-            // some code here...
+            $action = $this->request->getPost('action');
+            
+            $rules = [
+                'action' => 'required|in_list[generateBackups,deleteBackups,downloadBackups]'
+            ];
+
+            if ($action === 'deleteBackups' || $action === 'downloadBackups'):
+                $rules['filename'] = 'required|regex_match[/^[a-zA-Z0-9_\-\.]+$/]';
+            endif;
+
+            /* 3. Esecuzione della validazione sicura sui dati in ingresso */
+            if ( ! $this->validateData($this->request->getPost(), $rules)):
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/tools.messages.validationErrors')]);
+            endif;
+
+            /* Intercetta l'azione di generazione inviata da JavaScript */
+            if ($action === 'generateBackups'):
+                
+                /* Affidiamo al Model la creazione, compressione e rotazione dei file */
+                $backupCreated = $this->toolsModel->generateDatabaseBackups();
+
+                if ($backupCreated):
+                    return $this->jsonResponse(['result'  => true, 'message' => lang('backend/tools.messages.generateBackupsSuccess')]);
+                else:
+                    return $this->jsonResponse(['result'  => false, 'message' => lang('backend/tools.messages.generateBackupsError')]);
+                endif;
+
+            /* Intercetta l'azione di eliminazione */
+            elseif ($action === 'deleteBackups'):
+                
+                $filename = $this->request->getPost('filename');
+                                
+                if ($this->toolsModel->deleteBackups($filename)):
+                    return $this->jsonResponse(['result'  => true, 'message' => lang('backend/tools.messages.deleteBackupsSuccess')]);
+                else:
+                    return $this->jsonResponse(['result'  => false, 'message' => lang('backend/tools.messages.deleteBackupsError')]);
+                endif;
+
+            elseif ($action === 'downloadBackups'):
+                
+                $filename = $this->request->getPost('filename');
+                
+                $path = WRITEPATH . 'backups/' . basename($filename);
+                
+                if (file_exists($path) && is_file($path)):
+                    return $this->jsonResponse(['result' => true, 'downloadUrl' => base_url('backend/tools/downloadBackups/' . $filename)]);
+                else:
+                    return $this->jsonResponse(['result' => false, 'message' => lang('backend/tools.messages.backupNotFoundError')]);
+                endif;
+
+            endif;
 
         endif;
+    }
+
+    /**
+     * Gestisce lo scaricamento fisico del file di backup
+     */
+    public function downloadBackups(string $filename)
+    {
+        /* basename() impedisce tentativi di directory traversal (sicurezza) */
+        $path = WRITEPATH . 'backups/' . basename($filename);
+        
+        if (file_exists($path) && is_file($path)):
+
+            /* Registrazione attività (da inserire nel Controller) */
+            $currentAdmin = service('authorization')->currentAdmin();
+            log_admin_activity('DOWNLOAD_BACKUP', 'tools', sprintf('Scaricato backup del database: %s', $fileName), $currentAdmin);
+
+            return $this->response->download($path, null);
+        endif;
+
+        /* Fallback in caso di file inesistente */
+        return redirect()->to(base_url('backend/dashboard'))->with('error', lang('backend/tools.messages.backupNotFoundError'));
     }
 }

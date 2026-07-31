@@ -22,6 +22,8 @@ abstract class BackendModel extends BaseModel
 
 	protected ?string $entity = null;
 
+	protected bool $hasSoftDelete = false;
+
 	/**
 	 * Query SQL predefinita per la selezione dei record principali.
 	 *
@@ -121,7 +123,7 @@ abstract class BackendModel extends BaseModel
 	}
 
 	/**
-	 * Elabora l'estrazione paginata dei record applicando ordinamenti, filtri di ricerca e limiti.
+	 * Elabora l'estrazione paginata dei record applicando ordinamenti, filtri di ricerca, limiti e stato cestino.
 	 *
 	 * @param array $posts Parametri di input per la paginazione, l'ordinamento e i filtri.
 	 * @return array Esito dell'operazione contenente i record estratti e la configurazione della paginazione.
@@ -130,7 +132,8 @@ abstract class BackendModel extends BaseModel
 	{
 		try
 		{
-			$posts = $this->checkAllowedFields($posts, array_merge($this->showAllAllowedFields, ['searchDates']));
+			/* Whitelist estesa: aggiunto 'trash_filter' ai parametri consentiti */
+			$posts = $this->checkAllowedFields($posts, array_merge($this->showAllAllowedFields, ['searchDates', 'trash_filter']));
 
 			$params = [];
 			$paramsFilter = [];
@@ -145,13 +148,18 @@ abstract class BackendModel extends BaseModel
 				$params[] = service('authorization')->currentAdmin()->uuid;
 			endif;
 
-			/* 1. Filtri di testo standard (Esistente) */
+			/* Filtro Cestino basato sulla proprietà module */
+			$trashStatus = (isset($posts['trash_filter']) && in_array($posts['trash_filter'], ['active', 'trashed', 'all'])) ? $posts['trash_filter'] : 'active';
+			$sql .= $this->buildTrashFilter($trashStatus, $this->module, $this->hasSoftDelete);
+			$paramsFilter['trash_filter'] = $trashStatus;
+
+			/* 1. Filtri di testo standard */
 			if ( ! empty(array_filter($posts['searchFields']))):
 				$sql .= $this->buildFilters($posts['searchFields'], $params);
 				$paramsFilter['searchFields'] = $posts['searchFields'];
 			endif;
 
-			/* 2. NUOVO: Filtri per i range di date (Aggiunto) */
+			/* 2. Filtri per i range di date */
 			if ( ! empty(array_filter($posts['searchDates']))):
 				$sql .= $this->buildDateFilters($posts['searchDates'], $params);
 				$paramsFilter['searchDates'] = $posts['searchDates'];
@@ -160,15 +168,14 @@ abstract class BackendModel extends BaseModel
 			$sql .= ' order by ' . $posts['column'] . ' ' . $posts['order'];
 
 			$page = (isset($posts['page']) && is_numeric($posts['page']) && $posts['page'] > 0) ? (int)$posts['page'] : 1;
-
 			$recordsPerPage = (isset($posts['rows']) && is_numeric($posts['rows']) && $posts['rows'] > 0) ? min((int)$posts['rows'], 20) : 5;
-
 			$offset = ($page - 1) * $recordsPerPage; 
 
 			$sql .= ' limit ' . $offset . ', ' . $recordsPerPage;
 
 			$records = $this->db->query($sql, $params)->getResult();
 
+			/* Passaggio dei parametri completi al metodo di conteggio */
 			$totalRows = $this->getNumRows($paramsFilter); 
 
 			$lastItemPage = ($totalRows - $offset);
@@ -194,13 +201,16 @@ abstract class BackendModel extends BaseModel
 	private function getNumRows(array $paramsFilter): int
 	{
 		$params = [];
-
 		$sql = $this->getNumRowsQuery;
 
 		if($this->module === 'admins'):
 			$params[] = 1;
 			$params[] = service('authorization')->currentAdmin()->uuid;
 		endif;
+
+		/* 0. Filtro Cestino basato sulla proprietà module (Sincronizzato) */
+		$trashStatus = isset($paramsFilter['trash_filter']) ? $paramsFilter['trash_filter'] : 'active';
+		$sql .= $this->buildTrashFilter($trashStatus, $this->module, $this->hasSoftDelete);
 
 		if (isset($paramsFilter['searchFields']) && is_array($paramsFilter['searchFields'])):
 			$sql .= $this->buildFilters($paramsFilter['searchFields'], $params);
@@ -235,27 +245,56 @@ abstract class BackendModel extends BaseModel
 	}
 
 	private function buildDateFilters(array $searchDates, array &$params): string
-		{
-			$whereClause = '';
+	{
+		$whereClause = '';
 
-			foreach ($this->showAllSearchAllowedDates as $dbColumn):
-				/* 1. Controllo e binding per il limite inferiore (Da / >=) */
-				$fromKey = $dbColumn . '-from';
-				if (isset($searchDates[$fromKey]) && trim($searchDates[$fromKey]) !== ''):
-					$whereClause .= " and " . $dbColumn . " >= ?";
-					$params[] = $searchDates[$fromKey];
-				endif;
+		foreach ($this->showAllSearchAllowedDates as $dbColumn):
+			/* 1. Controllo e binding per il limite inferiore (Da / >=) */
+			$fromKey = $dbColumn . '-from';
+			if (isset($searchDates[$fromKey]) && trim($searchDates[$fromKey]) !== ''):
+				$whereClause .= " and " . $dbColumn . " >= ?";
+				$params[] = $searchDates[$fromKey];
+			endif;
 
-				/* 2. Controllo e binding per il limite superiore (A / <=) */
-				$toKey = $dbColumn . '-to';
-				if (isset($searchDates[$toKey]) && trim($searchDates[$toKey]) !== ''):
-					$whereClause .= " and " . $dbColumn . " <= ?";
-					$params[] = $searchDates[$toKey];
-				endif;
-			endforeach;
+			/* 2. Controllo e binding per il limite superiore (A / <=) */
+			$toKey = $dbColumn . '-to';
+			if (isset($searchDates[$toKey]) && trim($searchDates[$toKey]) !== ''):
+				$whereClause .= " and " . $dbColumn . " <= ?";
+				$params[] = $searchDates[$toKey];
+			endif;
+		endforeach;
 
-			return $whereClause;
-		}
+		return $whereClause;
+	}
+
+	/**
+	 * Genera la clausola SQL per filtrare i record in base allo stato del cestino.
+	 *
+	 * @param string $filter Tipo di filtro richiesto ('active', 'trashed', 'all').
+	 * @param string $table  Nome della tabella principale per evitare ambiguità SQL in caso di JOIN.
+	 * @return string Clausola SQL generata.
+	 */
+	private function buildTrashFilter(string $filter, string $table, bool $hasSoftDelete = true): string
+	{
+	    /* Sanitizzazione rigorosa del nome tabella per prevenire SQL injection strutturali */
+	    $table = preg_replace('/[^a-zA-Z0-9_]/', '', $table);
+
+	    /* Scudo strutturale: se la tabella non possiede la colonna deleted_at, la logica viene aggirata */
+	    if ($hasSoftDelete === false):
+	        return "";
+	    endif;
+
+	    if ($filter === 'trashed'):
+	        return " and {$table}.deleted_at IS NOT NULL";
+	    endif;
+
+	    if ($filter === 'all'):
+	        return ""; /* Nessuna restrizione, restituisce l'intero storico */
+	    endif;
+
+	    /* Comportamento enterprise di default (active): blocco rigoroso dei record cestinati */
+	    return " and {$table}.deleted_at IS NULL";
+	}
 
 	/**
 	 * Recupera un singolo record specifico estraendolo tramite il valore UUID.

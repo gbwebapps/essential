@@ -12,7 +12,7 @@
         <input type="hidden" name="entity" value="<?= esc($entity); ?>">
         <input type="hidden" name="context" value="<?= esc($context); ?>">
         <button type="submit" class="btn btn-sm btn-secondary">
-            <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/components/galleryOneImg.buttons.reload'); ?>
+            <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/components/galleryOneImg.buttons.reload'); ?>
         </button>
     </form>
 </div>

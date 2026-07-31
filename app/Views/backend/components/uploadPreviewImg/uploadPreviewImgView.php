@@ -13,7 +13,7 @@
             <div>
                 <input type="file" name="images[]" id="inputImages" style="display: none;" multiple>
                 <button type="button" class="btn btn-sm btn-secondary" id="buttonImages">
-                    <i class="fa-solid fa-arrow-pointer"></i><?= lang('backend/components/uploadPreviewImg.buttons.uploadImages'); ?>
+                    <i class="fa-solid fa-arrow-pointer me-1"></i><?= lang('backend/components/uploadPreviewImg.buttons.uploadImages'); ?>
                 </button>
             </div>
 
@@ -24,7 +24,7 @@
                         <input type="hidden" name="entity" value="<?= esc($entity); ?>">
                         <input type="hidden" name="context" value="<?= esc($context); ?>">
                         <button type="submit" class="btn btn-sm btn-success">
-                            <i class="fa-solid fa-upload"></i> <?= lang('backend/components/uploadPreviewImg.buttons.sendImages'); ?>
+                            <i class="fa-solid fa-upload me-1"></i> <?= lang('backend/components/uploadPreviewImg.buttons.sendImages'); ?>
                         </button>
                     </form>
                 </div>

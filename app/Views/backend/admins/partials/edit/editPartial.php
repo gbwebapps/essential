@@ -26,7 +26,7 @@
                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>" form="getGeneralData">
                     <input type="hidden" name="context" value="edit" form="getGeneralData">
                     <button type="submit" class="btn btn-sm btn-secondary" form="getGeneralData">
-                        <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/admins.buttons.reload'); ?>
+                        <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/admins.buttons.reload'); ?>
                     </button>
                 </div>
                 <div id="generalData">
@@ -40,7 +40,7 @@
                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>" form="getPermissions">
                     <input type="hidden" name="context" value="edit" form="getPermissions">
                     <button type="submit" class="btn btn-sm btn-secondary" form="getPermissions">
-                        <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/admins.buttons.reload'); ?>
+                        <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/admins.buttons.reload'); ?>
                     </button>
                 </div>
                 <div id="permissions">
@@ -61,7 +61,7 @@
                     <input form="getImages" type="hidden" name="entity" value="<?= esc($entity); ?>">
                     <input form="getImages" type="hidden" name="context" value="<?= esc($context); ?>">
                     <button form="getImages" type="submit" class="btn btn-sm btn-secondary">
-                        <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/components/galleryOneImg.buttons.reload'); ?>
+                        <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/components/galleryOneImg.buttons.reload'); ?>
                     </button>
                 </div>
                 <div id="galleryOne">
@@ -74,7 +74,7 @@
                     <h2 class="card-title text-start mb-0"><?= lang('backend/admins.panels.metaData'); ?></h2>
                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>" form="getMetaData">
                     <button type="submit" class="btn btn-sm btn-secondary" form="getMetaData">
-                        <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/admins.buttons.reload'); ?>
+                        <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/admins.buttons.reload'); ?>
                     </button>
                 </div>
                 <div id="metaData">

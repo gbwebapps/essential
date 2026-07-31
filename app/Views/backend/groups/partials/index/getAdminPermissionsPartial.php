@@ -70,10 +70,10 @@
 
             <div class="row mt-3">
                 <div class="col-12 d-flex align-middle justify-content-center">
-                    <button type="button" class="btn btn-danger btn-sm btn-refresh-admin-perms mx-2" data-uuid="<?= $uuid; ?>" data-message="Sei sicuro di voler ricaricare i dati originari di questo amministratore?">
+                    <button type="button" class="btn btn-danger btn-sm btn-refresh-admin-perms me-2" data-uuid="<?= $uuid; ?>" data-message="Sei sicuro di voler ricaricare i dati originari di questo amministratore?">
                         <i class="fa-solid fa-refresh me-1"></i>Ricarica dati
                     </button>
-                    <button type="submit" class="btn btn-success btn-sm">
+                    <button type="submit" class="btn btn-success btn-sm ms-2">
                         <i class="fa-solid fa-floppy-disk me-1"></i>Invia dati
                     </button>
                 </div>

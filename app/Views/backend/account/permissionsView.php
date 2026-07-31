@@ -18,7 +18,7 @@
                     <div>
                         <form id="getPermissions">
                             <button type="submit" class="btn btn-sm btn-secondary">
-                                <i class="fa-solid fa-arrows-rotate"></i> <?= lang('backend/account.buttons.reload'); ?>
+                                <i class="fa-solid fa-arrows-rotate me-1"></i> <?= lang('backend/account.buttons.reload'); ?>
                             </button>
                         </form>
                     </div>

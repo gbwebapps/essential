@@ -147,13 +147,13 @@
             <!-- Pulsanti di Controllo -->
             <div class="row">
                 <div class="col-12 mt-4 text-center">
-                    <button type="button" class="btn btn-outline-danger btn-sm btn-delete-email" data-message="Sei sicuro di voler ripristinare i valori dei files?">
+                    <button type="button" class="btn btn-outline-danger btn-sm me-2 btn-delete-email" data-message="Sei sicuro di voler ripristinare i valori dei files?">
                         <i class="fa-solid fa-trash-can me-1"></i><?= lang('backend/settings.buttons.restoreData'); ?>
                     </button>
-                    <button type="button" class="btn btn-danger btn-sm text-white me-2 btn-refresh-email">
+                    <button type="button" class="btn btn-danger btn-sm text-white mx-2 btn-refresh-email">
                         <i class="fa-solid fa-rotate me-1"></i><?= lang('backend/settings.buttons.refreshData'); ?>
                     </button>
-                    <button type="submit" class="btn btn-success btn-sm text-white btn-save-email">
+                    <button type="submit" class="btn btn-success btn-sm text-white ms-2 btn-save-email">
                         <i class="fa-solid fa-floppy-disk me-1"></i><?= lang('backend/settings.buttons.sendData'); ?>
                     </button>
                 </div>

@@ -190,7 +190,7 @@ class AuthController extends BackendController
 
         endif;
 
-        return redirect()->to('backend/auth')->with('class', 'danger')->with('message', lang('backend/auth.messages.checkAuthError'))->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
+        return redirect()->to('backend/auth')->with('class', 'light text-danger fw-bold')->with('message', lang('backend/auth.messages.checkAuthError'))->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
     }
 
     /**
@@ -265,7 +265,7 @@ class AuthController extends BackendController
 
         /* 4. Imposta i flashdata nativi di CI4 */
         $this->session->setFlashdata('message', $message);
-        $this->session->setFlashdata('class', 'success');
+        $this->session->setFlashdata('class', 'light text-success fw-bold');
         $this->session->setFlashdata('icon', '<i class="fa-solid fa-handshake"></i>');
 
         /* 5. Esegue un redirect pulito in GET verso la pagina di login */

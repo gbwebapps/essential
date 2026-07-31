@@ -173,7 +173,7 @@ class AuthorizationClass
      */
     private function getAdmin(string $uuid): ?object
     {
-        /* 1. Recupero dei dati base dell'utente includendo group_id */
+        /* 1. Recupero dei dati base dell'utente includendo group_id con blocco rigoroso del cestino */
         $sql = "select 
                     uuid, 
                     firstname, 
@@ -187,11 +187,13 @@ class AuthorizationClass
                     created_at, 
                     updated_at, 
                     suspended_at, 
-                    resetted_at 
+                    resetted_at, 
+                    deleted_at 
                 from admins 
                 where uuid = ? 
                 and status = 1 
                 and suspended_at is null 
+                and deleted_at is null 
                 limit 1";
 
         $data = $this->db->query($sql, [$uuid])->getRow();

@@ -118,11 +118,11 @@ class AuditsModel extends BackendModel
             ],
             'searchDates.created_at-from' => [
                 'label' => lang('backend/audits.labels.dateFrom'),
-                'rules' => ['permit_empty', 'valid_date[Y-m-d H:i]'],
+                'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]'],
             ],
             'searchDates.created_at-to' => [
                 'label' => lang('backend/audits.labels.dateTo'),
-                'rules' => ['permit_empty', 'valid_date[Y-m-d H:i]'],
+                'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]'],
             ],
         ];
     }

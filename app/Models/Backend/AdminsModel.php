@@ -10,9 +10,11 @@ class AdminsModel extends BackendModel
 
     protected ?string $entity = 'admins';
 
+    protected bool $hasSoftDelete = true;
+
     protected ?string $defaultColumn = 'created_at';
 
-    protected array $showAllAllowedFields = ['column', 'order', 'page', 'rows', 'searchFields'];
+    protected array $showAllAllowedFields = ['column', 'order', 'page', 'rows', 'searchFields', 'trash_filter'];
 
     /**
      * Elenco dei campi anagrafici e relazionali consentiti durante la fase di inserimento di un nuovo amministratore.
@@ -89,7 +91,7 @@ class AdminsModel extends BackendModel
      *
      * @var string|null
      */
-    protected ?string $getDataQuery = "select uuid, firstname, lastname, email, phone, status, created_at, updated_at, resetted_at, suspended_at,
+    protected ?string $getDataQuery = "select uuid, firstname, lastname, email, phone, status, created_at, updated_at, resetted_at, suspended_at, deleted_at,
                                         (select images.filename from images where images.entity_uuid = admins.uuid and images.entity = 'admins' and images.is_cover = 1 limit 1) as cover, 
                                         (select count(*) from images where images.entity_uuid = admins.uuid and images.entity = 'admins') as images_num 
                                         from admins where master <> ? and uuid <> ?";
@@ -113,7 +115,8 @@ class AdminsModel extends BackendModel
                                             admins.created_at, 
                                             admins.updated_at, 
                                             suspended_at, 
-                                            resetted_at 
+                                            resetted_at, 
+                                            admins.deleted_at 
                                         from admins 
                                         join admins_groups 
                                         on admins.group_id = admins_groups.id 
@@ -161,6 +164,9 @@ class AdminsModel extends BackendModel
             ],
             'rows' => [
                 'rules' => ['required', 'is_natural_no_zero'] 
+            ],
+            'trash_filter' => [
+                'rules' => ['in_list[active,trashed,all]'] 
             ],
         ];
     }
@@ -220,7 +226,7 @@ class AdminsModel extends BackendModel
             ],
             'phone' => [
                 'label' => lang('backend/admins.labels.phone'),
-                'rules' => ['required', 'trim', 'is_unique[admins.phone]', 'regex_match[/^\+?[0-9]{9,15}$/]'],
+                'rules' => ['required', 'trim', 'regex_match[/^\+?[0-9]{9,15}$/]'],
             ],
             'status' => [
                 'label' => lang('backend/admins.labels.status'),
@@ -239,7 +245,7 @@ class AdminsModel extends BackendModel
             ],
             'images' => [
                 'label' => lang('backend/admins.labels.images'),
-                'rules' => ['permit_empty', 'checkImages']
+                'rules' => ['permit_empty', 'checkImages'] // checkImages[size:2048,ext:png|jpg|jpeg|webp]
             ]
         ];
     }
@@ -284,7 +290,7 @@ class AdminsModel extends BackendModel
             ],
             'phone' => [
                 'label' => lang('backend/admins.labels.phone'),
-                'rules' => ['required', "is_unique[admins.phone,uuid,{$posts['uuid']}]", 'regex_match[/^\+?[0-9]{9,15}$/]'],
+                'rules' => ['required', 'trim', 'regex_match[/^\+?[0-9]{9,15}$/]'],
             ],
             'status' => [
                 'label' => lang('backend/admins.labels.status'),
@@ -311,7 +317,7 @@ class AdminsModel extends BackendModel
             ],
             'images' => [
                 'label' => lang('backend/admins.labels.images'),
-                'rules' => ['permit_empty', 'checkImages[size:2048,ext:png|jpg|jpeg|webp]']
+                'rules' => ['permit_empty', 'checkImages'] // checkImages[size:2048,ext:png|jpg|jpeg|webp]
             ]
         ];
     }
@@ -806,7 +812,7 @@ class AdminsModel extends BackendModel
             endif;
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('ADD_ADMIN', 'admins', sprintf('Aggiunta admin %s %s', esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+            log_admin_activity('ADD', 'admins', sprintf('Aggiunta admin %s %s', esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
 
         } catch (\Throwable $e) {
             
@@ -861,6 +867,11 @@ class AdminsModel extends BackendModel
 
             if($data['result'] === false):
                 return ['result' => false, 'message' => $data['message']];
+            endif;
+
+            /* Scudo Enterprise: blocco immediato se il record si trova nel cestino */
+            if ($data['row']->deleted_at !== null):
+                return ['result' => false, 'message' => lang('backend/admins.messages.cannotModifyDeleted')]; /* Ricorda di creare la stringa lingua */
             endif;
 
             /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
@@ -939,7 +950,7 @@ class AdminsModel extends BackendModel
             $data['row']->updated_at = $updated_at;
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('EDIT_ADMIN', 'admins', sprintf('Aggiornamento admin %s %s', esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+            log_admin_activity('EDIT', 'admins', sprintf('Aggiornamento admin %s %s', esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
 
             return [
                 'result'  => true, 
@@ -1024,7 +1035,7 @@ class AdminsModel extends BackendModel
      * @param array $posts Dataset contenente l'identificativo univoco del profilo da rimuovere.
      * @return array Esito dell'operazione corredato dal messaggio localizzato di avvenuta cancellazione.
      */
-    public function del(array $posts): array
+    public function hardDelete(array $posts): array
     {
         try 
         {
@@ -1056,27 +1067,166 @@ class AdminsModel extends BackendModel
             if ($this->db->transStatus() === false):
 
                 $this->db->transRollback();
-                log_message('error', lang('backend/admins.messages.delError'));
+                log_message('error', lang('backend/admins.messages.hardDeleteError'));
 
-                return ['result' => false, 'message' => lang('backend/admins.messages.delError')];
+                return ['result' => false, 'message' => lang('backend/admins.messages.hardDeleteError')];
             endif;
 
             $this->db->transCommit();
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('DELETE_ADMIN', 'admins', sprintf('Eliminazione admin %s %s', esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+            log_admin_activity('HARD_DELETE', 'admins', sprintf('Eliminazione admin %s %s', esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
 
             \App\Libraries\ImageFileSystemService::removeAllImages('admins', $posts['uuid']);
 
-            return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.delSuccess'), esc($data['row']->firstname), esc($data['row']->lastname))];
+            return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.hardDeleteSuccess'), esc($data['row']->firstname), esc($data['row']->lastname))];
 
         } catch (\Throwable $e) {
 
             /* Rollback incondizionato: se c'è un'eccezione, si annulla sempre */
             $this->db->transRollback();
 
-            log_message('error', lang('backend/admins.messages.delError') . ' - ' . $e);
-            return ['result' => false, 'message' => lang('backend/admins.messages.delError')];
+            log_message('error', lang('backend/admins.messages.hardDeleteError') . ' - ' . $e);
+            return ['result' => false, 'message' => lang('backend/admins.messages.hardDeleteError')];
+
+        }
+    }
+
+    public function softDelete(array $posts): array
+    {
+        try 
+        {
+            /* Match dei posts con i campi consentiti */
+            $posts = $this->checkAllowedFields($posts, $this->delAllowedFields);
+
+            /* Recupero i dati dell'utente prima dell'eliminazione */
+            $data = $this->getByUUID($posts['uuid']);
+
+            if($data['result'] === false):
+                return ['result' => false, 'message' => $data['message']];
+            endif;
+
+            /* Scudo Enterprise: blocco immediato se il record si trova nel cestino */
+            if ($data['row']->deleted_at !== null):
+                return ['result' => false, 'message' => lang('backend/admins.messages.cannotModifyDeleted')]; /* Ricorda di creare la stringa lingua */
+            endif;
+
+            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
+            if ((int) $data['row']->master === 1):
+                return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
+            endif;
+
+            $this->db->transBegin();
+
+            /* Generazione marcatore per offuscare l'email ed evitare conflitti UNIQUE */
+            $deletedMarker = '.deleted.' . time();
+
+            /* Cestinamento e offuscamento email */
+            $sql = "update admins set email = CONCAT(email, ?), deleted_at = NOW() where uuid = ?";
+            $this->db->query($sql, [$deletedMarker, $posts['uuid']]);
+
+            /* Revoca immediata degli accessi attivi (disconnessione forzata) */
+            $this->db->query("delete from admins_tokens where admin_uuid = ?", [$posts['uuid']]);
+            $this->db->query("delete from admins_2fa_codes where admin_uuid = ?", [$posts['uuid']]);
+
+            if ($this->db->transStatus() === false):
+
+                $this->db->transRollback();
+                log_message('error', lang('backend/admins.messages.softDeleteError'));
+
+                return ['result' => false, 'message' => lang('backend/admins.messages.softDeleteError')];
+            endif;
+
+            $this->db->transCommit();
+
+            /* Registrazione attività */
+            $currentAdmin = service('authorization')->currentAdmin();
+            log_admin_activity('SOFT_DELETE', 'admins', sprintf('Cestinato admin %s %s', esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+
+            /* Nota: usa una stringa di lingua dedicata come softDelSuccess se l'hai creata */
+            return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.softDeleteSuccess'), esc($data['row']->firstname), esc($data['row']->lastname))];
+
+        } catch (\Throwable $e) {
+
+            /* Rollback incondizionato: se c'è un'eccezione, si annulla sempre */
+            $this->db->transRollback();
+
+            log_message('error', lang('backend/admins.messages.softDeleteError') . ' - ' . $e);
+            return ['result' => false, 'message' => lang('backend/admins.messages.softDeleteError')];
+
+        }
+    }
+
+    public function restoreDelete(array $posts): array
+    {
+        try 
+        {
+            /* Match dei posts con i campi consentiti */
+            $posts = $this->checkAllowedFields($posts, $this->delAllowedFields);
+
+            /* Recupero diretto dal DB per aggirare eventuali filtri sui record attivi */
+            $sql = "select * from admins where uuid = ?";
+            $row = $this->db->query($sql, [$posts['uuid']])->getRow();
+
+            if (empty($row)):
+                return ['result' => false, 'message' => lang('backend/admins.messages.notFound')];
+            endif;
+
+            /* Ripulisco l'email dal marcatore generato durante il soft delete */
+            if (strpos($row->email, '.deleted.') !== false):
+                $cleanEmail = explode('.deleted.', $row->email)[0];
+            else:
+                $cleanEmail = $row->email;
+            endif;
+
+            /* Scudo di sicurezza: verifico se nel frattempo l'email è stata presa da un utente attivo */
+            $sqlCheck = "select uuid from admins where email = ? and deleted_at IS NULL";
+            $emailExists = $this->db->query($sqlCheck, [$cleanEmail])->getRow();
+
+            $this->db->transBegin();
+
+            if ( ! empty($emailExists)):
+                
+                /* CONFLITTO: Ripristino forzando a inattivo e mantenendo la mail offuscata */
+                $tempEmail = time() . '@temp.local';
+                $sqlUpdate = "update admins set email = ?, status = 0, deleted_at = NULL where uuid = ?";
+                $this->db->query($sqlUpdate, [$tempEmail, $posts['uuid']]);
+                
+                $message = lang('backend/admins.messages.restoreDeleteConflict'); 
+                
+            else:
+                
+                /* NESSUN CONFLITTO: Ripristino dell'utente e della sua email originale */
+                $sqlUpdate = "update admins set email = ?, deleted_at = NULL where uuid = ?";
+                $this->db->query($sqlUpdate, [$cleanEmail, $posts['uuid']]);
+                
+                $message = sprintf(lang('backend/admins.messages.restoreDeleteSuccess'), esc($row->firstname), esc($row->lastname));
+                
+            endif;
+
+            if ($this->db->transStatus() === false):
+
+                $this->db->transRollback();
+                log_message('error', lang('backend/admins.messages.restoreDeleteError'));
+
+                return ['result' => false, 'message' => lang('backend/admins.messages.restoreDeleteError')];
+            endif;
+
+            $this->db->transCommit();
+
+            /* Registrazione attività */
+            $currentAdmin = service('authorization')->currentAdmin();
+            log_admin_activity('RESTORE_DELETE', 'admins', sprintf('Ripristinato admin %s %s', esc($row->firstname), esc($row->lastname)), $currentAdmin);
+
+            return ['result' => true, 'message' => $message];
+
+        } catch (\Throwable $e) {
+
+            /* Rollback incondizionato: se c'è un'eccezione, si annulla sempre */
+            $this->db->transRollback();
+
+            log_message('error', lang('backend/admins.messages.restoreDeleteError') . ' - ' . $e);
+            return ['result' => false, 'message' => lang('backend/admins.messages.restoreDeleteError')];
 
         }
     }
@@ -1107,6 +1257,11 @@ class AdminsModel extends BackendModel
 
             if($data['result'] === false):
                 return ['result' => false, 'message' => $data['message']];
+            endif;
+
+            /* Scudo Enterprise: blocco immediato se il record si trova nel cestino */
+            if ($data['row']->deleted_at !== null):
+                return ['result' => false, 'message' => lang('backend/admins.messages.cannotModifyDeleted')]; /* Ricorda di creare la stringa lingua */
             endif;
 
             /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
@@ -1208,6 +1363,11 @@ class AdminsModel extends BackendModel
                 return ['result' => false, 'message' => $data['message']];
             endif;
 
+            /* Scudo Enterprise: blocco immediato se il record si trova nel cestino */
+            if ($data['row']->deleted_at !== null):
+                return ['result' => false, 'message' => lang('backend/admins.messages.cannotModifyDeleted')]; /* Ricorda di creare la stringa lingua */
+            endif;
+
             /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
             if ((int) $data['row']->master === 1):
                 return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
@@ -1293,6 +1453,11 @@ class AdminsModel extends BackendModel
 
             if ($data['result'] === false):
                 return ['result' => false, 'message' => $data['message']];
+            endif;
+
+            /* Scudo Enterprise: blocco immediato se il record si trova nel cestino */
+            if ($data['row']->deleted_at !== null):
+                return ['result' => false, 'message' => lang('backend/admins.messages.cannotModifyDeleted')]; /* Ricorda di creare la stringa lingua */
             endif;
 
             /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
@@ -1390,6 +1555,11 @@ class AdminsModel extends BackendModel
 
             if($data['result'] === false):
                 return ['result' => false, 'message' => $data['message']];
+            endif;
+
+            /* Scudo Enterprise: blocco immediato se il record si trova nel cestino */
+            if ($data['row']->deleted_at !== null):
+                return ['result' => false, 'message' => lang('backend/admins.messages.cannotModifyDeleted')]; /* Ricorda di creare la stringa lingua */
             endif;
 
             /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */

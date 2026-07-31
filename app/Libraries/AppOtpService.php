@@ -36,7 +36,7 @@ class AppOtpService
         $config = setting('Backend\Auth');
 
         /* Crea l'istanza TOTP impostando la durata standard (30s), l'algoritmo e il numero di cifre */
-        $totp = TOTP::create($secret, 30, 'sha1', $config->twoFactorDigits);
+        $totp = TOTP::create($secret, 30, 'sha1', (int) $config->twoFactorDigits);
         $totp->setLabel($label);
         $totp->setIssuer($config->twoFactorIssuer);
 
@@ -57,10 +57,10 @@ class AppOtpService
         $config = setting('Backend\Auth');
         
         /* CORREZIONE: Inizializzo l'oggetto con le stesse identiche configurazioni del QR Code */
-        $totp = TOTP::create($secret, 30, 'sha1', $config->twoFactorDigits);
+        $totp = TOTP::create($secret, 30, 'sha1', (int) $config->twoFactorDigits);
         
         /* Consente una tolleranza di X periodi prima/dopo per compensare disallineamenti di orario dello smartphone */
-        $window = $config->twoFactorWindow;
+        $window = (int) $config->twoFactorWindow;
 
         return $totp->verify($code, null, $window);
     }

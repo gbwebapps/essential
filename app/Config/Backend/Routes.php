@@ -105,8 +105,11 @@ $routes->group('backend', function($routes) {
             $routes->get('downloadExport/(:any)', '\App\Controllers\Backend\ToolsController::downloadExport/$1');
             $routes->post('validateAuditsDateRequest', '\App\Controllers\Backend\ToolsController::validateAuditsDateRequest');
 
-            $routes->post('dbMaintenance', '\App\Controllers\Backend\ToolsController::dbMaintenance');
-            $routes->post('backup', '\App\Controllers\Backend\ToolsController::backup');
+            $routes->get('dbMaintenance', '\App\Controllers\Backend\ToolsController::dbMaintenance');
+            $routes->post('optimizeTable', '\App\Controllers\Backend\ToolsController::optimizeTable');
+
+            $routes->post('backups', '\App\Controllers\Backend\ToolsController::backups');
+            $routes->get('downloadBackups/(:segment)', '\App\Controllers\Backend\ToolsController::downloadBackups/$1');
         });
 
         /* GROUPS */
@@ -141,7 +144,10 @@ $routes->group('backend', function($routes) {
 
             $routes->get('show/(:uuid)', '\App\Controllers\Backend\AdminsController::show/$1');
 
-            $routes->post('delete', '\App\Controllers\Backend\AdminsController::delete');
+            $routes->post('hardDelete', '\App\Controllers\Backend\AdminsController::hardDelete');
+            $routes->post('softDelete', '\App\Controllers\Backend\AdminsController::softDelete');
+            $routes->post('restoreDelete', '\App\Controllers\Backend\AdminsController::restoreDelete');
+
             $routes->post('changeStatus', '\App\Controllers\Backend\AdminsController::changeStatus');
             $routes->post('resetPassword', '\App\Controllers\Backend\AdminsController::resetPassword');
 

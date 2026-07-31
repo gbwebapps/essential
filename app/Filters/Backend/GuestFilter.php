@@ -35,7 +35,7 @@ class GuestFilter implements FilterInterface
 
         /* Imposta i flashdata per entrambi i flussi */
         session()->setFlashdata('message', $message);
-        session()->setFlashdata('class', 'danger');
+        session()->setFlashdata('class', 'light text-danger fw-bold');
         session()->setFlashdata('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
 
         /* Se un utente loggato tenta un'operazione AJAX su rotte guest (es. tab rimasta aperta) */

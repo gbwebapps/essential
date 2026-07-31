@@ -37,7 +37,7 @@ class ImagesRules
         ];
 
         /* 2. Parsing e sovrascrittura condizionale tramite gli argomenti espliciti della regola (se presenti) */
-        if (! empty($params)) :
+        if ( ! empty($params)) :
             $pairs = explode(',', $params);
             foreach ($pairs as $pair) :
 
@@ -62,7 +62,7 @@ class ImagesRules
 
         /* 3. Ciclo di validazione sulle immagini reali basato sulla configurazione unificata */
         foreach ($files as $jsKey => $file) :
-            if (! $file->isValid()) :
+            if ( ! $file->isValid()) :
                 continue;
             endif;
 
@@ -73,7 +73,7 @@ class ImagesRules
             endif;
 
             /* Controllo Estensioni */
-            if (! empty($config['ext']) && ! in_array($file->getClientExtension(), $config['ext'], true)) :
+            if ( ! empty($config['ext']) && ! in_array($file->getClientExtension(), $config['ext'], true)) :
                 $validator->setError("images.{$jsKey}", lang('backend/upload.extIn', [implode(', ', $config['ext'])]));
                 $hasErrors = true;
             endif;

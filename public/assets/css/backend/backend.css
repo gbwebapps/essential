@@ -101,28 +101,29 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
 /* Proprietà grafiche comuni e condivise */
 #alert-container .alert,
-.alert-sessione {
+.alert-session {
     width: 51.25rem;
     max-width: 90vw;
-    box-shadow: 0 0 0 rgb(0 0 0 / 50%), 0 0 .25rem rgb(0 0 0 / 50%);
+    box-shadow: 0 0 0 rgb(0 0 0 / 25%), 0 0 .15rem rgb(0 0 0 / 25%);
 }
 
 /* Contenitore per gli Alert generati da JavaScript */
 #alert-container {
-    margin-top: 3.5rem;
+    margin-top: 3.21rem;
+    z-index: 1079;
 }
 
 /* Alert generato da PHP (Sessione): ancorato fisso in alto nello stesso identico punto */
-.alert-sessione {
+.alert-session {
     position: fixed;
-    top: 4.5rem;
+    top: 4.2rem;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1080; /* Stesso z-index dell'alert-container */
 }
 
 /* Correzione pulsante di chiusura per l'alert con d-flex */
-.alert-sessione .btn-close {
+.alert-session .btn-close {
     position: relative !important;
     top: auto;
     right: auto;

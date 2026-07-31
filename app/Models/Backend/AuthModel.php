@@ -187,15 +187,17 @@ class AuthModel extends BackendModel
                 $secondsInterval = (int) $this->config->attemptsInterval;
                 $attemptsInterval = date('Y-m-d H:i:s', time() - $secondsInterval);
                 
+                /* Inserita clausola di sicurezza AND admins.deleted_at IS NULL */
                 $sql = "select admins.uuid, admins.firstname, admins.lastname, admins.email, admins.password_hash, COUNT(admins_attempts.id) as times
                         from admins
                         left join admins_attempts
                         on admins_attempts.admin_uuid = admins.uuid and admins_attempts.timestamp > ?
-                        where admins.email = ? and admins.status = 1 and admins.suspended_at is null
+                        where admins.email = ? and admins.status = 1 and admins.suspended_at IS NULL and admins.deleted_at IS NULL
                         group by admins.uuid limit 1";
                 $params = [$attemptsInterval, $posts['email']];
             else:
-                $sql = "select uuid, firstname, lastname, email, password_hash from admins where email = ? and status = 1 and suspended_at is null limit 1";
+                /* Inserita clausola di sicurezza AND deleted_at IS NULL */
+                $sql = "select uuid, firstname, lastname, email, password_hash from admins where email = ? and status = 1 and suspended_at IS NULL and deleted_at IS NULL limit 1";
                 $params = [$posts['email']];
             endif;
 
@@ -389,7 +391,7 @@ class AuthModel extends BackendModel
         
         session()->setFlashdata([
             'message' => $welcomeMessage,
-            'class'   => 'success',
+            'class'   => 'light text-success fw-bold',
             'icon'    => '<i class="fa-solid fa-handshake"></i>'
         ]);
 
@@ -410,7 +412,7 @@ class AuthModel extends BackendModel
     {
         $posts = $this->checkAllowedFields($posts, $this->resetPasswordAllowedFields);
 
-        $sql = "select uuid, firstname, lastname, email from admins where email = ?";
+        $sql = "select uuid, firstname, lastname, email from admins where email = ? and deleted_at IS NULL";
         $admin = $this->db->query($sql, [$posts['email']])->getRow();
 
         if ($admin):
@@ -620,8 +622,8 @@ class AuthModel extends BackendModel
             $method     = (string) $sessionData['method'];
             $rememberMe = (bool) $sessionData['rememberMe'];
 
-            /* Recupero l'oggetto anagrafico dell'admin per il login finale */
-            $admin = $this->db->query("select * from admins where uuid = ? and status = 1 limit 1", [$adminUuid])->getRow();
+            /* Recupero l'oggetto anagrafico dell'admin per il login finale, bloccando rigorosamente i record cestinati */
+            $admin = $this->db->query("select * from admins where uuid = ? and status = 1 and deleted_at IS NULL limit 1", [$adminUuid])->getRow();
             if ( ! $admin):
                 log_admin_activity(null, 'VERIFY_FAILED', 'auth', 'Tentativo di accesso con account inesistente');
                 return ['result' => false, 'message' => lang('backend/auth.messages.verifyFailed')];

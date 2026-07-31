@@ -37,5 +37,6 @@ return [
 	], 
 	'messages' => [
 		'validationErrors' => 'Errori di validazione.', 
+		'noAuditsFound' => 'Non sono presenti attività.', 
 	]
 ];

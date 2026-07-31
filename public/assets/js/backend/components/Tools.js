@@ -1,5 +1,5 @@
 /* Import delle utility da backend.js */
-import { urlbase, apiFetch, showAlert, askConfirm, handleValidationErrors, smoothReplace } from '../backend.js';
+import { urlbase, apiFetch, showAlert, askConfirm, handleValidationErrors, smoothReplace, initRangeDatePicker } from '../backend.js';
 
 export class ToolsManager {
     constructor() {
@@ -13,12 +13,14 @@ export class ToolsManager {
                 delete: 'backend/tools/deleteAudits',
                 export: 'backend/tools/exportAudits'
             },
-            dbMaintenance: 'backend/tools/dbMaintenance',
-            backup: 'backend/tools/backup'
+            dbMaintenance: 'backend/tools/optimizeTable',
+            backups: 'backend/tools/backups'
         };
 
         this.currentExportForm = null;
         this.currentExportUrl = null;
+
+        this.datePickers = { from: null, to: null };
 
         this.init();
     }
@@ -91,7 +93,7 @@ export class ToolsManager {
             }
         });
 
-        /* 2. Gestione Submit Form per moduli singoli (dbMaintenance, backup) */
+        /* 2. Gestione Submit Form per moduli singoli (dbMaintenance, backups) */
         document.addEventListener('submit', e => {
             if (e.target && e.target.id.endsWith('-tools-form')) {
                 const env = e.target.id.replace('-tools-form', '');
@@ -151,22 +153,155 @@ export class ToolsManager {
             }
         });
 
-        /* 5. Gestione dinamica dei range dei calendari HTML5 */
-        document.addEventListener('change', e => {
-            if (e.target && e.target.id === 'fromDate') {
-                const toDate = document.getElementById('toDate');
-                if (toDate && e.target.value) {
-                    toDate.min = e.target.value;
+        /* 6. Gestione ottimizzazione tabelle Database (Singola e Massiva) */
+        document.addEventListener('click', e => {
+            const btn = e.target.closest('.btn-optimize-table, .btn-optimize-all');
+            if (btn) {
+                e.preventDefault();
+
+                const form = btn.closest('form');
+                if ( ! form) return;
+
+                const tempInputs = [];
+                let tablesToProcess = [];
+                let inputName = 'table';
+
+                /* Determina se è una tabella singola o un array dal dataset */
+                if (btn.dataset.table) {
+                    tablesToProcess.push(btn.dataset.table);
+                } else if (btn.dataset.tables) {
+                    tablesToProcess = JSON.parse(btn.dataset.tables);
+                    inputName = 'table[]'; /* Dichiara a PHP che arriverà un array */
                 }
-            }
-            
-            if (e.target && e.target.id === 'toDate') {
-                const fromDate = document.getElementById('fromDate');
-                if (fromDate && e.target.value) {
-                    fromDate.max = e.target.value;
-                }
+
+                if (tablesToProcess.length === 0) return;
+
+                /* Inietta gli input nascosti nel form */
+                tablesToProcess.forEach(tableName => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = inputName;
+                    input.value = tableName;
+                    form.appendChild(input);
+                    tempInputs.push(input);
+                });
+
+                const actionUrl = urlbase + this.routes.dbMaintenance;
+                
+                this.executeAction(form, actionUrl, 'updateTablesDOM');
+                
+                /* Pulisce il form a fine operazione */
+                tempInputs.forEach(input => input.remove());
             }
         });
+
+        /* 8. Gestione Generazione Backup Database */
+        document.addEventListener('click', e => {
+            const btnBackup = e.target.closest('.btn-generate-backups');
+            if (btnBackup) {
+                e.preventDefault();
+
+                const form = btnBackup.closest('form');
+                if ( ! form) return;
+
+                /* Inietta un input temporaneo per specificare al PHP l'azione richiesta */
+                const actionInput = document.createElement('input');
+                actionInput.type = 'hidden';
+                actionInput.name = 'action';
+                actionInput.value = 'generateBackups';
+                form.appendChild(actionInput);
+
+                /* Utilizza la rotta dedicata ai backups (assicurati di averla in this.routes) */
+                const actionUrl = urlbase + this.routes.backups; 
+                
+                /* Esegue la chiamata. Passando 'backups' come env, il pannello si ricaricherà aggiornando in automatico la lista dei file sotto */
+                this.executeAction(form, actionUrl, 'backups');
+                
+                /* Pulisce il form eliminando l'input temporaneo */
+                actionInput.remove();
+            }
+        });
+
+        /* 9. Gestione Eliminazione Backup */
+        document.addEventListener('click', async e => {
+            const btnDelete = e.target.closest('.btn-delete-backups');
+            if (btnDelete) {
+                e.preventDefault();
+                
+                const filename = btnDelete.dataset.filename;
+                const message = btnDelete.dataset.message;
+                
+                /* Attendiamo la risposta del modale */
+                const ok = await askConfirm(message);
+                if ( ! ok) return;
+
+                /* Creazione di un form temporaneo per la chiamata AJAX */
+                const tempForm = document.createElement('form');
+                
+                const actionInput = document.createElement('input');
+                actionInput.type = 'hidden';
+                actionInput.name = 'action';
+                actionInput.value = 'deleteBackups';
+                tempForm.appendChild(actionInput);
+
+                const fileInput = document.createElement('input');
+                fileInput.type = 'hidden';
+                fileInput.name = 'filename';
+                fileInput.value = filename;
+                tempForm.appendChild(fileInput);
+
+                const actionUrl = urlbase + this.routes.backups; 
+                
+                /* Esegue l'azione e ricarica il pannello backups */
+                this.executeAction(tempForm, actionUrl, 'backups');
+            }
+        });
+
+        /* Gestione Download Backup */
+        document.addEventListener('click', e => {
+            const btnDownload = e.target.closest('.btn-download-backups');
+            if (btnDownload) {
+                e.preventDefault();
+                
+                const filename = btnDownload.dataset.filename;
+                
+                /* Creazione form temporaneo per la chiamata POST */
+                const tempForm = document.createElement('form');
+                
+                const actionInput = document.createElement('input');
+                actionInput.type = 'hidden';
+                actionInput.name = 'action';
+                actionInput.value = 'downloadBackups';
+                tempForm.appendChild(actionInput);
+
+                const fileInput = document.createElement('input');
+                fileInput.type = 'hidden';
+                fileInput.name = 'filename';
+                fileInput.value = filename;
+                tempForm.appendChild(fileInput);
+
+                const actionUrl = urlbase + this.routes.backups; 
+                
+                /* Passa null come env per evitare il ricaricamento del DOM */
+                this.executeAction(tempForm, actionUrl, null);
+            }
+        });
+    }
+
+    /* Distrugge le istanze di Flatpickr per liberare memoria e DOM */
+    destroyDatePickers() {
+        if (this.datePickers.from) this.datePickers.from.destroy();
+        if (this.datePickers.to) this.datePickers.to.destroy();
+        this.datePickers = { from: null, to: null };
+    }
+
+    /* Inizializza Flatpickr solo se l'ambiente lo richiede */
+    initDatePickers(env) {
+        if (env === 'manageAudits') {
+            const { pickerFrom, pickerTo } = initRangeDatePicker('#wrapper-audits-created_at-from', '#wrapper-audits-created_at-to');
+            this.datePickers.from = pickerFrom;
+            this.datePickers.to = pickerTo;
+        }
     }
 
     /* Carica asincronamente il partial HTML dell'accordion selezionato */
@@ -185,7 +320,14 @@ export class ToolsManager {
             const data = await response.json();
 
             if (data.result === true && data.output) {
+
+                if (env === 'manageAudits') {
+                    this.destroyDatePickers();
+                }
+
                 await smoothReplace(container, data.output);
+                this.initDatePickers(env);
+
                 return true;
             }
             return false;
@@ -215,6 +357,11 @@ export class ToolsManager {
     resetContainer(containerId) {
         const container = document.getElementById(containerId);
         if (container) {
+            
+            if (containerId === 'manageAudits-tools-container') {
+                this.destroyDatePickers();
+            }
+
             container.innerHTML = '';
         }
     }
@@ -248,7 +395,7 @@ export class ToolsManager {
                 return;
             }
 
-            if (data.result === true) {
+           if (data.result === true) {
                 if (data.message && typeof showAlert === 'function') showAlert('success', data.message);
 
                 /* Avvia il download contestuale se il backend restituisce un URL */
@@ -260,10 +407,64 @@ export class ToolsManager {
                     link.click();
                     document.body.removeChild(link);
                 }
-                
-                const containerId = `${env}-tools-container`;
-                await this.loadPanel(containerId, env);
+
+                /* Gestione differenziata e massiva del refresh DOM */
+                if (env === 'updateTablesDOM' && data.tableData) {
+                    
+                    /* Forza il dato in array per evitare errori JS fatali */
+                    const tables = Array.isArray(data.tableData) ? data.tableData : [data.tableData];
+                    
+                    let totalSize = 0;
+                    let totalOverhead = 0;
+
+                    /* Estrai le stringhe tradotte dal form */
+                    const langTotalSpace = form.dataset.langTotalSpace;
+                    const langOverhead = form.dataset.langOverhead;
+                    const langRows = form.dataset.langRows;
+
+                    tables.forEach(table => {
+                        if ( ! table || ! table.name) return;
+
+                        /* 1. Trova la singola riga */
+                        const row = document.querySelector(`li[data-table="${table.name}"]`);
+                        
+                        if (row) {
+                            /* Cerca il div con la classe text-muted invece del tag small */
+                            const dataContainer = row.querySelector('.text-muted.d-flex');
+                            
+                            if (dataContainer) {
+                                dataContainer.innerHTML = `
+                                    <span class="me-3"><i class="fa-solid fa-list me-2"></i>${langRows.replace('%d', table.rows)}</span>
+                                    <span class="me-3"><i class="fa-solid fa-hard-drive me-2"></i>${langTotalSpace.replace('%s', table.size.toFixed(2))}</span>
+                                    <span class="text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>${langOverhead.replace('%s', table.overhead.toFixed(2))}</span>
+                                `;
+                            }
+                        }
+
+                        /* 2. Raccoglie i dati per il totale globale */
+                        totalSize += parseFloat(table.size) || 0;
+                        totalOverhead += parseFloat(table.overhead) || 0;
+                    });
+
+                    /* 3. Se l'array ha più di 1 elemento (Ottimizza Tutte), aggiorna anche l'header Database */
+                    if (tables.length > 1) {
+                        /* L'header utilizza ancora il tag small, quindi questo selettore va bene */
+                        const headerSmall = document.querySelector('.text-muted.infoDb');
+                        if (headerSmall) {
+                            headerSmall.innerHTML = `
+                                <span class="me-3"><i class="fa-solid fa-hard-drive me-2"></i>${langTotalSpace.replace('%s', totalSize.toFixed(2))}</span>
+                                <span class="text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>${langOverhead.replace('%s', totalOverhead.toFixed(2))}</span>
+                            `;
+                        }
+                    }
+
+                } else {
+                    /* Comportamento standard per tutti gli altri env: ricarica l'intero pannello */
+                    const containerId = `${env}-tools-container`;
+                    await this.loadPanel(containerId, env);
+                }
             }
+            
         } catch (error) {
             console.error("Operazione interrotta: ", error);
             return false;

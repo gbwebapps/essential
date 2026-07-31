@@ -56,7 +56,7 @@ class AccountModel extends BackendModel
 	        ],
 	        'phone' => [
 	            'label' => lang('backend/account.labels.phone'),
-	            'rules' => ['required', "is_unique[admins.phone,uuid,{$adminUuid}]", 'regex_match[/^\+?[0-9]{9,15}$/]'],
+	            'rules' => ['required', 'trim', 'regex_match[/^\+?[0-9]{9,15}$/]'],
 	        ],
 	        'note' => [
 	            'label' => lang('backend/account.labels.note'),

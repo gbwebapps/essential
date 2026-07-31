@@ -10,17 +10,16 @@
             $msgContent = $message ?? session()->getFlashdata('message');
             $msgIcon = $message_icon ?? session()->getFlashdata('icon') ?? '';
 
-            if ($msgClass) :
-                $alertClass = (in_array($msgClass, ['success', 'danger', 'info', 'warning', 'primary', 'secondary'])) ? 'alert-' . $msgClass : 'alert-secondary';
-            endif;
-
             if ($msgClass && $msgContent): 
         ?>
-            <div class="alert <?= $alertClass; ?> alert-sessione alert-dismissible fade show border-0 d-flex align-items-center p-3" role="alert">
+            <div class="alert alert-<?= $msgClass; ?> alert-session alert-dismissible fade show border-0 d-flex align-items-center p-3" role="alert">
                 <div class="w-100 text-center p-0 ms-4">
                     <?= $msgIcon; ?> <?= $msgContent; ?>
                 </div>
-                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                <!-- Pulsante stile badge per la chiusura dell'alert -->
+                <button type="button" class="badge bg-danger p-2 border-0 rounded-1 ms-auto" data-bs-dismiss="alert" style="cursor: pointer;">
+                    <i class="fa-solid fa-xmark"></i> Rimuovi
+                </button>
             </div>
         <?php endif; ?>
     </div>

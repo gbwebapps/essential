@@ -2,11 +2,11 @@
 
 namespace App\Controllers\Backend\Components;
 
-use CodeIgniter\Controller;
+use App\Controllers\BaseController;
 use App\Models\Backend\Components\GalleryOneImgModel;
 use CodeIgniter\HTTP\ResponseInterface;
 
-class GalleryOneController extends Controller
+class GalleryOneController extends BaseController
 {
     private GalleryOneImgModel $galleryModel;
 
@@ -28,7 +28,7 @@ class GalleryOneController extends Controller
 	    	/* Validazione campi nascosti */
 	    	if ( ! $this->validateData($posts, $rules)) :
 	    	    $errorMessage = implode('<br>', $this->validator->getErrors());
-	    	    return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/components/galleryOneImg.messages.validationToastErrors'), $errorMessage)]);
+	    	    return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/components/galleryOneImg.messages.validationToastErrors'), $errorMessage)]);
 	    	endif;
 
 	        $data = [
@@ -40,7 +40,7 @@ class GalleryOneController extends Controller
 
 	        $output = view('backend/components/galleryOneImg/galleryOneImgView', $data);
 
-	        return $this->response->setJSON(['result' => true, 'output' => $output]);
+	        return $this->jsonResponse(['result' => true, 'output' => $output]);
 
 		endif;
     }
@@ -58,11 +58,11 @@ class GalleryOneController extends Controller
 	    	/* Validazione campi nascosti */
 	    	if ( ! $this->validateData($posts, $rules)) :
 	    	    $errorMessage = implode('<br>', $this->validator->getErrors());
-	    	    return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/components/galleryOneImg.messages.validationToastErrors'), $errorMessage)]);
+	    	    return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/components/galleryOneImg.messages.validationToastErrors'), $errorMessage)]);
 	    	endif;
 
 	        if ( ! $this->galleryModel->deleteImage($posts)):
-	            return $this->response->setJSON(['result' => false, 'message' => lang('backend/components/galleryOneImg.messages.deleteError')]);
+	            return $this->jsonResponse(['result' => false, 'message' => lang('backend/components/galleryOneImg.messages.deleteError')]);
 	        endif;
 
 	        $data = [
@@ -75,7 +75,7 @@ class GalleryOneController extends Controller
 
 	        $output = view('backend/components/galleryOneImg/galleryOneImgView', $data);
 
-	        return $this->response->setJSON(['result' => true, 'message' => lang('backend/components/galleryOneImg.messages.deleteSuccess'), 'output'  => $output]);
+	        return $this->jsonResponse(['result' => true, 'message' => lang('backend/components/galleryOneImg.messages.deleteSuccess'), 'output'  => $output]);
 
 		endif;
     }
@@ -93,11 +93,11 @@ class GalleryOneController extends Controller
 	    	/* Validazione campi nascosti */
 	    	if ( ! $this->validateData($posts, $rules)) :
 	    	    $errorMessage = implode('<br>', $this->validator->getErrors());
-	    	    return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/components/galleryOneImg.messages.validationToastErrors'), $errorMessage)]);
+	    	    return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/components/galleryOneImg.messages.validationToastErrors'), $errorMessage)]);
 	    	endif;
 
 	        if ( ! $this->galleryModel->setCover($posts)):
-	            return $this->response->setJSON(['result' => false, 'message' => lang('backend/components/galleryOneImg.messages.setCoverError')]);
+	            return $this->jsonResponse(['result' => false, 'message' => lang('backend/components/galleryOneImg.messages.setCoverError')]);
 	        endif;
 
 	        $data = [
@@ -109,7 +109,7 @@ class GalleryOneController extends Controller
 
 	        $output = view('backend/components/galleryOneImg/galleryOneImgView', $data);
 
-	        return $this->response->setJSON(['result'  => true, 'message' => lang('backend/components/galleryOneImg.messages.setCoverSuccess'), 'output'  => $output ]);
+	        return $this->jsonResponse(['result'  => true, 'message' => lang('backend/components/galleryOneImg.messages.setCoverSuccess'), 'output'  => $output ]);
 
 	    endif;
     }
@@ -127,11 +127,11 @@ class GalleryOneController extends Controller
 	    	/* Validazione campi nascosti */
 	    	if ( ! $this->validateData($posts, $rules)) :
 	    	    $errorMessage = implode('<br>', $this->validator->getErrors());
-	    	    return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/components/galleryOneImg.messages.validationToastErrors'), $errorMessage)]);
+	    	    return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/components/galleryOneImg.messages.validationToastErrors'), $errorMessage)]);
 	    	endif;
 
 	        if ( ! $this->galleryModel->removeCover($posts)):
-	            return $this->response->setJSON(['result'  => false, 'message' => lang('backend/components/galleryOneImg.messages.removeCoverError') ]);
+	            return $this->jsonResponse(['result'  => false, 'message' => lang('backend/components/galleryOneImg.messages.removeCoverError') ]);
 	        endif;
 
 	        $data = [
@@ -143,7 +143,7 @@ class GalleryOneController extends Controller
 
 	        $output = view('backend/components/galleryOneImg/galleryOneImgView', $data);
 
-	        return $this->response->setJSON(['result'  => true, 'message' => lang('backend/components/galleryOneImg.messages.removeCoverSuccess'), 'output'  => $output ]);
+	        return $this->jsonResponse(['result'  => true, 'message' => lang('backend/components/galleryOneImg.messages.removeCoverSuccess'), 'output'  => $output ]);
 
 	    endif;
     }

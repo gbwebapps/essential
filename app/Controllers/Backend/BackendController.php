@@ -229,18 +229,4 @@ abstract class BackendController extends BaseController
 
         return null;
     }
-
-    /**
-     * Restituisce una risposta JSON standard con il CSRF sempre aggiornato.
-     */
-    protected function jsonResponse(array $data, int $statusCode = 200)
-    {
-        /* Iniezione dei dati CSRF rigenerati da CodeIgniter 4 */
-        $csrfData = ['csrfName' => csrf_token(), 'csrfHash' => csrf_hash(),];
-
-        /* Unione dei dati originali con le chiavi CSRF */
-        $payload = array_merge($data, $csrfData);
-
-        return $this->response->setStatusCode($statusCode)->setJSON($payload);
-    }
 }

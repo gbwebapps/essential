@@ -31,6 +31,9 @@ return [
 		'resetFilters' => 'Resetta filtri', 
 		'resetSorting' => 'Resetta ordinamento', 
 		'reloadList' => 'Ricarica lista', 
+		'activeRecords' => 'Attivi', 
+		'trashedRecords' => 'Eliminati', 
+		'allRecords' => 'Tutti', 
 	],
 	'labels' => [
 		'id' => 'ID', 
@@ -48,6 +51,7 @@ return [
 		'updatedAt' => 'Aggiornato il ', 
 		'resettedAt' => 'Reset il ',
 		'suspendedAt' => 'Sospeso il ',
+		'deletedAt' => 'Eliminato il ',
 		'note' => 'Note aggiuntive', 
 		'permissions' => 'Permessi', 
 		'assigned' => 'Assegnato', 
@@ -66,7 +70,8 @@ return [
         'username' => 'Username', 
         'action' => 'Azione', 
         'section' => 'Sezione', 
-        'details' => 'Operazione'
+        'details' => 'Operazione', 
+        'deleted' => 'Eliminato'
 	],
 	'placeholders' => [
 		'firstname' => 'Inserisci nome...', 
@@ -87,7 +92,9 @@ return [
 		'show' => 'Dettaglio', 
 		'edit' => 'Aggiorna', 
 		'reset' => 'Resetta password', 
-		'delete' => 'Elimina',
+		'softDelete' => 'Elimina',
+		'restoreDelete' => 'Ripristina', 
+		'hardDelete' => 'Elimina'
 	], 
 	'buttons' => [
 		'actions' => 'Azioni', 
@@ -109,7 +116,9 @@ return [
 		'areYouSureRefreshData' => 'Sei sicuro di voler ricaricare i dati?', 
 		'areYouSureChangeStatus' => 'Sei sicuro di modificare lo stato di %s %s?', 
 		'areYouSureReset' => 'Sei sicuro di resettare la password di %s %s?', 
-		'areYouSureDelete' => 'Sei sicuro di eliminare  %s %s?', 
+		'areYouSureSoftDelete' => 'Sei sicuro di eliminare  %s %s?', 
+		'areYouSureRestoreDelete' => 'Sei sicuro di ripristinare  %s %s?',
+		'areYouSureHardDelete' => 'Sei sicuro di eliminare definitivamente  %s %s?',  
 		'areYouSureChangePermission' => 'Sei sicuro di modificare il permesso di %s %s?', 
 		'areYouSureDeleteToken' => 'Sei sicuro di eliminare il token di  %s %s?', 
 		'areYouSureChangeGroup' => 'Il cambio gruppo modificherà temporaneamente la visualizzazione dei permessi. Se confermerai e salverai la pagina, le vecchie eccezioni verranno eliminate dal database. Procedere con il cambio visivo?', 
@@ -123,10 +132,14 @@ return [
 		'editSuccess' => 'Amministratore %s %s aggiornato con successo.', 
 		'editError' => 'Aggiornamento amministratore non andato a buon fine.', 
 		'noDataChanged' => 'Non sono state effettuate modifiche.', 
-		'delSuccess' => 'Amministratore %s %s eliminato con successo.',
-		'delError' => 'Eliminazione amministratore non andata a buon fine.',
-		'changeStatusSuccess' => 'Modifica stato %s %s effettuato con successo.',
+		'hardDeleteSuccess' => 'Amministratore %s %s eliminato definitivamente con successo.',
+		'hardDeleteError' => 'Eliminazione definitiva amministratore non andata a buon fine.',
+		'softDeleteSuccess' => 'Amministratore %s %s eliminato con successo.', 
+		'softDeleteError' => 'Eliminazione definitiva amministratore non andata a buon fine.', 
+		'restoreDeleteSuccess' => 'Amministratore %s %s ripristinato con successo.', 
+		'restoreDeleteError' => 'Ripristino amministratore non andato a buon fine.', 
 		'changeStatusError' => 'Modifica stato amministratore non andato a buon fine.', 
+		'changeStatusSuccess' => 'Modifica stato %s %s effettuato con successo.',
 		'wrongPermissionsFormat' => 'Uno o più permessi con formato non corretto.', 
 		'resetPasswordError' => 'Reset password amministratore non andato a buon fine.', 
 		'resetPasswordSuccessNoEmail' => 'Password amministratore %s %s resettata con successo, ma la mail non è stata inviata. Contattare amministratore.', 
@@ -134,6 +147,9 @@ return [
 		'changePermissionError' => 'Modifica permesso amministratore non andato a buon fine.', 
 		'changePermissionSuccess' => 'Modifica permesso %s %s effettuato con successo.', 
 		'deleteTokenSuccess' => 'Il token di %s %s è stato eliminato con successo.', 
-		'protectedAdmin' => 'Protetto da modifiche.'
+		'protectedAdmin' => 'Protetto da modifiche.', 
+		'cannotModifyDeleted' => 'Non è possibile modificare un admin eliminato.', 
+		'emailAlreadyInUse' => 'Email già utilizzata.', 
+		'restoreDeleteConflict' => "Admin ripristinato e disattivato. L'email originale è già in uso, modifica il record per assegnare un nuovo indirizzo."
 	]
 ];

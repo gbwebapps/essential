@@ -27,32 +27,46 @@
                             <div class="col-12 col-md-10">
                                 <div class="pt-2 d-flex flex-column flex-md-row align-items-center justify-content-md-end">
 
+                                    <!-- Selezione stato record (Attivi, Cestino, Tutti) -->
+                                    <div class="mb-2 mb-md-0 me-auto">
+                                        <a href="#" class="bar-link active me-2" data-trash-filter="active">
+                                            <i class="fa-solid fa-check"></i> <?= lang('backend/admins.links.activeRecords'); ?>
+                                        </a>
+                                        <a href="#" class="bar-link mx-2" data-trash-filter="trashed">
+                                            <i class="fa-solid fa-trash-can"></i> <?= lang('backend/admins.links.trashedRecords'); ?>
+                                        </a>
+                                        <a href="#" class="bar-link ms-2" data-trash-filter="all">
+                                            <i class="fa-solid fa-list"></i> <?= lang('backend/admins.links.allRecords'); ?>
+                                        </a>
+                                    </div>
+                                    <!-- End Selezione stato record -->
+
                                     <!-- Apertura/chiusura parte filtri -->
                                     <a href="#" id="link-search"
-                                       data-bs-toggle="collapse"
-                                       data-bs-target="#search-bar"
-                                       aria-expanded="false"
-                                       aria-controls="search-bar"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#search-bar"
+                                        aria-expanded="false"
+                                        aria-controls="search-bar"
                                         class="mb-2 mb-md-0 me-0 me-md-2 bar-link">
-                                        <b><i class="fa-solid fa-filter"></i> <?= lang('backend/admins.links.filters'); ?></b>
+                                        <i class="fa-solid fa-filter"></i> <?= lang('backend/admins.links.filters'); ?>
                                     </a>
                                     <!-- End Apertura/chiusura parte filtri -->
 
                                     <!-- Reset filtri e ordinamento -->
                                     <a href="#" id="link-reset-search" class="mb-2 mb-md-0 mx-0 mx-md-2 bar-link">
-                                        <b><i class="fa-solid fa-filter-circle-xmark"></i> <?= lang('backend/admins.links.resetFilters'); ?></b>
+                                        <i class="fa-solid fa-filter-circle-xmark"></i> <?= lang('backend/admins.links.resetFilters'); ?>
                                     </a>
                                     <!-- End Reset filtri e ordinamento -->
 
                                     <!-- Reset solo ordinamento -->
                                     <a href="#" id="reset-sorting-link" class="mb-2 mb-md-0 mx-0 mx-md-2 bar-link">
-                                        <b><i class="fa-solid fa-sort"></i> <?= lang('backend/admins.links.resetSorting'); ?></b>
+                                        <i class="fa-solid fa-sort"></i> <?= lang('backend/admins.links.resetSorting'); ?>
                                     </a>
                                     <!-- End Reset solo ordinamento -->
 
                                     <!-- Semplice ricarica lista -->
                                     <a href="#" id="refresh-list" class="mb-md-0 ms-0 ms-md-2 bar-link">
-                                        <b><i class="fa-solid fa-arrows-rotate"></i> <?= lang('backend/admins.links.reloadList'); ?></b>
+                                        <i class="fa-solid fa-arrows-rotate"></i> <?= lang('backend/admins.links.reloadList'); ?>
                                     </a>
                                     <!-- End Semplice ricarica lista -->
 

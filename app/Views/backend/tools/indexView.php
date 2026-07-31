@@ -8,14 +8,14 @@
                 
                 <div class="accordion" id="mainToolsDashboard">
 
-                    <?php foreach(['manageAudits', 'dbMaintenance', 'backup'] as $env): ?>
+                    <?php foreach(['manageAudits', 'dbMaintenance', 'backups'] as $env): ?>
 
                         <?php
                             /* Assegnazione icona specifica per ciascun pannello */
                             $icon = match($env) {
                                 'manageAudits' => 'fa-clock-rotate-left',
                                 'dbMaintenance' => 'fa-database',
-                                'backup' => 'fa-box-archive',
+                                'backups' => 'fa-box-archive',
                                 default => 'fa-wrench'
                             };
                         ?>

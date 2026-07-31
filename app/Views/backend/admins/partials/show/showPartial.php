@@ -9,7 +9,7 @@
                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
                     <input type="hidden" name="context" value="show">
                     <button type="submit" class="btn btn-sm btn-secondary">
-                        <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/admins.buttons.reload'); ?>
+                        <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/admins.buttons.reload'); ?>
                     </button>
                 </form>
             </div>
@@ -25,7 +25,7 @@
                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
                     <input type="hidden" name="context" value="show">
                     <button type="submit" class="btn btn-sm btn-secondary">
-                        <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/admins.buttons.reload'); ?>
+                        <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/admins.buttons.reload'); ?>
                     </button>
                 </form>
             </div>
@@ -40,7 +40,7 @@
                 <form id="getTokens">
                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
                     <button type="submit" class="btn btn-sm btn-secondary">
-                        <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/admins.buttons.reload'); ?>
+                        <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/admins.buttons.reload'); ?>
                     </button>
                 </form>
             </div>
@@ -57,7 +57,7 @@
                     <input type="hidden" name="entity" value="<?= esc($entity); ?>">
                     <input type="hidden" name="context" value="<?= esc($context); ?>">
                     <button type="submit" class="btn btn-sm btn-secondary">
-                        <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/components/galleryOneImg.buttons.reload'); ?>
+                        <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/components/galleryOneImg.buttons.reload'); ?>
                     </button>
                 </form>
             </div>
@@ -72,7 +72,7 @@
                 <form id="getMetaData">
                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
                     <button type="submit" class="btn btn-sm btn-secondary">
-                        <i class="fa-solid fa-arrows-rotate"></i><?= lang('backend/admins.buttons.reload'); ?>
+                        <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/admins.buttons.reload'); ?>
                     </button>
                 </form>
             </div>

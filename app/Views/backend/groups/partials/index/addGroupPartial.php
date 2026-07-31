@@ -61,10 +61,10 @@
 
 			<div class="row mt-3">
                 <div class="col-12 d-flex align-middle justify-content-center">
-                	<button type="button" class="btn btn-danger btn-sm me-1 btn-reset-group" data-message="<?= lang('backend/groups.messages.areYouSureToResetData'); ?>">
+                	<button type="button" class="btn btn-danger btn-sm me-2 btn-reset-group" data-message="<?= lang('backend/groups.messages.areYouSureToResetData'); ?>">
                 	    <i class="fa-solid fa-refresh me-1"></i><?= lang('backend/groups.buttons.resetData'); ?>
                 	</button>
-                    <button type="submit" class="btn btn-success btn-sm ms-1">
+                    <button type="submit" class="btn btn-success btn-sm ms-2">
                         <i class="fa-solid fa-floppy-disk me-1"></i><?= lang('backend/groups.buttons.sendData'); ?>
                     </button>
                 </div>

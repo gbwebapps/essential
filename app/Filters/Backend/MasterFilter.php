@@ -33,7 +33,7 @@ class MasterFilter implements FilterInterface
 
         /* Impostazione sessione di errore per accesso negato */
         session()->setFlashdata('message', sprintf(lang('backend/global.messages.permissionDenied'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)));
-        session()->setFlashdata('class', 'danger');
+        session()->setFlashdata('class', 'light text-danger fw-bold');
         session()->setFlashdata('icon', '<i class="fa-solid fa-ban"></i>');
 
         /* Blocco AJAX: restituisce esito negativo e messaggio */

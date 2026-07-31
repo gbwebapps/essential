@@ -27,6 +27,7 @@ export class ListManager {
             order: localStorage.getItem(`${this.config.controller}_order`) || 'asc',
             page: localStorage.getItem(`${this.config.controller}_page`) || 1,
             rows: localStorage.getItem(`${this.config.controller}_rows`) || 5,
+            trash_filter: localStorage.getItem(`${this.config.controller}_trash_filter`) || 'active',
 
             searchFields: {},
             searchDates: {}
@@ -45,6 +46,7 @@ export class ListManager {
 
         this.initFilters();
         this.initSearchBar();
+        this.initTrashFilterUI();
         this.updateActiveSearchIndicator();
         this.bindEvents();
         
@@ -91,6 +93,17 @@ export class ListManager {
         }
     }
 
+    initTrashFilterUI() {
+        const currentTrashFilter = this.state.trash_filter;
+        document.querySelectorAll('[data-trash-filter]').forEach(el => {
+            if (el.dataset.trashFilter === currentTrashFilter) {
+                el.classList.add('active', 'text-success', 'fw-bold');
+            } else {
+                el.classList.remove('active', 'text-success', 'fw-bold');
+            }
+        });
+    }
+
     initSearchBar() {
         const key = `${this.config.controller}_search_bar_visible`;
         const searchBar = document.getElementById('search-bar');
@@ -113,6 +126,18 @@ export class ListManager {
         /* NUOVO: Impedisce cloni dei listener */
         if (this.eventsBound) return;
         this.eventsBound = true;
+
+        document.querySelectorAll('[data-trash-filter]').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                const trashFilterValue = el.dataset.trashFilter;
+                
+                this.updateState('trash_filter', trashFilterValue);
+                this.initTrashFilterUI();
+                this.resetSortingAndPagination();
+                this.showAll();
+            });
+        });
 
         /* Paginazione e Ordinamento (Delegation sul container) */
         this.container.addEventListener('click', (e) => {
@@ -833,7 +858,7 @@ export class DeleteManager {
 
         this.config = Object.assign({
             controller: '',
-            url: '',
+            urls: {}, 
             listManager: null
         }, config);
 
@@ -843,7 +868,6 @@ export class DeleteManager {
             onDeleteError: null
         }, hooks);
 
-        /* NUOVO: Variabili di stato per la sicurezza */
         this.eventsBound = false;
         this.isSubmitting = false;
     }
@@ -854,12 +878,13 @@ export class DeleteManager {
 
     bindEvents() {
 
-        /* NUOVO: Impedisce cloni dei listener */
         if (this.eventsBound) return;
         this.eventsBound = true;
 
         document.addEventListener('submit', async e => {
-            const formEl = e.target.closest('.deleteRecord');
+
+            /* Intercetta tutti e tre i form delle azioni */
+            const formEl = e.target.closest('.deleteRecord, .restoreRecord, .hardDeleteRecord');
             if ( ! formEl) return;
 
             e.preventDefault();
@@ -867,38 +892,46 @@ export class DeleteManager {
             const message = formEl.dataset.message;
             const formData = new FormData(formEl);
 
+            /* Instradamento basato sulla classe del form */
+            let targetUrl = '';
+            if (formEl.classList.contains('deleteRecord')) {
+                targetUrl = this.config.urls.softDelete;
+            } else if (formEl.classList.contains('restoreRecord')) {
+                targetUrl = this.config.urls.restoreDelete;
+            } else if (formEl.classList.contains('hardDeleteRecord')) {
+                targetUrl = this.config.urls.hardDelete;
+            }
+
+            if ( ! targetUrl) return;
+
             const ok = await askConfirm(message);
             if (ok) {
-                await this.deleteRecord(formData);
+                await this.processAction(targetUrl, formData);
             }
         });
     }
 
-    async deleteRecord(formData) {
+    async processAction(url, formData) {
 
-        /* NUOVO: Se c'è già una richiesta in corso, blocca */
         if (this.isSubmitting) return;
         this.isSubmitting = true;
 
-        /* Hook opzionale prima dell'invio */
         if (typeof this.hooks.onDeleteBefore === 'function') {
             const stop = this.hooks.onDeleteBefore(formData);
             if (stop === false) {
-                this.isSubmitting = false; /* <--- NUOVO RILASCIO */
+                this.isSubmitting = false; 
                 return;
             }
         }
 
         try {
-            /* Chiamata POST all'endpoint */
-            const response = await apiFetch(this.config.url, {
+            const response = await apiFetch(url, {
                 method: 'POST',
                 body: formData
             });
 
             const data = await response.json();
 
-            /* Gestione fallimento logico generico */
             if (data.result === false) {
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('danger', data.message);
@@ -906,11 +939,9 @@ export class DeleteManager {
                 return;
             }
 
-            /* Caso successo */
             if (data.result === true) {
                 const listManager = this.config.listManager;
                 
-                /* Calcolo arretramento pagina se eliminiamo l'ultimo record della pagina corrente (non la prima) */
                 const lastItemEl = document.getElementById('lastItemPage');
                 const lastItemPage = lastItemEl ? parseInt(lastItemEl.dataset.lastitempage, 10) : 0;
 
@@ -924,30 +955,25 @@ export class DeleteManager {
                     }
                 }
 
-                /* Ricarica la lista */
                 if (listManager && typeof listManager.showAll === 'function') {
                     listManager.showAll();
                 }
 
-                /* Hook opzionale post-successo corretta */
                 if (typeof this.hooks.onDeleteAfter === 'function') {
                     this.hooks.onDeleteAfter(data);
                 }
 
-                /* Messaggio di successo */
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('success', data.message);
                 }
             }
 
         } catch (error) {
-            /* Errori di rete o crash del server */
             if (typeof this.hooks.onDeleteError === 'function') {
                 this.hooks.onDeleteError(error);
             }
             console.error("Errore DeleteManager:", error);
         } finally {
-            /* NUOVO: Rilascia sempre il blocco */
             this.isSubmitting = false;
         }
     }

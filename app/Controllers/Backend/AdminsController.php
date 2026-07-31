@@ -195,7 +195,7 @@ class AdminsController extends BackendController
             $posts = array_merge($this->request->getPost(), ['images' => $this->request->getFileMultiple('images') ?? []]);
 
             if(( ! isset($posts['uuid'])) || ( ! $this->regexp->validateUUID($posts['uuid']))):
-                return $this->jsonResponse(['result' => false, 'message' => lang('backend/admins.global.wrongUUIDFormat')]);
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/admins.errors.uuid')]);
             endif;
 
             $admin = $this->adminsModel->getByUUID($posts['uuid']);
@@ -263,18 +263,23 @@ class AdminsController extends BackendController
 
         /* GET Request - Caricamento iniziale della pagina */
         if(( ! isset($uuid)) || ( ! $this->regexp->validateUUID($uuid))):
-            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.global.wrongUUIDFormat'))->with('class', 'danger');
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.errors.uuid'))->with('class', 'light text-danger fw-bold');
         endif;
 
         $admin = $this->adminsModel->getByUUID($uuid);
 
         if($admin['result'] === false):
-            return redirect()->to(base_url('backend/admins/showAll'))->with('message', $admin['message'])->with('class', 'danger');
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', $admin['message'])->with('class', 'light text-danger fw-bold');
+        endif;
+
+        /* Scudo Enterprise: blocco immediato se il record si trova nel cestino */
+        if ($admin['row']->deleted_at !== null):
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.cannotModifyDeleted'))->with('class', 'light text-danger fw-bold')->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
         endif;
 
         /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
         if ((int) $admin['row']->master === 1):
-            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.protectedAdmin'))->with('class', 'danger')->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.protectedAdmin'))->with('class', 'light text-danger fw-bold')->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
         endif;
         
         $this->data['action'] = 'edit';
@@ -349,18 +354,23 @@ class AdminsController extends BackendController
     public function show(string $uuid): RedirectResponse|string
     {
         if (( ! isset($uuid)) || ( ! $this->regexp->validateUUID($uuid))):
-            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.global.wrongUUIDFormat'))->with('class', 'danger');
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.errors.uuid'))->with('class', 'light text-danger fw-bold');
         endif;
 
         $admin = $this->adminsModel->getByUUID($uuid);
 
         if ($admin['result'] === false):
-            return redirect()->to(base_url('backend/admins/showAll'))->with('message', $admin['message'])->with('class', 'danger');
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', $admin['message'])->with('class', 'light text-danger fw-bold');
+        endif;
+
+        /* Scudo Enterprise: blocco immediato se il record si trova nel cestino */
+        if ($admin['row']->deleted_at !== null):
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.cannotModifyDeleted'))->with('class', 'light text-danger fw-bold')->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
         endif;
 
         /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
         if ((int) $admin['row']->master === 1):
-            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.protectedAdmin'))->with('class', 'danger')->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.protectedAdmin'))->with('class', 'light text-danger fw-bold')->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
         endif;
         
         $this->data['action'] = 'show';
@@ -390,7 +400,7 @@ class AdminsController extends BackendController
      *
      * @return ResponseInterface Risposta JSON contenente l'esito dell'operazione.
      */
-    public function delete(): ResponseInterface
+    public function hardDelete(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -403,7 +413,47 @@ class AdminsController extends BackendController
                 return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/admins.messages.validationToastErrors'), $errorMessage)]);
             endif;
 
-            $json = $this->adminsModel->del($posts);
+            $json = $this->adminsModel->hardDelete($posts);
+
+            return $this->jsonResponse($json);
+
+        endif;
+    }
+
+    public function softDelete(): ResponseInterface
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            $posts = $this->request->getPost();
+            $rules = $this->adminsModel->delValidationRules();
+
+            if ( ! $this->validateData($posts, $rules)):
+                $errorMessage = implode('<br>', $this->validator->getErrors());
+                
+                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/admins.messages.validationToastErrors'), $errorMessage)]);
+            endif;
+
+            $json = $this->adminsModel->softDelete($posts);
+
+            return $this->jsonResponse($json);
+
+        endif;
+    }
+
+    public function restoreDelete(): ResponseInterface
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            $posts = $this->request->getPost();
+            $rules = $this->adminsModel->delValidationRules();
+
+            if ( ! $this->validateData($posts, $rules)):
+                $errorMessage = implode('<br>', $this->validator->getErrors());
+                
+                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/admins.messages.validationToastErrors'), $errorMessage)]);
+            endif;
+
+            $json = $this->adminsModel->restoreDelete($posts);
 
             return $this->jsonResponse($json);
 

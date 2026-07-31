@@ -22,7 +22,11 @@ const actions = {
 
         const deleteManager = new DeleteManager({
             controller: 'admins',
-            url: urlbase + 'backend/admins/delete',
+            urls: {
+                softDelete: urlbase + 'backend/admins/softDelete',
+                restoreDelete: urlbase + 'backend/admins/restoreDelete',
+                hardDelete: urlbase + 'backend/admins/hardDelete'
+            },
             listManager: adminsManager
         });
         deleteManager.init();

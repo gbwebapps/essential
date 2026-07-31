@@ -57,7 +57,7 @@ class PermissionFilter implements FilterInterface
 
         /* Gestione flussi Standard / GET */
         session()->setFlashdata('message', $message);
-        session()->setFlashdata('class', 'danger');
+        session()->setFlashdata('class', 'light text-danger fw-bold');
         session()->setFlashdata('icon', '<i class="fa-solid fa-ban"></i>');
 
         return redirect()->to(base_url('backend/dashboard'));

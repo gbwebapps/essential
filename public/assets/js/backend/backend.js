@@ -219,27 +219,15 @@ export function showAlert(type, message, customIcon = '')
     /* Determina classe e icona di default in base al tipo */
     switch (type) {
         case 'success':
-            alertClass = 'alert-success';
+            alertClass = 'light text-success fw-bold';
             defaultIcon = '<i class="fa-solid fa-circle-check"></i>';
             break;
         case 'danger':
-            alertClass = 'alert-danger';
+            alertClass = 'light text-danger fw-bold';
             defaultIcon = '<i class="fa-solid fa-triangle-exclamation"></i>';
-            break;
-        case 'info':
-            alertClass = 'alert-info';
-            defaultIcon = '<i class="fa-solid fa-circle-info"></i>';
-            break;
-        case 'warning':
-            alertClass = 'alert-warning';
-            defaultIcon = '<i class="fa-solid fa-triangle-exclamation"></i>';
-            break;
-        case 'primary':
-            alertClass = 'alert-primary';
-            defaultIcon = '<i class="fa-solid fa-circle-info"></i>';
             break;
         default:
-            alertClass = 'alert-secondary';
+            alertClass = 'light text-secondary fw-bold';
             defaultIcon = '';
     }
 
@@ -248,11 +236,13 @@ export function showAlert(type, message, customIcon = '')
     const iconHTML = finalIcon ? `${finalIcon} ` : '';
 
     const alertHTML = `
-        <div class="alert ${alertClass} alert-dismissible fade show border-0 d-flex align-items-center p-3" role="alert">
+        <div class="alert alert-${alertClass} alert-dismissible fade show border-0 d-flex align-items-center p-3" role="alert">
             <div class="w-100 text-center p-0 ms-4">
                 ${iconHTML}${message}
             </div>
-            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="badge bg-danger p-2 border-0 rounded-1 ms-auto" data-bs-dismiss="alert" style="cursor: pointer;">
+                <i class="fa-solid fa-xmark"></i> Rimuovi
+            </button>
         </div>`;
 
     const alertContainer = document.getElementById('alert-container');
@@ -399,9 +389,9 @@ export function initSingleDatePicker(containerSelector) {
         locale: flatpickr.l10ns.it,
         enableTime: true,
         time_24hr: true,
-        dateFormat: "Y-m-d H:i",
+        dateFormat: "Y-m-d H:i:s",
         altInput: true,
-        altFormat: "d/m/Y H:i",
+        altFormat: "d/m/Y H:i:s",
         allowInput: true,
         wrap: true
     });
@@ -418,10 +408,11 @@ export function initRangeDatePicker(fromContainerSelector, toContainerSelector) 
     const baseConfig = {
         locale: flatpickr.l10ns.it,
         enableTime: true,
+        enableSeconds: true,
         time_24hr: true,
-        dateFormat: "Y-m-d H:i",
+        dateFormat: "Y-m-d H:i:ss",
         altInput: true,
-        altFormat: "d/m/Y H:i",
+        altFormat: "d/m/Y H:i:ss",
         allowInput: true,
         wrap: true
     };

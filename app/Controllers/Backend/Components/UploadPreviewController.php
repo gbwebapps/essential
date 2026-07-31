@@ -2,12 +2,12 @@
 
 namespace App\Controllers\Backend\Components;
 
-use CodeIgniter\Controller;
+use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 
 use App\Models\Backend\Components\UploadPreviewModel;
 
-class UploadPreviewController extends Controller
+class UploadPreviewController extends BaseController
 {
     protected UploadPreviewModel $uploadPreview;
 
@@ -24,7 +24,7 @@ class UploadPreviewController extends Controller
             $images = ['images' => $this->request->getFileMultiple('images') ?? []];
 
             if(empty($images['images'])):
-                return $this->response->setJSON(['result' => false, 'message' => lang('backend/components/uploadPreviewImg.messages.imagesRequired')]);
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/components/uploadPreviewImg.messages.imagesRequired')]);
             endif;
 
             $hidden = $this->request->getPost(['uuid', 'entity', 'context']);
@@ -35,19 +35,19 @@ class UploadPreviewController extends Controller
             /* Validazione campi nascosti */
             if ( ! $this->validateData($hidden, $hiddenRules)) :
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->response->setJSON(['result'  => false, 'message' => sprintf(lang('backend/components/uploadPreviewImg.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/components/uploadPreviewImg.messages.validationToastErrors'), $errorMessage)]);
             endif;
 
             /* Validazione immagini */
             if ( ! $this->validateData($images, $imagesRules)) :
-                return $this->response->setJSON(['imagesErrors' => $this->validator->getErrors(), 'message' => lang('backend/components/uploadPreviewImg.messages.validationErrors')]);
+                return $this->jsonResponse(['imagesErrors' => $this->validator->getErrors(), 'message' => lang('backend/components/uploadPreviewImg.messages.validationErrors')]);
             endif;
 
             /* Unione dei dati per il salvataggio (sostituisce la variabile $posts mancante) */
             $posts = array_merge($hidden, $images);
             $json  = $this->uploadPreview->saveImages($posts);
 
-            return $this->response->setJSON($json);
+            return $this->jsonResponse($json);
 
         endif;
     }
