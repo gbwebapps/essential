@@ -95,6 +95,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     color: var(--bs-secondary);
 }
 
+.shadow-sm {
+    box-shadow: 0 0 0 rgb(0 0 0 / 10%), 0 0 .15rem rgb(0 0 0 / 10%) !important;
+}
+
 /* ==========================================================================
     Gestione Alert Globali (JS e Sessioni)
    ========================================================================== */
@@ -110,7 +114,8 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 /* Contenitore per gli Alert generati da JavaScript */
 #alert-container {
     margin-top: 3.21rem;
-    z-index: 1079;
+    position: relative; /* Questa riga attiva lo z-index */
+    z-index: 1080;
 }
 
 /* Alert generato da PHP (Sessione): ancorato fisso in alto nello stesso identico punto */

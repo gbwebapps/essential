@@ -12,7 +12,7 @@ return [
 		'generalData' => 'Dati generali', 
 		'metaData' => 'Meta dati', 
 		'permissions' => 'Permessi', 
-		'tokens' => 'Accessi'
+		'tokens' => 'Tokens'
 	],
 	'linksBar' => [
 		'index' => 'Dati', 
@@ -123,7 +123,7 @@ return [
 		'areYouSureDeleteToken' => 'Sei sicuro di eliminare il token di  %s %s?', 
 		'areYouSureChangeGroup' => 'Il cambio gruppo modificherà temporaneamente la visualizzazione dei permessi. Se confermerai e salverai la pagina, le vecchie eccezioni verranno eliminate dal database. Procedere con il cambio visivo?', 
 		'noAdminsFound' => 'Non sono presenti amministratori.', 
-		'noTokensFound' => 'Non sono presenti accessi.', 
+		'noTokensFound' => 'Non sono presenti tokens.', 
 		'validationErrors' => 'Errori di validazione.', 
 		'validationToastErrors' => '%s', 
 		'addSuccess' => 'Amministratore %s %s aggiunto con successo.', 
@@ -147,6 +147,7 @@ return [
 		'changePermissionError' => 'Modifica permesso amministratore non andato a buon fine.', 
 		'changePermissionSuccess' => 'Modifica permesso %s %s effettuato con successo.', 
 		'deleteTokenSuccess' => 'Il token di %s %s è stato eliminato con successo.', 
+		'deleteTokenError' => 'Eliminazione del token non è andata a buon fine', 
 		'protectedAdmin' => 'Protetto da modifiche.', 
 		'cannotModifyDeleted' => 'Non è possibile modificare un admin eliminato.', 
 		'emailAlreadyInUse' => 'Email già utilizzata.', 

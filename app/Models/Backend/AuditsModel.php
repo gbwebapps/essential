@@ -110,11 +110,11 @@ class AuditsModel extends BackendModel
             ],
             'searchFields.section' => [
                 'label' => lang('backend/admins.labels.section'), 
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-Z0-9@._-]+$/]'], 
+                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
             ],
             'searchFields.details' => [
                 'label' => lang('backend/admins.labels.details'), 
-                'rules' => ['permit_empty', 'regex_match[/^[0-9+\-\s()]+$/]'], 
+                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
             ],
             'searchDates.created_at-from' => [
                 'label' => lang('backend/audits.labels.dateFrom'),

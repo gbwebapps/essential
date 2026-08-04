@@ -52,24 +52,24 @@ export class GroupsManager {
         });
 
         /* 3. Intercettiamo il submit dei form di edit generati dinamicamente */
-        document.addEventListener('submit', async (e) => {
+        document.addEventListener('submit', e => {
             const editForm = e.target.closest('.edit-group-form');
             if (editForm) {
                 e.preventDefault();
-
-                const message = editForm.dataset.message;
-                const ok = await askConfirm(message);
-                if ( ! ok) return;
-
                 this.handleEditGroup(e);
             }
         });
 
         /* 4. Intercettiamo il click sul pulsante ripristino (refresh) del gruppo */
-        document.addEventListener('click', e => {
+        document.addEventListener('click', async (e) => {
             const refreshBtn = e.target.closest('.btn-refresh-group');
             if (refreshBtn) {
                 e.preventDefault();
+
+                const message = refreshBtn.dataset.message;
+                const ok = await askConfirm(message);
+                if ( ! ok) return;
+
                 this.handleRefreshGroup(refreshBtn);
             }
         });

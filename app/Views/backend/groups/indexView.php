@@ -8,7 +8,7 @@
 
                 <div class="accordion" id="mainGroupsDashboard">
 
-                    <div class="accordion-item mb-3 border">
+                    <div class="accordion-item mb-3 border shadow-sm">
                         <h2 class="accordion-header" id="main_heading_add">
                             <button class="accordion-button collapsed shadow-none bg-light text-secondary py-3 btn-trigger-add-group" type="button" aria-expanded="false" aria-controls="main_collapse_add">
                                 <h2 class="card-title mb-0 fs-5">
@@ -21,7 +21,7 @@
                         </div>
                     </div>
 
-                    <div class="accordion-item mb-3 border">
+                    <div class="accordion-item mb-3 border shadow-sm">
                         <h2 class="accordion-header" id="main_heading_list">
                             <button class="accordion-button collapsed shadow-none bg-light text-secondary py-3" type="button" data-bs-toggle="collapse" data-bs-target="#main_collapse_list" aria-expanded="false" aria-controls="main_collapse_list">
                                 <h2 class="card-title mb-0 fs-5">
@@ -34,7 +34,7 @@
                         </div>
                     </div>
 
-                    <div class="accordion-item border">
+                    <div class="accordion-item border shadow-sm">
                         <h2 class="accordion-header" id="main_heading_exceptions">
                             <button class="accordion-button collapsed shadow-none bg-light text-secondary py-3 btn-trigger-exceptions-group" type="button" aria-expanded="false" aria-controls="main_collapse_exceptions">
                                 <h2 class="card-title mb-0 fs-5">

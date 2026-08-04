@@ -6,6 +6,7 @@ return [
             'admins' => 'Amministratori',
             'groups' => 'Gruppi',
             'audits' => 'Registro attività', 
+            'tokens' => 'Tokens', 
             'account' => 'Profilo',
             'logout' => 'Esci'
         ],

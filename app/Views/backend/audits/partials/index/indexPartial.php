@@ -119,7 +119,7 @@
                                                 <?= $agentText; ?>
                                                 &nbsp;&bull;&nbsp;
                                                 <span><?= lang('backend/audits.labels.ipAddress'); ?></span>
-                                                <span class="text-primary"><?= esc($audit->ip_address); ?></span>
+                                                <span class="text-primary fw-bold"><?= esc($audit->ip_address); ?></span>
                                                 <!-- End parte useragent -->
 
                                             </td>

@@ -131,7 +131,7 @@ class Auth extends BaseConfig
      * 
      * @var int 
      */
-    public int $rememberMeTime = 86400;
+    public int $rememberMeTime = 864000;
 
     /**
      * Durata massima di inattività (in secondi) prima della scadenza della sessione di backend.

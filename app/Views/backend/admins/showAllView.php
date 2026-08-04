@@ -14,7 +14,7 @@
                         <div class="row">
 
                             <!-- Select per il numero delle righe da mostrare -->
-                            <div class="col-12 col-md-2">
+                            <div class="col-12 col-md-1">
                                 <select id="changeNumRows" class="form-select">
                                     <option value="5">5</option>
                                     <option value="10">10</option>
@@ -24,7 +24,7 @@
                             </div>
                             <!-- End Select per il numero delle righe da mostrare -->
 
-                            <div class="col-12 col-md-10">
+                            <div class="col-12 col-md-11">
                                 <div class="pt-2 d-flex flex-column flex-md-row align-items-center justify-content-md-end">
 
                                     <!-- Selezione stato record (Attivi, Cestino, Tutti) -->

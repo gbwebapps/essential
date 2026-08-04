@@ -176,7 +176,7 @@ class AuthModel extends BackendModel
             $posts = $this->checkAllowedFields($posts, $this->loginAllowedFields);
 
             $rememberMe = (isset($posts['rememberMe']) && $posts['rememberMe']) ? true : false;
-            $ip = $request->getIPAddress();
+            $ip_address = $request->getIPAddress();
 
             /* Lettura centralizzata delle configurazioni per evitare chiamate ridondanti */
             $allowAttempts = (bool) $this->config->attempts;
@@ -241,8 +241,8 @@ class AuthModel extends BackendModel
                 $this->db->transBegin();
                 
                 if ($allowAttempts):
-                    $sql = "insert into admins_attempts (admin_uuid, ip, timestamp) values (?, ?, ?)";
-                    $this->db->query($sql, [$admin->uuid, $ip, date('Y-m-d H:i:s')]);
+                    $sql = "insert into admins_attempts (admin_uuid, ip_address, timestamp) values (?, ?, ?)";
+                    $this->db->query($sql, [$admin->uuid, $ip_address, date('Y-m-d H:i:s')]);
                 endif;
 
                 $this->db->transCommit();
@@ -346,9 +346,9 @@ class AuthModel extends BackendModel
 
         /* 4. Registrazione del nuovo token nel database con i metodi nativi di CI4 */
         $userAgent = $request->getUserAgent()->getAgentString();
-        $ip = $request->getIPAddress();
+        $ip_address = $request->getIPAddress();
 
-        $sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, token_expire, token_type, user_agent, ip) values(?, ?, ?, ?, ?, ?, ?)";
+        $sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, token_expire, token_type, user_agent, ip_address, created_at) values(?, ?, ?, ?, ?, ?, ?, ?)";
         $this->db->query($sql, [
             $admin->uuid,
             $tokenHash,
@@ -356,7 +356,8 @@ class AuthModel extends BackendModel
             $tokenExpire,
             $tokenType,
             $userAgent,
-            $ip
+            $ip_address, 
+            date('Y-m-d H:i:s')
         ]);
 
         /* Chiude la transazione aperta nel metodo principale prima di impostare gli stati del client */
@@ -436,8 +437,8 @@ class AuthModel extends BackendModel
                 $sql = "delete from admins_tokens where admin_uuid = ? and token_type = ?";
                 $this->db->query($sql, [$admin->uuid, 'activation']);
 
-                $sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, token_expire, token_type, user_agent, ip) values(?,?,?,?,?,?,?)";
-                $this->db->query($sql, [$admin->uuid,$tokenHash, $tokenCreate, $tokenExpire, 'activation', $request->getUserAgent()->getAgentString(), $request->getIPAddress()]);
+                $sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, token_expire, token_type, user_agent, ip_address, created_at) values(?,?,?,?,?,?,?,?)";
+                $this->db->query($sql, [$admin->uuid,$tokenHash, $tokenCreate, $tokenExpire, 'activation', $request->getUserAgent()->getAgentString(), $request->getIPAddress(), date('Y-m-d H:i:s')]);
 
                 if ($this->db->transStatus() === false):
                     $this->db->transRollback();
@@ -447,7 +448,7 @@ class AuthModel extends BackendModel
 
                 $this->db->transCommit();
 
-                log_admin_activity('RESET_PASSWORD', 'auth', sprintf('Reset password %s %s ', esc($admin->firstname), esc($admin->lastname)), $admin);
+                log_admin_activity('RESET_PASSWORD_AUTH', 'auth', sprintf('Reset password %s %s ', esc($admin->firstname), esc($admin->lastname)), $admin);
 
             } catch (\Throwable $e) {
                 $this->db->transRollback();
@@ -610,7 +611,7 @@ class AuthModel extends BackendModel
             $posts = $this->checkAllowedFields($posts, $this->verifyAllowedFields);
 
             $config = $this->config;
-            $ip = $request->getIPAddress();
+            $ip_address = $request->getIPAddress();
 
             /* Recupero e validazione immediata della sessione protetta temporanea */
             $sessionData = session()->get('auth_2fa_pending');
@@ -692,8 +693,8 @@ class AuthModel extends BackendModel
 
             if ( ! $isValidCode):
                 /* Qualsiasi fallimento conta come tentativo errato per la sicurezza */
-                $sql = "insert into admins_2fa_attempts (admin_uuid, method, ip, timestamp) values (?, ?, ?, ?)";
-                $this->db->query($sql, [$adminUuid, $method, $ip, date('Y-m-d H:i:s')]);
+                $sql = "insert into admins_2fa_attempts (admin_uuid, method, ip_address, timestamp) values (?, ?, ?, ?)";
+                $this->db->query($sql, [$adminUuid, $method, $ip_address, date('Y-m-d H:i:s')]);
 
                 $this->db->transCommit();
 

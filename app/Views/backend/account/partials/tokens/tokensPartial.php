@@ -25,32 +25,25 @@
                     /* Creiamo l'oggetto DateTime con l'ora attuale per fare il confronto */
                     $now = new \DateTime();
 
-                    /* Confrontiamo i due oggetti DateTime in modo nativo e sicuro */
-                    if ($now < $dateExpire):
-                        $expireDate = '<span class="text-success fw-bold">' . convertDate($dateExpire->format('Y-m-d H:i:s')) . '</span>';
-                    else:
-                        $expireDate = '<span class="text-danger fw-bold"><s>' . convertDate($dateExpire->format('Y-m-d H:i:s')) . '</s></span>';
-                    endif;
+                    /* Applichiamo le classi in base al confronto (se adesso è maggiore della scadenza, è scaduto) */
+                    $class = ($now > $dateExpire) ? 'text-danger fw-bold text-decoration-line-through' : 'text-success fw-bold';
 
-                    /* Identificazione del tipo con fallback di sicurezza finale */
-                    $tokenType = '';
-                    if ($token->token_type === 'session'):
-                        $tokenType = lang('backend/account.labels.session');
-                    elseif ($token->token_type === 'activation'):
-                        $tokenType = lang('backend/account.labels.activation');
-                    elseif ($token->token_type === 'cookie'):
-                        $tokenType = lang('backend/account.labels.rememberMe');
-                    else:
-                        $tokenType = lang('backend/account.labels.unknown');
-                    endif;
+                    /* Mappatura delle traduzioni per i tipi di token */
+                    $typeMap = [
+                        'session'    => lang('backend/admins.labels.session'),
+                        'activation' => lang('backend/admins.labels.activation'),
+                        'cookie'     => lang('backend/admins.labels.rememberMe')
+                    ];
+
+                    /* Assegnazione con fallback automatico se la chiave non esiste */
+                    $tokenType = $typeMap[$token->token_type] ?? lang('backend/admins.labels.unknown');
                 ?>
 
                 <tr>
                     <td class="text-left fw-bold"><?= convertDate(esc($token->token_create)); ?></td>
-                    <td class="text-left"><?= $expireDate; ?></td>
-                    <td class="text-left">
-                        <span class="text-success fw-bold"><?= $tokenType; ?></span>
-                    </td>
+                    <td class="text-left <?= $class; ?>"><?= convertDate($dateExpire->format('Y-m-d H:i:s')); ?></td>
+                    <td class="text-left fw-bold"><?= esc($tokenType); ?></td>
+
                     <td class="text-center" rowspan="2">
                         <form class="deleteToken" data-message="<?= sprintf(lang('backend/account.messages.areYouSureDeleteToken'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)); ?>">
                             <input type="hidden" name="id" value="<?= esc($token->id); ?>">
@@ -86,9 +79,9 @@
                             ?>
 
                             <?= $agentText; ?>
-                            &nbsp;&bull;&nbsp;
+                            &bull; 
                             <span><?= lang('backend/account.labels.ipAddress'); ?></span>
-                            <span class="text-primary"><?= esc($token->ip); ?></span>
+                            <span class="text-primary"><?= esc($token->ip_address); ?></span>
                         </small>
                     </td>
                 </tr>

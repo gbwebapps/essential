@@ -246,7 +246,13 @@ export function showAlert(type, message, customIcon = '')
         </div>`;
 
     const alertContainer = document.getElementById('alert-container');
-    if (!alertContainer) return;
+    if ( ! alertContainer) return;
+
+    /* Cerca l'alert di sessione PHP e lo rimuove dal DOM se presente */
+    const sessionAlert = document.querySelector('.alert-session');
+    if (sessionAlert) {
+        sessionAlert.remove();
+    }
 
     /* Svuota il contenitore rimuovendo l'alert precedente prima di inserire il nuovo */
     alertContainer.innerHTML = '';

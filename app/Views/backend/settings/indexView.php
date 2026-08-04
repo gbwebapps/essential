@@ -10,7 +10,7 @@
 
                     <?php foreach(['auth', 'upload', 'email'] as $env): ?>
 
-                        <div class="accordion-item mb-3 border">
+                        <div class="accordion-item mb-3 border shadow-sm">
                             <h2 class="accordion-header" id="main_heading_<?= $env; ?>">
                                 <button class="accordion-button collapsed shadow-none bg-light text-secondary py-3 btn-trigger-<?= $env; ?>-settings" data-env="<?= $env; ?>" type="button" aria-expanded="false" aria-controls="main_collapse_<?= $env; ?>">
                                     <h2 class="card-title mb-0 fs-5">

@@ -127,8 +127,15 @@ $routes->group('backend', function($routes) {
             $routes->post('saveExceptions', '\App\Controllers\Backend\GroupsController::saveExceptions'); 
         });
 
+        /* AUDITS */
         $routes->group('audits', function($routes) {
             $routes->match(['GET', 'POST'], '/', '\App\Controllers\Backend\AuditsController::index');
+        });
+
+        /* TOKENS */
+        $routes->group('tokens', function($routes) {
+            $routes->match(['GET', 'POST'], '/', '\App\Controllers\Backend\TokensController::index');
+            $routes->post('hardDelete', '\App\Controllers\Backend\TokensController::hardDelete');
         });
 
         /* ADMINS */

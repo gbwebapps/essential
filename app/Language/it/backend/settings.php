@@ -131,8 +131,8 @@ return [
 	], 
 	'buttons' => [
 		'refreshData' => 'Refresh dati', 
-		'sendData' => 'Invia dati', 
-		'restoreData' => 'Ripristina dati'
+		'sendData' => 'Impostazioni database', 
+		'restoreData' => 'Impostazioni default'
 	], 
 	'options' => [
 		'first' => 'Prima opzione', 
@@ -141,8 +141,11 @@ return [
 	], 
 	'messages' => [
 		'validationErrors' => 'Errori di validazione.', 
-		'saveSuccess' => 'Impostazioni aggiornate con successo.', 
-		'deleteSuccess' => 'Impostazioni eliminate con successo dal database.', 
-		'noDataChanged' => 'Non sono state effettuate modifiche.', 
+		'saveSuccess' => 'Impostazioni salvate sul database con successo.', 
+		'deleteSuccess' => 'Impostazioni rimosse dal database con successo.', 
+		'noDataChanged' => 'Non sono state effettuate modifiche alle impostazioni.', 
+		'alreadyDefault' => 'Non esistono impostazioni da rimuovere dal database.', 
+		'areYouSureDeleteSettings' => 'Sei sicuro di voler rimuovere le impostazioni dal database?',
+		'areYouSureRefreshSettings' => 'Sei sicuro di voler ricaricare le impostazioni?', 
 	], 
 ];

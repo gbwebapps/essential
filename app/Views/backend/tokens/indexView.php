@@ -2,7 +2,7 @@
 
 <?= $this->section('content') ?>
 
-    <div class="audits">
+    <div class="tokens">
 
         <div class="row">
             <div class="col-12">
@@ -34,25 +34,25 @@
                                        aria-expanded="false"
                                        aria-controls="search-bar"
                                         class="mb-2 mb-md-0 me-0 me-md-2 bar-link">
-                                        <b><i class="fa-solid fa-filter"></i> <?= lang('backend/audits.links.filters'); ?></b>
+                                        <b><i class="fa-solid fa-filter"></i> <?= lang('backend/tokens.links.filters'); ?></b>
                                     </a>
                                     <!-- End Apertura/chiusura parte filtri -->
 
                                     <!-- Reset filtri e ordinamento -->
                                     <a href="#" id="link-reset-search" class="mb-2 mb-md-0 mx-0 mx-md-2 bar-link">
-                                        <b><i class="fa-solid fa-filter-circle-xmark"></i> <?= lang('backend/audits.links.resetFilters'); ?></b>
+                                        <b><i class="fa-solid fa-filter-circle-xmark"></i> <?= lang('backend/tokens.links.resetFilters'); ?></b>
                                     </a>
                                     <!-- End Reset filtri e ordinamento -->
 
                                     <!-- Reset solo ordinamento -->
                                     <a href="#" id="reset-sorting-link" class="mb-2 mb-md-0 mx-0 mx-md-2 bar-link">
-                                        <b><i class="fa-solid fa-sort"></i> <?= lang('backend/audits.links.resetSorting'); ?></b>
+                                        <b><i class="fa-solid fa-sort"></i> <?= lang('backend/tokens.links.resetSorting'); ?></b>
                                     </a>
                                     <!-- End Reset solo ordinamento -->
 
                                     <!-- Semplice ricarica lista -->
                                     <a href="#" id="refresh-list" class="mb-md-0 ms-0 ms-md-2 bar-link">
-                                        <b><i class="fa-solid fa-arrows-rotate"></i> <?= lang('backend/audits.links.reloadList'); ?></b>
+                                        <b><i class="fa-solid fa-arrows-rotate"></i> <?= lang('backend/tokens.links.reloadList'); ?></b>
                                     </a>
                                     <!-- End Semplice ricarica lista -->
 
@@ -67,73 +67,30 @@
                     <div id="search-bar" class="collapse">
                         <div class="row card-body">
 
-                            <!-- Ricerca avanzata per username -->
+                            <!-- Ricerca avanzata per email -->
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
-                                    <label for="audits-username"><?= lang('backend/audits.labels.username'); ?></label>
+                                    <label for="tokens-email"><?= lang('backend/tokens.labels.username'); ?></label>
                                     <div class="input-group">
-                                        <input type="text" id="audits-username" class="form-control" placeholder="<?= lang('backend/audits.placeholders.searchUsername'); ?>" autocomplete="off">
+                                        <input type="text" id="tokens-email" class="form-control" placeholder="<?= lang('backend/tokens.placeholders.searchUsername'); ?>" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
-                                    <div class="error_username text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div class="error_email text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
-                            <!-- End Ricerca avanzata per username -->
-
-                            <!-- Ricerca avanzata per azione -->
-                            <div class="col-md-3">
-                                <div class="mb-2 mb-md-0">
-                                    <label for="audits-action"><?= lang('backend/audits.labels.action'); ?></label>
-                                    <div class="input-group">
-                                        <input type="text" id="audits-action" class="form-control" placeholder="<?= lang('backend/audits.placeholders.searchAction'); ?>" autocomplete="off">
-                                        <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
-                                    </div>
-                                    <div class="error_action text-danger fw-bold small pt-1">&nbsp;</div>
-                                </div>
-                            </div>
-                            <!-- End Ricerca avanzata per azione -->
-
-                            <!-- Ricerca avanzata per sezione -->
-                            <div class="col-md-3">
-                                <div class="mb-2 mb-md-0">
-                                    <label for="audits-section"><?= lang('backend/audits.labels.section'); ?></label>
-                                    <div class="input-group">
-                                        <input type="text" id="audits-section" class="form-control" placeholder="<?= lang('backend/audits.placeholders.searchSection'); ?>" autocomplete="off">
-                                        <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
-                                    </div>
-                                    <div class="error_section text-danger fw-bold small pt-1">&nbsp;</div>
-                                </div>
-                            </div>
-                            <!-- End Ricerca avanzata per sezione -->
-
-                            <!-- Ricerca avanzata per dettagli -->
-                            <div class="col-md-3">
-                                <div class="mb-2 mb-md-0">
-                                    <label for="audits-details"><?= lang('backend/audits.labels.details'); ?></label>
-                                    <div class="input-group">
-                                        <input type="text" id="audits-details" class="form-control" placeholder="<?= lang('backend/audits.placeholders.searchDetails'); ?>" autocomplete="off">
-                                        <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
-                                    </div>
-                                    <div class="error_details text-danger fw-bold small pt-1">&nbsp;</div>
-                                </div>
-                            </div>
-                            <!-- End Ricerca avanzata per dettagli -->
-
-                        </div>
-
-                        <div class="row card-body py-0">
+                            <!-- End Ricerca avanzata per email -->
 
                             <!-- Ricerca avanzata per data da -->
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
                                     <!-- Campo Data Da -->
-                                    <label for="audits-created_at-from"><?= lang('backend/audits.labels.dateFrom'); ?></label>
-                                    <div id="wrapper-audits-created_at-from" class="input-group">
-                                        <input type="text" id="audits-created_at-from" data-input class="form-control" placeholder="<?= lang('backend/audits.placeholders.dateFrom'); ?>" autocomplete="off">
+                                    <label for="tokens-token_create-from"><?= lang('backend/tokens.labels.dateFrom'); ?></label>
+                                    <div id="wrapper-tokens-token_create-from" class="input-group">
+                                        <input type="text" id="tokens-token_create-from" data-input class="form-control" placeholder="<?= lang('backend/tokens.placeholders.dateFrom'); ?>" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <div class="error_created_at-from text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div class="error_token_create-from text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End ricerca avanzata per data da -->
@@ -142,9 +99,9 @@
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
                                     <!-- Campo Data A -->
-                                    <label for="audits-created_at-to"><?= lang('backend/audits.labels.dateTo'); ?></label>
-                                    <div id="wrapper-audits-created_at-to" class="input-group">
-                                        <input type="text" id="audits-created_at-to" data-input class="form-control" placeholder="<?= lang('backend/audits.placeholders.dateTo'); ?>" autocomplete="off">
+                                    <label for="tokens-token_create-to"><?= lang('backend/tokens.labels.dateTo'); ?></label>
+                                    <div id="wrapper-tokens-token_create-to" class="input-group">
+                                        <input type="text" id="tokens-token_create-to" data-input class="form-control" placeholder="<?= lang('backend/tokens.placeholders.dateTo'); ?>" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
@@ -153,14 +110,34 @@
                             </div>
                             <!-- End ricerca avanzata per data a -->
 
+                            <!-- Ricerca avanzata per azione -->
+                            <div class="col-md-3">
+                                <div class="mb-2 mb-md-0">
+                                    <label for="tokens-token_type"><?= lang('backend/tokens.labels.tokenType'); ?></label>
+                                    <div class="input-group">
+                                        <select id="tokens-token_type" class="form-select">
+                                            <!-- Option che funge da placeholder -->
+                                            <option value="" disabled selected hidden><?= lang('backend/tokens.placeholders.searchType'); ?></option>
+                                            <option value="activation"><?= lang('backend/tokens.labels.activation'); ?></option>
+                                            <option value="session"><?= lang('backend/tokens.labels.session'); ?></option>
+                                            <option value="cookie"><?= lang('backend/tokens.labels.cookie'); ?></option>
+                                        </select>
+                                        <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
+                                    </div>
+                                    <div class="error_token_type text-danger fw-bold small pt-1">&nbsp;</div>
+                                </div>
+                            </div>
+                            <!-- End Ricerca avanzata per azione -->
+
                         </div>
+
                     </div>
                     <!-- Fine parte filtri -->
 
                     <!-- Inizio contenuto -->
                     <div class="row">
                         <div class="col-12">
-                            <div id="index-audits-container"></div>
+                            <div id="index-tokens-container"></div>
                         </div>
                     </div>
                     <!-- Fine contenuto -->

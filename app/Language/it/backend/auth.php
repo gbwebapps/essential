@@ -46,10 +46,12 @@ return [
 		'setPasswordFailed' => 'Errore durante impostazione password.', 
 		'setPasswordError' => 'Errore durante impostazione password.', 
 		'checkAuthError' => 'Codice di autenticazione non valido oppure scaduto.', 
-		'tooMAnyAttempts' => 'Sono stati effettuati troppi tentativi.', 
+		'tooManyAttempts' => 'Sono stati effettuati troppi tentativi.', 
 	    'currentSessionOn' => '%s %s sessione ancora in corso.', 
 		'validationErrors' => 'Errori di validazione.', 
 		'resetPasswordSuccess' => 'Processo di reset password impostato. Verifica l\'email inviata per terminare le operazioni.', 
-		'resetPasswordSuccessNoEmail' => 'Processo di reset password impostato, ma l\'email non è stata inviata. Contattare l\'amministratore.'
+		'resetPasswordSuccessNoEmail' => 'Processo di reset password impostato, ma l\'email non è stata inviata. Contattare l\'amministratore.', 
+		'expiredCode' => 'Codice OTP scaduto.',
+		'wrongCode' => 'Codice OTP errato.', 
 	]
 ];

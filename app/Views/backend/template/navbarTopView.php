@@ -18,7 +18,7 @@
                     <!-- Dropdown profilo utente -->
                     <li class="nav-item dropdown">
                         <!-- Verifica se la sezione corrente appartiene all'area utente/account -->
-                        <?php $isActive = (isset($controller) && in_array($controller, ['users', 'account'])); ?>
+                        <?php $isActive = (isset($controller) && in_array($controller, ['account'])); ?>
                         
                         <a class="nav-link dropdown-toggle<?= $isActive ? ' active fw-bold' : ''; ?>" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fa-solid fa-user-circle"></i> <?= esc($currentAdmin->firstname ?? ''); ?> <?= esc($currentAdmin->lastname ?? ''); ?>
@@ -35,7 +35,7 @@
                                     $itemController = $item['controller'] ?? '';
 
                                     /* Se l'utente non è master, nascondi le voci relative alla gestione utenti */
-                                    if ( ! ((int) ($currentAdmin->master ?? 0) === 1) && in_array($itemController, ['admins', 'groups', 'audits'])):
+                                    if ( ! ((int) ($currentAdmin->master ?? 0) === 1) && in_array($itemController, ['admins', 'groups', 'audits', 'tokens'])):
                                         continue;
                                     endif;
                                     $visibleItems[] = $item;
