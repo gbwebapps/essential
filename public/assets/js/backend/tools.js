@@ -2,7 +2,7 @@
 import { action } from './backend.js';
 
 /* Import della classe logica polivalente */
-import { ToolsManager } from './components/Tools.js';
+import { ToolsManager } from './modules/Tools.js';
 
 const actions = {
     index: function() {

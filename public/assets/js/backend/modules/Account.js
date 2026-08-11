@@ -5,9 +5,9 @@ export class EditManager {
     constructor(hooks = {}) {
 
         /* Parametri di configurazione della sezione dedicati e hardcoded */
-        this.formSelector = '#account_edit';
+        this.formSelector = '#account-edit';
         this.url = urlbase + 'backend/account/edit';
-        this.refreshSelector = '#edit_refresh';
+        this.refreshSelector = '#edit-refresh';
         this.containerId = 'edit-account-container';
 
         /* Inizializza eventuali callback esterni da eseguire in momenti chiave */

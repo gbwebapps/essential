@@ -2,7 +2,8 @@
 import { urlbase, action, initRangeDatePicker } from './backend.js';
 
 /* Import dei componenti dalla sottocartella */
-import { ListManager, DeleteManager } from './components/Crud.js';
+import { ListManager, DeleteManager } from './modules/Crud.js';
+import { ExportCsvManager } from './components/ExportCsv.js';
 
 const actions = {
     index: function(){
@@ -28,6 +29,9 @@ const actions = {
             listManager: tokensManager
         });
         deleteManager.init();
+
+        const exportManager = new ExportCsvManager({ controller: 'tokens' });
+        exportManager.init();
 
     },
 };

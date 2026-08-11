@@ -60,42 +60,10 @@
                         <button type="button" class="btn btn-success btn-sm mx-2 btn-action-audits" data-action="delete" data-warning="<?= lang('backend/tools.messages.areYouSureToDeleteData'); ?>">
                             <i class="fa-solid fa-trash me-1"></i><?= lang('backend/tools.buttons.deleteData'); ?>
                         </button>
-                        <button type="button" class="btn btn-primary btn-sm ms-2 btn-action-audits" data-action="export">
-                            <i class="fa-solid fa-file-export me-1"></i><?= lang('backend/tools.buttons.exportData'); ?>
-                        </button>
                     </div>
                 </div>
 
             </div>
         </div>
     </form>
-</div>
-
-<!-- Modale nascosto per la selezione delle colonne di esportazione -->
-<div class="modal fade" id="exportColumnsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow">
-            <div class="modal-header border-0">
-                <h5 class="modal-title"><?= lang('backend/tools.panels.selectColumns'); ?></h5>
-            </div>
-            <div class="modal-body">
-                <form id="exportColumnsForm">
-                    <?php if ( ! empty($columns)): ?>
-                        <?php foreach ($columns as $column): ?>
-                            <div class="form-check">
-                                <input class="form-check-input export-column-checkbox" type="checkbox" value="<?= esc($column); ?>" id="export_col_<?= esc($column); ?>" checked>
-                                <label class="form-check-label" for="export_col_<?= esc($column); ?>">
-                                    <?= esc($column); ?>
-                                </label>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </form>
-            </div>
-            <div class="modal-footer border-0">
-                <button type="button" class="btn btn-danger" id="btnCancelExport" data-bs-dismiss="modal"><?= lang('backend/tools.buttons.undo'); ?></button>
-                <button type="button" class="btn btn-success" id="btnConfirmExport"><?= lang('backend/tools.buttons.export'); ?></button>
-            </div>
-        </div>
-    </div>
 </div>

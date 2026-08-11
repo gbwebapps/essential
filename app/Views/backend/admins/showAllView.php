@@ -65,10 +65,22 @@
                                     <!-- End Reset solo ordinamento -->
 
                                     <!-- Semplice ricarica lista -->
-                                    <a href="#" id="refresh-list" class="mb-md-0 ms-0 ms-md-2 bar-link">
+                                    <a href="#" id="refresh-list" class="mb-md-0 ms-0 mx-md-2 bar-link">
                                         <i class="fa-solid fa-arrows-rotate"></i> <?= lang('backend/admins.links.reloadList'); ?>
                                     </a>
                                     <!-- End Semplice ricarica lista -->
+
+                                    <!-- Esporta lista csv -->
+                                    <a href="#" class="mb-md-0 ms-0 mx-md-2 bar-link" id="export-entity" data-export-entity="admins">
+                                        <i class="fa-solid fa-file-csv"></i> <?= lang('backend/admins.links.export'); ?>
+                                    </a>
+                                    <!-- End esporta lista csv -->
+
+                                    <!-- Importa lista csv -->
+                                    <a href="#" class="mb-md-0 ms-0 ms-md-2 bar-link" id="import-entity" data-import-entity="admins">
+                                        <i class="fa-solid fa-file-import"></i> <?= lang('backend/admins.links.import'); ?>
+                                    </a>
+                                    <!-- End importa lista csv -->
 
                                 </div>
                             </div>
@@ -149,5 +161,8 @@
             </div>
         </div>
     </div>
+
+    <div id="export-modal-container"></div>
+    <div id="import-modal-container"></div>
     
 <?= $this->endSection() ?>

@@ -2,7 +2,7 @@
 import { action } from './backend.js';
 
 /* Import della classe logica polivalente */
-import { SettingsManager } from './components/Settings.js';
+import { SettingsManager } from './modules/Settings.js';
 
 const actions = {
     index: function() {

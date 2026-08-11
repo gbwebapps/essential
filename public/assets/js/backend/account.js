@@ -2,7 +2,7 @@
 import { action } from './backend.js';
 
 /* Import dei componenti dalla sottocartella */
-import { EditManager, GetPermissionsManager, GetTokensManager, DeleteTokenManager, ResetPasswordManager, SecurityManager } from './components/Account.js';
+import { EditManager, GetPermissionsManager, GetTokensManager, DeleteTokenManager, ResetPasswordManager, SecurityManager } from './modules/Account.js';
 
 /* Import componenti immagini */
 import { UploadPreviewImgManager } from './components/UploadPreview.js';

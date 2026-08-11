@@ -2,8 +2,10 @@
 import { urlbase, action, smoothReplace } from './backend.js';
 
 /* Import dei componenti dalla sottocartella */
-import { ListManager, AddManager, EditManager, DeleteManager, ChangeStatusManager, GeneralDataManager, MetaDataManager } from './components/Crud.js';
-import { ChangeGroupManager, GetPermissionsManager, ChangePermissionManager, GetTokensManager, DeleteTokenManager, ResetPasswordManager } from './components/Admins.js';
+import { ListManager, AddManager, EditManager, DeleteManager, ChangeStatusManager, GeneralDataManager, MetaDataManager } from './modules/Crud.js';
+import { ChangeGroupManager, GetPermissionsManager, ChangePermissionManager, GetTokensManager, DeleteTokenManager, ResetPasswordManager } from './modules/Admins.js';
+import { ExportCsvManager } from './components/ExportCsv.js';
+import { ImportCsvManager } from './components/ImportCsv.js';
 
 import { UploadPreviewImgManager } from './components/UploadPreview.js';
 import { GalleryOneImgManager } from './components/GalleryOne.js';
@@ -49,6 +51,21 @@ const actions = {
             }
         });
         adminResetManager.init();
+
+        const exportManager = new ExportCsvManager({ controller: 'admins' });
+        exportManager.init();
+
+        const importManager = new ImportCsvManager({
+            controller: 'admins' 
+        }, {
+            onImportAfter: data => {
+                if (typeof adminsManager !== 'undefined' && typeof adminsManager.showAll === 'function') {
+                    adminsManager.showAll();
+                }
+            }
+        });
+        importManager.init();
+
     },
     add: function() {
 
@@ -56,8 +73,8 @@ const actions = {
 
         const addManager = new AddManager({
             url: urlbase + 'backend/admins/add',
-            formSelector: '#admins_add',
-            resetSelector: '#add_reset', 
+            formSelector: '#admins-add',
+            resetSelector: '#add-reset', 
             containerId: 'add-admins-container', 
             imagePreviewManager: imagePreviewManager
         });
@@ -70,9 +87,9 @@ const actions = {
         const galleryOneImgManager = new GalleryOneImgManager();
 
         const editManager = new EditManager({
-            formSelector: '#admins_edit',
+            formSelector: '#admins-edit',
             url: urlbase + 'backend/admins/edit',
-            refreshSelector: '#edit_refresh',
+            refreshSelector: '#edit-refresh',
             containerId: 'edit-admins-container', 
             imagePreviewManager: imagePreviewManager,
             galleryOneImgManager: galleryOneImgManager

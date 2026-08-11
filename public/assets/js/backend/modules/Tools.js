@@ -10,15 +10,11 @@ export class ToolsManager {
         this.routes = {
             manageAudits: {
                 validate: 'backend/tools/validateAuditsDateRequest',
-                delete: 'backend/tools/deleteAudits',
-                export: 'backend/tools/exportAudits'
+                delete: 'backend/tools/deleteAudits'
             },
             dbMaintenance: 'backend/tools/optimizeTable',
             backups: 'backend/tools/backups'
         };
-
-        this.currentExportForm = null;
-        this.currentExportUrl = null;
 
         this.datePickers = { from: null, to: null };
 
@@ -31,7 +27,7 @@ export class ToolsManager {
 
     bindGlobalEvents() {
 
-        /* 1. Gestione Click Pulsanti Azione (Delete / Export) con pre-validazione */
+        /* 1. Gestione Click Pulsante Azione (Delete) con pre-validazione */
         document.addEventListener('click', async e => {
             const actionBtn = e.target.closest('.btn-action-audits');
             if (actionBtn) {
@@ -72,18 +68,6 @@ export class ToolsManager {
                                 if ( ! ok) return;
                             }
                             this.executeAction(form, actionUrl, 'manageAudits');
-                        } 
-                        
-                        /* Flusso Export: mostra il modale delle colonne */
-                        else if (actionType === 'export') {
-                            this.currentExportForm = form;
-                            this.currentExportUrl = actionUrl;
-
-                            const modalEl = document.getElementById('exportColumnsModal');
-                            if (modalEl) {
-                                const exportModal = new bootstrap.Modal(modalEl);
-                                exportModal.show();
-                            }
                         }
                     }
                 } catch (error) {
@@ -123,33 +107,6 @@ export class ToolsManager {
                     const env = form.id.replace('-tools-form', '');
                     this.reset(resetBtn, env);
                 }
-            }
-        });
-
-        /* 4. Gestione Conferma Esportazione dal Modale */
-        document.addEventListener('click', e => {
-            if (e.target && e.target.id === 'btnConfirmExport') {
-                e.preventDefault();
-
-                const modalEl = document.getElementById('exportColumnsModal');
-                const modalInstance = bootstrap.Modal.getInstance(modalEl);
-                if (modalInstance) modalInstance.hide();
-
-                /* Rimuove eventuali input nascosti precedenti per evitare duplicati */
-                this.currentExportForm.querySelectorAll('.hidden-export-column').forEach(el => el.remove());
-
-                /* Aggiunge le colonne selezionate come input hidden nel form principale */
-                modalEl.querySelectorAll('.export-column-checkbox:checked').forEach(cb => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'columns[]';
-                    input.value = cb.value;
-                    input.className = 'hidden-export-column';
-                    this.currentExportForm.appendChild(input);
-                });
-
-                /* Esegue la chiamata AJAX definitiva */
-                this.executeAction(this.currentExportForm, this.currentExportUrl, 'manageAudits');
             }
         });
 
@@ -211,10 +168,9 @@ export class ToolsManager {
                 actionInput.value = 'generateBackups';
                 form.appendChild(actionInput);
 
-                /* Utilizza la rotta dedicata ai backups (assicurati di averla in this.routes) */
+                /* Utilizza la rotta dedicata ai backups */
                 const actionUrl = urlbase + this.routes.backups; 
                 
-                /* Esegue la chiamata. Passando 'backups' come env, il pannello si ricaricherà aggiornando in automatico la lista dei file sotto */
                 this.executeAction(form, actionUrl, 'backups');
                 
                 /* Pulisce il form eliminando l'input temporaneo */
@@ -448,7 +404,6 @@ export class ToolsManager {
 
                     /* 3. Se l'array ha più di 1 elemento (Ottimizza Tutte), aggiorna anche l'header Database */
                     if (tables.length > 1) {
-                        /* L'header utilizza ancora il tag small, quindi questo selettore va bene */
                         const headerSmall = document.querySelector('.text-muted.infoDb');
                         if (headerSmall) {
                             headerSmall.innerHTML = `
@@ -458,7 +413,7 @@ export class ToolsManager {
                         }
                     }
 
-                } else {
+                } else if (env) {
                     /* Comportamento standard per tutti gli altri env: ricarica l'intero pannello */
                     const containerId = `${env}-tools-container`;
                     await this.loadPanel(containerId, env);

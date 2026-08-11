@@ -2,8 +2,6 @@
 
 namespace App\Models\Backend\Components;
 
-use CodeIgniter\Database\BaseConnection;
-
 use App\Models\Backend\BackendModel;
 
 class UploadPreviewModel extends BackendModel 

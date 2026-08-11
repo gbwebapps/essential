@@ -1,4 +1,4 @@
-<form id="account_edit">
+<form id="account-edit">
     <div class="card-body">
 
     	<!-- Nome e cognome -->

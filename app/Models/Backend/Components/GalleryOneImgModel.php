@@ -2,7 +2,6 @@
 
 namespace App\Models\Backend\Components;
 
-use CodeIgniter\Database\BaseConnection;
 use App\Libraries\ImageFileSystemService;
 
 use App\Models\Backend\BackendModel;

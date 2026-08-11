@@ -2,7 +2,8 @@
 import { urlbase, action, initRangeDatePicker } from './backend.js';
 
 /* Import dei componenti dalla sottocartella */
-import { ListManager } from './components/Crud.js';
+import { ListManager } from './modules/Crud.js';
+import { ExportCsvManager } from './components/ExportCsv.js';
 
 const actions = {
     index: function(){
@@ -19,6 +20,9 @@ const actions = {
 
         /* 2. Attiviamo Flatpickr sui wrapper (leggerà i valori appena inseriti dal manager) */
         const { pickerFrom, pickerTo } = initRangeDatePicker('#wrapper-audits-created_at-from', '#wrapper-audits-created_at-to');
+
+        const exportManager = new ExportCsvManager({ controller: 'audits' });
+        exportManager.init();
 
     },
 };

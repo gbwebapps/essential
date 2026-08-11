@@ -144,48 +144,6 @@ class ToolsController extends BackendController
     }
 
     /**
-     * Esegue l'esportazione degli audit in base ai parametri inviati.
-     */
-    public function exportAudits(): ResponseInterface
-    {
-        if ($this->request->isAJAX() && $this->request->is('post')):
-
-            $posts = $this->request->getPost();
-            $rules = $this->toolsModel->validateManageAuditsRules();
-
-            if ( ! $this->validateData($posts, $rules)):
-                return $this->jsonResponse(['errors' => $this->validator->getErrors(), 'message' => lang('backend/tools.messages.validationErrors')]);
-            endif;
-
-            $json = $this->toolsModel->exportAudits($posts);
-
-            return $this->jsonResponse($json);
-
-        endif;
-    }
-
-    /**
-     * Scarica il file esportato in modo sicuro dalla cartella writable.
-     *
-     * @param string|null $fileName Nome del file da scaricare.
-     */
-    public function downloadExport(?string $fileName = null): ResponseInterface
-    {
-        if (empty($fileName)):
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-        endif;
-
-        /* Assicurati che il percorso combaci con la cartella che hai scelto */
-        $filePath = WRITEPATH . 'exports/' . $fileName;
-
-        if ( ! is_file($filePath)):
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-        endif;
-
-        return $this->response->download($filePath, null);
-    }
-
-    /**
      * Esegue le operazioni di manutenzione sul database e le tabelle.
      */
     public function optimizeTable(): ResponseInterface

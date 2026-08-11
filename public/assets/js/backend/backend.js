@@ -3,6 +3,8 @@ export const controller = document.getElementById('controller').dataset.controll
 export const action = document.getElementById('action').dataset.action;
 export const urlbase = document.getElementById('hidden-urlbase').dataset.urlbase;
 
+import { ExportPdfManager } from './modules/ExportPdf.js';
+
 /* Scrollup */
 window.addEventListener('scroll', function() {
     const scrollupElements = document.querySelectorAll('.scrollup');
@@ -22,6 +24,19 @@ document.addEventListener('click', function(e) {
     if ( ! el) return;
     e.preventDefault();
     window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+/* Avvio del gestore PDF al caricamento della pagina */
+new ExportPdfManager();
+
+/* Listener globale per il pulsante di stampa */
+document.addEventListener('click', (e) => {
+    const printBtn = e.target.closest('#show-print-button');
+    
+    if (printBtn) {
+        e.preventDefault();
+        window.print();
+    }
 });
 
 /* --- Gestione globale Loader e Controlli --- */
@@ -268,85 +283,67 @@ export function showAlert(type, message, customIcon = '')
     });
 }
 
-/* Funzioni per generare alert di conferma si/no */
-let globalConfirmModalEl = null;
-let globalConfirmModal = null;
-let customBackdropEl = null;
+let confirmModalInitialized = false;
 
-export async function askConfirm(message, options = {}) {
+export async function askConfirm(message) {
     return new Promise(resolve => {
+        
+        const modalEl = document.getElementById('globalConfirmModal');
 
-        /* se il backdrop non esiste, crealo una volta sola */
-        if ( ! customBackdropEl) {
-            customBackdropEl = document.createElement('div');
-            customBackdropEl.id = 'customBackdrop';
-            document.body.appendChild(customBackdropEl);
+        /* 1. Fallback di sicurezza */
+        if ( ! modalEl) {
+            return resolve(window.confirm(message));
         }
 
-        /* se il modale non esiste, crealo una volta sola */
-        if ( ! globalConfirmModalEl) {
-            globalConfirmModalEl = document.createElement('div');
-            globalConfirmModalEl.id = 'globalConfirmModal';
-            globalConfirmModalEl.className = 'modal fade';
-            globalConfirmModalEl.tabIndex = -1;
-            globalConfirmModalEl.innerHTML = `
-                <div class="modal-dialog modal-dialog-centered">
-                  <div class="modal-content shadow">
-                    <div class="modal-header border-0">
-                      <h5 class="modal-title"></h5>
-                    </div>
-                    <div class="modal-body"></div>
-                    <div class="modal-footer border-0">
-                      <button type="button" class="btn btn-danger btn-cancel">No</button>
-                      <button type="button" class="btn btn-success btn-ok">Sì</button>
-                    </div>
-                  </div>
-                </div>`;
-            document.body.appendChild(globalConfirmModalEl);
-            globalConfirmModal = new bootstrap.Modal(globalConfirmModalEl, {
-                backdrop: false,   /* nessun overlay Bootstrap */
-                keyboard: false    /* ESC disabilitato */
-            });
-
-            // mostra/nasconde il backdrop custom sugli eventi bootstrap
-            globalConfirmModalEl.addEventListener('show.bs.modal', () => {
-                customBackdropEl.classList.add('active');
-            });
-            globalConfirmModalEl.addEventListener('hidden.bs.modal', () => {
-                customBackdropEl.classList.remove('active');
-            });
+        /* 2. Inizializzazione eventi backdrop una sola volta */
+        if ( ! confirmModalInitialized) {
+            const backdropEl = document.getElementById('customBackdrop');
+            if (backdropEl) {
+                modalEl.addEventListener('show.bs.modal', () => backdropEl.classList.add('active'));
+                modalEl.addEventListener('hidden.bs.modal', () => backdropEl.classList.remove('active'));
+            }
+            confirmModalInitialized = true;
         }
 
-        /* aggiorna testi */
-        globalConfirmModalEl.querySelector('.modal-title').textContent = options.title || 'Conferma';
-        globalConfirmModalEl.querySelector('.modal-body').textContent = message;
-        globalConfirmModalEl.querySelector('.btn-ok').textContent = options.okText || 'Sì';
-        globalConfirmModalEl.querySelector('.btn-cancel').textContent = options.cancelText || 'No';
+        /* Recupero o creazione istanza Bootstrap */
+        const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl, {
+            backdrop: false, 
+            keyboard: false  
+        });
 
-        const okBtn = globalConfirmModalEl.querySelector('.btn-ok');
-        const cancelBtn = globalConfirmModalEl.querySelector('.btn-cancel');
+        /* 3. Aggiornamento esclusivo del messaggio */
+        modalEl.querySelector('.modal-body').textContent = message;
 
-        const cleanUp = () => {
-            okBtn.removeEventListener('click', onOk);
-            cancelBtn.removeEventListener('click', onCancel);
+        /* 4. Prevenzione Multi-Esecuzione: controlli di esistenza prima della clonazione */
+        let oldOkBtn = modalEl.querySelector('.btn-ok');
+        let oldCancelBtn = modalEl.querySelector('.btn-cancel');
+
+        if ( ! oldOkBtn || ! oldCancelBtn) {
+            console.error("askConfirm: Pulsanti '.btn-ok' o '.btn-cancel' mancanti nel DOM.");
+            return resolve(false); 
+        }
+
+        const okBtn = oldOkBtn.cloneNode(true);
+        const cancelBtn = oldCancelBtn.cloneNode(true);
+
+        oldOkBtn.replaceWith(okBtn);
+        oldCancelBtn.replaceWith(cancelBtn);
+
+        /* 5. Gestione sicura della scelta tramite semaforo */
+        let isAnswered = false;
+
+        const handleChoice = (choice) => {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            modalInstance.hide();
+            resolve(choice);
         };
 
-        const onOk = () => {
-            cleanUp();
-            resolve(true);
-            globalConfirmModal.hide();
-        };
+        okBtn.addEventListener('click', () => handleChoice(true));
+        cancelBtn.addEventListener('click', () => handleChoice(false));
 
-        const onCancel = () => {
-            cleanUp();
-            resolve(false);
-            globalConfirmModal.hide();
-        };
-
-        okBtn.addEventListener('click', onOk);
-        cancelBtn.addEventListener('click', onCancel);
-
-        globalConfirmModal.show();
+        modalInstance.show();
     });
 }
 

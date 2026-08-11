@@ -2,7 +2,7 @@
 import { apiFetch, showAlert, askConfirm, smoothReplace, handleValidationErrors, handleValidationImages } from '../backend.js';
 
 /* Import degli altri componenti (nella stessa cartella) */
-import { UploadPreviewImgManager } from './UploadPreview.js';
+import { UploadPreviewImgManager } from '../components/UploadPreview.js';
 
 /* --- LIST MANAGER (Custom SSR) --- */
 export class ListManager {

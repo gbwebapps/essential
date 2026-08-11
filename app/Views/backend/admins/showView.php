@@ -9,5 +9,9 @@
             </div>
         </div>
     </div>
+
+    <!-- ######################### MODALE ESPORTAZIONE PDF ######################### -->
+    <?= $this->include('backend/template/exportPdfView', $this->data); ?>
+    <!-- ######################### FINE MODALE ESPORTAZIONE PDF ######################### -->
     
 <?= $this->endSection() ?>

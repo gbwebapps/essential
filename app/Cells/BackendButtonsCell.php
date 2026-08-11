@@ -44,7 +44,7 @@ class BackendButtonsCell
 
             case 'add':
                 return [
-                    'id_output' => 'add_reset',
+                    'id_output' => 'add-reset',
                     'text_left' => lang('backend/' . $controller . '.buttons.resetData'),
                     'icon_left' => '<i class="fa-solid fa-refresh d-none d-sm-inline"></i>',
                     'btn_left' => 'btn btn-danger btn-sm me-2',
@@ -56,7 +56,7 @@ class BackendButtonsCell
 
             case 'edit':
                 return [
-                    'id_output' => 'edit_refresh',
+                    'id_output' => 'edit-refresh',
                     'text_left' => lang('backend/' . $controller . '.buttons.refreshData'),
                     'icon_left' => '<i class="fa-solid fa-refresh d-none d-sm-inline"></i>',
                     'btn_left' => 'btn btn-danger btn-sm me-2',
@@ -68,19 +68,21 @@ class BackendButtonsCell
 
             case 'show':
                 return [
-                    'id_output' => 'print',
+                    'id_left' => 'show-print-button',
                     'text_left' => lang('backend/' . $controller . '.buttons.print'),
                     'icon_left' => '<i class="fa-solid fa-print d-none d-sm-inline"></i>',
                     'btn_left' => 'btn btn-primary btn-sm me-2',
-                    'message' => '',
+                    'message_left' => '', 
+                    'id_right' => 'show-export-button',
                     'text_right' => lang('backend/' . $controller . '.buttons.export'),
-                    'btn_right' => 'btn btn-primary btn-sm ms-2',
                     'icon_right' => '<i class="fa-solid fa-file-export d-none d-sm-inline"></i>',
+                    'btn_right' => 'btn btn-primary btn-sm ms-2',
+                    'message_right' => '', 
                 ];
 
             case 'edit_account':
                 return [
-                    'id_output' => 'edit_refresh',
+                    'id_output' => 'edit-refresh',
                     'text_left' => lang('backend/' . $controller . '.buttons.reloadData'),
                     'btn_left' => 'btn btn-danger btn-sm me-2',
                     'icon_left' => '<i class="fa-solid fa-refresh"></i>',

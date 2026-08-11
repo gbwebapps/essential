@@ -130,14 +130,14 @@ class AdminsClass
 	 *
 	 * @return array
 	 */
-	public function getLinksBarIndex(): array
-	{
-		return 
-		[
-            ['icon' => '<i class="fa-solid fa-users"></i>', 'label' => lang('backend/admins.linksBar.showAll'), 'route' => 'backend/admins/showAll'],
-            ['icon' => '<i class="fa-solid fa-user-plus"></i>', 'label' => lang('backend/admins.linksBar.add'), 'route' => 'backend/admins/add'], 
-        ];
-	}
+	// public function getLinksBarIndex(): array
+	// {
+	// 	return 
+	// 	[
+    //         ['icon' => '<i class="fa-solid fa-users"></i>', 'label' => lang('backend/admins.linksBar.showAll'), 'route' => 'backend/admins/showAll'],
+    //         ['icon' => '<i class="fa-solid fa-user-plus"></i>', 'label' => lang('backend/admins.linksBar.add'), 'route' => 'backend/admins/add'], 
+    //     ];
+	// }
 
 	/**
 	 * Costruisce la barra di navigazione secondaria per la sezione tabellare showAll.
@@ -150,7 +150,7 @@ class AdminsClass
 	{
 		return 
 		[
-		    ['icon' => '<i class="fa-solid fa-chart-simple"></i>', 'label' => lang('backend/admins.linksBar.index'), 'route' => 'backend/admins'],
+		    // ['icon' => '<i class="fa-solid fa-chart-simple"></i>', 'label' => lang('backend/admins.linksBar.index'), 'route' => 'backend/admins'],
 		    ['icon' => '<i class="fa-solid fa-user-plus"></i>', 'label' => lang('backend/admins.linksBar.add'), 'route' => 'backend/admins/add'], 
 		];
 	}
@@ -166,7 +166,7 @@ class AdminsClass
 	{
 		return 
 		[
-            ['icon' => '<i class="fa-solid fa-chart-simple"></i>', 'label' => lang('backend/admins.linksBar.index'), 'route' => 'backend/admins'],
+            // ['icon' => '<i class="fa-solid fa-chart-simple"></i>', 'label' => lang('backend/admins.linksBar.index'), 'route' => 'backend/admins'],
             ['icon' => '<i class="fa-solid fa-users"></i>', 'label' => lang('backend/admins.linksBar.showAll'), 'route' => 'backend/admins/showAll'], 
         ];
 	}
@@ -187,7 +187,7 @@ class AdminsClass
 
 		return 
 		[
-            ['icon' => '<i class="fa-solid fa-chart-simple"></i>', 'label' => lang('backend/admins.linksBar.index'), 'route' => 'backend/admins'],
+            // ['icon' => '<i class="fa-solid fa-chart-simple"></i>', 'label' => lang('backend/admins.linksBar.index'), 'route' => 'backend/admins'],
             ['icon' => '<i class="fa-solid fa-users"></i>', 'label' => lang('backend/admins.linksBar.showAll'), 'route' => 'backend/admins/showAll'],
             ['icon' => '<i class="fa-solid fa-user-plus"></i>', 'label' => lang('backend/admins.linksBar.add'), 'route' => 'backend/admins/add'],
             ['icon' => '<i class="fa-solid fa-user"></i>', 'label' => lang('backend/admins.linksBar.show'), 'route' => "backend/admins/show/{$uuid}"],
@@ -209,7 +209,7 @@ class AdminsClass
 		if ( ! $uuid) return [];
 
 		return [
-	        ['icon' => '<i class="fa-solid fa-chart-simple"></i>', 'label' => lang('backend/admins.linksBar.index'), 'route' => 'backend/admins'],
+	        // ['icon' => '<i class="fa-solid fa-chart-simple"></i>', 'label' => lang('backend/admins.linksBar.index'), 'route' => 'backend/admins'],
 	        ['icon' => '<i class="fa-solid fa-users"></i>', 'label' => lang('backend/admins.linksBar.showAll'), 'route' => 'backend/admins/showAll'],
 	        ['icon' => '<i class="fa-solid fa-user-plus"></i>', 'label' => lang('backend/admins.linksBar.add'), 'route' => 'backend/admins/add'],
 	        ['icon' => '<i class="fa-solid fa-user-pen"></i>', 'label' => lang('backend/admins.linksBar.edit'), 'route' => "backend/admins/edit/{$uuid}"],
@@ -226,12 +226,10 @@ class AdminsClass
 	 *
 	 * @return array
 	 */
-	public function getJsShowAll(): array
+	public function getJsShow(): array
 	{
 	    return [
-	        // ['id' => 'jquery', 'path' => 'assets/vendor/jquery/jquery.min.js', 'isModule' => false, 'position' => 'before', 'target' => 'backend-js'],
-	        // ['id' => 'datatables-js', 'path' => 'assets/vendor/datatables/js/dataTables.min.js', 'isModule' => false, 'position' => 'before', 'target' => 'backend-js'],
-	        // ['id' => 'datatables-bs5-js', 'path' => 'assets/vendor/datatables/js/dataTables.bootstrap5.min.js', 'isModule' => false, 'position' => 'before', 'target' => 'backend-js'],
+			['id' => 'html2pdf-js', 'path' => 'assets/vendor/html2pdf/js/html2pdf.bundle.min.js', 'position' => 'before', 'target' => 'admins-js'],
 	    ];
 	}
 

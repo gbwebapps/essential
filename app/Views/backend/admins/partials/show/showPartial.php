@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-8 offset-2">
-        <div class="card">
+        <div class="card" id="show-wrapper">
 
             <!-- General Data -->
             <div class="card-header rounded-0 d-flex justify-content-between align-items-center">

@@ -34,27 +34,33 @@
                                        aria-expanded="false"
                                        aria-controls="search-bar"
                                         class="mb-2 mb-md-0 me-0 me-md-2 bar-link">
-                                        <b><i class="fa-solid fa-filter"></i> <?= lang('backend/tokens.links.filters'); ?></b>
+                                        <i class="fa-solid fa-filter"></i> <?= lang('backend/tokens.links.filters'); ?>
                                     </a>
                                     <!-- End Apertura/chiusura parte filtri -->
 
                                     <!-- Reset filtri e ordinamento -->
                                     <a href="#" id="link-reset-search" class="mb-2 mb-md-0 mx-0 mx-md-2 bar-link">
-                                        <b><i class="fa-solid fa-filter-circle-xmark"></i> <?= lang('backend/tokens.links.resetFilters'); ?></b>
+                                        <i class="fa-solid fa-filter-circle-xmark"></i> <?= lang('backend/tokens.links.resetFilters'); ?>
                                     </a>
                                     <!-- End Reset filtri e ordinamento -->
 
                                     <!-- Reset solo ordinamento -->
                                     <a href="#" id="reset-sorting-link" class="mb-2 mb-md-0 mx-0 mx-md-2 bar-link">
-                                        <b><i class="fa-solid fa-sort"></i> <?= lang('backend/tokens.links.resetSorting'); ?></b>
+                                        <i class="fa-solid fa-sort"></i> <?= lang('backend/tokens.links.resetSorting'); ?>
                                     </a>
                                     <!-- End Reset solo ordinamento -->
 
                                     <!-- Semplice ricarica lista -->
-                                    <a href="#" id="refresh-list" class="mb-md-0 ms-0 ms-md-2 bar-link">
-                                        <b><i class="fa-solid fa-arrows-rotate"></i> <?= lang('backend/tokens.links.reloadList'); ?></b>
+                                    <a href="#" id="refresh-list" class="mb-md-0 ms-0 mx-md-2 bar-link">
+                                        <i class="fa-solid fa-arrows-rotate"></i> <?= lang('backend/tokens.links.reloadList'); ?>
                                     </a>
                                     <!-- End Semplice ricarica lista -->
+
+                                    <!-- Esporta lista csv -->
+                                    <a href="#" class="mb-md-0 ms-0 ms-md-2 bar-link" id="export-entity" data-export-entity="admins_tokens">
+                                        <i class="fa-solid fa-file-csv"></i> <?= lang('backend/tokens.links.export'); ?>
+                                    </a>
+                                    <!-- End esporta lista csv -->
 
                                 </div>
                             </div>
@@ -146,5 +152,7 @@
             </div>
         </div>
     </div>
+
+    <div id="export-modal-container"></div>
     
 <?= $this->endSection() ?>

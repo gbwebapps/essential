@@ -17,6 +17,7 @@
     "@fortawesome/fontawesome-free": "^7.2.0",
     "bootstrap": "^5.3.8",
     "flatpickr": "^4.6.13",
+    "html2pdf.js": "^0.14.0",
     "tom-select": "^2.6.2"
   }
 }

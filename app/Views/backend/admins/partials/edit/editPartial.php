@@ -18,7 +18,7 @@
         <div class="card">
 
             <!-- Form identificato per la gestione AJAX -->
-            <form id="admins_edit">
+            <form id="admins-edit">
 
                 <!-- General Data -->
                 <div class="card-header rounded-0 d-flex justify-content-between align-items-center">

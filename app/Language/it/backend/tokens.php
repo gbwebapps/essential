@@ -14,6 +14,7 @@ return [
 		'resetFilters' => 'Resetta filtri', 
 		'resetSorting' => 'Resetta ordinamento', 
 		'reloadList' => 'Ricarica lista', 
+		'export' => 'Esporta CSV', 
 		],
 	'labels' => [
 		'id' => 'ID',

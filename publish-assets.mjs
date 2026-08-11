@@ -50,6 +50,10 @@ const assetsToCopy = [
         from: 'node_modules/flatpickr/dist/flatpickr.min.css',
         to: 'public/assets/vendor/flatpickr/css/flatpickr.min.css'
     },
+    {
+        from: 'node_modules/html2pdf.js/dist/html2pdf.bundle.min.js',
+        to: 'public/assets/vendor/html2pdf/js/html2pdf.bundle.min.js'
+    }
 ];
 
 assetsToCopy.forEach(asset => {

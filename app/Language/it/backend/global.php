@@ -17,7 +17,7 @@ return [
         ],
         'bottomRight' => [
             'settings' => 'Impostazioni',
-            'tools' => 'Strumenti',
+            'tools' => 'Strumenti', 
         ],
     ],
     'links' => [
@@ -27,8 +27,27 @@ return [
         'modules' => 'Moduli',
         'services' => 'Servizi',
         'backToTop' => 'Torna in alto', 
-        'options' => 'Opzioni'
+        'options' => 'Opzioni', 
+        'undo' => 'Annulla', 
+        'export' => 'Esporta', 
+        'yes' => 'Si', 
+        'no' => 'No'
     ],
+    'modals' => [
+        'exportPdfTitle' => 'Impostazioni Esportazione PDF', 
+        'exportPdfOrientation' => 'Orientamento', 
+        'exportPdfOrientationVert' => 'Verticale', 
+        'exportPdfOrientationHoriz' => 'Orizzontale', 
+        'exportPdfFormat' => 'Formato', 
+        'exportPdfMargin' => 'Margini', 
+        'exportPdfMarginSup' => 'Superiore', 
+        'exportPdfMarginRgt' => 'Destro', 
+        'exportPdfMarginInf' => 'Inferiore', 
+        'exportPdfMarginLft' => 'Sinistro', 
+        'exportPdfCompression' => 'Compressione', 
+        'exportPdfImgQuality' => 'Qualità immagine', 
+        'globalTitle' => 'Richiesta di conferma'
+    ], 
     'pagination' => [
         'messageLeft' => 'Pagina %d di %d',
         'messageRight' => 'Da %d a %d di %d',

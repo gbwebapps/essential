@@ -34,6 +34,8 @@ return [
 		'activeRecords' => 'Attivi', 
 		'trashedRecords' => 'Eliminati', 
 		'allRecords' => 'Tutti', 
+		'export' => 'Esporta CSV', 
+		'import' => 'Importa CSV'
 	],
 	'labels' => [
 		'id' => 'ID', 

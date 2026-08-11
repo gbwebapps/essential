@@ -55,9 +55,9 @@ $routes->group('backend', function($routes) {
 
         /* MESSAGES */
         $routes->group('messages', ['filter' => 'authorization'], function($routes) {
-            $routes->get('/', '\App\Controllers\Backend\MessagesController::index', ['filter' => 'permission:messages_show']);
-            $routes->get('showAll', '\App\Controllers\Backend\MessagesController::showAll', ['filter' => 'permission:messages_show']);
-            $routes->get('show', '\App\Controllers\Backend\MessagesController::show', ['filter' => 'permission:messages_show']);
+            $routes->get('/', '\App\Controllers\Backend\MessagesController::index', ['filter' => 'permission:users_show']);
+            $routes->get('showAll', '\App\Controllers\Backend\MessagesController::showAll', ['filter' => 'permission:users_showAll']);
+            $routes->get('show', '\App\Controllers\Backend\MessagesController::show', ['filter' => 'permission:users_show']);
         });
 
         /* USERS */
@@ -78,6 +78,21 @@ $routes->group('backend', function($routes) {
             $routes->post('deleteImage', '\App\Controllers\Backend\Components\GalleryOneController::deleteImage');
             $routes->post('removeCover', '\App\Controllers\Backend\Components\GalleryOneController::removeCover');
             $routes->post('setCover', '\App\Controllers\Backend\Components\GalleryOneController::setCover');
+        });
+
+        /* EXPORT CSV */
+        $routes->group('export', ['filter' => 'authorization'], function($routes) {
+            $routes->post('showModal', '\App\Controllers\Backend\Components\ExportController::showModal');
+            $routes->post('generate', '\App\Controllers\Backend\Components\ExportController::generate');
+            $routes->get('download/(:any)', '\App\Controllers\Backend\Components\ExportController::download/$1');
+        });
+
+        /* IMPORT CSV */
+        $routes->group('import', ['filter' => 'authorization'], function($routes) {
+            $routes->post('showModal', '\App\Controllers\Backend\Components\ImportController::showModal');
+            $routes->get('download/(:any)', '\App\Controllers\Backend\Components\ImportController::download/$1');
+            $routes->post('processCsv', '\App\Controllers\Backend\Components\ImportController::processCsv');
+            $routes->post('executeImport', '\App\Controllers\Backend\Components\ImportController::executeImport');
         });
     });
 
@@ -101,8 +116,6 @@ $routes->group('backend', function($routes) {
             $routes->post('openTools', '\App\Controllers\Backend\ToolsController::openTools');
 
             $routes->post('deleteAudits', '\App\Controllers\Backend\ToolsController::deleteAudits');
-            $routes->post('exportAudits', '\App\Controllers\Backend\ToolsController::exportAudits');
-            $routes->get('downloadExport/(:any)', '\App\Controllers\Backend\ToolsController::downloadExport/$1');
             $routes->post('validateAuditsDateRequest', '\App\Controllers\Backend\ToolsController::validateAuditsDateRequest');
 
             $routes->get('dbMaintenance', '\App\Controllers\Backend\ToolsController::dbMaintenance');
@@ -140,7 +153,11 @@ $routes->group('backend', function($routes) {
 
         /* ADMINS */
         $routes->group('admins', function($routes) {
-            $routes->get('/', '\App\Controllers\Backend\AdminsController::index');
+            // $routes->get('/', '\App\Controllers\Backend\AdminsController::index');
+
+            $routes->get('/', function() {
+                return redirect()->to('backend/admins/showAll');
+            });
 
             $routes->match(['GET', 'POST'], 'showAll', '\App\Controllers\Backend\AdminsController::showAll');
 

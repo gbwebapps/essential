@@ -65,15 +65,15 @@ class AdminsController extends BackendController
      *
      * @return string La vista HTML iniziale dell'indice.
      */
-    public function index(): string|ResponseInterface
-    {
-        $this->data['action'] = 'index';
+    // public function index(): string|ResponseInterface
+    // {
+    //     $this->data['action'] = 'index';
         
-        $this->data['title'] = lang('backend/admins.titles.index');
-        $this->data['icon'] = '<i class="fa-solid fa-chart-simple"></i>';
+    //     $this->data['title'] = lang('backend/admins.titles.index');
+    //     $this->data['icon'] = '<i class="fa-solid fa-chart-simple"></i>';
 
-        return $this->render('backend/admins/indexView', $this->data);
-    }
+    //     return $this->render('backend/admins/indexView', $this->data);
+    // }
 
     /**
      * Gestisce la visualizzazione della tabella degli amministratori (GET) e il caricamento asincrono filtrato dei record (POST AJAX).

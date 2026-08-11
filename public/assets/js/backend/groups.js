@@ -2,7 +2,7 @@
 import { action } from './backend.js';
 
 /* Import della classe logica */
-import { GroupsManager } from './components/Groups.js';
+import { GroupsManager } from './modules/Groups.js';
 
 const actions = {
     index: function() {
