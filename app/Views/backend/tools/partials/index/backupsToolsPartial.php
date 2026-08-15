@@ -12,7 +12,7 @@
     <h5 class="mb-3 fw-bold"><i class="fa-solid fa-list me-2"></i><?= lang('backend/tools.labels.lastAvailableBackups'); ?></h5>
     
     <?php if (empty($backups)): ?>
-        <div class="alert alert-danger mb-0 text-center">
+        <div class="text-center text-danger py-3 fw-bold">
             <?= lang('backend/tools.labels.noBackupsFound'); ?>
         </div>
     <?php else: ?>

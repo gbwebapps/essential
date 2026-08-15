@@ -37,7 +37,7 @@ class ToolsController extends BackendController
      *
      * @var array
      */
-    protected array $allowedEnvs = ['manageAudits', 'dbMaintenance', 'backups'];
+    protected array $allowedEnvs = ['system', 'manageAudits', 'dbMaintenance', 'backups', 'cleanSpace'];
 
     /**
      * Inizializza il controller impostando il contesto operativo e istanziando modello e libreria specifici.
@@ -96,6 +96,10 @@ class ToolsController extends BackendController
                 $this->data['tables'] = $this->toolsModel->getTablesStatus();
             elseif ($env === 'backups'):
                 $this->data['backups'] = $this->toolsModel->getBackups();
+            elseif ($env === 'cleanSpace'):
+                $this->data['folders'] = $this->toolsModel->getWritableFoldersStatus();
+            elseif ($env === 'system'):
+                $this->data['sysInfo'] = $this->toolsModel->getSystemInfo();
             endif;
 
             return $this->jsonResponse(['result' => true, 'output' => view('backend/tools/partials/index/' . $env . 'ToolsPartial', $this->data)]);
@@ -226,7 +230,7 @@ class ToolsController extends BackendController
                 
                 $filename = $this->request->getPost('filename');
                 
-                $path = WRITEPATH . 'backups/' . basename($filename);
+                $path = WRITEPATH . 'backups/database/' . basename($filename);
                 
                 if (file_exists($path) && is_file($path)):
                     return $this->jsonResponse(['result' => true, 'downloadUrl' => base_url('backend/tools/downloadBackups/' . $filename)]);
@@ -245,7 +249,7 @@ class ToolsController extends BackendController
     public function downloadBackups(string $filename)
     {
         /* basename() impedisce tentativi di directory traversal (sicurezza) */
-        $path = WRITEPATH . 'backups/' . basename($filename);
+        $path = WRITEPATH . 'backups/database/' . basename($filename);
         
         if (file_exists($path) && is_file($path)):
 
@@ -258,5 +262,31 @@ class ToolsController extends BackendController
 
         /* Fallback in caso di file inesistente */
         return redirect()->to(base_url('backend/dashboard'))->with('error', lang('backend/tools.messages.backupNotFoundError'));
+    }
+
+    /**
+     * Svuota i file all'interno di una determinata cartella writable.
+     */
+    public function cleanFolder(): ResponseInterface
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+            
+            $folder = $this->request->getPost('folder');
+            
+            /* La regex consente lettere, numeri, underscore, trattini e lo slash per le sottocartelle */
+            $rules = [
+                'folder' => 'required|regex_match[/^[a-zA-Z0-9_\-\/]+$/]'
+            ];
+
+            if ( ! $this->validateData($this->request->getPost(), $rules)):
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/tools.messages.validationErrors')]);
+            endif;
+
+            /* L'esito e il messaggio arrivano direttamente dal Model */
+            $cleanResult = $this->toolsModel->cleanWritableFolder($folder);
+
+            return $this->jsonResponse($cleanResult);
+
+        endif;
     }
 }

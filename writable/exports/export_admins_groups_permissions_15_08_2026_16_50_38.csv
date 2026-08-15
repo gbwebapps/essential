@@ -1,0 +1,17 @@
+﻿id,group_id,permission
+8,1,messages_delete
+5,1,messages_index
+7,1,messages_show
+6,1,messages_showall
+4,1,users_delete
+1,1,users_index
+3,1,users_show
+2,1,users_showall
+11,2,messages_index
+13,2,messages_show
+12,2,messages_showall
+9,2,users_index
+10,2,users_show
+15,3,messages_index
+16,3,messages_show
+14,3,users_index

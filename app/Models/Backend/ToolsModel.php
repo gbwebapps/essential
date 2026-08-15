@@ -189,7 +189,7 @@ class ToolsModel extends BackendModel
 	public function getBackups(): array
 	{
 		/* Definisce il percorso assoluto alla cartella backups di CodeIgniter */
-		$path = WRITEPATH . 'backups/';
+		$path = WRITEPATH . 'backups/database/';
 		$backups = [];
 
 		/* Recupera tutti i file con estensione .zip */
@@ -219,7 +219,7 @@ class ToolsModel extends BackendModel
 
 	public function generateDatabaseBackups(): bool
 	{
-		$path = WRITEPATH . 'backups/';
+		$path = WRITEPATH . 'backups/database/';
 		
 		/* Crea la cartella se non dovesse esistere */
 		if ( ! is_dir($path)):
@@ -328,7 +328,7 @@ class ToolsModel extends BackendModel
 	public function deleteBackups(string $filename): bool
 	{
 		/* basename protegge il percorso assicurando che sia solo il nome del file */
-		$path = WRITEPATH . 'backups/' . basename($filename);
+		$path = WRITEPATH . 'backups/database/' . basename($filename);
 		
 		if (file_exists($path) && is_file($path)):
 			if (unlink($path)):
@@ -342,5 +342,131 @@ class ToolsModel extends BackendModel
 		endif;
 
 		return false;
+	}
+
+	/**
+	 * Whitelist delle cartelle di sistema svuotabili (relative a WRITEPATH).
+	 * Previene attacchi di Path Traversal.
+	 * 
+	 * @var array
+	 */
+	protected array $cleanableFolders = ['backups/database', 'backups/imports', 'cache', 'debugbar', 'exports', 'logs', 'session', 'uploads/csv'];
+
+	/**
+	 * Scansiona le cartelle autorizzate e restituisce il conteggio dei file eliminabili.
+	 * Esclude i puntatori di sistema e i file index.html di protezione.
+	 *
+	 * @return array
+	 */
+	public function getWritableFoldersStatus(): array
+	{
+	    $status = [];
+
+	    foreach ($this->cleanableFolders as $folder):
+	        $path = WRITEPATH . $folder;
+	        $count = 0;
+
+	        if (is_dir($path)):
+	            $files = scandir($path);
+	            foreach ($files as $file):
+	                if ($file !== '.' && $file !== '..' && strtolower($file) !== 'index.html'):
+	                    if (is_file($path . DIRECTORY_SEPARATOR . $file)):
+	                        $count++;
+	                    endif;
+	                endif;
+	            endforeach;
+	        endif;
+
+	        $status[] = [
+	            'name'  => $folder,
+	            'count' => $count
+	        ];
+	    endforeach;
+
+	    return $status;
+	}
+
+	/**
+	 * Svuota fisicamente i file di una cartella autorizzata.
+	 *
+	 * @param string $folder Nome della cartella
+	 * @return array
+	 */
+	public function cleanWritableFolder(string $folder): array
+	{
+	    /* Validazione di Sicurezza (Whitelist) */
+	    if ( ! in_array($folder, $this->cleanableFolders, true)):
+	        return ['result' => false, 'message' => lang('backend/tools.messages.validationErrors')];
+	    endif;
+
+	    $path = WRITEPATH . $folder;
+	    $deletedCount = 0;
+
+	    if (is_dir($path)):
+	        $files = scandir($path);
+	        foreach ($files as $file):
+	            if ($file !== '.' && $file !== '..' && strtolower($file) !== 'index.html'):
+	                $filePath = $path . DIRECTORY_SEPARATOR . $file;
+	                
+	                /* Elimina solo se è un file (non tocca eventuali sottocartelle) */
+	                if (is_file($filePath)):
+	                    if (unlink($filePath)):
+	                        $deletedCount++;
+	                    endif;
+	                endif;
+	            endif;
+	        endforeach;
+	    endif;
+
+	    /* Registrazione attività */
+	    $currentAdmin = service('authorization')->currentAdmin();
+	    log_admin_activity('CLEAN_' . strtoupper($folder), 'tools', sprintf("Svuotata cartella %s: eliminati %d file", $folder, $deletedCount), $currentAdmin);
+
+	    return ['result' => true, 'message' => sprintf(lang('backend/tools.messages.folderCleanSuccess'), $deletedCount, $folder)];
+	}
+
+	/**
+	 * Recupera le informazioni di diagnostica su Sistema, PHP e Ambiente.
+	 *
+	 * @return array
+	 */
+	public function getSystemInfo(): array
+	{
+		return [
+			'framework' => [
+				'ci_version'  => \CodeIgniter\CodeIgniter::CI_VERSION,
+				'environment' => ENVIRONMENT,
+			],
+			'local' => [
+				'locale'      => service('request')->getLocale(),
+				'timezone'    => date_default_timezone_get(),
+			],
+			'server' => [
+				/* Recupera il sistema operativo, la release e l'architettura */
+				'os'       => php_uname('s') . ' ' . php_uname('r') . ' (' . php_uname('m') . ')',
+				'software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Sconosciuto',
+			],
+			'php' => [
+				'version'             => PHP_VERSION,
+				'architecture'        => (PHP_INT_SIZE * 8) . '-bit',
+				'sapi'                => php_sapi_name(),
+				'memory_limit'        => ini_get('memory_limit'),
+				'max_execution_time'  => ini_get('max_execution_time'),
+				'upload_max_filesize' => ini_get('upload_max_filesize'),
+				'max_file_uploads'    => ini_get('max_file_uploads'),
+				'post_max_size'       => ini_get('post_max_size'),
+				'max_input_vars'      => ini_get('max_input_vars'),
+				'display_errors'      => ini_get('display_errors') ? 'On' : 'Off',
+				'opcache'             => ini_get('opcache.enable') ? 'On' : 'Off',
+			],
+			'extensions' => [
+				/* extension_loaded restituisce true/false in base alla presenza dell'estensione */
+				'intl'     => extension_loaded('intl'),
+				'mbstring' => extension_loaded('mbstring'),
+				'curl'     => extension_loaded('curl'),
+				'zip'      => extension_loaded('zip'),
+				'gd'       => extension_loaded('gd'),
+			]
+		];
 	}
 }

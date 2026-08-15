@@ -5,6 +5,7 @@ export class ToolsManager {
     constructor() {
         this.loadUrl = urlbase + 'backend/tools/openTools';
         this.isSubmitting = false;
+        this.eventsBound = false;
 
         /* Mappa delle rotte per le azioni di business */
         this.routes = {
@@ -13,7 +14,8 @@ export class ToolsManager {
                 delete: 'backend/tools/deleteAudits'
             },
             dbMaintenance: 'backend/tools/optimizeTable',
-            backups: 'backend/tools/backups'
+            backups: 'backend/tools/backups',
+            cleanSpace: 'backend/tools/cleanFolder'
         };
 
         this.datePickers = { from: null, to: null };
@@ -26,6 +28,9 @@ export class ToolsManager {
     }
 
     bindGlobalEvents() {
+
+        if (this.eventsBound) return;
+        this.eventsBound = true;
 
         /* 1. Gestione Click Pulsante Azione (Delete) con pre-validazione */
         document.addEventListener('click', async e => {
@@ -240,6 +245,41 @@ export class ToolsManager {
                 
                 /* Passa null come env per evitare il ricaricamento del DOM */
                 this.executeAction(tempForm, actionUrl, null);
+            }
+        });
+
+        /* 10. Gestione Svuotamento Cartelle (cleanSpace) */
+        document.addEventListener('click', async e => {
+            const btnClean = e.target.closest('.btn-clean-folder');
+            if (btnClean) {
+                e.preventDefault();
+
+                const folder = btnClean.dataset.folder;
+                const message = btnClean.dataset.confirm;
+
+                /* Attendiamo la risposta del modale di conferma */
+                if (message) {
+                    const ok = await askConfirm(message);
+                    if ( ! ok) return;
+                }
+
+                const form = btnClean.closest('form');
+                if ( ! form) return;
+
+                /* Inietta un input temporaneo per passare il nome della cartella al controller */
+                const folderInput = document.createElement('input');
+                folderInput.type = 'hidden';
+                folderInput.name = 'folder';
+                folderInput.value = folder;
+                form.appendChild(folderInput);
+
+                const actionUrl = urlbase + this.routes.cleanSpace;
+
+                /* Esegue l'azione e ricarica il pannello passando l'env 'cleanSpace' */
+                await this.executeAction(form, actionUrl, 'cleanSpace');
+
+                /* Pulisce il form eliminando l'input temporaneo */
+                folderInput.remove();
             }
         });
     }

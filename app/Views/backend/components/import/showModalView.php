@@ -71,7 +71,7 @@
             </div>
 
             <div class="modal-footer border-0">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><?= lang('backend/components/import.buttons.undo'); ?></button>
+                <button type="button" id="btnCancelImport" class="btn btn-danger" data-bs-dismiss="modal"><?= lang('backend/components/import.buttons.undo'); ?></button>
                 <button type="submit" class="btn btn-success" form="importForm"><?= lang('backend/components/import.buttons.import'); ?></button>
             </div>
 

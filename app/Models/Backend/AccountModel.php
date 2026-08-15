@@ -7,13 +7,6 @@ use App\Models\Backend\BackendModel;
 class AccountModel extends BackendModel
 {
 	/**
-	 * Identificativo testuale del modulo associato al profilo del profilo corrente.
-	 *
-	 * @var string|null
-	 */
-	protected ?string $module = 'account';
-
-	/**
 	 * Elenco dei campi consentiti per la persistenza dei dati durante la fase di aggiornamento del profilo corrente.
 	 *
 	 * @var array

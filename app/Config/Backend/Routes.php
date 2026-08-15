@@ -82,7 +82,6 @@ $routes->group('backend', function($routes) {
 
         /* EXPORT CSV */
         $routes->group('export', ['filter' => 'authorization'], function($routes) {
-            $routes->post('showModal', '\App\Controllers\Backend\Components\ExportController::showModal');
             $routes->post('generate', '\App\Controllers\Backend\Components\ExportController::generate');
             $routes->get('download/(:any)', '\App\Controllers\Backend\Components\ExportController::download/$1');
         });
@@ -93,6 +92,7 @@ $routes->group('backend', function($routes) {
             $routes->get('download/(:any)', '\App\Controllers\Backend\Components\ImportController::download/$1');
             $routes->post('processCsv', '\App\Controllers\Backend\Components\ImportController::processCsv');
             $routes->post('executeImport', '\App\Controllers\Backend\Components\ImportController::executeImport');
+            $routes->post('deleteFile', '\App\Controllers\Backend\Components\ImportController::deleteFile');
         });
     });
 
@@ -123,6 +123,8 @@ $routes->group('backend', function($routes) {
 
             $routes->post('backups', '\App\Controllers\Backend\ToolsController::backups');
             $routes->get('downloadBackups/(:segment)', '\App\Controllers\Backend\ToolsController::downloadBackups/$1');
+
+            $routes->post('cleanFolder', '\App\Controllers\Backend\ToolsController::cleanFolder');
         });
 
         /* GROUPS */

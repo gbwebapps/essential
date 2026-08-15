@@ -35,17 +35,17 @@
                         </div>
 
                         <!-- Blocco Centrale: Totali Spazio e Overhead -->
-                        <div class="col-6">
-                            <div class="text-muted infoDb">
+                        <div class="col-7">
+                            <div class="text-muted infoDb d-flex justify-content-center">
                                 <span class="me-3"><i class="fa-solid fa-hard-drive me-2"></i><?= sprintf(lang('backend/tools.labels.totalSpace'), number_format($totalSize, 2)); ?></span>
                                 <span class="text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i><?= sprintf(lang('backend/tools.labels.overhead'), number_format($totalOverhead, 2)); ?></span>
                             </div>
                         </div>
 
                         <!-- Blocco Destra: Azione Globale -->
-                        <div class="col-3 text-end">
+                        <div class="col-2 text-start">
                             <!-- Passiamo l'intero array di tabelle codificato in JSON al dataset -->
-                            <button type="button" class="btn btn-sm btn-success btn-optimize-all" data-tables='<?= json_encode($allTableNames); ?>'>
+                            <button type="button" class="btn btn-sm btn-primary btn-optimize-all" data-tables='<?= json_encode($allTableNames); ?>'>
                                 <i class="fa-solid fa-wand-magic-sparkles me-2"></i><?= lang('backend/tools.buttons.dbOptimize'); ?>
                             </button>
                         </div>
@@ -58,22 +58,34 @@
                         <li class="list-group-item py-3" data-table="<?= $table['name']; ?>">
                             
                             <div class="row align-items-center">
-                                <div class="col-4 text-start">
+                                <div class="col-3 text-start">
                                     <h6 class="fw-bold mb-0">
                                         <i class="fa-solid fa-table me-2"></i><?= $table['name']; ?>
                                     </h6>
                                 </div>
-                                <div class="col-6 text-start">
+                                <div class="col-7 text-start">
                                     <div class="text-muted d-flex justify-content-around"> 
                                         <span class="me-3"><i class="fa-solid fa-list me-2"></i><?= sprintf(lang('backend/tools.labels.rows'), $table['rows']); ?></span>
                                         <span class="me-3"><i class="fa-solid fa-hard-drive me-2"></i><?= sprintf(lang('backend/tools.labels.totalSpace'), number_format($table['size'], 2)); ?></span>
                                         <span class="text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i><?= sprintf(lang('backend/tools.labels.overhead'), number_format($table['overhead'], 2)); ?></span>
                                     </div>
                                 </div>
-                                <div class="col-2 text-end">
-                                    <button type="button" class="btn btn-sm btn-success btn-optimize-table" data-table="<?= $table['name']; ?>">
-                                        <i class="fa-solid fa-wand-magic-sparkles me-1"></i><?= lang('backend/tools.buttons.tableOptimize'); ?>
-                                    </button>
+                                <div class="col-2 text-start">
+                                    <a href="#" class="btn-optimize-table d-block" data-table="<?= $table['name']; ?>">
+                                        <i class="fa-solid fa-circle-arrow-right me-1"></i> <?= lang('backend/tools.buttons.tableOptimize'); ?>
+                                    </a>
+
+                                    <!-- Esporta lista csv diretta (Modificato id in class) -->
+                                    <a href="#" class="export-entity d-block" data-export-entity="<?= $table['name']; ?>">
+                                        <i class="fa-solid fa-circle-arrow-right me-1"></i> <?= lang('backend/admins.links.export'); ?>
+                                    </a>
+                                    <!-- End esporta lista csv -->
+
+                                    <!-- Importa lista csv (Modificato id in class) -->
+                                    <a href="#" class="import-entity d-block" data-import-entity="<?= $table['name']; ?>">
+                                        <i class="fa-solid fa-circle-arrow-right me-1"></i> <?= lang('backend/admins.links.import'); ?>
+                                    </a>
+                                    <!-- End importa lista csv -->
                                 </div>
                             </div>
 
@@ -86,3 +98,5 @@
         </div>
     </form>
 </div>
+
+<div id="import-modal-container"></div>

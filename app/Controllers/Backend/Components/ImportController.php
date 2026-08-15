@@ -20,7 +20,7 @@ class ImportController extends BaseController
         if ($this->request->isAJAX() && $this->request->is('post')):
 
             $posts = $this->request->getPost();
-            $rules = $this->importModel->showModalValidationRules();
+            $rules = ['entity' => 'required|alpha_dash'];
 
             /* Validazione campi nascosti */
             if ( ! $this->validateData($posts, $rules)) :
@@ -56,8 +56,11 @@ class ImportController extends BaseController
         /* Apre un buffer in memoria per scrivere il CSV senza creare file su disco */
         $output = fopen('php://memory', 'w');
         
-        /* Scrive l'intestazione come unica riga del CSV (usando il punto e virgola come separatore) */
-        fputcsv($output, $headers, ';');
+        /* Aggiunge il BOM UTF-8 per la compatibilità con Excel */
+        fputs($output, "\xEF\xBB\xBF");
+        
+        /* Scrive l'intestazione come unica riga del CSV (usando la virgola come separatore) */
+        fputcsv($output, $headers, ',');
         
         /* Riporta il puntatore all'inizio del buffer per poterlo leggere */
         rewind($output);
@@ -74,19 +77,19 @@ class ImportController extends BaseController
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
-            /* Validazione dell'entità e del file caricato (obbligatorio, estensione csv, max 2MB) */
+            $posts = $this->request->getPost();
             $rules = [
                 'entity' => 'required|alpha_dash',
                 'csvFile' => [
                     'rules'  => 'uploaded[csvFile]|ext_in[csvFile,csv,txt]|max_size[csvFile,2048]',
                     'errors' => [
-                        'uploaded' => 'Devi selezionare un file da importare.', /* Il messaggio per file mancante */
-                        'ext_in'   => 'Il file caricato non è in un formato valido.' /* Il messaggio per estensione errata */
+                        'uploaded' => lang('backend/components/import.errors.uploaded'),  
+                        'ext_in'   => lang('backend/components/import.errors.ext_in'),  
                     ]
                 ]
             ];
 
-            if ( ! $this->validateData($this->request->getPost(), $rules)):
+            if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 return $this->jsonResponse(['result' => false, 'message' => $errorMessage]);
             endif;
@@ -119,30 +122,81 @@ class ImportController extends BaseController
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
+            $posts = $this->request->getPost();
             $rules = [
                 'entity' => 'required|alpha_dash',
                 'tempFile' => 'required|regex_match[/^[a-zA-Z0-9_\-\.]+$/]',
-                'step' => 'required|in_list[confirm]'
+                'step' => 'required|in_list[confirm]',
+                /* --- INIZIO MODIFICA CHUNKING: Validazione parametro offset --- */
+                'offset' => 'permit_empty|is_natural'
+                /* --- FINE MODIFICA CHUNKING --- */
             ];
 
-            if ( ! $this->validateData($this->request->getPost(), $rules)):
+            if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 return $this->jsonResponse(['result' => false, 'message' => $errorMessage]);
             endif;
 
             $entity = $this->request->getPost('entity');
             $tempFile = $this->request->getPost('tempFile');
+            
+            /* --- INIZIO MODIFICA CHUNKING: Inizializzazione offset --- */
+            $offset = (int) $this->request->getPost('offset'); // Se null/vuoto, diventa 0
+            /* --- FINE MODIFICA CHUNKING --- */
 
-            /* Avvio scrittura massiva */
-            $importResult = $this->importModel->executeImport($entity, $tempFile);
+            /* --- INIZIO MODIFICA CHUNKING: Backup SOLO al primo blocco --- */
+            /* Esecuzione del backup preventivo della tabella (solo al giro iniziale) */
+            if ($offset === 0):
+                if ($this->importModel->backupTableBeforeImport($entity) === false):
+                    return $this->jsonResponse(['result' => false, 'message' => lang('backend/components/import.messages.backupError')]);
+                endif;
+            endif;
+            /* --- FINE MODIFICA CHUNKING --- */
+
+            /* --- INIZIO MODIFICA CHUNKING: Passaggio offset al model --- */
+            /* Avvio scrittura massiva a blocchi */
+            $importResult = $this->importModel->executeImport($entity, $tempFile, $offset);
+            /* --- FINE MODIFICA CHUNKING --- */
 
             if ($importResult['status'] === false):
                 return $this->jsonResponse(['result' => false, 'message' => $importResult['message']]);
             endif;
 
-            $successMessage = sprintf(lang('backend/components/import.messages.importSuccess'), $importResult['inserted'], $importResult['updated']);
+            /* --- INIZIO MODIFICA CHUNKING: Restituzione dati di stato al JS --- */
+            return $this->jsonResponse([
+                'result' => true, 
+                'message' => $importResult['message'],
+                'nextOffset' => $importResult['nextOffset'],
+                'isFinished' => $importResult['isFinished'],
+                'inserted' => $importResult['inserted'],
+                'updated' => $importResult['updated']
+            ]);
+            /* --- FINE MODIFICA CHUNKING --- */
 
-            return $this->jsonResponse(['result' => true, 'message' => $successMessage]);
+        endif;
+    }
+
+    public function deleteFile(): ResponseInterface
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            $posts = $this->request->getPost();
+            $rules = ['file' => 'required|regex_match[/^[a-zA-Z0-9_\-\.]+$/]'];
+
+            if ( ! $this->validateData($posts, $rules)):
+                $errorMessage = implode('<br>', $this->validator->getErrors());
+                return $this->jsonResponse(['result' => false, 'message' => $errorMessage]);
+            endif;
+
+            $file = $this->request->getPost('file');
+            $filePath = WRITEPATH . 'uploads/csv/' . $file;
+
+            /* Elimina il file se esiste fisicamente sul server */
+            if (file_exists($filePath)):
+                unlink($filePath);
+            endif;
+
+            return $this->jsonResponse(['result' => true]);
 
         endif;
     }

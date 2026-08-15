@@ -8,8 +8,6 @@ class AdminsModel extends BackendModel
 {
     protected ?string $module = 'admins';
 
-    protected ?string $entity = 'admins';
-
     protected bool $hasSoftDelete = true;
 
     protected ?string $defaultColumn = 'created_at';
@@ -786,10 +784,10 @@ class AdminsModel extends BackendModel
             /* Gestione Upload e Scrittura Immagini nel flusso transazionale */
             if ( ! empty($posts['images'])):
                 $uploadService = new \App\Libraries\Backend\Upload();
-                $filenames = $uploadService->doUpload($posts['images'], $this->entity, $uuid);
+                $filenames = $uploadService->doUpload($posts['images'], 'admins', $uuid);
                 
                 if ($filenames):
-                    $this->insertImages($filenames, $uuid, $this->entity, 'add');
+                    $this->insertImages($filenames, $uuid, 'admins', 'add');
                 endif;
             endif;
 
@@ -826,12 +824,11 @@ class AdminsModel extends BackendModel
         $emailService = new \App\Libraries\Backend\EmailService();
 
         /* Configuro i parametri dinamici per questa specifica chiamata */
-        $module = $this->module;
         $template = 'emailCreateAdminPartial';
         $subjectLangKey = 'backend/email.admins.add.subjectCreateAdminEmail';
 
         /* Chiamata al metodo con i parametri separati */
-        if ( ! $emailService->sendActivationEmail($data['row'], $token->getValue(), $module, $template, $subjectLangKey)):
+        if ( ! $emailService->sendActivationEmail($data['row'], $token->getValue(), $this->module, $template, $subjectLangKey)):
 
             $message = sprintf(lang('backend/admins.messages.addSuccessNoEmail'), esc($data['row']->firstname), esc($data['row']->lastname));
             return ['result' => false, 'message' => $message];
@@ -924,10 +921,10 @@ class AdminsModel extends BackendModel
             /* Gestione Upload e Scrittura Immagini nel flusso transazionale */
             if ( ! empty($posts['images'])):
                 $uploadService = new \App\Libraries\Backend\Upload();
-                $filenames = $uploadService->doUpload($posts['images'], $this->entity, $posts['uuid']);
+                $filenames = $uploadService->doUpload($posts['images'], 'admins', $posts['uuid']);
                 
                 if ($filenames):
-                    $this->insertImages($filenames, $posts['uuid'], $this->entity, 'edit');
+                    $this->insertImages($filenames, $posts['uuid'], 'admins', 'edit');
                 endif;
             endif;
 
@@ -1319,12 +1316,11 @@ class AdminsModel extends BackendModel
         $emailService = new \App\Libraries\Backend\EmailService();
 
         /* Configuro i parametri dinamici per questa specifica chiamata */
-        $module = $this->module;
         $template = 'emailResetPasswordAdminPartial';
         $subjectLangKey = 'backend/email.admins.resetPassword.subjectResetPasswordEmail';
 
         /* Chiamata al metodo con i nuovi parametri separati */
-        if ( ! $emailService->sendActivationEmail($data['row'], $token->getValue(), $module, $template, $subjectLangKey)):
+        if ( ! $emailService->sendActivationEmail($data['row'], $token->getValue(), $this->module, $template, $subjectLangKey)):
 
             $message = sprintf(lang('backend/admins.messages.resetPasswordSuccessNoEmail'), esc($data['row']->firstname), esc($data['row']->lastname));
             return ['result' => false, 'message' => $message];

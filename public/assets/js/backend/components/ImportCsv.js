@@ -10,6 +10,8 @@ export class ImportCsvManager {
             modalContainerId: 'import-modal-container', 
             modalId: 'importModal', 
             linkId: '#import-entity', 
+            removeId: '#btnCancelImport', 
+            urlDelete: urlbase + 'backend/import/deleteFile',
         }, config);
 
         this.hooks = Object.assign({
@@ -17,11 +19,18 @@ export class ImportCsvManager {
             onModalAfter: null,
             onImportBefore: null,
             onImportAfter: null,
+            onDeleteBefore: null,
+            onDeleteAfter: null,
             onError: null
         }, hooks);
 
         this.eventsBound = false;
         this.isSubmitting = false;
+        
+        /* --- INIZIO MODIFICA CHUNKING: Contatori totali per l'intero processo --- */
+        this.totalInserted = 0;
+        this.totalUpdated = 0;
+        /* --- FINE MODIFICA CHUNKING --- */
     }
 
     init() {
@@ -48,8 +57,22 @@ export class ImportCsvManager {
         document.addEventListener('submit', async e => {
             if (e.target.id === 'importForm') {
                 e.preventDefault();
+                /* --- INIZIO MODIFICA CHUNKING: Reset contatori all'avvio di una nuova importazione --- */
+                this.totalInserted = 0;
+                this.totalUpdated = 0;
+                /* --- FINE MODIFICA CHUNKING --- */
                 await this.processImport(e.target);
             }
+        });
+
+        /* Eliminazione file temporaneo se l'admin clicca su annulla nel modale di importazione */
+        document.addEventListener('click', async e => {
+            const btn = e.target.closest(this.config.removeId);
+            if ( ! btn) return;
+
+            e.preventDefault();
+            
+            await this.deleteTempFile();
         });
 
     }
@@ -129,13 +152,82 @@ export class ImportCsvManager {
         }
     }
 
-    async processImport(formElement) {
+    async deleteTempFile() {
+
+        /* Recupera l'elemento tramite il selettore dell'attributo name */
+        const tempFileEl = document.querySelector('input[name="tempFile"]');
+        if ( ! tempFileEl || ! tempFileEl.value) return;
+
+        const tempFile = tempFileEl.value;
 
         if (this.isSubmitting) return;
         this.isSubmitting = true;
 
+        if (typeof this.hooks.onDeleteBefore === 'function') {
+            const stop = this.hooks.onDeleteBefore(tempFile);
+            if (stop === false) {
+                this.isSubmitting = false;
+                return;
+            }
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('file', tempFile);
+
+            /* Assicurati di avere urlDelete definito nella tua configurazione (es. this.config.urlDelete) */
+            const response = await apiFetch(this.config.urlDelete, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            /* Controllo fallimento logico generico */
+            if (data.result === false) {
+                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+                return;
+            }
+
+            /* Caso successo */
+            if (data.result === true) {
+                if (typeof this.hooks.onDeleteAfter === 'function') {
+                    this.hooks.onDeleteAfter(data);
+                }
+            }
+
+        } catch (error) {
+            if (typeof this.hooks.onError === 'function') {
+                this.hooks.onError(error);
+            }
+            console.error("Errore ImportCsvManager (deleteTempFile):", error);
+        } finally {
+            this.isSubmitting = false;
+        }
+    }
+
+    /* --- INIZIO MODIFICA CHUNKING: Aggiunto parametro offset alla firma della funzione --- */
+    async processImport(formElement, currentOffset = 0) {
+    /* --- FINE MODIFICA CHUNKING --- */
+
+        /* Blocchiamo il submit multiplo solo se siamo al primo giro (offset 0) */
+        if (this.isSubmitting && currentOffset === 0) return;
+        this.isSubmitting = true;
+
+        if (currentOffset === 0 && typeof this.hooks.onImportBefore === 'function') {
+            const stop = this.hooks.onImportBefore(formElement);
+            if (stop === false) {
+                this.isSubmitting = false;
+                return;
+            }
+        }
+
         try {
             const formData = new FormData(formElement);
+            
+            /* --- INIZIO MODIFICA CHUNKING: Accodiamo l'offset corrente alla richiesta --- */
+            formData.append('offset', currentOffset);
+            /* --- FINE MODIFICA CHUNKING --- */
             
             /* Determina l'URL in base allo step (upload file o conferma finale) */
             const isConfirmStep = formData.get('step') === 'confirm';
@@ -150,6 +242,7 @@ export class ImportCsvManager {
 
             if (data.result === false) {
                 if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+                this.isSubmitting = false; // Sblocca in caso di errore
                 return;
             }
 
@@ -161,11 +254,39 @@ export class ImportCsvManager {
                     if (modalBody) {
                         smoothReplace(modalBody, data.output);
                     }
+                    this.isSubmitting = false; // Sblocca perché attende il click dell'utente per il secondo step
                 } 
                 
-                /* Se era lo step finale, mostriamo il successo e chiudiamo il modale */
+                /* --- INIZIO MODIFICA CHUNKING: Gestione ricorsione per lo step finale --- */
                 else if (isConfirmStep) {
-                    if (data.message && typeof showAlert === 'function') showAlert('success', data.message);
+                    
+                    /* Aggiorniamo i totali globali con quelli ricevuti da questo specifico blocco */
+                    this.totalInserted += (data.inserted || 0);
+                    this.totalUpdated += (data.updated || 0);
+
+                    /* Se il backend ci dice che non ha ancora finito, richiamiamo la funzione con il nuovo offset */
+                    if (data.isFinished === false && data.nextOffset) {
+                        
+                        /* Opzionale: Qui potresti aggiornare un testo nel modale es. "Elaborate 500 righe..." */
+                        
+                        /* Chiamata ricorsiva al prossimo blocco */
+                        await this.processImport(formElement, data.nextOffset);
+                        return; // Usciamo da questa iterazione per non eseguire il codice sottostante
+                    }
+                    
+                    /* Se arriviamo qui, l'importazione è finita totalmente. Mostriamo l'esito reale. */
+                    
+                    /* Se i totali sono zero, mostriamo il messaggio neutro, altrimenti costruiamo la stringa di successo */
+                    let finalMessage = data.message; 
+                    if ((this.totalInserted + this.totalUpdated) === 0) {
+                        finalMessage = 'Importazione completata: nessun record modificato poiché i dati sono già allineati.';
+                    } else {
+                        /* Questa è una costruzione di fallback qualora il server restituisca solo il testo dell'ultimo blocco. 
+                           Se usi una logica multilingua stretta, potresti dover restituire le stringhe dal backend. */
+                        finalMessage = `Importazione completata. Inseriti: ${this.totalInserted}, Aggiornati: ${this.totalUpdated}.`;
+                    }
+
+                    if (finalMessage && typeof showAlert === 'function') showAlert('success', finalMessage);
                     
                     const modalEl = document.getElementById(this.config.modalId);
                     if (modalEl) {
@@ -176,13 +297,17 @@ export class ImportCsvManager {
                     if (typeof this.hooks.onImportAfter === 'function') {
                         this.hooks.onImportAfter(data);
                     }
+                    
+                    this.isSubmitting = false; // Sblocco definitivo a fine processo
                 }
+                /* --- FINE MODIFICA CHUNKING --- */
             }
 
         } catch (error) {
-            console.error("Errore ImportCsvManager:", error);
-            if (typeof showAlert === 'function') showAlert('danger', 'Errore di comunicazione con il server.');
-        } finally {
+            if (typeof this.hooks.onError === 'function') {
+                this.hooks.onError(error);
+            }
+            console.error("Errore di comunicazione con il server:", error);
             this.isSubmitting = false;
         }
     }

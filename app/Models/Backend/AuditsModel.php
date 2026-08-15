@@ -22,8 +22,6 @@ class AuditsModel extends BackendModel
      */
     protected ?string $module = 'audits';
 
-    protected ?string $entity = 'audits';
-
     /**
      * Colonna di ordinamento predefinita utilizzata nelle query di estrazione se non specificata.
      *

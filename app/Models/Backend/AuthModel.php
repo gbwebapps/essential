@@ -17,13 +17,6 @@ class AuthModel extends BackendModel
     private object $config;
 
     /**
-     * Identificativo testuale del modulo associato la gestione della autenticazione.
-     *
-     * @var string|null
-     */
-    protected ?string $module = 'auth';
-
-    /**
      * Inizializza il modello ereditando i comportamenti base e caricando le configurazioni di sicurezza.
      *
      * Rinvigorisce l'istanza valorizzando l'espressione regolare per il controllo delle password

@@ -20,8 +20,6 @@ abstract class BackendModel extends BaseModel
 	 */
 	protected ?string $module = null;
 
-	protected ?string $entity = null;
-
 	protected bool $hasSoftDelete = false;
 
 	/**

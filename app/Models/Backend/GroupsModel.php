@@ -7,13 +7,6 @@ use App\Models\Backend\BackendModel;
 class GroupsModel extends BackendModel
 {
 	/**
-	 * Identificativo testuale del modulo associato per la gestione dei permessi e delle rotte.
-	 *
-	 * @var string|null
-	 */
-	protected ?string $module = 'groups';
-
-    /**
      * Elenco dei campi anagrafici e relazionali consentiti durante la fase di inserimento di un nuovo gruppo.
      *
      * @var array

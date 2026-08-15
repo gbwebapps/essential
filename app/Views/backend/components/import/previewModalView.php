@@ -30,7 +30,7 @@
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="<?= count($headers); ?>" class="text-center text-muted">
+                        <td colspan="<?= count($headers); ?>" class="text-center text-muted p-3">
                             <?= lang('backend/components/import.messages.noDataToPreview'); ?>
                         </td>
                     </tr>

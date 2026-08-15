@@ -8,46 +8,28 @@ use App\Models\Backend\BackendModel;
 
 class ExportModel extends BackendModel 
 {
-	public function showModalValidationRules(): array 
+	public function generateValidationRules(): array 
     {
         return [
             'entity' => [
                 'label' => lang('backend/components/export.labels.entity'),
                 'rules' => ['required', 'alpha_dash'],
             ],
-        ];
-    }
-
-    public function generateValidationRules(): array 
-    {
-        return [
-            'entity' => [
-            	'label' => lang('backend/components/export.labels.entity'),
-            	'rules' => ['required', 'alpha_dash'],
-            ],
-            'columns' => [
-                'label' => lang('backend/components/export.labels.columns'),
-                'rules' => ['required'],
-            ],
-            'columns.*' => [
-                'label' => lang('backend/components/export.labels.columns'),
-                'rules' => ['alpha_dash'],
-            ],
             'order' => [
-            	'label' => lang('backend/components/export.labels.order'),
-            	'rules' => ['permit_empty', 'in_list[asc,desc,ASC,DESC]'],
+                'label' => lang('backend/components/export.labels.order'),
+                'rules' => ['permit_empty', 'in_list[asc,desc,ASC,DESC]'],
             ],
             'column' => [
-            	'label' => lang('backend/components/export.labels.column'),
-            	'rules' => ['permit_empty', 'alpha_dash'],
+                'label' => lang('backend/components/export.labels.column'),
+                'rules' => ['permit_empty', 'alpha_dash'],
             ],
             'trash_filter' => [
-            	'label' => lang('backend/components/export.labels.trash_filter'),
-            	'rules' => ['permit_empty', 'in_list[active,trashed,all]'],
+                'label' => lang('backend/components/export.labels.trash_filter'),
+                'rules' => ['permit_empty', 'in_list[active,trashed,all]'],
             ],
             'page' => [
-            	'label' => lang('backend/components/export.labels.page'),
-            	'rules' => ['permit_empty', 'is_natural_no_zero'],
+                'label' => lang('backend/components/export.labels.page'),
+                'rules' => ['permit_empty', 'is_natural_no_zero'],
             ],
         ];
     }
@@ -65,40 +47,38 @@ class ExportModel extends BackendModel
             return ['result' => false, 'message' => lang('backend/components/export.messages.invalidEntity')];
         endif;
 
-    	/* 1. Recuperiamo le colonne reali della tabella */
-    	$allowedColumns = $this->db->getFieldNames($entity);
+        /* 1. Recuperiamo le colonne reali della tabella */
+        $allowedColumns = $this->db->getFieldNames($entity);
 
-    	/* 2. Prepariamo i suffissi per le ricerche temporali */
-    	$dateKeys = [];
-    	foreach ($allowedColumns as $col) {
-    	    $dateKeys[] = $col . '-from';
-    	    $dateKeys[] = $col . '-to';
-    	}
+        /* 2. Prepariamo i suffissi per le ricerche temporali */
+        $dateKeys = [];
+        foreach ($allowedColumns as $col):
+            $dateKeys[] = $col . '-from';
+            $dateKeys[] = $col . '-to';
+        endforeach;
 
         /* Chiavi di sistema inviate dal JS da ignorare come filtri DB */
-        $systemKeys = ['entity', 'columns', 'column', 'order', 'page', 'rows', 'trash_filter', 'search_bar_visible'];
+        $systemKeys = ['entity', 'column', 'order', 'page', 'rows', 'trash_filter', 'search_bar_visible'];
 
-    	/* 3. Uniamo tutto: colonne reali, suffissi data, chiavi di sistema e opzioni UI */
-    	$allowedFields = array_merge(
-    	    $allowedColumns, 
-    	    $dateKeys, 
-    	    $systemKeys, 
-    	    ['search_bar_visible', 'rows']
-    	);
+        /* 3. Uniamo tutto: colonne reali, suffissi data e chiavi di sistema */
+        $allowedFields = array_merge(
+            $allowedColumns, 
+            $dateKeys, 
+            $systemKeys
+        );
 
-    	/* 4. Filtriamo i post */
-    	$posts = $this->checkAllowedFields($posts, $allowedFields);
-
-        $allowedColumns = $this->db->getFieldNames($entity);
-        $requestedColumns = $posts['columns'] ?? [];
-        $validColumns = array_intersect($requestedColumns, $allowedColumns);
-
-        if (empty($validColumns)):
-            return ['result' => false, 'message' => lang('backend/components/export.messages.noColumnsSelected')];
-        endif;
-
-        $selectFields = implode(', ', $validColumns);
+        /* 4. Filtriamo i post */
+        $posts = $this->checkAllowedFields($posts, $allowedFields);
+                
+        /* Forza l'esportazione integrale e rigorosa di tutte le colonne della tabella */
+        $selectFields = implode(', ', $allowedColumns);
         $sql = "select {$selectFields} from {$entity} where 1 = 1";
+
+        /* Se è la tabella admins escludo l'esportazione del master. */
+        if($entity === 'admins'):
+            $sql .= ' and master <> 1';
+        endif;
+        
         $bindings = [];
 
         /* 1. Applicazione Dinamica Filtri (Testo e Date misti nell'array piatto) */
@@ -111,7 +91,7 @@ class ExportModel extends BackendModel
             if (str_ends_with($key, '-from')):
                 $realField = str_replace('-from', '', $key);
                 if (in_array($realField, $allowedColumns)):
-                    $sql .= " AND {$realField} >= ?";
+                    $sql .= " and {$realField} >= ?";
                     $bindings[] = $value; 
                 endif;
             
@@ -191,13 +171,14 @@ class ExportModel extends BackendModel
 
             /* Scriviamo le intestazioni solo al primo ciclo */
             if ($isFirstChunk):
-                fputcsv($file, array_keys($records[0]));
+                fputs($file, "\xEF\xBB\xBF");
+                fputcsv($file, array_keys($records[0]), ',');
                 $isFirstChunk = false;
             endif;
 
             /* Scriviamo tutte le righe del blocco corrente */
             foreach ($records as $row):
-                fputcsv($file, $row);
+                fputcsv($file, $row, ',');
             endforeach;
 
             /* Se abbiamo estratto meno record del limite, significa che è l'ultimo blocco */

@@ -22,8 +22,6 @@ class TokensModel extends BackendModel
      */
     protected ?string $module = 'admins_tokens';
 
-    protected ?string $entity = 'admins_tokens';
-
     /**
      * Colonna di ordinamento predefinita utilizzata nelle query di estrazione se non specificata.
      *

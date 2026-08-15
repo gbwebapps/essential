@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 1); 
 
 namespace App\Controllers\Backend\Components;
 
@@ -15,41 +15,20 @@ class ExportController extends BaseController
         $this->exportModel = model(ExportModel::class);
     }
 
-    public function showModal(): ResponseInterface
-    {
-        if ($this->request->isAJAX() && $this->request->is('post')):
-
-	        $posts = $this->request->getPost();
-	    	$rules = $this->exportModel->showModalValidationRules();
-
-	    	/* Validazione campi nascosti */
-	    	if ( ! $this->validateData($posts, $rules)) :
-	    	    $errorMessage = implode('<br>', $this->validator->getErrors());
-	    	    return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/components/export.messages.validateToastErrors'), $errorMessage)]);
-	    	endif;
-
-	        $data = ['columns' => $this->exportModel->getExportColumns($posts['entity']), 'entity' => $posts['entity']]; 
-	        $output = view('backend/components/export/showModalView', $data);
-
-	        return $this->jsonResponse(['result' => true, 'output' => $output]);
-
-		endif;
-    }
-
     public function generate(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
             $posts = $this->request->getPost();
-
             $rules = $this->exportModel->generateValidationRules();
 
-            /* Validazione campi */
+            /* Validazione dell'entità o dei filtri base */
             if ( ! $this->validateData($posts, $rules)) :
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/components/export.messages.validateToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/components/export.messages.validateToastErrors'), $errorMessage)]);
             endif;
 
+            /* Genera l'esportazione con tutte le colonne e i filtri correnti */
             $json = $this->exportModel->generate($posts);
 
             return $this->jsonResponse($json);
@@ -63,7 +42,6 @@ class ExportController extends BaseController
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         endif;
 
-        /* Assicurati che il percorso combaci con la cartella che hai scelto */
         $filePath = WRITEPATH . 'exports/' . $fileName;
 
         if ( ! is_file($filePath)):
