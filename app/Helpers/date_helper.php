@@ -16,16 +16,25 @@ if ( ! function_exists('convertDate')):
      * @param string      $format Il formato ICU di destinazione per la localizzazione.
      * @return string La stringa della data formattata, oppure vuota/originale in caso di errore o valore nullo.
      */
-    function convertDate(?string $date, string $format = 'd MMMM yyyy HH:mm:ss'): string
+    function convertDate(?string $date, ?string $format = null): string
     {
         if (empty($date)):
             return '';
         endif;
 
         try {
-            return \CodeIgniter\I18n\Time::parse($date)->toLocalizedString($format);
+            $userTimezone = setting('Backend\General', 'timezone') ?? config('App')->appTimezone;
+            $appTimezone  = config('App')->appTimezone;
+            
+            /* 1. Usa il formato passato come parametro, altrimenti 
+               2. Cerca nelle impostazioni Generali, altrimenti 
+               3. Usa un fallback statico */
+            $userFormat = $format ?? setting('Backend\General', 'dateFormat') ?? 'd MMMM yyyy HH:mm:ss';
+
+            return \CodeIgniter\I18n\Time::parse($date, $appTimezone)->setTimezone($userTimezone)->toLocalizedString($userFormat);
+
         } catch (\Throwable $e) {
-            /* In caso di errore nel parsing, restituisce la stringa originale per evitare crash della vista */
+            /* In caso di errore nel parsing, restituisce la stringa originale */
             return $date;
         }
     }

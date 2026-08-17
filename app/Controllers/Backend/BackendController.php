@@ -88,6 +88,15 @@ abstract class BackendController extends BaseController
     {
         parent::initController($request, $response, $logger);
 
+        /* Recupera i settaggi generali tramite l'helper */
+        $generalSettings = setting('Backend\General');
+
+        /* Imposta la Lingua per le traduzioni e le risposte del framework */
+        if ( ! empty($generalSettings->language)):
+            service('request')->setLocale($generalSettings->language);
+            service('language')->setLocale($generalSettings->language);
+        endif;
+
         /* Carichiamo il servizio sessione nativo di CI4 */
         $this->session = \Config\Services::session();
 

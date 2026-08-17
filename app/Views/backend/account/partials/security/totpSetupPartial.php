@@ -43,6 +43,12 @@
                                 <i class="fa-solid fa-circle-check me-1"></i> <?= lang('backend/account.buttons.verifyAndActivate'); ?>
                             </button>
                         </div>
+                        <!-- Nuovo pulsante Annulla -->
+                        <div class="col-auto">
+                            <button type="button" id="cancel-setup-btn" class="btn btn-danger btn-sm">
+                                <i class="fa-solid fa-xmark me-1"></i> <?= lang('backend/account.buttons.undoAndClose'); ?>
+                            </button>
+                        </div>
                     </div>
                     <div class="error_otp text-danger small mt-1">&nbsp;</div>
                 </form>

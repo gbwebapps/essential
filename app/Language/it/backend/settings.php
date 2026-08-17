@@ -7,7 +7,8 @@ return [
 	'panels' => [
 		'authSetting' => 'Sicurezza', 
 		'uploadSetting' => 'Upload', 
-		'emailSetting' => 'Posta elettronica'
+		'emailSetting' => 'Posta elettronica', 
+		'generalSetting' => 'Generali'
 	], 
 	'linksBar' => [
 		'tools' => 'Strumenti', 
@@ -21,6 +22,7 @@ return [
 		'protConn' => 'Protocollo e connessione', 
 		'authSMTP' => 'Autenticazione SMTP', 
 		'parameters' => 'Parametri di invio e formato', 
+		'locale' => 'Locale', 
 
 		/* Campi Auth */
 		'attempts' => 'Controllo tentativi falliti',
@@ -96,6 +98,11 @@ return [
 
 		'disabled' => 'Disabilitato',
 		'enabled' => 'Abilitato',
+
+		/* Campi generali */
+		'timezone' => 'Fuso orario', 
+		'language' => 'Lingua', 
+		'dateFormat' => 'Formato data', 
 	], 
 	'placeholders' => [
 		'attemptsLimit' => 'Inserisci limite tentativi accesso...',
@@ -128,6 +135,22 @@ return [
 		'SMTPPass' => 'Inserisci password...', 
 		'SMTPAuthMethod' => 'Inserisci metodo autenticazione', 
 		'charset' => 'Inserisci set caratteri', 
+	], 
+	'languages' => [
+		'italian' => 'Italiano', 
+		'englishUs' => 'Inglese US', 
+		'englishUk' => 'Inglese UK', 
+		'spanish' => 'Spagnolo', 
+		'franch' => 'Francese', 
+		'german' => 'Tedesco', 
+		'chinese' => 'Cinese', 
+	], 
+	'dateFormats' => [
+		'extended' => '16 Agosto 2026 15:30:00 (Esteso 24h)', 
+		'compact' => '16/08/2026 15:30 (Compatto 24h)', 
+		'usExtended' => 'August 16 2026 3:30:00 PM (Esteso USA 12h)', 
+		'usCompact' => '08/16/2026 3:30 PM (Compatto USA 12h)', 
+		'isoStandard' => '2026-08-16 15:30:00 (Standard ISO 24h)', 
 	], 
 	'buttons' => [
 		'refreshData' => 'Refresh dati', 

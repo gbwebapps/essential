@@ -6,6 +6,18 @@ use App\Models\Backend\BackendModel;
 
 class SettingsModel extends BackendModel
 {
+    /**
+     * Elenco dei campi POST autorizzati per la configurazione General.
+     * Evita tentativi di mass-assignment (assegnazione massiva).
+     *
+     * @var array
+     */
+    private array $allowedGeneralFields = [
+        'timezone',
+        'language',
+        'dateFormat'
+    ];
+
 	/**
      * Elenco dei campi POST autorizzati per la configurazione Auth.
      * Evita tentativi di mass-assignment (assegnazione massiva).
@@ -268,6 +280,24 @@ class SettingsModel extends BackendModel
             'priority' => [
                 'label' => lang('backend/settings.labels.priority'),
                 'rules' => ['required', 'in_list[1,3,5]'],
+            ],
+        ];
+    }
+
+    public function generalSettingsValidateRules(): array
+    {
+        return [
+            'timezone' => [
+                'label' => lang('backend/settings.labels.timezone'),
+                'rules' => ['required', 'timezone'],
+            ],
+            'language' => [
+                'label' => lang('backend/settings.labels.language'),
+                'rules' => ['required', 'in_list[it,en-US,en-GB,es,fr,de,zh]'],
+            ],
+            'dateFormat' => [
+                'label' => lang('backend/settings.labels.dateFormat'),
+                'rules' => ['required', 'in_list[d MMMM yyyy HH:mm:ss,dd/MM/yyyy HH:mm,MM/dd/yyyy h:mm a,yyyy-MM-dd HH:mm:ss]'],
             ],
         ];
     }

@@ -19,6 +19,7 @@
                                    id="method-<?= esc($method); ?>" 
                                    value="<?= esc($method); ?>" 
                                    data-message="<?= lang('backend/account.messages.areYouSureChangeMethod'); ?>" 
+                                   data-requires-setup="<?= ($method === 'totp') ? 'true' : 'false'; ?>"
                                    <?php if ($activeMethod === $method) : ?>checked<?php endif; ?>>
                             <label class="form-check-label d-block ms-2 cursor-pointer" for="method-<?= esc($method); ?>">
                                 <span class="d-block fw-bold mb-1">

@@ -619,39 +619,73 @@ export class SecurityManager {
 
     bindEvents() {
 
-        /* Intercetta il cambio di selezione sui radio button del metodo 2FA */
-        document.addEventListener('change', async e => {
-            if (! e.target.matches('.twofactor-method-trigger')) return;
-            
-            const method = e.target.value;
-            const wrapper = document.getElementById(this.wrapperId);
-            if (wrapper) wrapper.innerHTML = ''; /* Reset sotto-form TOTP */
+        /* 1. Intercetta il click sui radio button del metodo 2FA */
+        document.addEventListener('click', async e => {
+            if ( ! e.target.matches('.twofactor-method-trigger')) return;
 
-            if (method === 'totp') {
-                await this.requestTotpSetup();
+            if (e.target.disabled) return;
+            
+            /* Blocca il cambio grafico immediato nativo del browser */
+            e.preventDefault();
+
+            const radio = e.target;
+            const method = radio.value;
+            const requiresSetup = radio.dataset.requiresSetup === 'true';
+            const wrapper = document.getElementById(this.wrapperId);
+
+            /* Se clicca sul metodo che è già quello attivo/salvato, non fa nulla e chiude eventuali form aperti */
+            if (method === this.currentActiveMethod) {
+                if (wrapper) smoothClear(wrapper);
+                this.unlockMethods();
                 return;
             }
 
-            /* Chiediamo conferma per None o Email leggendo il data-message dal radio */
-            const message = e.target.dataset.message;
-            if (message) {
-                const ok = await askConfirm(message);
-                if (! ok) {
-                    /* Rollback dinamico sul metodo precedentemente attivo */
-                    const previousRadio = document.querySelector(`.twofactor-method-trigger[value="${this.currentActiveMethod}"]`);
-                    if (previousRadio) previousRadio.checked = true;
-                    return;
-                }
+            /* Se il metodo richiede una fase di setup (es. TOTP) */
+            if (requiresSetup) {
+                this.lockMethods();
+                
+                /* Rimuoviamo SOLO l'opacità. Lasciamo pe-none così non è più cliccabile! */
+                const activeCard = radio.closest('.card');
+                if (activeCard) activeCard.classList.remove('opacity-50');
+
+                if (wrapper) wrapper.innerHTML = ''; 
+                
+                /* La chiamata è attualmente quella del TOTP, scalabile in futuro */
+                await this.requestTotpSetup(); 
+                return;
             }
 
-            /* Se conferma, salva immediatamente la preferenza */
+            /* Se il metodo è ad azione diretta (Nessuno, Email) */
+            const message = radio.dataset.message;
+            if (message) {
+                const ok = await askConfirm(message);
+                if ( ! ok) return; /* Se annulla, il DOM è già intatto grazie a e.preventDefault() */
+            }
+
+            /* Se conferma, salva */
             await this.saveBasicMethod(method);
 
-            /* Aggiorno lo stile del metodo salvato */
+            /* Aggiornamento interfaccia solo a salvataggio confermato */
+            if (wrapper) wrapper.innerHTML = '';
+            radio.checked = true;
             this.updateVisualBorder(method);
-            
-            /* Aggiorno lo stato del metodo corrente attivo */
             this.currentActiveMethod = method; 
+        });
+
+        /* 2. Intercetta il click sul tasto "Annulla" del setup intermedio */
+        document.addEventListener('click', e => {
+            if ( ! e.target.closest('#cancel-setup-btn')) return;
+            
+            /* Svuota il contenitore del setup */
+            const wrapper = document.getElementById(this.wrapperId);
+            if (wrapper) smoothReplace(wrapper, '');
+            
+            /* Sblocca i radio button */
+            this.unlockMethods();
+            
+            /* Assicura che la spunta sia sul metodo realmente attivo nel database */
+            const activeRadio = document.querySelector(`.twofactor-method-trigger[value="${this.currentActiveMethod}"]`);
+            if (activeRadio) activeRadio.checked = true;
         });
 
         /* Intercetta l'invio del codice di verifica del TOTP caricato dinamicamente */
@@ -667,7 +701,7 @@ export class SecurityManager {
 
         /* Gestione della visibilità della chiave segreta TOTP */
         document.addEventListener('click', e => {
-            if (! e.target.closest('#toggle-secret-visibility')) return;
+            if ( ! e.target.closest('#toggle-secret-visibility')) return;
 
             const input = document.getElementById('totp-secret-field');
             const icon = document.getElementById('toggle-secret-icon');
@@ -770,6 +804,7 @@ export class SecurityManager {
             if (typeof this.hooks.onSecurityError === 'function') {
                 this.hooks.onSecurityError(error);
             }
+            this.unlockMethods();
             console.error("Errore SecurityManager (requestTotpSetup):", error);
         } finally {
             this.isSubmitting = false;
@@ -802,14 +837,18 @@ export class SecurityManager {
             }
 
             if (data.result === true) {
+
+                this.unlockMethods();
                 
                 this.currentActiveMethod = 'totp';
                 this.updateVisualBorder('totp');
 
+                document.getElementById('method-totp').checked = true;
+
                 if (typeof showAlert === 'function' && data.message) showAlert('success', data.message);
                 
                 const wrapper = document.getElementById(this.wrapperId);
-                if (wrapper) wrapper.innerHTML = ''; /* Svuota il QR code ad attivazione completata */
+                if (wrapper) smoothClear(wrapper);
 
                 if (typeof this.hooks.onSecurityAfter === 'function') {
                     this.hooks.onSecurityAfter(data);
@@ -824,6 +863,22 @@ export class SecurityManager {
         } finally {
             this.isSubmitting = false;
         }
+    }
+
+    lockMethods() {
+        document.querySelectorAll('.twofactor-method-trigger').forEach(radio => {
+            radio.disabled = true;
+            const card = radio.closest('.card');
+            if (card) card.classList.add('opacity-50', 'pe-none');
+        });
+    }
+
+    unlockMethods() {
+        document.querySelectorAll('.twofactor-method-trigger').forEach(radio => {
+            radio.disabled = false;
+            const card = radio.closest('.card');
+            if (card) card.classList.remove('opacity-50', 'pe-none');
+        });
     }
 
     updateVisualBorder(newMethod) {

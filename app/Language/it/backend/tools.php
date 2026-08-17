@@ -5,10 +5,10 @@ return [
 		'index' => 'Strumenti', 
 	],
 	'panels' => [
-		'manageAudits' => 'Gestisci attività', 
-		'dbMaintenance' => 'Manutenzione', 
+		'manageAudits' => 'Gestisci registro attività', 
+		'dbMaintenance' => 'Gestione tabelle', 
 		'backups' => 'Backups', 
-		'cleanSpace' => 'Pulizia files', 
+		'cleanSpace' => 'Pulizia cartelle', 
 		'system' => 'Sistema'
 	], 
 	'linksBar' => [

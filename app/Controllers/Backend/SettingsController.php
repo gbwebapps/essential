@@ -33,7 +33,7 @@ class SettingsController extends BackendController
      *
      * @var array
      */
-    protected array $allowedEnvs = ['auth', 'upload', 'email'];
+    protected array $allowedEnvs = ['general', 'auth', 'upload', 'email'];
 
     /**
      * Inizializza il controller impostando il contesto operativo.
@@ -81,6 +81,13 @@ class SettingsController extends BackendController
             /* Estrazione globale dell'intero gruppo */
             $this->data[$env . 'Settings'] = $this->settingsModel->getSettings($namespace);
 
+            /* Carica i dati specifici solo se apriamo la sezione 'general' */
+            if ($env === 'general'):
+                $this->data['timezones'] = $this->settingsClass->getTimezones();
+                $this->data['languages'] = $this->settingsClass->getLanguages();
+                $this->data['dateFormats'] = $this->settingsClass->getDateFormats();
+            endif;
+
             return $this->jsonResponse(['result' => true, 'output' => view('backend/settings/partials/index/' . $env . 'SettingsPartial', $this->data)]);
 
         endif;
@@ -122,6 +129,13 @@ class SettingsController extends BackendController
             /* 3. Ricarica i settaggi aggiornati (ora puliti e rinfrescati) per la vista */
             $this->data[$env . 'Settings'] = $this->settingsModel->getSettings($namespace);
 
+            /* Carica i dati specifici solo se apriamo la sezione 'general' */
+            if ($env === 'general'):
+                $this->data['timezones'] = $this->settingsClass->getTimezones();
+                $this->data['languages'] = $this->settingsClass->getLanguages();
+                $this->data['dateFormats'] = $this->settingsClass->getDateFormats();
+            endif;
+
             /* 4. Restituisci la risposta di successo con il partial aggiornato */
             return $this->jsonResponse(['result'  => true, 'message' => lang('backend/settings.messages.saveSuccess'), 'output'  => view('backend/settings/partials/index/' . $env . 'SettingsPartial', $this->data)]);
 
@@ -147,6 +161,13 @@ class SettingsController extends BackendController
             $keysFilter = $posts['keys'] ?? null;
 
             $this->data[$env . 'Settings'] = $this->settingsModel->getSettings($namespace, $keysFilter);
+
+            /* Carica i dati specifici solo se apriamo la sezione 'general' */
+            if ($env === 'general'):
+                $this->data['timezones'] = $this->settingsClass->getTimezones();
+                $this->data['languages'] = $this->settingsClass->getLanguages();
+                $this->data['dateFormats'] = $this->settingsClass->getDateFormats();
+            endif;
 
             return $this->jsonResponse(['result' => true, 'data' => $this->data[$env . 'Settings']]);
 

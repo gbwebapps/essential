@@ -350,20 +350,48 @@ export async function askConfirm(message) {
 export function smoothReplace(container, newHtml) {
     if ( ! container) return;
 
-    // 1. Applichiamo subito l'opacità zero (nascosto) senza transizione
+    /* Se l'HTML è vuoto, facciamo un fade-out prima di svuotare */
+    if (newHtml === '') {
+        container.style.transition = 'opacity 0.25s ease-in-out';
+        container.style.opacity = '0';
+        
+        setTimeout(() => {
+            container.innerHTML = '';
+            container.style.transition = '';
+            container.style.opacity = '';
+        }, 250);
+        return;
+    }
+
+    /* Comportamento normale: fade-in del nuovo contenuto */
     container.style.transition = 'none';
     container.style.opacity = '0';
-
-    // 2. Sostituiamo immediatamente il contenuto HTML
+    
     container.innerHTML = newHtml;
-
-    // 3. Forziamo il reflow del browser (obbliga a registrare lo stato opacità = 0)
-    container.offsetHeight;
-
-    // 4. Ripristiniamo la transizione CSS e portiamo l'opacità a 1 per avviare il fade-in
+    
+    container.offsetHeight; /* Forza il reflow */
+    
     container.style.transition = 'opacity 0.25s ease-in-out';
     container.style.opacity = '1';
 }
+
+// export function smoothReplace(container, newHtml) {
+//     if ( ! container) return;
+
+//     // 1. Applichiamo subito l'opacità zero (nascosto) senza transizione
+//     container.style.transition = 'none';
+//     container.style.opacity = '0';
+
+//     // 2. Sostituiamo immediatamente il contenuto HTML
+//     container.innerHTML = newHtml;
+
+//     // 3. Forziamo il reflow del browser (obbliga a registrare lo stato opacità = 0)
+//     container.offsetHeight;
+
+//     // 4. Ripristiniamo la transizione CSS e portiamo l'opacità a 1 per avviare il fade-in
+//     container.style.transition = 'opacity 0.25s ease-in-out';
+//     container.style.opacity = '1';
+// }
 
 /* Funzione globale per inizializzare tutte le Tom Select attive nella pagina */
 export function initTomSelects() {

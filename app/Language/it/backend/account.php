@@ -61,7 +61,8 @@ return [
 		'refreshData' => 'Ricarica dati', 
 		'reload' => 'Ricarica pannello', 
 		'resetPassword' => 'Procedi al reset della password',
-		'verifyAndActivate'  => 'Verifica e attiva',
+		'verifyAndActivate'  => 'Verifica e attiva', 
+		'undoAndClose' => 'Annulla e chiudi'
 	], 
 	'errors' => [
 		'id' => 'ID non conforme.', 
