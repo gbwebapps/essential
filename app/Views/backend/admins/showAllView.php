@@ -25,17 +25,17 @@
                             <!-- End Select per il numero delle righe da mostrare -->
 
                             <div class="col-12 col-md-11">
-                                <div class="pt-2 d-flex flex-column flex-md-row align-items-center justify-content-md-end">
+                                <div class="pt-2 d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-md-end">
 
                                     <!-- Selezione stato record (Attivi, Cestino, Tutti) -->
-                                    <div class="mb-2 mb-md-0 me-auto">
-                                        <a href="#" class="bar-link active me-2" data-trash-filter="active">
+                                    <div class="d-flex flex-column flex-md-row me-md-auto mb-2 mb-md-0">
+                                        <a href="#" class="bar-link active mb-2 mb-md-0 me-0 me-md-2" data-trash-filter="active">
                                             <i class="fa-solid fa-check"></i> <?= lang('backend/admins.links.activeRecords'); ?>
                                         </a>
-                                        <a href="#" class="bar-link mx-2" data-trash-filter="trashed">
+                                        <a href="#" class="bar-link mb-2 mb-md-0 mx-0 mx-md-2" data-trash-filter="trashed">
                                             <i class="fa-solid fa-trash-can"></i> <?= lang('backend/admins.links.trashedRecords'); ?>
                                         </a>
-                                        <a href="#" class="bar-link ms-2" data-trash-filter="all">
+                                        <a href="#" class="bar-link mb-0 mb-md-0 ms-0 ms-md-2" data-trash-filter="all">
                                             <i class="fa-solid fa-list"></i> <?= lang('backend/admins.links.allRecords'); ?>
                                         </a>
                                     </div>
@@ -65,13 +65,13 @@
                                     <!-- End Reset solo ordinamento -->
 
                                     <!-- Semplice ricarica lista -->
-                                    <a href="#" id="refresh-list" class="mb-md-0 ms-0 mx-md-2 bar-link">
+                                    <a href="#" id="refresh-list" class="mb-2 mb-md-0 mx-0 mx-md-2 bar-link">
                                         <i class="fa-solid fa-arrows-rotate"></i> <?= lang('backend/admins.links.reloadList'); ?>
                                     </a>
                                     <!-- End Semplice ricarica lista -->
 
                                     <!-- Esporta lista csv diretta -->
-                                    <a href="#" class="mb-md-0 ms-0 mx-md-2 bar-link" id="export-entity" data-export-entity="admins">
+                                    <a href="#" class="mb-2 mb-md-0 mx-0 mx-md-2 bar-link" id="export-entity" data-export-entity="admins">
                                         <i class="fa-solid fa-file-csv"></i> <?= lang('backend/admins.links.export'); ?>
                                     </a>
                                     <!-- End esporta lista csv -->

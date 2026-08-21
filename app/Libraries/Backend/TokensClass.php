@@ -38,15 +38,15 @@ class TokensClass
 	 *
 	 * @return array
 	 */
-	public function getOptionsIndex()
-	{
-		return 
-		[
-		    ['label' => lang('backend/tokens.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/tokens.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/tokens.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		];
-	}
+	// public function getOptionsIndex()
+	// {
+	// 	return 
+	// 	[
+	// 	    ['label' => lang('backend/tokens.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/tokens.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/tokens.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	];
+	// }
 
 	/* ------------------------------------------------------------------------------------------------- */
 

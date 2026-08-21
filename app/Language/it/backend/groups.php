@@ -39,6 +39,8 @@ return [
 	], 
 	'errors' => [
 		'permission' => 'Permesso non conforme.', 
+		'wrongUUID' => 'Formato UUID non corretto.', 
+		'wrongID' => 'Formato ID non corretto', 
 	],
 	'messages' => [
 		'areYouSureDeleteGroup' => 'Sei sicuro di voler eliminare questo gruppo?', 
@@ -48,6 +50,7 @@ return [
 		'noGroupFound' => 'Nessun gruppo trovato.', 
 		'noDataChanged' => 'Non sono state effettuate modifiche.', 
 		'validationErrors' => 'Errori di validazione.', 
+		'validateToastErrors' => '%s', 
 		'addError' => 'Aggiunta gruppo non andata a buon fine.', 
 		'addSuccess' => 'Gruppo aggiunto con successo.', 
 		'editError' => 'Aggiornamento gruppo non andato a buon fine.',

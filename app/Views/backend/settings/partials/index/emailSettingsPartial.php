@@ -1,5 +1,5 @@
 <div class="card-body">
-    <form id="email-settings" autocomplete="off">
+    <form id="email-settings" autocomplete="off" novalidate>
         <div class="row">
             <div class="col-12">
                 
@@ -142,22 +142,30 @@
                         <div class="error_priority text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Pulsanti di Controllo -->
-            <div class="row">
-                <div class="col-12 mt-4 text-center">
-                    <button type="button" class="btn btn-outline-danger btn-sm me-2 btn-delete-email" data-message="<?= lang('backend/settings.messages.areYouSureDeleteSettings'); ?>">
-                        <i class="fa-solid fa-trash-can me-1"></i><?= lang('backend/settings.buttons.restoreData'); ?>
-                    </button>
-                    <button type="button" class="btn btn-danger btn-sm text-white mx-2 btn-refresh-email" data-message="<?= lang('backend/settings.messages.areYouSureRefreshSettings'); ?>">
-                        <i class="fa-solid fa-rotate me-1"></i><?= lang('backend/settings.buttons.refreshData'); ?>
-                    </button>
-                    <button type="submit" class="btn btn-success btn-sm text-white ms-2 btn-save-email">
-                        <i class="fa-solid fa-floppy-disk me-1"></i><?= lang('backend/settings.buttons.sendData'); ?>
-                    </button>
+                <!-- Pulsanti di Controllo -->
+                <div class="row">
+                    <div class="col-12">
+                        <!-- Flexbox: In colonna su mobile, in riga da tablet in poi, centrato orizzontalmente -->
+                        <div class="d-flex flex-column flex-md-row justify-content-center gap-2">
+                            
+                            <button type="button" class="btn btn-danger btn-sm btn-delete-email" data-message="<?= lang('backend/settings.messages.areYouSureDeleteSettings'); ?>">
+                                <i class="fa-solid fa-trash-can me-1"></i><?= lang('backend/settings.buttons.restoreData'); ?>
+                            </button>
+                            
+                            <button type="button" class="btn btn-warning btn-sm text-dark btn-refresh-email" data-message="<?= lang('backend/settings.messages.areYouSureRefreshSettings'); ?>">
+                                <i class="fa-solid fa-rotate me-1"></i><?= lang('backend/settings.buttons.refreshData'); ?>
+                            </button>
+                            
+                            <button type="submit" class="btn btn-success btn-sm text-white btn-save-email">
+                                <i class="fa-solid fa-floppy-disk me-1"></i><?= lang('backend/settings.buttons.sendData'); ?>
+                            </button>
+                            
+                        </div>
+                    </div>
                 </div>
             </div>
+
         </div>
     </form>
 </div>

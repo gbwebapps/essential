@@ -182,11 +182,15 @@ class GroupsController extends BackendController
             /* CASO 1: Ripristino dei dati originali dal database (Refresh) */
             if (isset($posts['action']) && $posts['action'] === 'refresh'):
 
+                if ( ! isset($posts['id']) || ( ! is_numeric($posts['id']) ) || (int) $posts['id'] <= 0):
+                    return $this->jsonResponse(['result' => false, 'message' => lang('backend/groups.errors.wrongID')]);
+                endif;
+
                 /* Recuperiamo i record freschi dal Model usando l'ID del gruppo */
                 $groupRow = $this->groupsModel->getGroupById($posts);
                 
                 if ( ! $groupRow):
-                    return $this->jsonResponse(['result' => false, 'message' => lang('backend/groups.messages.notFound')]);
+                    return $this->jsonResponse(['result' => false, 'message' => lang('backend/groups.messages.noGroupFound')]);
                 endif;
 
                 $this->data['group'] = $groupRow;
@@ -198,6 +202,21 @@ class GroupsController extends BackendController
 
                 return $this->jsonResponse(['result' => true, 'output' => $output]);
 
+            endif;
+
+            /* Sbarramento preliminare per proteggere la regola is_unique da ID manomessi */
+            if ( ! isset($posts['id']) || ! is_numeric($posts['id']) || (int) $posts['id'] <= 0):
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/groups.errors.wrongID')]);
+            endif;
+
+            /* Cast sicuro per la generazione delle regole successive */
+            $posts['id'] = (int) $posts['id'];
+
+            /* Recuperiamo i record freschi dal Model usando l'ID del gruppo */
+            $groupRow = $this->groupsModel->getGroupById($posts);
+            
+            if ( ! $groupRow):
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/groups.messages.noGroupFound')]);
             endif;
 
             /* CASO 2: Salvataggio standard dei dati */
@@ -230,6 +249,10 @@ class GroupsController extends BackendController
 
             $posts = $this->request->getPost();
             $rules = $this->groupsModel->delValidationRules();
+
+            if ( ! isset($posts['id']) || ( ! is_numeric($posts['id']) ) || (int) $posts['id'] <= 0):
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/groups.errors.wrongID')]);
+            endif;
 
             /* Validazione dei posts */
             if ( ! $this->validateData($posts, $rules)):
@@ -302,7 +325,6 @@ class GroupsController extends BackendController
             endif;
 
             $this->data['uuid'] = $posts['uuid'];
-
             $this->data['name'] = $admin['name'];
             
             /* 1. Mappa globale dei permessi dal file di configurazione */
@@ -331,7 +353,7 @@ class GroupsController extends BackendController
 
             /* Validazione preliminare dell'UUID dell'amministratore */
             if (( ! isset($posts['uuid'])) || ( ! $this->regexp->validateUUID($posts['uuid']))):
-                return $this->jsonResponse(['result' => false, 'message' => lang('backend/global.messages.wrongUUIDFormat')]);
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/groups.errors.wrongUUID')]);
             endif;
 
             /* Recuperiamo le regole di validazione specifiche per le eccezioni dal Model */
@@ -344,7 +366,7 @@ class GroupsController extends BackendController
                 /* Raggruppiamo i dot-errors di 'permissions.*' sotto la chiave unica per il DOM */
                 $cleanErrors = removeDotPermissions('permissions', $rawErrors);
 
-                return $this->jsonResponse(['errors' => $cleanErrors, 'message' => lang('backend/global.messages.validationErrors')]);
+                return $this->jsonResponse(['errors' => $cleanErrors, 'message' => lang('backend/groups.messages.validationErrors')]);
             endif;
 
             /* Eseguiamo il salvataggio dei delta sul database tramite il Model */

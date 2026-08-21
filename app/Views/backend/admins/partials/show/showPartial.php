@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="col-8 offset-2">
+    <div class="col-12 col-lg-8 offset-lg-2">
         <div class="card" id="show-wrapper">
 
             <!-- General Data -->

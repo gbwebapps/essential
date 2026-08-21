@@ -110,7 +110,7 @@ class SettingsController extends BackendController
 
             /* Generazione dinamica sicura del metodo di validazione dopo il controllo in whitelist */
             $method = $env . 'SettingsValidateRules';
-            $rules = $this->settingsModel->{$method}();
+            $rules = $this->settingsModel->{$method}($posts);
 
             if ( ! $this->validateData($posts, $rules)):
                 return $this->jsonResponse(['errors' => $this->validator->getErrors(), 'message' => lang('backend/settings.messages.validationErrors')]);

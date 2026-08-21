@@ -40,7 +40,7 @@ export class GroupsManager {
 
             const bodyContainer = subCollapse.querySelector('.template-container');
             if (bodyContainer) {
-                bodyContainer.innerHTML = ''; 
+                smoothReplace(bodyContainer, '');
             }
         });
 
@@ -338,17 +338,9 @@ export class GroupsManager {
 
         const groupId = btnEl.dataset.id;
         
+        /* Ricerca elementi DOM senza bloccare il flusso */
         const formEl = document.querySelector(`.edit-group-form[data-id="${groupId}"]`);
-        if ( ! formEl) {
-            this.isSubmitting = false;
-            return;
-        }
-        
-        const container = formEl.closest('.accordion-body .template-container');
-        if ( ! container) {
-            this.isSubmitting = false;
-            return;
-        }
+        const container = formEl ? formEl.closest('.accordion-body .template-container') : null;
 
         try {
             const formData = new FormData();
@@ -369,12 +361,12 @@ export class GroupsManager {
                 return;
             }
 
-            if (data.result === true && data.output) {
-                smoothReplace(container, data.output);
+            if (data.result === true && data.output && container) {
+                this.smoothReplace(container, data.output);
             }
 
         } catch (error) {
-            console.error("Errore durante il ripristino dei dati del gruppo:", error);
+            console.error("Errore:", error);
         } finally {
             this.isSubmitting = false;
         }
@@ -452,7 +444,7 @@ export class GroupsManager {
     resetAddContainer() {
         const container = document.getElementById('add-groups-container');
         if (container) {
-            container.innerHTML = '';
+            smoothReplace(container, '');
             this.isAddLoaded = false; 
         }
     }
@@ -485,7 +477,7 @@ export class GroupsManager {
     resetListContainer() {
         const container = document.getElementById('showAll-groups-container');
         if (container) {
-            container.innerHTML = ''; 
+            smoothReplace(container, ''); 
             this.isListLoaded = false; 
         }
     }
@@ -518,7 +510,7 @@ export class GroupsManager {
     resetExceptionsContainer() {
         const container = document.getElementById('exceptions-groups-container');
         if (container) {
-            container.innerHTML = '';
+            smoothReplace(container, '');
             this.isExceptionsLoaded = false; 
         }
     }
@@ -535,7 +527,7 @@ export class GroupsManager {
 
         /* Rimuove la griglia dei permessi appena si digitano caratteri */
         const permissionsGrid = document.getElementById('admin-permissions-container');
-        if (permissionsGrid) permissionsGrid.innerHTML = '';
+        if (permissionsGrid) smoothReplace(permissionsGrid, '');
 
         const query = inputEl.value.trim();
         const container = document.getElementById('dropdownAdmins');
@@ -543,7 +535,7 @@ export class GroupsManager {
 
         /* Se la query è inferiore a 3 caratteri svuotiamo il dropdown e ci fermiamo */
         if (query.length < 3) {
-            container.innerHTML = '';
+            smoothReplace(container, '');
             return;
         }
 
@@ -570,7 +562,7 @@ export class GroupsManager {
                 if (data.result === true && data.output) {
                     smoothReplace(container, data.output);
                 } else {
-                    container.innerHTML = '';
+                    smoothReplace(container, '');
                 }
             } catch (error) {
                 console.error("Errore durante la ricerca degli amministratori:", error);
@@ -593,7 +585,7 @@ export class GroupsManager {
 
         const dropdownContainer = document.getElementById('dropdownAdmins');
         if (dropdownContainer) {
-            dropdownContainer.innerHTML = '';
+            smoothReplace(dropdownContainer, '');
         }
 
         const permissionsContainer = document.getElementById('admin-permissions-container');
@@ -676,12 +668,9 @@ export class GroupsManager {
         this.isSubmitting = true;
 
         const adminUuid = btnEl.dataset.uuid;
-
+        
+        /* Ricerca del contenitore senza bloccare il flusso */
         const permissionsContainer = document.getElementById('admin-permissions-container');
-        if ( ! permissionsContainer) {
-            this.isSubmitting = false;
-            return;
-        }
 
         try {
             const formData = new FormData();
@@ -694,9 +683,18 @@ export class GroupsManager {
 
             const data = await response.json();
 
-            if (data.result === true && data.output) {
+            if (data.result === false) {
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+                return;
+            }
+
+            /* Esegue il rimpiazzo solo se il backend restituisce true e il contenitore esiste */
+            if (data.result === true && data.output && permissionsContainer) {
                 smoothReplace(permissionsContainer, data.output);
             }
+
         } catch (error) {
             console.error("Errore durante il ripristino delle eccezioni:", error);
         } finally {
@@ -718,9 +716,10 @@ export class GroupsManager {
 
         /* Svuotiamo dropdown e griglia permessi */
         const dropdownContainer = document.getElementById('dropdownAdmins');
-        if (dropdownContainer) dropdownContainer.innerHTML = '';
+        if (dropdownContainer) smoothReplace(dropdownContainer, '');
+
 
         const permissionsContainer = document.getElementById('admin-permissions-container');
-        if (permissionsContainer) permissionsContainer.innerHTML = '';
+        if (permissionsContainer) smoothReplace(permissionsContainer, '');
     }
 }

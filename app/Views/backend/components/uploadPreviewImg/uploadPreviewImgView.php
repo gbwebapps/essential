@@ -1,3 +1,20 @@
+<style>
+    .drop-zone-custom {
+        height: 4.5rem; 
+        border: 2px dashed #adb5bd; /* Grigio Bootstrap intermedio */
+        border-radius: 0.375rem; /* Bordo arrotondato standard Bootstrap */
+        background-color: #f8f9fa; /* Sfondo bg-light */
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+        cursor: pointer;
+    }
+
+    /* Attivata via JS quando il file è sopra l'area */
+    .drop-zone-custom.is-dragover {
+        background-color: #e9ecef;
+        border-color: #6c757d;
+    }
+</style>
+
 <!-- Definizione della variabile per capire se la vista è standalone o dentro un form -->
 <?php $saveImages = $saveImages ?? false; ?>
 
@@ -34,10 +51,20 @@
     
 </div>
 
-<div class="card-body"> 
+<div class="card-body pb-0"> 
     <div class="row">
         <div class="col-lg-12">
+            
+            <!-- 1. Area Drop Zone indipendente dal ciclo di vita delle anteprime -->
+            <div id="drop-zone-area" class="drop-zone-custom d-flex align-items-center justify-content-center p-3 mb-3 text-muted w-100">
+                <span class="fw-bold">
+                    <i class="fa-solid fa-cloud-arrow-up me-2"></i> Trascina le immagini per caricarle.
+                </span>
+            </div>
+
+            <!-- 2. Contenitore esclusivo per l'iniezione JS delle miniature -->
             <div id="previewImages" class="row justify-content-center align-items-center" data-required-text="<?= lang('backend/components/uploadPreviewImg.messages.notImagesSelected'); ?>"></div>
+            
         </div>
     </div>
 </div>

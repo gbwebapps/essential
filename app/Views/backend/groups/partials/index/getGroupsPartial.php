@@ -4,9 +4,11 @@
         <div class="accordion" id="groupsAccordion">
 
             <?php if ( ! empty($groups)): ?>
-                <?php foreach($groups as $group): ?>
+                <?php foreach($groups as $key => $group): ?>
 
-                    <div class="accordion-item mb-3 border">
+                    <?php $marginClass = ($key === array_key_last($groups)) ? '' : 'mb-3'; ?>
+
+                    <div class="accordion-item <?= $marginClass; ?> border">
                         <h2 class="accordion-header" id="heading_group_<?= $group->id; ?>">
                             <button class="accordion-button collapsed shadow-none bg-light text-secondary group-toggle-btn" 
                                     type="button" 

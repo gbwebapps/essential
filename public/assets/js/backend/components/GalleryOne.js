@@ -32,7 +32,7 @@ export class GalleryOneImgManager {
         e.preventDefault();
 
         const wrapper = btn.closest('.preview-item');
-        if (!wrapper) return;
+        if ( ! wrapper) return;
 
         const formData = new FormData();
         ['id', 'uuid', 'entity', 'context', 'filename'].forEach(key => {

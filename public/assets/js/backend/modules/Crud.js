@@ -212,7 +212,7 @@ export class ListManager {
                 const triggerSearch = () => {
                     if ( ! value) {
                         const errorDiv = document.querySelector(`.error_${this.config.controller}-${field.name}`);
-                        if (errorDiv) errorDiv.innerHTML = '&nbsp;';
+                        if (errorDiv) smoothReplace(errorDiv, '&nbsp;');
                     }
                     this.resetSortingAndPagination();
                     this.showAll();
@@ -287,7 +287,7 @@ export class ListManager {
             this.state[field.type][field.name] = '';
             
             const errorDiv = document.querySelector(`.error_${this.config.controller}-${field.name}`);
-            if (errorDiv) errorDiv.innerHTML = '&nbsp;';
+            smoothReplace(errorDiv, '&nbsp;');
         });
         
         this.updateActiveSearchIndicator();

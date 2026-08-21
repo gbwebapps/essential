@@ -648,7 +648,7 @@ export class SecurityManager {
                 const activeCard = radio.closest('.card');
                 if (activeCard) activeCard.classList.remove('opacity-50');
 
-                if (wrapper) wrapper.innerHTML = ''; 
+                if (wrapper) smoothReplace(wrapper, '');
                 
                 /* La chiamata è attualmente quella del TOTP, scalabile in futuro */
                 await this.requestTotpSetup(); 
@@ -666,7 +666,7 @@ export class SecurityManager {
             await this.saveBasicMethod(method);
 
             /* Aggiornamento interfaccia solo a salvataggio confermato */
-            if (wrapper) wrapper.innerHTML = '';
+            if (wrapper) smoothReplace(wrapper, '');
             radio.checked = true;
             this.updateVisualBorder(method);
             this.currentActiveMethod = method; 

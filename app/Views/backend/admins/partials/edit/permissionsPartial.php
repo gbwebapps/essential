@@ -1,8 +1,8 @@
-<div class="card-body">
+<div class="card-body pb-0">
 
-    <?php foreach($permissions as $permission): ?>
+    <?php foreach($permissions as $key => $permission): ?>
 
-        <div class="row mb-2 g-0 bg-light pt-2 ps-2 pe-2 border rounded-2">
+        <div class="row mb-2 g-0 bg-light pt-2 ps-2 pe-2 border rounded-1">
             <div class="col-6 text-start">
                 <h5><?= $permission['icon']; ?> <?= ucfirst($permission['title']); ?></h5>
             </div>
@@ -14,7 +14,10 @@
             </div>
         </div>
 
-        <div class="row mb-3">
+        <?php $marginClass = ($key === array_key_last($permissions)) ? '' : 'mb-3'; ?>
+
+            <div class="row <?= $marginClass; ?>">
+
             <div class="col-12">
                 <div class="row">
 
@@ -32,7 +35,7 @@
                             $isChecked = $isAdminActive ? 'checked' : ''; 
                         ?>
 
-                        <div class="col-3 text-center py-1">
+                        <div class="col-12 col-lg-3 text-center py-1">
                             <ul class="list-group list-group-flush border rounded-2">
                                 <li class="list-group-item" style="min-height: 75px;">
                                     <label for="exc_<?= $k; ?>" class="fw-bold text-dark d-block mb-1">

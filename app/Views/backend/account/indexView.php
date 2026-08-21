@@ -9,17 +9,19 @@
         <?php if ( ! empty($sections)): ?>
             <?php foreach ($sections as $key => $section): ?>
                 
-                <div class="<?= $section['class']; ?> mb-4">
+                <!-- Gestione griglia fissa nella vista: 1 colonna mobile, 2 tablet, 3 desktop -->
+                <div class="<?= $section['class']; ?>">
                     <a href="<?= base_url($section['route']); ?>" class="text-decoration-none text-reset">
                         
                         <div class="card h-100 bg-light text-secondary shadow-sm" id="<?= $key; ?>">
-                            <div class="card-body d-flex align-items-center justify-content-between p-4">
+                            <!-- Flexbox: colonna su mobile piccolo, riga da smartphone orizzontale in su -->
+                            <div class="card-body d-flex flex-column flex-sm-row align-items-center justify-content-center justify-content-sm-between p-4">
                                 
-                                <div class="lead">
-                                    <?= $section['icon_3x']; ?>
+                                <div class="lead mb-3 mb-sm-0">
+                                    <?= $section['icon_2x']; ?>
                                 </div>
                                 
-                                <div class="lead fw-bold">
+                                <div class="lead fw-bold text-center text-sm-end">
                                     <?= $section['title']; ?>
                                 </div>
                                 

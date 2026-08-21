@@ -52,7 +52,7 @@
                 </div>
 
                 <!-- Pulsanti -->
-                <div class="row mt-4">
+                <div class="row mt-lg-2">
                     <div class="col-12 d-flex align-middle justify-content-center">
                         <button type="button" class="btn btn-danger btn-sm me-2 btn-reset-tools" data-confirm="<?= lang('backend/tools.messages.areYouSureToResetData'); ?>">
                             <i class="fa-solid fa-refresh me-1"></i><?= lang('backend/tools.buttons.resetData'); ?>

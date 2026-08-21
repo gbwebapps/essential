@@ -155,7 +155,7 @@ class GroupsModel extends BackendModel
         return [
             'id' => [
                 'label' => lang('backend/groups.labels.id'),
-                'rules' => ['required', 'is_natural_no_zero', 'is_not_unique[admins_groups.id]'],
+                'rules' => ['is_not_unique[admins_groups.id]'],
             ],
             'name' => [
                 'label' => lang('backend/groups.labels.name'),
@@ -217,8 +217,8 @@ class GroupsModel extends BackendModel
                 'label' => lang('backend/groups.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'], 
                 'errors' => [
-                    'required' => lang('backend/groups.errors.uuid'), 
-                    'regex_match' => lang('backend/groups.errors.uuid') 
+                    'required' => lang('backend/groups.errors.wrongUUID'), 
+                    'regex_match' => lang('backend/groups.errors.wrongUUID') 
                 ]
             ],
             /* Validazione di ogni singolo elemento contenuto nell'array delle eccezioni */
@@ -249,8 +249,8 @@ class GroupsModel extends BackendModel
                 'label' => lang('backend/groups.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'], 
                 'errors' => [
-                    'required' => lang('backend/groups.errors.uuid'), 
-                    'regex_match' => lang('backend/groups.errors.uuid') 
+                    'required' => lang('backend/groups.errors.wrongUUID'), 
+                    'regex_match' => lang('backend/groups.errors.wrongUUID') 
                 ]
             ],
         ];

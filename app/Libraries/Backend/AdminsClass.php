@@ -38,15 +38,15 @@ class AdminsClass
 	 *
 	 * @return array
 	 */
-	public function getOptionsIndex(): array
-	{
-		return 
-		[
-		    ['label' => lang('backend/admins.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/admins.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/admins.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		];
-	}
+	// public function getOptionsIndex(): array
+	// {
+	// 	return 
+	// 	[
+	// 	    ['label' => lang('backend/admins.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/admins.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/admins.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	];
+	// }
 
 	/**
 	 * Genera l'elenco delle opzioni contestuali per la vista globale (showAll) degli amministratori.
@@ -56,15 +56,15 @@ class AdminsClass
 	 *
 	 * @return array
 	 */
-	public function getOptionsShowAll(): array
-	{
-		return 
-		[
-		    ['label' => lang('backend/admins.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/admins.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/admins.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		];
-	}
+	// public function getOptionsShowAll(): array
+	// {
+	// 	return 
+	// 	[
+	// 	    ['label' => lang('backend/admins.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/admins.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/admins.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	];
+	// }
 
 	/**
 	 * Genera l'elenco delle opzioni contestuali utilizzabili all'interno della vista di creazione (add).
@@ -74,15 +74,15 @@ class AdminsClass
 	 *
 	 * @return array
 	 */
-	public function getOptionsAdd(): array
-	{
-		return 
-		[
-		    ['label' => lang('backend/admins.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/admins.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/admins.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		];
-	}
+	// public function getOptionsAdd(): array
+	// {
+	// 	return 
+	// 	[
+	// 	    ['label' => lang('backend/admins.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/admins.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/admins.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	];
+	// }
 
 	/**
 	 * Genera l'elenco delle opzioni contestuali utilizzabili all'interno della vista di modifica (edit).
@@ -92,15 +92,15 @@ class AdminsClass
 	 *
 	 * @return array
 	 */
-	public function getOptionsEdit(): array
-	{
-		return 
-		[
-		    ['label' => lang('backend/admins.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/admins.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/admins.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		];
-	}
+	// public function getOptionsEdit(): array
+	// {
+	// 	return 
+	// 	[
+	// 	    ['label' => lang('backend/admins.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/admins.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/admins.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	];
+	// }
 
 	/**
 	 * Genera l'elenco delle opzioni contestuali per la vista di dettaglio singolo (show).
@@ -110,15 +110,15 @@ class AdminsClass
 	 *
 	 * @return array
 	 */
-	public function getOptionsShow(): array
-	{
-		return 
-		[
-		    ['label' => lang('backend/admins.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/admins.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/admins.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		];
-	}
+	// public function getOptionsShow(): array
+	// {
+	// 	return 
+	// 	[
+	// 	    ['label' => lang('backend/admins.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/admins.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/admins.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	];
+	// }
 
 	/* ------------------------------------------------------------------------------------------------- */
 
@@ -243,10 +243,8 @@ class AdminsClass
 	 *
 	 * @return array
 	 */
-	public function getCssShowAll(): array
-	{
-	    return [
-	        // ['id' => 'datatables-bs5-css', 'path' => 'assets/vendor/datatables/css/dataTables.bootstrap5.min.css', 'position' => 'before', 'target' => 'backend-css'],
-	    ];
-	}
+	// public function getCssShowAll(): array
+	// {
+	//     return [];
+	// }
 }

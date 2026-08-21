@@ -67,14 +67,14 @@ class AuthController extends BackendController
         $this->data['sections'] = [
             'login' => [
                 'title' => lang('backend/auth.titles.login'),
-                'class' => 'col-4',
-                'icon_3x' => '<i class="fa-solid fa-right-to-bracket fa-3x"></i>',
+                'class' => 'col-12 col-md-4',
+                'icon_2x' => '<i class="fa-solid fa-right-to-bracket fa-2x"></i>',
                 'route' => 'backend/auth/login',
             ],
             'recovery' => [
                 'title' => lang('backend/auth.titles.resetPassword'),
-                'class' => 'col-4',
-                'icon_3x' => '<i class="fa-solid fa-unlock fa-3x"></i>',
+                'class' => 'col-12 col-md-4',
+                'icon_2x' => '<i class="fa-solid fa-unlock fa-2x"></i>',
                 'route' => 'backend/auth/resetPassword',
             ],
         ];

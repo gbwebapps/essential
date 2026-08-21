@@ -63,51 +63,51 @@ class AccountController extends BackendController
         $this->data['sections'] = [
             'general' => [
                 'title' => lang('backend/account.leftMenu.general'),
-                'class' => 'col-4',
+                'class' => 'col-12 col-md-6 col-lg-4 mb-4',
                 'icon' => '<i class="fa-solid fa-id-card"></i>',
-                'icon_3x' => '<i class="fa-solid fa-id-card fa-3x"></i>',
+                'icon_2x' => '<i class="fa-solid fa-id-card fa-2x"></i>',
                 'route' => 'backend/account/general',
             ],
             'edit' => [
                 'title' => lang('backend/account.leftMenu.edit'),
-                'class' => 'col-4',
+                'class' => 'col-12 col-md-6 col-lg-4 mb-4',
                 'icon' => '<i class="fa-solid fa-user-edit"></i>',
-                'icon_3x' => '<i class="fa-solid fa-user-edit fa-3x"></i>',
+                'icon_2x' => '<i class="fa-solid fa-user-edit fa-2x"></i>',
                 'route' => 'backend/account/edit',
             ],
             'permissions' => [
                 'title' => lang('backend/account.leftMenu.permissions'),
-                'class' => 'col-4',
+                'class' => 'col-12 col-md-6 col-lg-4 mb-4',
                 'icon' => '<i class="fa-solid fa-check-circle"></i>',
-                'icon_3x' => '<i class="fa-solid fa-check-circle fa-3x"></i>',
+                'icon_2x' => '<i class="fa-solid fa-check-circle fa-2x"></i>',
                 'route' => 'backend/account/permissions',
             ],
              'images' => [
                 'title' => lang('backend/account.leftMenu.images'),
-                'class' => 'col-4',
+                'class' => 'col-12 col-md-6 col-lg-4 mb-4',
                 'icon' => '<i class="fa-solid fa-images"></i>',
-                'icon_3x' => '<i class="fa-solid fa-images fa-3x"></i>',
+                'icon_2x' => '<i class="fa-solid fa-images fa-2x"></i>',
                 'route' => 'backend/account/images',
             ], 
             'tokens' => [
                 'title' => lang('backend/account.leftMenu.tokens'),
-                'class' => 'col-4',
+                'class' => 'col-12 col-md-6 col-lg-4 mb-4',
                 'icon' => '<i class="fa-solid fa-chain"></i>',
-                'icon_3x' => '<i class="fa-solid fa-chain fa-3x"></i>',
+                'icon_2x' => '<i class="fa-solid fa-chain fa-2x"></i>',
                 'route' => 'backend/account/tokens',
             ],
             'resetPassword' => [
                 'title' => lang('backend/account.leftMenu.resetPassword'),
-                'class' => 'col-4',
+                'class' => 'col-12 col-md-6 col-lg-4 mb-4',
                 'icon' => '<i class="fa-solid fa-unlock"></i>',
-                'icon_3x' => '<i class="fa-solid fa-unlock fa-3x"></i>',
+                'icon_2x' => '<i class="fa-solid fa-unlock fa-2x"></i>',
                 'route' => 'backend/account/resetPassword',
             ],
             'security' => [
                 'title' => lang('backend/account.leftMenu.security'),
-                'class' => 'col-4',
+                'class' => 'col-12 col-md-6 col-lg-4 mb-4',
                 'icon' => '<i class="fa-solid fa-user-shield"></i>',
-                'icon_3x' => '<i class="fa-solid fa-user-shield fa-3x"></i>',
+                'icon_2x' => '<i class="fa-solid fa-user-shield fa-2x"></i>',
                 'route' => 'backend/account/security',
             ],
         ];
@@ -443,7 +443,7 @@ class AccountController extends BackendController
             $posts = array_intersect_key($this->request->getPost(), array_flip($allowedFields));
 
             if ( ! $this->validateData($posts, ['otp' => 'required|is_natural_no_zero|exact_length[6]'])) :
-                return $this->jsonResponse(['result'  => false, 'message' => lang('backend/account.messages.validationErrors')]);
+                return $this->jsonResponse(['result'  => false, 'message' => lang('backend/account.messages.missingCode')]);
             endif;
 
             /* Da qui in poi lavoriamo solo sul parametro sanificato e validato */

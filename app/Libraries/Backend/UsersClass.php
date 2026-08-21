@@ -39,15 +39,15 @@ class UsersClass
 	 *
 	 * @return array
 	 */
-	public function getOptionsIndex()
-	{
-		return 
-		[
-		    ['label' => lang('backend/users.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/users.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/users.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		];
-	}
+	// public function getOptionsIndex()
+	// {
+	// 	return 
+	// 	[
+	// 	    ['label' => lang('backend/users.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/users.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/users.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	];
+	// }
 
 	/**
 	 * Genera l'elenco delle opzioni contestuali per la griglia di visualizzazione globale (showAll) degli utenti.
@@ -57,15 +57,15 @@ class UsersClass
 	 *
 	 * @return array
 	 */
-	public function getOptionsShowAll()
-	{
-		return 
-		[
-		    ['label' => lang('backend/users.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/users.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/users.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		];
-	}
+	// public function getOptionsShowAll()
+	// {
+	// 	return 
+	// 	[
+	// 	    ['label' => lang('backend/users.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/users.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/users.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	];
+	// }
 
 	/**
 	 * Genera l'elenco delle opzioni contestuali utilizzabili durante la visualizzazione della scheda singola (show).
@@ -75,15 +75,15 @@ class UsersClass
 	 *
 	 * @return array
 	 */
-	public function getOptionsShow()
-	{
-		return 
-		[
-		    ['label' => lang('backend/users.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/users.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/users.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		];
-	}
+	// public function getOptionsShow()
+	// {
+	// 	return 
+	// 	[
+	// 	    ['label' => lang('backend/users.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/users.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/users.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	];
+	// }
 
 	/* ------------------------------------------------------------------------------------------------- */
 

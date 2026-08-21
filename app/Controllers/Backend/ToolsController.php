@@ -158,12 +158,11 @@ class ToolsController extends BackendController
 
             $ruleKey = is_array($table) ? 'table.*' : 'table';
             
-            $rules = [
-                $ruleKey => 'required|regex_match[/^[a-zA-Z0-9_]+$/]'
-            ];
+            $rules = [$ruleKey => 'required|regex_match[/^[a-zA-Z0-9_]+$/]'];
 
             if ( ! $this->validateData($this->request->getPost(), $rules)):
-                return $this->jsonResponse(['result' => false, 'message' => lang('backend/tools.messages.validationErrors')]);
+                $errorMessage = implode('<br>', $this->validator->getErrors());
+                return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/tools.messages.validateToastErrors'), $errorMessage)]);
             endif;
 
             $optimizationResult = $this->toolsModel->runOptimization($table);
@@ -190,9 +189,7 @@ class ToolsController extends BackendController
 
             $action = $this->request->getPost('action');
             
-            $rules = [
-                'action' => 'required|in_list[generateBackups,deleteBackups,downloadBackups]'
-            ];
+            $rules = ['action' => 'required|in_list[generateBackups,deleteBackups,downloadBackups]'];
 
             if ($action === 'deleteBackups' || $action === 'downloadBackups'):
                 $rules['filename'] = 'required|regex_match[/^[a-zA-Z0-9_\-\.]+$/]';
@@ -274,9 +271,7 @@ class ToolsController extends BackendController
             $folder = $this->request->getPost('folder');
             
             /* La regex consente lettere, numeri, underscore, trattini e lo slash per le sottocartelle */
-            $rules = [
-                'folder' => 'required|regex_match[/^[a-zA-Z0-9_\-\/]+$/]'
-            ];
+            $rules = ['folder' => 'required|regex_match[/^[a-zA-Z0-9_\-\/]+$/]'];
 
             if ( ! $this->validateData($this->request->getPost(), $rules)):
                 return $this->jsonResponse(['result' => false, 'message' => lang('backend/tools.messages.validationErrors')]);

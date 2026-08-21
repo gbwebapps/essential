@@ -39,15 +39,15 @@ class SettingsClass
 	 *
 	 * @return array
 	 */
-	public function getOptionsIndex()
-	{
-		return 
-		[
-		    ['label' => lang('backend/settings.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/settings.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/settings.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		];
-	}
+	// public function getOptionsIndex()
+	// {
+	// 	return 
+	// 	[
+	// 	    ['label' => lang('backend/settings.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/settings.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/settings.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	];
+	// }
 
 	/* ------------------------------------------------------------------------------------------------- */
 

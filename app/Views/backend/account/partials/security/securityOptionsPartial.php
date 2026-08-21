@@ -6,11 +6,14 @@
         </div>
     </div>
 
-    <div class="row">
+    <!-- Aggiunto gy-3 per gestire lo spazio verticale automatico solo quando vanno a capo -->
+    <div class="row gy-3">
 
         <?php foreach (setting('Backend\Auth')->twoFactorMethods as $method) : ?>
-            <div class="col-12 col-md-4">
-                <div class="card h-100 border <?php if ($activeMethod === $method) : ?>border-primary bg-light<?php endif; ?>">
+            
+            <!-- Rimossa la classe mb-3 fissa, ora gestita dalla row -->
+            <div class="col-12 col-lg-4">
+                <div class="card h-100 border <?= ($activeMethod === $method) ? 'border-primary bg-light' : ''; ?>">
                     <div class="card-body d-flex align-items-start p-3">
                         <div class="form-check w-100 m-0">
                             <input class="form-check-input twofactor-method-trigger" 
@@ -20,7 +23,7 @@
                                    value="<?= esc($method); ?>" 
                                    data-message="<?= lang('backend/account.messages.areYouSureChangeMethod'); ?>" 
                                    data-requires-setup="<?= ($method === 'totp') ? 'true' : 'false'; ?>"
-                                   <?php if ($activeMethod === $method) : ?>checked<?php endif; ?>>
+                                   <?= ($activeMethod === $method) ? 'checked' : ''; ?>>
                             <label class="form-check-label d-block ms-2 cursor-pointer" for="method-<?= esc($method); ?>">
                                 <span class="d-block fw-bold mb-1">
                                     <?php if ($method === 'email') : ?>
@@ -36,10 +39,11 @@
                     </div>
                 </div>
             </div>
+            
         <?php endforeach; ?>
 
     </div>
 
-    <div id="totp-setup-wrapper" class="mt-4"></div>
+    <div id="totp-setup-wrapper"></div>
 
 </div>

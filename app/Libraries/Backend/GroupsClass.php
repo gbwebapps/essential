@@ -39,15 +39,15 @@ class GroupsClass
 	 *
 	 * @return array
 	 */
-	public function getOptionsIndex()
-	{
-		return 
-		[
-		    ['label' => lang('backend/groups.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/groups.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/groups.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		];
-	}
+	// public function getOptionsIndex()
+	// {
+	// 	return 
+	// 	[
+	// 	    ['label' => lang('backend/groups.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/groups.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/groups.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	];
+	// }
 
 	/* ------------------------------------------------------------------------------------------------- */
 

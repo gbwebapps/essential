@@ -366,13 +366,25 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 @media (max-width: 767px) {
+    
     .bar-link {
         padding: .25rem;
-        width: 100%;
         background-color: #6c757d;
         color: #fff !important;
         text-align: center;
         border-radius: .25rem;
+    }
+
+    .bar-link[data-trash-filter] {
+        background-color: #0d6efd; /* Colore primary di Bootstrap */
+    }
+
+    .bar-link[data-trash-filter].active {
+        background-color: #198754; /* Colore success di Bootstrap */
+    }
+
+    #link-search.text-danger {
+        background-color: #dc3545; /* Colore danger di Bootstrap */
     }
 
     .bar {
@@ -380,6 +392,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
         padding: 0;
         margin-bottom: 1rem;
         border: 0;
+        box-shadow: none;
     }
 
     .bar-item {
@@ -391,7 +404,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     }
 
     /* solo le bar_item che NON sono l’ultima hanno margin-bottom */
-    .bar .row > div:not(:last-child) .bar_item {
+    .bar .row > div:not(:last-child) .bar-item {
         margin-bottom: .25rem;
     }
 
@@ -399,6 +412,12 @@ input[type="time"]::-webkit-calendar-picker-indicator {
         display: inline-block;
         width: 100%;
         height: 100%;
+    }
+
+    .dropdown-mobile-center {
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        top: 100% !important; 
     }
 }
 

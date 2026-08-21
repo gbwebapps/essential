@@ -25,7 +25,7 @@
                             <!-- End Select per il numero delle righe da mostrare -->
 
                             <div class="col-12 col-md-11">
-                                <div class="pt-2 d-flex flex-column flex-md-row align-items-center justify-content-md-end">
+                                <div class="pt-2 d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-md-end">
 
                                     <!-- Apertura/chiusura parte filtri -->
                                     <a href="#" id="link-search"
@@ -51,7 +51,7 @@
                                     <!-- End Reset solo ordinamento -->
 
                                     <!-- Semplice ricarica lista -->
-                                    <a href="#" id="refresh-list" class="mb-md-0 ms-0 mx-md-2 bar-link">
+                                    <a href="#" id="refresh-list" class="mb-2 mb-md-0 mx-0 mx-md-2 bar-link">
                                         <i class="fa-solid fa-arrows-rotate"></i> <?= lang('backend/tokens.links.reloadList'); ?>
                                     </a>
                                     <!-- End Semplice ricarica lista -->

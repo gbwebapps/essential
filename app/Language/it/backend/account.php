@@ -61,8 +61,9 @@ return [
 		'refreshData' => 'Ricarica dati', 
 		'reload' => 'Ricarica pannello', 
 		'resetPassword' => 'Procedi al reset della password',
-		'verifyAndActivate'  => 'Verifica e attiva', 
-		'undoAndClose' => 'Annulla e chiudi'
+		'verifyAndActivate' => 'Verifica e attiva', 
+		'undoClose' => 'Chiudi configurazione ed esci', 
+		'delete' => 'Elimina'
 	], 
 	'errors' => [
 		'id' => 'ID non conforme.', 
@@ -88,7 +89,8 @@ return [
 		'updateSecuritySettingsSuccess' => 'Impostazioni di sicurezza aggiornate con successo.', 
 		'configurationInitializeError' => 'Impossibile inizializzare la configurazione TOTP.', 
 		'noConfigurationSession' => 'Nessuna sessione di configurazione TOTP attiva o scaduta.', 
-		'wrongCode' => 'Il codice inserito non è valido. Riprova.', 
+		'wrongCode' => 'Il codice inserito non è valido.', 
+		'missingCode' => 'Inserire il codice.', 
 		'totpActivationNotPossible' => 'Impossibile attivare l\'autenticazione TOTP.', 
 		'totpConfigurationSuccess' => 'L\'applicazione di autenticazione è stata configurata con successo.', 
 		'areYouSureChangeMethod' => 'Sei sicuro di voler cambiare il metodo del secondo fattore di autenticazione?'

@@ -1,8 +1,8 @@
-<div class="card-body">
+<div class="card-body pb-0">
 
     <!-- Nome e Cognome -->
     <div class="row">
-        <div class="col-6">
+        <div class="col-12 col-lg-6">
             <div class="mb-2">
                 <label for="firstname" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.firstname'); ?></label>
                 <input type="text" id="firstname" name="firstname" value="<?= esc($admin->firstname); ?>" class="form-control" placeholder="<?= lang('backend/admins.placeholders.firstname'); ?>">
@@ -10,7 +10,7 @@
                 <div class="error_firstname text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
             </div>
         </div>
-        <div class="col-6">
+        <div class="col-12 col-lg-6">
             <div class="mb-2">
                 <label for="lastname" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.lastname'); ?></label>
                 <input type="text" id="lastname" name="lastname" value="<?= esc($admin->lastname); ?>" class="form-control" placeholder="<?= lang('backend/admins.placeholders.lastname'); ?>">
@@ -22,14 +22,14 @@
 
     <!-- Email e Telefono -->
     <div class="row">
-        <div class="col-6">
+        <div class="col-12 col-lg-6">
             <div class="mb-2">
                 <label for="email" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.email'); ?></label>
                 <input type="text" id="email" name="email" value="<?= esc($admin->email); ?>" class="form-control" placeholder="<?= lang('backend/admins.placeholders.email'); ?>">
                 <div class="error_email text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
             </div>
         </div>
-        <div class="col-6">
+        <div class="col-12 col-lg-6">
             <div class="mb-2">
                 <label for="phone" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.phone'); ?></label>
                 <input type="text" id="phone" name="phone" value="<?= esc($admin->phone); ?>" class="form-control" placeholder="<?= lang('backend/admins.placeholders.phone'); ?>">
@@ -41,7 +41,7 @@
 
     <!-- Gruppo e Stato Attivazione -->
     <div class="row">
-        <div class="col-6">
+        <div class="col-12 col-lg-6">
             <div class="mb-2">
                 <label for="group_id" class="form-label">
                     <i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.group'); ?>
@@ -56,7 +56,7 @@
                 <div class="error_group_id text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
             </div>
         </div>
-        <div class="col-6">
+        <div class="col-12 col-lg-6">
             <div class="mb-2">
                 <label for="status" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.status'); ?></label>
                 <select name="status" class="form-select" id="status">

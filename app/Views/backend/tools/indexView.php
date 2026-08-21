@@ -2,7 +2,7 @@
 
 <?= $this->section('content') ?>
 
-    <div class="container">
+    <div class="container-fluid container-lg px-0">
         <div class="row g-0">
             <div class="col-12">
                 
@@ -31,6 +31,7 @@
                                 </button>
                             </h2>
                             <div id="main_collapse_<?= $env; ?>" class="accordion-collapse collapse" aria-labelledby="main_heading_<?= $env; ?>" data-bs-parent="#mainToolsDashboard">
+                                <!-- Rimosse le classi px-1 px-md-3 -->
                                 <div id="<?= $env; ?>-tools-container" class="accordion-body bg-white border-top mb-0"></div>
                             </div>
                         </div>

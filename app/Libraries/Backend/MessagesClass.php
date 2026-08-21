@@ -39,15 +39,15 @@ class MessagesClass
 	 *
 	 * @return array
 	 */
-	public function getOptionsIndex()
-	{
-		return 
-		[
-		    ['label' => lang('backend/messages.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/messages.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/messages.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		];
-	}
+	// public function getOptionsIndex()
+	// {
+	// 	return 
+	// 	[
+	// 	    ['label' => lang('backend/messages.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/messages.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/messages.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	];
+	// }
 
 	/**
 	 * Genera l'elenco delle opzioni contestuali per l'elenco globale e tabellare (showAll) dei messaggi.
@@ -57,15 +57,15 @@ class MessagesClass
 	 *
 	 * @return array
 	 */
-	public function getOptionsShowAll()
-	{
-		return 
-		[
-		    ['label' => lang('backend/messages.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/messages.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/messages.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		];
-	}
+	// public function getOptionsShowAll()
+	// {
+	// 	return 
+	// 	[
+	// 	    ['label' => lang('backend/messages.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/messages.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/messages.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	];
+	// }
 
 	/**
 	 * Genera l'elenco delle opzioni contestuali utilizzabili durante la visualizzazione di una singola comunicazione (show).
@@ -75,15 +75,15 @@ class MessagesClass
 	 *
 	 * @return array
 	 */
-	public function getOptionsShow()
-	{
-		return 
-		[
-		    ['label' => lang('backend/messages.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/messages.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		    ['label' => lang('backend/messages.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
-		];
-	}
+	// public function getOptionsShow()
+	// {
+	// 	return 
+	// 	[
+	// 	    ['label' => lang('backend/messages.options.first'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/messages.options.second'), 'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	    ['label' => lang('backend/messages.options.thirst'),  'route' => '#', 'icon' => '', 'class' => '', 'id' => ''],
+	// 	];
+	// }
 
 	/* ------------------------------------------------------------------------------------------------- */
 

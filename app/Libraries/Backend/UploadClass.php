@@ -5,7 +5,7 @@ namespace App\Libraries\Backend;
 use CodeIgniter\Config\BaseConfig;
 use CodeIgniter\HTTP\Files\UploadedFile;
 
-class Upload
+class UploadClass
 {
     /**
      * @var object

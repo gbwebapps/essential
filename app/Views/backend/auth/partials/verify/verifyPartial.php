@@ -1,5 +1,6 @@
 <div class="row">
-    <div class="col-4 offset-4">
+    <!-- col-12 per mobile, col-sm-8 per tablet portrait piccolo, col-md-6 per tablet, col-lg-4 per desktop -->
+    <div class="col-12 col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
 
         <form id="verify_form">
 

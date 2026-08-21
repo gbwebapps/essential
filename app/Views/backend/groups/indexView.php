@@ -2,7 +2,7 @@
 
 <?= $this->section('content') ?>
 
-    <div class="container">
+    <div class="container-fluid container-lg px-0">
         <div class="row g-0">
             <div class="col-12">
 

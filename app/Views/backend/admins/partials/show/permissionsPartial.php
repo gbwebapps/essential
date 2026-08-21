@@ -1,6 +1,6 @@
 <div class="card-body">
 
-    <?php foreach($permissions as $permission): ?>
+    <?php foreach($permissions as $key => $permission): ?>
 
         <div class="row mb-2 g-0 bg-light pt-2 ps-2 pe-2 border rounded-1">
             <div class="col-6 text-start">
@@ -9,7 +9,10 @@
             <div class="col-6 text-end"></div>
         </div>
 
-        <div class="row mb-3">
+        <?php $marginClass = ($key === array_key_last($permissions)) ? '' : 'mb-3'; ?>
+
+            <div class="row <?= $marginClass; ?>">
+
             <div class="col-12">
                 <div class="row">
 
@@ -39,7 +42,7 @@
                             endif;
                         ?>
 
-                        <div class="col-3 text-center py-1">
+                        <div class="col-12 col-lg-3 text-center py-1">
                             <ul class="list-group list-group-flush border rounded-2">
                                 <li class="list-group-item" style="min-height: 75px;">
                                     <label class="fw-bold text-dark d-block mb-1">

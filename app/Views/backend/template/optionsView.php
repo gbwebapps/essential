@@ -7,7 +7,7 @@
         </button>
         
         <!-- Menu a comparsa allineato alla fine del contenitore -->
-        <ul class="dropdown-menu dropdown-menu-end">
+        <ul class="dropdown-menu dropdown-menu-md-end dropdown-mobile-center">
             <?php 
                 /* Calcolo del totale per la gestione dei separatori visivi */
                 $totalItems = count($options); 

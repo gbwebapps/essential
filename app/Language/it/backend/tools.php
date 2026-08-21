@@ -79,6 +79,7 @@ return [
 		'deleteSuccess' => 'Eliminazione audits avvenuta con successo.', 
 		'startDateAfterEndDate' => 'La data di inizio non può essere antecedente a quella di fine.', 
 		'validationErrors' => 'Errori di validazione.', 
+		'validateToastErrors' => '%s',
 		'optimizeSuccess' => 'La tabella è stata ottimizzata con successo.', 
 		'optimizeAllSuccess' => 'Il database è stato ottimizzato con successo.', 
 		'optimizeError' => 'L\'ottimizzazione non è andata a buon fine.', 

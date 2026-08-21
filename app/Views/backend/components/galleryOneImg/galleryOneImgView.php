@@ -3,7 +3,7 @@
         <div class="row" id="galleryOneImg-container-<?= esc($uuid); ?>">
             <?php if ( ! empty($images) && is_array($images)): ?>
                 <?php foreach ($images as $img): ?>
-                    <div class="col-sm-6 col-md-4 col-lg-3 mb-3 text-center">
+                    <div class="col-6 col-lg-3 mb-3 text-center">
 
                         <?php $bg = ((int) $img['is_cover'] === 1) ? 'bg-success' : 'bg-white'; ?>
 
@@ -74,7 +74,7 @@
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <div class="col-12 text-center text-danger fw-bold py-3">
+                <div class="col-12 text-center fw-bold">
                     <?= lang('backend/components/galleryOneImg.labels.noImagesFound'); ?>
                 </div>
             <?php endif; ?>

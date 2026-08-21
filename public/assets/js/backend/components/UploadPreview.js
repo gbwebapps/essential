@@ -8,7 +8,10 @@ export class UploadPreviewImgManager {
         this.inputSelector = '#inputImages';
         this.previewSelector = '#previewImages';
         this.triggerSelector = '#buttonImages';
+        this.dropZoneSelector = '#drop-zone-area';
+
         this.galleryOneImgManager = galleryOneImgManager;
+
         this.files = []; 
 
         /* Variabili di stato coerenti con l'architettura dei tuoi Manager */
@@ -20,7 +23,7 @@ export class UploadPreviewImgManager {
 
     /* Animazione ingresso miniatura */
     smoothAdd(container, element) {
-        if (!container || !element) return;
+        if ( ! container || !element) return;
         element.style.opacity = 0;
         element.style.transform = 'scale(0.95)';
         element.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
@@ -33,7 +36,7 @@ export class UploadPreviewImgManager {
 
     /* Animazione uscita miniatura */
     smoothRemove(element) {
-        if (!element) return;
+        if ( ! element) return;
         element.style.height = element.offsetHeight + 'px';
         element.style.overflow = 'hidden';
         element.style.transition = 'opacity 0.2s ease, transform 0.2s ease, height 0.2s ease, margin 0.2s ease, padding 0.2s ease';
@@ -60,10 +63,14 @@ export class UploadPreviewImgManager {
 
     /* DELEGAZIONE DEGLI EVENTI: Listener unici sul document */
     bindEvents() {
-        /* 1. Click sul pulsante Scegli Immagini */
+
+        /* 1. Click sul pulsante Scegli Immagini OPPURE sull'area Drop Zone */
         document.addEventListener('click', e => {
             const btn = e.target.closest(this.triggerSelector);
-            if (!btn) return;
+            const dropZone = e.target.closest(this.dropZoneSelector);
+            
+            /* Se il click non è né sul pulsante né sull'area drop, esce */
+            if ( ! btn && ! dropZone) return;
             
             const input = document.querySelector(this.inputSelector);
             if (input) input.click();
@@ -71,7 +78,7 @@ export class UploadPreviewImgManager {
 
         /* 2. Cambio stato dell'input file (Selezione immagini) */
         document.addEventListener('change', e => {
-            if (!e.target.matches(this.inputSelector)) return;
+            if ( ! e.target.matches(this.inputSelector)) return;
 
             const newFiles = Array.from(e.target.files);
             newFiles.forEach(fileBlob => {
@@ -85,11 +92,11 @@ export class UploadPreviewImgManager {
         /* 3. Rimozione della miniatura */
         document.addEventListener('click', e => {
             const removeBtn = e.target.closest('.remove-preview');
-            if (!removeBtn) return;
+            if ( ! removeBtn) return;
 
             /* Sicurezza: verifichiamo che il pulsante appartenga al nostro contenitore attivo */
             const previewContainer = document.querySelector(this.previewSelector);
-            if (!previewContainer || !previewContainer.contains(removeBtn)) return;
+            if ( ! previewContainer || !previewContainer.contains(removeBtn)) return;
 
             const id = removeBtn.dataset.id;
             this.files = this.files.filter(f => f.id !== id);
@@ -98,7 +105,7 @@ export class UploadPreviewImgManager {
 
         /* 4. Submit del Form "Salva Immagini" autonomo */
         document.addEventListener('submit', async e => {
-            if (!e.target.matches('#saveImages')) return;
+            if ( ! e.target.matches('#saveImages')) return;
 
             e.preventDefault();
 
@@ -113,12 +120,47 @@ export class UploadPreviewImgManager {
                 this.isSubmitting = false;
             }
         });
+
+        /* 5. Effetti visivi Drag & Drop */
+        document.addEventListener('dragover', e => {
+            e.preventDefault(); 
+            const dropZone = e.target.closest(this.dropZoneSelector);
+            if (dropZone) {
+                dropZone.classList.add('is-dragover');
+            }
+        });
+
+        document.addEventListener('dragleave', e => {
+            e.preventDefault();
+            const dropZone = e.target.closest(this.dropZoneSelector);
+            if (dropZone) {
+                dropZone.classList.remove('is-dragover');
+            }
+        });
+
+        /* 6. Gestione del rilascio file (Drop) */
+        document.addEventListener('drop', e => {
+            e.preventDefault(); 
+            const dropZone = e.target.closest(this.dropZoneSelector);
+            
+            if (dropZone) {
+                dropZone.classList.remove('is-dragover');
+                
+                /* Estrae i file e li passa alla funzione esistente per creare l'anteprima */
+                const newFiles = Array.from(e.dataTransfer.files);
+                newFiles.forEach(fileBlob => {
+                    if (fileBlob.type.startsWith('image/')) {
+                        this.addPreview(fileBlob);
+                    }
+                });
+            }
+        });
     }
 
     /* Generazione anteprima locale */
     addPreview(fileBlob, existingId = null) {
         const id = existingId || (Date.now().toString(36) + Math.random().toString(36).slice(2, 7));
-        if (!existingId) {
+        if ( ! existingId) {
             this.files.push({ id, file: fileBlob });
         }
 
@@ -146,7 +188,7 @@ export class UploadPreviewImgManager {
 
     removePreview(id) {
         const previewContainer = document.querySelector(this.previewSelector);
-        if (!previewContainer) return;
+        if ( ! previewContainer) return;
 
         const el = previewContainer.querySelector(`[data-id="${id}"]`);
         if (el) {
@@ -157,10 +199,10 @@ export class UploadPreviewImgManager {
 
     getRow() {
         const previewContainer = document.querySelector(this.previewSelector);
-        if (!previewContainer) return null;
+        if ( ! previewContainer) return null;
 
         let row = previewContainer.querySelector('.row');
-        if (!row) {
+        if ( ! row) {
             row = document.createElement('div');
             row.className = 'row';
             previewContainer.innerHTML = '';
@@ -174,7 +216,7 @@ export class UploadPreviewImgManager {
         this.files = [];
         const previewContainer = document.querySelector(this.previewSelector);
         if (previewContainer) {
-            previewContainer.innerHTML = ''; /* Collassa istantaneamente lo spazio a zero */
+            previewContainer.innerHTML = '';
         }
     }
 

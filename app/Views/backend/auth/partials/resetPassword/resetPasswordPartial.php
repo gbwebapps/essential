@@ -1,5 +1,6 @@
 <div class="row">
-    <div class="col-4 offset-4">
+    <!-- Aggiunto col-sm-8 e offset-sm-2 per coprire i tablet in portrait sotto i 768px. Su md passa a 6 colonne. -->
+    <div class="col-12 col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
 
         <form id="reset_password_form">
 

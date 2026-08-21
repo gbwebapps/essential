@@ -358,7 +358,7 @@ export class ToolsManager {
                 this.destroyDatePickers();
             }
 
-            container.innerHTML = '';
+            smoothReplace(container, '');
         }
     }
 
@@ -425,16 +425,17 @@ export class ToolsManager {
                         const row = document.querySelector(`li[data-table="${table.name}"]`);
                         
                         if (row) {
-                            /* Cerca il div con la classe text-muted invece del tag small */
+                            /* Cerca il div con la classe text-muted */
                             const dataContainer = row.querySelector('.text-muted.d-flex');
                             
-                            if (dataContainer) {
-                                dataContainer.innerHTML = `
-                                    <span class="me-3"><i class="fa-solid fa-list me-2"></i>${langRows.replace('%d', table.rows)}</span>
-                                    <span class="me-3"><i class="fa-solid fa-hard-drive me-2"></i>${langTotalSpace.replace('%s', table.size.toFixed(2))}</span>
-                                    <span class="text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>${langOverhead.replace('%s', table.overhead.toFixed(2))}</span>
-                                `;
-                            }
+                           if (dataContainer) {
+                               const htmlContent = `
+                                   <span class="mb-2 mb-lg-0"><i class="fa-solid fa-list me-2"></i>${langRows.replace('%d', table.rows)}</span>
+                                   <span class="mb-2 mb-lg-0"><i class="fa-solid fa-hard-drive me-2"></i>${langTotalSpace.replace('%s', table.size.toFixed(2))}</span>
+                                   <span class="text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>${langOverhead.replace('%s', table.overhead.toFixed(2))}</span>
+                               `;
+                               smoothReplace(dataContainer, htmlContent);
+                           }
                         }
 
                         /* 2. Raccoglie i dati per il totale globale */
@@ -446,10 +447,12 @@ export class ToolsManager {
                     if (tables.length > 1) {
                         const headerSmall = document.querySelector('.text-muted.infoDb');
                         if (headerSmall) {
-                            headerSmall.innerHTML = `
-                                <span class="me-3"><i class="fa-solid fa-hard-drive me-2"></i>${langTotalSpace.replace('%s', totalSize.toFixed(2))}</span>
+                            /* INIETTA LE NUOVE CLASSI RESPONSIVE: mb-2 mb-lg-0 me-lg-4 */
+                            const htmlHeader = `
+                                <span class="mb-2 mb-lg-0 me-lg-4"><i class="fa-solid fa-hard-drive me-2"></i>${langTotalSpace.replace('%s', totalSize.toFixed(2))}</span>
                                 <span class="text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>${langOverhead.replace('%s', totalOverhead.toFixed(2))}</span>
                             `;
+                            smoothReplace(headerSmall, htmlHeader);
                         }
                     }
 

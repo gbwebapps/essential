@@ -19,7 +19,7 @@
                             dell'ultimo record in una pagina che non è la prima, la visualizzazione rimanga bloccata e non passi alla pagina successiva. -->
                             <div id="lastItemPage" data-lastitempage="<?= $data['lastItemPage']; ?>"></div>
 
-                            <table class="table table-condensed mb-0">
+                            <table class="table table-condensed mb-0 text-nowrap">
                                 <thead>
                                     <tr class="sorting">
 
@@ -266,7 +266,7 @@
 
             <!-- ...altrimenti visualizzo messaggio adeguato. -->
             <?php else: ?>
-                <div class="text-center text-danger py-3 fw-bold"><?= lang('backend/admins.messages.noAdminsFound'); ?></div>
+                <div class="text-center py-3 fw-bold"><?= lang('backend/admins.messages.noAdminsFound'); ?></div>
             <?php endif; ?>
         </div>
     </div>

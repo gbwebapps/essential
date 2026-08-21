@@ -100,7 +100,7 @@ class SettingsModel extends BackendModel
      *
      * @return array
      */
-    public function authSettingsValidateRules(): array
+    public function authSettingsValidateRules(array $posts = []): array
     {
         return [
             'attempts' => [
@@ -129,7 +129,7 @@ class SettingsModel extends BackendModel
             ],
             'twoFactorIssuer' => [
                 'label' => lang('backend/settings.labels.twoFactorIssuer'),
-                'rules' => ['required', 'string', 'max_length[255]'],
+                'rules' => ['required', 'trim', 'max_length[255]', 'regex_match[/^[a-zA-Z0-9\s\-_.]+$/]'],
             ],
             'twoFactorDigits' => [
                 'label' => lang('backend/settings.labels.twoFactorDigits'),
@@ -167,7 +167,7 @@ class SettingsModel extends BackendModel
      *
      * @return array
      */
-    public function uploadSettingsValidateRules(): array
+    public function uploadSettingsValidateRules(array $posts = []): array
     {
         return [
             'renameImages' => [
@@ -226,8 +226,11 @@ class SettingsModel extends BackendModel
      *
      * @return array
      */
-    public function emailSettingsValidateRules(): array
+    public function emailSettingsValidateRules(array $posts = []): array
     {
+        /* Verifichiamo se il protocollo inviato dal form è smtp */
+        $isSmtp = (isset($posts['protocol']) && $posts['protocol'] === 'smtp');
+
         return [
             'fromEmail' => [
                 'label' => lang('backend/settings.labels.fromEmail'),
@@ -235,7 +238,7 @@ class SettingsModel extends BackendModel
             ],
             'fromName' => [
                 'label' => lang('backend/settings.labels.fromName'),
-                'rules' => ['required', 'max_length[255]'],
+                'rules' => ['required', 'trim', 'max_length[255]', 'regex_match[/^[a-zA-Z0-9\s\-_.]+$/]'],
             ],
             'recipients' => [
                 'label' => lang('backend/settings.labels.recipients'),
@@ -243,31 +246,32 @@ class SettingsModel extends BackendModel
             ],
             'protocol' => [
                 'label' => lang('backend/settings.labels.protocol'),
-                'rules' => ['required', 'in_list[smtp,mail,sendmail]'],
+                'rules' => ['required', 'in_list[smtp,mail,sendemail]'],
             ],
             'SMTPHost' => [
                 'label' => lang('backend/settings.labels.SMTPHost'),
-                'rules' => ['required_if_field[protocol,smtp]', 'permit_empty', 'regex_match[/^[a-zA-Z0-9.-]+$/]', 'max_length[255]'],
+                /* Se è smtp forziamo required, altrimenti permit_empty */
+                'rules' => [$isSmtp ? 'required' : 'permit_empty', 'regex_match[/^[a-zA-Z0-9.-]+$/]', 'max_length[255]'],
             ],
             'SMTPPort' => [
                 'label' => lang('backend/settings.labels.SMTPPort'),
-                'rules' => ['required_if_field[protocol,smtp]', 'permit_empty', 'is_natural_no_zero', 'less_than_equal_to[65535]'],
+                'rules' => [$isSmtp ? 'required' : 'permit_empty', 'is_natural_no_zero', 'less_than_equal_to[65535]'],
             ],
             'SMTPCrypto' => [
                 'label' => lang('backend/settings.labels.SMTPCrypto'),
-                'rules' => ['required_if_field[protocol,smtp]', 'permit_empty', 'in_list[none,tls,ssl]'],
+                'rules' => [$isSmtp ? 'required' : 'permit_empty', 'in_list[none,tls,ssl]'],
             ],
             'SMTPUser' => [
                 'label' => lang('backend/settings.labels.SMTPUser'),
-                'rules' => ['permit_empty', 'max_length[255]'],
+                'rules' => ['permit_empty', 'max_length[255]', 'regex_match[/^[a-zA-Z0-9@.\-_]+$/]'],
             ],
             'SMTPPass' => [
                 'label' => lang('backend/settings.labels.SMTPPass'),
-                'rules' => ['permit_empty', 'max_length[255]'],
+                'rules' => ['permit_empty', 'max_length[255]', 'regex_match[/^[^<>]+$/]'],
             ],
             'SMTPAuthMethod' => [
                 'label' => lang('backend/settings.labels.SMTPAuthMethod'),
-                'rules' => ['required_if_field[protocol,smtp]', 'permit_empty', 'in_list[LOGIN,PLAIN]'],
+                'rules' => [$isSmtp ? 'required' : 'permit_empty', 'in_list[LOGIN,PLAIN]'],
             ],
             'mailType' => [
                 'label' => lang('backend/settings.labels.mailType'),
@@ -275,7 +279,7 @@ class SettingsModel extends BackendModel
             ],
             'charset' => [
                 'label' => lang('backend/settings.labels.charset'),
-                'rules' => ['required', 'max_length[30]'],
+                'rules' => ['required', 'max_length[30]', 'regex_match[/^[a-zA-Z0-9\-]+$/]'],
             ],
             'priority' => [
                 'label' => lang('backend/settings.labels.priority'),
@@ -284,7 +288,7 @@ class SettingsModel extends BackendModel
         ];
     }
 
-    public function generalSettingsValidateRules(): array
+    public function generalSettingsValidateRules(array $posts = []): array
     {
         return [
             'timezone' => [

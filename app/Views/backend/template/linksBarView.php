@@ -9,7 +9,7 @@
                     <!-- Ciclo per generare dinamicamente i collegamenti della barra -->
                     <?php foreach($linksBar as $link): ?>
 
-                        <div class="col-3">
+                        <div class="col-12 col-lg-3">
 
                             <?php /* Controllo per evitare il rendering di elementi vuoti */ ?>
                             <?php if( ! empty($link)): ?>

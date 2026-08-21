@@ -2,13 +2,13 @@
     <div class="row mb-3">
 
         <!-- Campo nome e cognome -->
-        <div class="col-6 ">
+        <div class="col-12 col-lg-6">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item"><i class="fa-solid fa-arrow-circle-down"></i><?= lang('backend/admins.labels.firstname'); ?></li>
                 <li class="list-group-item fw-bold"><?= esc($admin->firstname); ?></li>
             </ul>
         </div>
-        <div class="col-6">
+        <div class="col-12 col-lg-6">
             <!-- Campo lastname -->
             <ul class="list-group list-group-flush">
                 <li class="list-group-item"><i class="fa-solid fa-arrow-circle-down"></i><?= lang('backend/admins.labels.lastname'); ?></li>
@@ -21,13 +21,13 @@
     <div class="row mb-3">
 
         <!-- Campo email e telefono -->
-        <div class="col-6">
+        <div class="col-12 col-lg-6">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item"><i class="fa-solid fa-arrow-circle-down"></i><?= lang('backend/admins.labels.email'); ?></li>
                 <li class="list-group-item fw-bold"><?= esc($admin->email); ?></li>
             </ul>
         </div>
-        <div class="col-6">
+        <div class="col-12 col-lg-6">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item"><i class="fa-solid fa-arrow-circle-down"></i><?= lang('backend/admins.labels.phone'); ?></li>
                 <li class="list-group-item fw-bold"><?= esc($admin->phone); ?></li>
@@ -39,13 +39,13 @@
     <div class="row">
 
         <!-- Campo gruppo e status -->
-        <div class="col-6">
+        <div class="col-12 col-lg-6">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item"><i class="fa-solid fa-arrow-circle-down"></i><?= lang('backend/admins.labels.group'); ?></li>
                 <li class="list-group-item fw-bold"><?= esc($admin->groupName); ?></li>
             </ul>
         </div>
-        <div class="col-6">
+        <div class="col-12 col-lg-6">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item"><i class="fa-solid fa-arrow-circle-down"></i><?= lang('backend/admins.labels.status'); ?></li>
                 <li class="list-group-item">

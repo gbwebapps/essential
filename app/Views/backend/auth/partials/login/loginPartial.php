@@ -1,5 +1,6 @@
 <div class="row">
-    <div class="col-4 offset-4">
+    <!-- Aggiunto col-sm-8 e offset-sm-2 per coprire i tablet in portrait sotto i 768px. Su md passa a 6 colonne. -->
+    <div class="col-12 col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
 
         <form id="login_form">
 
@@ -19,10 +20,10 @@
             </div>
             <!-- End Campo password -->
 
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between align-items-center mt-3">
 
                 <!-- Checkbox remember me -->
-                <div class="form-check text-start my-3">
+                <div class="form-check text-start mb-0">
                     <input class="form-check-input" type="checkbox" name="rememberMe" id="rememberMe">
                     <label class="form-check-label" for="rememberMe">
                         <?= lang('backend/auth.labels.rememberMe'); ?>
