@@ -17,7 +17,7 @@ $routes->group('backend', function($routes) {
 
     /* AUTH GUEST */
     $routes->group('auth', ['filter' => 'guest'], function($routes) {
-        $routes->get('/', '\App\Controllers\Backend\AuthController::index');
+        $routes->match(['GET', 'POST'], '/', '\App\Controllers\Backend\AuthController::index');
         $routes->match(['GET', 'POST'], 'login', '\App\Controllers\Backend\AuthController::login');
         $routes->match(['GET', 'POST'], 'resetPassword', '\App\Controllers\Backend\AuthController::resetPassword');
         $routes->get('setPassword/(:token)', '\App\Controllers\Backend\AuthController::setPassword/$1');

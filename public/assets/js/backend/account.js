@@ -9,6 +9,7 @@ import { UploadPreviewImgManager } from './components/UploadPreview.js';
 import { GalleryOneImgManager } from './components/GalleryOne.js';
 
 const actions = {
+    index: function() {}, 
     general: function() {}, 
     edit: function() {
 

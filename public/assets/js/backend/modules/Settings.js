@@ -144,20 +144,19 @@ export class SettingsManager {
 
     /* Esegue il refresh in SettingsManager */
     async refresh(btnEl, env) {
-
+        
         if (this.isSubmitting) return;
         this.isSubmitting = true;
 
-        try {
-            const containerId = `${env}-settings-container`;
-            const success = await this.loadPanel(containerId, env);
+        /* Recupera il contenitore esatto partendo dal pulsante cliccato */
+        const form = btnEl.closest('form');
+        const container = form.closest('.accordion-body');
 
-            /* Re-inizializzazione locale e isolata dopo il ricaricamento */
-            if (success && typeof initTomSelects === 'function') {
-                initTomSelects();
-            }
+        try {
+            /* Affida il ricaricamento DOM e l'inizializzazione di TomSelect esclusivamente a loadPanel */
+            await this.loadPanel(container.id, env);
         } catch (error) {
-            /* Errore durante il ripristino delle impostazioni */
+            console.error("Errore durante il ripristino delle impostazioni:", error);
         } finally {
             this.isSubmitting = false;
         }

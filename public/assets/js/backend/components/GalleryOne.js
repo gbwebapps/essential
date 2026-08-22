@@ -4,13 +4,12 @@ import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace } from '../back
 export class GalleryOneImgManager {
     constructor() {
         this.containerId = '#imagesData';
-        this.container = document.querySelector(this.containerId);
+        /* Rimosso this.container per evitare nodi orfani (fantasma) */
+        
         this.onSubmit = this.onSubmit.bind(this);
         this.onClick = this.onClick.bind(this);
         
-        /* Variabile di stato per evitare listener multipli sul document */
         this.eventsBound = false;
-        
         this.bindEvents();
     }
 
@@ -18,10 +17,7 @@ export class GalleryOneImgManager {
         if (this.eventsBound) return;
         this.eventsBound = true;
 
-        /* Listener globale per il submit del form di reload */
         document.addEventListener('submit', this.onSubmit);
-        
-        /* SOLUZIONE 2: Spostiamo il listener del click sul document globale */
         document.addEventListener('click', this.onClick);
     }
 
@@ -95,12 +91,10 @@ export class GalleryOneImgManager {
                 showAlert('success', data.message);
             }
             
-            /* Aggiornato: esegue solo il rimpiazzo HTML, i listener sul document non muoiono */
-            if (this.container) {
-                smoothReplace(this.container, data.output);
-                
-                /* Mantiene aggiornato il riferimento al nuovo elemento nel DOM */
-                this.container = document.querySelector(this.containerId);
+            /* Peschiamo il nodo VIVO dal DOM un attimo prima di agire */
+            const currentContainer = document.querySelector(this.containerId);
+            if (currentContainer) {
+                smoothReplace(currentContainer, data.output);
             }
         }
     }

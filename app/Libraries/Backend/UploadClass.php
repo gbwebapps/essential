@@ -87,11 +87,7 @@ class UploadClass
 
                 foreach ($folders as $k => $v):
                     $dest = $baseImg . '/' . $k . '/' . $filename;
-                    if ((bool) $this->config->cropCenter):
-                        $this->cropCenter($destination, $dest, $v[0], $v[1]);
-                    else:
-                        $this->scaleImage($imgInfo, $destination, $dest, $v[0], $v[1]);
-                    endif;
+                    $this->cropImage($destination, $dest, $v[0], $v[1], $this->config->cropImage);
                 endforeach;
 
             } catch (\Exception $e) {
@@ -103,57 +99,8 @@ class UploadClass
         return $uploaded ?: false;
     }
 
-    /* ridimensionamento proporzionale */
-    protected function scaleImage(array $imgInfo, string $srcPath, string $destPath, int $targetX, int $targetY): bool
-    {
-        [$width, $height, $type] = $imgInfo;
-
-        switch ($type):
-            case IMAGETYPE_JPEG: $src = imagecreatefromjpeg($srcPath); break;
-            case IMAGETYPE_PNG:  $src = imagecreatefrompng($srcPath);  break;
-            case IMAGETYPE_GIF:  $src = imagecreatefromgif($srcPath);  break;
-            case IMAGETYPE_WEBP: $src = function_exists('imagecreatefromwebp') ? imagecreatefromwebp($srcPath) : false; break;
-            case IMAGETYPE_BMP:  $src = function_exists('imagecreatefrombmp') ? imagecreatefrombmp($srcPath) : false; break;
-            case IMAGETYPE_AVIF: $src = function_exists('imagecreatefromavif') ? imagecreatefromavif($srcPath) : false; break;
-            default: return false;
-        endswitch;
-
-        if ( ! $src): 
-            return false; 
-        endif;
-
-        $ratio     = min($targetX / $width, $targetY / $height);
-        $newWidth  = (int) ($width * $ratio);
-        $newHeight = (int) ($height * $ratio);
-
-        $dst = imagecreatetruecolor($newWidth, $newHeight);
-
-        if (in_array($type, [IMAGETYPE_PNG, IMAGETYPE_GIF, IMAGETYPE_WEBP, IMAGETYPE_AVIF])):
-            imagecolortransparent($dst, imagecolorallocatealpha($dst, 0, 0, 0, 127));
-            imagealphablending($dst, false);
-            imagesavealpha($dst, true);
-        endif;
-
-        imagecopyresampled($dst, $src, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-
-        $result = false;
-        switch ($type):
-            case IMAGETYPE_JPEG: $result = imagejpeg($dst, $destPath, 90); break;
-            case IMAGETYPE_PNG:  $result = imagepng($dst, $destPath); break;
-            case IMAGETYPE_GIF:  $result = imagegif($dst, $destPath); break;
-            case IMAGETYPE_WEBP: $result = function_exists('imagewebp') ? imagewebp($dst, $destPath) : false; break;
-            case IMAGETYPE_BMP:  $result = function_exists('imagebmp')  ? imagebmp($dst, $destPath)  : false; break;
-            case IMAGETYPE_AVIF: $result = function_exists('imageavif') ? imageavif($dst, $destPath) : false; break;
-        endswitch;
-
-        imagedestroy($src);
-        imagedestroy($dst);
-
-        return (bool) $result;
-    }
-
-    /* crop centrale con rapporto forzato */
-    protected function cropCenter(string $srcPath, string $destPath, int $targetX, int $targetY): bool
+    /* Crop forzato con 5 punti di ancoraggio */
+    protected function cropImage(string $srcPath, string $destPath, int $targetX, int $targetY, string $position = 'center'): bool
     {
         [$width, $height, $type] = getimagesize($srcPath);
 
@@ -174,17 +121,31 @@ class UploadClass
         $srcRatio    = $width / $height;
         $targetRatio = $targetX / $targetY;
 
+        /* Calcolo dell'area di ritaglio (scarta l'eccedenza) */
         if ($srcRatio > $targetRatio):
             $newWidth  = (int) ($height * $targetRatio);
             $newHeight = $height;
-            $srcX      = (int) (($width - $newWidth) / 2);
-            $srcY      = 0;
         else:
             $newWidth  = $width;
             $newHeight = (int) ($width / $targetRatio);
-            $srcX      = 0;
-            $srcY      = (int) (($height - $newHeight) / 2);
         endif;
+
+        /* Calcolo delle coordinate di partenza (X, Y) in base all'ancoraggio */
+        switch ($position):
+            case 'start':
+                $srcX = 0;
+                $srcY = 0;
+                break;
+            case 'end':
+                $srcX = $width - $newWidth;
+                $srcY = $height - $newHeight;
+                break;
+            case 'center':
+            default:
+                $srcX = (int) (($width - $newWidth) / 2);
+                $srcY = (int) (($height - $newHeight) / 2);
+                break;
+        endswitch;
 
         $dst = imagecreatetruecolor($targetX, $targetY);
 

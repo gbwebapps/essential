@@ -8,7 +8,7 @@ class Upload extends BaseConfig
 {
 	public int $renameImages = 0;
 	public int $overwriteImages = 0;
-	public int $cropCenter = 1;
+	public string $cropImage = 'center';
 	public int $resizeMediumX = 960;
 	public int $resizeMediumY = 540;
 	public int $resizeSmallX = 96;

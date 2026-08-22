@@ -783,7 +783,7 @@ class AdminsModel extends BackendModel
 
             /* Gestione Upload e Scrittura Immagini nel flusso transazionale */
             if ( ! empty($posts['images'])):
-                $uploadService = new \App\Libraries\Backend\Upload();
+                $uploadService = new \App\Libraries\Backend\UploadClass();
                 $filenames = $uploadService->doUpload($posts['images'], 'admins', $uuid);
                 
                 if ($filenames):
@@ -920,7 +920,7 @@ class AdminsModel extends BackendModel
 
             /* Gestione Upload e Scrittura Immagini nel flusso transazionale */
             if ( ! empty($posts['images'])):
-                $uploadService = new \App\Libraries\Backend\Upload();
+                $uploadService = new \App\Libraries\Backend\UploadClass();
                 $filenames = $uploadService->doUpload($posts['images'], 'admins', $posts['uuid']);
                 
                 if ($filenames):

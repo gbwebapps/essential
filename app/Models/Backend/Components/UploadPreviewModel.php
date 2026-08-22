@@ -43,7 +43,7 @@ class UploadPreviewModel extends BackendModel
 
 		    if ( ! empty($posts['images'])):
 
-		        $uploadService = new \App\Libraries\Backend\Upload();
+		        $uploadService = new \App\Libraries\Backend\UploadClass();
 		        $filenames = $uploadService->doUpload($posts['images'], $posts['entity'], $posts['uuid']);
 
 		        if ($filenames):

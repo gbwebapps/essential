@@ -32,12 +32,13 @@
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="upload_cropCenter" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.cropCenter'); ?></label>
-                        <select id="upload_cropCenter" name="cropCenter" class="form-select shadow-none">
-                            <option value="0" <?= (int) $uploadSettings['cropCenter'] === 0 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.disabled'); ?></option>
-                            <option value="1" <?= (int) $uploadSettings['cropCenter'] === 1 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.enabled'); ?></option>
+                        <label for="upload_cropImage" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.cropImage'); ?></label>
+                        <select id="upload_cropImage" name="cropImage" class="form-select shadow-none">
+                            <option value="center" <?= (string) $uploadSettings['cropImage'] === 'center' ? 'selected' : ''; ?>><?= lang('backend/settings.labels.center'); ?></option>
+                            <option value="start" <?= (string) $uploadSettings['cropImage'] === 'start' ? 'selected' : ''; ?>><?= lang('backend/settings.labels.start'); ?></option>
+                            <option value="end" <?= (string) $uploadSettings['cropImage'] === 'end' ? 'selected' : ''; ?>><?= lang('backend/settings.labels.end'); ?></option>
                         </select>
-                        <div class="error_cropCenter text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                        <div class="error_cropImage text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
                 </div>
 
