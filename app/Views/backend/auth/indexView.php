@@ -10,8 +10,6 @@
         </div>
     </div>
 
-    <?php if (session()->getFlashdata('isLogout')): ?>
-        <script>localStorage.clear();</script>
-    <?php session()->destroy(); endif; ?>
+    <script>localStorage.clear();</script>
 
 <?= $this->endSection() ?>

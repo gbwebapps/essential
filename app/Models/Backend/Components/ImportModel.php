@@ -60,6 +60,26 @@ class ImportModel extends BackendModel
     {
         $structure = $this->getTableStructure($entity);
         $expectedHeaders = array_column($structure, 'name');
+
+        /* Trova la chiave primaria reale dallo schema */
+        $primaryKey = null;
+        foreach ($structure as $col):
+            if ($col['primary_key'] == 1):
+                $primaryKey = $col['name'];
+                break;
+            endif;
+        endforeach;
+
+        /* Carica i dati esistenti in memoria per un confronto O(1) velocissimo */
+        $existingDataMap = [];
+        if ($primaryKey !== null && $this->db->tableExists($entity)) {
+            $dbRecords = $this->db->table($entity)->get()->getResultArray();
+            foreach ($dbRecords as $record) {
+                $existingDataMap[$record[$primaryKey]] = $record;
+            }
+        }
+
+        $plan = ['insert' => 0, 'update' => 0, 'skip' => 0];
         
         $handle = fopen($file->getTempName(), 'r');
         
@@ -105,6 +125,29 @@ class ImportModel extends BackendModel
                     $data[$key] = null;
                 endif;
             endforeach;
+
+            /* --- INIZIO MODIFICA: CALCOLO STATO RECORD (Insert, Update, Skip) --- */
+            $idValue = $data[$primaryKey] ?? null;
+
+            if ( ! empty($idValue) && array_key_exists($idValue, $existingDataMap)):
+                $dbRow = $existingDataMap[$idValue];
+                $hasChanges = false;
+                foreach ($data as $key => $value):
+                    if ($key !== 'updated_at' && array_key_exists($key, $dbRow) && (string)$dbRow[$key] !== (string)$value):
+                        $hasChanges = true;
+                        break;
+                    endif;
+                endforeach;
+
+                if ($hasChanges):
+                    $plan['update']++;
+                else:
+                    $plan['skip']++;
+                endif;
+            else:
+                $plan['insert']++;
+            endif;
+            /* --- FINE MODIFICA --- */
 
             /* Conserva solo i primi 10 record puliti per l'anteprima nella vista */
             if (count($rows) < 10):
@@ -176,7 +219,8 @@ class ImportModel extends BackendModel
             'status'   => true,
             'headers'  => $csvHeaders,
             'rows'     => $rows,
-            'tempFile' => $tempFilename
+            'tempFile' => $tempFilename,
+            'plan'     => $plan /* <--- Aggiunto */
         ];
     }
 

@@ -50,7 +50,6 @@ class SettingsModel extends BackendModel
     private array $allowedUploadFields = [
         'renameImages',
         'overwriteImages',
-        'cropImage',
         'resizeMediumX',
         'resizeMediumY',
         'resizeSmallX',
@@ -177,10 +176,6 @@ class SettingsModel extends BackendModel
             'overwriteImages' => [
                 'label' => lang('backend/settings.labels.overwriteImages'),
                 'rules' => ['required', 'in_list[0,1]'],
-            ],
-            'cropImage' => [
-                'label' => lang('backend/settings.labels.cropImage'),
-                'rules' => ['required', 'in_list[center,start,end]'],
             ],
             'resizeMediumX' => [
                 'label' => lang('backend/settings.labels.resizeMediumX'),

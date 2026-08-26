@@ -254,6 +254,18 @@ export class ImportCsvManager {
                     if (modalBody) {
                         smoothReplace(modalBody, data.output);
                     }
+
+                    /* --- INIZIO MODIFICA: Nasconde il pulsante se non ci sono dati da elaborare --- */
+                    const submitBtn = document.querySelector('#' + this.config.modalId + ' button[form="importForm"]');
+                    if (submitBtn) {
+                        if (data.hasProcessableData === false) {
+                            submitBtn.style.display = 'none';
+                        } else {
+                            submitBtn.style.display = ''; /* Ripristina la visualizzazione di default */
+                        }
+                    }
+                    /* --- FINE MODIFICA --- */
+                    
                     this.isSubmitting = false; // Sblocca perché attende il click dell'utente per il secondo step
                 } 
                 

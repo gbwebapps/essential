@@ -5,10 +5,22 @@
     <input type="hidden" name="tempFile" value="<?= esc($tempFile); ?>">
     <input type="hidden" name="step" value="confirm">
 
-    <div class="alert alert-info">
-        <i class="fa-solid fa-circle-info me-2"></i>
-        <?= lang('backend/components/import.messages.previewInfo'); ?>
-    </div>
+    <?php if ($plan['insert'] === 0 && $plan['update'] === 0): ?>
+        <!-- STATO: NESSUNA AZIONE NECESSARIA -->
+        <div class="alert alert-success d-flex align-items-center mb-3">
+            <i class="fa-solid fa-check-circle fa-2x me-3"></i>
+            <div>
+                <strong>Sincronizzazione perfetta!</strong><br>
+                I dati presenti nel CSV sono già identici a quelli del database (<?= $plan['skip'] ?> record analizzati). Nessuna importazione necessaria.
+            </div>
+        </div>
+    <?php else: ?>
+        <!-- STATO: AZIONI TROVATE -->
+        <div class="alert alert-warning mb-3">
+            <i class="fa-solid fa-database me-2"></i>
+            <strong>Piano di Esecuzione:</strong> Trovati <strong><?= $plan['insert'] ?></strong> nuovi record da inserire e <strong><?= $plan['update'] ?></strong> record da aggiornare (<?= $plan['skip'] ?> record verranno ignorati perché già identici).
+        </div>
+    <?php endif; ?>
 
     <div class="table-responsive">
         <table class="table table-sm table-striped table-bordered align-middle">

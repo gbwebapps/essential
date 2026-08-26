@@ -80,7 +80,6 @@ return [
 		/* Campi Upload */
 		'renameImages' => 'Rinomina immagini in upload',
 		'overwriteImages' => 'Sovrascrivi immagini esistenti',
-		'cropImage' => 'Ritaglio anteprime',
 		'maxImageX' => 'Larghezza immagine', 
 		'maxImageY' => 'Altezza immagine', 
 		'resizeMediumX' => 'Larghezza anteprima media',
@@ -89,9 +88,6 @@ return [
 		'resizeSmallY' => 'Altezza anteprima piccola',
 		'maxFileSize' => 'Peso massimo file', 
 		'allowedExtensions' => 'Estensioni', 
-		'center' => 'Centro (ritaglio bilanciato)', 
-		'start' => 'Inizio (ritaglia in alto o a sinistra)', 
-		'end' => 'Fine (ritaglia in basso o a destra)', 
 
 		'uploadImageRules' => 'Regole caricamento immagini', 
 		'dimensionsOriginal' => 'Dimensioni immagini',

@@ -30,16 +30,6 @@
                         </select>
                         <div class="error_overwriteImages text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
-
-                    <div class="col-md-4 mb-3">
-                        <label for="upload_cropImage" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.cropImage'); ?></label>
-                        <select id="upload_cropImage" name="cropImage" class="form-select shadow-none">
-                            <option value="center" <?= (string) $uploadSettings['cropImage'] === 'center' ? 'selected' : ''; ?>><?= lang('backend/settings.labels.center'); ?></option>
-                            <option value="start" <?= (string) $uploadSettings['cropImage'] === 'start' ? 'selected' : ''; ?>><?= lang('backend/settings.labels.start'); ?></option>
-                            <option value="end" <?= (string) $uploadSettings['cropImage'] === 'end' ? 'selected' : ''; ?>><?= lang('backend/settings.labels.end'); ?></option>
-                        </select>
-                        <div class="error_cropImage text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
-                    </div>
                 </div>
 
                 <!-- Limiti di Peso File -->

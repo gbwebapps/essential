@@ -43,7 +43,7 @@ class AuthorizationFilter implements FilterInterface
             $authModel->logoutByCookie($cookie);
         endif;
 
-        if ( ! $request->isAJAX() && $request->is('get')):
+        if ( ! url_is('backend/auth/logout')):
             session()->set('intended_url', current_url());
         endif;
 

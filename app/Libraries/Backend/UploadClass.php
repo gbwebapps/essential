@@ -87,7 +87,8 @@ class UploadClass
 
                 foreach ($folders as $k => $v):
                     $dest = $baseImg . '/' . $k . '/' . $filename;
-                    $this->cropImage($destination, $dest, $v[0], $v[1], $this->config->cropImage);
+                    /* Rimossa l'iniezione del parametro position */
+                    $this->cropImage($destination, $dest, $v[0], $v[1]);
                 endforeach;
 
             } catch (\Exception $e) {
@@ -99,8 +100,11 @@ class UploadClass
         return $uploaded ?: false;
     }
 
-    /* Crop forzato con 5 punti di ancoraggio */
-    protected function cropImage(string $srcPath, string $destPath, int $targetX, int $targetY, string $position = 'center'): bool
+    /**
+     * Esegue un ritaglio centrale forzato (Center Crop) dell'immagine.
+     * Calcola le proporzioni per riempire l'area target e ritaglia le eccedenze in modo simmetrico.
+     */
+    protected function cropImage(string $srcPath, string $destPath, int $targetX, int $targetY): bool
     {
         [$width, $height, $type] = getimagesize($srcPath);
 
@@ -121,31 +125,20 @@ class UploadClass
         $srcRatio    = $width / $height;
         $targetRatio = $targetX / $targetY;
 
-        /* Calcolo dell'area di ritaglio (scarta l'eccedenza) */
+        /* Calcolo dell'area di ritaglio (scarta l'eccedenza mantenendo le proporzioni originali) */
         if ($srcRatio > $targetRatio):
+            /* Immagine originale troppo larga rispetto al target (crop orizzontale) */
             $newWidth  = (int) ($height * $targetRatio);
             $newHeight = $height;
         else:
+            /* Immagine originale troppo alta rispetto al target (crop verticale) */
             $newWidth  = $width;
             $newHeight = (int) ($width / $targetRatio);
         endif;
 
-        /* Calcolo delle coordinate di partenza (X, Y) in base all'ancoraggio */
-        switch ($position):
-            case 'start':
-                $srcX = 0;
-                $srcY = 0;
-                break;
-            case 'end':
-                $srcX = $width - $newWidth;
-                $srcY = $height - $newHeight;
-                break;
-            case 'center':
-            default:
-                $srcX = (int) (($width - $newWidth) / 2);
-                $srcY = (int) (($height - $newHeight) / 2);
-                break;
-        endswitch;
+        /* Calcolo automatico e implicito delle coordinate di partenza dal centro esatto */
+        $srcX = (int) (($width - $newWidth) / 2);
+        $srcY = (int) (($height - $newHeight) / 2);
 
         $dst = imagecreatetruecolor($targetX, $targetY);
 

@@ -746,6 +746,12 @@ class AuthModel extends BackendModel
                 $sql = "delete from admins_tokens where token_hash = ? and token_type = ?";
                 $this->db->query($sql, [$tokenHash, 'session']);
 
+                /* Svuota ESCLUSIVAMENTE la chiave con i dati di login */
+                session()->remove('backendSession');
+
+                /* Rigenera l'ID per prevenire la Session Fixation */
+                session()->regenerate(true);
+
             endif;
         } catch (\Throwable $e) {
             log_message('error', lang('backend/auth.messages.logoutSessionError') . ' - ' . $e);
@@ -781,6 +787,9 @@ class AuthModel extends BackendModel
 
             /* Rimuove il cookie fisicamente dal browser */
             delete_cookie('backendRememberMe');
+
+            /* Rigenera l'ID per prevenire la Session Fixation */
+            session()->regenerate(true);
 
         } catch (\Throwable $e) {
             log_message('error', lang('backend/auth.messages.logoutCookieError') . ' - ' . $e);

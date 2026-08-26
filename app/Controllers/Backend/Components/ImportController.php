@@ -110,10 +110,14 @@ class ImportController extends BaseController
                 'entity' => $entity,
                 'headers' => $previewData['headers'],
                 'rows' => $previewData['rows'], 
-                'tempFile' => $previewData['tempFile'] 
+                'tempFile' => $previewData['tempFile'],
+                'plan' => $previewData['plan']
             ]);
 
-            return $this->jsonResponse(['result' => true, 'output' => $output]);
+            /* Calcola se ci sono operazioni da eseguire (inserimenti o aggiornamenti) */
+            $hasProcessableData = ($previewData['plan']['insert'] > 0 || $previewData['plan']['update'] > 0);
+
+            return $this->jsonResponse(['result' => true, 'output' => $output, 'hasProcessableData' => $hasProcessableData]);
 
         endif;
     }
