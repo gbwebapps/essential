@@ -4,7 +4,9 @@
         <div class="modal-content shadow">
 
             <div class="modal-header border-0">
-                <h5 class="modal-title"><?= lang('backend/components/import.panels.main'); ?></h5>
+                <h5 class="modal-title">
+                    <i class="fa-solid fa-file-csv"></i> <?= sprintf(lang('backend/components/import.panels.main'), esc($entity)); ?>
+                </h5>
             </div>
 
             <div class="modal-body">
@@ -20,7 +22,7 @@
                         <!-- Link per il download del template CSV -->
                         <div class="d-flex justify-content-center mb-3 lead">
                             <a href="<?= base_url('backend/import/download/' . esc($entity)); ?>">
-                                <i class="fa-solid fa-download"></i> <?= lang('backend/components/import.links.downloadTemplate'); ?>
+                                <i class="fa-solid fa-download"></i> <?= sprintf(lang('backend/components/import.links.downloadTemplate'), esc($entity)); ?>
                             </a>
                         </div>
 
@@ -71,8 +73,12 @@
             </div>
 
             <div class="modal-footer border-0">
-                <button type="button" id="btnCancelImport" class="btn btn-danger" data-bs-dismiss="modal"><?= lang('backend/components/import.buttons.undo'); ?></button>
-                <button type="submit" class="btn btn-success" form="importForm"><?= lang('backend/components/import.buttons.import'); ?></button>
+                <button type="button" id="btnCancelImport" class="btn btn-danger btn-sm" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-xmark"></i> <?= lang('backend/components/import.buttons.close'); ?>
+                </button>
+                <button type="submit" class="btn btn-success btn-sm" form="importForm">
+                    <i class="fa-solid fa-file-import"></i> <?= lang('backend/components/import.buttons.import'); ?>
+                </button>
             </div>
 
         </div>

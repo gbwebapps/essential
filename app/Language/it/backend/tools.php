@@ -6,7 +6,7 @@ return [
 	],
 	'panels' => [
 		'manageAudits' => 'Gestisci registro attività', 
-		'dbMaintenance' => 'Gestione tabelle', 
+		'dbMaintenance' => 'Gestione database', 
 		'backups' => 'Backups', 
 		'cleanSpace' => 'Pulizia cartelle', 
 		'system' => 'Sistema'
@@ -27,8 +27,8 @@ return [
 		'year' => 'Anno', 
 		'hour' => 'Ore', 
 		'minutes' => 'Minuti',
-		'auditsStats' => 'Sono presenti %d audits dal %s al %s', 
-		'noAuditsStats' => 'Non sono stati trovati audits.', 
+		'auditsStats' => 'Sono presenti %d attività dal %s al %s', 
+		'noAuditsStats' => 'Non sono state trovate attività.', 
 		'totalSpace' => '%s MB', 
 		'overhead' => 'Overhead %s MB', 
 		'rows' => '~ %d righe', 
@@ -61,8 +61,8 @@ return [
 
 	], 
 	'buttons' => [
-		'resetData' => 'Resetta form', 
-		'deleteData' => 'Elimina audits',  
+		'resetData' => 'Resetta dati', 
+		'deleteData' => 'Elimina attività',  
 		'dbOptimize' => 'Ottimizza database', 
 		'tableOptimize' => 'Ottimizza tabella', 
 		'generateBackups' => 'Genera Backup Database', 
@@ -72,15 +72,16 @@ return [
 		'cleanFolder' => 'Svuota cartella'
 	], 
 	'messages' => [
-		'areYouSureToResetData' => 'Sei sicuro di voler resettare il form?', 
-		'areYouSureToDeleteData' => 'Sei sicuro di voler eliminare gli audits selezionati?', 
+		'areYouSureToResetData' => 'Sei sicuro di voler resettare i dati?', 
+		'areYouSureToDeleteData' => 'Sei sicuro di voler eliminare le attività nel range delle date selezionate? Verranno eliminate %d attività.', 
 		'areYouSureToDeleteBackups' => 'Sei sicuro di voler eliminare il backup?', 
-		'noAuditsDeleted' => 'Non sono stati eliminati audits.', 
-		'deleteSuccess' => 'Eliminazione audits avvenuta con successo.', 
+		'noAuditsDeleted' => 'Non sono state eliminate attività nel range delle date selezionate.', 
+		'noAuditsFound' => 'Non sono state trovate attività nel range delle date selezionate.', 
+		'deleteSuccess' => 'Sono state eliminate con successo %d attività.', 
 		'startDateAfterEndDate' => 'La data di inizio non può essere antecedente a quella di fine.', 
 		'validationErrors' => 'Errori di validazione.', 
 		'validateToastErrors' => '%s',
-		'optimizeSuccess' => 'La tabella è stata ottimizzata con successo.', 
+		'optimizeSuccess' => 'La tabella %s è stata ottimizzata con successo.', 
 		'optimizeAllSuccess' => 'Il database è stato ottimizzato con successo.', 
 		'optimizeError' => 'L\'ottimizzazione non è andata a buon fine.', 
 		'generateBackupsSuccess' => 'Il backup è stato generato con successo.', 

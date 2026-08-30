@@ -57,7 +57,7 @@ return [
 		'note' => 'Inserisci note aggiuntive...', 
 	], 
 	'buttons' => [
-		'sendData' => 'Invia dati', 
+		'sendData' => 'Salva dati', 
 		'refreshData' => 'Ricarica dati', 
 		'reload' => 'Ricarica pannello', 
 		'resetPassword' => 'Procedi al reset della password',

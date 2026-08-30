@@ -23,6 +23,6 @@ return [
         'invalidEntity' => 'Nome tabella sconosciuto.', 
         'noColumnsSelected' => 'Non sono state selezionate colonne.', 
         'noDataFound' => 'Non sono stati trovati records.', 
-        'exportSuccess' => 'Esportazione avvenuta con successo.', 
+        'exportSuccess' => 'Esportazione tabella %s avvenuta con successo.', 
     ],
 ];

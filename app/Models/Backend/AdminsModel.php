@@ -224,7 +224,7 @@ class AdminsModel extends BackendModel
             ],
             'phone' => [
                 'label' => lang('backend/admins.labels.phone'),
-                'rules' => ['required', 'trim', 'regex_match[/^\+?[0-9]{9,15}$/]'],
+                'rules' => ['required', 'trim', 'regex_match[/^\+[0-9]{9,15}$/]'], 
             ],
             'status' => [
                 'label' => lang('backend/admins.labels.status'),
@@ -288,7 +288,7 @@ class AdminsModel extends BackendModel
             ],
             'phone' => [
                 'label' => lang('backend/admins.labels.phone'),
-                'rules' => ['required', 'trim', 'regex_match[/^\+?[0-9]{9,15}$/]'],
+                'rules' => ['required', 'trim', 'regex_match[/^\+[0-9]{9,15}$/]'], 
             ],
             'status' => [
                 'label' => lang('backend/admins.labels.status'),

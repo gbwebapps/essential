@@ -241,6 +241,10 @@ export function showAlert(type, message, customIcon = '')
             alertClass = 'light text-danger fw-bold';
             defaultIcon = '<i class="fa-solid fa-triangle-exclamation"></i>';
             break;
+        case 'info':
+            alertClass = 'light text-info fw-bold';
+            defaultIcon = '<i class="fa-solid fa-circle-info"></i>';
+            break;
         default:
             alertClass = 'light text-secondary fw-bold';
             defaultIcon = '';

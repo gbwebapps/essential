@@ -152,9 +152,9 @@ return [
 		'isoStandard' => '2026-08-16 15:30:00 (Standard ISO 24h)', 
 	], 
 	'buttons' => [
-		'refreshData' => 'Refresh dati', 
-		'sendData' => 'Impostazioni database', 
-		'restoreData' => 'Impostazioni default'
+		'refreshData' => 'Ricarica dati', 
+		'sendData' => 'Salva impostazioni nel database', 
+		'restoreData' => 'Elimina impostazioni dal database'
 	], 
 	'options' => [
 		'first' => 'Prima opzione', 
@@ -163,11 +163,11 @@ return [
 	], 
 	'messages' => [
 		'validationErrors' => 'Errori di validazione.', 
-		'saveSuccess' => 'Impostazioni salvate sul database con successo.', 
-		'deleteSuccess' => 'Impostazioni rimosse dal database con successo.', 
+		'saveSuccess' => 'Impostazioni salvate nel database con successo.', 
+		'deleteSuccess' => 'Impostazioni eliminate dal database con successo.', 
 		'noDataChanged' => 'Non sono state effettuate modifiche alle impostazioni.', 
-		'alreadyDefault' => 'Non esistono impostazioni da rimuovere dal database.', 
-		'areYouSureDeleteSettings' => 'Sei sicuro di voler rimuovere le impostazioni dal database?',
+		'alreadyDefault' => 'Non esistono impostazioni da eliminare dal database.', 
+		'areYouSureDeleteSettings' => 'Sei sicuro di voler eliminare le impostazioni dal database?',
 		'areYouSureRefreshSettings' => 'Sei sicuro di voler ricaricare le impostazioni?', 
 	], 
 ];

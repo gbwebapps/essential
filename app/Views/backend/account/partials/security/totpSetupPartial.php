@@ -48,10 +48,10 @@
                         <div class="col-12">
                             <div class="d-flex flex-column flex-sm-row gap-2">
                                 <button type="submit" class="btn btn-success btn-sm flex-fill">
-                                    <i class="fa-solid fa-circle-check me-1"></i> <?= lang('backend/account.buttons.verifyAndActivate'); ?>
+                                    <i class="fa-solid fa-circle-check"></i> <?= lang('backend/account.buttons.verifyAndActivate'); ?>
                                 </button>
                                 <button type="button" id="cancel-setup-btn" class="btn btn-danger btn-sm flex-fill">
-                                    <i class="fa-solid fa-xmark me-1"></i> <?= lang('backend/account.buttons.undoClose'); ?>
+                                    <i class="fa-solid fa-xmark"></i> <?= lang('backend/account.buttons.undoClose'); ?>
                                 </button>
                             </div>
                         </div>

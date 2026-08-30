@@ -121,13 +121,29 @@ class ToolsController extends BackendController
                 return $this->jsonResponse(['errors' => $this->validator->getErrors(), 'message' => lang('backend/tools.messages.validationErrors')]);
             endif;
 
-            return $this->jsonResponse(['result' => true]);
+            /* Conteggio preventivo delle attività da eliminare */
+            $count = $this->toolsModel->countAuditsToDelete($posts);
+
+            if ($count === false):
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/tools.messages.startDateAfterEndDate')]);
+            endif;
+
+            /* Formatta il messaggio di conferma direttamente nel backend */
+            $confirmMessage = sprintf(lang('backend/tools.messages.areYouSureToDeleteData'), $count);
+
+            $json = ['result' => true, 'count' => $count, 'confirmMessage' => $confirmMessage];
+            
+            if($count === 0):
+                $json['noDataMessage'] = lang('backend/tools.messages.noAuditsFound');
+            endif;
+
+            return $this->jsonResponse($json);
 
         endif;
     }
 
     /**
-     * Esegue la cancellazione degli audit in base ai parametri inviati.
+     * Esegue la cancellazione degli audits in base ai parametri inviati.
      */
     public function deleteAudits(): ResponseInterface
     {
@@ -172,7 +188,7 @@ class ToolsController extends BackendController
             endif;
 
             /* Scegliamo il messaggio corretto */
-            $message = is_array($table) ? lang('backend/tools.messages.optimizeAllSuccess') : lang('backend/tools.messages.optimizeSuccess');
+            $message = is_array($table) ? lang('backend/tools.messages.optimizeAllSuccess') : sprintf(lang('backend/tools.messages.optimizeSuccess'), $table);
 
             /* tableData conterrà sempre un array (di 1 elemento o di N elementi) */
             return $this->jsonResponse(['result' => true, 'message'   => $message, 'tableData' => $optimizationResult]);

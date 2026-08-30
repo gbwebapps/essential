@@ -12,6 +12,7 @@ use App\Validation\Backend\AuthRules;
 use App\Validation\Backend\AdminsRules;
 use App\Validation\Backend\ImagesRules;
 use App\Validation\Backend\SettingsRules;
+use App\Validation\Backend\CustomRules;
 
 class Validation extends BaseConfig
 {
@@ -26,6 +27,7 @@ class Validation extends BaseConfig
      * @var list<string>
      */
     public array $ruleSets = [
+        CustomRules::class,
         Rules::class,
         FormatRules::class,
         FileRules::class,
@@ -33,7 +35,7 @@ class Validation extends BaseConfig
         AuthRules::class, 
         AdminsRules::class, 
         ImagesRules::class, 
-        SettingsRules::class
+        SettingsRules::class, 
     ];
 
     /**

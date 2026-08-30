@@ -110,7 +110,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 .modal-xl {
-    max-width: 95%!Important;
+    max-width: 80%!Important;
 }
 
 /* ==========================================================================

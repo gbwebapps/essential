@@ -35,7 +35,7 @@ return [
 		'delete' => 'Elimina', 
 		'refreshData' => 'Ricarica dati', 
 		'resetData' => 'Resetta dati', 
-		'sendData' => 'Invia dati', 
+		'sendData' => 'Salva dati', 
 	], 
 	'errors' => [
 		'permission' => 'Permesso non conforme.', 

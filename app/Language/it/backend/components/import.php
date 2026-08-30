@@ -2,7 +2,7 @@
 
 return [
 	'panels' => [
-		'main' => 'Importa dati da CSV', 
+		'main' => 'Importazione dati CSV nella tabella <span class="text-primary fw-bold">%s</span>', 
 	], 
 	'labels' => [
 		'entity' => 'Tabella', 
@@ -13,10 +13,10 @@ return [
 		'uploadCsv' => 'Carica file', 
 	], 
 	'links' => [
-		'downloadTemplate' => 'Scarica il file CSV di esempio'
+		'downloadTemplate' => 'Scarica il file CSV di esempio per <span class="text-primary fw-bold">%s</span>'
 	], 
     'buttons' => [
-    	'undo' => 'Annulla', 
+    	'close' => 'Chiudi', 
     	'import' => 'Importa', 
     ], 
     'errors' => [

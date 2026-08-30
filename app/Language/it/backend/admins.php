@@ -101,7 +101,7 @@ return [
 	'buttons' => [
 		'actions' => 'Azioni', 
 		'resetData' => 'Resetta dati', 
-		'sendData' => 'Invia dati', 
+		'sendData' => 'Salva dati', 
 		'refreshData' => 'Ricarica dati', 
 		'reload' => 'Ricarica pannello', 
 		'print' => 'Stampa', 

@@ -83,6 +83,21 @@ class ToolsModel extends BackendModel
 		return ['from' => $from, 'to' => $to];
 	}
 
+	/* Conta gli audits presenti nel range di date indicato */
+	public function countAuditsToDelete(array $posts): int|bool
+	{
+		$dates = $this->buildAuditDates($posts);
+
+		if ($dates === false):
+			return false;
+		endif;
+
+		$sql = 'select count(*) as total from admins_audits where created_at between ? and ?';
+		$result = $this->db->query($sql, [$dates['from'], $dates['to']])->getRow();
+
+		return (int) $result->total;
+	}
+
 	public function deleteAudits(array $posts): array
 	{
 		$dates = $this->buildAuditDates($posts);
@@ -96,7 +111,9 @@ class ToolsModel extends BackendModel
 
 		$this->db->query($sql, [$dates['from'], $dates['to']]);
 
-		if ($this->db->affectedRows() > 0):
+		$deleted = $this->db->affectedRows();
+
+		if ($deleted > 0):
 
 			$fromLog = convertDate($dates['from']);
 	        $toLog = convertDate($dates['to']);
@@ -104,7 +121,7 @@ class ToolsModel extends BackendModel
 			$currentAdmin = service('authorization')->currentAdmin();
 			log_admin_activity('DELETE_AUDITS', 'tools', sprintf(lang('Eliminazione audits dal %s al %s'), $fromLog, $toLog), $currentAdmin);
 
-			return ['result' => true, 'message' => lang('backend/tools.messages.deleteSuccess')];
+			return ['result' => true, 'message' => sprintf(lang('backend/tools.messages.deleteSuccess'), $deleted)];
 
 		endif;
 

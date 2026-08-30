@@ -54,10 +54,16 @@ export class ToolsManager {
                     const response = await apiFetch(validateUrl, { method: 'POST', body: formData });
                     const data = await response.json();
 
-                    /* Se la validazione fallisce, stampa gli errori e si ferma (niente modale) */
+                    /* Se la validazione formale fallisce, stampa gli errori e si ferma */
                     if (data.errors) {
                         if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
                         if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+                        return;
+                    }
+
+                    /* Gestisce gli errori logici (es. data inizio successiva a data fine) */
+                    if (data.result === false && data.message) {
+                        if (typeof showAlert === 'function') showAlert('danger', data.message);
                         return;
                     }
 
@@ -65,13 +71,24 @@ export class ToolsManager {
                     if (data.result === true) {
                         const actionUrl = urlbase + this.routes.manageAudits[actionType];
 
-                        /* Flusso Delete: mostra il modale di conferma, poi esegue */
+                        /* Flusso Delete: controlla il conteggio, mostra il modale, poi esegue */
                         if (actionType === 'delete') {
-                            const warningMessage = actionBtn.dataset.warning;
+                            
+                            /* Se non ci sono record, mostra l'avviso e blocca il flusso */
+                            if (data.count === 0) {
+                                if (data.noDataMessage && typeof showAlert === 'function') {
+                                    showAlert('info', data.noDataMessage);
+                                }
+                                return;
+                            }
+
+                            /* Se ci sono record, usa il messaggio preformattato dal backend */
+                            const warningMessage = data.confirmMessage;
                             if (warningMessage) {
                                 const ok = await askConfirm(warningMessage);
                                 if ( ! ok) return;
                             }
+                            
                             this.executeAction(form, actionUrl, 'manageAudits');
                         }
                     }
