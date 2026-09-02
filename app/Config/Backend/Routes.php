@@ -82,6 +82,7 @@ $routes->group('backend', function($routes) {
 
         /* EXPORT CSV */
         $routes->group('export', ['filter' => 'authorization'], function($routes) {
+            $routes->post('showModal', '\App\Controllers\Backend\Components\ExportController::showModal');
             $routes->post('generate', '\App\Controllers\Backend\Components\ExportController::generate');
             $routes->get('download/(:any)', '\App\Controllers\Backend\Components\ExportController::download/$1');
         });

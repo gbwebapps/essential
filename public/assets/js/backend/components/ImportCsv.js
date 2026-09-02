@@ -42,7 +42,7 @@ export class ImportCsvManager {
         if (this.eventsBound) return;
         this.eventsBound = true;
 
-        /* 1. Apertura Modale (Delegazione per catturare il click sul link di esportazione) */
+        /* 1. Apertura Modale */
         document.addEventListener('click', async e => {
             const btn = e.target.closest(this.config.linkId);
             if ( ! btn) return;
@@ -224,10 +224,11 @@ export class ImportCsvManager {
 
         try {
             const formData = new FormData(formElement);
-            
-            /* --- INIZIO MODIFICA CHUNKING: Accodiamo l'offset corrente alla richiesta --- */
             formData.append('offset', currentOffset);
-            /* --- FINE MODIFICA CHUNKING --- */
+            
+            /* Invia al server il totale accumulato fino al giro precedente */
+            formData.append('accumulatedInserted', this.totalInserted || 0);
+            formData.append('accumulatedUpdated', this.totalUpdated || 0);
             
             /* Determina l'URL in base allo step (upload file o conferma finale) */
             const isConfirmStep = formData.get('step') === 'confirm';
@@ -241,8 +242,27 @@ export class ImportCsvManager {
             const data = await response.json();
 
             if (data.result === false) {
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
-                this.isSubmitting = false; // Sblocca in caso di errore
+                /* 1. Caso errori massivi: inietta l'HTML pre-compilato nel contenitore del modale */
+                if (data.errorOutput) {
+                    const modalAlertContainer = document.getElementById('import-alert-container');
+                    
+                    if (modalAlertContainer) {
+                        smoothReplace(modalAlertContainer, data.errorOutput);
+
+                        const currentAlert = modalAlertContainer.querySelector('.alert');
+                        if (currentAlert) {
+                            currentAlert.addEventListener('closed.bs.alert', function () {
+                                smoothReplace(modalAlertContainer, '');
+                            });
+                        }
+                    }
+                } 
+                /* 2. Caso errore generico: utilizza la funzione globale standard */
+                else if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+                
+                this.isSubmitting = false;
                 return;
             }
 
@@ -250,7 +270,7 @@ export class ImportCsvManager {
 
                 /* Se era il primo step (upload), mostriamo l'anteprima */
                 if ( ! isConfirmStep && data.output) {
-                    const modalBody = document.querySelector('#' + this.config.modalId + ' .modal-body');
+                    const modalBody = document.getElementById('import-content-area');
                     if (modalBody) {
                         smoothReplace(modalBody, data.output);
                     }
@@ -271,34 +291,29 @@ export class ImportCsvManager {
                 
                 /* --- INIZIO MODIFICA CHUNKING: Gestione ricorsione per lo step finale --- */
                 else if (isConfirmStep) {
+
+                    const modalBody = document.getElementById('import-content-area');
                     
-                    /* Aggiorniamo i totali globali con quelli ricevuti da questo specifico blocco */
+                    if (data.isFinished === false && data.progressOutput && modalBody) {
+                        if (currentOffset === 0) {
+                            smoothReplace(modalBody, data.progressOutput);
+                        } else {
+                            const progressText = document.getElementById('import-progress-text');
+                            if (progressText && data.progressMessage) {
+                                progressText.textContent = data.progressMessage;
+                            }
+                        }
+                    }
+
                     this.totalInserted += (data.inserted || 0);
                     this.totalUpdated += (data.updated || 0);
 
-                    /* Se il backend ci dice che non ha ancora finito, richiamiamo la funzione con il nuovo offset */
                     if (data.isFinished === false && data.nextOffset) {
-                        
-                        /* Opzionale: Qui potresti aggiornare un testo nel modale es. "Elaborate 500 righe..." */
-                        
-                        /* Chiamata ricorsiva al prossimo blocco */
                         await this.processImport(formElement, data.nextOffset);
-                        return; // Usciamo da questa iterazione per non eseguire il codice sottostante
+                        return;
                     }
                     
-                    /* Se arriviamo qui, l'importazione è finita totalmente. Mostriamo l'esito reale. */
-                    
-                    /* Se i totali sono zero, mostriamo il messaggio neutro, altrimenti costruiamo la stringa di successo */
-                    let finalMessage = data.message; 
-                    if ((this.totalInserted + this.totalUpdated) === 0) {
-                        finalMessage = 'Importazione completata: nessun record modificato poiché i dati sono già allineati.';
-                    } else {
-                        /* Questa è una costruzione di fallback qualora il server restituisca solo il testo dell'ultimo blocco. 
-                           Se usi una logica multilingua stretta, potresti dover restituire le stringhe dal backend. */
-                        finalMessage = `Importazione completata. Inseriti: ${this.totalInserted}, Aggiornati: ${this.totalUpdated}.`;
-                    }
-
-                    if (finalMessage && typeof showAlert === 'function') showAlert('success', finalMessage);
+                    if (data.message && typeof showAlert === 'function') showAlert('success', data.message);
                     
                     const modalEl = document.getElementById(this.config.modalId);
                     if (modalEl) {
@@ -310,7 +325,7 @@ export class ImportCsvManager {
                         this.hooks.onImportAfter(data);
                     }
                     
-                    this.isSubmitting = false; // Sblocco definitivo a fine processo
+                    this.isSubmitting = false;
                 }
                 /* --- FINE MODIFICA CHUNKING --- */
             }

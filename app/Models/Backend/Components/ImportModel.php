@@ -199,10 +199,17 @@ class ImportModel extends BackendModel
             return ['status' => false, 'message' => lang('backend/components/import.messages.noDataFound')];
         endif;
 
-        /* Se sono emersi errori durante il ciclo, blocca tutto e restituisci il report */
+        /* Se sono emersi errori durante il ciclo, blocca tutto e restituisce l'array originale */
         if ( ! empty($errors)):
-            $errorMessage = implode('<br>', $errors);
-            return ['status' => false, 'message' => $errorMessage];
+            $maxErrors = 500;
+            $totalErrors = count($errors);
+
+            if ($totalErrors > $maxErrors):
+                $errors = array_slice($errors, 0, $maxErrors);
+                $errors[] = '... e altri ' . ($totalErrors - $maxErrors) . ' errori non mostrati per limiti di memoria.';
+            endif;
+
+            return ['status' => false, 'validationErrors' => $errors];
         endif;
 
         $csvDir = WRITEPATH . 'uploads/csv/';
@@ -272,7 +279,7 @@ class ImportModel extends BackendModel
         $updated = 0;
 
         /* --- INIZIO MODIFICA CHUNKING: Impostazione variabili di controllo --- */
-        $chunkSize = 500;
+        $chunkSize = 10;
         $currentRow = 0;
         $processedInChunk = 0;
         $isFinished = false;
@@ -299,7 +306,7 @@ class ImportModel extends BackendModel
             if ($processedInChunk >= $chunkSize):
                 break;
             endif;
-        /* --- FINE MODIFICA CHUNKING --- */
+            /* --- FINE MODIFICA CHUNKING --- */
             
             /* Salta le righe totalmente vuote */
             if ( ! array_filter($row)):

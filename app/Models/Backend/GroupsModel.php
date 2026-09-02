@@ -101,7 +101,7 @@ class GroupsModel extends BackendModel
 	        ],
 	        'description' => [
 	            'label' => lang('backend/groups.labels.description'),
-	            'rules' => ['required', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+	            'rules' => ['required', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ,]+$/u]'], 
 	        ],
             /* Validazione di ogni singolo elemento contenuto nell'array delle eccezioni */
             'permissions.*' => [
@@ -163,7 +163,7 @@ class GroupsModel extends BackendModel
             ],
             'description' => [
                 'label' => lang('backend/groups.labels.description'),
-                'rules' => ['required', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+                'rules' => ['required', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ,]+$/u]'], 
             ],
             /* Validazione di ciascun permesso inviato nell'array del gruppo */
             'permissions.*' => [

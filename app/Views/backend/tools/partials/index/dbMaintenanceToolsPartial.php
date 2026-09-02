@@ -91,10 +91,10 @@
                                         <i class="fa-solid fa-circle-arrow-right me-1"></i> <?= lang('backend/tools.buttons.tableOptimize'); ?>
                                     </a>
                                     <a href="#" class="export-entity d-block mb-2 text-decoration-none" data-export-entity="<?= $table['name']; ?>">
-                                        <i class="fa-solid fa-circle-arrow-right me-1"></i> <?= lang('backend/admins.links.export'); ?>
+                                        <i class="fa-solid fa-circle-arrow-right me-1"></i> <?= lang('backend/components/export.links.export'); ?>
                                     </a>
                                     <a href="#" class="import-entity d-block text-decoration-none" data-import-entity="<?= $table['name']; ?>">
-                                        <i class="fa-solid fa-circle-arrow-right me-1"></i> <?= lang('backend/admins.links.import'); ?>
+                                        <i class="fa-solid fa-circle-arrow-right me-1"></i> <?= lang('backend/components/import.links.import'); ?>
                                     </a>
                                 </div>
 
@@ -110,3 +110,4 @@
 </div>
 
 <div id="import-modal-container"></div>
+<div id="export-modal-container"></div>

@@ -72,13 +72,13 @@
 
                                     <!-- Esporta lista csv diretta -->
                                     <a href="#" class="mb-2 mb-md-0 mx-0 mx-md-2 bar-link" id="export-entity" data-export-entity="admins">
-                                        <i class="fa-solid fa-file-csv"></i> <?= lang('backend/admins.links.export'); ?>
+                                        <i class="fa-solid fa-file-export"></i> <?= lang('backend/components/export.links.export'); ?>
                                     </a>
                                     <!-- End esporta lista csv -->
 
                                     <!-- Importa lista csv -->
                                     <a href="#" class="mb-md-0 ms-0 ms-md-2 bar-link" id="import-entity" data-import-entity="admins">
-                                        <i class="fa-solid fa-file-import"></i> <?= lang('backend/admins.links.import'); ?>
+                                        <i class="fa-solid fa-file-import"></i> <?= lang('backend/components/import.links.import'); ?>
                                     </a>
                                     <!-- End importa lista csv -->
 
@@ -163,5 +163,6 @@
     </div>
 
     <div id="import-modal-container"></div>
+    <div id="export-modal-container"></div>
     
 <?= $this->endSection() ?>

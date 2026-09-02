@@ -39,7 +39,7 @@ class ExportModel extends BackendModel
 		return $this->db->getFieldNames($table);
 	}
 
-	public function generate(array $posts): array
+	public function generate(array $posts, int $offset = 0, ?string $fileName = null): array
     {
         $entity = $posts['entity'] ?? '';
 
@@ -58,7 +58,7 @@ class ExportModel extends BackendModel
         endforeach;
 
         /* Chiavi di sistema inviate dal JS da ignorare come filtri DB */
-        $systemKeys = ['entity', 'column', 'order', 'page', 'rows', 'trash_filter', 'search_bar_visible'];
+        $systemKeys = ['entity', 'column', 'order', 'page', 'rows', 'trash_filter', 'search_bar_visible', 'offset', 'fileName'];
 
         /* 3. Uniamo tutto: colonne reali, suffissi data e chiavi di sistema */
         $allowedFields = array_merge(
@@ -81,13 +81,11 @@ class ExportModel extends BackendModel
         
         $bindings = [];
 
-        /* 1. Applicazione Dinamica Filtri (Testo e Date misti nell'array piatto) */
+        /* 1. Applicazione Dinamica Filtri */
         foreach ($posts as $key => $value):
             
-            /* Salta le chiavi di sistema o vuote */
             if (empty($value) || in_array($key, $systemKeys)) continue;
 
-            /* Gestione Date: suffisso -from */
             if (str_ends_with($key, '-from')):
                 $realField = str_replace('-from', '', $key);
                 if (in_array($realField, $allowedColumns)):
@@ -95,7 +93,6 @@ class ExportModel extends BackendModel
                     $bindings[] = $value; 
                 endif;
             
-            /* Gestione Date: suffisso -to */
             elseif (str_ends_with($key, '-to')):
                 $realField = str_replace('-to', '', $key);
                 if (in_array($realField, $allowedColumns)):
@@ -103,7 +100,6 @@ class ExportModel extends BackendModel
                     $bindings[] = $value;
                 endif;
 
-            /* Gestione Testo: la chiave è esattamente una colonna */
             elseif (in_array($key, $allowedColumns)):
                 $sql .= " and {$key} like ?";
                 $bindings[] = "%{$value}%";
@@ -127,80 +123,77 @@ class ExportModel extends BackendModel
             $sql .= " order by {$column} " . strtoupper($order);
         endif;
 
-        $records = $this->db->query($sql, $bindings)->getResultArray();
+        /* Impostazioni per i Chunk */
+        $limit = 10;
+        $chunkSql = $sql . " LIMIT {$limit} OFFSET {$offset}";
+        $records = $this->db->query($chunkSql, $bindings)->getResultArray();
 
-        if (empty($records)):
-            return ['result' => false, 'message' => lang('backend/components/export.messages.noDataFound')];
-        endif;
-
-        /* Preparazione cartella e file CSV */
+        /* Preparazione cartella */
         $directory = WRITEPATH . 'exports/';
         if ( ! is_dir($directory)):
             mkdir($directory, 0755, true);
         endif;
 
-        $fileName = 'export_' . $entity . '_' . date('d_m_Y_H_i_s') . '.csv';
-        $filePath = $directory . $fileName;
-        $file = fopen($filePath, 'w');
-
-        /* Impostazioni per i Chunk */
-        $limit = 500;
-        $offset = 0;
-        $isFirstChunk = true;
-
-        /* Estrazione a blocchi */
-        while (true):
+        /* Gestione File: Creazione (w) al primo chunk, Append (a) ai successivi */
+        if ($offset === 0 || empty($fileName)):
+            $fileName = 'export_' . $entity . '_' . date('d_m_Y_H_i_s') . '.csv';
+            $filePath = $directory . $fileName;
+            $file = fopen($filePath, 'w');
             
-            /* Accodiamo limite e offset alla query base */
-            $chunkSql = $sql . " LIMIT {$limit} OFFSET {$offset}";
-            $records = $this->db->query($chunkSql, $bindings)->getResultArray();
-
-            /* Se il blocco è vuoto, valutiamo cosa fare */
             if (empty($records)):
-                
-                /* Se è il primo in assoluto, significa che non ci sono dati */
-                if ($isFirstChunk):
-                    fclose($file);
-                    unlink($filePath); /* Eliminiamo il file vuoto appena creato */
-                    return ['result' => false, 'message' => lang('backend/components/export.messages.noDataFound')];
-                endif;
-                
-                /* Altrimenti siamo semplicemente arrivati alla fine dei dati */
-                break;
+                fclose($file);
+                unlink($filePath);
+                return ['result' => false, 'message' => lang('backend/components/export.messages.noDataFound')];
             endif;
 
-            /* Scriviamo le intestazioni solo al primo ciclo */
-            if ($isFirstChunk):
-                fputs($file, "\xEF\xBB\xBF");
-                fputcsv($file, array_keys($records[0]), ',');
-                $isFirstChunk = false;
-            endif;
+            /* Intestazioni solo al primo ciclo */
+            fputs($file, "\xEF\xBB\xBF");
+            fputcsv($file, array_keys($records[0]), ',');
+        else:
+            $filePath = $directory . $fileName;
+            $file = fopen($filePath, 'a');
+        endif;
 
-            /* Scriviamo tutte le righe del blocco corrente */
-            foreach ($records as $row):
-                fputcsv($file, $row, ',');
-            endforeach;
+        /* Se il blocco è vuoto negli offset successivi, abbiamo finito */
+        if (empty($records)):
+            fclose($file);
+            $currentAdmin = service('authorization')->currentAdmin();
+            log_admin_activity('EXPORT_DATA', $entity, sprintf(lang('Esportazione completata: %s'), $entity), $currentAdmin);
+            return [
+                'result' => true,
+                'isFinished' => true,
+                'message' => sprintf(lang('backend/components/export.messages.exportSuccess'), $entity),
+                'downloadUrl' => base_url('backend/export/download/' . $fileName)
+            ];
+        endif;
 
-            /* Se abbiamo estratto meno record del limite, significa che è l'ultimo blocco */
-            if (count($records) < $limit):
-                break;
-            endif;
-
-            /* Prepariamo l'inizio del blocco successivo */
-            $offset += $limit;
-
-        endwhile;
+        /* Scrittura dati del blocco corrente */
+        foreach ($records as $row):
+            fputcsv($file, $row, ',');
+        endforeach;
 
         fclose($file);
 
-        /* Log e risposta finale */
-        $currentAdmin = service('authorization')->currentAdmin();
-        log_admin_activity('EXPORT_DATA', $entity, sprintf(lang('Esportazione dati dalla tabella: %s'), $entity), $currentAdmin);
+        /* Controllo di fine: se estratte meno righe del limite, era l'ultimo blocco */
+        $isFinished = count($records) < $limit;
+        $nextOffset = $offset + count($records);
+
+        if ($isFinished):
+            $currentAdmin = service('authorization')->currentAdmin();
+            log_admin_activity('EXPORT_DATA', $entity, sprintf(lang('Esportazione completata: %s'), $entity), $currentAdmin);
+            return [
+                'result' => true,
+                'isFinished' => true,
+                'message' => sprintf(lang('backend/components/export.messages.exportSuccess'), $entity),
+                'downloadUrl' => base_url('backend/export/download/' . $fileName)
+            ];
+        endif;
 
         return [
             'result' => true,
-            'message' => lang('backend/components/export.messages.exportSuccess'),
-            'downloadUrl' => base_url('backend/export/download/' . $fileName),
+            'isFinished' => false,
+            'nextOffset' => $nextOffset,
+            'fileName' => $fileName
         ];
     }
 }

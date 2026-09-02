@@ -22,7 +22,7 @@
 
     <div class="row">
         <div class="col-6">
-            <h2 class="card-title text-center text-lg-start mb-0">
+            <h2 class="card-title text-start mb-0">
                 <?= lang('backend/components/uploadPreviewImg.title'); ?>
             </h2>
         </div>

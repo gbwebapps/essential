@@ -169,5 +169,7 @@ return [
 		'alreadyDefault' => 'Non esistono impostazioni da eliminare dal database.', 
 		'areYouSureDeleteSettings' => 'Sei sicuro di voler eliminare le impostazioni dal database?',
 		'areYouSureRefreshSettings' => 'Sei sicuro di voler ricaricare le impostazioni?', 
+		'sourceDatabase' => 'Configurazione personalizzata attiva &bull; Lettura dal Database.',
+		'sourceConfigFile' => 'Configurazione di base attiva &bull; Lettura dal file di Configurazione.',
 	], 
 ];

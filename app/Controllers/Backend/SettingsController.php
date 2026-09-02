@@ -78,6 +78,9 @@ class SettingsController extends BackendController
 
             $namespace = 'Backend\\' . ucfirst($env);
 
+            /* Verifica l'origine dei dati per informare l'interfaccia (DB o Config File) */
+            $this->data['isFromDatabase'] = $this->settingsModel->hasDatabaseSettings($namespace);
+
             /* Estrazione globale dell'intero gruppo */
             $this->data[$env . 'Settings'] = $this->settingsModel->getSettings($namespace);
 
@@ -125,6 +128,9 @@ class SettingsController extends BackendController
             if ($saveResult !== null && $saveResult['result'] === false) :
                 return $this->jsonResponse(['result'  => false, 'message' => $saveResult['message']]);
             endif;
+
+            /* Verifica l'origine dei dati per informare l'interfaccia (DB o Config File) */
+            $this->data['isFromDatabase'] = $this->settingsModel->hasDatabaseSettings($namespace);
 
             /* 3. Ricarica i settaggi aggiornati (ora puliti e rinfrescati) per la vista */
             $this->data[$env . 'Settings'] = $this->settingsModel->getSettings($namespace);

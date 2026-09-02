@@ -32,13 +32,15 @@
                                 $isAssigned = $isGroupActive;
                             endif;
 
-                            /* Configurazione del link pulsante in base allo stato effettivo */
+                            /* Configurazione del link pulsante e del verbo per il messaggio di conferma */
                             if ($isAssigned):
                                 $permText = lang('backend/admins.labels.assigned');
                                 $permClass = "btn btn-link text-success fw-bold shadow-none p-0";
+                                $actionVerb = lang('backend/admins.labels.removeVerb'); /* Es: "rimuovere" */
                             else:
                                 $permText = lang('backend/admins.labels.notAssigned');
                                 $permClass = "btn btn-link text-danger fw-bold shadow-none p-0";
+                                $actionVerb = lang('backend/admins.labels.assignVerb'); /* Es: "assegnare" */
                             endif;
                         ?>
 
@@ -46,7 +48,7 @@
                             <ul class="list-group list-group-flush border rounded-2">
                                 <li class="list-group-item" style="min-height: 75px;">
                                     <label class="fw-bold text-dark d-block mb-1">
-                                        <form class="changePermission" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureChangePermission'), esc($admin->firstname), esc($admin->lastname)); ?>">
+                                        <form class="changePermission" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureChangePermission'), $actionVerb, $v, esc($admin->firstname), esc($admin->lastname)); ?>">
                                             <input type="hidden" name="permission" value="<?= $k; ?>">
                                             <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
                                             <button type="submit" class="<?= $permClass; ?>">

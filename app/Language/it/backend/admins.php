@@ -34,8 +34,6 @@ return [
 		'activeRecords' => 'Attivi', 
 		'trashedRecords' => 'Eliminati', 
 		'allRecords' => 'Tutti', 
-		'export' => 'Esporta CSV', 
-		'import' => 'Importa CSV'
 	],
 	'labels' => [
 		'id' => 'ID', 
@@ -73,7 +71,9 @@ return [
         'action' => 'Azione', 
         'section' => 'Sezione', 
         'details' => 'Operazione', 
-        'deleted' => 'Eliminato'
+        'deleted' => 'Eliminato', 
+        'removeVerb' => 'rimuovere', 
+        'assignVerb' => 'assegnare', 
 	],
 	'placeholders' => [
 		'firstname' => 'Inserisci nome...', 
@@ -105,7 +105,7 @@ return [
 		'refreshData' => 'Ricarica dati', 
 		'reload' => 'Ricarica pannello', 
 		'print' => 'Stampa', 
-		'export' => 'Esporta'
+		'exportPdf' => 'Esporta Pdf'
 	],
 	'errors' => [
 		'uuid' => 'UUID non conforme.', 
@@ -121,7 +121,7 @@ return [
 		'areYouSureSoftDelete' => 'Sei sicuro di eliminare  %s %s?', 
 		'areYouSureRestoreDelete' => 'Sei sicuro di ripristinare  %s %s?',
 		'areYouSureHardDelete' => 'Sei sicuro di eliminare definitivamente  %s %s?',  
-		'areYouSureChangePermission' => 'Sei sicuro di modificare il permesso di %s %s?', 
+		'areYouSureChangePermission' => 'Sei sicuro di %s il permesso %s a %s %s?', 
 		'areYouSureDeleteToken' => 'Sei sicuro di eliminare il token di  %s %s?', 
 		'areYouSureChangeGroup' => 'Il cambio gruppo modificherà temporaneamente la visualizzazione dei permessi. Se confermerai e salverai la pagina, le vecchie eccezioni verranno eliminate dal database. Procedere con il cambio visivo?', 
 		'noAdminsFound' => 'Non sono presenti amministratori.', 

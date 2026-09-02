@@ -11,20 +11,24 @@ return [
 		'maxLength' => 'Lunghezza', 
 		'keysAndIndexes' => 'Chiave primaria e indici', 
 		'uploadCsv' => 'Carica file', 
+        'toggleVisibility' => 'Mostra/Nascondi', 
 	], 
 	'links' => [
-		'downloadTemplate' => 'Scarica il file CSV di esempio per <span class="text-primary fw-bold">%s</span>'
+		'downloadTemplate' => 'Scarica il file CSV di esempio per <span class="text-primary fw-bold">%s</span>', 
+        'import' => 'Importa CSV',
 	], 
     'buttons' => [
     	'close' => 'Chiudi', 
     	'import' => 'Importa', 
+        'remove' => 'Rimuovi', 
     ], 
     'errors' => [
     	'uploaded' => 'Devi selezionare un file da importare.', 
     	'ext_in' => 'Il file caricato non è in un formato valido.', 
     ], 
     'messages' => [
-        'validateToastErrors' => '%s',
+        'validateToastErrors' => '%s', 
+        'validationErrors' => '%d errori di validazione.', 
         'invalidEntity' => 'Nome tabella sconosciuto.', 
         'noStructure' => 'Non ci sono dati per la struttura di questa tabella.', 
         'fileReadError' => 'Errore di lettura del file.', 
@@ -42,5 +46,6 @@ return [
         'importationUndone' => "Importazione annullata: rilevata riga con numero errato di colonne rispetto all'intestazione.", 
         'importTransactionError' => 'Errore durante l\'esecuzione del processo di importazione. ', 
         'importationNoRecordsModified' => 'Importazione completata: nessun record modificato poiché i dati sono già allineati.', 
+        'processedRows' => 'Elaborate %d righe', 
     ],
 ];

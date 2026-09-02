@@ -439,4 +439,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
         top: 0;
         width: 100%;
     }
+
+    /* Nasconde la classe indesiderata all'interno del wrapper */
+    #show-wrapper .btn-secondary, 
+    #show-wrapper .scrollup {
+        display: none !important;
+    }
 }

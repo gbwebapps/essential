@@ -79,6 +79,7 @@ export class ToolsManager {
                                 if (data.noDataMessage && typeof showAlert === 'function') {
                                     showAlert('info', data.noDataMessage);
                                 }
+                                await this.reset('manageAudits');
                                 return;
                             }
 
@@ -89,7 +90,7 @@ export class ToolsManager {
                                 if ( ! ok) return;
                             }
                             
-                            this.executeAction(form, actionUrl, 'manageAudits');
+                            await this.executeAction(form, actionUrl, 'manageAudits');
                         }
                     }
                 } catch (error) {
@@ -100,14 +101,14 @@ export class ToolsManager {
         });
 
         /* 2. Gestione Submit Form per moduli singoli (dbMaintenance, backups) */
-        document.addEventListener('submit', e => {
+        document.addEventListener('submit', async e => {
             if (e.target && e.target.id.endsWith('-tools-form')) {
                 const env = e.target.id.replace('-tools-form', '');
                 
                 if (typeof this.routes[env] === 'string') {
                     e.preventDefault();
                     const actionUrl = urlbase + this.routes[env];
-                    this.executeAction(e.target, actionUrl, env);
+                    await this.executeAction(e.target, actionUrl, env);
                 }
             }
         });
@@ -127,13 +128,13 @@ export class ToolsManager {
                 const form = resetBtn.closest('form');
                 if (form && form.id.endsWith('-tools-form')) {
                     const env = form.id.replace('-tools-form', '');
-                    this.reset(resetBtn, env);
+                    await this.reset(env);
                 }
             }
         });
 
         /* 6. Gestione ottimizzazione tabelle Database (Singola e Massiva) */
-        document.addEventListener('click', e => {
+        document.addEventListener('click', async e => {
             const btn = e.target.closest('.btn-optimize-table, .btn-optimize-all');
             if (btn) {
                 e.preventDefault();
@@ -167,7 +168,7 @@ export class ToolsManager {
 
                 const actionUrl = urlbase + this.routes.dbMaintenance;
                 
-                this.executeAction(form, actionUrl, 'updateTablesDOM');
+                await this.executeAction(form, actionUrl, 'updateTablesDOM');
                 
                 /* Pulisce il form a fine operazione */
                 tempInputs.forEach(input => input.remove());
@@ -175,7 +176,7 @@ export class ToolsManager {
         });
 
         /* 8. Gestione Generazione Backup Database */
-        document.addEventListener('click', e => {
+        document.addEventListener('click', async e => {
             const btnBackup = e.target.closest('.btn-generate-backups');
             if (btnBackup) {
                 e.preventDefault();
@@ -193,7 +194,7 @@ export class ToolsManager {
                 /* Utilizza la rotta dedicata ai backups */
                 const actionUrl = urlbase + this.routes.backups; 
                 
-                this.executeAction(form, actionUrl, 'backups');
+                await this.executeAction(form, actionUrl, 'backups');
                 
                 /* Pulisce il form eliminando l'input temporaneo */
                 actionInput.remove();
@@ -231,12 +232,12 @@ export class ToolsManager {
                 const actionUrl = urlbase + this.routes.backups; 
                 
                 /* Esegue l'azione e ricarica il pannello backups */
-                this.executeAction(tempForm, actionUrl, 'backups');
+                await this.executeAction(tempForm, actionUrl, 'backups');
             }
         });
 
         /* Gestione Download Backup */
-        document.addEventListener('click', e => {
+        document.addEventListener('click', async e => {
             const btnDownload = e.target.closest('.btn-download-backups');
             if (btnDownload) {
                 e.preventDefault();
@@ -261,7 +262,7 @@ export class ToolsManager {
                 const actionUrl = urlbase + this.routes.backups; 
                 
                 /* Passa null come env per evitare il ricaricamento del DOM */
-                this.executeAction(tempForm, actionUrl, null);
+                await this.executeAction(tempForm, actionUrl, null);
             }
         });
 
@@ -351,7 +352,7 @@ export class ToolsManager {
     }
 
     /* Ricarica la vista parziale per resettare il form */
-    async reset(resetBtn, env) {
+    async reset(env) {
         if (this.isSubmitting) return;
         this.isSubmitting = true;
 

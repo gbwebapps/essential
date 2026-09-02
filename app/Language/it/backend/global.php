@@ -31,7 +31,9 @@ return [
         'undo' => 'Annulla', 
         'export' => 'Esporta', 
         'yes' => 'Si', 
-        'no' => 'No'
+        'no' => 'No', 
+        'close' => 'Chiudi', 
+        'exportPdf' => 'Esporta Pdf', 
     ],
     'modals' => [
         'exportPdfTitle' => 'Impostazioni Esportazione PDF', 

@@ -102,11 +102,21 @@ class ImportController extends BaseController
 
             /* Se la validazione fallisce (es. colonne mancanti o errate), blocchiamo tutto */
             if ($previewData['status'] === false):
+
+                /* 1. Caso array di errori strutturali: compila la vista HTML dell'alert */
+                if (isset($previewData['validationErrors'])):
+                    $errorOutput = view('backend/components/import/errorsModalPartial', [
+                        'validationErrors' => $previewData['validationErrors']
+                    ]);
+                    return $this->jsonResponse(['result' => false, 'errorOutput' => $errorOutput]);
+                endif;
+                
+                /* 2. Caso errore generico bloccante: restituisce il messaggio semplice */
                 return $this->jsonResponse(['result' => false, 'message' => $previewData['message']]);
             endif;
 
             /* Prepara la vista con la tabella di anteprima dei dati */
-            $output = view('backend/components/import/previewModalView', [
+            $output = view('backend/components/import/previewModalPartial', [
                 'entity' => $entity,
                 'headers' => $previewData['headers'],
                 'rows' => $previewData['rows'], 
@@ -157,25 +167,35 @@ class ImportController extends BaseController
             endif;
             /* --- FINE MODIFICA CHUNKING --- */
 
-            /* --- INIZIO MODIFICA CHUNKING: Passaggio offset al model --- */
-            /* Avvio scrittura massiva a blocchi */
             $importResult = $this->importModel->executeImport($entity, $tempFile, $offset);
-            /* --- FINE MODIFICA CHUNKING --- */
 
             if ($importResult['status'] === false):
                 return $this->jsonResponse(['result' => false, 'message' => $importResult['message']]);
             endif;
 
-            /* --- INIZIO MODIFICA CHUNKING: Restituzione dati di stato al JS --- */
+            /* Somma i totali inviati dal Javascript con il parziale di quest'ultimo blocco */
+            $totalInserted = (int)$this->request->getPost('accumulatedInserted') + $importResult['inserted'];
+            $totalUpdated  = (int)$this->request->getPost('accumulatedUpdated') + $importResult['updated'];
+
+            /* Genera il messaggio corretto solo al giro finale */
+            $finalMessage = '';
+            if ($importResult['isFinished']):
+                $finalMessage = ($totalInserted + $totalUpdated) === 0 
+                    ? lang('backend/components/import.messages.importationNoRecordsModified') 
+                    : sprintf(lang('backend/components/import.messages.importSuccess'), $totalInserted, $totalUpdated);
+            endif;
+
             return $this->jsonResponse([
                 'result' => true, 
-                'message' => $importResult['message'],
+                'message' => $finalMessage,
                 'nextOffset' => $importResult['nextOffset'],
                 'isFinished' => $importResult['isFinished'],
+                /* Passiamo i parziali al JS per il prossimo giro */
                 'inserted' => $importResult['inserted'],
-                'updated' => $importResult['updated']
+                'updated' => $importResult['updated'],
+                'progressOutput' => view('backend/components/import/loadingModalPartial'), 
+                'progressMessage' => sprintf(lang('backend/components/import.messages.processedRows'), $importResult['nextOffset']),
             ]);
-            /* --- FINE MODIFICA CHUNKING --- */
 
         endif;
     }

@@ -5,7 +5,7 @@
                 <?php foreach ($images as $img): ?>
                     <div class="col-6 col-lg-3 mb-3 text-center">
 
-                        <?php $bg = ((int) $img['is_cover'] === 1) ? 'bg-success' : 'bg-white'; ?>
+                        <?php $bg = ((int) $img['is_cover'] === 1) ? 'bg-dark' : 'bg-white'; ?>
 
                         <div class="position-relative preview-item rounded overflow-hidden <?= $bg; ?> p-1 border shadow-sm"
                              data-id="<?= esc($img['id']); ?>"
@@ -21,7 +21,7 @@
 
                                      <?php if ((int) $img['is_cover'] === 1): ?>
                                          <!-- Usiamo direttamente l'icona con un'ombra nativa per massima pulizia grafica -->
-                                         <i class="fa-solid fa-circle-check fa-2x position-absolute top-0 start-0 m-2 text-success"></i>
+                                         <i class="fa-solid fa-circle-check fa-2x position-absolute top-0 start-0 m-2 text-dark"></i>
                                      <?php endif; ?>
                                 
                                 <div class="gallery-one-overlay d-flex justify-content-center align-items-center">
@@ -64,7 +64,7 @@
 
                                     <?php if ((int) $img['is_cover'] === 1) : ?>
                                         <!-- C'è solo questa icona nell'angolo. Quella centrale è stata eliminata definitivamente -->
-                                        <i class="fa-solid fa-circle-check fa-2x position-absolute top-0 start-0 m-2 text-success"></i>
+                                        <i class="fa-solid fa-circle-check fa-2x position-absolute top-0 start-0 m-2 text-dark"></i>
                                     <?php endif; ?>
 
                                 </a>

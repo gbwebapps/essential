@@ -39,6 +39,7 @@ export class ListManager {
         /* NUOVO: Variabili di stato */
         this.eventsBound = false;
         this.isLoading = false;
+        this.isResetting = false;
     }
 
     init() {
@@ -165,11 +166,33 @@ export class ListManager {
         });
 
         /* Azioni Toolbar */
-        document.getElementById('link-reset-search')?.addEventListener('click', (e) => {
+        // document.getElementById('link-reset-search')?.addEventListener('click', async (e) => {
+        //     e.preventDefault();
+            
+        //     this.isResetting = true; // ACCENDE IL SILENZIATORE
+            
+        //     this.resetFilters();
+        //     this.resetSortingAndPagination();
+        //     await this.showAll();
+            
+        //     this.isResetting = false; // SPEGNE IL SILENZIATORE
+        // });
+
+        document.getElementById('link-reset-search')?.addEventListener('click', async (e) => {
             e.preventDefault();
+            
+            this.isResetting = true; // ACCENDE IL SILENZIATORE
+            
             this.resetFilters();
             this.resetSortingAndPagination();
-            this.showAll();
+            
+            /* Uccide i timer in sospeso e sblocca il semaforo per garantire l'esecuzione */
+            clearTimeout(this.debounceTimer);
+            this.isLoading = false;
+            
+            await this.showAll();
+            
+            this.isResetting = false; // SPEGNE IL SILENZIATORE
         });
 
         document.getElementById('reset-sorting-link')?.addEventListener('click', (e) => {
@@ -200,6 +223,9 @@ export class ListManager {
             if ( ! inputEl) return;
 
             const handleSearchUpdate = (useDebounce) => {
+
+                if (this.isResetting) return;
+
                 const value = inputEl.value;
                 localStorage.setItem(`${this.config.controller}_${field.name}`, value);
                 this.state[field.type][field.name] = value;
@@ -278,8 +304,12 @@ export class ListManager {
                     fp.clear();
                 } else {
                     inputEl.value = '';
-                    const resetBtn = inputEl.closest('.input-group')?.querySelector('.reset-search-field');
-                    if (resetBtn) resetBtn.style.display = 'none';
+                }
+
+                /* Nasconde forzatamente la "x" sia per le date che per i testi */
+                const resetBtn = inputEl.closest('.input-group')?.querySelector('.reset-search-field');
+                if (resetBtn) {
+                    resetBtn.style.display = 'none';
                 }
             }
             

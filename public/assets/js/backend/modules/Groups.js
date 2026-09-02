@@ -70,7 +70,7 @@ export class GroupsManager {
                 const ok = await askConfirm(message);
                 if ( ! ok) return;
 
-                this.handleRefreshGroup(refreshBtn);
+                await this.handleRefreshGroup(refreshBtn);
             }
         });
 
@@ -84,7 +84,7 @@ export class GroupsManager {
                 const ok = await askConfirm(message);
                 if ( ! ok) return;
 
-                this.handleDeleteGroup(deleteBtn);
+                await this.handleDeleteGroup(deleteBtn);
             }
         });
 
@@ -98,7 +98,7 @@ export class GroupsManager {
                 const ok = await askConfirm(message);
                 if ( ! ok) return;
 
-                this.handleResetGroup(resetBtn);
+                await this.handleResetGroup(resetBtn);
             }
         });
 
@@ -135,7 +135,7 @@ export class GroupsManager {
                 const ok = await askConfirm(message);
                 if ( ! ok) return;
                 
-                this.handleRefreshAdminPermissions(refreshAdminBtn);
+                await this.handleRefreshAdminPermissions(refreshAdminBtn);
             }
         });
 
@@ -362,7 +362,7 @@ export class GroupsManager {
             }
 
             if (data.result === true && data.output && container) {
-                this.smoothReplace(container, data.output);
+                smoothReplace(container, data.output);
             }
 
         } catch (error) {

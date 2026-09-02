@@ -74,7 +74,7 @@ class BackendButtonsCell
                     'btn_left' => 'btn btn-primary btn-sm me-2',
                     'message_left' => '', 
                     'id_right' => 'show-export-button',
-                    'text_right' => lang('backend/' . $controller . '.buttons.export'),
+                    'text_right' => lang('backend/' . $controller . '.buttons.exportPdf'),
                     'icon_right' => '<i class="fa-solid fa-file-export d-none d-sm-inline"></i>',
                     'btn_right' => 'btn btn-primary btn-sm ms-2',
                     'message_right' => '', 

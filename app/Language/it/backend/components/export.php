@@ -2,18 +2,11 @@
 
 return [
 	'panels' => [
-		'main' => 'Seleziona le colonne da esportare',
+		'main' => 'Esportazione dati CSV dalla tabella <span class="text-primary fw-bold">%s</span>', 
 	], 
-	'labels' => [
-		'entity' => 'Tabella', 
-        'columns' => 'Colonne', 
-        'noColumns' => 'Non sono state selezionate colonne.', 
-        'order' => 'Direzione ordinamento', 
-        'column' => 'Colonna ordinamento', 
-        'trash_filter' => 'Tipo di visualizzazione', 
-        'page' => 'Pagina ordinamento', 
-        'selectAll' => 'Seleziona / Deseleziona tutte'
-	], 
+    'links' => [
+        'export' => 'Esporta CSV', 
+    ],
     'buttons' => [
     	'undo' => 'Annulla', 
     	'export' => 'Esporta', 
@@ -24,5 +17,6 @@ return [
         'noColumnsSelected' => 'Non sono state selezionate colonne.', 
         'noDataFound' => 'Non sono stati trovati records.', 
         'exportSuccess' => 'Esportazione tabella %s avvenuta con successo.', 
+        'processedRows' => 'Elaborate %d righe', 
     ],
 ];

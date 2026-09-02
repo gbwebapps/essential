@@ -57,8 +57,8 @@
                                     <!-- End Semplice ricarica lista -->
 
                                     <!-- Esporta lista csv diretta -->
-                                    <a href="#" class="mb-md-0 ms-0 mx-md-2 bar-link" id="export-entity" data-export-entity="admins_tokens">
-                                        <i class="fa-solid fa-file-csv"></i> <?= lang('backend/admins.links.export'); ?>
+                                    <a href="#" class="mb-2 mb-md-0 mx-0 mx-md-2 bar-link" id="export-entity" data-export-entity="admins_tokens">
+                                        <i class="fa-solid fa-file-export"></i> <?= lang('backend/components/export.links.export'); ?>
                                     </a>
                                     <!-- End esporta lista csv -->
 
@@ -152,5 +152,7 @@
             </div>
         </div>
     </div>
+
+    <div id="export-modal-container"></div>
     
 <?= $this->endSection() ?>

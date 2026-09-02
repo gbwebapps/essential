@@ -4,7 +4,9 @@
         <div class="modal-content shadow">
 
             <div class="modal-header border-0">
-                <h5 class="modal-title"><?= lang('backend/global.modals.exportPdfTitle'); ?></h5>
+                <h5 class="modal-title">
+                    <i class="fa-solid fa-file-export"></i> <?= lang('backend/global.modals.exportPdfTitle'); ?>
+                </h5>
             </div>
 
             <div class="modal-body">
@@ -107,8 +109,12 @@
             </div>
             
             <div class="modal-footer border-0">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><?= lang('backend/global.buttons.undo'); ?></button>
-                <button type="submit" class="btn btn-success" form="exportPdfForm"><?= lang('backend/global.buttons.export'); ?></button>
+                <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-xmark"></i> <?= lang('backend/global.buttons.close'); ?>
+            </button>
+                <button type="submit" class="btn btn-success btn-sm" form="exportPdfForm">
+                    <i class="fa-solid fa-file-export"></i> <?= lang('backend/global.buttons.exportPdf'); ?>
+            </button>
             </div>
 
         </div>

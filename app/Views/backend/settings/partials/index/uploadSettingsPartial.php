@@ -1,4 +1,18 @@
 <div class="card-body">
+
+    <!-- Indicatore della sorgente dati -->
+    <div class="ps-2 py-1 bg-light fw-bold small mb-3 border text-center rounded-2">
+        <?php if (isset($isFromDatabase) && $isFromDatabase): ?>
+            <span class="text-primary">
+                <i class="fa-solid fa-database me-1"></i> <?= lang('backend/settings.messages.sourceDatabase'); ?>
+            </span>
+        <?php else: ?>
+            <span class="text-secondary">
+                <i class="fa-solid fa-file-code me-1"></i> <?= lang('backend/settings.messages.sourceConfigFile'); ?>
+            </span>
+        <?php endif; ?>
+    </div>
+    
     <form id="upload-settings" autocomplete="off" novalidate>
         <div class="row">
             <div class="col-12">
