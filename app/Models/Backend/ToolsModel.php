@@ -367,7 +367,7 @@ class ToolsModel extends BackendModel
 	 * 
 	 * @var array
 	 */
-	protected array $cleanableFolders = ['backups/database', 'backups/imports', 'cache', 'debugbar', 'exports', 'logs', 'session', 'uploads/csv'];
+	protected array $cleanableFolders = ['backups/database', 'backups/imports', 'cache', 'debugbar', 'exports', 'logs', 'session', 'uploads/staging'];
 
 	/**
 	 * Scansiona le cartelle autorizzate e restituisce il conteggio dei file eliminabili.

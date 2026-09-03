@@ -81,8 +81,9 @@
                                         <!-- Definisco un default se non c'é immagine -->
                                         <?php $cover = ($admin->cover ?? null); ?>
                                         <?php $isTrashed = ( ! is_null($admin->deleted_at)); ?>
+                                        <?php $isSuperadmin = (int) $admin->superadmin === 1; ?>
                                         
-                                        <tr class="<?= $isTrashed ? 'text-decoration-line-through' : ''; ?>">
+                                        <tr class="<?= $isTrashed ? 'text-decoration-line-through' : ''; ?> <?= $isSuperadmin ? 'table-light' : ''; ?>">
                                             <!-- Cella allegati -->
                                             <td rowspan="2" class="align-middle text-center border-end fw-bold">
                                                 <span class="badge bg-info"><?= $admin->images_num; ?></span>
@@ -98,128 +99,138 @@
                                             </td>
 
                                             <!-- Cella firstname -->
-                                            <td class="align-middle">
+                                            <td class="align-middle border-bottom-0 fw-bold">
                                                 <span><?= esc($admin->firstname); ?></span>
                                             </td>
 
                                             <!-- Cella lastname -->
-                                            <td class="align-middle">
+                                            <td class="align-middle border-bottom-0 fw-bold">
                                                 <span><?= esc($admin->lastname); ?></span>
                                             </td>
 
                                             <!-- Cella email -->
-                                            <td class="align-middle">
+                                            <td class="align-middle border-bottom-0 fw-bold">
                                                 <span><?= esc($admin->email); ?></span>
                                             </td>
 
                                             <!-- Cella phone -->
-                                            <td class="align-middle">
+                                            <td class="align-middle border-bottom-0 fw-bold">
                                                 <span><?= esc($admin->phone); ?></span>
                                             </td>
 
                                             <!-- Cella status -->
-                                            <td class="align-middle text-center">
-                                                <?php if( ! $isTrashed): ?>
-                                                    <?php
-                                                        $status = (int) $admin->status;
+                                            <td class="align-middle text-center border-bottom-0">
+                                                <?php if( ! $isSuperadmin): ?>
 
-                                                        if($status === 1):
-                                                            $statusText = lang('backend/admins.labels.active');
-                                                            $statusClass ="text-success btn btn-link shadow-none";
-                                                        elseif($status === 0):
-                                                            $statusText = lang('backend/admins.labels.unactive');
-                                                            $statusClass ="text-danger btn btn-link shadow-none";
-                                                        endif;
-                                                    ?>
-                                                    <form class="changeStatus" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureChangeStatus'), esc($admin->firstname), esc($admin->lastname)); ?>">
-                                                        <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
-                                                        <button type="submit" class="<?= $statusClass; ?>">
-                                                            <?= $statusText; ?>
-                                                        </button>
-                                                    </form>
-                                                <?php else: ?>
-                                                    <?php if($isTrashed): ?>
-                                                        <span class="badge bg-danger p-2 border-0 rounded-1"><?= lang('backend/admins.labels.deleted'); ?></span>
+                                                    <?php if( ! $isTrashed): ?>
+                                                        <?php
+                                                            $status = (int) $admin->status;
+
+                                                            if($status === 1):
+                                                                $statusText = lang('backend/admins.labels.active');
+                                                                $statusClass ="text-success btn btn-link shadow-none fw-bold";
+                                                            elseif($status === 0):
+                                                                $statusText = lang('backend/admins.labels.unactive');
+                                                                $statusClass ="text-danger btn btn-link shadow-none fw-bold";
+                                                            endif;
+                                                        ?>
+                                                        <form class="changeStatus" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureChangeStatus'), esc($admin->firstname), esc($admin->lastname)); ?>">
+                                                            <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
+                                                            <button type="submit" class="<?= $statusClass; ?>">
+                                                                <?= $statusText; ?>
+                                                            </button>
+                                                        </form>
+                                                    <?php else: ?>
+                                                        <?php if($isTrashed): ?>
+                                                            <span class="badge bg-danger p-2 border-0 rounded-1"><?= lang('backend/admins.labels.deleted'); ?></span>
+                                                        <?php endif; ?>
                                                     <?php endif; ?>
+
                                                 <?php endif; ?>
                                             </td>
 
                                             <!-- Cella Dropdown Menu -->
-                                            <td class="align-middle text-end">
-                                                <!-- Pulsante Azioni -->
-                                                <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <?= lang('backend/admins.buttons.actions'); ?>
-                                                </button>
+                                            <td class="align-middle text-end border-bottom-0">
 
-                                                <!-- Corpo Dropdown -->
-                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                <?php if( ! $isSuperadmin): ?>
 
-                                                    <?php if( ! $isTrashed): ?>
-                                                        <!-- Pulsante Dettaglio -->
-                                                        <li>
-                                                            <a class="dropdown-item" href="<?= base_url('backend/admins/show/' . esc($admin->uuid)); ?>">
-                                                                <i class="fa-solid fa-user"></i> <?= lang('backend/admins.actions.show'); ?>
-                                                            </a>
-                                                        </li>
-                                                        <li><hr class="dropdown-divider"></li>
+                                                    <!-- Pulsante Azioni -->
+                                                    <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <?= lang('backend/admins.buttons.actions'); ?>
+                                                    </button>
 
-                                                        <!-- Pulsante Aggiorna -->
-                                                        <li>
-                                                            <a class="dropdown-item" href="<?= base_url('backend/admins/edit/' . esc($admin->uuid)); ?>">
-                                                                <i class="fa-solid fa-user-pen"></i> <?= lang('backend/admins.actions.edit'); ?>
-                                                            </a>
-                                                        </li>
-                                                        <li><hr class="dropdown-divider"></li>
+                                                    <!-- Corpo Dropdown -->
+                                                    <ul class="dropdown-menu dropdown-menu-end">
 
-                                                        <!-- Pulsante Reset password -->
-                                                        <li>
-                                                            <form class="resetAdmin" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureReset'), esc($admin->firstname), esc($admin->lastname)); ?>">
-                                                                <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
-                                                                <button type="submit" class="dropdown-item btn-link text-secondary">
-                                                                    <i class="fa-solid fa-unlock"></i> <?= lang('backend/admins.actions.reset'); ?>
-                                                                </button>
-                                                            </form>
-                                                        </li>
-                                                        <li><hr class="dropdown-divider"></li>
+                                                        <?php if( ! $isTrashed): ?>
+                                                            <!-- Pulsante Dettaglio -->
+                                                            <li>
+                                                                <a class="dropdown-item" href="<?= base_url('backend/admins/show/' . esc($admin->uuid)); ?>">
+                                                                    <i class="fa-solid fa-user"></i> <?= lang('backend/admins.actions.show'); ?>
+                                                                </a>
+                                                            </li>
+                                                            <li><hr class="dropdown-divider"></li>
 
-                                                        <!-- Pulsante Elimina (Soft Delete) -->
-                                                        <li>
-                                                            <form class="deleteRecord" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureSoftDelete'), esc($admin->firstname), esc($admin->lastname)); ?>">
-                                                                <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
-                                                                <button type="submit" class="dropdown-item btn-link text-secondary">
-                                                                    <i class="fa-solid fa-trash"></i> <?= lang('backend/admins.actions.softDelete'); ?>
-                                                                </button>
-                                                            </form>
-                                                        </li>
-                                                    <?php else: ?>
-                                                        <!-- Pulsante Ripristina (Restore Delete) -->
-                                                        <li>
-                                                            <form class="restoreRecord" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureRestoreDelete'), esc($admin->firstname), esc($admin->lastname)); ?>">
-                                                                <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
-                                                                <button type="submit" class="dropdown-item btn-link text-success">
-                                                                    <i class="fa-solid fa-trash-arrow-up"></i> <?= lang('backend/admins.actions.restoreDelete'); ?>
-                                                                </button>
-                                                            </form>
-                                                        </li>
-                                                        <li><hr class="dropdown-divider"></li>
+                                                            <!-- Pulsante Aggiorna -->
+                                                            <li>
+                                                                <a class="dropdown-item" href="<?= base_url('backend/admins/edit/' . esc($admin->uuid)); ?>">
+                                                                    <i class="fa-solid fa-user-pen"></i> <?= lang('backend/admins.actions.edit'); ?>
+                                                                </a>
+                                                            </li>
+                                                            <li><hr class="dropdown-divider"></li>
 
-                                                        <!-- Pulsante Elimina Definitivamente (Hard Delete) -->
-                                                        <li>
-                                                            <form class="hardDeleteRecord" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureHardDelete'), esc($admin->firstname), esc($admin->lastname)); ?>">
-                                                                <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
-                                                                <button type="submit" class="dropdown-item btn-link text-danger">
-                                                                    <i class="fa-solid fa-trash"></i> <?= lang('backend/admins.actions.hardDelete'); ?>
-                                                                </button>
-                                                            </form>
-                                                        </li>
-                                                    <?php endif; ?>
+                                                            <!-- Pulsante Reset password -->
+                                                            <li>
+                                                                <form class="resetAdmin" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureReset'), esc($admin->firstname), esc($admin->lastname)); ?>">
+                                                                    <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
+                                                                    <button type="submit" class="dropdown-item btn-link text-secondary">
+                                                                        <i class="fa-solid fa-unlock"></i> <?= lang('backend/admins.actions.reset'); ?>
+                                                                    </button>
+                                                                </form>
+                                                            </li>
+                                                            <li><hr class="dropdown-divider"></li>
 
-                                                </ul>
+                                                            <!-- Pulsante Elimina (Soft Delete) -->
+                                                            <li>
+                                                                <form class="deleteRecord" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureSoftDelete'), esc($admin->firstname), esc($admin->lastname)); ?>">
+                                                                    <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
+                                                                    <button type="submit" class="dropdown-item btn-link text-secondary">
+                                                                        <i class="fa-solid fa-trash"></i> <?= lang('backend/admins.actions.softDelete'); ?>
+                                                                    </button>
+                                                                </form>
+                                                            </li>
+                                                        <?php else: ?>
+                                                            <!-- Pulsante Ripristina (Restore Delete) -->
+                                                            <li>
+                                                                <form class="restoreRecord" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureRestoreDelete'), esc($admin->firstname), esc($admin->lastname)); ?>">
+                                                                    <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
+                                                                    <button type="submit" class="dropdown-item btn-link text-success">
+                                                                        <i class="fa-solid fa-trash-arrow-up"></i> <?= lang('backend/admins.actions.restoreDelete'); ?>
+                                                                    </button>
+                                                                </form>
+                                                            </li>
+                                                            <li><hr class="dropdown-divider"></li>
+
+                                                            <!-- Pulsante Elimina Definitivamente (Hard Delete) -->
+                                                            <li>
+                                                                <form class="hardDeleteRecord" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureHardDelete'), esc($admin->firstname), esc($admin->lastname)); ?>">
+                                                                    <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
+                                                                    <button type="submit" class="dropdown-item btn-link text-danger">
+                                                                        <i class="fa-solid fa-trash"></i> <?= lang('backend/admins.actions.hardDelete'); ?>
+                                                                    </button>
+                                                                </form>
+                                                            </li>
+                                                        <?php endif; ?>
+
+                                                    </ul>
+
+                                                <?php endif; ?>
+
                                             </td>
                                         </tr>
 
                                         <!-- Riga inferiore -->
-                                        <tr class="<?= $isTrashed ? 'text-decoration-line-through' : ''; ?>">
+                                        <tr class="<?= $isTrashed ? 'text-decoration-line-through' : ''; ?> <?= $isSuperadmin ? 'table-light' : ''; ?>">
                                             <td colspan="7" class="align-middle small">
 
                                                 <!-- Parte creato -->

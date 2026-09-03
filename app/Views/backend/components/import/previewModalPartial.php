@@ -24,21 +24,42 @@
         </div>
     <?php endif; ?>
 
-    <div class="table-responsive">
-        <table class="table table-sm table-striped table-bordered align-middle">
+    <!-- CONTENITORE CON SCROLL VERTICALE -->
+    <div class="table-responsive border rounded" style="max-height: 400px; overflow-y: auto;">
+        <table class="table table-sm table-striped table-bordered align-middle mb-0">
             <thead class="table-dark">
                 <tr>
                     <?php foreach ($headers as $header): ?>
-                        <th><?= esc($header); ?></th>
+                        <th class="sticky-top bg-dark text-white"><?= esc($header); ?></th>
                     <?php endforeach; ?>
                 </tr>
             </thead>
             <tbody>
                 <?php if ( ! empty($rows)): ?>
-                    <?php foreach ($rows as $row): ?>
-                        <tr>
-                            <?php foreach ($row as $cell): ?>
-                                <td><?= esc($cell); ?></td>
+                    <?php foreach ($rows as $rowItem): ?>
+                        <?php 
+                            /* Estrazione dei dati dal nuovo array strutturato */
+                            $record = $rowItem['record'];
+                            $action = $rowItem['action'];
+                            $changed = $rowItem['changed'];
+                            
+                            /* Evidenzia l'intera riga se è un inserimento nuovo */
+                            $rowClass = ($action === 'insert') ? 'table-success' : '';
+                        ?>
+                        <tr class="<?= $rowClass ?>">
+                            <?php foreach ($headers as $header): ?>
+                                <?php 
+                                    $cellValue = $record[$header] ?? '';
+                                    
+                                    /* Verifica se la colonna corrente rientra tra quelle modificate */
+                                    $isChanged = in_array($header, $changed, true);
+                                    
+                                    /* Evidenzia la singola cella se è stata modificata */
+                                    $cellClass = $isChanged ? 'table-warning fw-bold' : '';
+                                ?>
+                                <td class="<?= $cellClass ?>" <?= $isChanged ? 'title="Valore modificato"' : '' ?>>
+                                    <?= esc((string)$cellValue); ?>
+                                </td>
                             <?php endforeach; ?>
                         </tr>
                     <?php endforeach; ?>
@@ -52,5 +73,18 @@
             </tbody>
         </table>
     </div>
+
+    <?php 
+        /* Calcolo per visualizzare l'avviso di record eccedenti l'anteprima */
+        $totalToProcess = $plan['insert'] + $plan['update'];
+        $previewCount = count($rows);
+        
+        if ($totalToProcess > $previewCount): 
+    ?>
+        <div class="text-center text-muted small mt-2">
+            <i class="fa-solid fa-info-circle me-1"></i>
+            Vengono mostrate le prime <strong><?= $previewCount ?></strong> righe soggette a modifica. Seguono altre <strong><?= ($totalToProcess - $previewCount) ?></strong> righe...
+        </div>
+    <?php endif; ?>
 
 </form>

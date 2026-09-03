@@ -28,7 +28,7 @@
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="general_timezone" class="form-label fw-semibold mb-1">
+                        <label for="general_timezone" class="form-label  mb-1">
                             <i class="fa-solid fa-circle-arrow-down"></i> 
                             <?= lang('backend/settings.labels.timezone'); ?>
                         </label>
@@ -43,7 +43,7 @@
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="general_language" class="form-label fw-semibold mb-1">
+                        <label for="general_language" class="form-label  mb-1">
                             <i class="fa-solid fa-circle-arrow-down"></i> 
                             <?= lang('backend/settings.labels.language'); ?>
                         </label>
@@ -58,7 +58,7 @@
                     </div> 
 
                     <div class="col-md-4 mb-3">
-                        <label for="dateFormat" class="form-label fw-semibold mb-1"> 
+                        <label for="dateFormat" class="form-label  mb-1"> 
                             <i class="fa-solid fa-circle-arrow-down"></i> 
                             <?= lang('backend/settings.labels.dateFormat') ?>
                         </label>

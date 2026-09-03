@@ -550,7 +550,7 @@ class GroupsModel extends BackendModel
             */
             $sql = 'select uuid, concat(firstname, " ", lastname) as identity  
                     from admins 
-                    where (lower(firstname) like ? or lower(lastname) like ?) and master <> 1';
+                    where (lower(firstname) like ? or lower(lastname) like ?)';
             
             $query = $this->db->query($sql, [$bindValue, $bindValue]);
 
@@ -619,11 +619,21 @@ class GroupsModel extends BackendModel
         {
             $posts = $this->checkAllowedFields($posts, $this->saveExceptionsAllowedFields);
 
-            $sql = 'select group_id, firstname, lastname from admins where uuid = ?';
+            $sql = 'select group_id, firstname, lastname, superadmin, deleted_at from admins where uuid = ?';
             $admin = $this->db->query($sql, [$posts['uuid']])->getRow();
             
             if ( ! $admin):
                 return ['result' => false, 'message' => lang('backend/groups.messages.noAdminFound')];
+            endif;
+
+            /* Scudo Enterprise: blocco immediato se il record si trova nel cestino */
+            if ($admin->deleted_at !== null):
+                return ['result' => false, 'message' => lang('backend/groups.messages.cannotModifyDeleted')]; /* Ricorda di creare la stringa lingua */
+            endif;
+
+            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il superadmin */
+            if ((int) $admin->superadmin === 1):
+                return ['result'  => false, 'message' => lang('backend/groups.messages.protectedAdmin')];
             endif;
 
             /* 1. Recuperiamo la situazione ATTUALE sul database prima di fare modifiche */
@@ -700,7 +710,7 @@ class GroupsModel extends BackendModel
 
         } catch (\Throwable $e) {
             $this->db->transRollback();
-            log_message('error', $e);
+            log_message('error', 'Errore salvataggio eccezione: ' . $e);
             return ['result' => false, 'message' => lang('backend/groups.messages.saveExceptionsError')];
         }
     }

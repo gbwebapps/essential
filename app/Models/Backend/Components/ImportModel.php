@@ -2,13 +2,12 @@
 
 namespace App\Models\Backend\Components;
 
-use App\Libraries\ImageFileSystemService;
-
 use App\Models\Backend\BackendModel;
 
 class ImportModel extends BackendModel 
 {
-	private function getTargetModelInstance(string $entity)
+    /* Type Hinting rigoroso: restituisce un Model di CI4 o null */
+    private function getTargetModelInstance(string $entity): ?\CodeIgniter\Model
     {
         $modelName = 'App\\Models\\Backend\\' . ucfirst($entity) . 'Model';
         
@@ -19,6 +18,7 @@ class ImportModel extends BackendModel
         return null;
     }
 
+    /* Nota: Se non è chiamato dal controller, cambia public in private */
     public function getTableStructure(string $table): array
     {
         /* Controllo di sicurezza sull'esistenza della tabella */
@@ -56,7 +56,7 @@ class ImportModel extends BackendModel
         return $structure;
     }
 
-    public function parseAndValidateCsv($file, string $entity): array
+    public function parseAndValidateCsv(\CodeIgniter\HTTP\Files\UploadedFile $file, string $entity): array
     {
         $structure = $this->getTableStructure($entity);
         $expectedHeaders = array_column($structure, 'name');
@@ -70,15 +70,6 @@ class ImportModel extends BackendModel
             endif;
         endforeach;
 
-        /* Carica i dati esistenti in memoria per un confronto O(1) velocissimo */
-        $existingDataMap = [];
-        if ($primaryKey !== null && $this->db->tableExists($entity)) {
-            $dbRecords = $this->db->table($entity)->get()->getResultArray();
-            foreach ($dbRecords as $record) {
-                $existingDataMap[$record[$primaryKey]] = $record;
-            }
-        }
-
         $plan = ['insert' => 0, 'update' => 0, 'skip' => 0];
         
         $handle = fopen($file->getTempName(), 'r');
@@ -87,30 +78,90 @@ class ImportModel extends BackendModel
             return ['status' => false, 'message' => lang('backend/components/import.messages.fileReadError')];
         endif;
 
-        /* Lettura CSV con virgola (,) e pulizia preventiva di spazi e BOM UTF-8 */
+        /* Lettura CSV con virgola e pulizia preventiva di spazi e BOM UTF-8 */
         $csvHeaders = array_map(function($header) {
             return trim(preg_replace('/^\xEF\xBB\xBF/', '', (string) $header));
         }, fgetcsv($handle, 0, ','));
 
-        /* Controllo corrispondenza colonne */
-        if ($csvHeaders !== $expectedHeaders):
+        /* Controllo validità colonne CSV (Minimo 2 colonne) */
+        if (count($csvHeaders) < 2):
             fclose($handle);
-            return ['status' => false, 'message' => lang('backend/components/import.messages.headerMismatch')];
+            return ['status' => false, 'message' => lang('backend/components/import.messages.insufficientColumns')];
         endif;
+
+        /* Controllo validità colonne CSV (Presenza obbligatoria Primary Key) */
+        if ( ! in_array($primaryKey, $csvHeaders, true)):
+            fclose($handle);
+            return ['status' => false, 'message' => sprintf(lang('backend/components/import.messages.missingPrimaryKey'), $primaryKey)];
+        endif;
+
+        /* Controllo validità colonne CSV (Nessuna colonna estranea consentita) */
+        $invalidColumns = array_diff($csvHeaders, $expectedHeaders);
+        if ( ! empty($invalidColumns)):
+            fclose($handle);
+            return ['status' => false, 'message' => sprintf(lang('backend/components/import.messages.invalidColumns'), implode(', ', $invalidColumns))];
+        endif;
+
+        /* MAPPA IN MEMORIA OTTIMIZZATA */
+        $existingDataMap = [];
+        if ($primaryKey !== null && $this->db->tableExists($entity)):
+            $pkIndex = array_search($primaryKey, $csvHeaders, true);
+            if ($pkIndex !== false):
+                $csvIds = [];
+                while (($row = fgetcsv($handle, 0, ',')) !== false):
+                    if (isset($row[$pkIndex]) && trim((string)$row[$pkIndex]) !== ''):
+                        $csvIds[] = trim((string)$row[$pkIndex]);
+                    endif;
+                endwhile;
+
+                rewind($handle);
+                fgetcsv($handle, 0, ',');
+
+                if ( ! empty($csvIds)):
+                    $chunks = array_chunk(array_unique($csvIds), 1000);
+                    foreach ($chunks as $chunk):
+                        $dbRecords = $this->db->table($entity)->whereIn($primaryKey, $chunk)->get()->getResultArray();
+                        foreach ($dbRecords as $record):
+                            $existingDataMap[$record[$primaryKey]] = $record;
+                        endforeach;
+                    endforeach;
+                endif;
+            endif;
+        endif;
+
+        $stagingDir = WRITEPATH . 'uploads/staging/';
+        if ( ! is_dir($stagingDir)):
+            mkdir($stagingDir, 0755, true);
+        endif;
+        
+        $tempFilename = $entity . '_staging_' . time() . '_' . bin2hex(random_bytes(4)) . '.csv';
+        $stagingPath = $stagingDir . $tempFilename;
+        $stagingHandle = fopen($stagingPath, 'w');
+        
+        $stagingHeaders = $csvHeaders;
+        $stagingHeaders[] = '__import_action';
+        fputcsv($stagingHandle, $stagingHeaders, ',');
 
         $rows = [];
         $errors = [];
-        $lineNumber = 2; /* La riga 1 è occupata dalle intestazioni */
+        $lineNumber = 2;
+        
+        $targetModel = $this->getTargetModelInstance($entity);
+        $validator = \Config\Services::validation();
+        
+        /* Genera le regole e le filtra mantenendo SOLO quelle delle colonne presenti nel CSV */
+        $fallbackRules = array_intersect_key(
+            $this->buildDynamicRules($structure), 
+            array_flip($csvHeaders)
+        );
 
         while (($row = fgetcsv($handle, 0, ',')) !== false):
             
-            /* Salta le righe totalmente vuote */
             if ( ! array_filter($row)):
                 $lineNumber++;
                 continue;
             endif;
 
-            /* Controllo di integrità: previene il fatal error di array_combine */
             if (count($row) !== count($csvHeaders)):
                 $errors[] = sprintf(lang('backend/components/import.messages.wrongColumnsNumber'), $lineNumber, count($row), count($csvHeaders));
                 $lineNumber++;
@@ -119,69 +170,55 @@ class ImportModel extends BackendModel
 
             $data = array_combine($csvHeaders, $row);
 
-            /* Pulizia dei dati: converte "null" o stringhe vuote in null nativo */
             foreach ($data as $key => $value):
                 if (trim((string)$value) === '' || strtolower(trim((string)$value)) === 'null'):
                     $data[$key] = null;
                 endif;
             endforeach;
 
-            /* --- INIZIO MODIFICA: CALCOLO STATO RECORD (Insert, Update, Skip) --- */
             $idValue = $data[$primaryKey] ?? null;
+            $action = 'insert';
+            
+            /* NUOVA LOGICA: Tracciamento delle singole colonne modificate */
+            $changedColumns = [];
 
             if ( ! empty($idValue) && array_key_exists($idValue, $existingDataMap)):
                 $dbRow = $existingDataMap[$idValue];
-                $hasChanges = false;
+                
                 foreach ($data as $key => $value):
+                    /* Confronto esatto: se c'è una differenza, salviamo il nome della colonna nell'array */
                     if ($key !== 'updated_at' && array_key_exists($key, $dbRow) && (string)$dbRow[$key] !== (string)$value):
-                        $hasChanges = true;
-                        break;
+                        $changedColumns[] = $key;
                     endif;
                 endforeach;
 
-                if ($hasChanges):
+                /* Se l'array non è vuoto, c'è stato almeno un cambiamento */
+                if ( ! empty($changedColumns)):
+                    $action = 'update';
                     $plan['update']++;
                 else:
                     $plan['skip']++;
+                    $lineNumber++;
+                    continue; 
                 endif;
             else:
                 $plan['insert']++;
             endif;
-            /* --- FINE MODIFICA --- */
 
-            /* Conserva solo i primi 10 record puliti per l'anteprima nella vista */
-            if (count($rows) < 10):
-                $rows[] = array_values($data);
-            endif;
-
-            /* 
-             * VALIDAZIONE IBRIDA: CRUD Model o Fallback Dinamico
-             */
-            $primaryKey = $csvHeaders[0];
-            $idValue = $data[$primaryKey] ?? null;
-            
-            $targetModel = $this->getTargetModelInstance($entity);
-            $validator = \Config\Services::validation();
-            
-            /* Svuota i dati e gli errori del ciclo precedente */
             $validator->reset(); 
             
             if ($targetModel !== null):
-                /* 1. Esiste il CRUD: usiamo le sue regole specifiche */
-                if (empty($idValue)):
-                    $rules = $targetModel->addValidationRules();
-                else:
-                    $rules = $targetModel->editValidationRules(['uuid' => $idValue]);
-                endif;
+                $rules = empty($idValue) ? $targetModel->addValidationRules() : $targetModel->editValidationRules(['uuid' => $idValue]);
             else:
-                /* 2. Nessun CRUD (es. tabelle pivot/tools): usiamo le regole universali del DB */
-                $rules = $this->buildDynamicRules($structure);
+                $rules = $fallbackRules;
+            endif;
+
+            if ( ! empty($rules)):
+                $rules = array_intersect_key($rules, array_flip($csvHeaders));
             endif;
 
             if ( ! empty($rules)):
                 $validator->setRules($rules);
-
-                /* Esegue la validazione sui dati della riga corrente */
                 if ( ! $validator->run($data)):
                     foreach ($validator->getErrors() as $field => $error):
                         $errors[] = "Riga {$lineNumber} ({$field}): {$error}";
@@ -189,21 +226,47 @@ class ImportModel extends BackendModel
                 endif;
             endif;
 
+            if (empty($errors)):
+                $stagingData = $data;
+                $stagingData['__import_action'] = $action;
+                fputcsv($stagingHandle, array_values($stagingData), ',');
+
+                /* 
+                 * UPGRADE STRUTTURALE DELL'ANTEPRIMA:
+                 * Esteso a 50 righe e trasformato in un array multidimensionale
+                 * che contiene i dati associativi e i metadati sulle differenze.
+                 */
+                if (count($rows) < 50):
+                    $rows[] = [
+                        'record'  => $data,           /* Array associativo dei dati [colonna => valore] */
+                        'action'  => $action,         /* 'insert' o 'update' */
+                        'changed' => $changedColumns  /* Array con i nomi delle colonne modificate */
+                    ];
+                endif;
+            endif;
+
             $lineNumber++;
         endwhile;
 
         fclose($handle);
+        fclose($stagingHandle);
 
-        /* Verifica che ci sia almeno una riga di dati validi */
-        if (empty($rows)):
-            return ['status' => false, 'message' => lang('backend/components/import.messages.noDataFound')];
+        /* Controllo di garanzia: il file conteneva solo l'intestazione o righe vuote */
+        if (($plan['insert'] + $plan['update'] + $plan['skip']) === 0):
+            if (file_exists($stagingPath)):
+                unlink($stagingPath);
+            endif;
+            return ['status' => false, 'message' => lang('backend/components/import.messages.emptyFile') ?? 'Il file CSV non contiene dati validi da elaborare.'];
         endif;
 
-        /* Se sono emersi errori durante il ciclo, blocca tutto e restituisce l'array originale */
         if ( ! empty($errors)):
+            if (file_exists($stagingPath)):
+                unlink($stagingPath);
+            endif;
+
             $maxErrors = 500;
             $totalErrors = count($errors);
-
+            
             if ($totalErrors > $maxErrors):
                 $errors = array_slice($errors, 0, $maxErrors);
                 $errors[] = '... e altri ' . ($totalErrors - $maxErrors) . ' errori non mostrati per limiti di memoria.';
@@ -212,30 +275,26 @@ class ImportModel extends BackendModel
             return ['status' => false, 'validationErrors' => $errors];
         endif;
 
-        $csvDir = WRITEPATH . 'uploads/csv/';
-
-        /* Crea la cartella se non esiste */
-        if ( ! is_dir($csvDir)):
-            mkdir($csvDir, 0777, true);
+        if ($plan['insert'] === 0 && $plan['update'] === 0):
+            if (file_exists($stagingPath)):
+                unlink($stagingPath);
+            endif;
         endif;
-
-        $tempFilename = $file->getRandomName();
-        $file->move($csvDir, $tempFilename);
 
         return [
             'status'   => true,
             'headers'  => $csvHeaders,
             'rows'     => $rows,
             'tempFile' => $tempFilename,
-            'plan'     => $plan /* <--- Aggiunto */
+            'plan'     => $plan
         ];
     }
 
-    /* --- INIZIO MODIFICA CHUNKING: Aggiunto parametro $offset (default 0) --- */
     public function executeImport(string $entity, string $tempFile, int $offset = 0): array
-    /* --- FINE MODIFICA CHUNKING --- */
     {
-        $filePath = WRITEPATH . 'uploads/csv/' . $tempFile;
+        /* FIX SICUREZZA: Prevenzione Directory Traversal */
+        $tempFile = basename($tempFile);
+        $filePath = WRITEPATH . 'uploads/staging/' . $tempFile;
 
         if ( ! file_exists($filePath)):
             return ['status' => false, 'message' => lang('backend/components/import.messages.fileNotFoundError')];
@@ -253,21 +312,26 @@ class ImportModel extends BackendModel
          */
         $this->db->transStart();
 
-        /* Estrazione prima riga (nomi colonne) e pulizia massiva BOM e spazi */
+        /* Estrazione prima riga (nomi colonne, inclusa la colonna di sistema __import_action) */
         $headers = array_map(function($header) {
             return trim(preg_replace('/^\xEF\xBB\xBF/', '', (string) $header));
         }, fgetcsv($handle, 0, ','));
         
-        /* Recupero rigoroso della Primary Key dallo schema del database */
+        /* Recupero rigoroso della Primary Key e mappatura colonne dallo schema del database */
         $structure = $this->getTableStructure($entity);
         $primaryKey = null;
+        $tableColumns = [];
         
         foreach ($structure as $col):
+            $tableColumns[] = $col['name'];
             if ($col['primary_key'] == 1):
                 $primaryKey = $col['name'];
-                break;
             endif;
         endforeach;
+
+        /* Prepariamo i flag booleani fuori dal ciclo per massimizzare le performance */
+        $hasCreatedAt = in_array('created_at', $tableColumns, true);
+        $hasUpdatedAt = in_array('updated_at', $tableColumns, true);
 
         if ($primaryKey === null):
             $this->db->transRollback();
@@ -278,14 +342,11 @@ class ImportModel extends BackendModel
         $inserted = 0;
         $updated = 0;
 
-        /* --- INIZIO MODIFICA CHUNKING: Impostazione variabili di controllo --- */
-        $chunkSize = 10;
+        $chunkSize = 5;
         $currentRow = 0;
         $processedInChunk = 0;
         $isFinished = false;
-        /* --- FINE MODIFICA CHUNKING --- */
 
-        /* --- INIZIO MODIFICA CHUNKING: Sostituzione condizione while per gestire offset e EOF --- */
         while (true):
             $row = fgetcsv($handle, 0, ',');
 
@@ -302,26 +363,29 @@ class ImportModel extends BackendModel
                 continue;
             endif;
 
-            /* Interrompe il ciclo se è stato raggiunto il limite di questo blocco (500) */
+            /* Interrompe il ciclo se è stato raggiunto il limite di questo blocco */
             if ($processedInChunk >= $chunkSize):
                 break;
             endif;
-            /* --- FINE MODIFICA CHUNKING --- */
             
             /* Salta le righe totalmente vuote */
             if ( ! array_filter($row)):
                 continue;
             endif;
 
-            /* Controllo di integrità critico prima di unire i dati */
+            /* Controllo di integrità: il numero di colonne deve corrispondere all'header dello staging */
             if (count($row) !== count($headers)):
                 $this->db->transRollback();
                 fclose($handle);
                 return ['status' => false, 'message' => lang('backend/components/messages.importationUndone')];
             endif;
 
-            /* Combina intestazione e riga per avere l'array associativo colonna => valore */
+            /* Combina intestazione e riga */
             $data = array_combine($headers, $row);
+            
+            /* Estrae l'azione dettata dallo staging e la rimuove dai dati da persistere */
+            $action = $data['__import_action'] ?? 'insert';
+            unset($data['__import_action']);
             
             /* 1. Pulizia dei dati: converte la stringa "null" o i campi vuoti nel vero null di PHP */
             foreach ($data as $key => $value):
@@ -330,56 +394,45 @@ class ImportModel extends BackendModel
                 endif;
             endforeach;
 
-            /* 2. Forza created_at con la data attuale se è nullo */
-            if (array_key_exists('created_at', $data) && $data['created_at'] === null):
-                $data['created_at'] = date('Y-m-d H:i:s');
+            /* 2. FIX ENTERPRISE: INIEZIONE TIMESTAMP FORZATA IN BASE ALLO SCHEMA REALE */
+            $now = date('Y-m-d H:i:s');
+
+            if ($action === 'insert'):
+                if ($hasCreatedAt && empty($data['created_at'])):
+                    $data['created_at'] = $now;
+                endif;
+                
+            elseif ($action === 'update'):
+                if ($hasUpdatedAt):
+                    $data['updated_at'] = $now; // Forza SEMPRE la data attuale, ignorando il CSV
+                endif;
+                
+                /* Sicurezza: impediamo che un update alteri la data di creazione originale */
+                if (array_key_exists('created_at', $data)):
+                    unset($data['created_at']);
+                endif;
             endif;
             
             $idValue = $data[$primaryKey] ?? null;
 
-            if ( ! empty($idValue)):
-                
-                /* Estrae il record esistente per il confronto */
-                $existingRecord = $this->db->table($entity)->where($primaryKey, $idValue)->get()->getRowArray();
-                
-                if ($existingRecord !== null):
-                    /* Confronta i dati in arrivo con quelli nel DB */
-                    $hasChanges = false;
-                    foreach ($data as $key => $value):
-                        /* Escludiamo updated_at dal confronto per evitare falsi positivi */
-                        if ($key !== 'updated_at' && array_key_exists($key, $existingRecord) && (string)$existingRecord[$key] !== (string)$value):
-                            $hasChanges = true;
-                            break;
-                        endif;
-                    endforeach;
-
-                    /* UPDATE solo se rileva differenze reali */
-                    if ($hasChanges):
-                        
-                        /* Forza la data di aggiornamento attuale se la colonna esiste */
-                        if (array_key_exists('updated_at', $data)):
-                            $data['updated_at'] = date('Y-m-d H:i:s');
-                        endif;
-
-                        $this->db->table($entity)->where($primaryKey, $idValue)->update($data);
-                        $updated++;
-                    endif;
-                else:
-                    /* INSERT con UUID fornito dal CSV */
-                    $this->db->table($entity)->insert($data);
-                    $inserted++;
-                endif;
-
+            /* 
+             * ESECUZIONE CIECA E OTTIMIZZATA
+             * Ci fidiamo ciecamente del file di staging, azzerando il carico di lettura
+             */
+            if ($action === 'update'):
+                $this->db->table($entity)->where($primaryKey, $idValue)->update($data);
+                $updated++;
             else:
-                /* INSERT (Nuovo record senza UUID nel CSV, deleghiamo al DB l'auto-generazione se prevista) */
-                $data[$primaryKey] = $this->generateUUID();
+                /* Insert: genera l'UUID in caso di assenza */
+                if (empty($idValue)):
+                    $data[$primaryKey] = $this->generateUUID();
+                endif;
+                
                 $this->db->table($entity)->insert($data);
                 $inserted++;
             endif;
 
-            /* --- INIZIO MODIFICA CHUNKING: Incremento contatore locale --- */
             $processedInChunk++;
-            /* --- FINE MODIFICA CHUNKING --- */
 
         endwhile;
 
@@ -393,84 +446,89 @@ class ImportModel extends BackendModel
             return ['status' => false, 'message' => lang('backend/components/import.messages.importTransactionError')];
         endif;
 
-        /* --- INIZIO MODIFICA CHUNKING: Operazioni finali SOLO se il file è concluso --- */
+        /* Operazioni finali di pulizia e logging SOLO se il file è concluso */
         if ($isFinished):
-            /* Pulizia del file temporaneo */
+            /* Pulizia fisica del file temporaneo di staging */
             if (file_exists($filePath)):
                 unlink($filePath);
             endif;
 
-            /* Log e risposta finale */
             $currentAdmin = service('authorization')->currentAdmin();
             log_admin_activity('IMPORT_DATA', $entity, sprintf(lang('Importazione dati dalla tabella: %s'), $entity), $currentAdmin);
         endif;
-        /* --- FINE MODIFICA CHUNKING --- */
 
-
-        /* Se zero record modificati/inseriti, è un successo: i dati a database sono già identici al CSV */
+        /* Risposta finale aggregata per il controller */
         if (($inserted + $updated) === 0):
             return [
                 'status' => true,
                 'message' => lang('backend/components/import.messages.importationNoRecordsModified'),
-                /* --- INIZIO MODIFICA CHUNKING: Aggiunta dati di stato --- */
                 'nextOffset' => $offset + $processedInChunk,
                 'isFinished' => $isFinished,
                 'inserted' => $inserted,
                 'updated' => $updated
-                /* --- FINE MODIFICA CHUNKING --- */
             ];
         endif;
 
         return [
             'status' => true, 
             'message' => sprintf(lang('backend/components/import.messages.importSuccess'), $inserted, $updated), 
-            /* --- INIZIO MODIFICA CHUNKING: Aggiunta dati di stato --- */
             'nextOffset' => $offset + $processedInChunk,
             'isFinished' => $isFinished,
             'inserted' => $inserted,
             'updated' => $updated
-            /* --- FINE MODIFICA CHUNKING --- */
         ];
     }
 
     public function backupTableBeforeImport(string $entity): bool
     {
         $builder = $this->db->table($entity);
-        $data = $builder->get()->getResultArray();
+        $totalRows = $builder->countAllResults(false);
+
+        /* Salta la creazione se la tabella è vuota */
+        if ($totalRows === 0):
+            return true;
+        endif;
 
         $backupDir = WRITEPATH . 'backups/imports/';
         
-        /* Crea la cartella se non esiste */
         if ( ! is_dir($backupDir)):
-            mkdir($backupDir, 0777, true);
-        endif;
-
-        /* Salta la creazione se la tabella è vuota */
-        if (empty($data)):
-            return true;
+            mkdir($backupDir, 0755, true);
         endif;
 
         $filename = $entity . '_backup_' . date('Ymd_His') . '.sql';
         $filepath = $backupDir . $filename;
 
-        /* Intestazione e svuotamento tabella con bypass delle chiavi esterne */
-        $sqlContent = "/* Backup tabella: {$entity} - Data: " . date('Y-m-d H:i:s') . " */\n";
-        $sqlContent .= "SET FOREIGN_KEY_CHECKS = 0;\n";
-        $sqlContent .= "TRUNCATE TABLE `{$entity}`;\n";
-        $sqlContent .= "SET FOREIGN_KEY_CHECKS = 1;\n\n";
+        /* Creazione e intestazione file (sovrascrive se esiste) */
+        $handle = fopen($filepath, 'w');
+        if ($handle === false):
+            return false;
+        endif;
 
-        /* Generazione query di insert */
-        foreach ($data as $row):
-            /* Utilizza il metodo nativo di CI4 per sfuggire e quotare i valori in modo sicuro */
-            $escapedValues = array_map([$this->db, 'escape'], array_values($row));
-            
-            $columns = implode('`, `', array_keys($row));
-            $values = implode(', ', $escapedValues);
-            
-            $sqlContent .= "INSERT INTO `{$entity}` (`{$columns}`) VALUES ({$values});\n";
-        endforeach;
+        fwrite($handle, "/* Backup tabella: {$entity} - Data: " . date('Y-m-d H:i:s') . " */\n");
+        fwrite($handle, "SET FOREIGN_KEY_CHECKS = 0;\n");
+        fwrite($handle, "TRUNCATE TABLE `{$entity}`;\n");
+        fwrite($handle, "SET FOREIGN_KEY_CHECKS = 1;\n\n");
 
-        return (file_put_contents($filepath, $sqlContent) !== false);
+        /* Chunking per prevenire Memory Leak */
+        $chunkSize = 1000;
+        $offset = 0;
+
+        while ($offset < $totalRows):
+            $chunk = $builder->limit($chunkSize, $offset)->get()->getResultArray();
+            
+            foreach ($chunk as $row):
+                $escapedValues = array_map([$this->db, 'escape'], array_values($row));
+                $columns = implode('`, `', array_keys($row));
+                $values = implode(', ', $escapedValues);
+                
+                fwrite($handle, "INSERT INTO `{$entity}` (`{$columns}`) VALUES ({$values});\n");
+            endforeach;
+            
+            $offset += $chunkSize;
+        endwhile;
+
+        fclose($handle);
+        return true;
     }
 
     /* Genera regole di validazione dinamiche basate sullo schema reale del DB */

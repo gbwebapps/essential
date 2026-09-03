@@ -7,16 +7,16 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 
 /**
- * Class MasterFilter
+ * Class SuperAdminFilter
  *
  * Filtro di protezione (Middleware) di livello critico.
  * Limita l'accesso ad aree e funzionalità sensibili del sistema esclusivamente 
- * agli utenti amministratori dotati di privilegi di livello Superadmin (Master).
+ * agli utenti amministratori dotati di privilegi di livello Superadmin (SuperAdmin).
  */
-class MasterFilter implements FilterInterface
+class SuperAdminFilter implements FilterInterface
 {
     /**
-     * Intercetta la richiesta HTTP in ingresso per validare i privilegi Master dell'operatore.
+     * Intercetta la richiesta HTTP in ingresso per validare i privilegi SuperAdmin dell'operatore.
      *
      * @param RequestInterface $request   Oggetto della richiesta HTTP corrente.
      * @param array|null       $arguments Argomenti opzionali configurati nella rotta.
@@ -26,8 +26,8 @@ class MasterFilter implements FilterInterface
     {
         $currentAdmin = service('authorization')->currentAdmin();
 
-        /* Se l'utente è loggato ed è master, prosegue normalmente */
-        if ($currentAdmin && (int) $currentAdmin->master === 1):
+        /* Se l'utente è loggato ed è superadmin, prosegue normalmente */
+        if ($currentAdmin && (int) $currentAdmin->superadmin === 1):
             return null;
         endif;
 

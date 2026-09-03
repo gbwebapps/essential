@@ -47,7 +47,7 @@
             </div>
 
             <!-- Sezione Destra: Menu Servizi (visibile solo agli utenti Master) -->
-            <?php if ((int) $currentAdmin->master === 1): ?>
+            <?php if ((int) $currentAdmin->superadmin === 1): ?>
             <div class="btn-group dropup ms-auto">
                 <button type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa-solid fa-gears"></i> 

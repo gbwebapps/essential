@@ -164,7 +164,7 @@ class AuthorizationClass
      * Estrae l'anagrafica dell'amministratore dal database e ne mappa i privilegi operativi.
      *
      * Seleziona i campi sensibili dell'utente verificando che lo stato sia attivo e non sospeso.
-     * Successivamente, analizza il flag di superamministrazione (master): se abilitato, concede
+     * Successivamente, analizza il flag di superamministrazione (superadmin): se abilitato, concede
      * l'accesso universale, altrimenti popola dinamicamente l'oggetto delle autorizzazioni
      * mappando come proprietà i singoli record estratti dalla tabella dei permessi.
      *
@@ -182,7 +182,7 @@ class AuthorizationClass
                     phone, 
                     status,
                     note,  
-                    master, 
+                    superadmin, 
                     group_id, 
                     created_at, 
                     updated_at, 
@@ -206,9 +206,9 @@ class AuthorizationClass
         /* 2. Inizializzazione della proprietà per i permessi come oggetto vuoto */
         $data->permissions = new \stdClass();
 
-        /* 3. Logica di estrazione permessi o bypass per il master */
-        if ((int) $data->master === 1):
-            /* Bypass: il master riceve una proprietà universale */
+        /* 3. Logica di estrazione permessi o bypass per il superadmin */
+        if ((int) $data->superadmin === 1):
+            /* Bypass: il superadmin riceve una proprietà universale */
             $data->permissions->all = true;
         else:
             /* Array temporaneo per mappare i permessi finali */

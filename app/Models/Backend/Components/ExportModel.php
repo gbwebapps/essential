@@ -2,13 +2,11 @@
 
 namespace App\Models\Backend\Components;
 
-use App\Libraries\ImageFileSystemService;
-
 use App\Models\Backend\BackendModel;
 
 class ExportModel extends BackendModel 
 {
-	public function generateValidationRules(): array 
+    public function generateValidationRules(): array 
     {
         return [
             'entity' => [
@@ -35,55 +33,109 @@ class ExportModel extends BackendModel
     }
 
     public function getExportColumns(string $table): array 
-	{
-		return $this->db->getFieldNames($table);
-	}
-
-	public function generate(array $posts, int $offset = 0, ?string $fileName = null): array
     {
+        /* Controllo di sicurezza */
+        if ( ! $this->db->tableExists($table)):
+            return [];
+        endif;
+
+        $fields = $this->db->getFieldData($table);
+        $columns = [];
+
+        foreach ($fields as $field):
+            /* Escludiamo la chiave primaria dall'elenco selezionabile dall'utente */
+            if ($field->primary_key !== 1):
+                $columns[] = $field->name;
+            endif;
+        endforeach;
+
+        return $columns;
+    }
+
+    public function getPrimaryKey(string $table): ?string
+    {
+        if ( ! $this->db->tableExists($table)):
+            return null;
+        endif;
+
+        $fields = $this->db->getFieldData($table);
+        
+        foreach ($fields as $field):
+            if ($field->primary_key == 1):
+                return $field->name;
+            endif;
+        endforeach;
+
+        return null;
+    }
+
+    public function generate(array $posts, ?int $lastId = null, ?string $fileName = null): array
+    {
+        /* Sanificazione preventiva per evitare Directory Traversal */
+        $fileName = $fileName !== null ? basename($fileName) : null;
+
         $entity = $posts['entity'] ?? '';
 
         if (empty($entity) || ! $this->db->tableExists($entity)):
             return ['result' => false, 'message' => lang('backend/components/export.messages.invalidEntity')];
         endif;
 
-        /* 1. Recuperiamo le colonne reali della tabella */
         $allowedColumns = $this->db->getFieldNames($entity);
 
-        /* 2. Prepariamo i suffissi per le ricerche temporali */
+        /* Controllo di sicurezza: la tabella deve avere la colonna id numerica per il cursore (keyset pagination) */
+        if ( ! in_array('id', $allowedColumns)):
+            return ['result' => false, 'message' => 'Colonna id mancante. Esportazione a cursore impossibile.'];
+        endif;
+
+        /* Validazione server-side delle colonne scelte (Sicurezza contro manomissioni lato client) */
+        $requestedColumns = $posts['selected_columns'] ?? [];
+        if (empty($requestedColumns) || ! is_array($requestedColumns)):
+            return ['result' => false, 'message' => lang('backend/components/export.messages.noColumnsSelected') ?? 'Nessuna colonna selezionata per l\'esportazione.'];
+        endif;
+
+        /* Intersezione con lo schema reale del DB: scarta spietatamente qualsiasi colonna inesistente */
+        $validSelectedColumns = array_intersect($requestedColumns, $allowedColumns);
+
+        if (empty($validSelectedColumns)):
+            return ['result' => false, 'message' => 'Le colonne richieste non sono valide.'];
+        endif;
+
+        /* FORZATURA DI SICUREZZA: La PK e la colonna 'id' (motore del cursore) DEVONO essere sempre presenti */
+        $primaryKey = $this->getPrimaryKey($entity);
+        $mandatoryColumns = ['id'];
+        
+        if ($primaryKey !== null):
+            $mandatoryColumns[] = $primaryKey;
+        endif;
+
+        foreach ($mandatoryColumns as $mandatoryCol):
+            if ( ! in_array($mandatoryCol, $validSelectedColumns)):
+                /* Mettiamo le colonne obbligatorie forzatamente all'inizio dell'array */
+                array_unshift($validSelectedColumns, $mandatoryCol);
+            endif;
+        endforeach;
+        
+        /* Rimuoviamo eventuali duplicati logici (se id e primaryKey coincidono) */
+        $validSelectedColumns = array_unique($validSelectedColumns);
+
         $dateKeys = [];
         foreach ($allowedColumns as $col):
             $dateKeys[] = $col . '-from';
             $dateKeys[] = $col . '-to';
         endforeach;
 
-        /* Chiavi di sistema inviate dal JS da ignorare come filtri DB */
-        $systemKeys = ['entity', 'column', 'order', 'page', 'rows', 'trash_filter', 'search_bar_visible', 'offset', 'fileName'];
+        /* Aggiungiamo 'selected_columns' tra le chiavi di sistema per bypassare il checkAllowedFields e il generatore di WHERE */
+        $systemKeys = ['entity', 'column', 'order', 'page', 'rows', 'trash_filter', 'search_bar_visible', 'lastId', 'fileName', 'processedCount', 'selected_columns'];
 
-        /* 3. Uniamo tutto: colonne reali, suffissi data e chiavi di sistema */
-        $allowedFields = array_merge(
-            $allowedColumns, 
-            $dateKeys, 
-            $systemKeys
-        );
-
-        /* 4. Filtriamo i post */
+        $allowedFields = array_merge($allowedColumns, $dateKeys, $systemKeys);
         $posts = $this->checkAllowedFields($posts, $allowedFields);
                 
-        /* Forza l'esportazione integrale e rigorosa di tutte le colonne della tabella */
-        $selectFields = implode(', ', $allowedColumns);
+        /* Costruiamo la query limitandola rigorosamente alle sole colonne richieste e validate */
+        $selectFields = implode(', ', $validSelectedColumns);
         $sql = "select {$selectFields} from {$entity} where 1 = 1";
-
-        /* Se è la tabella admins escludo l'esportazione del master. */
-        if($entity === 'admins'):
-            $sql .= ' and master <> 1';
-        endif;
-        
         $bindings = [];
 
-        /* 1. Applicazione Dinamica Filtri */
         foreach ($posts as $key => $value):
-            
             if (empty($value) || in_array($key, $systemKeys)) continue;
 
             if (str_ends_with($key, '-from')):
@@ -92,22 +144,18 @@ class ExportModel extends BackendModel
                     $sql .= " and {$realField} >= ?";
                     $bindings[] = $value; 
                 endif;
-            
             elseif (str_ends_with($key, '-to')):
                 $realField = str_replace('-to', '', $key);
                 if (in_array($realField, $allowedColumns)):
                     $sql .= " and {$realField} <= ?";
                     $bindings[] = $value;
                 endif;
-
             elseif (in_array($key, $allowedColumns)):
                 $sql .= " and {$key} like ?";
                 $bindings[] = "%{$value}%";
             endif;
-
         endforeach;
 
-        /* 2. Applicazione stato Cestino */
         if (isset($posts['trash_filter']) && in_array('deleted_at', $allowedColumns)):
             if ($posts['trash_filter'] === 'active'):
                 $sql .= " and deleted_at is null";
@@ -116,26 +164,24 @@ class ExportModel extends BackendModel
             endif;
         endif;
 
-        /* 3. Applicazione ordinamento */
-        $column = $posts['column'] ?? 'created_at';
-        $order = $posts['order'] ?? 'desc';
-        if (in_array($column, $allowedColumns) && in_array(strtolower($order), ['asc', 'desc'])):
-            $sql .= " order by {$column} " . strtoupper($order);
+        /* KEYSET PAGINATION PURA CON ID NUMERICO */
+        if ($lastId !== null && $lastId > 0):
+            $sql .= " and id > ?";
+            $bindings[] = $lastId;
         endif;
 
-        /* Impostazioni per i Chunk */
-        $limit = 10;
-        $chunkSql = $sql . " LIMIT {$limit} OFFSET {$offset}";
-        $records = $this->db->query($chunkSql, $bindings)->getResultArray();
+        /* Limit impostato basso esclusivamente per finalità di testing */
+        $limit = 5;
+        $sql .= " order by id ASC LIMIT {$limit}";
+        
+        $records = $this->db->query($sql, $bindings)->getResultArray();
 
-        /* Preparazione cartella */
         $directory = WRITEPATH . 'exports/';
         if ( ! is_dir($directory)):
             mkdir($directory, 0755, true);
         endif;
 
-        /* Gestione File: Creazione (w) al primo chunk, Append (a) ai successivi */
-        if ($offset === 0 || empty($fileName)):
+        if ($lastId === null || empty($fileName)):
             $fileName = 'export_' . $entity . '_' . date('d_m_Y_H_i_s') . '.csv';
             $filePath = $directory . $fileName;
             $file = fopen($filePath, 'w');
@@ -146,7 +192,6 @@ class ExportModel extends BackendModel
                 return ['result' => false, 'message' => lang('backend/components/export.messages.noDataFound')];
             endif;
 
-            /* Intestazioni solo al primo ciclo */
             fputs($file, "\xEF\xBB\xBF");
             fputcsv($file, array_keys($records[0]), ',');
         else:
@@ -154,33 +199,22 @@ class ExportModel extends BackendModel
             $file = fopen($filePath, 'a');
         endif;
 
-        /* Se il blocco è vuoto negli offset successivi, abbiamo finito */
-        if (empty($records)):
-            fclose($file);
-            $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('EXPORT_DATA', $entity, sprintf(lang('Esportazione completata: %s'), $entity), $currentAdmin);
-            return [
-                'result' => true,
-                'isFinished' => true,
-                'message' => sprintf(lang('backend/components/export.messages.exportSuccess'), $entity),
-                'downloadUrl' => base_url('backend/export/download/' . $fileName)
-            ];
+        if ( ! empty($records)):
+            foreach ($records as $row):
+                fputcsv($file, $row, ',');
+            endforeach;
         endif;
-
-        /* Scrittura dati del blocco corrente */
-        foreach ($records as $row):
-            fputcsv($file, $row, ',');
-        endforeach;
 
         fclose($file);
 
-        /* Controllo di fine: se estratte meno righe del limite, era l'ultimo blocco */
-        $isFinished = count($records) < $limit;
-        $nextOffset = $offset + count($records);
+        /* Unificata e ripulita la logica di chiusura dell'esportazione */
+        $chunkSize = count($records);
+        $isFinished = $chunkSize < $limit;
 
         if ($isFinished):
             $currentAdmin = service('authorization')->currentAdmin();
             log_admin_activity('EXPORT_DATA', $entity, sprintf(lang('Esportazione completata: %s'), $entity), $currentAdmin);
+            
             return [
                 'result' => true,
                 'isFinished' => true,
@@ -189,10 +223,13 @@ class ExportModel extends BackendModel
             ];
         endif;
 
+        $lastRecord = end($records);
+
         return [
             'result' => true,
             'isFinished' => false,
-            'nextOffset' => $nextOffset,
+            'lastId' => (int) $lastRecord['id'],
+            'chunkSize' => $chunkSize,
             'fileName' => $fileName
         ];
     }

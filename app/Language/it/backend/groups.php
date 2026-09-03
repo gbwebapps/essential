@@ -59,5 +59,7 @@ return [
 		'delSuccess' => 'Gruppo eliminato con successo.', 
 		'saveExceptionsSuccess' => 'Eccezione aggiunta con successo.', 
 		'saveExceptionsError' => 'Aggiunta eccezione non andata a buon fine.', 
+		'protectedAdmin' => 'Protetto da modifiche.', 
+		'cannotModifyDeleted' => 'Non è possibile modificare un admin eliminato.', 
 	]
 ];

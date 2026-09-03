@@ -28,7 +28,7 @@
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="auth_attempts" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.attempts'); ?></label>
+                        <label for="auth_attempts" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.attempts'); ?></label>
                         <select id="auth_attempts" name="attempts" class="form-select shadow-none">
                             <option value="0" <?= (int) $authSettings['attempts'] === 0 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.disabled'); ?></option>
                             <option value="1" <?= (int) $authSettings['attempts'] === 1 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.enabled'); ?></option>
@@ -37,13 +37,13 @@
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="auth_attemptsLimit" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.attemptsLimit'); ?></label>
+                        <label for="auth_attemptsLimit" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.attemptsLimit'); ?></label>
                         <input type="number" id="auth_attemptsLimit" name="attemptsLimit" class="form-control shadow-none" min="1" max="20" value="<?= esc($authSettings['attemptsLimit']); ?>" placeholder="<?= lang('backend/settings.placeholders.attemptsLimit'); ?>">
                         <div class="error_attemptsLimit text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="auth_attemptsInterval" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.attemptsInterval'); ?></label>
+                        <label for="auth_attemptsInterval" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.attemptsInterval'); ?></label>
                         <input type="number" id="auth_attemptsInterval" name="attemptsInterval" class="form-control shadow-none" min="10" value="<?= esc($authSettings['attemptsInterval']); ?>" placeholder="<?= lang('backend/settings.placeholders.attemptsInterval'); ?>">
                         <div class="error_attemptsInterval text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>  
@@ -60,7 +60,7 @@
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="auth_twoFactor" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.twoFactor'); ?></label>
+                        <label for="auth_twoFactor" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.twoFactor'); ?></label>
                         <select id="auth_twoFactor" name="twoFactor" class="form-select shadow-none">
                             <option value="0" <?= (int) $authSettings['twoFactor'] === 0 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.disabled'); ?></option>
                             <option value="1" <?= (int) $authSettings['twoFactor'] === 1 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.enabled'); ?></option>
@@ -69,25 +69,25 @@
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="auth_twoFactorLimit" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.twoFactorLimit'); ?></label>
+                        <label for="auth_twoFactorLimit" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.twoFactorLimit'); ?></label>
                         <input type="number" id="auth_twoFactorLimit" name="twoFactorLimit" class="form-control shadow-none" min="1" max="10" value="<?= esc($authSettings['twoFactorLimit']); ?>" placeholder="<?= lang('backend/settings.placeholders.twoFactorLimit'); ?>">
                         <div class="error_twoFactorLimit text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="auth_twoFactorTime" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.twoFactorTime'); ?></label>
+                        <label for="auth_twoFactorTime" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.twoFactorTime'); ?></label>
                         <input type="number" id="auth_twoFactorTime" name="twoFactorTime" class="form-control shadow-none" min="10" value="<?= esc($authSettings['twoFactorTime']); ?>" placeholder="<?= lang('backend/settings.placeholders.twoFactorTime'); ?>">
                         <div class="error_twoFactorTime text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="auth_twoFactorIssuer" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.twoFactorIssuer'); ?></label>
+                        <label for="auth_twoFactorIssuer" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.twoFactorIssuer'); ?></label>
                         <input type="text" id="auth_twoFactorIssuer" name="twoFactorIssuer" class="form-control shadow-none" value="<?= esc($authSettings['twoFactorIssuer']); ?>" placeholder="<?= lang('backend/settings.placeholders.twoFactorIssuer'); ?>">
                         <div class="error_twoFactorIssuer text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="auth_twoFactorDigits" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.twoFactorDigits'); ?></label>
+                        <label for="auth_twoFactorDigits" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.twoFactorDigits'); ?></label>
                         <select id="auth_twoFactorDigits" name="twoFactorDigits" class="form-select shadow-none">
                             <option value="6" <?= $authSettings['twoFactorDigits'] == 6 ? 'selected' : ''; ?>>6</option>
                             <option value="8" <?= $authSettings['twoFactorDigits'] == 8 ? 'selected' : ''; ?>>8</option>
@@ -96,19 +96,19 @@
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="auth_twoFactorWindow" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.twoFactorWindow'); ?></label>
+                        <label for="auth_twoFactorWindow" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.twoFactorWindow'); ?></label>
                         <input type="number" id="auth_twoFactorWindow" name="twoFactorWindow" class="form-control shadow-none" min="0" max="2" value="<?= esc($authSettings['twoFactorWindow']); ?>" placeholder="<?= lang('backend/settings.placeholders.twoFactorWindow'); ?>">
                         <div class="error_twoFactorWindow text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="auth_twoFactorEmailExpiry" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.twoFactorEmailExpiry'); ?></label>
+                        <label for="auth_twoFactorEmailExpiry" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.twoFactorEmailExpiry'); ?></label>
                         <input type="number" id="auth_twoFactorEmailExpiry" name="twoFactorEmailExpiry" class="form-control shadow-none" min="10" value="<?= esc($authSettings['twoFactorEmailExpiry']); ?>" placeholder="<?= lang('backend/settings.placeholders.twoFactorEmailExpiry'); ?>">
                         <div class="error_twoFactorEmailExpiry text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="auth_twoFactorEmailFrom" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.twoFactorEmailFrom'); ?></label>
+                        <label for="auth_twoFactorEmailFrom" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.twoFactorEmailFrom'); ?></label>
                         <input type="email" id="auth_twoFactorEmailFrom" name="twoFactorEmailFrom" class="form-control shadow-none" value="<?= esc($authSettings['twoFactorEmailFrom']); ?>" placeholder="<?= lang('backend/settings.placeholders.twoFactorEmailFrom'); ?>">
                         <div class="error_twoFactorEmailFrom text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
@@ -125,19 +125,19 @@
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="auth_sessionTime" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.sessionTime'); ?></label>
+                        <label for="auth_sessionTime" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.sessionTime'); ?></label>
                         <input type="number" id="auth_sessionTime" name="sessionTime" class="form-control shadow-none" min="60" value="<?= esc($authSettings['sessionTime']); ?>" placeholder="<?= lang('backend/settings.placeholders.sessionTime'); ?>">
                         <div class="error_sessionTime text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="auth_rememberMeTime" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.rememberMeTime'); ?></label>
+                        <label for="auth_rememberMeTime" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.rememberMeTime'); ?></label>
                         <input type="number" id="auth_rememberMeTime" name="rememberMeTime" class="form-control shadow-none" min="3600" value="<?= esc($authSettings['rememberMeTime']); ?>" placeholder="<?= lang('backend/settings.placeholders.rememberMeTime'); ?>">
                         <div class="error_rememberMeTime text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="auth_activationTime" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.activationTime'); ?></label>
+                        <label for="auth_activationTime" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.activationTime'); ?></label>
                         <input type="number" id="auth_activationTime" name="activationTime" class="form-control shadow-none" min="3600" value="<?= esc($authSettings['activationTime']); ?>" placeholder="<?= lang('backend/settings.placeholders.activationTime'); ?>">
                         <div class="error_activationTime text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>

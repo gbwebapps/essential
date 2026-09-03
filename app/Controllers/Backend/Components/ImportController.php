@@ -213,9 +213,11 @@ class ImportController extends BaseController
             endif;
 
             $file = $this->request->getPost('file');
-            $filePath = WRITEPATH . 'uploads/csv/' . $file;
+            
+            /* Aggiorniamo il percorso puntando alla nuova directory staging */
+            $filePath = WRITEPATH . 'uploads/staging/' . $file;
 
-            /* Elimina il file se esiste fisicamente sul server */
+            /* Elimina il file di staging se l'utente annulla o chiude la modale */
             if (file_exists($filePath)):
                 unlink($filePath);
             endif;

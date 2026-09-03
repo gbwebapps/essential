@@ -28,7 +28,16 @@ class ExportController extends BaseController
                 return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/components/export.messages.validateToastErrors'), $errorMessage)]);
             endif;
 
-            $output = view('backend/components/export/showModalView', ['entity' => $posts['entity']]);
+            $entity = $posts['entity'];
+            
+            /* Otteniamo le colonne esportabili (esclusa la PK) */
+            $exportColumns = $this->exportModel->getExportColumns($entity);
+
+            /* Passiamo i dati alla view che creerà i checkbox */
+            $output = view('backend/components/export/showModalView', [
+                'entity'  => $entity,
+                'columns' => $exportColumns
+            ]);
 
             return $this->jsonResponse(['result' => true, 'output' => $output]);
 
@@ -42,41 +51,53 @@ class ExportController extends BaseController
             $posts = $this->request->getPost();
             $rules = $this->exportModel->generateValidationRules();
             
-            /* Aggiungiamo dinamicamente le regole per il chunking */
-            $rules['offset'] = ['label' => 'Offset', 'rules' => 'permit_empty|is_natural'];
+            /* Regole per il cursore numerico ID */
+            $rules['lastId'] = ['label' => 'Last ID', 'rules' => 'permit_empty|is_natural'];
+            $rules['processedCount'] = ['label' => 'Processed Count', 'rules' => 'permit_empty|is_natural'];
             $rules['fileName'] = ['label' => 'File Name', 'rules' => 'permit_empty|string'];
 
-            /* Validazione dell'entità o dei filtri base */
-            if ( ! $this->validateData($posts, $rules)) :
+            if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/components/export.messages.validateToastErrors'), $errorMessage)]);
             endif;
 
-            /* Estrazione variabili di chunking */
-            $offset = (int) $this->request->getPost('offset');
-            $fileName = $this->request->getPost('fileName'); // Sarà null al primo giro
+            $lastId = $this->request->getPost('lastId') !== '' ? (int) $this->request->getPost('lastId') : null;
+            $fileName = $this->request->getPost('fileName');
+            $processedCount = (int) $this->request->getPost('processedCount');
 
-            /* Genera l'esportazione a blocchi */
-            $exportResult = $this->exportModel->generate($posts, $offset, $fileName);
+            $exportResult = $this->exportModel->generate($posts, $lastId, $fileName);
 
-            if ($exportResult['result'] === false):
+            if ($exportResult['result'] === false || $exportResult['isFinished'] === true):
                 return $this->jsonResponse($exportResult);
             endif;
 
-            /* Se ha finito (isFinished = true), restituiamo il link al file */
-            if ($exportResult['isFinished'] === true):
-                return $this->jsonResponse($exportResult);
-            endif;
+            $currentTotal = $processedCount + $exportResult['chunkSize'];
 
-            /* Se il blocco è parziale, restituiamo i dati per il prossimo giro e la vista del loader */
             return $this->jsonResponse([
                 'result' => true,
                 'isFinished' => false,
-                'nextOffset' => $exportResult['nextOffset'],
+                'lastId' => $exportResult['lastId'],
                 'fileName' => $exportResult['fileName'],
-                'progressMessage' => sprintf(lang('backend/components/export.messages.processedRows'), $exportResult['nextOffset'])
+                'processedCount' => $currentTotal,
+                'progressMessage' => sprintf(lang('backend/components/export.messages.processedRows'), $currentTotal)
             ]);
 
+        endif;
+    }
+
+    public function remove(): ResponseInterface
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+            $fileName = $this->request->getPost('fileName');
+            
+            if ($fileName):
+                $filePath = WRITEPATH . 'exports/' . basename($fileName);
+                if (is_file($filePath)):
+                    unlink($filePath);
+                endif;
+            endif;
+
+            return $this->jsonResponse(['result' => true]);
         endif;
     }
 
@@ -86,7 +107,7 @@ class ExportController extends BaseController
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         endif;
 
-        $filePath = WRITEPATH . 'exports/' . $fileName;
+        $filePath = WRITEPATH . 'exports/' . basename($fileName);
 
         if ( ! is_file($filePath)):
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();

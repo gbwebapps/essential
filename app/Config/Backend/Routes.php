@@ -4,7 +4,7 @@
  * Backend Routing Configuration
  *
  * Mappatura completa degli URL, raggruppamento logico dei moduli amministrativi
- * e applicazione chirurgica dei filtri di protezione (guest, authorization, master).
+ * e applicazione chirurgica dei filtri di protezione (guest, authorization, superadmin).
  */
 
 /* REDIRECT BACKEND */
@@ -84,6 +84,7 @@ $routes->group('backend', function($routes) {
         $routes->group('export', ['filter' => 'authorization'], function($routes) {
             $routes->post('showModal', '\App\Controllers\Backend\Components\ExportController::showModal');
             $routes->post('generate', '\App\Controllers\Backend\Components\ExportController::generate');
+            $routes->post('remove', '\App\Controllers\Backend\Components\ExportController::remove');
             $routes->get('download/(:any)', '\App\Controllers\Backend\Components\ExportController::download/$1');
         });
 
@@ -97,8 +98,8 @@ $routes->group('backend', function($routes) {
         });
     });
 
-    /* MASTER */
-    $routes->group('', ['filter' => ['authorization', 'master']], function($routes) {
+    /* SUPERADMIN */
+    $routes->group('', ['filter' => ['authorization', 'superadmin']], function($routes) {
         
         /* SETTINGS */
         $routes->group('settings', function($routes) {

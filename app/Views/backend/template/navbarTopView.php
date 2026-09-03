@@ -27,15 +27,15 @@
                         <ul class="dropdown-menu dropdown-menu-end"> 
                             <?php
 
-                                /* 1. Preparazione lista visibile: filtraggio in base ai permessi master */
+                                /* 1. Preparazione lista visibile: filtraggio in base ai permessi superadmin */
                                 $visibleItems = [];
                                 foreach ($menuTopRight as $item):
 
                                     /* Verifica di sicurezza sul controller per evitare errori se non definito */
                                     $itemController = $item['controller'] ?? '';
 
-                                    /* Se l'utente non è master, nascondi le voci relative alla gestione utenti */
-                                    if ( ! ((int) ($currentAdmin->master ?? 0) === 1) && in_array($itemController, ['admins', 'groups', 'audits', 'tokens'])):
+                                    /* Se l'utente non è superadmin, nascondi le voci relative alla gestione utenti */
+                                    if ( ! ((int) ($currentAdmin->superadmin ?? 0) === 1) && in_array($itemController, ['admins', 'groups', 'audits', 'tokens'])):
                                         continue;
                                     endif;
                                     $visibleItems[] = $item;

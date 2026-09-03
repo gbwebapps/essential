@@ -58,7 +58,7 @@ class TokensModel extends BackendModel
 
     protected ?string $getNumRowsQuery = "select count(*) as count from admins_tokens as at join admins as a on a.uuid = at.admin_uuid where 1 = 1";
 
-    protected ?string $getUUIDQuery = "select at.id, a.uuid, a.firstname, a.lastname, a.deleted_at, a.master from admins_tokens as at join admins as a on a.uuid = at.admin_uuid where at.id = ?";
+    protected ?string $getUUIDQuery = "select at.id, a.uuid, a.firstname, a.lastname, a.deleted_at, a.superadmin from admins_tokens as at join admins as a on a.uuid = at.admin_uuid where at.id = ?";
 
     /**
      * Inizializza il modello eseguendo le configurazioni di base ereditate dalla classe madre.
@@ -162,8 +162,8 @@ class TokensModel extends BackendModel
                 return ['result' => false, 'message' => lang('backend/tokens.messages.cannotModifyDeleted')]; /* Ricorda di creare la stringa lingua */
             endif;
 
-            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
-            if ((int) $data['row']->master === 1):
+            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il superadmin */
+            if ((int) $data['row']->superadmin === 1):
                 return ['result'  => false, 'message' => lang('backend/tokens.messages.protectedAdmin')];
             endif;
 

@@ -204,8 +204,8 @@ class AdminsController extends BackendController
                 return $this->jsonResponse(['result' => false, 'message' => $admin['message']]);
             endif;
 
-            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
-            if ((int) $admin['row']->master === 1):
+            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il superadmin */
+            if ((int) $admin['row']->superadmin === 1):
                 return $this->jsonResponse(['result' => false, 'message' => lang('backend/admins.messages.protectedAdmin')]);
             endif;
 
@@ -277,8 +277,8 @@ class AdminsController extends BackendController
             return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.cannotModifyDeleted'))->with('class', 'light text-danger fw-bold')->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
         endif;
 
-        /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
-        if ((int) $admin['row']->master === 1):
+        /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il superadmin */
+        if ((int) $admin['row']->superadmin === 1):
             return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.protectedAdmin'))->with('class', 'light text-danger fw-bold')->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
         endif;
         
@@ -368,8 +368,8 @@ class AdminsController extends BackendController
             return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.cannotModifyDeleted'))->with('class', 'light text-danger fw-bold')->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
         endif;
 
-        /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
-        if ((int) $admin['row']->master === 1):
+        /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il superadmin */
+        if ((int) $admin['row']->superadmin === 1):
             return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.protectedAdmin'))->with('class', 'light text-danger fw-bold')->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
         endif;
         

@@ -89,10 +89,10 @@ class AdminsModel extends BackendModel
      *
      * @var string|null
      */
-    protected ?string $getDataQuery = "select uuid, firstname, lastname, email, phone, status, created_at, updated_at, resetted_at, suspended_at, deleted_at,
+    protected ?string $getDataQuery = "select uuid, firstname, lastname, email, phone, status, superadmin, created_at, updated_at, resetted_at, suspended_at, deleted_at,
                                         (select images.filename from images where images.entity_uuid = admins.uuid and images.entity = 'admins' and images.is_cover = 1 limit 1) as cover, 
                                         (select count(*) from images where images.entity_uuid = admins.uuid and images.entity = 'admins') as images_num 
-                                        from admins where master <> ? and uuid <> ?";
+                                        from admins where 1 = 1";
 
     /**
      * Stringa SQL per il recupero puntuale dei dettagli anagrafici e di stato di un singolo amministratore tramite UUID.
@@ -107,7 +107,7 @@ class AdminsModel extends BackendModel
                                             email, 
                                             phone, 
                                             status, 
-                                            master, 
+                                            superadmin, 
                                             group_id, 
                                             note, 
                                             admins.created_at, 
@@ -125,7 +125,7 @@ class AdminsModel extends BackendModel
      *
      * @var string|null
      */
-    protected ?string $getNumRowsQuery = 'select count(*) as count from admins where master <> ? and uuid <> ?';
+    protected ?string $getNumRowsQuery = 'select count(*) as count from admins where 1 = 1';
 
     /**
      * Inizializza il modello eseguendo le configurazioni di base ereditate dalla classe madre.
@@ -871,8 +871,8 @@ class AdminsModel extends BackendModel
                 return ['result' => false, 'message' => lang('backend/admins.messages.cannotModifyDeleted')]; /* Ricorda di creare la stringa lingua */
             endif;
 
-            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
-            if ((int) $data['row']->master === 1):
+            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il superadmin */
+            if ((int) $data['row']->superadmin === 1):
                 return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
             endif;
 
@@ -1046,8 +1046,8 @@ class AdminsModel extends BackendModel
                 return ['result' => false, 'message' => $data['message']];
             endif;
 
-            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
-            if ((int) $data['row']->master === 1):
+            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il superadmin */
+            if ((int) $data['row']->superadmin === 1):
                 return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
             endif;
 
@@ -1108,8 +1108,8 @@ class AdminsModel extends BackendModel
                 return ['result' => false, 'message' => lang('backend/admins.messages.cannotModifyDeleted')]; /* Ricorda di creare la stringa lingua */
             endif;
 
-            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
-            if ((int) $data['row']->master === 1):
+            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il superadmin */
+            if ((int) $data['row']->superadmin === 1):
                 return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
             endif;
 
@@ -1261,8 +1261,8 @@ class AdminsModel extends BackendModel
                 return ['result' => false, 'message' => lang('backend/admins.messages.cannotModifyDeleted')]; /* Ricorda di creare la stringa lingua */
             endif;
 
-            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
-            if ((int) $data['row']->master === 1):
+            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il superadmin */
+            if ((int) $data['row']->superadmin === 1):
                 return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
             endif;
 
@@ -1364,8 +1364,8 @@ class AdminsModel extends BackendModel
                 return ['result' => false, 'message' => lang('backend/admins.messages.cannotModifyDeleted')]; /* Ricorda di creare la stringa lingua */
             endif;
 
-            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
-            if ((int) $data['row']->master === 1):
+            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il superadmin */
+            if ((int) $data['row']->superadmin === 1):
                 return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
             endif;
 
@@ -1456,8 +1456,8 @@ class AdminsModel extends BackendModel
                 return ['result' => false, 'message' => lang('backend/admins.messages.cannotModifyDeleted')]; /* Ricorda di creare la stringa lingua */
             endif;
 
-            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
-            if ((int) $data['row']->master === 1):
+            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il superadmin */
+            if ((int) $data['row']->superadmin === 1):
                 return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
             endif;
 
@@ -1558,8 +1558,8 @@ class AdminsModel extends BackendModel
                 return ['result' => false, 'message' => lang('backend/admins.messages.cannotModifyDeleted')]; /* Ricorda di creare la stringa lingua */
             endif;
 
-            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il master */
-            if ((int) $data['row']->master === 1):
+            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il superadmin */
+            if ((int) $data['row']->superadmin === 1):
                 return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
             endif;
 

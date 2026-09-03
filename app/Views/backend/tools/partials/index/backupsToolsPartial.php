@@ -1,7 +1,7 @@
 <!-- Sezione Generazione -->
 <div class="card-body text-center pb-3">
     <form id="backup-tools-form" autocomplete="off">
-        <button type="button" class="btn btn-success btn-generate-backups" title="Crea e scarica un nuovo backup del database in formato ZIP">
+        <button type="button" class="btn btn-success btn-generate-backups btn-sm" title="Crea e scarica un nuovo backup del database in formato ZIP">
             <i class="fa-solid fa-file-zipper me-2"></i><?= lang('backend/tools.buttons.generateBackups'); ?>
         </button>
     </form>
@@ -9,10 +9,10 @@
 
 <!-- Sezione Lista Backup -->
 <div class="card-body">
-    <h5 class="mb-3 fw-bold"><i class="fa-solid fa-circle-arrow-down me-2"></i><?= lang('backend/tools.labels.lastAvailableBackups'); ?></h5>
+    <h5 class="mb-3"><i class="fa-solid fa-circle-arrow-down me-2"></i><?= lang('backend/tools.labels.lastAvailableBackups'); ?></h5>
     
     <?php if (empty($backups)): ?>
-        <div class="text-center text-danger py-3 fw-bold">
+        <div class="text-center text-dark py-3 fw-bold">
             <?= lang('backend/tools.labels.noBackupsFound'); ?>
         </div>
     <?php else: ?>

@@ -88,13 +88,13 @@
                                 <!-- Blocco Destra: Azioni -->
                                 <div class="col-12 col-lg-2">
                                     <a href="#" class="btn-optimize-table d-block mb-2 text-decoration-none" data-table="<?= $table['name']; ?>">
-                                        <i class="fa-solid fa-circle-arrow-right me-1"></i> <?= lang('backend/tools.buttons.tableOptimize'); ?>
+                                        <i class="fa-solid fa-wand-magic-sparkles me-1"></i> <?= lang('backend/tools.buttons.tableOptimize'); ?>
                                     </a>
                                     <a href="#" class="export-entity d-block mb-2 text-decoration-none" data-export-entity="<?= $table['name']; ?>">
-                                        <i class="fa-solid fa-circle-arrow-right me-1"></i> <?= lang('backend/components/export.links.export'); ?>
+                                        <i class="fa-solid fa-file-export me-1"></i> <?= lang('backend/components/export.links.export'); ?>
                                     </a>
                                     <a href="#" class="import-entity d-block text-decoration-none" data-import-entity="<?= $table['name']; ?>">
-                                        <i class="fa-solid fa-circle-arrow-right me-1"></i> <?= lang('backend/components/import.links.import'); ?>
+                                        <i class="fa-solid fa-file-import me-1"></i> <?= lang('backend/components/import.links.import'); ?>
                                     </a>
                                 </div>
 

@@ -141,11 +141,6 @@ abstract class BackendModel extends BaseModel
 
 			$sql = $this->getDataQuery;
 
-			if($this->module === 'admins'):
-				$params[] = 1;
-				$params[] = service('authorization')->currentAdmin()->uuid;
-			endif;
-
 			/* Filtro Cestino basato sulla proprietà module */
 			$trashStatus = (isset($posts['trash_filter']) && in_array($posts['trash_filter'], ['active', 'trashed', 'all'])) ? $posts['trash_filter'] : 'active';
 			$sql .= $this->buildTrashFilter($trashStatus, $this->module, $this->hasSoftDelete);
@@ -200,11 +195,6 @@ abstract class BackendModel extends BaseModel
 	{
 		$params = [];
 		$sql = $this->getNumRowsQuery;
-
-		if($this->module === 'admins'):
-			$params[] = 1;
-			$params[] = service('authorization')->currentAdmin()->uuid;
-		endif;
 
 		/* 0. Filtro Cestino basato sulla proprietà module (Sincronizzato) */
 		$trashStatus = isset($paramsFilter['trash_filter']) ? $paramsFilter['trash_filter'] : 'active';

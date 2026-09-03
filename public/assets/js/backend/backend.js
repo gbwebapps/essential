@@ -157,14 +157,22 @@ function enableLinks() {
 /* Funzione per disabilitare tutti gli elementi di un form durante lka chiamata ajax */
 function disableAllControls() {
     const controls = document.querySelectorAll('input, select, textarea, button');
-    controls.forEach(el => el.disabled = true);
+    controls.forEach(el => {
+        if (!el.classList.contains('no-general-disabled')) {
+            el.disabled = true;
+        }
+    });
     disableLinks();
 }
 
 /* Funzione per abilitare tutti gli elementi di un form durante la chiamata ajax */
 function enableAllControls() {
     const controls = document.querySelectorAll('input, select, textarea, button');
-    controls.forEach(el => el.disabled = false);
+    controls.forEach(el => {
+        if (!el.classList.contains('no-general-disabled')) {
+            el.disabled = false;
+        }
+    });
     enableLinks();
 }
 

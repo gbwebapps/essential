@@ -28,7 +28,7 @@
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="upload_renameImages" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.renameImages'); ?></label>
+                        <label for="upload_renameImages" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.renameImages'); ?></label>
                         <select id="upload_renameImages" name="renameImages" class="form-select shadow-none">
                             <option value="0" <?= (int) $uploadSettings['renameImages'] === 0 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.disabled'); ?></option>
                             <option value="1" <?= (int) $uploadSettings['renameImages'] === 1 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.enabled'); ?></option>
@@ -37,7 +37,7 @@
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="upload_overwriteImages" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.overwriteImages'); ?></label>
+                        <label for="upload_overwriteImages" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.overwriteImages'); ?></label>
                         <select id="upload_overwriteImages" name="overwriteImages" class="form-select shadow-none">
                             <option value="0" <?= (int) $uploadSettings['overwriteImages'] === 0 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.disabled'); ?></option>
                             <option value="1" <?= (int) $uploadSettings['overwriteImages'] === 1 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.enabled'); ?></option>
@@ -57,13 +57,13 @@
                     </div>
 
                     <div class="col-12 col-md-6 mb-3">
-                        <label for="upload_maxFileSize" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.maxFileSize'); ?></label>
+                        <label for="upload_maxFileSize" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.maxFileSize'); ?></label>
                         <input type="number" id="upload_maxFileSize" name="maxFileSize" class="form-control shadow-none" min="1" value="<?= esc($uploadSettings['maxFileSize']); ?>" placeholder="<?= lang('backend/settings.placeholders.maxFileSize'); ?>">
                         <div class="error_maxFileSize text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
 
                     <div class="col-12 col-md-6 mb-3">
-                        <label for="upload_allowedExtensions" class="form-label fw-semibold mb-1">
+                        <label for="upload_allowedExtensions" class="form-label  mb-1">
                             <i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.allowedExtensions'); ?>
                         </label>
                         
@@ -102,13 +102,13 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="upload_maxImageX" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.maxImageX'); ?></label>
+                        <label for="upload_maxImageX" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.maxImageX'); ?></label>
                         <input type="number" id="upload_maxImageX" name="maxImageX" class="form-control shadow-none" min="0" value="<?= esc($uploadSettings['maxImageX']); ?>" placeholder="<?= lang('backend/settings.placeholders.maxImageX'); ?>">
                         <div class="error_maxImageX text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="upload_maxImageY" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.maxImageY'); ?></label>
+                        <label for="upload_maxImageY" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.maxImageY'); ?></label>
                         <input type="number" id="upload_maxImageY" name="maxImageY" class="form-control shadow-none" min="0" value="<?= esc($uploadSettings['maxImageY']); ?>" placeholder="<?= lang('backend/settings.placeholders.maxImageY'); ?>">
                         <div class="error_maxImageY text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
@@ -125,13 +125,13 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="upload_resizeMediumX" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.resizeMediumX'); ?></label>
+                        <label for="upload_resizeMediumX" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.resizeMediumX'); ?></label>
                         <input type="number" id="upload_resizeMediumX" name="resizeMediumX" class="form-control shadow-none" min="0" value="<?= esc($uploadSettings['resizeMediumX']); ?>" placeholder="<?= lang('backend/settings.placeholders.resizeMediumX'); ?>">
                         <div class="error_resizeMediumX text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="upload_resizeMediumY" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.resizeMediumY'); ?></label>
+                        <label for="upload_resizeMediumY" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.resizeMediumY'); ?></label>
                         <input type="number" id="upload_resizeMediumY" name="resizeMediumY" class="form-control shadow-none" min="0" value="<?= esc($uploadSettings['resizeMediumY']); ?>" placeholder="<?= lang('backend/settings.placeholders.resizeMediumY'); ?>">
                         <div class="error_resizeMediumY text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
@@ -148,13 +148,13 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="upload_resizeSmallX" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.resizeSmallX'); ?></label>
+                        <label for="upload_resizeSmallX" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.resizeSmallX'); ?></label>
                         <input type="number" id="upload_resizeSmallX" name="resizeSmallX" class="form-control shadow-none" min="0" value="<?= esc($uploadSettings['resizeSmallX']); ?>" placeholder="<?= lang('backend/settings.placeholders.resizeSmallX'); ?>">
                         <div class="error_resizeSmallX text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="upload_resizeSmallY" class="form-label fw-semibold mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.resizeSmallY'); ?></label>
+                        <label for="upload_resizeSmallY" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.resizeSmallY'); ?></label>
                         <input type="number" id="upload_resizeSmallY" name="resizeSmallY" class="form-control shadow-none" min="0" value="<?= esc($uploadSettings['resizeSmallY']); ?>" placeholder="<?= lang('backend/settings.placeholders.resizeSmallY'); ?>">
                         <div class="error_resizeSmallY text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>

@@ -118,7 +118,7 @@ class Auth extends BaseConfig
      * Indirizzo e-mail del mittente utilizzato per l'invio dei codici di verifica.
      * @var string
      */
-    public string $twoFactorEmailFrom = 'master@essential.it';
+    public string $twoFactorEmailFrom = 'superadmin@essential.it';
 
     /**
      * Elenco dei metodi di autenticazione a due fattori supportati dal sistema.

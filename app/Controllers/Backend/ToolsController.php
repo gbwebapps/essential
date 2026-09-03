@@ -231,7 +231,8 @@ class ToolsController extends BackendController
             /* Intercetta l'azione di eliminazione */
             elseif ($action === 'deleteBackups'):
                 
-                $filename = $this->request->getPost('filename');
+                /* Sanificazione immediata dell'input */
+                $filename = basename($this->request->getPost('filename'));
                                 
                 if ($this->toolsModel->deleteBackups($filename)):
                     return $this->jsonResponse(['result'  => true, 'message' => lang('backend/tools.messages.deleteBackupsSuccess')]);
@@ -241,11 +242,12 @@ class ToolsController extends BackendController
 
             elseif ($action === 'downloadBackups'):
                 
-                $filename = $this->request->getPost('filename');
+                /* Sanificazione immediata dell'input */
+                $filename = basename($this->request->getPost('filename'));
                 
-                $path = WRITEPATH . 'backups/database/' . basename($filename);
+                $path = WRITEPATH . 'backups/database/' . $filename;
                 
-                if (file_exists($path) && is_file($path)):
+                if (is_file($path)):
                     return $this->jsonResponse(['result' => true, 'downloadUrl' => base_url('backend/tools/downloadBackups/' . $filename)]);
                 else:
                     return $this->jsonResponse(['result' => false, 'message' => lang('backend/tools.messages.backupNotFoundError')]);
