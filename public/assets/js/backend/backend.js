@@ -58,12 +58,17 @@ export function toggleLoader(show) {
 /* Coda di esecuzione per evitare Race Conditions sulle chiamate simultanee */
 let fetchQueue = Promise.resolve();
 
-/* --- Chiamata fetch generica ottimizzata (Interfaccia Response preservata) --- */
-export async function apiFetch(input, init = {}) {
-
-    /* Concateniamo la chiamata per eseguirle in sequenza e mantenere coerente il CSRF */
-    fetchQueue = fetchQueue.then(() => executeFetch(input, init));
-    return fetchQueue;
+/* --- Chiamata fetch generica ottimizzata --- */
+export function apiFetch(input, init = {}) {
+    
+    /* 1. Creiamo il task corrente accodandolo alla fine della coda */
+    const currentTask = fetchQueue.then(() => executeFetch(input, init));
+    
+    /* 2. Ripariamo la coda: se il task fallisce, la coda lo ignora per rimanere "viva" per il click successivo */
+    fetchQueue = currentTask.catch(() => {});
+    
+    /* 3. Ritorniamo il task al Manager, che così può scatenare il suo blocco try/catch/finally */
+    return currentTask;
 }
 
 async function executeFetch(input, init = {}) {
@@ -106,24 +111,53 @@ async function executeFetch(input, init = {}) {
         }
 
         /* 2. Gestione degli errori del server (es. 403, 500, 404) */
+        
+        /* Tenta il parse del JSON (in caso il server abbia risposto con un errore strutturato) */
         const errorJson = await response.json().catch(() => ({}));
         
-        /* Aggiornamento del token CSRF anche in caso di risposta d'errore HTTP */
+        /* Aggiornamento del token CSRF (se presente nel JSON di errore) */
         const errorHash = errorJson?.csrfHash || errorJson?.csrf;
         if (errorHash && csrfMeta) {
             csrfMeta.setAttribute('content', errorHash);
         }
 
-        const serverMessage = errorJson.message || `Errore server (${response.status})`;
-        handleAjaxError({ status: response.status }, serverMessage, null);
+        /* Mapping "Enterprise" degli Status Code a messaggi User-Friendly */
+        const i18n = document.getElementById('js-i18n-errors');
+
+        let customMessage = '';
+        
+        switch (response.status) {
+            case 403:
+                customMessage = i18n ? i18n.dataset.err403 : 'Accesso negato (403).';
+                break;
+            case 404:
+                customMessage = i18n ? i18n.dataset.err404 : 'Risorsa non trovata (404).';
+                break;
+            case 500:
+                customMessage = i18n ? i18n.dataset.err500 : 'Errore interno (500).';
+                break;
+            case 504:
+                customMessage = i18n ? i18n.dataset.err504 : 'Timeout del server (504).';
+                break;
+            default:
+                customMessage = errorJson.message || `Errore di comunicazione (${response.status})`;
+        }
+
+        handleAjaxError({ status: response.status }, customMessage, null);
+        
+        if (response.status === 403) {
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        }
         
         throw response;
 
     } catch (error) {
         if ( ! (error instanceof Response)) {
-            
-            /* Errori di rete puri (es. assenza di connessione) */
-            handleAjaxError({ status: 0 }, error.message, error);
+            const i18n = document.getElementById('js-i18n-errors');
+            const netError = i18n ? i18n.dataset.errNetwork : 'Errore di rete.';
+            handleAjaxError({ status: 0 }, netError, error.message);
         }
         throw error;
     } finally {
@@ -209,28 +243,16 @@ export function handleValidationImages(errors) {
 /* Funzione per gestire il .fail delle chiamate ajax */
 export function handleAjaxError(jqXHR, textStatus, errorThrown) {
 
-    /* Messaggio descrittivo di base */
-    let message = '';
-
-    /* Se è un errore 403, prendiamo SOLO lo statusText pulito senza debug */
-    if (jqXHR.status === 403) {
-        message = textStatus;
-    } else {
-        /* Per tutti gli altri errori (es. 500, 404), mantiene il report completo */
-        message = `Errore AJAX:
-        - Status Code: ${jqXHR.status}
-        - Status Text: ${textStatus}
-        - Error Thrown: ${errorThrown}`;
+    /* Mostra SEMPRE e SOLO la stringa human-friendly che ci arriva da apiFetch */
+    if (typeof showAlert === 'function') {
+        showAlert('danger', textStatus);
     }
 
-    /* Mostra il messaggio in un toast */
-    showAlert('danger', message);
-
-    /* Logga comunque il messaggio completo in console per il debug dello sviluppatore */
-    console.error('Dettagli errore AJAX:', {
-        status: jqXHR.status,
-        textStatus: textStatus,
-        errorThrown: errorThrown
+    /* Logga il report completo e asettico in console (visibile solo aprendo i DevTools) */
+    console.error('[Architettura Essential] - Errore Rete/Server:', {
+        httpStatus: jqXHR.status,
+        userMessage: textStatus,
+        nativeError: errorThrown || 'N/A'
     });
 }
 
@@ -387,23 +409,25 @@ export function smoothReplace(container, newHtml) {
     container.style.opacity = '1';
 }
 
-// export function smoothReplace(container, newHtml) {
-//     if ( ! container) return;
+/* Inizializza la chiusura automatica di un Offcanvas al click sui link interni */
+export function initOffcanvasAutoClose(offcanvasId, linkSelector = '.cmd-link') {
 
-//     // 1. Applichiamo subito l'opacità zero (nascosto) senza transizione
-//     container.style.transition = 'none';
-//     container.style.opacity = '0';
+    const offcanvasEl = document.getElementById(offcanvasId);
+    
+    // Se l'Offcanvas non esiste nella pagina, interrompe l'esecuzione
+    if ( ! offcanvasEl) return;
 
-//     // 2. Sostituiamo immediatamente il contenuto HTML
-//     container.innerHTML = newHtml;
-
-//     // 3. Forziamo il reflow del browser (obbliga a registrare lo stato opacità = 0)
-//     container.offsetHeight;
-
-//     // 4. Ripristiniamo la transizione CSS e portiamo l'opacità a 1 per avviare il fade-in
-//     container.style.transition = 'opacity 0.25s ease-in-out';
-//     container.style.opacity = '1';
-// }
+    const links = offcanvasEl.querySelectorAll(linkSelector);
+    
+    links.forEach(link => {
+        link.addEventListener('click', () => {
+            const instance = bootstrap.Offcanvas.getInstance(offcanvasEl);
+            if (instance) {
+                instance.hide();
+            }
+        });
+    });
+}
 
 /* Funzione globale per inizializzare tutte le Tom Select attive nella pagina */
 export function initTomSelects() {

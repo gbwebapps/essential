@@ -7,7 +7,7 @@ use App\Models\Backend\BackendModel;
 class ImportModel extends BackendModel 
 {
     /* Type Hinting rigoroso: restituisce un Model di CI4 o null */
-    private function getTargetModelInstance(string $entity): ?\CodeIgniter\Model
+    private function getTargetModelInstance(string $entity)
     {
         $modelName = 'App\\Models\\Backend\\' . ucfirst($entity) . 'Model';
         

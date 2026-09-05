@@ -154,6 +154,7 @@ class GroupsController extends BackendController
 
             /* Validazione dei posts */
             if ( ! $this->validateData($posts, $rules)):
+
                 /* Catturiamo gli errori grezzi (compresi eventuali permissions.0, permissions.1) */
                 $rawErrors = $this->validator->getErrors();
 
@@ -162,6 +163,18 @@ class GroupsController extends BackendController
 
                 return $this->jsonResponse(['errors' => $cleanErrors, 'message' => lang('backend/groups.messages.validationErrors')]);
             endif;
+
+            /* Simula un errore 403 (Sessione scaduta / Accesso negato) */
+            //return $this->response->setStatusCode(403)->setJSON(['result' => false]);
+
+            /* Simula un errore 404 (Risorsa non trovata) */
+            //return $this->response->setStatusCode(404)->setJSON(['result' => false]);
+
+            /* Simula un errore 500 (Errore interno del server) */
+            //return $this->response->setStatusCode(500)->setJSON(['result' => false]);
+
+            /* Simula un errore 504 (Timeout) */
+            // return $this->response->setStatusCode(504)->setJSON(['result' => false]);
 
             /* Esecuzione della logica di inserimento con sbarramento interno */
             $result = $this->groupsModel->add($posts);

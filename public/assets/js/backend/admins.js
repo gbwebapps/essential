@@ -1,5 +1,5 @@
 /* Import delle costanti e utility da backend.js */
-import { urlbase, action, smoothReplace } from './backend.js';
+import { urlbase, action, smoothReplace, initOffcanvasAutoClose } from './backend.js';
 
 /* Import dei componenti dalla sottocartella */
 import { ListManager, AddManager, EditManager, DeleteManager, ChangeStatusManager, GeneralDataManager, MetaDataManager } from './modules/Crud.js';
@@ -65,6 +65,8 @@ const actions = {
             }
         });
         importManager.init();
+
+        initOffcanvasAutoClose('actionsOffcanvas');
 
     },
     add: function() {

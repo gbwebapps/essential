@@ -27,7 +27,7 @@ class AuditsModel extends BackendModel
      *
      * @var string|null
      */
-    protected ?string $defaultColumn = 'created_at';
+    protected ?string $defaultColumn = 'id';
 
     /**
      * Elenco dei parametri di input autorizzati per il filtraggio e l'impaginazione della vista tabellare globale.

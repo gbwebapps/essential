@@ -10,7 +10,7 @@ class AdminsModel extends BackendModel
 
     protected bool $hasSoftDelete = true;
 
-    protected ?string $defaultColumn = 'created_at';
+    protected ?string $defaultColumn = 'id';
 
     protected array $showAllAllowedFields = ['column', 'order', 'page', 'rows', 'searchFields', 'trash_filter'];
 

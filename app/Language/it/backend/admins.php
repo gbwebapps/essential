@@ -27,8 +27,8 @@ return [
 		'thirst' => 'Terza opzione', 
 	], 
 	'links' => [
-		'filters' => 'Filtri', 
-		'resetFilters' => 'Resetta filtri', 
+		'filters' => 'Cerca', 
+		'resetFilters' => 'Pulisci ricerca', 
 		'resetSorting' => 'Resetta ordinamento', 
 		'reloadList' => 'Ricarica lista', 
 		'activeRecords' => 'Attivi', 

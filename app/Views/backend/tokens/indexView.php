@@ -14,7 +14,7 @@
                         <div class="row">
 
                             <!-- Select per il numero delle righe da mostrare -->
-                            <div class="col-12 col-md-1">
+                            <div class="col-12 col-md-1 mb-3 mb-md-0">
                                 <select id="changeNumRows" class="form-select">
                                     <option value="5">5</option>
                                     <option value="10">10</option>
@@ -24,46 +24,52 @@
                             </div>
                             <!-- End Select per il numero delle righe da mostrare -->
 
-                            <div class="col-12 col-md-11">
-                                <div class="pt-2 d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-md-end">
+                            <!-- Bottone Mobile per aprire l'Offcanvas -->
+                            <div class="col-12 d-md-none mb-3">
+                                <button class="btn btn-secondary w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#actionsOffcanvas" aria-controls="actionsOffcanvas">
+                                    <i class="fa-solid fa-bars"></i> Opzioni e Filtri
+                                </button>
+                            </div>
+                            <!-- End Bottone Mobile -->
 
-                                    <!-- Apertura/chiusura parte filtri -->
-                                    <a href="#" id="link-search"
-                                       data-bs-toggle="collapse"
-                                       data-bs-target="#search-bar"
-                                       aria-expanded="false"
-                                       aria-controls="search-bar"
-                                        class="mb-2 mb-md-0 me-0 me-md-2 bar-link">
-                                        <i class="fa-solid fa-filter"></i> <?= lang('backend/tokens.links.filters'); ?>
-                                    </a>
-                                    <!-- End Apertura/chiusura parte filtri -->
+                            <!-- Contenitore Offcanvas -->
+                            <div class="col-12 col-md-11 offcanvas-md offcanvas-bottom" tabindex="-1" id="actionsOffcanvas">
+                                <div class="offcanvas-header">
+                                    <h5 class="offcanvas-title">
+                                        <i class="fa-solid fa-bars"></i> Opzioni e Filtri
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#actionsOffcanvas" aria-label="Close"></button>
+                                </div>
+                                
+                                <div class="offcanvas-body pt-md-2">
+                                    <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-md-end w-100 gap-0 gap-md-3">
+                                        
+                                        <!-- Azioni e Filtri -->
+                                        <a href="#" id="link-search" data-bs-toggle="collapse" data-bs-target="#search-bar" class="cmd-link">
+                                            <i class="fa-solid fa-magnifying-glass"></i> <?= lang('backend/tokens.links.filters'); ?>
+                                        </a>
+                                        
+                                        <a href="#" id="link-reset-search" class="cmd-link">
+                                            <i class="fa-solid fa-xmark"></i> <?= lang('backend/tokens.links.resetFilters'); ?>
+                                        </a>
+                                        
+                                        <a href="#" id="reset-sorting-link" class="cmd-link">
+                                            <i class="fa-solid fa-sort"></i> <?= lang('backend/tokens.links.resetSorting'); ?>
+                                        </a>
+                                        
+                                        <a href="#" id="refresh-list" class="cmd-link">
+                                            <i class="fa-solid fa-arrows-rotate"></i> <?= lang('backend/tokens.links.reloadList'); ?>
+                                        </a>
 
-                                    <!-- Reset filtri e ordinamento -->
-                                    <a href="#" id="link-reset-search" class="mb-2 mb-md-0 mx-0 mx-md-2 bar-link">
-                                        <i class="fa-solid fa-filter-circle-xmark"></i> <?= lang('backend/tokens.links.resetFilters'); ?>
-                                    </a>
-                                    <!-- End Reset filtri e ordinamento -->
+                                        <a href="#" id="export-entity" class="cmd-link"  data-export-entity="admins_tokens">
+                                            <i class="fa-solid fa-file-export"></i> <?= lang('backend/components/export.links.export'); ?>
+                                        </a>
+                                        <!-- End Azioni e Filtri -->
 
-                                    <!-- Reset solo ordinamento -->
-                                    <a href="#" id="reset-sorting-link" class="mb-2 mb-md-0 mx-0 mx-md-2 bar-link">
-                                        <i class="fa-solid fa-sort"></i> <?= lang('backend/tokens.links.resetSorting'); ?>
-                                    </a>
-                                    <!-- End Reset solo ordinamento -->
-
-                                    <!-- Semplice ricarica lista -->
-                                    <a href="#" id="refresh-list" class="mb-2 mb-md-0 mx-0 mx-md-2 bar-link">
-                                        <i class="fa-solid fa-arrows-rotate"></i> <?= lang('backend/tokens.links.reloadList'); ?>
-                                    </a>
-                                    <!-- End Semplice ricarica lista -->
-
-                                    <!-- Esporta lista csv diretta -->
-                                    <a href="#" class="mb-2 mb-md-0 mx-0 mx-md-2 bar-link" id="export-entity" data-export-entity="admins_tokens">
-                                        <i class="fa-solid fa-file-export"></i> <?= lang('backend/components/export.links.export'); ?>
-                                    </a>
-                                    <!-- End esporta lista csv -->
-
+                                    </div>
                                 </div>
                             </div>
+                            <!-- End Contenitore Offcanvas -->
 
                         </div>
                     </div>

@@ -27,7 +27,7 @@ class TokensModel extends BackendModel
      *
      * @var string|null
      */
-    protected ?string $defaultColumn = 'token_create';
+    protected ?string $defaultColumn = 'id';
 
     /**
      * Elenco dei parametri di input autorizzati per il filtraggio e l'impaginazione della vista tabellare globale.

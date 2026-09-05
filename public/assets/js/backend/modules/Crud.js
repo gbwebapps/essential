@@ -337,6 +337,7 @@ export class ListManager {
         const hasDateFields = Object.values(this.state.searchDates).some(val => val?.trim() !== '');
         
         linkSearch.classList.toggle('text-danger', hasTextFields || hasDateFields);
+        linkSearch.classList.toggle('fw-bold', hasTextFields || hasDateFields);
     }
 
     /* --- COMUNICAZIONE SERVER --- */

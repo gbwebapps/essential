@@ -109,6 +109,7 @@ $routes->group('backend', function($routes) {
             $routes->post('saveSettings', '\App\Controllers\Backend\SettingsController::saveSettings');
             $routes->post('deleteSettings', '\App\Controllers\Backend\SettingsController::deleteSettings');
             $routes->post('getSettings', '\App\Controllers\Backend\SettingsController::getSettings');
+            $routes->post('checkDeleteSettings', '\App\Controllers\Backend\SettingsController::checkDeleteSettings');
         });
 
         /* TOOLS */

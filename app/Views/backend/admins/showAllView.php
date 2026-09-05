@@ -14,7 +14,7 @@
                         <div class="row">
 
                             <!-- Select per il numero delle righe da mostrare -->
-                            <div class="col-12 col-md-1">
+                            <div class="col-12 col-md-1 mb-3 mb-md-0">
                                 <select id="changeNumRows" class="form-select">
                                     <option value="5">5</option>
                                     <option value="10">10</option>
@@ -24,66 +24,70 @@
                             </div>
                             <!-- End Select per il numero delle righe da mostrare -->
 
-                            <div class="col-12 col-md-11">
-                                <div class="pt-2 d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-md-end">
+                            <!-- Bottone Mobile per aprire l'Offcanvas -->
+                            <div class="col-12 d-md-none mb-3">
+                                <button class="btn btn-secondary w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#actionsOffcanvas" aria-controls="actionsOffcanvas">
+                                    <i class="fa-solid fa-bars"></i> Opzioni e Filtri
+                                </button>
+                            </div>
+                            <!-- End Bottone Mobile -->
 
-                                    <!-- Selezione stato record (Attivi, Cestino, Tutti) -->
-                                    <div class="d-flex flex-column flex-md-row me-md-auto mb-2 mb-md-0">
-                                        <a href="#" class="bar-link active mb-2 mb-md-0 me-0 me-md-2" data-trash-filter="active">
-                                            <i class="fa-solid fa-check"></i> <?= lang('backend/admins.links.activeRecords'); ?>
+                            <!-- Contenitore Offcanvas -->
+                            <div class="col-12 col-md-11 offcanvas-md offcanvas-bottom" tabindex="-1" id="actionsOffcanvas">
+                                <div class="offcanvas-header">
+                                    <h5 class="offcanvas-title">
+                                        <i class="fa-solid fa-bars"></i> Opzioni e Filtri
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#actionsOffcanvas" aria-label="Close"></button>
+                                </div>
+                                
+                                <div class="offcanvas-body pt-md-2">
+                                    <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-md-end w-100 gap-0 gap-md-3">
+                                        
+                                        <!-- Selezione stato record -->
+                                        <div class="d-flex flex-column flex-md-row gap-0 gap-md-3 me-md-auto mb-3 mb-md-0 border-md-end pe-md-3">
+                                            <a href="#" class="cmd-link active-filter" data-trash-filter="active">
+                                                <i class="fa-solid fa-check"></i> <?= lang('backend/admins.links.activeRecords'); ?>
+                                            </a>
+                                            <a href="#" class="cmd-link" data-trash-filter="trashed">
+                                                <i class="fa-solid fa-trash-can"></i> <?= lang('backend/admins.links.trashedRecords'); ?>
+                                            </a>
+                                            <a href="#" class="cmd-link" data-trash-filter="all">
+                                                <i class="fa-solid fa-list"></i> <?= lang('backend/admins.links.allRecords'); ?>
+                                            </a>
+                                        </div>
+                                        <!-- End Selezione stato record -->
+
+                                        <!-- Azioni e Filtri -->
+                                        <a href="#" id="link-search" data-bs-toggle="collapse" data-bs-target="#search-bar" class="cmd-link">
+                                            <i class="fa-solid fa-magnifying-glass"></i> <?= lang('backend/admins.links.filters'); ?>
                                         </a>
-                                        <a href="#" class="bar-link mb-2 mb-md-0 mx-0 mx-md-2" data-trash-filter="trashed">
-                                            <i class="fa-solid fa-trash-can"></i> <?= lang('backend/admins.links.trashedRecords'); ?>
+                                        
+                                        <a href="#" id="link-reset-search" class="cmd-link">
+                                            <i class="fa-solid fa-xmark"></i> <?= lang('backend/admins.links.resetFilters'); ?>
                                         </a>
-                                        <a href="#" class="bar-link mb-0 mb-md-0 ms-0 ms-md-2" data-trash-filter="all">
-                                            <i class="fa-solid fa-list"></i> <?= lang('backend/admins.links.allRecords'); ?>
+                                        
+                                        <a href="#" id="reset-sorting-link" class="cmd-link">
+                                            <i class="fa-solid fa-sort"></i> <?= lang('backend/admins.links.resetSorting'); ?>
                                         </a>
+                                        
+                                        <a href="#" id="refresh-list" class="cmd-link">
+                                            <i class="fa-solid fa-arrows-rotate"></i> <?= lang('backend/admins.links.reloadList'); ?>
+                                        </a>
+                                        
+                                        <a href="#" id="export-entity" data-export-entity="admins" class="cmd-link">
+                                            <i class="fa-solid fa-file-export"></i> <?= lang('backend/components/export.links.export'); ?>
+                                        </a>
+                                        
+                                        <a href="#" id="import-entity" data-import-entity="admins" class="cmd-link">
+                                            <i class="fa-solid fa-file-import"></i> <?= lang('backend/components/import.links.import'); ?>
+                                        </a>
+                                        <!-- End Azioni e Filtri -->
+
                                     </div>
-                                    <!-- End Selezione stato record -->
-
-                                    <!-- Apertura/chiusura parte filtri -->
-                                    <a href="#" id="link-search"
-                                        data-bs-toggle="collapse"
-                                        data-bs-target="#search-bar"
-                                        aria-expanded="false"
-                                        aria-controls="search-bar"
-                                        class="mb-2 mb-md-0 me-0 me-md-2 bar-link">
-                                        <i class="fa-solid fa-filter"></i> <?= lang('backend/admins.links.filters'); ?>
-                                    </a>
-                                    <!-- End Apertura/chiusura parte filtri -->
-
-                                    <!-- Reset filtri e ordinamento -->
-                                    <a href="#" id="link-reset-search" class="mb-2 mb-md-0 mx-0 mx-md-2 bar-link">
-                                        <i class="fa-solid fa-filter-circle-xmark"></i> <?= lang('backend/admins.links.resetFilters'); ?>
-                                    </a>
-                                    <!-- End Reset filtri e ordinamento -->
-
-                                    <!-- Reset solo ordinamento -->
-                                    <a href="#" id="reset-sorting-link" class="mb-2 mb-md-0 mx-0 mx-md-2 bar-link">
-                                        <i class="fa-solid fa-sort"></i> <?= lang('backend/admins.links.resetSorting'); ?>
-                                    </a>
-                                    <!-- End Reset solo ordinamento -->
-
-                                    <!-- Semplice ricarica lista -->
-                                    <a href="#" id="refresh-list" class="mb-2 mb-md-0 mx-0 mx-md-2 bar-link">
-                                        <i class="fa-solid fa-arrows-rotate"></i> <?= lang('backend/admins.links.reloadList'); ?>
-                                    </a>
-                                    <!-- End Semplice ricarica lista -->
-
-                                    <!-- Esporta lista csv diretta -->
-                                    <a href="#" class="mb-2 mb-md-0 mx-0 mx-md-2 bar-link" id="export-entity" data-export-entity="admins">
-                                        <i class="fa-solid fa-file-export"></i> <?= lang('backend/components/export.links.export'); ?>
-                                    </a>
-                                    <!-- End esporta lista csv -->
-
-                                    <!-- Importa lista csv -->
-                                    <a href="#" class="mb-md-0 ms-0 ms-md-2 bar-link" id="import-entity" data-import-entity="admins">
-                                        <i class="fa-solid fa-file-import"></i> <?= lang('backend/components/import.links.import'); ?>
-                                    </a>
-                                    <!-- End importa lista csv -->
-
                                 </div>
                             </div>
+                            <!-- End Contenitore Offcanvas -->
 
                         </div>
                     </div>

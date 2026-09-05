@@ -208,4 +208,34 @@ class SettingsController extends BackendController
 
         endif;
     }
+
+    /**
+     * Verifica preventivamente l'esistenza di impostazioni nel database per il modulo richiesto.
+     * Utilizzato per bloccare il modale lato client se non ci sono dati da eliminare.
+     */
+    public function checkDeleteSettings(): ResponseInterface
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')) :
+
+            $env = $this->request->getPost('env');
+
+            if ( ! in_array($env, $this->allowedEnvs, true)) :
+                return $this->jsonResponse(['result'  => false, 'message' => lang('backend/settings.messages.validationErrors')]);
+            endif;
+
+            $namespace = 'Backend\\' . ucfirst($env);
+
+            /* Se non ci sono dati, blocca e restituisce il messaggio informativo */
+            if ( ! $this->settingsModel->hasDatabaseSettings($namespace)) :
+                return $this->jsonResponse([
+                    'result'  => false, 
+                    'message' => lang('backend/settings.messages.alreadyDefault')
+                ]);
+            endif;
+
+            /* Se i dati esistono, restituisce true dando il via libera al modale JS */
+            return $this->jsonResponse(['result' => true]);
+
+        endif;
+    }
 }

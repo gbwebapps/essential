@@ -35,6 +35,13 @@ return [
         'close' => 'Chiudi', 
         'exportPdf' => 'Esporta Pdf', 
     ],
+    'errors' => [
+        'err403' => 'Sessione di sicurezza scaduta o accesso non autorizzato. Ricaricamento in corso...',
+        'err404' => 'La risorsa richiesta non è stata trovata o è stata rimossa.',
+        'err500' => 'Si è verificato un errore critico durante l\'elaborazione della richiesta.',
+        'err504' => 'Il server ha impiegato troppo tempo a rispondere. Operazione annullata.',
+        'errNetwork' => 'Connessione di rete assente. Verifica lo stato della tua connessione internet.',
+    ], 
     'modals' => [
         'exportPdfTitle' => 'Impostazioni Esportazione PDF', 
         'exportPdfOrientation' => 'Orientamento', 

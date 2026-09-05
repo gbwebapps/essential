@@ -349,6 +349,49 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     min-height: 21px;
 }
 
+.action {
+    font-size: 0.875rem;
+    font-weight: 700;
+}
+
+/* Forza l'altezza minima uguale per tutte le righe della tabella */
+.table-row-110 {
+    height: 110px; 
+}
+
+/* Forza l'altezza minima uguale per tutte le righe della tabella */
+.table-row-60 {
+    height: 60px; 
+}
+
+.table-bg-superadmin {
+    /* Diciamo a tutti i <td> di questa riga di usare questo colore di sfondo */
+    --bs-table-bg: #f8f9fa;
+    
+    /* Manteniamo il colore dei bordi standard della tabella, prevenendo l'ispessimento */
+    --bs-table-border-color: inherit; 
+}
+
+/* Gestione animazione ruotazione Chevron */
+.toggle-meta-btn i {
+    transition: transform 0.3s ease-in-out;
+}
+/* Quando Bootstrap apre il collapse, ruota l'icona di 90 gradi verso il basso */
+.toggle-meta-btn[aria-expanded="true"] i {
+    transform: rotate(90deg);
+}
+
+/* Comandi: link su desktop, pulsanti solidi su mobile */
+.cmd-link {
+    text-decoration: none;
+    color: #495057;
+    transition: all 0.2s ease-in-out;
+}
+
+.cmd-link:hover {
+    color: #0d6efd;
+}
+
 @media (max-width: 991px) {
     .pagination-left, .pagination-right {
         display: none;
@@ -366,25 +409,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 @media (max-width: 767px) {
-    
-    .bar-link {
-        padding: .25rem;
-        background-color: #6c757d;
-        color: #fff !important;
-        text-align: center;
-        border-radius: .25rem;
-    }
 
-    .bar-link[data-trash-filter] {
-        background-color: #0d6efd; /* Colore primary di Bootstrap */
-    }
-
-    .bar-link[data-trash-filter].active {
-        background-color: #198754; /* Colore success di Bootstrap */
-    }
-
-    #link-search.text-danger {
-        background-color: #dc3545; /* Colore danger di Bootstrap */
+    /* Altezza del canvas applicata SOLO su mobile */
+    .offcanvas-bottom {
+        height: 75vh !important; 
     }
 
     .bar {
@@ -418,6 +446,32 @@ input[type="time"]::-webkit-calendar-picker-indicator {
         left: 50% !important;
         transform: translateX(-50%) !important;
         top: 100% !important; 
+    }
+
+    .cmd-link {
+        display: block;
+        padding: 0.6rem 1rem;
+        background-color: #f8f9fa;
+        color: #212529;
+        border-radius: 0.25rem;
+        margin-bottom: 0.5rem;
+        text-align: center;
+        border: 1px solid #dee2e6;
+    }
+
+    #dynamic_actions .btn-sm {
+        font-size: 0.75rem !important;
+        padding: 0.35rem 0.4rem !important;
+        white-space: nowrap; /* Impedisce che il testo vada a capo */
+    }
+    
+    #dynamic_actions .btn-sm i {
+        font-size: 0.7rem; /* Ridimensiona anche l'icona */
+    }
+
+    .modal-xl {
+        max-width: 95% !important;
+        margin: 0.5rem auto !important;
     }
 }
 

@@ -1,5 +1,5 @@
 /* Import delle costanti e utility da backend.js */
-import { urlbase, action, initRangeDatePicker } from './backend.js';
+import { urlbase, action, initRangeDatePicker, initOffcanvasAutoClose } from './backend.js';
 
 /* Import dei componenti dalla sottocartella */
 import { ListManager, DeleteManager } from './modules/Crud.js';
@@ -32,6 +32,8 @@ const actions = {
 
         const exportManager = new ExportCsvManager({ controller: 'tokens' });
         exportManager.init();
+
+        initOffcanvasAutoClose('actionsOffcanvas');
 
     },
 };

@@ -13,7 +13,7 @@
                         <div class="table-responsive border-top">
 
                             <!-- Icona da visualizzare a fianco al nome colonna, se ascendente o discendente -->
-                            <?php $icon = ($posts['order'] == 'desc') ? '<i class="fa-solid fa-arrow-circle-down"></i>' : '<i class="fa-solid fa-arrow-circle-up"></i>'; ?>
+                            <?php $icon = ($posts['order'] == 'desc') ? '<i class="fa-solid fa-arrow-down"></i>' : '<i class="fa-solid fa-arrow-up"></i>'; ?>
 
                             <!-- Numero dei record visualizzati in una pagina. Serve al Trick per evitare che all'eliminazione
                             dell'ultimo record in una pagina che non è la prima, la visualizzazione rimanga bloccata e non passi alla pagina successiva. -->
@@ -32,6 +32,8 @@
                                         <th style="width: 7.5%;" class="text-center">
                                             <i class="fa-solid fa-image"></i>
                                         </th>
+
+                                        <th style="width: 2.5%;" class="text-center">&nbsp;</th>
 
                                         <!-- Colonna firstname -->
                                         <th style="width: 17.5%;">
@@ -62,14 +64,14 @@
                                         </th>
 
                                         <!-- Colonna status -->
-                                        <th style="width: 5%; text-align: center;">
+                                        <th style="width: 7.5%; text-align: center;">
                                             <a class="sort" href="#" data-column="status" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'status') ? 'asc' : 'desc'); ?>">
                                                 <?= lang('backend/admins.labels.status'); ?>&nbsp;<?= (($posts['column'] == 'status') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
                                         </th>
 
                                         <!-- Colonna azioni -->
-                                        <th style="width: 12.5%;">&nbsp;</th>
+                                        <th style="width: 7.5%;">&nbsp;</th>
 
                                     </tr>
                                 </thead>
@@ -83,14 +85,15 @@
                                         <?php $isTrashed = ( ! is_null($admin->deleted_at)); ?>
                                         <?php $isSuperadmin = (int) $admin->superadmin === 1; ?>
                                         
-                                        <tr class="<?= $isTrashed ? 'text-decoration-line-through' : ''; ?> <?= $isSuperadmin ? 'table-light' : ''; ?>">
-                                            <!-- Cella allegati -->
-                                            <td rowspan="2" class="align-middle text-center border-end fw-bold">
+                                        <tr class="border-end border-start table-row-110<?= $isTrashed ? ' text-decoration-line-through' : ''; ?> <?= $isSuperadmin ? ' table-bg-superadmin' : ''; ?>">
+
+                                            <!-- Cella allegati (rowspan rimosso, aggiunto py-3 per altezza) -->
+                                            <td class="align-middle text-center border-end fw-bold py-3">
                                                 <span class="badge bg-info"><?= $admin->images_num; ?></span>
                                             </td>
 
-                                            <!-- Cella immagine -->
-                                            <td rowspan="2" class="align-middle text-center border-end bg-light">
+                                            <!-- Cella immagine (rowspan rimosso, aggiunto py-3 per altezza) -->
+                                            <td class="align-middle text-center border-end bg-light py-3">
                                                 <?php if(is_null($cover)): ?>
                                                     <span class="fw-bold text-danger"><?= lang('backend/admins.labels.noImage'); ?></span>
                                                 <?php else: ?>
@@ -98,28 +101,35 @@
                                                 <?php endif; ?>
                                             </td>
 
+                                            <!-- Cella chevron -->
+                                            <td class="align-middle fw-bold">
+                                                <button class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 text-secondary shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($admin->uuid); ?>" aria-expanded="false" title="Mostra dettagli di sistema">
+                                                    <i class="fa-solid fa-chevron-right"></i>
+                                                </button>
+                                            </td>
+
                                             <!-- Cella firstname -->
-                                            <td class="align-middle border-bottom-0 fw-bold">
+                                            <td class="align-middle fw-bold">
                                                 <span><?= esc($admin->firstname); ?></span>
                                             </td>
 
                                             <!-- Cella lastname -->
-                                            <td class="align-middle border-bottom-0 fw-bold">
+                                            <td class="align-middle fw-bold">
                                                 <span><?= esc($admin->lastname); ?></span>
                                             </td>
 
                                             <!-- Cella email -->
-                                            <td class="align-middle border-bottom-0 fw-bold">
+                                            <td class="align-middle fw-bold">
                                                 <span><?= esc($admin->email); ?></span>
                                             </td>
 
                                             <!-- Cella phone -->
-                                            <td class="align-middle border-bottom-0 fw-bold">
+                                            <td class="align-middle fw-bold">
                                                 <span><?= esc($admin->phone); ?></span>
                                             </td>
 
                                             <!-- Cella status -->
-                                            <td class="align-middle text-center border-bottom-0">
+                                            <td class="align-middle text-center">
                                                 <?php if( ! $isSuperadmin): ?>
 
                                                     <?php if( ! $isTrashed): ?>
@@ -149,116 +159,109 @@
                                                 <?php endif; ?>
                                             </td>
 
-                                            <!-- Cella Dropdown Menu -->
-                                            <td class="align-middle text-end border-bottom-0">
-
+                                            <!-- Cella Azioni Rapide -->
+                                            <td class="align-middle text-start">
+                                                
                                                 <?php if( ! $isSuperadmin): ?>
-
-                                                    <!-- Pulsante Azioni -->
-                                                    <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <?= lang('backend/admins.buttons.actions'); ?>
-                                                    </button>
-
-                                                    <!-- Corpo Dropdown -->
-                                                    <ul class="dropdown-menu dropdown-menu-end">
-
+                                                    
+                                                    <div class="d-flex flex-column gap-1">
+                                                        
                                                         <?php if( ! $isTrashed): ?>
+                                                            
                                                             <!-- Pulsante Dettaglio -->
-                                                            <li>
-                                                                <a class="dropdown-item" href="<?= base_url('backend/admins/show/' . esc($admin->uuid)); ?>">
-                                                                    <i class="fa-solid fa-user"></i> <?= lang('backend/admins.actions.show'); ?>
-                                                                </a>
-                                                            </li>
-                                                            <li><hr class="dropdown-divider"></li>
+                                                            <a href="<?= base_url('backend/admins/show/' . esc($admin->uuid)); ?>" class="text-decoration-none text-secondary action">
+                                                                <i class="fa-solid fa-user fa-fw"></i> <?= lang('backend/admins.actions.show'); ?>
+                                                            </a>
 
                                                             <!-- Pulsante Aggiorna -->
-                                                            <li>
-                                                                <a class="dropdown-item" href="<?= base_url('backend/admins/edit/' . esc($admin->uuid)); ?>">
-                                                                    <i class="fa-solid fa-user-pen"></i> <?= lang('backend/admins.actions.edit'); ?>
-                                                                </a>
-                                                            </li>
-                                                            <li><hr class="dropdown-divider"></li>
+                                                            <a href="<?= base_url('backend/admins/edit/' . esc($admin->uuid)); ?>" class="text-decoration-none text-secondary action">
+                                                                <i class="fa-solid fa-user-pen fa-fw"></i> <?= lang('backend/admins.actions.edit'); ?>
+                                                            </a>
 
                                                             <!-- Pulsante Reset password -->
-                                                            <li>
-                                                                <form class="resetAdmin" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureReset'), esc($admin->firstname), esc($admin->lastname)); ?>">
-                                                                    <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
-                                                                    <button type="submit" class="dropdown-item btn-link text-secondary">
-                                                                        <i class="fa-solid fa-unlock"></i> <?= lang('backend/admins.actions.reset'); ?>
-                                                                    </button>
-                                                                </form>
-                                                            </li>
-                                                            <li><hr class="dropdown-divider"></li>
+                                                            <form class="resetAdmin m-0 p-0" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureReset'), esc($admin->firstname), esc($admin->lastname)); ?>">
+                                                                <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
+                                                                <button type="submit" class="btn btn-link p-0 m-0 text-secondary text-decoration-none action shadow-none">
+                                                                    <i class="fa-solid fa-unlock fa-fw"></i> <?= lang('backend/admins.actions.reset'); ?>
+                                                                </button>
+                                                            </form>
 
                                                             <!-- Pulsante Elimina (Soft Delete) -->
-                                                            <li>
-                                                                <form class="deleteRecord" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureSoftDelete'), esc($admin->firstname), esc($admin->lastname)); ?>">
-                                                                    <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
-                                                                    <button type="submit" class="dropdown-item btn-link text-secondary">
-                                                                        <i class="fa-solid fa-trash"></i> <?= lang('backend/admins.actions.softDelete'); ?>
-                                                                    </button>
-                                                                </form>
-                                                            </li>
+                                                            <form class="deleteRecord m-0 p-0" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureSoftDelete'), esc($admin->firstname), esc($admin->lastname)); ?>">
+                                                                <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
+                                                                <button type="submit" class="btn btn-link p-0 m-0 text-danger text-decoration-none action shadow-none">
+                                                                    <i class="fa-solid fa-xmark fa-fw"></i> <?= lang('backend/admins.actions.softDelete'); ?>
+                                                                </button>
+                                                            </form>
+                                                            
                                                         <?php else: ?>
+                                                            
                                                             <!-- Pulsante Ripristina (Restore Delete) -->
-                                                            <li>
-                                                                <form class="restoreRecord" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureRestoreDelete'), esc($admin->firstname), esc($admin->lastname)); ?>">
-                                                                    <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
-                                                                    <button type="submit" class="dropdown-item btn-link text-success">
-                                                                        <i class="fa-solid fa-trash-arrow-up"></i> <?= lang('backend/admins.actions.restoreDelete'); ?>
-                                                                    </button>
-                                                                </form>
-                                                            </li>
-                                                            <li><hr class="dropdown-divider"></li>
+                                                            <form class="restoreRecord m-0 p-0" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureRestoreDelete'), esc($admin->firstname), esc($admin->lastname)); ?>">
+                                                                <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
+                                                                <button type="submit" class="btn btn-link p-0 m-0 text-success text-decoration-none action shadow-none">
+                                                                    <i class="fa-solid fa-trash-arrow-up fa-fw"></i> <?= lang('backend/admins.actions.restoreDelete'); ?>
+                                                                </button>
+                                                            </form>
 
                                                             <!-- Pulsante Elimina Definitivamente (Hard Delete) -->
-                                                            <li>
-                                                                <form class="hardDeleteRecord" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureHardDelete'), esc($admin->firstname), esc($admin->lastname)); ?>">
-                                                                    <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
-                                                                    <button type="submit" class="dropdown-item btn-link text-danger">
-                                                                        <i class="fa-solid fa-trash"></i> <?= lang('backend/admins.actions.hardDelete'); ?>
-                                                                    </button>
-                                                                </form>
-                                                            </li>
+                                                            <form class="hardDeleteRecord m-0 p-0" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureHardDelete'), esc($admin->firstname), esc($admin->lastname)); ?>">
+                                                                <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
+                                                                <button type="submit" class="btn btn-link p-0 m-0 text-danger text-decoration-none action shadow-none">
+                                                                    <i class="fa-solid fa-xmark fa-fw"></i> <?= lang('backend/admins.actions.hardDelete'); ?>
+                                                                </button>
+                                                            </form>
+                                                            
                                                         <?php endif; ?>
-
-                                                    </ul>
-
+                                                        
+                                                    </div>
+                                                    
                                                 <?php endif; ?>
-
+                                                
                                             </td>
                                         </tr>
 
-                                        <!-- Riga inferiore -->
-                                        <tr class="<?= $isTrashed ? 'text-decoration-line-through' : ''; ?> <?= $isSuperadmin ? 'table-light' : ''; ?>">
-                                            <td colspan="7" class="align-middle small">
+                                        <!-- Riga inferiore (Metadati a comparsa fluida) -->
+                                        <tr class="border-end border-start">
 
-                                                <!-- Parte creato -->
-                                                <?= lang('backend/admins.labels.createdAt'); ?> <span class="fw-bold"><?= convertDate(esc($admin->created_at)); ?></span>
+                                            <!-- Colspan 9 copre l'intera tabella. Nessun padding sul td per evitare scatti nell'animazione -->
+                                            <td colspan="9" class="p-0 border-0">
+                                                
+                                                <!-- Contenitore collassabile puntato dal bottone -->
+                                                <div class="collapse" id="meta-<?= esc($admin->uuid); ?>">
+                                                    
+                                                    <!-- Box effettivo dei metadati: spazioso, con background neutro -->
+                                                    <div class="p-2 border-bottom <?= $isTrashed ? 'text-decoration-line-through' : ''; ?> <?= $isSuperadmin ? 'bg-light text-dark' : 'bg-light text-secondary'; ?> small">
+                                                        
+                                                        <!-- Parte creato -->
+                                                        <?= lang('backend/admins.labels.createdAt'); ?> <span class="fw-bold"><?= convertDate(esc($admin->created_at)); ?></span>
 
-                                                <!-- Parte aggiornato -->
-                                                <?php if( ! is_null($admin->updated_at)): ?>
-                                                    &nbsp;&bull;&nbsp;
-                                                    <?= lang('backend/admins.labels.updatedAt'); ?> <span class="fw-bold"><?= convertDate(esc($admin->updated_at)); ?></span>
-                                                <?php endif; ?>
+                                                        <!-- Parte aggiornato -->
+                                                        <?php if( ! is_null($admin->updated_at)): ?>
+                                                            &nbsp;&bull;&nbsp;
+                                                            <?= lang('backend/admins.labels.updatedAt'); ?> <span class="fw-bold"><?= convertDate(esc($admin->updated_at)); ?></span>
+                                                        <?php endif; ?>
 
-                                                <!-- Parte sospeso -->
-                                                <?php if( ! is_null($admin->suspended_at)): ?>
-                                                    &nbsp;&bull;&nbsp;
-                                                    <?= lang('backend/admins.labels.suspendedAt'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->suspended_at)); ?></span>
-                                                <?php endif; ?>
+                                                        <!-- Parte sospeso -->
+                                                        <?php if( ! is_null($admin->suspended_at)): ?>
+                                                            &nbsp;&bull;&nbsp;
+                                                            <?= lang('backend/admins.labels.suspendedAt'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->suspended_at)); ?></span>
+                                                        <?php endif; ?>
 
-                                                <!-- Parte resettato -->
-                                                <?php if( ! is_null($admin->resetted_at)): ?>
-                                                    &nbsp;&bull;&nbsp;
-                                                    <?= lang('backend/admins.labels.resettedAt'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->resetted_at)); ?></span>
-                                                <?php endif; ?>
+                                                        <!-- Parte resettato -->
+                                                        <?php if( ! is_null($admin->resetted_at)): ?>
+                                                            &nbsp;&bull;&nbsp;
+                                                            <?= lang('backend/admins.labels.resettedAt'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->resetted_at)); ?></span>
+                                                        <?php endif; ?>
 
-                                                <!-- Parte eliminato (Cestinato) -->
-                                                <?php if($isTrashed): ?>
-                                                    &nbsp;&bull;&nbsp;
-                                                    <?= lang('backend/admins.labels.deletedAt'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->deleted_at)); ?></span>
-                                                <?php endif; ?>
+                                                        <!-- Parte eliminato (Cestinato) -->
+                                                        <?php if($isTrashed): ?>
+                                                            &nbsp;&bull;&nbsp;
+                                                            <?= lang('backend/admins.labels.deletedAt'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->deleted_at)); ?></span>
+                                                        <?php endif; ?>
+
+                                                    </div>
+                                                </div>
 
                                             </td>
                                         </tr>

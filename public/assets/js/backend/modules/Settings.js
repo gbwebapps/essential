@@ -6,8 +6,10 @@ export class SettingsManager {
         this.loadUrl = urlbase + 'backend/settings/openSettings';
         this.saveUrl = urlbase + 'backend/settings/saveSettings';
         this.deleteUrl = urlbase + 'backend/settings/deleteSettings';
-        this.isSubmitting = false;
 
+        this.checkDeleteUrl = urlbase + 'backend/settings/checkDeleteSettings';
+
+        this.isSubmitting = false;
         this.init();
     }
 
@@ -52,12 +54,39 @@ export class SettingsManager {
                 if (form) {
                     e.preventDefault();
 
-                    const message = deleteBtn.dataset.message;
-                    const ok = await askConfirm(message);
-                    if ( ! ok) return;
-
                     const env = form.id.replace('-settings', '');
-                    this.deleteSettings(deleteBtn, env);
+
+                    const formData = new FormData();
+                    formData.append('env', env);
+
+                    try {
+                        /* 1. Chiamata di pre-flight al backend */
+                        const response = await apiFetch(this.checkDeleteUrl, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        const data = await response.json();
+
+                        /* 2. Se non ci sono dati, mostra l'avviso e blocca il flusso */
+                        if (data.result === false) {
+                            if (data.message && typeof showAlert === 'function') {
+                                showAlert('info', data.message);
+                            }
+                            return;
+                        }
+                        
+                        /* 3. Se ci sono dati, lancia la conferma classica */
+                        const message = deleteBtn.dataset.message;
+                        const ok = await askConfirm(message);
+                        if ( ! ok) return;
+
+                        /* 4. Esegue l'eliminazione effettiva */
+                        this.deleteSettings(deleteBtn, env);
+
+                    } catch (error) {
+                        console.error("Errore durante il controllo preliminare:", error);
+                    }
                 }
             }
         });

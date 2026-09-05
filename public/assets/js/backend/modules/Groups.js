@@ -589,7 +589,7 @@ export class GroupsManager {
         }
 
         const permissionsContainer = document.getElementById('admin-permissions-container');
-        if (!permissionsContainer) return;
+        if ( ! permissionsContainer) return;
 
         try {
             const formData = new FormData();
