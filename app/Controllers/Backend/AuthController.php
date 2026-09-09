@@ -252,9 +252,9 @@ class AuthController extends BackendController
 
         /* 2. Esegue il logout corrispondente tramite il Model */
         if ($cookie !== null):
-            $this->authModel->logoutByCookie($cookie);
+            $this->authModel->logoutByCookie($cookie, 'manual');
         else:
-            $this->authModel->logoutBySession();
+            $this->authModel->logoutBySession('manual');
         endif;
 
         /* 3. Prepara il messaggio di saluto utilizzando i dati appena salvati */

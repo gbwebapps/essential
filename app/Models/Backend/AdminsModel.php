@@ -182,11 +182,11 @@ class AdminsModel extends BackendModel
         return [
             'searchFields.firstname' => [
                 'label' => lang('backend/admins.labels.firstname'), 
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'], 
             ],
             'searchFields.lastname' => [
                 'label' => lang('backend/admins.labels.lastname'), 
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'], 
             ],
             'searchFields.email' => [
                 'label' => lang('backend/admins.labels.email'), 
@@ -212,11 +212,11 @@ class AdminsModel extends BackendModel
         return [
             'firstname' => [
                 'label' => lang('backend/admins.labels.firstname'),
-                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'],
+                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'],
             ],
             'lastname' => [
                 'label' => lang('backend/admins.labels.lastname'),
-                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'],
+                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'],
             ],
             'email' => [
                 'label' => lang('backend/admins.labels.email'),
@@ -276,11 +276,11 @@ class AdminsModel extends BackendModel
             ],
             'firstname' => [
                 'label' => lang('backend/admins.labels.firstname'),
-                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'],
+                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'],
             ],
             'lastname' => [
                 'label' => lang('backend/admins.labels.lastname'),
-                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'],
+                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'],
             ],
             'email' => [
                 'label' => lang('backend/admins.labels.email'),

@@ -164,18 +164,6 @@ class GroupsController extends BackendController
                 return $this->jsonResponse(['errors' => $cleanErrors, 'message' => lang('backend/groups.messages.validationErrors')]);
             endif;
 
-            /* Simula un errore 403 (Sessione scaduta / Accesso negato) */
-            //return $this->response->setStatusCode(403)->setJSON(['result' => false]);
-
-            /* Simula un errore 404 (Risorsa non trovata) */
-            //return $this->response->setStatusCode(404)->setJSON(['result' => false]);
-
-            /* Simula un errore 500 (Errore interno del server) */
-            //return $this->response->setStatusCode(500)->setJSON(['result' => false]);
-
-            /* Simula un errore 504 (Timeout) */
-            // return $this->response->setStatusCode(504)->setJSON(['result' => false]);
-
             /* Esecuzione della logica di inserimento con sbarramento interno */
             $result = $this->groupsModel->add($posts);
 
@@ -273,10 +261,39 @@ class GroupsController extends BackendController
                 return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/groups.messages.validateToastErrors'), $errorMessage)]);
             endif;
 
+            if ($this->groupsModel->hasAdminsAttached((int) $posts['id'])):
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/groups.messages.hasAdminsAttached')]);
+            endif;
+
             /* Esecuzione della logica di inserimento con sbarramento interno */
             $result = $this->groupsModel->del($posts);
 
             return $this->jsonResponse($result);
+
+        endif;
+    }
+
+    /**
+     * Esegue un controllo pre-volo (Pre-flight) per verificare se il gruppo
+     * può essere eliminato o se ci sono vincoli di integrità referenziale.
+     */
+    public function checkDeleteConstraints(): ResponseInterface
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            $posts = $this->request->getPost();
+
+            if ( ! isset($posts['id']) || ( ! is_numeric($posts['id']) ) || (int) $posts['id'] <= 0):
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/groups.errors.wrongID')]);
+            endif;
+
+            /* Controllo vincoli: se ci sono admin associati, blocca l'operazione restituendo esito negativo */
+            if ($this->groupsModel->hasAdminsAttached((int) $posts['id'])):
+                return $this->jsonResponse(['result' => false,'message' => lang('backend/groups.messages.hasAdminsAttached')]);
+            endif;
+
+            /* Via libera: nessun vincolo rilevato */
+            return $this->jsonResponse(['result' => true]);
 
         endif;
     }

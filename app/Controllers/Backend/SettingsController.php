@@ -59,6 +59,9 @@ class SettingsController extends BackendController
         $this->data['title'] = lang('backend/settings.titles.index');
         $this->data['icon'] = '<i class="fa-solid fa-sliders"></i>';
 
+        /* Recupera il modulo da riaprire salvato in sessione dopo il reload */
+        $this->data['openAccordion'] = session()->getFlashdata('open_accordion');
+
         return $this->render('backend/settings/indexView', $this->data);
     }
 
@@ -106,12 +109,10 @@ class SettingsController extends BackendController
             $posts = $this->request->getPost();
             $env = $posts['env'] ?? '';
 
-            /* Utilizzo della proprietà centralizzata per la whitelist */
             if ( ! in_array($env, $this->allowedEnvs, true)):
                 return $this->jsonResponse(['result' => false, 'message' => lang('backend/settings.messages.validationErrors')]);
             endif;
 
-            /* Generazione dinamica sicura del metodo di validazione dopo il controllo in whitelist */
             $method = $env . 'SettingsValidateRules';
             $rules = $this->settingsModel->{$method}($posts);
 
@@ -121,29 +122,45 @@ class SettingsController extends BackendController
 
             $namespace = 'Backend\\' . ucfirst($env);
 
-            /* 1. Esegui il salvataggio e cattura il risultato del model */
+            /* 1. Salvataggio via Model */
             $saveResult = $this->settingsModel->saveSettings($namespace, $posts);
 
-            /* 2. Se il salvataggio restituisce un esito negativo (es. sbarramento nessuna modifica), lo restituiamo subito */
             if ($saveResult !== null && $saveResult['result'] === false) :
                 return $this->jsonResponse(['result'  => false, 'message' => $saveResult['message']]);
             endif;
 
-            /* Verifica l'origine dei dati per informare l'interfaccia (DB o Config File) */
-            $this->data['isFromDatabase'] = $this->settingsModel->hasDatabaseSettings($namespace);
+            /* 2. Gestione Reload per campi critici */
+            if (isset($saveResult['requires_reload']) && $saveResult['requires_reload'] === true) :
+                
+                /* Estraiamo la lingua attualmente configurata (ora aggiornata nel DB/Config) */
+                $language = setting('Backend\General')->language;
 
-            /* 3. Ricarica i settaggi aggiornati (ora puliti e rinfrescati) per la vista */
+                /* Forziamo la generazione del messaggio passando la nuova lingua come 3° parametro */
+                $localizedMessage = lang('backend/settings.messages.saveSuccess', [], $language);
+
+                session()->setFlashdata('message', $localizedMessage);
+                session()->setFlashdata('class', 'light text-success fw-bold'); 
+                session()->setFlashdata('icon', '<i class="fa-solid fa-check"></i>');
+                session()->setFlashdata('open_accordion', $env);
+
+                return $this->jsonResponse(['result' => true, 'action' => 'reload']);
+            endif;
+
+            /* 3. Flusso standard senza reload */
+            $this->data['isFromDatabase'] = $this->settingsModel->hasDatabaseSettings($namespace);
             $this->data[$env . 'Settings'] = $this->settingsModel->getSettings($namespace);
 
-            /* Carica i dati specifici solo se apriamo la sezione 'general' */
             if ($env === 'general'):
                 $this->data['timezones'] = $this->settingsClass->getTimezones();
                 $this->data['languages'] = $this->settingsClass->getLanguages();
                 $this->data['dateFormats'] = $this->settingsClass->getDateFormats();
             endif;
 
-            /* 4. Restituisci la risposta di successo con il partial aggiornato */
-            return $this->jsonResponse(['result'  => true, 'message' => lang('backend/settings.messages.saveSuccess'), 'output'  => view('backend/settings/partials/index/' . $env . 'SettingsPartial', $this->data)]);
+            return $this->jsonResponse([
+                'result'  => true, 
+                'message' => $saveResult['message'], 
+                'output'  => view('backend/settings/partials/index/' . $env . 'SettingsPartial', $this->data)
+            ]);
 
         endif;
     }

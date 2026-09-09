@@ -2,11 +2,11 @@
 
 namespace App\Controllers\Backend\Components;
 
-use App\Controllers\BaseController;
+use App\Controllers\Backend\BackendController;
 use App\Models\Backend\Components\ImportModel;
 use CodeIgniter\HTTP\ResponseInterface;
 
-class ImportController extends BaseController
+class ImportController extends BackendController
 {
     private ImportModel $importModel;
 

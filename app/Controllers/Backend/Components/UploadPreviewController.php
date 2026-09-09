@@ -2,12 +2,12 @@
 
 namespace App\Controllers\Backend\Components;
 
-use App\Controllers\BaseController;
+use App\Controllers\Backend\BackendController;
 use CodeIgniter\HTTP\ResponseInterface;
 
 use App\Models\Backend\Components\UploadPreviewModel;
 
-class UploadPreviewController extends BaseController
+class UploadPreviewController extends BackendController 
 {
     protected UploadPreviewModel $uploadPreview;
 

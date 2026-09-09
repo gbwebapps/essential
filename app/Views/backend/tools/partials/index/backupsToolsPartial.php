@@ -24,23 +24,26 @@
                     
                     <div class="row align-items-center text-start">
                         
-                        <!-- Dettagli File (Tutta l'ampiezza su mobile, 8/12 su tablet, 9/12 su desktop) -->
+                        <!-- Dettagli File -->
                         <div class="col-12 col-md-8 col-lg-9 mb-3 mb-md-0">
                             <h6 class="mb-1 fw-bold"><?= $backup['filename']; ?></h6>
                             <small class="text-muted">
-                                <span class="me-3"><i class="fa-regular fa-calendar me-1"></i><?= $backup['date']; ?></span>
+                                <span class="me-3"><i class="fa-regular fa-calendar me-1"></i><?= $backup['humanDateTime']; ?></span>
                                 <span><i class="fa-solid fa-hard-drive me-1"></i><?= sprintf(lang('backend/tools.labels.totalSpace'), $backup['size']); ?></span> 
                             </small>
                         </div>
 
-                        <!-- Azioni: Scarica / Elimina (Rinchiuse nella colonna rimanente) -->
+                        <!-- Azioni -->
                         <div class="col-12 col-md-4 col-lg-3">
                             <div class="d-flex justify-content-center justify-content-md-end gap-2">
-                                <!-- flex-fill allarga al 50% su mobile, flex-md-grow-0 annulla l'espansione da tablet in poi -->
                                 <button type="button" class="btn btn-sm btn-primary flex-fill flex-md-grow-0 btn-download-backups" data-filename="<?= $backup['filename']; ?>">
                                     <i class="fa-solid fa-download me-1"></i><?= lang('backend/tools.buttons.download'); ?>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-danger flex-fill flex-md-grow-0 btn-delete-backups" data-filename="<?= $backup['filename']; ?>" data-message="<?= lang('backend/tools.messages.areYouSureToDeleteBackups'); ?>">
+                                
+                                <!-- Iniezione singola della data discorsiva tramite sprintf -->
+                                <button type="button" class="btn btn-sm btn-danger flex-fill flex-md-grow-0 btn-delete-backups" 
+                                        data-filename="<?= $backup['filename']; ?>" 
+                                        data-message="<?= sprintf(lang('backend/tools.messages.areYouSureToDeleteBackups'), $backup['humanDateTime']); ?>">
                                     <i class="fa-solid fa-trash me-1"></i><?= lang('backend/tools.buttons.delete'); ?>
                                 </button>
                             </div>

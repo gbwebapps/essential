@@ -12,6 +12,12 @@ return [
 		'keysAndIndexes' => 'Chiave primaria e indici', 
 		'uploadCsv' => 'Carica file', 
         'toggleVisibility' => 'Mostra/Nascondi', 
+        'importingInProgress' => 'Importazione in corso...',
+        'preparingData' => 'Preparazione dei dati...',
+        'perfectSync' => 'Sincronizzazione perfetta!',
+        'syncNoChanges' => 'I dati presenti nel CSV sono già identici a quelli del database (%d record analizzati). Nessuna importazione necessaria.',
+        'executionPlan' => 'Piano di Esecuzione: Trovati %d nuovi record da inserire e %d record da aggiornare (%d record verranno ignorati perché già identici).',
+        'previewNotice' => 'Vengono mostrate le prime %d righe soggette a modifica. Seguono altre %d righe...',
 	], 
 	'links' => [
 		'downloadTemplate' => 'Scarica il file CSV di esempio per <span class="text-primary fw-bold">%s</span>', 

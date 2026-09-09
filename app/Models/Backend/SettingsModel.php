@@ -89,6 +89,16 @@ class SettingsModel extends BackendModel
      */
     protected array $settingsCache = [];
 
+    /**
+     * Elenco dei campi critici che richiedono il reload della pagina.
+     *
+     * @var array
+     */
+    protected array $requiresReloadFields = [
+        'language',
+        'timezone'
+    ];
+
 	protected function initModel(): void 
 	{
 		parent::initModel();
@@ -292,7 +302,7 @@ class SettingsModel extends BackendModel
             ],
             'language' => [
                 'label' => lang('backend/settings.labels.language'),
-                'rules' => ['required', 'in_list[it,en-US,en-GB,es,fr,de,zh]'],
+                'rules' => ['required', 'in_list[it,en,es,fr,de,zh]'],
             ],
             'dateFormat' => [
                 'label' => lang('backend/settings.labels.dateFormat'),
@@ -367,7 +377,7 @@ class SettingsModel extends BackendModel
     }
 
     /**
-     * Salva o aggiorna le impostazioni nel database e svuota la cache in-memory del gruppo.
+     * Salva o aggiorna le impostazioni nel database e svuota la cache in-memory.
      */
     public function saveSettings(string $namespace, array $posts): ?array
     {
@@ -379,28 +389,31 @@ class SettingsModel extends BackendModel
         /* 2. Filtriamo immediatamente l'input lasciando solo i campi autorizzati */
         $posts = $this->checkAllowedFields($posts, $allowedFields);
 
-        /* 
-           3. Controllo di sbarramento: 
-              Se esistono già record a DB, controlliamo se è cambiato qualcosa.
-              Se NON esistono record a DB, saltiamo il controllo ed eseguiamo l'insert.
-        */
+        $needsReload = false;
+
+        /* 3. Controllo di sbarramento e rilevazione campi critici */
         if ($this->hasDatabaseSettings($namespace)) :
-            if ( ! $this->hasSettingsChanged($namespace, $posts)) :
+            $changedKeys = $this->getChangedKeys($namespace, $posts);
+
+            if (empty($changedKeys)) :
                 return ['result' => false, 'message' => lang('backend/settings.messages.noDataChanged')];
             endif;
+
+            $needsReload = count(array_intersect($changedKeys, $this->requiresReloadFields)) > 0;
+        else :
+            $needsReload = count(array_intersect(array_keys($posts), $this->requiresReloadFields)) > 0;
         endif;
 
-        /* 4. Svuota la cache locale poiché i dati stanno per cambiare */
+        /* 4. Svuota la cache locale */
         if (isset($this->settingsCache[$namespace])) :
             unset($this->settingsCache[$namespace]);
         endif;
 
-        /* Gestione centralizzata: se allowedExtensions è un array, lo convertiamo in stringa */
         if (isset($posts['allowedExtensions']) && is_array($posts['allowedExtensions'])) :
             $posts['allowedExtensions'] = implode('|', $posts['allowedExtensions']);
         endif;
 
-        /* 5. Costruzione della scrittura massiva (Single Bulk Insert/Update Query) */
+        /* 5. Costruzione della scrittura massiva */
         $valuesQueries = [];
         $params = [];
 
@@ -418,7 +431,51 @@ class SettingsModel extends BackendModel
         $currentAdmin = service('authorization')->currentAdmin();
         log_admin_activity('SAVE_SETTINGS', 'settings', 'Salvataggio impostazioni.', $currentAdmin);
 
-        return ['result' => true, 'message' => lang('backend/settings.messages.saveSuccess')];
+        return [
+            'result' => true, 
+            'message' => lang('backend/settings.messages.saveSuccess'),
+            'requires_reload' => $needsReload
+        ];
+    }
+
+    /**
+     * Verifica quali dati inviati differiscono da quelli attualmente salvati.
+     * Ritorna un array contenente le chiavi modificate.
+     *
+     * @param string $namespace
+     * @param array $posts
+     * @return array
+     */
+    public function getChangedKeys(string $namespace, array $posts): array
+    {
+        $current = $this->getSettings($namespace);
+        $changed = [];
+
+        foreach ($posts as $key => $value) :
+            if ( ! array_key_exists($key, $current)) :
+                continue;
+            endif;
+
+            /* Normalizzazione immediata */
+            if (is_array($value)) :
+                $filtered = array_filter($value);
+                sort($filtered);
+                $valPost = implode('|', $filtered);
+
+                $dbArray = array_filter(explode('|', $current[$key]));
+                sort($dbArray);
+                $valDb = implode('|', $dbArray);
+            else :
+                $valPost = trim((string) $value);
+                $valDb   = trim((string) $current[$key]);
+            endif;
+
+            if ($valPost !== $valDb) :
+                $changed[] = $key;
+            endif;
+        endforeach;
+
+        return $changed;
     }
 
     /**

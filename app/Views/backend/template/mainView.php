@@ -101,6 +101,13 @@
          data-err-network="<?= esc(lang('backend/global.errors.errNetwork')) ?>">
     </div>
     <!-- Fine contenitore invisibile -->
+
+    <!-- Altre definizioni di lingua -->
+    <div id="lang-definitions" 
+        data-remove="<?= lang('backend/global.buttons.remove'); ?>"
+        data-select="<?= lang('backend/global.labels.select'); ?>">
+    </div>
+    <!-- Fine altre definizioni di lingua -->
     
 </body>
 

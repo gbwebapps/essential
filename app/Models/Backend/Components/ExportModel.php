@@ -43,10 +43,12 @@ class ExportModel extends BackendModel
         $columns = [];
 
         foreach ($fields as $field):
-            /* Escludiamo la chiave primaria dall'elenco selezionabile dall'utente */
-            if ($field->primary_key !== 1):
+
+            /* Escludiamo la chiave primaria e l'id dal form */
+            if ($field->primary_key !== 1 && $field->name !== 'id'):
                 $columns[] = $field->name;
             endif;
+
         endforeach;
 
         return $columns;
@@ -71,6 +73,9 @@ class ExportModel extends BackendModel
 
     public function generate(array $posts, ?int $lastId = null, ?string $fileName = null): array
     {
+        /* Recuperiamo il conteggio precedente o partiamo da zero */
+        $processedCount = (int) ($posts['processedCount'] ?? 0);
+
         /* Sanificazione preventiva per evitare Directory Traversal */
         $fileName = $fileName !== null ? basename($fileName) : null;
 
@@ -90,7 +95,7 @@ class ExportModel extends BackendModel
         /* Validazione server-side delle colonne scelte (Sicurezza contro manomissioni lato client) */
         $requestedColumns = $posts['selected_columns'] ?? [];
         if (empty($requestedColumns) || ! is_array($requestedColumns)):
-            return ['result' => false, 'message' => lang('backend/components/export.messages.noColumnsSelected') ?? 'Nessuna colonna selezionata per l\'esportazione.'];
+            return ['result' => false, 'message' => lang('backend/components/export.messages.noColumnsSelected')];
         endif;
 
         /* Intersezione con lo schema reale del DB: scarta spietatamente qualsiasi colonna inesistente */
@@ -102,6 +107,8 @@ class ExportModel extends BackendModel
 
         /* FORZATURA DI SICUREZZA: La PK e la colonna 'id' (motore del cursore) DEVONO essere sempre presenti */
         $primaryKey = $this->getPrimaryKey($entity);
+        
+        /* FORZATURA DI SICUREZZA: La colonna 'id' è il motore del cursore (keyset pagination). Deve essere obbligatoriamente inclusa nella query SELECT per calcolare il lastId del blocco di esportazione successivo, anche se verrà rimossa al volo prima della scrittura nel CSV. */
         $mandatoryColumns = ['id'];
         
         if ($primaryKey !== null):
@@ -110,6 +117,7 @@ class ExportModel extends BackendModel
 
         foreach ($mandatoryColumns as $mandatoryCol):
             if ( ! in_array($mandatoryCol, $validSelectedColumns)):
+
                 /* Mettiamo le colonne obbligatorie forzatamente all'inizio dell'array */
                 array_unshift($validSelectedColumns, $mandatoryCol);
             endif;
@@ -193,7 +201,12 @@ class ExportModel extends BackendModel
             endif;
 
             fputs($file, "\xEF\xBB\xBF");
-            fputcsv($file, array_keys($records[0]), ',');
+
+            /* Copiamo la prima riga e rimuoviamo l'id per stampare gli header puliti */
+            $firstRow = $records[0];
+            unset($firstRow['id']);
+
+            fputcsv($file, array_keys($firstRow), ',');
         else:
             $filePath = $directory . $fileName;
             $file = fopen($filePath, 'a');
@@ -201,7 +214,11 @@ class ExportModel extends BackendModel
 
         if ( ! empty($records)):
             foreach ($records as $row):
+
+                /* Rimuoviamo l'id solo dalla riga da scrivere sul file */
+                unset($row['id']);
                 fputcsv($file, $row, ',');
+
             endforeach;
         endif;
 
@@ -209,16 +226,20 @@ class ExportModel extends BackendModel
 
         /* Unificata e ripulita la logica di chiusura dell'esportazione */
         $chunkSize = count($records);
+
+        /* Aggiorniamo il totale globale delle righe esportate */
+        $processedCount += $chunkSize;
+
         $isFinished = $chunkSize < $limit;
 
         if ($isFinished):
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('EXPORT_DATA', $entity, sprintf(lang('Esportazione completata: %s'), $entity), $currentAdmin);
+            log_admin_activity('EXPORT_DATA', $entity, sprintf(lang('backend/components/export.messages.exportSuccess'), $processedCount, $entity), $currentAdmin);
             
             return [
                 'result' => true,
                 'isFinished' => true,
-                'message' => sprintf(lang('backend/components/export.messages.exportSuccess'), $entity),
+                'message' => sprintf(lang('backend/components/export.messages.exportSuccess'), $processedCount, $entity),
                 'downloadUrl' => base_url('backend/export/download/' . $fileName)
             ];
         endif;

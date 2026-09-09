@@ -234,30 +234,30 @@
                                                     <div class="p-2 border-bottom <?= $isTrashed ? 'text-decoration-line-through' : ''; ?> <?= $isSuperadmin ? 'bg-light text-dark' : 'bg-light text-secondary'; ?> small">
                                                         
                                                         <!-- Parte creato -->
-                                                        <?= lang('backend/admins.labels.createdAt'); ?> <span class="fw-bold"><?= convertDate(esc($admin->created_at)); ?></span>
+                                                        <?= lang('backend/admins.labels.createdAt'); ?> <span class="fw-bold"><?= convertDate(esc($admin->created_at), 'conversational'); ?></span>
 
                                                         <!-- Parte aggiornato -->
                                                         <?php if( ! is_null($admin->updated_at)): ?>
                                                             &nbsp;&bull;&nbsp;
-                                                            <?= lang('backend/admins.labels.updatedAt'); ?> <span class="fw-bold"><?= convertDate(esc($admin->updated_at)); ?></span>
+                                                            <?= lang('backend/admins.labels.updatedAt'); ?> <span class="fw-bold"><?= convertDate(esc($admin->updated_at), 'conversational'); ?></span>
                                                         <?php endif; ?>
 
                                                         <!-- Parte sospeso -->
                                                         <?php if( ! is_null($admin->suspended_at)): ?>
                                                             &nbsp;&bull;&nbsp;
-                                                            <?= lang('backend/admins.labels.suspendedAt'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->suspended_at)); ?></span>
+                                                            <?= lang('backend/admins.labels.suspendedAt'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->suspended_at), 'conversational'); ?></span>
                                                         <?php endif; ?>
 
                                                         <!-- Parte resettato -->
                                                         <?php if( ! is_null($admin->resetted_at)): ?>
                                                             &nbsp;&bull;&nbsp;
-                                                            <?= lang('backend/admins.labels.resettedAt'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->resetted_at)); ?></span>
+                                                            <?= lang('backend/admins.labels.resettedAt'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->resetted_at), 'conversational'); ?></span>
                                                         <?php endif; ?>
 
                                                         <!-- Parte eliminato (Cestinato) -->
                                                         <?php if($isTrashed): ?>
                                                             &nbsp;&bull;&nbsp;
-                                                            <?= lang('backend/admins.labels.deletedAt'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->deleted_at)); ?></span>
+                                                            <?= lang('backend/admins.labels.deletedAt'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->deleted_at), 'conversational'); ?></span>
                                                         <?php endif; ?>
 
                                                     </div>

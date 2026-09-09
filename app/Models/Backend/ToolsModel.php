@@ -84,19 +84,20 @@ class ToolsModel extends BackendModel
 	}
 
 	/* Conta gli audits presenti nel range di date indicato */
-	public function countAuditsToDelete(array $posts): int|bool
-	{
-		$dates = $this->buildAuditDates($posts);
+	public function countAuditsToDelete(array $posts): array|bool
+    {
+        $dates = $this->buildAuditDates($posts);
 
-		if ($dates === false):
-			return false;
-		endif;
+        if ($dates === false):
+            return false;
+        endif;
 
-		$sql = 'select count(*) as total from admins_audits where created_at between ? and ?';
-		$result = $this->db->query($sql, [$dates['from'], $dates['to']])->getRow();
+        $sql = 'select count(*) as total from admins_audits where created_at between ? and ?';
+        $result = $this->db->query($sql, [$dates['from'], $dates['to']])->getRow();
 
-		return (int) $result->total;
-	}
+        /* Restituiamo una struttura dati completa al Controller */
+        return ['count' => (int) $result->total, 'from' => $dates['from'], 'to' => $dates['to']];
+    }
 
 	public function deleteAudits(array $posts): array
 	{
@@ -115,13 +116,13 @@ class ToolsModel extends BackendModel
 
 		if ($deleted > 0):
 
-			$fromLog = convertDate($dates['from']);
-	        $toLog = convertDate($dates['to']);
+			$fromLog = convertDate($dates['from'], 'conversational');
+	        $toLog = convertDate($dates['to'], 'conversational');
 
 			$currentAdmin = service('authorization')->currentAdmin();
 			log_admin_activity('DELETE_AUDITS', 'tools', sprintf(lang('Eliminazione audits dal %s al %s'), $fromLog, $toLog), $currentAdmin);
 
-			return ['result' => true, 'message' => sprintf(lang('backend/tools.messages.deleteSuccess'), $deleted)];
+			return ['result' => true, 'message' => sprintf(lang('backend/tools.messages.deleteSuccess'), $deleted, $fromLog, $toLog)];
 
 		endif;
 
@@ -204,35 +205,69 @@ class ToolsModel extends BackendModel
 	}
 
 	public function getBackups(): array
-	{
-		/* Definisce il percorso assoluto alla cartella backups di CodeIgniter */
-		$path = WRITEPATH . 'backups/database/';
-		$backups = [];
+    {
+        /* Definisce il percorso assoluto alla cartella backups di CodeIgniter */
+        $path = WRITEPATH . 'backups/database/';
+        $backups = [];
 
-		/* Recupera tutti i file con estensione .zip */
-		$files = glob($path . '*.zip');
+        /* Recupera tutti i file con estensione .zip */
+        $files = glob($path . '*.zip');
 
-		if ($files):
-			foreach ($files as $file):
+        if ($files):
+            foreach ($files as $file):
 
-				/* Popola l'array con le informazioni fisiche del file */
-				$backups[] = [
-					'filename' => basename($file),
-					'date' => date('d/m/Y H:i:s', filemtime($file)),
-					'size' => number_format(filesize($file) / 1048576, 2, ',', ''),
-					'time' => filemtime($file) /* Salviamo il timestamp grezzo per l'ordinamento */
-				];
+                $filename = basename($file);
+                
+                /* 1. Ottiene la data in formato MySQL (dal nome file o dal file system) */
+                $mysqlDate = $this->extractDateFromFilename($filename);
+                
+                if ( ! $mysqlDate):
+                    $mysqlDate = date('Y-m-d H:i:s', filemtime($file));
+                endif;
 
-			endforeach;
+                /* 2. Sfrutta l'helper per generare la stringa discorsiva completa */
+                $humanDateTime = convertDate($mysqlDate, 'conversational');
 
-			/* Ordina l'array dal file più recente al più vecchio usando l'operatore astrale */
-			usort($backups, function($a, $b) {
-				return $b['time'] <=> $a['time'];
-			});
-		endif;
+                /* 3. Popola l'array */
+                $backups[] = [
+                    'filename'      => $filename,
+                    'humanDateTime' => $humanDateTime,
+                    'size'          => number_format(filesize($file) / 1048576, 2, ',', ''),
+                    'time'          => filemtime($file)
+                ];
 
-		return $backups;
-	}
+            endforeach;
+
+            /* Ordina l'array dal file più recente al più vecchio usando l'operatore astrale */
+            usort($backups, function($a, $b) {
+                return $b['time'] <=> $a['time'];
+            });
+        endif;
+
+        return $backups;
+    }
+
+    /**
+     * Estrae la data dal nome del file e la restituisce in formato standard MySQL (Y-m-d H:i:s).
+     *
+     * @param string $filename Il nome del file
+     * @return string|bool Restituisce la data formattata o false in caso di fallimento.
+     */
+    private function extractDateFromFilename(string $filename): string|bool
+    {
+        /* Regex rigorosa: backup_YYYY-MM-DD_HH-MM-SS.zip */
+        $pattern = '/^backup_(\d{4}-\d{2}-\d{2})_(\d{2}-\d{2}-\d{2})\.zip$/';
+        
+        if (preg_match($pattern, $filename, $matches)):
+            
+            $timeFormatted = str_replace('-', ':', $matches[2]);
+            
+            return $matches[1] . ' ' . $timeFormatted;
+            
+        endif;
+        
+        return false;
+    }
 
 	public function generateDatabaseBackups(): bool
 	{

@@ -38,12 +38,13 @@ class AuthorizationFilter implements FilterInterface
 
         /* Eseguiamo la disconnessione completa che pulisce anche il database */
         if ($cookie === null):
-            $authModel->logoutBySession();
+            $authModel->logoutBySession('timeout');
         else:
-            $authModel->logoutByCookie($cookie);
+            $authModel->logoutByCookie($cookie, 'timeout');
         endif;
 
-        if ( ! url_is('backend/auth/logout')):
+        /* Salviamo l'URL solo se è una normale navigazione GET (non AJAX) e non è il logout */
+        if ( ! $request->isAJAX() && $request->is('get') && ! url_is('backend/auth/logout')):
             session()->set('intended_url', current_url());
         endif;
 

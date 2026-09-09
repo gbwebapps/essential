@@ -4,6 +4,11 @@ import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace } from '../back
 export class ResetPasswordManager {
     constructor(hooks = {}) {
 
+        if (ResetPasswordManager.instance) {
+            return ResetPasswordManager.instance;
+        }
+        ResetPasswordManager.instance = this;
+
         /* Parametri di configurazione della sezione dedicati e hardcoded */
         this.formSelector = '.resetAdmin';
         this.url = `${urlbase}backend/admins/resetPassword`;
@@ -99,8 +104,13 @@ export class ResetPasswordManager {
 }
 
 export class ChangeGroupManager {
-    constructor(hooks = {})
-    {
+    constructor(hooks = {}) {
+
+        if (ChangeGroupManager.instance) {
+            return ChangeGroupManager.instance;
+        }
+        ChangeGroupManager.instance = this;
+
         /* Parametro di configurazione della sezione dedicato e hardcoded */
         this.url = urlbase + 'backend/admins/changeGroup';
 
@@ -211,6 +221,11 @@ export class ChangeGroupManager {
 export class GetPermissionsManager {
     constructor(hooks = {}) {
 
+        if (GetPermissionsManager.instance) {
+            return GetPermissionsManager.instance;
+        }
+        GetPermissionsManager.instance = this;
+
         /* Parametri di configurazione della sezione dedicati e hardcoded */
         this.url = urlbase + 'backend/admins/getPermissions'; 
         this.formSelector = '#getPermissions';
@@ -302,6 +317,11 @@ export class GetPermissionsManager {
 
 export class ChangePermissionManager {
     constructor(hooks = {}) {
+
+        if (ChangePermissionManager.instance) {
+            return ChangePermissionManager.instance;
+        }
+        ChangePermissionManager.instance = this;
 
         /* Parametro di configurazione della sezione dedicato e hardcoded */
         this.url = urlbase + 'backend/admins/changePermission';
@@ -415,6 +435,11 @@ export class ChangePermissionManager {
 export class GetTokensManager {
     constructor(hooks = {}) {
 
+        if (GetTokensManager.instance) {
+            return GetTokensManager.instance;
+        }
+        GetTokensManager.instance = this;
+
         /* Parametri di configurazione della sezione dedicati e hardcoded */
         this.url = urlbase + 'backend/admins/getTokens'; 
         this.formSelector = '#getTokens';
@@ -506,6 +531,11 @@ export class GetTokensManager {
 
 export class DeleteTokenManager {
     constructor(hooks = {}) { 
+
+        if (DeleteTokenManager.instance) {
+            return DeleteTokenManager.instance;
+        }
+        DeleteTokenManager.instance = this;
 
         /* Parametro di configurazione della sezione dedicato e hardcoded */
         this.url = urlbase + 'backend/admins/deleteToken';

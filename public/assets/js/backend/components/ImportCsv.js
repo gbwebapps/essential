@@ -4,6 +4,11 @@ import { urlbase, apiFetch, showAlert, smoothReplace, handleValidationErrors } f
 export class ImportCsvManager {
     constructor(config = {}, hooks = {}) {
 
+        if (ImportCsvManager.instance) {
+            return ImportCsvManager.instance;
+        }
+        ImportCsvManager.instance = this;
+
         this.config = Object.assign({
             controller: '',
             urlModal: urlbase + 'backend/import/showModal',

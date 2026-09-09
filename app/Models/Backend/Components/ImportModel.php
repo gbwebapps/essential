@@ -448,13 +448,14 @@ class ImportModel extends BackendModel
 
         /* Operazioni finali di pulizia e logging SOLO se il file è concluso */
         if ($isFinished):
+
             /* Pulizia fisica del file temporaneo di staging */
             if (file_exists($filePath)):
                 unlink($filePath);
             endif;
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('IMPORT_DATA', $entity, sprintf(lang('Importazione dati dalla tabella: %s'), $entity), $currentAdmin);
+            log_admin_activity('IMPORT_DATA', $entity, sprintf(lang('Importazione dati nella tabella %s. Inseriti %d records, aggiornati %d records.'), $entity, $inserted, $updated), $currentAdmin);
         endif;
 
         /* Risposta finale aggregata per il controller */

@@ -6,6 +6,7 @@ return [
         'uuid' => 'UUID', 
         'entity' => 'Entità', 
         'context' => 'Contesto', 
+        'dragAndDrop' => 'Trascina le immagini per caricarle.'
     ], 
     'buttons' => [
         'uploadImages' => 'Seleziona immagini',

@@ -145,7 +145,7 @@ class Auth extends BaseConfig
      * 
      * @var int 
      */
-    public int $activationTime = 21600;
+    public int $activationTime = 43200;
 
     /**
      * Espressione regolare (Regex) utilizzata per validare i requisiti minimi di sicurezza delle password.

@@ -3,6 +3,12 @@ import { urlbase, apiFetch, showAlert, askConfirm, handleValidationErrors, smoot
 
 export class ToolsManager {
     constructor() {
+
+        if (ToolsManager.instance) {
+            return ToolsManager.instance;
+        }
+        ToolsManager.instance = this;
+        
         this.loadUrl = urlbase + 'backend/tools/openTools';
         this.isSubmitting = false;
         this.eventsBound = false;

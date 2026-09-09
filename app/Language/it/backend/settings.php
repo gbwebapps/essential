@@ -137,8 +137,7 @@ return [
 	], 
 	'languages' => [
 		'italian' => 'Italiano', 
-		'englishUs' => 'Inglese US', 
-		'englishUk' => 'Inglese UK', 
+		'english' => 'Inglese', 
 		'spanish' => 'Spagnolo', 
 		'franch' => 'Francese', 
 		'german' => 'Tedesco', 

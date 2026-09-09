@@ -47,14 +47,14 @@
                                         </th>
 
                                         <!-- Colonna details -->
-                                        <th style="width: 45%;">
+                                        <th style="width: 42.5%;">
                                             <a class="sort" href="#" data-column="details" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'details') ? 'asc' : 'desc'); ?>">
                                                 <?= lang('backend/audits.labels.details'); ?>&nbsp;<?= (($posts['column'] == 'details') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
                                         </th>
 
                                         <!-- Colonna created At -->
-                                        <th style="width: 10%;">
+                                        <th style="width: 12.5%;">
                                             <a class="sort" href="#" data-column="created_at" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'created_at') ? 'asc' : 'desc'); ?>">
                                                 <?= lang('backend/audits.labels.createdAt'); ?>&nbsp;<?= (($posts['column'] == 'created_at') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
@@ -98,7 +98,7 @@
 
                                             <!-- Cella created At -->
                                             <td class="align-middle">
-                                                <span class="fw-bold"><?= convertDate(esc($audit->created_at)); ?></span>
+                                                <span class="fw-bold"><?= convertDate(esc($audit->created_at), 'conversational'); ?></span>
                                             </td>
                                         </tr>
 

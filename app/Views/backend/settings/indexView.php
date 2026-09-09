@@ -6,7 +6,7 @@
         <div class="row g-0">
             <div class="col-12">
                 
-                <div class="accordion" id="mainSettingsDashboard">
+                <div class="accordion" id="mainSettingsDashboard" data-open-accordion="<?= esc($openAccordion ?? '') ?>">
 
                     <?php foreach(['general', 'auth', 'upload', 'email'] as $env): ?>
 

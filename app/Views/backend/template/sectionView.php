@@ -18,7 +18,7 @@
                 </div>
                 <!-- Pulsante stile badge per la chiusura dell'alert -->
                 <button type="button" class="badge bg-danger p-2 border-0 rounded-1 ms-auto" data-bs-dismiss="alert" style="cursor: pointer;">
-                    <i class="fa-solid fa-xmark"></i> Rimuovi
+                    <i class="fa-solid fa-xmark"></i> <?= lang('backend/global.buttons.remove'); ?>
                 </button>
             </div>
         <?php endif; ?>

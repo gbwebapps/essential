@@ -4,10 +4,23 @@ import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace, handleValidati
 export class GroupsManager {
     constructor() {
 
+        if (GroupsManager.instance) {
+            return GroupsManager.instance;
+        }
+        GroupsManager.instance = this;
+
         /* Parametri di configurazione della sezione dedicati e hardcoded */
         this.getGroupsUrl = urlbase + 'backend/groups/getGroups';
         this.getGroupUrl = urlbase + 'backend/groups/getGroup';
-        this.urlGetExceptions = urlbase + 'backend/groups/getDropdownAdmins';
+        this.getExceptionsUrl = urlbase + 'backend/groups/getDropdownAdmins';
+        this.checkDeleteUrl = urlbase + 'backend/groups/checkDeleteConstraints';
+        this.getAddUrl = urlbase + 'backend/groups/add';
+        this.getEditUrl = urlbase + 'backend/groups/edit';
+        this.getDeleteUrl = urlbase + 'backend/groups/del';
+        this.getOpenAddGroup = urlbase + 'backend/groups/openAdd';
+        this.getOpenExceptionsGroup = urlbase + 'backend/groups/openExceptions';
+        this.getAdminPermissionsUrl = urlbase + 'backend/groups/getAdminPermissions';
+        this.getSaveExceptionsUrl = urlbase + 'backend/groups/saveExceptions';
 
         /* Variabili di stato per evitare ricaricamenti inutili */
         this.isListLoaded = false;
@@ -80,10 +93,20 @@ export class GroupsManager {
             if (deleteBtn) {
                 e.preventDefault();
 
+                if (this.isSubmitting) return;
+
+                /* 1. SCUDO PREVENTIVO UX: Verifichiamo i vincoli in background */
+                const isSafeToDelete = await this.checkDeleteConstraints(deleteBtn.dataset.id);
+                
+                /* Se l'esito è negativo, ci fermiamo qui (il messaggio è già comparso) */
+                if ( ! isSafeToDelete) return; 
+
+                /* 2. Via libera: mostriamo il normale alert di conferma */
                 const message = deleteBtn.dataset.message;
                 const ok = await askConfirm(message);
                 if ( ! ok) return;
 
+                /* 3. Esecuzione reale */
                 await this.handleDeleteGroup(deleteBtn);
             }
         });
@@ -195,7 +218,7 @@ export class GroupsManager {
         document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
 
         try {
-            const response = await apiFetch(urlbase + 'backend/groups/add', {
+            const response = await apiFetch(this.getAddUrl, {
                 method: 'POST',
                 body: formData
             });
@@ -254,7 +277,7 @@ export class GroupsManager {
             const formData = new FormData();
             formData.append('action', 'reset');
 
-            const response = await apiFetch(urlbase + 'backend/groups/add', {
+            const response = await apiFetch(this.getAddUrl, {
                 method: 'POST',
                 body: formData
             });
@@ -284,7 +307,7 @@ export class GroupsManager {
         document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
 
         try {
-            const response = await apiFetch(urlbase + 'backend/groups/edit', {
+            const response = await apiFetch(this.getEditUrl, {
                 method: 'POST',
                 body: formData
             });
@@ -347,7 +370,7 @@ export class GroupsManager {
             formData.append('id', groupId);
             formData.append('action', 'refresh');
 
-            const response = await apiFetch(urlbase + 'backend/groups/edit', {
+            const response = await apiFetch(this.getEditUrl, {
                 method: 'POST',
                 body: formData
             });
@@ -384,7 +407,7 @@ export class GroupsManager {
             const formData = new FormData();
             formData.append('id', groupId);
 
-            const response = await apiFetch(urlbase + 'backend/groups/del', {
+            const response = await apiFetch(this.getDeleteUrl, {
                 method: 'POST',
                 body: formData
             });
@@ -424,7 +447,7 @@ export class GroupsManager {
         if ( ! container) return false;
 
         try {
-            const response = await apiFetch(urlbase + 'backend/groups/openAdd', { method: 'POST' });
+            const response = await apiFetch(this.getOpenAddGroup, { method: 'POST' });
 
             const data = await response.json();
 
@@ -490,7 +513,7 @@ export class GroupsManager {
         if ( ! container) return false;
 
         try {
-            const response = await apiFetch(urlbase + 'backend/groups/openExceptions', { method: 'POST' });
+            const response = await apiFetch(this.getOpenExceptionsGroup, { method: 'POST' });
 
             const data = await response.json();
 
@@ -545,7 +568,7 @@ export class GroupsManager {
                 const formData = new FormData();
                 formData.append('query', query);
 
-                const response = await apiFetch(this.urlGetExceptions, {
+                const response = await apiFetch(this.getExceptionsUrl, {
                     method: 'POST',
                     body: formData
                 });
@@ -595,7 +618,7 @@ export class GroupsManager {
             const formData = new FormData();
             formData.append('uuid', adminUuid);
 
-            const response = await apiFetch(urlbase + 'backend/groups/getAdminPermissions', {
+            const response = await apiFetch(this.getAdminPermissionsUrl, {
                 method: 'POST',
                 body: formData
             });
@@ -625,7 +648,7 @@ export class GroupsManager {
         document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
 
         try {
-            const response = await apiFetch(urlbase + 'backend/groups/saveExceptions', {
+            const response = await apiFetch(this.getSaveExceptionsUrl, {
                 method: 'POST',
                 body: formData
             });
@@ -676,7 +699,7 @@ export class GroupsManager {
             const formData = new FormData();
             formData.append('uuid', adminUuid);
 
-            const response = await apiFetch(urlbase + 'backend/groups/getAdminPermissions', {
+            const response = await apiFetch(this.getAdminPermissionsUrl, {
                 method: 'POST',
                 body: formData
             });
@@ -721,5 +744,37 @@ export class GroupsManager {
 
         const permissionsContainer = document.getElementById('admin-permissions-container');
         if (permissionsContainer) smoothReplace(permissionsContainer, '');
+    }
+
+    /**
+     * Contatta il backend per verificare se ci sono vincoli prima di eliminare.
+     */
+    async checkDeleteConstraints(groupId) {
+        try {
+            const formData = new FormData();
+            formData.append('id', groupId);
+
+            const response = await apiFetch(this.checkDeleteUrl, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            /* Se il backend restituisce false (es. ci sono utenti), mostra l'errore e blocca tutto */
+            if (data.result === false) {
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('info', data.message);
+                }
+                return false;
+            }
+
+            /* Via libera */
+            return true;
+            
+        } catch (error) {
+            console.error("Errore durante il controllo vincoli di eliminazione:", error);
+            return false;
+        }
     }
 }

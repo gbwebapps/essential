@@ -1,8 +1,13 @@
 /* Import delle utility risalendo di un livello */
-import { apiFetch, urlbase, handleValidationImages, showAlert } from '../backend.js';
+import { langDefinitions, apiFetch, urlbase, handleValidationImages, showAlert } from '../backend.js';
 
 export class UploadPreviewImgManager {
     constructor(galleryOneImgManager = null) {
+
+        if (UploadPreviewImgManager.instance) {
+            return UploadPreviewImgManager.instance;
+        }
+        UploadPreviewImgManager.instance = this;
 
         /* Salviamo i selettori stringa, NON i nodi del DOM, così rimangono validi per sempre */
         this.inputSelector = '#inputImages';
@@ -174,7 +179,7 @@ export class UploadPreviewImgManager {
                     <img src="${e.target.result}" class="img-fluid w-100 d-block" alt="">
                     <div class="preview-overlay d-flex align-items-center justify-content-center">
                         <button type="button" class="btn btn-danger btn-sm remove-preview" data-id="${id}">
-                            <i class="fa-solid fa-trash me-1"></i> Rimuovi
+                            <i class="fa-solid fa-trash me-1"></i> ${ langDefinitions.dataset.remove }
                         </button>
                     </div>
                 </div>

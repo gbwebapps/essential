@@ -97,11 +97,11 @@ class GroupsModel extends BackendModel
 	    return [
 	        'name' => [
 	            'label' => lang('backend/groups.labels.name'),
-	            'rules' => ['required', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+	            'rules' => ['required', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'], 
 	        ],
 	        'description' => [
 	            'label' => lang('backend/groups.labels.description'),
-	            'rules' => ['required', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ,]+$/u]'], 
+	            'rules' => ['required', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'], 
 	        ],
             /* Validazione di ogni singolo elemento contenuto nell'array delle eccezioni */
             'permissions.*' => [
@@ -159,11 +159,11 @@ class GroupsModel extends BackendModel
             ],
             'name' => [
                 'label' => lang('backend/groups.labels.name'),
-                'rules' => ['required', "is_unique[admins_groups.name,id,{$posts['id']}]", 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+                'rules' => ['required', "is_unique[admins_groups.name,id,{$posts['id']}]", 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'], 
             ],
             'description' => [
                 'label' => lang('backend/groups.labels.description'),
-                'rules' => ['required', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ,]+$/u]'], 
+                'rules' => ['required', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'], 
             ],
             /* Validazione di ciascun permesso inviato nell'array del gruppo */
             'permissions.*' => [
@@ -237,7 +237,7 @@ class GroupsModel extends BackendModel
         return [
             'query' => [
                 'label' => lang('backend/groups.labels.query'),
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'], 
             ],
         ];
     }
@@ -706,12 +706,26 @@ class GroupsModel extends BackendModel
             $currentAdmin = service('authorization')->currentAdmin();
             log_admin_activity('SAVE_EXCEPTIONS', 'groups', sprintf('Inserimento eccezione %s %s ', esc($admin->firstname), esc($admin->lastname)), $currentAdmin);
 
-            return ['result' => true, 'message' => lang('backend/groups.messages.saveExceptionsSuccess')];
+            return ['result' => true, 'message' => sprintf(lang('backend/groups.messages.saveExceptionsSuccess'), esc($admin->firstname), esc($admin->lastname))];
 
         } catch (\Throwable $e) {
             $this->db->transRollback();
             log_message('error', 'Errore salvataggio eccezione: ' . $e);
             return ['result' => false, 'message' => lang('backend/groups.messages.saveExceptionsError')];
         }
+    }
+
+    /**
+     * Verifica se un gruppo possiede amministratori associati.
+     *
+     * @param int $groupId ID del gruppo da controllare.
+     * @return bool True se esistono vincoli, False altrimenti.
+     */
+    public function hasAdminsAttached(int $groupId): bool
+    {
+        $sql = 'select count(uuid) as total from admins where group_id = ?';
+        $result = $this->db->query($sql, [$groupId])->getRow();
+
+        return (int) $result->total > 0;
     }
 }

@@ -139,6 +139,7 @@ $routes->group('backend', function($routes) {
             $routes->post('add', '\App\Controllers\Backend\GroupsController::add'); 
             $routes->post('edit', '\App\Controllers\Backend\GroupsController::edit'); 
             $routes->post('del', '\App\Controllers\Backend\GroupsController::del'); 
+            $routes->post('checkDeleteConstraints', '\App\Controllers\Backend\GroupsController::checkDeleteConstraints'); 
             $routes->post('openExceptions', '\App\Controllers\Backend\GroupsController::openExceptions'); 
             $routes->post('getDropdownAdmins', '\App\Controllers\Backend\GroupsController::getDropdownAdmins'); 
             $routes->post('getAdminPermissions', '\App\Controllers\Backend\GroupsController::getAdminPermissions'); 
@@ -154,6 +155,11 @@ $routes->group('backend', function($routes) {
         $routes->group('tokens', function($routes) {
             $routes->match(['GET', 'POST'], '/', '\App\Controllers\Backend\TokensController::index');
             $routes->post('hardDelete', '\App\Controllers\Backend\TokensController::hardDelete');
+        });
+
+        /* LOGS */
+        $routes->group('logs', function($routes) {
+            $routes->match(['GET', 'POST'], '/', '\App\Controllers\Backend\LogsController::index');
         });
 
         /* ADMINS */

@@ -11,8 +11,8 @@
         <div class="alert alert-success d-flex align-items-center mb-3">
             <i class="fa-solid fa-check-circle fa-2x me-3"></i>
             <div>
-                <strong>Sincronizzazione perfetta!</strong><br>
-                I dati presenti nel CSV sono già identici a quelli del database (<?= $plan['skip'] ?> record analizzati). Nessuna importazione necessaria.
+                <strong><?= lang('backend/components/import.labels.perfectSync'); ?></strong><br>
+                <?= sprintf(lang('backend/components/import.labels.syncNoChanges'), $plan['skip']); ?>
             </div>
         </div>
     <?php else: ?>
@@ -20,7 +20,7 @@
         <!-- STATO: AZIONI TROVATE -->
         <div class="alert alert-warning mb-3">
             <i class="fa-solid fa-database me-2"></i>
-            <strong>Piano di Esecuzione:</strong> Trovati <strong><?= $plan['insert'] ?></strong> nuovi record da inserire e <strong><?= $plan['update'] ?></strong> record da aggiornare (<?= $plan['skip'] ?> record verranno ignorati perché già identici).
+            <?= sprintf(lang('backend/components/import.labels.executionPlan'), $plan['insert'], $plan['update'], $plan['skip']); ?>
         </div>
     <?php endif; ?>
 
@@ -83,7 +83,7 @@
     ?>
         <div class="text-center text-muted small mt-2">
             <i class="fa-solid fa-info-circle me-1"></i>
-            Vengono mostrate le prime <strong><?= $previewCount ?></strong> righe soggette a modifica. Seguono altre <strong><?= ($totalToProcess - $previewCount) ?></strong> righe...
+            <?= lkang('backend/components/import.messages.previewNotice'); ?>
         </div>
     <?php endif; ?>
 

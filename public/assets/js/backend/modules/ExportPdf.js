@@ -1,6 +1,11 @@
 export class ExportPdfManager {
 
     constructor(config = {}) {
+
+        if (ExportPdfManager.instance) {
+            return ExportPdfManager.instance;
+        }
+        ExportPdfManager.instance = this;
         
         /* 1. Ripristinata la configurazione dinamica */
         this.config = Object.assign({

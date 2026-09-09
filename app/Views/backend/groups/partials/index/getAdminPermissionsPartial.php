@@ -74,10 +74,10 @@
             <div class="col-12">
                 <div class="d-flex flex-column flex-md-row justify-content-center gap-2">
                     <button type="button" class="btn btn-warning text-dark btn-sm btn-refresh-admin-perms" data-uuid="<?= $uuid; ?>" data-message="Sei sicuro di voler ricaricare i dati originari di questo amministratore?">
-                        <i class="fa-solid fa-refresh me-1"></i>Ricarica dati
+                        <i class="fa-solid fa-refresh me-1"></i> <?= lang('backend/groups.buttons.resetData'); ?>
                     </button>
                     <button type="submit" class="btn btn-success btn-sm">
-                        <i class="fa-solid fa-floppy-disk me-1"></i>Invia dati
+                        <i class="fa-solid fa-floppy-disk me-1"></i> <?= lang('backend/groups.buttons.sendData'); ?>
                     </button>
                 </div>
             </div>

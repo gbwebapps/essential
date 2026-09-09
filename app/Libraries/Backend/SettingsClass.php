@@ -110,8 +110,7 @@ class SettingsClass
 	{
 	    return [
 	        'it' => lang('backend/settings.languages.italian'),
-	        'en-US' => lang('backend/settings.languages.englishUs'),
-	        'en-GB' => lang('backend/settings.languages.englishUk'),
+	        'en' => lang('backend/settings.languages.english'),
 	        'es' => lang('backend/settings.languages.spanish'),
 	        'fr' => lang('backend/settings.languages.franch'),
 	        'de' => lang('backend/settings.languages.german'),

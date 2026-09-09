@@ -2,11 +2,11 @@
 
 namespace App\Controllers\Backend\Components;
 
-use App\Controllers\BaseController;
+use App\Controllers\Backend\BackendController;
 use App\Models\Backend\Components\GalleryOneImgModel;
 use CodeIgniter\HTTP\ResponseInterface;
 
-class GalleryOneController extends BaseController
+class GalleryOneController extends BackendController
 {
     private GalleryOneImgModel $galleryModel;
 

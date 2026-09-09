@@ -11,7 +11,7 @@
                     <?php if ($stats['total'] === 0): ?>
                         <?= lang('backend/tools.labels.noAuditsStats'); ?>
                     <?php else: ?>
-                        <?= sprintf(lang('backend/tools.labels.auditsStats'), $stats['total'], convertDate($stats['min_date']), convertDate($stats['max_date'])); ?>
+                        <?= sprintf(lang('backend/tools.labels.auditsStats'), $stats['total'], convertDate($stats['min_date'], 'conversational'), convertDate($stats['max_date'], 'conversational')); ?>
                     <?php endif; ?>
                 </div>
             </div>

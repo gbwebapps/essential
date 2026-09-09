@@ -57,9 +57,10 @@ return [
 		'editSuccess' => 'Gruppo aggiornato con successo.',
 		'delError' => 'Eliminazione gruppo non andata a buon fine.', 
 		'delSuccess' => 'Gruppo eliminato con successo.', 
-		'saveExceptionsSuccess' => 'Eccezione aggiunta con successo.', 
+		'saveExceptionsSuccess' => 'Eccezione aggiunta con successo a %s %s.', 
 		'saveExceptionsError' => 'Aggiunta eccezione non andata a buon fine.', 
 		'protectedAdmin' => 'Protetto da modifiche.', 
 		'cannotModifyDeleted' => 'Non è possibile modificare un admin eliminato.', 
+		'hasAdminsAttached' => 'Non è possibile eliminare un gruppo al quale sono associati amministratori.'
 	]
 ];

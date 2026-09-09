@@ -7,6 +7,7 @@ return [
             'groups' => 'Gruppi',
             'audits' => 'Registro attività', 
             'tokens' => 'Tokens', 
+            'logs' => 'Accessi', 
             'account' => 'Profilo',
             'logout' => 'Esci'
         ],
@@ -23,6 +24,12 @@ return [
     'links' => [
         'selectAll' => 'Seleziona tutti'
     ], 
+    'labels' => [
+        'select' => 'Seleziona'
+    ], 
+    'formats' => [
+        'conversationalDate' => "EEEE d MMMM yyyy 'alle' HH:mm:ss",
+    ], 
     'buttons' => [
         'modules' => 'Moduli',
         'services' => 'Servizi',
@@ -34,6 +41,7 @@ return [
         'no' => 'No', 
         'close' => 'Chiudi', 
         'exportPdf' => 'Esporta Pdf', 
+        'remove' => 'Rimuovi', 
     ],
     'errors' => [
         'err403' => 'Sessione di sicurezza scaduta o accesso non autorizzato. Ricaricamento in corso...',

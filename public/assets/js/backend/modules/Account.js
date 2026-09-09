@@ -4,6 +4,11 @@ import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace, handleValidati
 export class EditManager {
     constructor(hooks = {}) {
 
+        if (EditManager.instance) {
+            return EditManager.instance;
+        }
+        EditManager.instance = this;
+
         /* Parametri di configurazione della sezione dedicati e hardcoded */
         this.formSelector = '#account-edit';
         this.url = urlbase + 'backend/account/edit';
@@ -196,6 +201,11 @@ export class EditManager {
 
 export class GetPermissionsManager {
     constructor(hooks = {}) {
+
+        if (GetPermissionsManager.instance) {
+            return GetPermissionsManager.instance;
+        }
+        GetPermissionsManager.instance = this;
         
         /* Parametri di configurazione della sezione dedicati e hardcoded */
         this.url = urlbase + 'backend/account/permissions'; 
@@ -277,6 +287,11 @@ export class GetPermissionsManager {
 
 export class GetTokensManager {
     constructor(hooks = {}) {
+
+        if (GetTokensManager.instance) {
+            return GetTokensManager.instance;
+        }
+        GetTokensManager.instance = this;
 
         /* Parametri di configurazione della sezione dedicati e hardcoded */
         this.url = urlbase + 'backend/account/tokens'; 
@@ -363,8 +378,13 @@ export class GetTokensManager {
 }
 
 export class DeleteTokenManager {
-    constructor(hooks = {})
-    {
+    constructor(hooks = {}) {
+
+        if (DeleteTokenManager.instance) {
+            return DeleteTokenManager.instance;
+        }
+        DeleteTokenManager.instance = this;
+
         /* Parametri di configurazione della sezione dedicati e hardcoded */
         this.url = urlbase + 'backend/account/deleteToken'; 
         this.containerId = 'tokens-account-container';
@@ -472,6 +492,11 @@ export class DeleteTokenManager {
 
 export class ResetPasswordManager {
     constructor(hooks = {}) {
+
+        if (ResetPasswordManager.instance) {
+            return ResetPasswordManager.instance;
+        }
+        ResetPasswordManager.instance = this;
 
         /* Parametri di configurazione della sezione dedicati e hardcoded */
         this.url = urlbase + 'backend/account/resetPassword'; 
@@ -586,6 +611,11 @@ export class ResetPasswordManager {
 
 export class SecurityManager {
     constructor(hooks = {}) {
+
+        if (SecurityManager.instance) {
+            return SecurityManager.instance;
+        }
+        SecurityManager.instance = this;
 
         /* Parametri di configurazione e selettori hardcoded */
         this.wrapperId = 'totp-setup-wrapper';

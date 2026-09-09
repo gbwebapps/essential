@@ -4,6 +4,11 @@ import { urlbase, apiFetch, showAlert, handleValidationErrors } from '../backend
 export class LoginManager {
     constructor(hooks = {}) {
 
+        if (LoginManager.instance) {
+            return LoginManager.instance;
+        }
+        LoginManager.instance = this;
+
         /* Parametri di configurazione della sezione dedicati e hardcoded (Guest Mode) */
         this.formId = 'login_form';
         this.url = urlbase + 'backend/auth/login';
@@ -107,6 +112,11 @@ export class LoginManager {
 export class ResetPasswordManager {
     constructor(hooks = {}) {
 
+        if (ResetPasswordManager.instance) {
+            return ResetPasswordManager.instance;
+        }
+        ResetPasswordManager.instance = this;
+
         /* Parametri di configurazione della sezione dedicati e hardcoded (Guest Mode) */
         this.formId = 'reset_password_form';
         this.url = urlbase + 'backend/auth/resetPassword';
@@ -207,6 +217,11 @@ export class ResetPasswordManager {
 export class SetPasswordManager {
     constructor(hooks = {}) {
 
+        if (SetPasswordManager.instance) {
+            return SetPasswordManager.instance;
+        }
+        SetPasswordManager.instance = this;
+
         /* Parametri di configurazione della sezione dedicati e hardcoded (Guest Mode) */
         this.formId = 'set_password_form';
         this.url = urlbase + 'backend/auth/setPassword';
@@ -306,6 +321,11 @@ export class SetPasswordManager {
 
 export class VerifyManager {
     constructor(hooks = {}) {
+
+        if (VerifyManager.instance) {
+            return VerifyManager.instance;
+        }
+        VerifyManager.instance = this;
 
         /* Configurazione dedicata alla sezione di verifica OTP */
         this.formId = 'verify_form';

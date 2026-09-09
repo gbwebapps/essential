@@ -3,6 +3,12 @@ import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace } from '../back
 
 export class GalleryOneImgManager {
     constructor() {
+
+        if (GalleryOneImgManager.instance) {
+            return GalleryOneImgManager.instance;
+        }
+        GalleryOneImgManager.instance = this;
+        
         this.containerId = '#imagesData';
         /* Rimosso this.container per evitare nodi orfani (fantasma) */
         

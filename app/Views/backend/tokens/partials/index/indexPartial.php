@@ -82,13 +82,13 @@
 
                                             /* Mappatura delle traduzioni per i tipi di token */
                                             $typeMap = [
-                                                'session'    => lang('backend/admins.labels.session'),
-                                                'activation' => lang('backend/admins.labels.activation'),
-                                                'cookie'     => lang('backend/admins.labels.rememberMe')
+                                                'session'    => lang('backend/tokens.labels.session'),
+                                                'activation' => lang('backend/tokens.labels.activation'),
+                                                'cookie'     => lang('backend/tokens.labels.rememberMe')
                                             ];
 
                                             /* Assegnazione con fallback automatico se la chiave non esiste */
-                                            $tokenType = $typeMap[$token->token_type] ?? lang('backend/admins.labels.unknown');
+                                            $tokenType = $typeMap[$token->token_type] ?? lang('backend/tokens.labels.unknown');
                                         ?>
 
                                         <tr class="border-end border-start table-row-60">
@@ -106,12 +106,12 @@
 
                                             <!-- Cella token_create -->
                                             <td class="align-middle">
-                                                <span class="fw-bold"><?= convertDate(esc($token->token_create)); ?></span>
+                                                <span class="fw-bold"><?= convertDate(esc($token->token_create), 'conversational'); ?></span>
                                             </td>
 
                                             <!-- Cella token_expire -->
                                             <td class="align-middle">
-                                                <span class="<?= $class; ?>"><?= convertDate($dateExpire->format('Y-m-d H:i:s')); ?></span>
+                                                <span class="<?= $class; ?>"><?= convertDate($dateExpire->format('Y-m-d H:i:s'), 'conversational'); ?></span>
                                             </td>
 
                                             <!-- Cella token_type -->
@@ -121,7 +121,7 @@
 
                                             <!-- Cella created_at -->
                                             <td class="align-middle">
-                                                <span class="fw-bold"><?= convertDate(esc($token->created_at)); ?></span>
+                                                <span class="fw-bold"><?= convertDate(esc($token->created_at), 'conversational'); ?></span>
                                             </td>
 
                                             <!-- Cella actions -->

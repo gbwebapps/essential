@@ -4,7 +4,7 @@
         <div class="col-12 col-lg-6">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/admins.labels.createdAt'); ?></li>
-                <li class="list-group-item fw-bold"><?= convertDate(esc($admin->created_at)); ?></li>
+                <li class="list-group-item fw-bold"><?= convertDate(esc($admin->created_at), 'conversational'); ?></li>
             </ul>
         </div>
 
@@ -12,7 +12,7 @@
             <div class="col-12 col-lg-6">
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/admins.labels.updatedAt'); ?></li>
-                    <li class="list-group-item fw-bold"><?= convertDate(esc($admin->updated_at)); ?></li>
+                    <li class="list-group-item fw-bold"><?= convertDate(esc($admin->updated_at), 'conversational'); ?></li>
                 </ul>
             </div>
         <?php endif; ?>
@@ -21,7 +21,7 @@
             <div class="col-12 col-lg-6">
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/admins.labels.suspendedAt'); ?></li>
-                    <li class="list-group-item fw-bold"><?= convertDate(esc($admin->suspended_at)); ?></li>
+                    <li class="list-group-item fw-bold"><?= convertDate(esc($admin->suspended_at), 'conversational'); ?></li>
                 </ul>
             </div>
         <?php endif; ?>
@@ -30,7 +30,7 @@
             <div class="col-12 col-lg-6">
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/admins.labels.resettedAt'); ?></li>
-                    <li class="list-group-item fw-bold"><?= convertDate(esc($admin->resetted_at)); ?></li>
+                    <li class="list-group-item fw-bold"><?= convertDate(esc($admin->resetted_at), 'conversational'); ?></li>
                 </ul>
             </div>
         <?php endif; ?>

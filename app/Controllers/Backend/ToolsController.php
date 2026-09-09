@@ -121,19 +121,23 @@ class ToolsController extends BackendController
                 return $this->jsonResponse(['errors' => $this->validator->getErrors(), 'message' => lang('backend/tools.messages.validationErrors')]);
             endif;
 
-            /* Conteggio preventivo delle attività da eliminare */
-            $count = $this->toolsModel->countAuditsToDelete($posts);
+            /* Esecuzione query preventiva e recupero del payload (conteggio e date) */
+            $auditData = $this->toolsModel->countAuditsToDelete($posts);
 
-            if ($count === false):
+            if ($auditData === false):
                 return $this->jsonResponse(['result' => false, 'message' => lang('backend/tools.messages.startDateAfterEndDate')]);
             endif;
 
-            /* Formatta il messaggio di conferma direttamente nel backend */
-            $confirmMessage = sprintf(lang('backend/tools.messages.areYouSureToDeleteData'), $count);
+            /* Formattazione umana delle date delegata al livello di presentazione */
+            $from = convertDate($auditData['from'], 'conversational');
+            $to = convertDate($auditData['to'], 'conversational');
 
-            $json = ['result' => true, 'count' => $count, 'confirmMessage' => $confirmMessage];
+            /* Iniezione dinamica dei parametri: 1° %s (da), 2° %s (a), 3° %d (totale) */
+            $confirmMessage = sprintf(lang('backend/tools.messages.areYouSureToDeleteData'), $from, $to, $auditData['count']);
+
+            $json = ['result' => true, 'count' => $auditData['count'], 'confirmMessage' => $confirmMessage];
             
-            if($count === 0):
+            if ($auditData['count'] === 0):
                 $json['noDataMessage'] = lang('backend/tools.messages.noAuditsFound');
             endif;
 

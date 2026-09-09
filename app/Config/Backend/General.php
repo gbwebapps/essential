@@ -10,7 +10,7 @@ class General extends BaseConfig
     public string $timezone = 'Europe/Rome';
     
     /* Imposta il codice lingua di default */
-    public string $language = 'it';
+    public string $language = 'en';
 
     /* Imposta il formato data/ora di default per la visualizzazione */
     public string $dateFormat = 'd MMMM yyyy HH:mm:ss';

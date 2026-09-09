@@ -353,6 +353,20 @@ class AuthModel extends BackendModel
             date('Y-m-d H:i:s')
         ]);
 
+        $sql = "insert into admins_logs (admin_uuid, username, login, log_type, user_agent, ip_address, created_at) values (?, ?, ?, ?, ?, ?, ?)";
+        $this->db->query($sql, [
+            $admin->uuid,
+            $admin->email, /* Disponibile grazie alla SELECT in login() */
+            date('Y-m-d H:i:s'),
+            $tokenType,
+            $userAgent,
+            $ip_address,
+            date('Y-m-d H:i:s')
+        ]);
+
+        /* Recupero immediato dell'ID autogenerato del log per il futuro logout */
+        $loginLogId = $this->db->insertID();
+
         /* Chiude la transazione aperta nel metodo principale prima di impostare gli stati del client */
         $this->db->transCommit();
 
@@ -360,6 +374,9 @@ class AuthModel extends BackendModel
 
         /* 5. Rigenerazione dell'ID di sessione per prevenire Session Fixation */
         session()->regenerate(true);
+
+        /* Salvataggio dell'ID del log di accesso per aggiornarlo al momento del logout */
+        session()->set('login_log_id', $loginLogId);
 
         /* 6. Assegnazione del token al client (con cifratura per il cookie Remember Me) */
         if ($rememberMe):
@@ -731,25 +748,28 @@ class AuthModel extends BackendModel
      *
      * @return void
      */
-    public function logoutBySession(): void
+    public function logoutBySession(string $reason = 'manual'): void
     {
         try 
         {
             if (session()->has('backendSession')):
                 
-                /* Recupera il token in chiaro dalla sessione */
                 $sessionValue = session()->get('backendSession');
                 $token = new \App\Libraries\Token($sessionValue);
                 $tokenHash = $token->getHash($this->config->hashKey);
 
-                /* Elimina il record dal database */
                 $sql = "delete from admins_tokens where token_hash = ? and token_type = ?";
                 $this->db->query($sql, [$tokenHash, 'session']);
 
-                /* Svuota ESCLUSIVAMENTE la chiave con i dati di login */
-                session()->remove('backendSession');
+                /* AGGIORNAMENTO LOG: Utilizza la variabile $reason */
+                if (session()->has('login_log_id')):
+                    $logId = session()->get('login_log_id');
+                    $sqlLog = "update admins_logs set logout = ?, logout_reason = ? where id = ?";
+                    $this->db->query($sqlLog, [date('Y-m-d H:i:s'), $reason, $logId]);
+                    session()->remove('login_log_id');
+                endif;
 
-                /* Rigenera l'ID per prevenire la Session Fixation */
+                session()->remove('backendSession');
                 session()->regenerate(true);
 
             endif;
@@ -768,27 +788,29 @@ class AuthModel extends BackendModel
      * @param string $cookieValue Valore crittografato prelevato dal cookie del client.
      * @return void
      */
-    public function logoutByCookie(string $cookieValue): void
+    public function logoutByCookie(string $cookieValue, string $reason = 'manual'): void
     {
         try 
         {
-            /* Decifra il valore del cookie */
             $decryptedValue = service('crypto')->decrypt($cookieValue);
 
             if ($decryptedValue):
-                /* Ricava l'hash dal token decifrato */
                 $token = new \App\Libraries\Token($decryptedValue);
                 $tokenHash = $token->getHash($this->config->hashKey);
 
-                /* Elimina il record dal database */
                 $sql = "delete from admins_tokens where token_hash = ? and token_type = ?";
                 $this->db->query($sql, [$tokenHash, 'cookie']);
+                
+                /* AGGIORNAMENTO LOG: Utilizza la variabile $reason */
+                if (session()->has('login_log_id')):
+                    $logId = session()->get('login_log_id');
+                    $sqlLog = "update admins_logs set logout = ?, logout_reason = ? where id = ?";
+                    $this->db->query($sqlLog, [date('Y-m-d H:i:s'), $reason, $logId]);
+                    session()->remove('login_log_id');
+                endif;
             endif;
 
-            /* Rimuove il cookie fisicamente dal browser */
             delete_cookie('backendRememberMe');
-
-            /* Rigenera l'ID per prevenire la Session Fixation */
             session()->regenerate(true);
 
         } catch (\Throwable $e) {

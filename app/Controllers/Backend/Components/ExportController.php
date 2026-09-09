@@ -2,11 +2,11 @@
 
 namespace App\Controllers\Backend\Components;
 
-use App\Controllers\BaseController;
+use App\Controllers\Backend\BackendController;
 use App\Models\Backend\Components\ExportModel;
 use CodeIgniter\HTTP\ResponseInterface;
 
-class ExportController extends BaseController
+class ExportController extends BackendController
 {
     private ExportModel $exportModel;
 

@@ -6,6 +6,9 @@ use App\Models\Backend\BackendModel;
 
 class AccountModel extends BackendModel
 {
+
+	protected ?string $module = 'account';
+
 	/**
 	 * Elenco dei campi consentiti per la persistenza dei dati durante la fase di aggiornamento del profilo corrente.
 	 *
@@ -37,11 +40,11 @@ class AccountModel extends BackendModel
 	    return [
 	        'firstname' => [
 	            'label' => lang('backend/account.labels.firstname'),
-	            'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'],
+	            'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'],
 	        ],
 	        'lastname' => [
 	            'label' => lang('backend/account.labels.lastname'),
-	            'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'],
+	            'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'],
 	        ],
 	        'email' => [
 	            'label' => lang('backend/account.labels.email'),
@@ -318,9 +321,9 @@ class AccountModel extends BackendModel
 	    if($token = $this->db->query($sql, [$currentAdmin->uuid, 'activation'])->getRow()):
 
 		    if (date('Y-m-d H:i:s') < $token->token_expire):
-		        $expiringDate = '<span class="text-success">' . convertDate($token->token_expire) . '</span>';
+		        $expiringDate = '<span class="text-success">' . convertDate($token->token_expire, 'conversational') . '</span>';
 		    else:
-		        $expiringDate = '<span class="text-danger"><s>' . convertDate($token->token_expire) . '</s></span>';
+		        $expiringDate = '<span class="text-danger"><s>' . convertDate($token->token_expire, 'conversational') . '</s></span>';
 		    endif;
 
 		endif;

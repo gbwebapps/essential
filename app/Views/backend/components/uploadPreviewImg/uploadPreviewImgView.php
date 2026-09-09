@@ -58,7 +58,7 @@
             <!-- 1. Area Drop Zone indipendente dal ciclo di vita delle anteprime -->
             <div id="drop-zone-area" class="drop-zone-custom d-flex align-items-center justify-content-center p-3 mb-3 text-muted w-100">
                 <span class="fw-bold">
-                    <i class="fa-solid fa-cloud-arrow-up me-2"></i> Trascina le immagini per caricarle.
+                    <i class="fa-solid fa-cloud-arrow-up me-2"></i> <?= lang('backend/components/uploadPreviewImg.labels.dragAndDrop'); ?>
                 </span>
             </div>
 

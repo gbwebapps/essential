@@ -3,6 +3,8 @@ export const controller = document.getElementById('controller').dataset.controll
 export const action = document.getElementById('action').dataset.action;
 export const urlbase = document.getElementById('hidden-urlbase').dataset.urlbase;
 
+export const langDefinitions = document.getElementById('lang-definitions');
+
 import { ExportPdfManager } from './modules/ExportPdf.js';
 
 /* Scrollup */
@@ -290,7 +292,7 @@ export function showAlert(type, message, customIcon = '')
                 ${iconHTML}${message}
             </div>
             <button type="button" class="badge bg-danger p-2 border-0 rounded-1 ms-auto" data-bs-dismiss="alert" style="cursor: pointer;">
-                <i class="fa-solid fa-xmark"></i> Rimuovi
+                <i class="fa-solid fa-xmark"></i> ${ langDefinitions.dataset.remove }
             </button>
         </div>`;
 
@@ -324,9 +326,10 @@ export async function askConfirm(message) {
         
         const modalEl = document.getElementById('globalConfirmModal');
 
-        /* 1. Fallback di sicurezza */
+        /* 1. Fallback di sicurezza: window.confirm non supporta HTML, quindi spogliamo i tag */
         if ( ! modalEl) {
-            return resolve(window.confirm(message));
+            const strippedMessage = message.replace(/<[^>]*>?/gm, '');
+            return resolve(window.confirm(strippedMessage));
         }
 
         /* 2. Inizializzazione eventi backdrop una sola volta */
@@ -345,8 +348,25 @@ export async function askConfirm(message) {
             keyboard: false  
         });
 
-        /* 3. Aggiornamento esclusivo del messaggio */
-        modalEl.querySelector('.modal-body').textContent = message;
+        /* --- INIZIO SCUDO ENTERPRISE (Anti-XSS) --- */
+        const sanitizeHTML = (str) => {
+            if (!str) return '';
+            
+            /* Escapa le parentesi angolari disinnescando qualsiasi tag */
+            let safe = str.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            
+            /* Ripristina esplicitamente solo i tag autorizzati.
+               Per lo <span> consentiamo opzionalmente l'attributo class 
+               limitato a caratteri sicuri (alfanumerici, trattini, underscore, spazi).
+            */
+            safe = safe.replace(/&lt;(br\s*\/?|b|\/b|p|\/p|span(?:\s+class="[a-zA-Z0-9\-_ ]+")?|\/span)&gt;/gi, '<$1>');
+            
+            return safe;
+        };
+        /* --- FINE SCUDO ENTERPRISE --- */
+
+        /* 3. Aggiornamento esclusivo del messaggio iniettando l'HTML sanificato */
+        modalEl.querySelector('.modal-body').innerHTML = sanitizeHTML(message);
 
         /* 4. Prevenzione Multi-Esecuzione: controlli di esistenza prima della clonazione */
         let oldOkBtn = modalEl.querySelector('.btn-ok');
@@ -435,12 +455,12 @@ export function initTomSelects() {
         new TomSelect(select, {
             plugins: {
                 remove_button: {
-                    title: 'Rimuovi'
+                    title: langDefinitions.dataset.remove, 
                 }
             },
             persist: false,
             create: false,
-            placeholder: select.getAttribute('placeholder') || 'Seleziona...'
+            placeholder: langDefinitions.dataset.select
         });
     });
 }

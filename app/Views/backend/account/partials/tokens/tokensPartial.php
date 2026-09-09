@@ -48,11 +48,11 @@
                             <div class="row">
                                 <div class="col-12 col-md-4 mb-3 mb-md-0 text-start">
                                     <small class="text-muted fw-bold d-block mb-1"><i class="fa-solid fa-circle-arrow-down me-1"></i><?= lang('backend/account.labels.createdToken'); ?></small>
-                                    <span class="fw-bold"><?= convertDate(esc($token->token_create)); ?></span>
+                                    <span class="fw-bold"><?= convertDate(esc($token->token_create), 'conversational'); ?></span>
                                 </div>
                                 <div class="col-12 col-md-4 mb-3 mb-md-0 text-start">
                                     <small class="text-muted fw-bold d-block mb-1"><i class="fa-solid fa-circle-arrow-down me-1"></i><?= lang('backend/account.labels.expiredToken'); ?></small>
-                                    <span class="<?= $class; ?>"><?= convertDate($dateExpire->format('Y-m-d H:i:s')); ?></span>
+                                    <span class="<?= $class; ?>"><?= convertDate($dateExpire->format('Y-m-d H:i:s'), 'conversational'); ?></span>
                                 </div>
                                 <div class="col-12 col-md-4 mb-3 mb-md-0 text-start">
                                     <small class="text-muted fw-bold d-block mb-1"><i class="fa-solid fa-circle-arrow-down me-1"></i><?= lang('backend/account.labels.typeToken'); ?></small>

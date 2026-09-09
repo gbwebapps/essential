@@ -8,6 +8,11 @@ import { UploadPreviewImgManager } from '../components/UploadPreview.js';
 export class ListManager {
     constructor(config = {}, hooks = {}) {
 
+        if (ListManager.instance) {
+            return ListManager.instance;
+        }
+        ListManager.instance = this;
+
         this.config = Object.assign({
             controller: '',
             url: '',
@@ -439,6 +444,11 @@ export class ListManager {
 export class AddManager {
     constructor(config = {}, hooks = {}) {
 
+        if (AddManager.instance) {
+            return AddManager.instance;
+        }
+        AddManager.instance = this;
+
         this.config = Object.assign({
             formSelector: '', 
             url: '',
@@ -659,6 +669,11 @@ export class AddManager {
 
 export class EditManager {
     constructor(config = {}, hooks = {}) {
+
+        if (EditManager.instance) {
+            return EditManager.instance;
+        }
+        EditManager.instance = this;
 
         /* Inizializza la configurazione di base con i selettori dinamici */
         this.config = Object.assign({
@@ -887,6 +902,11 @@ export class EditManager {
 export class DeleteManager {
     constructor(config = {}, hooks = {}){
 
+        if (DeleteManager.instance) {
+            return DeleteManager.instance;
+        }
+        DeleteManager.instance = this;
+
         this.config = Object.assign({
             controller: '',
             urls: {}, 
@@ -1013,6 +1033,11 @@ export class DeleteManager {
 export class ChangeStatusManager {
     constructor(config = {}, hooks = {}) {
 
+        if (ChangeStatusManager.instance) {
+            return ChangeStatusManager.instance;
+        }
+        ChangeStatusManager.instance = this;
+
         this.config = Object.assign({
             controller: '',
             url: '',
@@ -1117,6 +1142,11 @@ export class ChangeStatusManager {
 export class GeneralDataManager {
     constructor(config = {}, hooks = {}) {
 
+        if (GeneralDataManager.instance) {
+            return GeneralDataManager.instance;
+        }
+        GeneralDataManager.instance = this;
+
         this.config = Object.assign({
             url: '', 
             formSelector: ''
@@ -1213,6 +1243,11 @@ export class GeneralDataManager {
 
 export class MetaDataManager {
     constructor(config = {}, hooks = {}) {
+
+        if (MetaDataManager.instance) {
+            return MetaDataManager.instance;
+        }
+        MetaDataManager.instance = this;
         
         this.config = Object.assign({
             url: '', 
