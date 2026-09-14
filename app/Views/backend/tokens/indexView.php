@@ -117,7 +117,7 @@
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <div class="error_created_at-to text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div class="error_token_create-to text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End ricerca avanzata per data a -->

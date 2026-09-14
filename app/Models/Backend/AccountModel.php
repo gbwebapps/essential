@@ -203,6 +203,28 @@ class AccountModel extends BackendModel
 	}
 
 	/**
+     * Recupera l'ID del token di sessione attualmente in uso.
+     * Gestisce internamente la lettura della sessione e l'interrogazione al DB.
+     */
+    public function getCurrentTokenId(): ?int
+    {
+        if (session()->has('backendSession')):
+            
+            $sessionValue = session()->get('backendSession');
+            $token = new \App\Libraries\Token($sessionValue);
+            $tokenHash = $token->getHash(config('Backend/Auth')->hashKey);
+
+            $sql = "select id from admins_tokens where token_hash = ? and token_type = 'session'";
+            $row = $this->db->query($sql, [$tokenHash])->getRow();
+
+            return $row ? (int) $row->id : null;
+            
+        endif;
+
+        return null;
+    }
+
+	/**
 	 * Revoca ed elimina permanentemente un singolo token identificativo (sessione o persistenza) dal database.
 	 *
 	 * Filtra i dati in ingresso tramite whitelisting ed esegue la verifica preventiva sull'esistenza dell'account.
@@ -213,33 +235,50 @@ class AccountModel extends BackendModel
 	 * @param array $posts Dataset contenente l'UUID dell'amministratore e l'ID sequenziale del token da revocare.
 	 * @return array Matrice di risposta contenente l'esito logico dell'epurazione e il messaggio per l'interfaccia.
 	 */
-	public function deleteToken(array $posts, \stdClass $currentAdmin): array
-	{
-	    /* Match dei posts con i campi consentiti */
-	    $posts = $this->checkAllowedFields($posts, $this->deleteTokenAllowedFields);
+	public function deleteToken(array $posts, \stdClass $currentAdmin, ?int $currentTokenId = null): array
+    {
+        /* Match dei posts con i campi consentiti */
+        $posts = $this->checkAllowedFields($posts, $this->deleteTokenAllowedFields);
 
-	    try {
+        /* SBARRAMENTO DI SICUREZZA: Impedisce l'eliminazione esclusiva del token di sessione in uso */
+        if ($currentTokenId !== null && (int) $posts['id'] === $currentTokenId):
+            log_message('warning', 'Tentativo bloccato: l\'utente ha tentato di eliminare il token della sessione in uso.');
+            return ['result' => false, 'message' => lang('backend/account.messages.cannotDeleteCurrentToken')];
+        endif;
 
-	        /* Query per eliminare il token */
-	        $sql = "delete from admins_tokens where admin_uuid = ? and id = ?";
-	        $this->db->query($sql, [$currentAdmin->uuid, $posts['id']]);
+        try {
 
-	        if($this->db->affectedRows() > 0):
-	        	
-	        	log_admin_activity('DELETE_TOKEN', 'account', sprintf('Eliminazione token %s %s', esc($currentAdmin->firstname), esc($currentAdmin->lastname)), $currentAdmin);
+            /* 1. Recupero il token per leggere last_activity */
+            $tokenSql = "select id, last_activity, token_type from admins_tokens where admin_uuid = ? and id = ?";
+            $tokenRow = $this->db->query($tokenSql, [$currentAdmin->uuid, $posts['id']])->getRow();
 
-	            return ['result' => true, 'message' => sprintf(lang('backend/account.messages.deleteTokenSuccess'), esc($currentAdmin->firstname), esc($currentAdmin->lastname))];
-	        endif;
+            if ($tokenRow):
+                /* 2. Aggiorno il log se è una sessione o cookie */
+                if (in_array($tokenRow->token_type, ['cookie', 'session'])):
+                    $logoutTime = ! empty($tokenRow->last_activity) ? $tokenRow->last_activity : date('Y-m-d H:i:s');
+                    $logUpdateSql = "update admins_logs set logout = ?, logout_reason = 'deleted' where token_id = ?";
+                    $this->db->query($logUpdateSql, [$logoutTime, $tokenRow->id]);
+                endif;
+            endif;
 
-	        return ['result' => false, 'message' => lang('backend/account.messages.deleteTokenError')];
+            /* 3. Elimino fisicamente il token */
+            $sql = "delete from admins_tokens where admin_uuid = ? and id = ?";
+            $this->db->query($sql, [$currentAdmin->uuid, $posts['id']]);
 
-	    } catch(\Throwable $e) {
+            if($this->db->affectedRows() > 0):
+                log_admin_activity('DELETE_TOKEN', 'account', sprintf('Eliminazione token %s %s', esc($currentAdmin->firstname), esc($currentAdmin->lastname)), $currentAdmin);
+                return ['result' => true, 'message' => sprintf(lang('backend/account.messages.deleteTokenSuccess'), esc($currentAdmin->firstname), esc($currentAdmin->lastname))];
+            endif;
 
-	        log_message('error', lang('backend/account.messages.deleteTokenError') . ' - ' . $e);
-	        return ['result' => false, 'message' => lang('backend/account.messages.deleteTokenError')];
+            return ['result' => false, 'message' => lang('backend/account.messages.deleteTokenError')];
 
-	    }
-	}
+        } catch(\Throwable $e) {
+
+            log_message('error', lang('backend/account.messages.deleteTokenError') . ' - ' . $e);
+            return ['result' => false, 'message' => lang('backend/account.messages.deleteTokenError')];
+
+        }
+    }
 
 	public function resetPassword(\stdClass $currentAdmin, \CodeIgniter\HTTP\IncomingRequest $request): array
 	{

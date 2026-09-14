@@ -8,6 +8,8 @@ class ToolsModel extends BackendModel
 {
 	protected array $manageAuditsAllowedFields = ['fromDate', 'toDate']; 
 
+	protected array $manageLogsAllowedFields = ['fromDate', 'toDate']; 
+
 	protected function initModel(): void 
 	{
 		parent::initModel();
@@ -28,21 +30,19 @@ class ToolsModel extends BackendModel
 		];
 	}
 
-	/**
-	 * Recupera l'anno del primo audit registrato nel database.
-	 *
-	 * @return int Anno di partenza o anno corrente se non ci sono record.
-	 */
-	public function getMinAuditYear(): int
+	/* Regole di validazione per i nuovi campi HTML5 */
+	public function validateManageLogsRules(): array
 	{
-		$sql = 'select min(created_at) as min_date from admins_audits';
-		$result  = $this->db->query($sql)->getRow();
-
-		if ( ! empty($result->min_date)):
-			return (int) date('Y', strtotime($result->min_date));
-		endif;
-
-		return (int) date('Y');
+		return [
+			'fromDate' => [
+				'label' => lang('backend/tools.labels.dateFrom'), 
+				'rules' => ['required', 'valid_date[Y-m-d H:i:s]'], 
+			], 
+			'toDate' => [
+				'label' => lang('backend/tools.labels.dateTo'), 
+				'rules' => ['required', 'valid_date[Y-m-d H:i:s]'], 
+			], 
+		];
 	}
 
 	/**
@@ -122,18 +122,96 @@ class ToolsModel extends BackendModel
 			$currentAdmin = service('authorization')->currentAdmin();
 			log_admin_activity('DELETE_AUDITS', 'tools', sprintf(lang('Eliminazione audits dal %s al %s'), $fromLog, $toLog), $currentAdmin);
 
-			return ['result' => true, 'message' => sprintf(lang('backend/tools.messages.deleteSuccess'), $deleted, $fromLog, $toLog)];
+			return ['result' => true, 'message' => sprintf(lang('backend/tools.messages.deleteAuditsSuccess'), $deleted, $fromLog, $toLog)];
 
 		endif;
 
 		return ['result' => false, 'message' => lang('backend/tools.messages.noAuditsDeleted')];
 	}
 
-	/* Recupera l'elenco delle colonne della tabella per il modale di esportazione */
-	public function getAuditColumns(): array
+	/**
+	 * Recupera le statistiche generali degli log (totale, prima e ultima data).
+	 *
+	 * @return array
+	 */
+	public function getLogsStats(): array
 	{
-		return $this->db->getFieldNames('admins_audits');
+		$sql = 'select count(*) as total_logs, min(created_at) as min_date, max(created_at) as max_date from admins_logs';
+
+		$result  = $this->db->query($sql)->getRow();
+		
+		$total = (int) ($result->total_logs ?? 0);
+
+		/* Restituisce le date solo se esistono record nel database */
+		return [
+			'total' => $total,
+			'min_date' => $total > 0 ? $result->min_date : null,
+			'max_date' => $total > 0 ? $result->max_date : null,
+		];
 	}
+
+	/* Prepara e valida le date di inizio e fine intervallo */
+	protected function buildLogDates(array $posts): array|bool
+	{
+		$posts = $this->checkAllowedFields($posts, $this->manageLogsAllowedFields);
+
+		/* Normalizziamo la data e l'ora, lasciando che PHP gestisca i secondi in automatico */
+		$from = $posts['fromDate'];
+		$to = $posts['toDate'];
+
+		/* Controllo logico: la data di inizio non può essere successiva alla fine */
+		if (strtotime($from) > strtotime($to)):
+			return false;
+		endif;
+
+		return ['from' => $from, 'to' => $to];
+	}
+
+	/* Conta gli logs presenti nel range di date indicato */
+	public function countLogsToDelete(array $posts): array|bool
+    {
+        $dates = $this->buildLogDates($posts);
+
+        if ($dates === false):
+            return false;
+        endif;
+
+        $sql = 'select count(*) as total from admins_logs where created_at between ? and ?';
+        $result = $this->db->query($sql, [$dates['from'], $dates['to']])->getRow();
+
+        /* Restituiamo una struttura dati completa al Controller */
+        return ['count' => (int) $result->total, 'from' => $dates['from'], 'to' => $dates['to']];
+    }
+
+    public function deleteLogs(array $posts): array
+    {
+    	$dates = $this->buildLogDates($posts);
+
+    	if ($dates === false):
+    		return ['result' => false, 'message' => lang('backend/tools.messages.startDateAfterEndDate')];
+    	endif;
+
+    	/* Query di eliminazione diretta */
+    	$sql = 'delete from admins_logs where created_at between ? and ?';
+
+    	$this->db->query($sql, [$dates['from'], $dates['to']]);
+
+    	$deleted = $this->db->affectedRows();
+
+    	if ($deleted > 0):
+
+    		$fromLog = convertDate($dates['from'], 'conversational');
+            $toLog = convertDate($dates['to'], 'conversational');
+
+    		$currentAdmin = service('authorization')->currentAdmin();
+    		log_admin_activity('DELETE_LOGS', 'tools', sprintf(lang('Eliminazione logs dal %s al %s'), $fromLog, $toLog), $currentAdmin);
+
+    		return ['result' => true, 'message' => sprintf(lang('backend/tools.messages.deleteLogsSuccess'), $deleted, $fromLog, $toLog)];
+
+    	endif;
+
+    	return ['result' => false, 'message' => lang('backend/tools.messages.noLogsDeleted')];
+    }
 
 	/* Recupera le statistiche di una o di tutte le tabelle del database */
 	public function getTablesStatus(?string $tableName = null): array

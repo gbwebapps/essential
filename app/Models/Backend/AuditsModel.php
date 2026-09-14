@@ -52,7 +52,11 @@ class AuditsModel extends BackendModel
 
     protected array $showAllSearchAllowedDates = ['created_at'];
 
-    protected ?string $getDataQuery = "select id, admin_uuid, username, action, section, details, ip_address, user_agent, created_at from admins_audits where 1 = 1";
+    protected ?string $getDataQuery = "select aa.id, admin_uuid, username, action, section, details, ip_address, user_agent, aa.created_at, superadmin 
+                                       from admins_audits as aa 
+                                       join admins as a 
+                                       on a.uuid = aa.admin_uuid 
+                                       where 1 = 1";
 
     protected ?string $getNumRowsQuery = 'select count(*) as count from admins_audits where 1 = 1';
 
@@ -100,19 +104,19 @@ class AuditsModel extends BackendModel
         return [
             'searchFields.username' => [
                 'label' => lang('backend/admins.labels.username'), 
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\']+$/u]'], 
             ],
             'searchFields.action' => [
                 'label' => lang('backend/admins.labels.action'), 
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\']+$/u]'], 
             ],
             'searchFields.section' => [
                 'label' => lang('backend/admins.labels.section'), 
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\']+$/u]'], 
             ],
             'searchFields.details' => [
                 'label' => lang('backend/admins.labels.details'), 
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\']+$/u]'], 
             ],
             'searchDates.created_at-from' => [
                 'label' => lang('backend/audits.labels.dateFrom'),

@@ -19,15 +19,15 @@ return [
 	'labels' => [
 		'id' => 'ID',
 		'uuid' => 'UUID', 
-		'username' => 'Username', 
+		'username' => 'Nome utente', 
 		'tokenCreate' => 'Data inizio', 
 		'tokenExpire' => 'Data scadenza', 
 		'tokenType' => 'Tipo', 
 		'operatingSystem' => 'Sistema operativo', 
 		'browser' => 'Browser web', 
 		'ipAddress' => 'Indirizzo IP', 
-		'dateFrom' => 'Data inizio partenza', 
-		'dateTo' => 'Data inizio arrivo',
+		'dateFrom' => 'Data inizio', 
+		'dateTo' => 'Data fine',
 		'createdAt' => 'Aggiunto il ', 
 		'session' => 'Sessione', 
 		'activation' => 'Attivazione', 
@@ -44,10 +44,10 @@ return [
 		'actions' => 'Azioni'
 	], 
 	'placeholders' => [
-		'searchUsername' => 'Cerca per username...', 
+		'searchUsername' => 'Cerca per nome utente...', 
 		'searchType' => 'Cerca per tipo...', 
-		'dateFrom' => 'Cerca per data inizio di partenza...', 
-		'dateTo' => 'Cerca per data inizio di arrivo...',
+		'dateFrom' => 'Cerca per data inizio...', 
+		'dateTo' => 'Cerca per data fine...',
 	], 
 	'messages' => [
 		'validationErrors' => 'Errori di validazione.', 

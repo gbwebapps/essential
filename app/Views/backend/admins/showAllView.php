@@ -27,7 +27,7 @@
                             <!-- Bottone Mobile per aprire l'Offcanvas -->
                             <div class="col-12 d-md-none mb-3">
                                 <button class="btn btn-secondary w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#actionsOffcanvas" aria-controls="actionsOffcanvas">
-                                    <i class="fa-solid fa-bars"></i> Opzioni e Filtri
+                                    <i class="fa-solid fa-bars"></i> <?= lang('backend/admins.labels.filtersAndOptions'); ?>
                                 </button>
                             </div>
                             <!-- End Bottone Mobile -->
@@ -36,7 +36,7 @@
                             <div class="col-12 col-md-11 offcanvas-md offcanvas-bottom" tabindex="-1" id="actionsOffcanvas">
                                 <div class="offcanvas-header">
                                     <h5 class="offcanvas-title">
-                                        <i class="fa-solid fa-bars"></i> Opzioni e Filtri
+                                        <i class="fa-solid fa-bars"></i> <?= lang('backend/admins.labels.filtersAndOptions'); ?>
                                     </h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#actionsOffcanvas" aria-label="Close"></button>
                                 </div>

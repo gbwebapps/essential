@@ -67,7 +67,9 @@
                                     <!-- Ciclo i dati -->
                                     <?php foreach($data['records'] as $audit): ?>
 
-                                        <tr class="border-end border-start table-row-60">
+                                        <?php $isSuperadmin = (int) $audit->superadmin === 1; ?>
+
+                                        <tr class="border-end border-start table-row-60<?= $isSuperadmin ? ' table-bg-superadmin' : ''; ?>">
                                             
                                             <!-- Cella chevron -->
                                             <td class="align-middle fw-bold">

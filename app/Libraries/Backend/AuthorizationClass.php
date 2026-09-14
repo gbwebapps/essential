@@ -100,14 +100,28 @@ class AuthorizationClass
         $sql = "select * from admins_tokens where token_hash = ? and token_type = ? limit 1";
         $query = $this->db->query($sql, [$tokenHash, 'session'])->getRow();
 
-        /* Controlla la validità temporale confrontando le stringhe DATETIME */
-        if (isset($query->token_hash) && $query->token_expire > date('Y-m-d H:i:s')):
+        /*
+         * 1. Calcolo del limite di inattività basato su last_activity.
+         * Il token è valido se (last_activity + sessionTime) è nel futuro.
+         */
+        $now = \CodeIgniter\I18n\Time::now();
+        $sessionTimeLimit = (int) setting('Backend\Auth')->sessionTime;
+        $maxActivityTime = isset($query->last_activity) ? \CodeIgniter\I18n\Time::parse($query->last_activity)->addSeconds($sessionTimeLimit) : null;
 
-            /* Aggiorna la scadenza per mantenere la sessione attiva */
-            $newExpire = date('Y-m-d H:i:s', time() + (int) setting('Backend\Auth')->sessionTime);
-            $sqlUpdate = "update admins_tokens set token_expire = ? where token_hash = ? and token_type = ?";
-            $this->db->query($sqlUpdate, [$newExpire, $tokenHash, 'session']);
+        if (isset($query->token_hash) && $maxActivityTime && $now->isBefore($maxActivityTime)):
 
+            /* 
+             * 2. Sliding Expiration & Audit Trail.
+             * Registriamo l'ora esatta di questa interazione (last_activity) e posticipiamo
+             * la scadenza assoluta del token.
+             */
+            $currentTimeStr = $now->format('Y-m-d H:i:s');
+            $newExpireStr   = $now->addSeconds($sessionTimeLimit)->format('Y-m-d H:i:s');
+            
+            $sqlUpdate = "update admins_tokens set last_activity = ?, token_expire = ? where token_hash = ? and token_type = ?";
+            $this->db->query($sqlUpdate, [$currentTimeStr, $newExpireStr, $tokenHash, 'session']);
+
+            /* 3. Risoluzione dell'identità */
             $data = $this->getAdmin($query->admin_uuid);
             if ($data):
                 return $data;
@@ -149,12 +163,27 @@ class AuthorizationClass
         $sql = "select * from admins_tokens where token_hash = ? and token_type = ? limit 1";
         $query = $this->db->query($sql, [$tokenHash, 'cookie'])->getRow();
 
-        /* Anche qui il confronto avviene in formato DATETIME */
-        if (isset($query->token_hash) && $query->token_expire > date('Y-m-d H:i:s')):
+        /* 1. Controllo di validità assoluta (il RememberMe ha una data di "morte" rigida) */
+        $now = \CodeIgniter\I18n\Time::now();
+        $expireTime = isset($query->token_expire) ? \CodeIgniter\I18n\Time::parse($query->token_expire) : null;
+
+        if (isset($query->token_hash) && $expireTime && $now->isBefore($expireTime)):
+            
+            /* 
+             * 2. Audit Trail (Tracking).
+             * Aggiorniamo in tempo reale solo l'ultima attività nota dell'amministratore,
+             * senza alterare la scadenza assoluta del token persistente.
+             */
+            $currentTimeStr = $now->format('Y-m-d H:i:s');
+            $sqlUpdate = "update admins_tokens set last_activity = ? where token_hash = ? and token_type = ?";
+            $this->db->query($sqlUpdate, [$currentTimeStr, $tokenHash, 'cookie']);
+
+            /* 3. Risoluzione dell'identità */
             $data = $this->getAdmin($query->admin_uuid);
             if ($data):
                 return $data;
             endif;
+            
         endif;
 
         return null;

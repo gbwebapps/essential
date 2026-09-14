@@ -19,12 +19,17 @@ export class ToolsManager {
                 validate: 'backend/tools/validateAuditsDateRequest',
                 delete: 'backend/tools/deleteAudits'
             },
+            manageLogs: {
+                validate: 'backend/tools/validateLogsDateRequest',
+                delete: 'backend/tools/deleteLogs'
+            },
             dbMaintenance: 'backend/tools/optimizeTable',
             backups: 'backend/tools/backups',
             cleanSpace: 'backend/tools/cleanFolder'
         };
 
-        this.datePickers = { from: null, to: null };
+        this.datePickers = {};
+        this.requireDatePickers = ['manageAudits', 'manageLogs'];
 
         this.init();
     }
@@ -40,21 +45,26 @@ export class ToolsManager {
 
         /* 1. Gestione Click Pulsante Azione (Delete) con pre-validazione */
         document.addEventListener('click', async e => {
-            const actionBtn = e.target.closest('.btn-action-audits');
+
+            const actionBtn = e.target.closest('.btn-action-audits, .btn-action-logs');
+
             if (actionBtn) {
                 e.preventDefault();
 
                 const form = actionBtn.closest('form');
                 const actionType = actionBtn.dataset.action;
                 
-                if ( ! form || !this.routes.manageAudits[actionType]) return;
+                /* Determina dinamicamente l'ambiente (audits o logs) */
+                const env = actionBtn.classList.contains('btn-action-audits') ? 'manageAudits' : 'manageLogs';
+                
+                if ( ! form || !this.routes[env][actionType]) return;
 
                 /* Pulisce i messaggi di errore precedenti */
                 form.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
 
                 /* Esegue la pre-validazione invisibile */
                 const formData = new FormData(form);
-                const validateUrl = urlbase + this.routes.manageAudits.validate;
+                const validateUrl = urlbase + this.routes[env].validate;
 
                 try {
                     const response = await apiFetch(validateUrl, { method: 'POST', body: formData });
@@ -75,7 +85,7 @@ export class ToolsManager {
 
                     /* Se i dati sono corretti, procede con l'azione specifica */
                     if (data.result === true) {
-                        const actionUrl = urlbase + this.routes.manageAudits[actionType];
+                        const actionUrl = urlbase + this.routes[env][actionType];
 
                         /* Flusso Delete: controlla il conteggio, mostra il modale, poi esegue */
                         if (actionType === 'delete') {
@@ -85,7 +95,8 @@ export class ToolsManager {
                                 if (data.noDataMessage && typeof showAlert === 'function') {
                                     showAlert('info', data.noDataMessage);
                                 }
-                                await this.reset('manageAudits');
+                                /* Usa l'env dinamico per il reset */
+                                await this.reset(env);
                                 return;
                             }
 
@@ -96,7 +107,8 @@ export class ToolsManager {
                                 if ( ! ok) return;
                             }
                             
-                            await this.executeAction(form, actionUrl, 'manageAudits');
+                            /* Usa l'env dinamico per l'esecuzione */
+                            await this.executeAction(form, actionUrl, env);
                         }
                     }
                 } catch (error) {
@@ -309,18 +321,32 @@ export class ToolsManager {
     }
 
     /* Distrugge le istanze di Flatpickr per liberare memoria e DOM */
-    destroyDatePickers() {
-        if (this.datePickers.from) this.datePickers.from.destroy();
-        if (this.datePickers.to) this.datePickers.to.destroy();
-        this.datePickers = { from: null, to: null };
+    destroyDatePickers(env) {
+        if (this.datePickers[env]) {
+            if (this.datePickers[env].from && typeof this.datePickers[env].from.destroy === 'function') {
+                this.datePickers[env].from.destroy();
+            }
+            if (this.datePickers[env].to && typeof this.datePickers[env].to.destroy === 'function') {
+                this.datePickers[env].to.destroy();
+            }
+            delete this.datePickers[env];
+        }
     }
 
     /* Inizializza Flatpickr solo se l'ambiente lo richiede */
     initDatePickers(env) {
-        if (env === 'manageAudits') {
-            const { pickerFrom, pickerTo } = initRangeDatePicker('#wrapper-audits-created_at-from', '#wrapper-audits-created_at-to');
-            this.datePickers.from = pickerFrom;
-            this.datePickers.to = pickerTo;
+        if (this.requireDatePickers.includes(env)) {
+            
+            /* Trasforma 'manageAudits' in 'audits' per matchare l'HTML */
+            const prefix = env.replace('manage', '').toLowerCase();
+
+            const { pickerFrom, pickerTo } = initRangeDatePicker(
+                `#wrapper-${prefix}-created_at-from`, 
+                `#wrapper-${prefix}-created_at-to`
+            );
+            
+            /* Salva nello stato isolato */
+            this.datePickers[env] = { from: pickerFrom, to: pickerTo };
         }
     }
 
@@ -341,8 +367,9 @@ export class ToolsManager {
 
             if (data.result === true && data.output) {
 
-                if (env === 'manageAudits') {
-                    this.destroyDatePickers();
+                /* Verifica dinamica per la distruzione dei calendari */
+                if (this.requireDatePickers.includes(env)) {
+                    this.destroyDatePickers(env);
                 }
 
                 await smoothReplace(container, data.output);
@@ -378,8 +405,10 @@ export class ToolsManager {
         const container = document.getElementById(containerId);
         if (container) {
             
-            if (containerId === 'manageAudits-tools-container') {
-                this.destroyDatePickers();
+            /* Estrapola l'ambiente dal containerId e distrugge i calendari se necessario */
+            const env = containerId.replace('-tools-container', '');
+            if (this.requireDatePickers.includes(env)) {
+                this.destroyDatePickers(env);
             }
 
             smoothReplace(container, '');

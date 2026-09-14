@@ -74,6 +74,7 @@ return [
         'deleted' => 'Eliminato', 
         'removeVerb' => 'rimuovere', 
         'assignVerb' => 'assegnare', 
+        'filtersAndOptions' => 'Opzioni e Filtri', 
 	],
 	'placeholders' => [
 		'firstname' => 'Inserisci nome...', 

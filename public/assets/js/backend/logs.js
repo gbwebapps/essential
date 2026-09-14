@@ -13,13 +13,22 @@ const actions = {
             controller: 'logs',
             url: urlbase + 'backend/logs',
             containerId: 'index-logs-container',
-            searchFields: ['email', 'log_type'],
-            searchDates: ['log_create']
+            searchFields: ['username', 'logout_reason'],
+            searchDates: ['login']
         });
         logsManager.init();
 
         /* 2. Attiviamo Flatpickr sui wrapper (leggerà i valori appena inseriti dal manager) */
-        const { pickerFrom, pickerTo } = initRangeDatePicker('#wrapper-logs-log_create-from', '#wrapper-logs-log_create-to');
+        const { pickerFrom, pickerTo } = initRangeDatePicker('#wrapper-logs-login-from', '#wrapper-logs-login-to');
+
+        const deleteManager = new DeleteManager({
+            controller: 'logs',
+            urls: {
+                hardDelete: urlbase + 'backend/logs/hardDelete'
+            },
+            listManager: logsManager
+        });
+        deleteManager.init();
 
         const exportManager = new ExportCsvManager({ controller: 'logs' });
         exportManager.init();

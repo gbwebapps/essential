@@ -75,14 +75,28 @@
 
                         </div>
                         
-                        <!-- Azione (Elimina) -->
+                        <!-- Azione (Elimina o Badge Sessione Corrente) -->
                         <div class="col-12 col-lg-auto mt-3 mt-lg-0 text-start text-lg-end">
-                            <form class="deleteToken d-grid d-lg-block" data-message="<?= sprintf(lang('backend/account.messages.areYouSureDeleteToken'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)); ?>">
-                                <input type="hidden" name="id" value="<?= esc($token->id); ?>">
-                                <button type="submit" class="btn btn-danger btn-sm shadow-none">
-                                    <i class="fa-solid fa-trash me-1"></i> <?= lang('backend/account.buttons.delete'); ?>
-                                </button>
-                            </form>
+                            
+                            <?php if (isset($currentTokenId) && $currentTokenId === (int) $token->id): ?>
+                                
+                                <!-- Segnaposto per la sessione in corso: non eliminabile -->
+                                <span class="badge bg-success py-2 px-3 shadow-sm">
+                                    <i class="fa-solid fa-desktop me-1"></i> <?= lang('backend/account.labels.currentDevice'); ?>
+                                </span>
+                                
+                            <?php else: ?>
+                                
+                                <!-- Form per eliminare tutti gli ALTRI tokens -->
+                                <form class="deleteToken d-grid d-lg-block" data-message="<?= sprintf(lang('backend/account.messages.areYouSureDeleteToken'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)); ?>">
+                                    <input type="hidden" name="id" value="<?= esc($token->id); ?>">
+                                    <button type="submit" class="btn btn-danger btn-sm shadow-none">
+                                        <i class="fa-solid fa-trash me-1"></i> <?= lang('backend/account.buttons.delete'); ?>
+                                    </button>
+                                </form>
+                                
+                            <?php endif; ?>
+
                         </div>
                         
                     </div>

@@ -110,8 +110,27 @@ class LogsController extends BackendController
         $this->data['action'] = 'index';
         
         $this->data['title'] = lang('backend/logs.titles.index');
-        $this->data['icon'] = '<i class="fa-solid fa-solid fa-user-clock"></i>';
+        $this->data['icon'] = '<i class="fa-solid fa-user-clock"></i>';
 
         return $this->render('backend/logs/indexView', $this->data);
+    }
+
+    public function hardDelete(): string|ResponseInterface
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            $posts = $this->request->getPost();
+            $rules = ['tokenId' => 'required|is_natural_no_zero'];
+
+            if ( ! $this->validateData($posts, $rules)):
+                $errorMessage = implode('<br>', $this->validator->getErrors());
+                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/logs.messages.validationToastErrors'), $errorMessage)]);
+            endif;
+
+            $json = $this->logsModel->deleteToken((int) $posts['tokenId']);
+
+            return $this->jsonResponse($json);
+
+        endif;
     }
 }

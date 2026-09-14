@@ -121,6 +121,9 @@ $routes->group('backend', function($routes) {
             $routes->post('deleteAudits', '\App\Controllers\Backend\ToolsController::deleteAudits');
             $routes->post('validateAuditsDateRequest', '\App\Controllers\Backend\ToolsController::validateAuditsDateRequest');
 
+            $routes->post('deleteLogs', '\App\Controllers\Backend\ToolsController::deleteLogs');
+            $routes->post('validateLogsDateRequest', '\App\Controllers\Backend\ToolsController::validateLogsDateRequest');
+
             $routes->get('dbMaintenance', '\App\Controllers\Backend\ToolsController::dbMaintenance');
             $routes->post('optimizeTable', '\App\Controllers\Backend\ToolsController::optimizeTable');
 
@@ -160,6 +163,7 @@ $routes->group('backend', function($routes) {
         /* LOGS */
         $routes->group('logs', function($routes) {
             $routes->match(['GET', 'POST'], '/', '\App\Controllers\Backend\LogsController::index');
+            $routes->post('hardDelete', '\App\Controllers\Backend\LogsController::hardDelete');
         });
 
         /* ADMINS */

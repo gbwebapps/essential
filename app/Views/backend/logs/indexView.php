@@ -79,30 +79,30 @@
                     <div id="search-bar" class="collapse">
                         <div class="row card-body">
 
-                            <!-- Ricerca avanzata per email -->
+                            <!-- Ricerca avanzata per username -->
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
-                                    <label for="logs-email"><?= lang('backend/logs.labels.username'); ?></label>
+                                    <label for="logs-username"><?= lang('backend/logs.labels.username'); ?></label>
                                     <div class="input-group">
-                                        <input type="text" id="logs-email" class="form-control" placeholder="<?= lang('backend/logs.placeholders.searchUsername'); ?>" autocomplete="off">
+                                        <input type="text" id="logs-username" class="form-control" placeholder="<?= lang('backend/logs.placeholders.searchUsername'); ?>" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
-                                    <div class="error_email text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div class="error_username text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
-                            <!-- End Ricerca avanzata per email -->
+                            <!-- End Ricerca avanzata per username -->
 
                             <!-- Ricerca avanzata per data da -->
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
                                     <!-- Campo Data Da -->
-                                    <label for="logs-log_create-from"><?= lang('backend/logs.labels.dateFrom'); ?></label>
-                                    <div id="wrapper-logs-log_create-from" class="input-group">
-                                        <input type="text" id="logs-log_create-from" data-input class="form-control" placeholder="<?= lang('backend/logs.placeholders.dateFrom'); ?>" autocomplete="off">
+                                    <label for="logs-login-from"><?= lang('backend/logs.labels.dateFrom'); ?></label>
+                                    <div id="wrapper-logs-login-from" class="input-group">
+                                        <input type="text" id="logs-login-from" data-input class="form-control" placeholder="<?= lang('backend/logs.placeholders.dateFrom'); ?>" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <div class="error_log_create-from text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div class="error_login-from text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End ricerca avanzata per data da -->
@@ -111,16 +111,36 @@
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
                                     <!-- Campo Data A -->
-                                    <label for="logs-log_create-to"><?= lang('backend/logs.labels.dateTo'); ?></label>
-                                    <div id="wrapper-logs-log_create-to" class="input-group">
-                                        <input type="text" id="logs-log_create-to" data-input class="form-control" placeholder="<?= lang('backend/logs.placeholders.dateTo'); ?>" autocomplete="off">
+                                    <label for="logs-login-to"><?= lang('backend/logs.labels.dateTo'); ?></label>
+                                    <div id="wrapper-logs-login-to" class="input-group">
+                                        <input type="text" id="logs-login-to" data-input class="form-control" placeholder="<?= lang('backend/logs.placeholders.dateTo'); ?>" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <div class="error_created_at-to text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div class="error_login-to text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End ricerca avanzata per data a -->
+
+                            <!-- Ricerca avanzata per logout_reason -->
+                            <div class="col-md-3">
+                                <div class="mb-2 mb-md-0">
+                                    <label for="logs-logout_reason"><?= lang('backend/logs.labels.logoutReason'); ?></label>
+                                    <div class="input-group">
+                                        <select id="logs-logout_reason" class="form-select">
+                                            <!-- Option che funge da placeholder -->
+                                            <option value="" disabled selected hidden><?= lang('backend/logs.placeholders.searchLogoutReason'); ?></option>
+                                            <option value="manual"><?= lang('backend/logs.labels.manual'); ?></option>
+                                            <option value="timeout"><?= lang('backend/logs.labels.timeout'); ?></option>
+                                            <option value="banned"><?= lang('backend/logs.labels.banned'); ?></option>
+                                            <option value="deleted"><?= lang('backend/logs.labels.deleted'); ?></option>
+                                        </select>
+                                        <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
+                                    </div>
+                                    <div class="error_logout_reason text-danger fw-bold small pt-1">&nbsp;</div>
+                                </div>
+                            </div>
+                            <!-- End Ricerca avanzata per logout_reason -->
 
                         </div>
                     </div>

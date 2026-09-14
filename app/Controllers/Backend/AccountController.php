@@ -246,19 +246,18 @@ class AccountController extends BackendController
     {
         $this->data['userAgent'] = new UserAgent();
         $this->data['tokens'] = $this->accountModel->getTokens($this->currentAdmin->uuid);
+        
+        /* Delega totale al Model per recuperare l'ID della sessione in uso */
+        $this->data['currentTokenId'] = $this->accountModel->getCurrentTokenId();
 
-        /* Se la richiesta è AJAX e in POST, gestiamo il rinfresco asincrono */
         if ($this->request->isAJAX() && $this->request->is('post')):
-
             return $this->jsonResponse([
                 'result' => true,
                 'output' => view('backend/account/partials/tokens/tokensPartial', $this->data)
             ]);
-
         endif;
 
         $this->data['action'] = 'tokens';
-
         return $this->render('backend/account/tokensView', $this->data);
     }
 
@@ -276,28 +275,25 @@ class AccountController extends BackendController
 
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                
                 return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/account.messages.validateToastErrors'), $errorMessage)]);
             endif;
 
-            $result = $this->accountModel->deleteToken($posts, $this->currentAdmin);
+            /* Delega totale al Model per l'ID corrente, poi lo passa per lo sbarramento */
+            $currentTokenId = $this->accountModel->getCurrentTokenId();
+            $result = $this->accountModel->deleteToken($posts, $this->currentAdmin, $currentTokenId);
 
             if($result['result'] === true):
-
                 $this->data['userAgent'] = new UserAgent();
                 $this->data['tokens'] = $this->accountModel->getTokens($this->currentAdmin->uuid);
+                $this->data['currentTokenId'] = $currentTokenId;
 
                 $json = ['result' => true, 'message' => $result['message']];
                 $json['output'] = view('backend/account/partials/tokens/tokensPartial', $this->data);
-
             else:
-
                 $json = ['result' => false, 'message' => $result['message']];
-
             endif;
 
             return $this->jsonResponse($json);
-
         endif;
     }
 

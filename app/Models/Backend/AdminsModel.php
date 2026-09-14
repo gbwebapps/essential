@@ -1563,7 +1563,20 @@ class AdminsModel extends BackendModel
                 return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
             endif;
 
-            /* Query per eliminare il token */
+            /* 1. Recupero il token per leggere last_activity */
+            $tokenSql = "select id, last_activity, token_type from admins_tokens where admin_uuid = ? and id = ?";
+            $tokenRow = $this->db->query($tokenSql, [$posts['uuid'], $posts['id']])->getRow();
+
+            if ($tokenRow):
+                /* 2. Aggiorno il log registrando la forzatura (banned) */
+                if (in_array($tokenRow->token_type, ['cookie', 'session'])):
+                    $logoutTime = ! empty($tokenRow->last_activity) ? $tokenRow->last_activity : date('Y-m-d H:i:s');
+                    $logUpdateSql = "update admins_logs set logout = ?, logout_reason = 'banned' where token_id = ?";
+                    $this->db->query($logUpdateSql, [$logoutTime, $tokenRow->id]);
+                endif;
+            endif;
+
+            /* 3. Elimino fisicamente il token */
             $sql = "delete from admins_tokens where admin_uuid = ? and id = ?";
             $this->db->query($sql, [$posts['uuid'], $posts['id']]);
 

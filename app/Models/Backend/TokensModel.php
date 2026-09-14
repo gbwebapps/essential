@@ -54,7 +54,7 @@ class TokensModel extends BackendModel
 
     protected array $showAllSearchAllowedDates = ['token_create'];
 
-    protected ?string $getDataQuery = "select at.*, a.uuid, a.firstname, a.lastname, a.email from admins_tokens as at join admins as a on a.uuid = at.admin_uuid where 1 = 1";
+    protected ?string $getDataQuery = "select at.*, a.uuid, a.firstname, a.lastname, a.email, a.superadmin from admins_tokens as at join admins as a on a.uuid = at.admin_uuid where 1 = 1";
 
     protected ?string $getNumRowsQuery = "select count(*) as count from admins_tokens as at join admins as a on a.uuid = at.admin_uuid where 1 = 1";
 
@@ -104,11 +104,11 @@ class TokensModel extends BackendModel
         return [
             'searchFields.email' => [
                 'label' => lang('backend/tokens.labels.username'), 
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\']+$/u]'], 
             ],
             'searchFields.token_type' => [
                 'label' => lang('backend/tokens.labels.token_type'), 
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\' ]+$/u]'], 
+                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\']+$/u]'], 
             ],
             'searchDates.token_create-from' => [
                 'label' => lang('backend/tokens.labels.dateFrom'),
@@ -167,7 +167,20 @@ class TokensModel extends BackendModel
                 return ['result'  => false, 'message' => lang('backend/tokens.messages.protectedAdmin')];
             endif;
 
-            /* Query per eliminare il token */
+            /* 1. Recupero il token per leggere last_activity */
+            $tokenSql = "select id, last_activity, token_type from admins_tokens where admin_uuid = ? and id = ?";
+            $tokenRow = $this->db->query($tokenSql, [$posts['uuid'], $posts['id']])->getRow();
+
+            if ($tokenRow):
+                /* 2. Aggiorno il log registrando la forzatura (banned) */
+                if (in_array($tokenRow->token_type, ['cookie', 'session'])):
+                    $logoutTime = ! empty($tokenRow->last_activity) ? $tokenRow->last_activity : date('Y-m-d H:i:s');
+                    $logUpdateSql = "update admins_logs set logout = ?, logout_reason = 'banned' where token_id = ?";
+                    $this->db->query($logUpdateSql, [$logoutTime, $tokenRow->id]);
+                endif;
+            endif;
+
+            /* 3. Elimino fisicamente il token */
             $sql = "delete from admins_tokens where admin_uuid = ? and id = ?";
             $this->db->query($sql, [$posts['uuid'], $posts['id']]);
 

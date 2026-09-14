@@ -46,8 +46,8 @@ return [
 	'placeholders' => [
 		'searchUsername' => 'Search by username...', 
 		'searchType' => 'Search by type...', 
-		'dateFrom' => 'Search by start date (from)...', 
-		'dateTo' => 'Search by start date (to)...',
+		'dateFrom' => 'Search by start date...', 
+		'dateTo' => 'Search by start date...',
 	], 
 	'messages' => [
 		'validationErrors' => 'Validation errors.', 

@@ -10,7 +10,7 @@ return [
 	],
 	'labels' => [
 		'email' => 'Email', 
-		'username' => 'Username', 
+		'username' => 'Nome utente', 
 		'password' => 'Password', 
 		'rememberMe' => 'Ricordami', 
 		'newPassword' => 'Inserisci password', 

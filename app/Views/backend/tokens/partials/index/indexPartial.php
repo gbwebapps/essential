@@ -89,9 +89,11 @@
 
                                             /* Assegnazione con fallback automatico se la chiave non esiste */
                                             $tokenType = $typeMap[$token->token_type] ?? lang('backend/tokens.labels.unknown');
+
+                                            $isSuperadmin = (int) $token->superadmin === 1;
                                         ?>
 
-                                        <tr class="border-end border-start table-row-60">
+                                        <tr class="border-end border-start table-row-60<?= $isSuperadmin ? ' table-bg-superadmin' : ''; ?>">
                                             <!-- Cella chevron -->
                                             <td class="align-middle fw-bold">
                                                 <button class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 text-secondary shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($token->id); ?>" aria-expanded="false" title="Mostra dettagli di sistema">
@@ -125,20 +127,24 @@
                                             </td>
 
                                             <!-- Cella actions -->
-                                            <td class="align-middle text-start">
+                                            <td class="align-middle text-center text-md-end">
 
-                                                <div class="d-flex flex-column gap-1">
+                                                <?php if( ! $isSuperadmin): ?>
 
-                                                    <!-- Pulsante Elimina Definitivamente (Hard Delete) -->
-                                                    <form class="hardDeleteRecord m-0 p-0" data-message="<?= sprintf(lang('backend/tokens.messages.areYouSureHardDelete'), esc($token->firstname), esc($token->lastname)); ?>">
-                                                        <input type="hidden" name="uuid" value="<?= esc($token->uuid); ?>">
-                                                        <input type="hidden" name="id" value="<?= esc($token->id); ?>">
-                                                        <button type="submit" class="btn btn-link p-0 m-0 text-danger text-decoration-none action shadow-none">
-                                                            <i class="fa-solid fa-xmark fa-fw"></i> <?= lang('backend/tokens.actions.hardDelete'); ?>
-                                                        </button>
-                                                    </form>
+                                                    <div class="d-flex flex-column gap-1">
 
-                                                </div>
+                                                        <!-- Pulsante Elimina Definitivamente (Hard Delete) -->
+                                                        <form class="hardDeleteRecord m-0 p-0" data-message="<?= sprintf(lang('backend/tokens.messages.areYouSureHardDelete'), esc($token->firstname), esc($token->lastname)); ?>">
+                                                            <input type="hidden" name="uuid" value="<?= esc($token->uuid); ?>">
+                                                            <input type="hidden" name="id" value="<?= esc($token->id); ?>">
+                                                            <button type="submit" class="btn btn-link p-0 m-0 text-danger text-decoration-none action shadow-none">
+                                                                <i class="fa-solid fa-xmark fa-fw"></i> <?= lang('backend/tokens.actions.hardDelete'); ?>
+                                                            </button>
+                                                        </form>
+
+                                                    </div>
+
+                                                <?php endif; ?>
 
                                             </td>
                                         </tr>

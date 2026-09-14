@@ -48,6 +48,7 @@ return [
         'totpSecretKey'      => 'Secret Key (manual configuration)',
 		'enterOtpCode' => 'Enter the 6-digit code',
 		'rememberMe' => 'Remember Me', 
+		'currentDevice' => 'Current session',
 	], 
 	'placeholders' => [
 		'firstname' => 'Enter first name...', 
@@ -93,6 +94,7 @@ return [
 		'missingCode' => 'Please enter the code.', 
 		'totpActivationNotPossible' => 'Unable to activate TOTP authentication.', 
 		'totpConfigurationSuccess' => 'The authenticator app was configured successfully.', 
-		'areYouSureChangeMethod' => 'Are you sure you want to change the two-factor authentication method?'
+		'areYouSureChangeMethod' => 'Are you sure you want to change the two-factor authentication method?', 
+		'cannotDeleteCurrentToken' => 'Cannot delete the current session.',
 	]
 ];

@@ -329,6 +329,7 @@ class AuthModel extends BackendModel
 
         /* Generazione delle stringhe DATETIME corrette per admins_tokens */
         $tokenCreate = date('Y-m-d H:i:s');
+        $lastActivity = date('Y-m-d H:i:s');
         $tokenExpire = date('Y-m-d H:i:s', time() + $time);
 
         /* 3. Pulizia dei vecchi token di tipo sessione se applicabile */
@@ -341,11 +342,12 @@ class AuthModel extends BackendModel
         $userAgent = $request->getUserAgent()->getAgentString();
         $ip_address = $request->getIPAddress();
 
-        $sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, token_expire, token_type, user_agent, ip_address, created_at) values(?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, last_activity, token_expire, token_type, user_agent, ip_address, created_at) values(?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $this->db->query($sql, [
             $admin->uuid,
             $tokenHash,
             $tokenCreate,
+            $lastActivity, 
             $tokenExpire,
             $tokenType,
             $userAgent,
@@ -353,8 +355,11 @@ class AuthModel extends BackendModel
             date('Y-m-d H:i:s')
         ]);
 
-        $sql = "insert into admins_logs (admin_uuid, username, login, log_type, user_agent, ip_address, created_at) values (?, ?, ?, ?, ?, ?, ?)";
+        $token_id = $this->db->insertID();
+
+        $sql = "insert into admins_logs (token_id, admin_uuid, username, login, token_type, user_agent, ip_address, created_at) values (?, ?, ?, ?, ?, ?, ?, ?)";
         $this->db->query($sql, [
+            $token_id, 
             $admin->uuid,
             $admin->email, /* Disponibile grazie alla SELECT in login() */
             date('Y-m-d H:i:s'),
@@ -750,25 +755,44 @@ class AuthModel extends BackendModel
      */
     public function logoutBySession(string $reason = 'manual'): void
     {
-        try 
-        {
+        try {
             if (session()->has('backendSession')):
                 
                 $sessionValue = session()->get('backendSession');
                 $token = new \App\Libraries\Token($sessionValue);
                 $tokenHash = $token->getHash($this->config->hashKey);
 
-                $sql = "delete from admins_tokens where token_hash = ? and token_type = ?";
-                $this->db->query($sql, [$tokenHash, 'session']);
-
-                /* AGGIORNAMENTO LOG: Utilizza la variabile $reason */
                 if (session()->has('login_log_id')):
                     $logId = session()->get('login_log_id');
-                    $sqlLog = "update admins_logs set logout = ?, logout_reason = ? where id = ?";
-                    $this->db->query($sqlLog, [date('Y-m-d H:i:s'), $reason, $logId]);
+
+                    /* 1. Guard Clause: Verifico lo stato attuale del log */
+                    $sqlLogCheck = "select logout_reason from admins_logs where id = ?";
+                    $logRow = $this->db->query($sqlLogCheck, [$logId])->getRow();
+
+                    /* 2. Se il log è aperto (null), procedo alla chiusura formale */
+                    if ($logRow && is_null($logRow->logout_reason)):
+
+                        /* Leggo last_activity PRIMA di eliminare il token */
+                        $sqlSelect = "select last_activity from admins_tokens where token_hash = ? and token_type = ?";
+                        $tokenRow = $this->db->query($sqlSelect, [$tokenHash, 'session'])->getRow();
+                        
+                        $logoutTime = ($tokenRow && $reason === 'timeout' && ! empty($tokenRow->last_activity)) ? $tokenRow->last_activity : date('Y-m-d H:i:s');
+
+                        /* 3. Scrivo la disconnessione nel log */
+                        $sqlLogUpdate = "update admins_logs set logout = ?, logout_reason = ? where id = ?";
+                        $this->db->query($sqlLogUpdate, [$logoutTime, $reason, $logId]);
+
+                    endif;
+
+                    /* Rimuovo il tracciante locale a prescindere dall'esito */
                     session()->remove('login_log_id');
                 endif;
 
+                /* 4. Elimino fisicamente il token (se non è già stato eliminato da altri) */
+                $sqlDelete = "delete from admins_tokens where token_hash = ? and token_type = ?";
+                $this->db->query($sqlDelete, [$tokenHash, 'session']);
+
+                /* 5. Distruzione sessione locale */
                 session()->remove('backendSession');
                 session()->regenerate(true);
 
@@ -790,28 +814,39 @@ class AuthModel extends BackendModel
      */
     public function logoutByCookie(string $cookieValue, string $reason = 'manual'): void
     {
-        try 
-        {
-            $decryptedValue = service('crypto')->decrypt($cookieValue);
+        try {
+            $token = new \App\Libraries\Token($cookieValue);
+            $tokenHash = $token->getHash($this->config->hashKey);
 
-            if ($decryptedValue):
-                $token = new \App\Libraries\Token($decryptedValue);
-                $tokenHash = $token->getHash($this->config->hashKey);
+            if (session()->has('login_log_id')):
+                $logId = session()->get('login_log_id');
 
-                $sql = "delete from admins_tokens where token_hash = ? and token_type = ?";
-                $this->db->query($sql, [$tokenHash, 'cookie']);
-                
-                /* AGGIORNAMENTO LOG: Utilizza la variabile $reason */
-                if (session()->has('login_log_id')):
-                    $logId = session()->get('login_log_id');
-                    $sqlLog = "update admins_logs set logout = ?, logout_reason = ? where id = ?";
-                    $this->db->query($sqlLog, [date('Y-m-d H:i:s'), $reason, $logId]);
-                    session()->remove('login_log_id');
+                /* 1. Guard Clause: Verifico lo stato attuale del log */
+                $sqlLogCheck = "select logout_reason from admins_logs where id = ?";
+                $logRow = $this->db->query($sqlLogCheck, [$logId])->getRow();
+
+                /* 2. Se il log è aperto (null), procedo alla chiusura formale */
+                if ($logRow && is_null($logRow->logout_reason)):
+
+                        /* Leggo last_activity PRIMA di eliminare il token */
+                        $sqlSelect = "select last_activity from admins_tokens where token_hash = ? and token_type = ?";
+                        $tokenRow = $this->db->query($sqlSelect, [$tokenHash, 'cookie'])->getRow();
+                        
+                        $logoutTime = ($tokenRow && $reason === 'timeout' && ! empty($tokenRow->last_activity)) ? $tokenRow->last_activity : date('Y-m-d H:i:s');
+
+                        /* 3. Scrivo la disconnessione nel log */
+                        $sqlLogUpdate = "update admins_logs set logout = ?, logout_reason = ? where id = ?";
+                        $this->db->query($sqlLogUpdate, [$logoutTime, $reason, $logId]);
+
                 endif;
+
+                /* Rimuovo il tracciante locale a prescindere dall'esito */
+                session()->remove('login_log_id');
             endif;
 
-            delete_cookie('backendRememberMe');
-            session()->regenerate(true);
+            /* 4. Elimino fisicamente il token (se non è già stato eliminato da altri) */
+            $sqlDelete = "delete from admins_tokens where token_hash = ? and token_type = ?";
+            $this->db->query($sqlDelete, [$tokenHash, 'cookie']);
 
         } catch (\Throwable $e) {
             log_message('error', lang('backend/auth.messages.logoutCookieError') . ' - ' . $e);

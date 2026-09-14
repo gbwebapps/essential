@@ -37,7 +37,7 @@ class ToolsController extends BackendController
      *
      * @var array
      */
-    protected array $allowedEnvs = ['system', 'manageAudits', 'dbMaintenance', 'backups', 'cleanSpace'];
+    protected array $allowedEnvs = ['system', 'manageAudits', 'dbMaintenance', 'backups', 'cleanSpace', 'manageLogs'];
 
     /**
      * Inizializza il controller impostando il contesto operativo e istanziando modello e libreria specifici.
@@ -88,9 +88,9 @@ class ToolsController extends BackendController
 
             /* Ottimizzazione: uso di if / elseif per evitare controlli a vuoto */
             if ($env === 'manageAudits'):
-                $this->data['minAuditYear'] = $this->toolsModel->getMinAuditYear();
                 $this->data['stats'] = $this->toolsModel->getAuditsStats(); 
-                $this->data['columns'] = $this->toolsModel->getAuditColumns();
+            elseif ($env === 'manageLogs'):
+                $this->data['stats'] = $this->toolsModel->getLogsStats(); 
             elseif ($env === 'dbMaintenance'):
                 $this->data['database'] = $this->toolsModel->getDatabase();
                 $this->data['tables'] = $this->toolsModel->getTablesStatus();
@@ -133,7 +133,7 @@ class ToolsController extends BackendController
             $to = convertDate($auditData['to'], 'conversational');
 
             /* Iniezione dinamica dei parametri: 1° %s (da), 2° %s (a), 3° %d (totale) */
-            $confirmMessage = sprintf(lang('backend/tools.messages.areYouSureToDeleteData'), $from, $to, $auditData['count']);
+            $confirmMessage = sprintf(lang('backend/tools.messages.areYouSureToDeleteAudits'), $from, $to, $auditData['count']);
 
             $json = ['result' => true, 'count' => $auditData['count'], 'confirmMessage' => $confirmMessage];
             
@@ -161,6 +161,66 @@ class ToolsController extends BackendController
             endif;
 
             $json = $this->toolsModel->deleteAudits($posts);
+
+            return $this->jsonResponse($json);
+
+        endif;
+    }
+
+    /**
+     * Esegue la validazione preventiva delle date prima di aprire modali o eseguire azioni.
+     */
+    public function validateLogsDateRequest(): ResponseInterface
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            $posts = $this->request->getPost();
+            $rules = $this->toolsModel->validateManageLogsRules();
+
+            if ( ! $this->validateData($posts, $rules)):
+                return $this->jsonResponse(['errors' => $this->validator->getErrors(), 'message' => lang('backend/tools.messages.validationErrors')]);
+            endif;
+
+            /* Esecuzione query preventiva e recupero del payload (conteggio e date) */
+            $logData = $this->toolsModel->countLogsToDelete($posts);
+
+            if ($logData === false):
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/tools.messages.startDateAfterEndDate')]);
+            endif;
+
+            /* Formattazione umana delle date delegata al livello di presentazione */
+            $from = convertDate($logData['from'], 'conversational');
+            $to = convertDate($logData['to'], 'conversational');
+
+            /* Iniezione dinamica dei parametri: 1° %s (da), 2° %s (a), 3° %d (totale) */
+            $confirmMessage = sprintf(lang('backend/tools.messages.areYouSureToDeleteLogs'), $from, $to, $logData['count']);
+
+            $json = ['result' => true, 'count' => $logData['count'], 'confirmMessage' => $confirmMessage];
+            
+            if ($logData['count'] === 0):
+                $json['noDataMessage'] = lang('backend/tools.messages.noLogsFound');
+            endif;
+
+            return $this->jsonResponse($json);
+
+        endif;
+    }
+
+    /**
+     * Esegue la cancellazione dei logs in base ai parametri inviati.
+     */
+    public function deleteLogs(): ResponseInterface
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+
+            $posts = $this->request->getPost();
+            $rules = $this->toolsModel->validateManageLogsRules();
+
+            if ( ! $this->validateData($posts, $rules)):
+                return $this->jsonResponse(['errors' => $this->validator->getErrors(), 'message' => lang('backend/tools.messages.validationErrors')]);
+            endif;
+
+            $json = $this->toolsModel->deleteLogs($posts);
 
             return $this->jsonResponse($json);
 

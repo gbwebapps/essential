@@ -35,7 +35,7 @@
                                     $itemController = $item['controller'] ?? '';
 
                                     /* Se l'utente non è superadmin, nascondi le voci relative alla gestione utenti */
-                                    if ( ! ((int) ($currentAdmin->superadmin ?? 0) === 1) && in_array($itemController, ['admins', 'groups', 'audits', 'tokens'])):
+                                    if ( ! ((int) ($currentAdmin->superadmin ?? 0) === 1) && in_array($itemController, ['admins', 'groups', 'audits', 'tokens', 'logs'])):
                                         continue;
                                     endif;
                                     $visibleItems[] = $item;
