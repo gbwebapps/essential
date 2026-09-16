@@ -79,7 +79,7 @@ return [
 		'validateToastErrors' => '%s',
 		'validationErrors' => 'Validation errors.', 
 		'areYouSureRefreshData' => 'Are you sure you want to reload the data?', 
-		'areYouSureDeleteToken' => 'Are you sure you want to delete the token for %s %s?', 
+		'areYouSureDeleteToken' => 'Are you sure you want to delete the token for <b>%s %s</b>?', 
 		'areYouSureStartingReset' => 'Are you sure you want to start the password reset process?', 
 		'noTokensFound' => 'No tokens found.', 
 		'deleteTokenSuccess' => 'The token for %s %s was deleted successfully.', 

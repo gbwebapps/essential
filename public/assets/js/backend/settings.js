@@ -7,48 +7,44 @@ import { SettingsManager } from './modules/Settings.js';
 const actions = {
     index: function() {
         
-        /* Istanziamo il manager UNA SOLA VOLTA globalmente per tutti i pannelli */
+        /* Istanziamo il manager UNA SOLA VOLTA globalmente */
         const manager = new SettingsManager();
 
-        /* Gestione dell'apertura visiva e del caricamento dinamico dei pannelli */
-        const triggerButtons = document.querySelectorAll('.accordion-header button[data-env]');
+        /* 1. DELEGAZIONE EVENTO CLICK: Alte performance, un solo listener in memoria */
+        document.addEventListener('click', async (e) => {
+            const btn = e.target.closest('.accordion-header button[data-env]');
+            if (!btn) return;
 
-        triggerButtons.forEach(btn => {
+            e.preventDefault();
+
             const env = btn.dataset.env;
             const mainCollapse = document.getElementById(`main_collapse_${env}`);
+            if (!mainCollapse) return;
 
-            if (mainCollapse) {
-                const bsCollapse = new bootstrap.Collapse(mainCollapse, { toggle: false });
+            /* Gestione nativa Bootstrap */
+            const bsCollapse = bootstrap.Collapse.getOrCreateInstance(mainCollapse, { toggle: false });
+            const isOpen = mainCollapse.classList.contains('show') || mainCollapse.classList.contains('collapsing');
 
-                btn.addEventListener('click', async (e) => {
-                    e.preventDefault();
-
-                    if (mainCollapse.classList.contains('show') || mainCollapse.classList.contains('collapsing')) {
-                        bsCollapse.hide();
-                        return;
-                    }
-
-                    const container = document.getElementById(`${env}-settings-container`);
-                    if (container && container.innerHTML.trim() !== '') {
-                        bsCollapse.show();
-                        return;
-                    }
-
-                    /* Chiamiamo il metodo del manager globale */
-                    const success = await manager.loadPanel(`${env}-settings-container`, env);
-                    if (success === false) return;
-
-                    btn.disabled = false;
-                    btn.classList.remove('disabled');
-                    bsCollapse.show();
-                });
-
-                mainCollapse.addEventListener('hidden.bs.collapse', (e) => {
-                    if (e.target === mainCollapse) {
-                        manager.resetContainer(`${env}-settings-container`);
-                    }
-                });
+            if (isOpen) {
+                bsCollapse.hide();
+                return;
             }
+
+            const container = document.getElementById(`${env}-settings-container`);
+            
+            /* Se il contenitore ha già i dati, lo apre e basta */
+            if (container && container.innerHTML.trim() !== '') {
+                bsCollapse.show();
+                return;
+            }
+
+            /* Se è vuoto, scarica il contenuto */
+            const success = await manager.loadPanel(`${env}-settings-container`, env);
+            if (success === false) return;
+
+            btn.disabled = false;
+            btn.classList.remove('disabled');
+            bsCollapse.show();
         });
     }
 };

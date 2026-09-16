@@ -54,11 +54,23 @@ class TokensModel extends BackendModel
 
     protected array $showAllSearchAllowedDates = ['token_create'];
 
-    protected ?string $getDataQuery = "select at.*, a.uuid, a.firstname, a.lastname, a.email, a.superadmin from admins_tokens as at join admins as a on a.uuid = at.admin_uuid where 1 = 1";
+    protected ?string $getDataQuery = "select admins_tokens.*, admins.uuid, admins.firstname, admins.lastname, admins.email, admins.superadmin 
+                                        from admins_tokens 
+                                        join admins 
+                                        on admins.uuid = admins_tokens.admin_uuid 
+                                        where 1 = 1";
 
-    protected ?string $getNumRowsQuery = "select count(*) as count from admins_tokens as at join admins as a on a.uuid = at.admin_uuid where 1 = 1";
+    protected ?string $getNumRowsQuery = "select count(*) as count 
+                                            from admins_tokens 
+                                            join admins 
+                                            on admins.uuid = admins_tokens.admin_uuid 
+                                            where 1 = 1";
 
-    protected ?string $getUUIDQuery = "select at.id, a.uuid, a.firstname, a.lastname, a.deleted_at, a.superadmin from admins_tokens as at join admins as a on a.uuid = at.admin_uuid where at.id = ?";
+    protected ?string $getUUIDQuery = "select admins_tokens.id, admins.uuid, admins.firstname, admins.lastname, admins.deleted_at, admins.superadmin 
+                                        from admins_tokens 
+                                        join admins 
+                                        on admins.uuid = admins_tokens.admin_uuid 
+                                        where admins_tokens.id = ?";
 
     /**
      * Inizializza il modello eseguendo le configurazioni di base ereditate dalla classe madre.

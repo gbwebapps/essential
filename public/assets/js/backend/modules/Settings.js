@@ -21,7 +21,6 @@ export class SettingsManager {
 
     init() {
         this.bindGlobalEvents();
-        this.checkAutoOpenAccordion();
     }
 
     bindGlobalEvents() {
@@ -167,20 +166,24 @@ export class SettingsManager {
             }
 
             if (data.result === true) {
-                /* Se il server richiede il reload, ricarica e ferma l'esecuzione */
-                if (data.action === 'reload') {
-                    window.location.reload();
-                    return; 
-                }
-
-                /* Flusso standard */
-                if (data.message && typeof showAlert === 'function') showAlert('success', data.message);
                 
                 if (data.output) {
                     smoothReplace(container, data.output);
                     initTomSelects();
                 }
+
+                if (data.fragments) {
+                    Object.entries(data.fragments).forEach(([selector, htmlContent]) => {
+                        const container = document.querySelector(selector);
+                        if (container) {
+                            smoothReplace(container, htmlContent);
+                        }
+                    });
+                }
+                
+                if (data.message && typeof showAlert === 'function') showAlert('success', data.message);
             }
+
         } catch (error) {
             console.error("Errore durante il salvataggio delle impostazioni:", error);
         } finally {
@@ -238,38 +241,6 @@ export class SettingsManager {
             console.error("Errore durante l'eliminazione delle impostazioni:", error);
         } finally {
             this.isSubmitting = false;
-        }
-    }
-
-    async checkAutoOpenAccordion() {
-        const wrapper = document.querySelector('[data-open-accordion]');
-        if ( ! wrapper) return;
-
-        const envToOpen = wrapper.dataset.openAccordion;
-        if ( ! envToOpen) return;
-
-        /* Individua l'ID del collapse basato sulla struttura della tua vista: main_collapse_general */
-        const collapseElementId = `main_collapse_${envToOpen}`;
-        const collapseElement = document.getElementById(collapseElementId);
-        
-        if (collapseElement) {
-            const container = collapseElement.querySelector('.accordion-body');
-            if (container && container.id) {
-                /* 1. Prima carica i dati in modo asincrono per evitare lo scatto bianco */
-                const success = await this.loadPanel(container.id, envToOpen);
-                if (success === false) return;
-
-                /* 2. Solo a caricamento riuscito, apre visivamente l'accordion */
-                const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseElement);
-                bsCollapse.show();
-
-                /* 3. Rimuove la classe 'collapsed' dal bottone trigger associato */
-                const triggerBtn = wrapper.querySelector(`.btn-trigger-${envToOpen}-settings`);
-                if (triggerBtn) {
-                    triggerBtn.classList.remove('collapsed');
-                    triggerBtn.setAttribute('aria-expanded', 'true');
-                }
-            }
         }
     }
 }

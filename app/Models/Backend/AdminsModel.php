@@ -77,6 +77,8 @@ class AdminsModel extends BackendModel
      */
     protected array $showAllSearchAllowedFields = ['firstname', 'lastname', 'email', 'phone']; 
 
+    protected array $showAllSearchAllowedDates = ['created_at', 'updated_at'];
+
     /**
      * Elenco delle proprietà anagrafiche utilizzate per la comparazione dei dati storici o per il tracciamento dei log.
      *
@@ -195,6 +197,14 @@ class AdminsModel extends BackendModel
             'searchFields.phone' => [
                 'label' => lang('backend/admins.labels.phone'), 
                 'rules' => ['permit_empty', 'regex_match[/^[0-9+\-\s()]+$/]'], 
+            ],
+            'searchDates.created_at-from' => [
+                'label' => lang('backend/admins.labels.dateFrom'),
+                'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]'],
+            ],
+            'searchDates.created_at-to' => [
+                'label' => lang('backend/admins.labels.dateTo'),
+                'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]'],
             ],
         ];
     }

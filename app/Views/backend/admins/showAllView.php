@@ -150,6 +150,71 @@
                             <!-- End Ricerca avanzata per phone -->
 
                         </div>
+
+                        <div class="row card-body py-0">
+
+                            <!-- Ricerca avanzata per data da -->
+                            <div class="col-md-3">
+                                <div class="mb-2 mb-md-0">
+                                    <!-- Campo Data Da -->
+                                    <label for="admins-created_at-from"><?= lang('backend/admins.labels.dateFrom'); ?></label>
+                                    <div id="wrapper-admins-created_at-from" class="input-group">
+                                        <input type="text" id="admins-created_at-from" data-input class="form-control" placeholder="<?= lang('backend/admins.placeholders.dateFrom'); ?>" autocomplete="off">
+                                        <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
+                                        <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
+                                    </div>
+                                    <div class="error_created_at-from text-danger fw-bold small pt-1">&nbsp;</div>
+                                </div>
+                            </div>
+                            <!-- End ricerca avanzata per data da -->
+
+                            <!-- Ricerca avanzata per data a -->
+                            <div class="col-md-3">
+                                <div class="mb-2 mb-md-0">
+                                    <!-- Campo Data A -->
+                                    <label for="admins-created_at-to"><?= lang('backend/admins.labels.dateTo'); ?></label>
+                                    <div id="wrapper-admins-created_at-to" class="input-group">
+                                        <input type="text" id="admins-created_at-to" data-input class="form-control" placeholder="<?= lang('backend/admins.placeholders.dateTo'); ?>" autocomplete="off">
+                                        <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
+                                        <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
+                                    </div>
+                                    <div class="error_created_at-to text-danger fw-bold small pt-1">&nbsp;</div>
+                                </div>
+                            </div>
+                            <!-- End ricerca avanzata per data a -->
+
+                            <!-- Ricerca avanzata per data da -->
+                            <div class="col-md-3">
+                                <div class="mb-2 mb-md-0">
+                                    <!-- Campo Data Da -->
+                                    <label for="admins-updated_at-from"><?= lang('backend/admins.labels.dateFrom'); ?></label>
+                                    <div id="wrapper-admins-updated_at-from" class="input-group">
+                                        <input type="text" id="admins-updated_at-from" data-input class="form-control" placeholder="<?= lang('backend/admins.placeholders.dateFrom'); ?>" autocomplete="off">
+                                        <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
+                                        <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
+                                    </div>
+                                    <div class="error_updated_at-from text-danger fw-bold small pt-1">&nbsp;</div>
+                                </div>
+                            </div>
+                            <!-- End ricerca avanzata per data da -->
+
+                            <!-- Ricerca avanzata per data a -->
+                            <div class="col-md-3">
+                                <div class="mb-2 mb-md-0">
+                                    <!-- Campo Data A -->
+                                    <label for="admins-updated_at-to"><?= lang('backend/admins.labels.dateTo'); ?></label>
+                                    <div id="wrapper-admins-updated_at-to" class="input-group">
+                                        <input type="text" id="admins-updated_at-to" data-input class="form-control" placeholder="<?= lang('backend/admins.placeholders.dateTo'); ?>" autocomplete="off">
+                                        <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
+                                        <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
+                                    </div>
+                                    <div class="error_updated_at-to text-danger fw-bold small pt-1">&nbsp;</div>
+                                </div>
+                            </div>
+                            <!-- End ricerca avanzata per data a -->
+
+                        </div>
+
                     </div>
                     <!-- Fine parte filtri -->
 

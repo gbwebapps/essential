@@ -1,5 +1,5 @@
 /* Import delle costanti e utility da backend.js */
-import { urlbase, action, smoothReplace, initOffcanvasAutoClose } from './backend.js';
+import { urlbase, action, smoothReplace, initOffcanvasAutoClose, initRangeDatePicker } from './backend.js';
 
 /* Import dei componenti dalla sottocartella */
 import { ListManager, AddManager, EditManager, DeleteManager, ChangeStatusManager, GeneralDataManager, MetaDataManager } from './modules/Crud.js';
@@ -18,9 +18,16 @@ const actions = {
             controller: 'admins',
             url: urlbase + 'backend/admins/showAll',
             containerId: 'showAll-admins-container',
-            searchFields: ['firstname', 'lastname', 'email', 'phone']
+            searchFields: ['firstname', 'lastname', 'email', 'phone'], 
+            searchDates: ['created_at', 'updated_at']
         });
         adminsManager.init();
+
+        /* Inizializzazione picker per created_at con alias */
+        const { pickerFrom: createdFrom, pickerTo: createdTo } = initRangeDatePicker('#wrapper-admins-created_at-from', '#wrapper-admins-created_at-to');
+
+        /* Inizializzazione picker per updated_at con alias */
+        const { pickerFrom: updatedFrom, pickerTo: updatedTo } = initRangeDatePicker('#wrapper-admins-updated_at-from', '#wrapper-admins-updated_at-to');
 
         const deleteManager = new DeleteManager({
             controller: 'admins',

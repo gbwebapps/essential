@@ -5,7 +5,7 @@
                 <?php foreach ($images as $img): ?>
                     <div class="col-6 col-lg-3 mb-3 text-center">
 
-                        <?php $bg = ((int) $img['is_cover'] === 1) ? 'bg-dark' : 'bg-white'; ?>
+                        <?php $bg = ((int) $img['is_cover'] === 1) ? 'bg-secondary' : 'bg-white'; ?>
 
                         <div class="position-relative preview-item rounded overflow-hidden <?= $bg; ?> p-1 border shadow-sm"
                              data-id="<?= esc($img['id']); ?>"

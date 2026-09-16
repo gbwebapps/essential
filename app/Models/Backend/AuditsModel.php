@@ -20,7 +20,7 @@ class AuditsModel extends BackendModel
      *
      * @var string|null
      */
-    protected ?string $module = 'audits';
+    protected ?string $module = 'admins_audits';
 
     /**
      * Colonna di ordinamento predefinita utilizzata nelle query di estrazione se non specificata.
@@ -52,10 +52,10 @@ class AuditsModel extends BackendModel
 
     protected array $showAllSearchAllowedDates = ['created_at'];
 
-    protected ?string $getDataQuery = "select aa.id, admin_uuid, username, action, section, details, ip_address, user_agent, aa.created_at, superadmin 
-                                       from admins_audits as aa 
-                                       join admins as a 
-                                       on a.uuid = aa.admin_uuid 
+    protected ?string $getDataQuery = "select admins_audits.id, admin_uuid, username, action, section, details, ip_address, user_agent, admins_audits.created_at, superadmin 
+                                       from admins_audits 
+                                       join admins 
+                                       on admins.uuid = admins_audits.admin_uuid 
                                        where 1 = 1";
 
     protected ?string $getNumRowsQuery = 'select count(*) as count from admins_audits where 1 = 1';

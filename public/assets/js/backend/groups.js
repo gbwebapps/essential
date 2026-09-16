@@ -11,84 +11,93 @@ const actions = {
         const groupManager = new GroupsManager();
 
         /* --- 1. GESTIONE MANUALE E FLUIDA: Aggiungi Gruppo --- */
-        const triggerAddBtn = document.querySelector('.btn-trigger-add-group');
-        const mainCollapseAdd = document.getElementById('main_collapse_add');
+        document.addEventListener('click', async (e) => {
+            const triggerAddBtn = e.target.closest('.btn-trigger-add-group');
+            if (!triggerAddBtn) return;
+            
+            e.preventDefault();
 
-        if (triggerAddBtn && mainCollapseAdd) {
-            const bsCollapseAdd = new bootstrap.Collapse(mainCollapseAdd, { toggle: false });
+            const mainCollapseAdd = document.getElementById('main_collapse_add');
+            if (!mainCollapseAdd) return;
 
-            triggerAddBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
+            const bsCollapseAdd = bootstrap.Collapse.getOrCreateInstance(mainCollapseAdd, { toggle: false });
 
-                if (mainCollapseAdd.classList.contains('show') || mainCollapseAdd.classList.contains('collapsing')) {
-                    bsCollapseAdd.hide();
-                    return;
-                }
+            if (mainCollapseAdd.classList.contains('show') || mainCollapseAdd.classList.contains('collapsing')) {
+                bsCollapseAdd.hide();
+                return;
+            }
 
-                const container = document.getElementById('add-groups-container');
-                if (container && container.innerHTML.trim() !== '') {
-                    bsCollapseAdd.show();
-                    return;
-                }
-
-                /* Interrompe l'apertura del collapsable se il metodo ritorna false (utente non loggato) */
-                const success = await groupManager.loadAddGroupPanel();
-                if (success === false) return;
-                
-                triggerAddBtn.disabled = false;
-                triggerAddBtn.classList.remove('disabled');
-                
+            const container = document.getElementById('add-groups-container');
+            if (container && container.innerHTML.trim() !== '') {
                 bsCollapseAdd.show();
-            });
+                return;
+            }
 
-            mainCollapseAdd.addEventListener('hidden.bs.collapse', (e) => {
-                if (e.target === mainCollapseAdd) {
-                    groupManager.resetAddContainer();
-                }
-            });
-        }
+            /* Interrompe l'apertura del collapsable se il metodo ritorna false (utente non loggato) */
+            const success = await groupManager.loadAddGroupPanel();
+            if (success === false) return;
+            
+            triggerAddBtn.disabled = false;
+            triggerAddBtn.classList.remove('disabled');
+            
+            bsCollapseAdd.show();
+        });
+
+        document.addEventListener('hidden.bs.collapse', (e) => {
+            if (e.target && e.target.id === 'main_collapse_add') {
+                groupManager.resetAddContainer();
+            }
+        });
+
 
         /* --- 2. GESTIONE MANUALE E FLUIDA: Lista Gruppi --- */
-        const triggerListBtn = document.querySelector('[data-bs-target="#main_collapse_list"]');
-        const mainCollapseList = document.getElementById('main_collapse_list');
+        
+        /* FIX: Rimuoviamo il data-bs-toggle a monte per evitare il conflitto (lo scattino) con Bootstrap */
+        document.querySelectorAll('[data-bs-target="#main_collapse_list"]').forEach(btn => {
+            btn.removeAttribute('data-bs-toggle');
+        });
 
-        if (triggerListBtn && mainCollapseList) {
-            triggerListBtn.removeAttribute('data-bs-toggle');
+        document.addEventListener('click', async (e) => {
+            const triggerListBtn = e.target.closest('[data-bs-target="#main_collapse_list"]');
+            if (!triggerListBtn) return;
             
-            const bsCollapseList = new bootstrap.Collapse(mainCollapseList, { toggle: false });
+            e.preventDefault();
+            
+            const mainCollapseList = document.getElementById('main_collapse_list');
+            if (!mainCollapseList) return;
 
-            triggerListBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
+            const bsCollapseList = bootstrap.Collapse.getOrCreateInstance(mainCollapseList, { toggle: false });
 
-                if (mainCollapseList.classList.contains('show') || mainCollapseList.classList.contains('collapsing')) {
-                    bsCollapseList.hide();
-                    return;
-                }
+            if (mainCollapseList.classList.contains('show') || mainCollapseList.classList.contains('collapsing')) {
+                bsCollapseList.hide();
+                return;
+            }
 
-                const container = document.getElementById('showAll-groups-container');
-                if (container && container.innerHTML.trim() !== '') {
-                    bsCollapseList.show();
-                    return;
-                }
-
-                /* Interrompe l'apertura del collapsable se il metodo ritorna false (utente non loggato) */
-                const success = await groupManager.loadGroupsList();
-                if (success === false) return;
-                
-                triggerListBtn.disabled = false;
-                triggerListBtn.classList.remove('disabled');
-                
+            const container = document.getElementById('showAll-groups-container');
+            if (container && container.innerHTML.trim() !== '') {
                 bsCollapseList.show();
-            });
+                return;
+            }
 
-            mainCollapseList.addEventListener('hidden.bs.collapse', (e) => {
-                if (e.target === mainCollapseList) {
-                    groupManager.resetListContainer();
-                }
-            });
-        }
+            /* Interrompe l'apertura del collapsable se il metodo ritorna false (utente non loggato) */
+            const success = await groupManager.loadGroupsList();
+            if (success === false) return;
+            
+            triggerListBtn.disabled = false;
+            triggerListBtn.classList.remove('disabled');
+            
+            bsCollapseList.show();
+        });
+
+        document.addEventListener('hidden.bs.collapse', (e) => {
+            if (e.target && e.target.id === 'main_collapse_list') {
+                groupManager.resetListContainer();
+            }
+        });
+
 
         /* --- 3. GESTIONE MANUALE E FLUIDA: Sotto-gruppi (Elementi del foreach) --- */
+        /* Questo blocco era già delegato correttamente nel tuo codice, l'ho lasciato identico */
         document.addEventListener('click', async (e) => {
             const subTriggerBtn = e.target.closest('.group-toggle-btn');
             if ( ! subTriggerBtn) return;
@@ -125,43 +134,45 @@ const actions = {
             bsSubCollapse.show();
         });
 
+
         /* --- 4. GESTIONE MANUALE E FLUIDA: Apri pannello eccezioni --- */
-        const triggerExceptionsBtn = document.querySelector('.btn-trigger-exceptions-group');
-        const mainCollapseExceptions = document.getElementById('main_collapse_exceptions');
+        document.addEventListener('click', async (e) => {
+            const triggerExceptionsBtn = e.target.closest('.btn-trigger-exceptions-group');
+            if (!triggerExceptionsBtn) return;
+            
+            e.preventDefault();
 
-        if (triggerExceptionsBtn && mainCollapseExceptions) {
-            const bsCollapseExceptions = new bootstrap.Collapse(mainCollapseExceptions, { toggle: false });
+            const mainCollapseExceptions = document.getElementById('main_collapse_exceptions');
+            if (!mainCollapseExceptions) return;
 
-            triggerExceptionsBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
+            const bsCollapseExceptions = bootstrap.Collapse.getOrCreateInstance(mainCollapseExceptions, { toggle: false });
 
-                if (mainCollapseExceptions.classList.contains('show') || mainCollapseExceptions.classList.contains('collapsing')) {
-                    bsCollapseExceptions.hide();
-                    return;
-                }
+            if (mainCollapseExceptions.classList.contains('show') || mainCollapseExceptions.classList.contains('collapsing')) {
+                bsCollapseExceptions.hide();
+                return;
+            }
 
-                const container = document.getElementById('exceptions-groups-container');
-                if (container && container.innerHTML.trim() !== '') {
-                    bsCollapseExceptions.show();
-                    return;
-                }
-
-                /* Interrompe l'apertura del collapsable se il metodo ritorna false (utente non loggato) */
-                const success = await groupManager.loadExceptionsPanel();
-                if (success === false) return;
-                
-                triggerExceptionsBtn.disabled = false;
-                triggerExceptionsBtn.classList.remove('disabled');
-                
+            const container = document.getElementById('exceptions-groups-container');
+            if (container && container.innerHTML.trim() !== '') {
                 bsCollapseExceptions.show();
-            });
+                return;
+            }
 
-            mainCollapseExceptions.addEventListener('hidden.bs.collapse', (e) => {
-                if (e.target === mainCollapseExceptions) {
-                    groupManager.resetExceptionsContainer();
-                }
-            });
-        }
+            /* Interrompe l'apertura del collapsable se il metodo ritorna false (utente non loggato) */
+            const success = await groupManager.loadExceptionsPanel();
+            if (success === false) return;
+            
+            triggerExceptionsBtn.disabled = false;
+            triggerExceptionsBtn.classList.remove('disabled');
+            
+            bsCollapseExceptions.show();
+        });
+
+        document.addEventListener('hidden.bs.collapse', (e) => {
+            if (e.target && e.target.id === 'main_collapse_exceptions') {
+                groupManager.resetExceptionsContainer();
+            }
+        });
     }
 };
 

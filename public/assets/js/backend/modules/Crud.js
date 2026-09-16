@@ -28,7 +28,7 @@ export class ListManager {
         }, hooks);
 
         this.state = {
-            column: localStorage.getItem(`${this.config.controller}_column`) || 'created_at',
+            column: localStorage.getItem(`${this.config.controller}_column`) || 'id',
             order: localStorage.getItem(`${this.config.controller}_order`) || 'asc',
             page: localStorage.getItem(`${this.config.controller}_page`) || 1,
             rows: localStorage.getItem(`${this.config.controller}_rows`) || 5,
@@ -329,7 +329,7 @@ export class ListManager {
     }
 
     resetSortingAndPagination() {
-        this.updateState('column', 'created_at');
+        this.updateState('column', 'id');
         this.updateState('order', 'asc');
         this.updateState('page', 1);
     }

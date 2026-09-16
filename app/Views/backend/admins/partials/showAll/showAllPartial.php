@@ -171,19 +171,19 @@
                                                         <?php if( ! $isTrashed): ?>
                                                             
                                                             <!-- Pulsante Dettaglio -->
-                                                            <a href="<?= base_url('backend/admins/show/' . esc($admin->uuid)); ?>" class="text-decoration-none text-white badge bg-secondary action">
+                                                            <a href="<?= base_url('backend/admins/show/' . esc($admin->uuid)); ?>" class="text-decoration-none badge bg-secondary-subtle text-secondary-emphasis action">
                                                                 <i class="fa-solid fa-user fa-fw"></i> <?= lang('backend/admins.actions.show'); ?>
                                                             </a>
 
                                                             <!-- Pulsante Aggiorna -->
-                                                            <a href="<?= base_url('backend/admins/edit/' . esc($admin->uuid)); ?>" class="text-decoration-none text-white badge bg-secondary action">
+                                                            <a href="<?= base_url('backend/admins/edit/' . esc($admin->uuid)); ?>" class="text-decoration-none badge bg-secondary-subtle text-secondary-emphasis action">
                                                                 <i class="fa-solid fa-user-pen fa-fw"></i> <?= lang('backend/admins.actions.edit'); ?>
                                                             </a>
 
                                                             <!-- Pulsante Reset password -->
                                                             <form class="resetAdmin m-0 p-0" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureReset'), esc($admin->firstname), esc($admin->lastname)); ?>">
                                                                 <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
-                                                                <button type="submit" class="btn badge bg-secondary text-white action shadow-none w-100 border-0">
+                                                                <button type="submit" class="btn badge bg-secondary-subtle text-secondary-emphasis action shadow-none w-100 border-0">
                                                                     <i class="fa-solid fa-unlock fa-fw"></i> <?= lang('backend/admins.actions.reset'); ?>
                                                                 </button>
                                                             </form>
@@ -191,7 +191,7 @@
                                                             <!-- Pulsante Elimina (Soft Delete) -->
                                                             <form class="deleteRecord m-0 p-0" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureSoftDelete'), esc($admin->firstname), esc($admin->lastname)); ?>">
                                                                 <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
-                                                                <button type="submit" class="btn badge bg-danger text-white action shadow-none w-100 border-0">
+                                                                <button type="submit" class="btn badge bg-danger-subtle text-danger-emphasis action shadow-none w-100 border-0">
                                                                     <i class="fa-solid fa-xmark fa-fw"></i> <?= lang('backend/admins.actions.softDelete'); ?>
                                                                 </button>
                                                             </form>
@@ -201,7 +201,7 @@
                                                             <!-- Pulsante Ripristina (Restore Delete) -->
                                                             <form class="restoreRecord m-0 p-0" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureRestoreDelete'), esc($admin->firstname), esc($admin->lastname)); ?>">
                                                                 <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
-                                                                <button type="submit" class="btn badge bg-success text-white action shadow-none w-100 border-0">
+                                                                <button type="submit" class="btn badge bg-success-subtle text-success-emphasis action shadow-none w-100 border-0">
                                                                     <i class="fa-solid fa-trash-arrow-up fa-fw"></i> <?= lang('backend/admins.actions.restoreDelete'); ?>
                                                                 </button>
                                                             </form>
@@ -209,7 +209,7 @@
                                                             <!-- Pulsante Elimina Definitivamente (Hard Delete) -->
                                                             <form class="hardDeleteRecord m-0 p-0" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureHardDelete'), esc($admin->firstname), esc($admin->lastname)); ?>">
                                                                 <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
-                                                                <button type="submit" class="btn badge bg-danger text-white action shadow-none w-100 border-0">
+                                                                <button type="submit" class="btn badge bg-danger-subtle text-danger-emphasis action shadow-none w-100 border-0">
                                                                     <i class="fa-solid fa-xmark fa-fw"></i> <?= lang('backend/admins.actions.hardDelete'); ?>
                                                                 </button>
                                                             </form>

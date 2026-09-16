@@ -79,7 +79,7 @@ return [
 		'validateToastErrors' => '%s',
 		'validationErrors' => 'Errori di validazione.', 
 		'areYouSureRefreshData' => 'Sei sicuro di voler ricaricare i dati?', 
-		'areYouSureDeleteToken' => 'Sei sicuro di eliminare il token di  %s %s?', 
+		'areYouSureDeleteToken' => 'Sei sicuro di eliminare il token di <b>%s %s</b>?', 
 		'areYouSureStartingReset' => 'Sei sicuro di voler iniziare il processo di reset password?', 
 		'noTokensFound' => 'Non sono presenti tokens.', 
 		'deleteTokenSuccess' => 'Il token di %s %s è stato eliminato con successo.', 

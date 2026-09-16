@@ -52,17 +52,17 @@ class LogsModel extends BackendModel
 
     protected array $showAllSearchAllowedDates = ['login'];
 
-    protected ?string $getDataQuery = "select al.*, at.token_expire, at.last_activity, at.id as token_id_val, a.firstname, a.lastname, a.superadmin  
-                                        from admins_logs as al  
-                                        left join admins_tokens as at 
-                                        on at.id = al.token_id 
-                                        left join admins as a 
-                                        on a.uuid = al.admin_uuid 
+    protected ?string $getDataQuery = "select admins_logs.*, admins_tokens.token_expire, admins_tokens.last_activity, admins_tokens.id as token_id_val, admins.firstname, admins.lastname, admins.superadmin  
+                                        from admins_logs 
+                                        left join admins_tokens 
+                                        on admins_tokens.id = admins_logs.token_id 
+                                        left join admins 
+                                        on admins.uuid = admins_logs.admin_uuid 
                                         where 1 = 1";
 
     protected ?string $getNumRowsQuery = "select count(*) as count from admins_logs where 1 = 1";
 
-    protected ?string $getUUIDQuery = "select * from admins_logs where a.id = ?";
+    protected ?string $getUUIDQuery = "select * from admins_logs where id = ?";
 
     /**
      * Inizializza il modello eseguendo le configurazioni di base ereditate dalla classe madre.

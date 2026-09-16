@@ -53,7 +53,7 @@ return [
 		'validationErrors' => 'Errori di validazione.', 
 		'validationToastErrors' => '%s', 
 		'noTokensFound' => 'Non sono presenti tokens.', 
-		'areYouSureHardDelete' => 'Sei sicuro di eliminare definitivamente il token di  %s %s?', 
+		'areYouSureHardDelete' => 'Sei sicuro di eliminare definitivamente il token di  <b>%s %s</b>?', 
 		'deleteTokenSuccess' => 'Il token di %s %s è stato eliminato con successo.', 
 		'deleteTokenError' => 'Eliminazione del token non è andata a buon fine', 
 		'protectedAdmin' => 'Protetto da modifiche.', 

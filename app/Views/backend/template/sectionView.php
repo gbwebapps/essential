@@ -12,7 +12,7 @@
 
             if ($msgClass && $msgContent): 
         ?>
-            <div class="alert alert-<?= $msgClass; ?> alert-session alert-dismissible fade show border-0 d-flex align-items-center p-3" role="alert">
+            <div class="alert alert-<?= $msgClass; ?> alert-session alert-dismissible fade show border-0 d-flex align-items-center p-3 mb-0" role="alert">
                 <div class="w-100 text-center p-0 ms-4">
                     <?= $msgIcon; ?> <?= $msgContent; ?>
                 </div>

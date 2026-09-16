@@ -287,7 +287,7 @@ export function showAlert(type, message, customIcon = '')
     const iconHTML = finalIcon ? `${finalIcon} ` : '';
 
     const alertHTML = `
-        <div class="alert alert-${alertClass} alert-dismissible fade show border-0 d-flex align-items-center p-3" role="alert">
+        <div class="alert alert-${alertClass} alert-dismissible fade show border-0 d-flex align-items-center p-3 mb-0" role="alert">
             <div class="w-100 text-center p-0 ms-4">
                 ${iconHTML}${message}
             </div>
@@ -497,11 +497,28 @@ export function initRangeDatePicker(fromContainerSelector, toContainerSelector) 
         enableTime: true,
         enableSeconds: true,
         time_24hr: true,
-        dateFormat: "Y-m-d H:i:ss",
+        dateFormat: "Y-m-d H:i:s",
         altInput: true,
-        altFormat: "d/m/Y H:i:ss",
+        altFormat: "d/m/Y H:i:s",
         allowInput: true,
-        wrap: true
+        wrap: true,
+        
+        /* OVERRIDE: Aggira il bug nativo di Flatpickr forzando il padding a 2 cifre */
+        formatDate: (date, formatStr) => {
+            const pad = (n) => n < 10 ? '0' + n : n;
+            
+            const tokens = {
+                Y: date.getFullYear(),
+                m: pad(date.getMonth() + 1),
+                d: pad(date.getDate()),
+                H: pad(date.getHours()),
+                i: pad(date.getMinutes()),
+                s: pad(date.getSeconds()) /* Forza lo zero iniziale sui secondi */
+            };
+            
+            /* Sostituisce i token nella stringa di formato con i valori calcolati */
+            return formatStr.replace(/[YmdHis]/g, match => tokens[match]);
+        }
     };
 
     const pickerFrom = flatpickr(fromContainerSelector, {

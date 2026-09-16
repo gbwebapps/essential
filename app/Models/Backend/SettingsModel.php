@@ -389,19 +389,15 @@ class SettingsModel extends BackendModel
         /* 2. Filtriamo immediatamente l'input lasciando solo i campi autorizzati */
         $posts = $this->checkAllowedFields($posts, $allowedFields);
 
-        $needsReload = false;
-
         /* 3. Controllo di sbarramento e rilevazione campi critici */
         if ($this->hasDatabaseSettings($namespace)) :
+
             $changedKeys = $this->getChangedKeys($namespace, $posts);
 
             if (empty($changedKeys)) :
                 return ['result' => false, 'message' => lang('backend/settings.messages.noDataChanged')];
             endif;
 
-            $needsReload = count(array_intersect($changedKeys, $this->requiresReloadFields)) > 0;
-        else :
-            $needsReload = count(array_intersect(array_keys($posts), $this->requiresReloadFields)) > 0;
         endif;
 
         /* 4. Svuota la cache locale */
@@ -431,11 +427,7 @@ class SettingsModel extends BackendModel
         $currentAdmin = service('authorization')->currentAdmin();
         log_admin_activity('SAVE_SETTINGS', 'settings', 'Salvataggio impostazioni.', $currentAdmin);
 
-        return [
-            'result' => true, 
-            'message' => lang('backend/settings.messages.saveSuccess'),
-            'requires_reload' => $needsReload
-        ];
+        return ['result' => true, 'message' => lang('backend/settings.messages.saveSuccess')];
     }
 
     /**

@@ -218,14 +218,14 @@ class AdminsClass
 
 	/* ------------------------------------------------------------------------------------------------- */
 
-	/**
-	 * Restituisce l'elenco dei file JavaScript specifici richiesti dalla vista tabellare globale.
-	 *
-	 * Configura i percorsi e i punti di aggancio per i motori di gestione delle tabelle dati (DataTables)
-	 * e delle relative estensioni per Bootstrap 5.
-	 *
-	 * @return array
-	 */
+	public function getJsShowAll(): array
+	{
+	    return [
+	        ['id' => 'flatpickr-js', 'path' => 'assets/vendor/flatpickr/js/flatpickr.min.js', 'position' => 'before', 'target' => 'admins-js'], 
+	        ['id' => 'it-js', 'path' => 'assets/vendor/flatpickr/js/it.js', 'position' => 'after', 'target' => 'flatpickr-js']
+	    ];
+	}
+
 	public function getJsShow(): array
 	{
 	    return [
@@ -235,16 +235,10 @@ class AdminsClass
 
 	/* ------------------------------------------------------------------------------------------------- */
 
-	/**
-	 * Restituisce l'elenco dei fogli di stile CSS specifici richiesti dalla vista tabellare globale.
-	 *
-	 * Definisce i file di stile necessari alla corretta resa grafica dell'interfaccia di impaginazione
-	 * e ricerca della tabella amministratori.
-	 *
-	 * @return array
-	 */
-	// public function getCssShowAll(): array
-	// {
-	//     return [];
-	// }
+	public function getCssShowAll(): array
+	{
+	    return [
+	        ['id' => 'flatpickr-css', 'path' => 'assets/vendor/flatpickr/css/flatpickr.min.css', 'position' => 'before', 'target' => 'backend-css']
+	    ];
+	}
 }

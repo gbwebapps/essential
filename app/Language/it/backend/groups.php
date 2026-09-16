@@ -43,7 +43,7 @@ return [
 		'wrongID' => 'Formato ID non corretto', 
 	],
 	'messages' => [
-		'areYouSureDeleteGroup' => 'Sei sicuro di voler eliminare questo gruppo?', 
+		'areYouSureDeleteGroup' => 'Sei sicuro di voler eliminare il gruppo <b>%s</b>?', 
 		'areYouSureToReload' => 'Sei sicuro di voler ricaricare i dati?', 
 		'areYouSureToResetData' => 'Sei sicuro di voler azzerare i dati?', 
 		'noAdminFound' => 'Nessun amministratore trovato.', 

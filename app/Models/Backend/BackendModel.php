@@ -224,7 +224,7 @@ abstract class BackendModel extends BaseModel
 
 		foreach ($searchFields as $key => $val):
 		    if (in_array($key, $this->showAllSearchAllowedFields)):
-		        $whereClause .= " and " . $key . " like ?";
+		        $whereClause .= " and " . $this->module . '.' . $key . " like ?";
 		        $params[] = "%$val%";
 		    endif;
 		endforeach;
@@ -240,14 +240,14 @@ abstract class BackendModel extends BaseModel
 			/* 1. Controllo e binding per il limite inferiore (Da / >=) */
 			$fromKey = $dbColumn . '-from';
 			if (isset($searchDates[$fromKey]) && trim($searchDates[$fromKey]) !== ''):
-				$whereClause .= " and " . $dbColumn . " >= ?";
+				$whereClause .= " and " . $this->module . '.' . $dbColumn . " >= ?";
 				$params[] = $searchDates[$fromKey];
 			endif;
 
 			/* 2. Controllo e binding per il limite superiore (A / <=) */
 			$toKey = $dbColumn . '-to';
 			if (isset($searchDates[$toKey]) && trim($searchDates[$toKey]) !== ''):
-				$whereClause .= " and " . $dbColumn . " <= ?";
+				$whereClause .= " and " . $this->module . '.' . $dbColumn . " <= ?";
 				$params[] = $searchDates[$toKey];
 			endif;
 		endforeach;

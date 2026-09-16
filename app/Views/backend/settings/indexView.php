@@ -6,7 +6,7 @@
         <div class="row g-0">
             <div class="col-12">
                 
-                <div class="accordion" id="mainSettingsDashboard" data-open-accordion="<?= esc($openAccordion ?? '') ?>">
+                <div class="accordion" id="mainSettingsDashboard">
 
                     <?php foreach(['general', 'auth', 'upload', 'email'] as $env): ?>
 
@@ -25,7 +25,8 @@
                             <h2 class="accordion-header" id="main_heading_<?= $env; ?>">
                                 <button class="accordion-button collapsed shadow-none bg-light text-secondary py-3 btn-trigger-<?= $env; ?>-settings" data-env="<?= $env; ?>" type="button" aria-expanded="false" aria-controls="main_collapse_<?= $env; ?>">
                                     <h2 class="card-title mb-0 fs-5">
-                                        <i class="fa-solid <?= $icon; ?> me-2"></i><?= lang('backend/settings.panels.' . $env . 'Setting'); ?>
+                                        <i class="fa-solid <?= $icon; ?> me-2"></i>
+                                        <span id="lang_<?= $env; ?>"><?= lang('backend/settings.panels.' . $env . 'Setting'); ?></span>
                                     </h2>
                                 </button>
                             </h2>

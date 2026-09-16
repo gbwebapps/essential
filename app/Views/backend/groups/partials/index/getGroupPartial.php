@@ -72,7 +72,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="d-flex flex-column flex-md-row justify-content-center gap-2">
-                    <button type="button" class="btn btn-danger btn-sm btn-delete-group" data-id="<?= $group->id; ?>" data-message="<?= lang('backend/groups.messages.areYouSureDeleteGroup'); ?>">
+                    <button type="button" class="btn btn-danger btn-sm btn-delete-group" data-id="<?= $group->id; ?>" data-message="<?= sprintf(lang('backend/groups.messages.areYouSureDeleteGroup'), $group->name); ?>">
                         <i class="fa-solid fa-trash-can me-1"></i> <?= lang('backend/groups.buttons.delete'); ?>
                     </button>
                     <button type="button" class="btn btn-warning text-dark btn-sm btn-refresh-group" data-id="<?= $group->id; ?>" data-message="<?= lang('backend/groups.messages.areYouSureToReload'); ?>">

@@ -59,9 +59,6 @@ class SettingsController extends BackendController
         $this->data['title'] = lang('backend/settings.titles.index');
         $this->data['icon'] = '<i class="fa-solid fa-sliders"></i>';
 
-        /* Recupera il modulo da riaprire salvato in sessione dopo il reload */
-        $this->data['openAccordion'] = session()->getFlashdata('open_accordion');
-
         return $this->render('backend/settings/indexView', $this->data);
     }
 
@@ -126,41 +123,47 @@ class SettingsController extends BackendController
             $saveResult = $this->settingsModel->saveSettings($namespace, $posts);
 
             if ($saveResult !== null && $saveResult['result'] === false) :
-                return $this->jsonResponse(['result'  => false, 'message' => $saveResult['message']]);
-            endif;
-
-            /* 2. Gestione Reload per campi critici */
-            if (isset($saveResult['requires_reload']) && $saveResult['requires_reload'] === true) :
-                
-                /* Estraiamo la lingua attualmente configurata (ora aggiornata nel DB/Config) */
-                $language = setting('Backend\General')->language;
-
-                /* Forziamo la generazione del messaggio passando la nuova lingua come 3° parametro */
-                $localizedMessage = lang('backend/settings.messages.saveSuccess', [], $language);
-
-                session()->setFlashdata('message', $localizedMessage);
-                session()->setFlashdata('class', 'light text-success fw-bold'); 
-                session()->setFlashdata('icon', '<i class="fa-solid fa-check"></i>');
-                session()->setFlashdata('open_accordion', $env);
-
-                return $this->jsonResponse(['result' => true, 'action' => 'reload']);
+                return $this->jsonResponse(['result' => false, 'message' => $saveResult['message']]);
             endif;
 
             /* 3. Flusso standard senza reload */
             $this->data['isFromDatabase'] = $this->settingsModel->hasDatabaseSettings($namespace);
             $this->data[$env . 'Settings'] = $this->settingsModel->getSettings($namespace);
 
+            $json = [];
+
             if ($env === 'general'):
+                
+                /* Le traduzioni nel controller useranno automaticamente la lingua corretta */
                 $this->data['timezones'] = $this->settingsClass->getTimezones();
                 $this->data['languages'] = $this->settingsClass->getLanguages();
                 $this->data['dateFormats'] = $this->settingsClass->getDateFormats();
+
+                $this->data['action'] = 'index';
+                $this->data['title'] = lang('backend/settings.titles.index');
+                $this->data['icon'] = '<i class="fa-solid fa-sliders"></i>';
+
+                /* Le viste eseguiranno i loro lang() usando il Locale appena intercettato */
+                $json['fragments'] = [
+                    '#navbar-top-view' => view('backend/template/navbarTopView', $this->data),
+                    '#section-view' => view('backend/template/sectionView', $this->data),
+                    '#links-bar-view' => view('backend/template/linksBarView', $this->data), 
+                    '#navbar-bottom-view' => view('backend/template/navbarBottomView', $this->data), 
+                ];
+
+                /* Cicliamo gli ambienti per aggiornare solo i testi dei titoli */
+                foreach($this->allowedEnvs as $v):
+                    $json['fragments']['#lang_' . $v] = lang('backend/settings.panels.' . $v . 'Setting');
+                endforeach;
+
             endif;
 
-            return $this->jsonResponse([
-                'result'  => true, 
-                'message' => $saveResult['message'], 
-                'output'  => view('backend/settings/partials/index/' . $env . 'SettingsPartial', $this->data)
-            ]);
+            /* Corretti gli errori di sintassi qui sotto */
+            $json['result'] = true;
+            $json['message'] = $saveResult['message'];
+            $json['output'] = view('backend/settings/partials/index/' . $env . 'SettingsPartial', $this->data);
+
+            return $this->jsonResponse($json);
 
         endif;
     }

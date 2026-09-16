@@ -45,7 +45,7 @@ return [
 	], 
 	'messages' => [
 		'noLogsFound' => 'Nessun log trovato.', 
-		'areYouSureHardDelete' => 'Sei sicuro di voler disconnettere %s %s?', 
+		'areYouSureHardDelete' => 'Sei sicuro di voler disconnettere <b>%s %s?</b>', 
 		'validationErrors' => 'Errori di validazione.', 
 		'validationToastErrors' => '%s', 
 		'deleteTokenSuccess' => '%s %s è stato disconnesso con successo.', 
