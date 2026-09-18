@@ -7,16 +7,24 @@ return [
     'links' => [
         'export' => 'CSV exportieren', 
     ],
+    'labels' => [
+        'selectDeselectAll' => 'Alle auswählen / abwählen',
+        'selectColumns' => 'Wählen Sie die Spalten aus, die in den Export einbezogen werden sollen. Der Primärschlüssel wird vom System zwingend mit eingeschlossen.', 
+        'dataElaboration' => 'Datenaufbereitung...',  
+        'runningExportation' => 'Export läuft...', 
+    ], 
     'buttons' => [
     	'undo' => 'Abbrechen', 
     	'export' => 'Exportieren', 
+        'operationUndo' => 'Vorgang abbrechen', 
+        'exportationStart' => 'Export starten',
     ], 
     'messages' => [
         'validateToastErrors' => '%s',
         'invalidEntity' => 'Unbekannter Tabellenname.', 
         'noColumnsSelected' => 'Es wurden keine Spalten ausgewählt.', 
         'noDataFound' => 'Keine Datensätze gefunden.', 
-        'exportSuccess' => '%d Datensätze erfolgreich aus der Tabelle %s exportiert.', 
+        'exportSuccess' => '%d Datensätze aus der Tabelle %s exportiert.', 
         'processedRows' => '%d Zeilen verarbeitet', 
     ],
 ];
