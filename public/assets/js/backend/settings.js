@@ -46,6 +46,14 @@ const actions = {
             btn.classList.remove('disabled');
             bsCollapse.show();
         });
+
+        /* Ripristina la distruzione totale del contenitore alla chiusura */
+        document.addEventListener('hidden.bs.collapse', (e) => {
+            if (e.target && e.target.id.startsWith('main_collapse_')) {
+                const env = e.target.id.replace('main_collapse_', '');
+                manager.resetContainer(`${env}-settings-container`);
+            }
+        });
     }
 };
 

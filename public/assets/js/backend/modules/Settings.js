@@ -1,5 +1,5 @@
 /* Import delle utility risalendo di un livello */
-import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace, handleValidationErrors, initTomSelects } from '../backend.js';
+import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace, handleValidationErrors, initTomSelects, resetTomSelects } from '../backend.js';
 
 export class SettingsManager {
     constructor() {
@@ -169,7 +169,11 @@ export class SettingsManager {
                 
                 if (data.output) {
                     smoothReplace(container, data.output);
-                    initTomSelects();
+                    if (env === 'general') {
+                        setTimeout(() => {
+                            resetTomSelects();
+                        }, 100);
+                    }
                 }
 
                 if (data.fragments) {

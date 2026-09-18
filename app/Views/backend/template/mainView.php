@@ -92,22 +92,11 @@
     <?= $this->include('backend/template/alertView', $this->data); ?>
     <!-- ######################### FINE MODALE ALERT ######################### -->
 
-    <!-- Inizio contenitore invisibile per la localizzazione degli errori JS -->
-    <div id="js-i18n-errors" class="d-none"
-         data-err403="<?= esc(lang('backend/global.errors.err403')); ?>"
-         data-err404="<?= esc(lang('backend/global.errors.err404')); ?>"
-         data-err500="<?= esc(lang('backend/global.errors.err500')); ?>"
-         data-err504="<?= esc(lang('backend/global.errors.err504')); ?>"
-         data-err-network="<?= esc(lang('backend/global.errors.errNetwork')) ?>">
+    <!-- ######################### DEFINIZIONE LINGUE ######################### -->
+    <div id="lang-definitions-view">
+        <?= $this->include('backend/template/langDefinitionsView', $this->data); ?>
     </div>
-    <!-- Fine contenitore invisibile -->
-
-    <!-- Altre definizioni di lingua -->
-    <div id="lang-definitions" 
-        data-remove="<?= lang('backend/global.buttons.remove'); ?>"
-        data-select="<?= lang('backend/global.labels.select'); ?>">
-    </div>
-    <!-- Fine altre definizioni di lingua -->
+    <!-- ######################### FINE DEFINIZIONE LINGUE ######################### -->
     
 </body>
 

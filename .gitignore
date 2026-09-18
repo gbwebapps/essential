@@ -48,8 +48,19 @@ Vagrantfile
 #-------------------------
 # Temporary Files
 #-------------------------
+/writable/backups/*
+!/writable/backups/index.html
+!/writable/backups/database/index.html
+!/writable/backups/imports/index.html
+
 /writable/cache/*
 !/writable/cache/index.html
+
+/writable/debugbar/*
+!/writable/debugbar/index.html
+
+/writable/exports/*
+!/writable/exports/index.html
 
 /writable/logs/*
 !/writable/logs/index.html
@@ -59,9 +70,6 @@ Vagrantfile
 
 /writable/uploads/*
 !/writable/uploads/index.html
-
-/writable/debugbar/*
-!/writable/debugbar/index.html
 
 php_errors.log
 
@@ -130,3 +138,4 @@ public/guide/
 public/images/
 .doctum_cache/
 tests/
+.aider*

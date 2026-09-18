@@ -12,59 +12,59 @@ const actions = {
     index: function() {
 
         const manager = new ToolsManager();
-        const triggerButtons = document.querySelectorAll('.accordion-header button[data-env]');
         
         /* Variabili per memorizzare le istanze e non ricrearle ad ogni click */
         let exportManager = null;
         let importManager = null;
 
-        triggerButtons.forEach(btn => {
+        /* Delegazione globale per i click sui pulsanti accordion */
+        document.addEventListener('click', async (e) => {
+            const btn = e.target.closest('.accordion-header button[data-env]');
+            if (!btn) return;
+
+            e.preventDefault();
+
             const env = btn.dataset.env;
             const mainCollapse = document.getElementById(`main_collapse_${env}`);
+            if (!mainCollapse) return;
 
-            if (mainCollapse) {
-                const bsCollapse = new bootstrap.Collapse(mainCollapse, { toggle: false });
+            const bsCollapse = bootstrap.Collapse.getOrCreateInstance(mainCollapse, { toggle: false });
 
-                btn.addEventListener('click', async (e) => {
-                    e.preventDefault();
+            if (mainCollapse.classList.contains('show') || mainCollapse.classList.contains('collapsing')) {
+                bsCollapse.hide();
+                return;
+            }
 
-                    if (mainCollapse.classList.contains('show') || mainCollapse.classList.contains('collapsing')) {
-                        bsCollapse.hide();
-                        return;
+            const container = document.getElementById(`${env}-tools-container`);
+
+            /* Carica il pannello via AJAX solo se il contenitore è vuoto */
+            if ( ! container || container.innerHTML.trim() === '') {
+                const success = await manager.loadPanel(`${env}-tools-container`, env);
+                if (success === false) return;
+                
+                /* Controlla se l'accordion aperto è quello della manutenzione */
+                if (env === 'dbMaintenance') {
+                    
+                    if ( ! exportManager) {
+                        exportManager = new ExportCsvManager({ linkId: '.export-entity' });
+                        exportManager.init();
                     }
-
-                    const container = document.getElementById(`${env}-tools-container`);
-
-                    /* Carica il pannello via AJAX solo se il contenitore è vuoto */
-                    if ( ! container || container.innerHTML.trim() === '') {
-                        const success = await manager.loadPanel(`${env}-tools-container`, env);
-                        if (success === false) return;
-                        
-                        /* Controlla se l'accordion aperto è quello della manutenzione */
-                        if (env === 'dbMaintenance') { /* <- ATTENZIONE: verifica che il tuo data-env sia 'manutenzione' */
-                            
-                            if ( ! exportManager) {
-                                /* Passiamo le nuove classi modificate nello Step 1 */
-                                exportManager = new ExportCsvManager({ linkId: '.export-entity' });
-                                exportManager.init();
-                            }
-                            
-                            if ( ! importManager) {
-                                importManager = new ImportCsvManager({ linkId: '.import-entity' });
-                                importManager.init();
-                            }
-                        }
+                    
+                    if ( ! importManager) {
+                        importManager = new ImportCsvManager({ linkId: '.import-entity' });
+                        importManager.init();
                     }
+                }
+            }
 
-                    bsCollapse.show();
-                });
+            bsCollapse.show();
+        });
 
-                /* Reset del contenitore alla chiusura dell'accordion */
-                mainCollapse.addEventListener('hidden.bs.collapse', (e) => {
-                    if (e.target === mainCollapse) {
-                        manager.resetContainer(`${env}-tools-container`);
-                    }
-                });
+        /* Delegazione globale per il reset del contenitore alla chiusura */
+        document.addEventListener('hidden.bs.collapse', (e) => {
+            if (e.target && e.target.id.startsWith('main_collapse_')) {
+                const env = e.target.id.replace('main_collapse_', '');
+                manager.resetContainer(`${env}-tools-container`);
             }
         });
 

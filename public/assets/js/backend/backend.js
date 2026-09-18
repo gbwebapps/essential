@@ -451,18 +451,33 @@ export function initOffcanvasAutoClose(offcanvasId, linkSelector = '.cmd-link') 
 
 /* Funzione globale per inizializzare tutte le Tom Select attive nella pagina */
 export function initTomSelects() {
+
+    /* Recupera il div con le traduzioni aggiornate dai frammenti */
+    const langDef = document.getElementById('lang-definitions');
+    const textSelect = langDef ? langDef.dataset.select : 'Seleziona';
+    const textRemove = langDef ? langDef.dataset.remove : 'Rimuovi';
+
     document.querySelectorAll('.tom-select:not(.tomselected)').forEach(select => {
         new TomSelect(select, {
+            placeholder: textSelect,
             plugins: {
                 remove_button: {
-                    title: langDefinitions.dataset.remove, 
+                    title: textRemove
                 }
-            },
+            }, 
             persist: false,
             create: false,
-            placeholder: langDefinitions.dataset.select
         });
     });
+}
+
+export function resetTomSelects() {
+    document.querySelectorAll('select.tomselected').forEach(select => {
+        if (select.tomselect) {
+            select.tomselect.destroy();
+        }
+    });
+    initTomSelects();
 }
 
 /**

@@ -149,6 +149,7 @@ class SettingsController extends BackendController
                     '#section-view' => view('backend/template/sectionView', $this->data),
                     '#links-bar-view' => view('backend/template/linksBarView', $this->data), 
                     '#navbar-bottom-view' => view('backend/template/navbarBottomView', $this->data), 
+                    '#lang-definitions-view' => view('backend/template/langDefinitionsView', $this->data), 
                 ];
 
                 /* Cicliamo gli ambienti per aggiornare solo i testi dei titoli */
