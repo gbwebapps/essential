@@ -115,6 +115,9 @@ class LogsController extends BackendController
         return $this->render('backend/logs/indexView', $this->data);
     }
 
+    /**
+     * @return 
+     */
     public function hardDelete(): string|ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):

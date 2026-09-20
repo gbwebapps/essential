@@ -19,7 +19,7 @@
                                 <span class="fw-bold text-dark"><?= esc($group->name); ?></span>
                             </button>
                         </h2>
-                        <div id="collapse_group_<?= $group->id; ?>" class="accordion-collapse collapse" aria-labelledby="heading_group_<?= $group->id; ?>" data-bs-parent="#groupsAccordion">
+                        <div id="collapse_group_<?= $group->id; ?>" class="accordion-collapse collapse" aria-labelledby="heading_group_<?= $group->id; ?>">
                             <div class="accordion-body bg-white border-top template-container"></div>
                         </div>
                     </div>

@@ -4,6 +4,9 @@ namespace App\Models\Backend;
 
 use App\Models\Backend\BackendModel;
 
+/**
+ * 
+ */
 class GroupsModel extends BackendModel
 {
 	/**
@@ -232,6 +235,9 @@ class GroupsModel extends BackendModel
         ];
     }
 
+    /**
+     * @return [type]
+     */
     public function dropdownAdminsRules()
     {
         return [

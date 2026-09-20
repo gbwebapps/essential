@@ -5,13 +5,7 @@ namespace App\Models\Backend;
 use App\Models\Backend\BackendModel;
 
 /**
- * Modello di gestione e persistenza delle anagrafiche e dei privilegi degli amministratori.
- *
- * Questa classe estende le funzionalità base del backend model per governare il ciclo di vita completo
- * (CRUD) degli utenti amministrativi. Gestisce la mappatura dei campi autorizzati per ogni singola
- * operazione, isola i criteri di ricerca e ordinamento per le visualizzazioni tabellari, orchestra
- * le sotto-query per il recupero degli asset polimorfi (immagini e documenti) e centralizza le query
- * native per l'estrazione dei record al netto delle eccezioni di sicurezza.
+ * Descrizione classe
  */
 class LogsModel extends BackendModel
 {
@@ -50,8 +44,16 @@ class LogsModel extends BackendModel
      */
     protected array $showAllSearchAllowedFields = ['username', 'logout_reason']; 
 
+    /**
+     * [$showAllSearchAllowedDates description]
+     * @var array
+     */
     protected array $showAllSearchAllowedDates = ['login'];
 
+    /**
+     * [$getDataQuery description]
+     * @var string
+     */
     protected ?string $getDataQuery = "select admins_logs.*, admins_tokens.token_expire, admins_tokens.last_activity, admins_tokens.id as token_id_val, admins.firstname, admins.lastname, admins.superadmin  
                                         from admins_logs 
                                         left join admins_tokens 
@@ -60,8 +62,16 @@ class LogsModel extends BackendModel
                                         on admins.uuid = admins_logs.admin_uuid 
                                         where 1 = 1";
 
+    /**
+     * [$getNumRowsQuery description]
+     * @var string
+     */
     protected ?string $getNumRowsQuery = "select count(*) as count from admins_logs where 1 = 1";
 
+    /**
+     * [$getUUIDQuery description]
+     * @var string
+     */
     protected ?string $getUUIDQuery = "select * from admins_logs where id = ?";
 
     /**
@@ -103,6 +113,9 @@ class LogsModel extends BackendModel
         ];
     }
 
+    /**
+     * @return [type]
+     */
     public function showAllSearchValidationRules(): array
     {
         return [
@@ -125,6 +138,10 @@ class LogsModel extends BackendModel
         ];
     }
 
+    /**
+     * @param  int
+     * @return [type]
+     */
     public function deleteToken(int $tokenId): array
     {
         try {

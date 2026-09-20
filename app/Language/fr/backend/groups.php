@@ -24,7 +24,8 @@ return [
 		'name' => 'Nom du groupe',
 		'description' => 'Description du groupe',
 		'permissions' => 'Autorisations', 
-		'query' => 'Champ de recherche'
+		'query' => 'Champ de recherche', 
+		'groupNameBar' => 'Groupe %s',
 	], 
 	'placeholders' => [
 		'groupName' => 'Saisir le nom du groupe...', 

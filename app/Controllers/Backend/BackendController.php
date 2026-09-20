@@ -88,21 +88,6 @@ abstract class BackendController extends BaseController
     {
         parent::initController($request, $response, $logger);
 
-        /* 1. Recupera i settaggi generali dal database */
-        $generalSettings = setting('Backend\General');
-
-        /* 2. Intercetta un'eventuale richiesta POST con una nuova lingua in arrivo */
-        $postLanguage = $request->getPost('language');
-
-        /* 3. Se c'è un POST usa quello, altrimenti usa il dato del database */
-        $activeLanguage = ( ! empty($postLanguage)) ? $postLanguage : $generalSettings->language;
-
-        /* 4. Imposta la Lingua per tutto il framework PRIMA di qualsiasi altra operazione */
-        if ( ! empty($activeLanguage)):
-            service('request')->setLocale($activeLanguage);
-            service('language')->setLocale($activeLanguage);
-        endif;
-
         /* Carichiamo il servizio sessione nativo di CI4 */
         $this->session = \Config\Services::session();
 

@@ -34,9 +34,10 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
+        'language'      => \App\Filters\Backend\LanguageFilter::class,
         'authorization' => \App\Filters\Backend\AuthorizationFilter::class,
         'guest'         => \App\Filters\Backend\GuestFilter::class,
-        'superadmin'        => \App\Filters\Backend\SuperAdminFilter::class, 
+        'superadmin'    => \App\Filters\Backend\SuperAdminFilter::class, 
         'permission'    => \App\Filters\Backend\PermissionFilter::class,
     ];
 
@@ -76,14 +77,10 @@ class Filters extends BaseFilters
      */
     public array $globals = [
         'before' => [
-            // 'honeypot',
             'csrf',
-            // 'invalidchars',
+            'language', 
         ],
-        'after' => [
-            // 'honeypot',
-            // 'secureheaders',
-        ],
+        'after' => [],
     ];
 
     /**

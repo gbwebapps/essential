@@ -5,31 +5,24 @@ namespace Config\Backend;
 use CodeIgniter\Config\BaseConfig;
 
 /**
- * Class Auth
- *
- * Configurazione centrale per le politiche di sicurezza, gestione delle sessioni,
- * tentativi di accesso e chiavi crittografiche per l'ambiente di Backend.
+ * 
  */
 class Auth extends BaseConfig
 {
     /**
-     * Chiave binaria utilizzata per le operazioni di hashing e validazione dei dati.
-     * 
-     * @var string 
+     * [$hashKey description]
+     * @var string
      */
 	public string $hashKey = '';
 
     /**
-     * Chiave binaria utilizzata per la cifratura e protezione della sessione.
-     * 
-     * @var string 
+     * [$sessionCryptoKey description]
+     * @var string
      */
 	public string $sessionCryptoKey = '';
 
     /**
-     * Costruttore della classe.
-     * Recupera la chiave di cifratura dal file di ambiente (.env), gestisce l'eventuale
-     * conversione da esadecimale e inizializza le chiavi crittografiche.
+     * 
      */
 	public function __construct()
     {

@@ -24,7 +24,8 @@ return [
 		'name' => 'Group name',
 		'description' => 'Group description',
 		'permissions' => 'Permissions', 
-		'query' => 'Search field'
+		'query' => 'Search field', 
+		'groupNameBar' => 'Group %s',
 	], 
 	'placeholders' => [
 		'groupName' => 'Enter group name...', 

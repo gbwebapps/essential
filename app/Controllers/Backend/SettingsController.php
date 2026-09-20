@@ -150,6 +150,8 @@ class SettingsController extends BackendController
                     '#links-bar-view' => view('backend/template/linksBarView', $this->data), 
                     '#navbar-bottom-view' => view('backend/template/navbarBottomView', $this->data), 
                     '#lang-definitions-view' => view('backend/template/langDefinitionsView', $this->data), 
+                    '#modal-alert-view' => view('backend/template/alertView', $this->data), 
+                    '#scroll-up-text' => lang('backend/global.buttons.backToTop')
                 ];
 
                 /* Cicliamo gli ambienti per aggiornare solo i testi dei titoli */

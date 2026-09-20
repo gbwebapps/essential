@@ -4,18 +4,34 @@ namespace App\Models\Backend;
 
 use App\Models\Backend\BackendModel;
 
+/**
+ * 
+ */
 class ToolsModel extends BackendModel
 {
+	/**
+	 * [$manageAuditsAllowedFields description]
+	 * @var [type]
+	 */
 	protected array $manageAuditsAllowedFields = ['fromDate', 'toDate']; 
 
+	/**
+	 * [$manageLogsAllowedFields description]
+	 * @var [type]
+	 */
 	protected array $manageLogsAllowedFields = ['fromDate', 'toDate']; 
 
+	/**
+	 * @return [type]
+	 */
 	protected function initModel(): void 
 	{
 		parent::initModel();
 	}
 
-	/* Regole di validazione per i nuovi campi HTML5 */
+	/**
+	 * @return [type]
+	 */
 	public function validateManageAuditsRules(): array
 	{
 		return [

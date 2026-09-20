@@ -282,6 +282,8 @@ export function showAlert(type, message, customIcon = '')
             defaultIcon = '';
     }
 
+    const langDefinitions = document.getElementById('lang-definitions');
+
     /* Usa l'icona custom se passata, altrimenti quella di default */
     const finalIcon = customIcon || defaultIcon;
     const iconHTML = finalIcon ? `${finalIcon} ` : '';
@@ -487,8 +489,11 @@ export function resetTomSelects() {
 export function initSingleDatePicker(containerSelector) {
     if (typeof flatpickr === 'undefined') return;
 
+    /* Recupera la lingua attiva dal tag HTML (es. 'it', 'en') */
+    const currentLang = document.documentElement.lang || 'it';
+
     return flatpickr(containerSelector, {
-        locale: flatpickr.l10ns.it,
+        locale: flatpickr.l10ns[currentLang] || 'default',
         enableTime: true,
         time_24hr: true,
         dateFormat: "Y-m-d H:i:s",
@@ -507,8 +512,12 @@ export function initSingleDatePicker(containerSelector) {
 export function initRangeDatePicker(fromContainerSelector, toContainerSelector) {
     if (typeof flatpickr === 'undefined') return { pickerFrom: null, pickerTo: null };
 
+    /* Recupera la lingua attiva dal tag HTML (es. 'it', 'en') */
+    const currentLang = document.documentElement.lang || 'it';
+
     const baseConfig = {
-        locale: flatpickr.l10ns.it,
+        /* Assegna dinamicamente la lingua o usa il default (inglese) in caso di errore */
+        locale: flatpickr.l10ns[currentLang] || 'default',
         enableTime: true,
         enableSeconds: true,
         time_24hr: true,

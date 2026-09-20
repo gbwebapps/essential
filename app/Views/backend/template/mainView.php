@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="<?= esc(setting('Backend\General')->language) ?>">
 
 <head>
     <!-- Configurazione meta e charset -->
@@ -64,7 +64,8 @@
 
     <!-- Pulsante per lo scroll rapido verso l'alto -->
     <button type="button" class="scrollup fade-out btn btn-secondary btn-sm">
-        <i class="fa-solid fa-arrow-circle-up"></i> <?= lang('backend/global.buttons.backToTop'); ?>
+        <i class="fa-solid fa-arrow-circle-up"></i> 
+        <span id="scroll-up-text"><?= lang('backend/global.buttons.backToTop'); ?></span>
     </button>
 
     <?php /* Passaggio del nome controller al comparto Javascript */ ?>
@@ -89,7 +90,9 @@
     <?php endforeach; endif; ?>
 
     <!-- ######################### MODALE ALERT ######################### -->
-    <?= $this->include('backend/template/alertView', $this->data); ?>
+    <div id="modal-alert-view">
+        <?= $this->include('backend/template/alertView', $this->data); ?>
+    </div>
     <!-- ######################### FINE MODALE ALERT ######################### -->
 
     <!-- ######################### DEFINIZIONE LINGUE ######################### -->

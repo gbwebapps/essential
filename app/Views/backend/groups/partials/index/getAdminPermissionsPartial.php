@@ -1,5 +1,7 @@
 <div class="card-body p-0 mt-4">
-    <div class="ps-2 py-1 bg-light fw-bold small mb-2 border text-center rounded-2">Gruppo <?= esc($name); ?></div>
+    <div class="ps-2 py-1 bg-light fw-bold small mb-2 border text-center rounded-2">
+        <?= sprintf(lang('backend/groups.labels.groupNameBar'), esc($name)); ?>
+    </div>
     <form id="edit-admin-exceptions-form" data-uuid="<?= $uuid; ?>">
 
         <input type="hidden" name="uuid" value="<?= $uuid; ?>">
@@ -73,7 +75,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="d-flex flex-column flex-md-row justify-content-center gap-2">
-                    <button type="button" class="btn btn-warning text-dark btn-sm btn-refresh-admin-perms" data-uuid="<?= $uuid; ?>" data-message="Sei sicuro di voler ricaricare i dati originari di questo amministratore?">
+                    <button type="button" class="btn btn-warning text-dark btn-sm btn-refresh-admin-perms" data-uuid="<?= $uuid; ?>" data-message="<?= lang('backend/groups.messages.areYouSureToReload'); ?>">
                         <i class="fa-solid fa-refresh me-1"></i> <?= lang('backend/groups.buttons.resetData'); ?>
                     </button>
                     <button type="submit" class="btn btn-success btn-sm">

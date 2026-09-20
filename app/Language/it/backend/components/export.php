@@ -7,9 +7,17 @@ return [
     'links' => [
         'export' => 'Esporta CSV', 
     ],
+    'labels' => [
+        'selectDeselectAll' => 'Seleziona / Deseleziona tutte',
+        'selectColumns' => 'Seleziona le colonne da includere nell\'esportazione. La chiave primaria verrà inclusa forzatamente dal sistema.', 
+        'dataElaboration' => 'Preparazione dei dati...',  
+        'runningExportation' => 'Esportazione in corso...', 
+    ], 
     'buttons' => [
     	'undo' => 'Annulla', 
     	'export' => 'Esporta', 
+        'operationUndo' => 'Annulla operazione', 
+        'exportationStart' => 'Avvia esportazione',
     ], 
     'messages' => [
         'validateToastErrors' => '%s',

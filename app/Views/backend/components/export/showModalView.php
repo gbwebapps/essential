@@ -15,13 +15,13 @@
 
                 <!-- FASE 1: Selezione Colonne -->
                 <div id="export-selection-area">
-                    <p class="text-muted small mb-3">Seleziona le colonne da includere nell'esportazione. La chiave primaria verrà inclusa forzatamente dal sistema.</p>
+                    <p class="text-muted small mb-3"><?= lang('backend/components/export.labels.selectColumns'); ?></p>
                     
                     <form id="export-columns-form">
                         <div class="form-check mb-3 border-bottom pb-2">
                             <input class="form-check-input" type="checkbox" id="export-check-all" checked>
                             <label class="form-check-label fw-bold" for="export-check-all">
-                                Seleziona / Deseleziona tutte
+                                <?= lang('backend/components/export.labels.selectDeselectAll'); ?>
                             </label>
                         </div>
                         
@@ -43,18 +43,18 @@
                 <!-- FASE 2: Loader di Esportazione (Inizialmente Nascosto) -->
                 <div id="export-spinner-area" class="d-none text-center py-4">
                     <div class="spinner-border text-success mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
-                    <h5 class="fw-bold text-dark">Esportazione in corso...</h5>
-                    <p class="fw-bold text-success mb-0" id="export-progress-text">Preparazione dei dati...</p>
+                    <h5 class="fw-bold text-dark"><?= lang('backend/components/export.labels.runningExportation'); ?></h5>
+                    <p class="fw-bold text-success mb-0" id="export-progress-text"><?= lang('backend/components/export.labels.dataElaboration'); ?></p>
                 </div>
 
             </div>
 
             <div class="modal-footer border-0 justify-content-center">
                 <button type="button" class="btn btn-sm btn-danger no-general-disabled" id="export-cancel-btn">
-                    <i class="fa-solid fa-xmark"></i> Annulla operazione
+                    <i class="fa-solid fa-xmark"></i> <?= lang('backend/components/export.buttons.operationUndo'); ?>
                 </button>
                 <button type="button" class="btn btn-sm btn-success" id="export-start-btn">
-                    <i class="fa-solid fa-play"></i> Avvia Esportazione
+                    <i class="fa-solid fa-play"></i> <?= lang('backend/components/export.buttons.exportationStart'); ?>
                 </button>
             </div>
 

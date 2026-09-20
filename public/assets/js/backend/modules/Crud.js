@@ -8,17 +8,25 @@ import { UploadPreviewImgManager } from '../components/UploadPreview.js';
 export class ListManager {
     constructor(config = {}, hooks = {}) {
 
-        if (ListManager.instance) {
-            return ListManager.instance;
+        /* 1. Registro istanze basato su containerId */
+        if ( ! ListManager.instances) {
+            ListManager.instances = {};
         }
-        ListManager.instance = this;
 
+        if (ListManager.instances[config.containerId]) {
+            return ListManager.instances[config.containerId];
+        }
+        
+        ListManager.instances[config.containerId] = this;
+
+        /* 2. Aggiunto debounceTime in configurazione */
         this.config = Object.assign({
             controller: '',
             url: '',
             containerId: '', 
             searchFields: [], 
-            searchDates: []
+            searchDates: [],
+            debounceTime: 500
         }, config);
 
         this.hooks = Object.assign({
@@ -41,7 +49,6 @@ export class ListManager {
         this.debounceTimer = null;
         this.container = document.querySelector(`#${this.config.containerId}`);
 
-        /* NUOVO: Variabili di stato */
         this.eventsBound = false;
         this.isLoading = false;
         this.isResetting = false;
@@ -59,18 +66,13 @@ export class ListManager {
         this.showAll();
     }
 
-    /* --- INIZIALIZZAZIONE --- */
     initFilters() {
-
-        /* Unifichiamo i campi per iterare sulla UI all'avvio */
         const allFields = [];
 
-        /* I campi testo rimangono standard */
         this.config.searchFields.forEach(f => {
             allFields.push({ name: f, type: 'searchFields', isDate: false });
         });
 
-        /* Per ogni colonna data, generiamo automaticamente le due varianti from e to */
         this.config.searchDates.forEach(f => {
             allFields.push({ name: `${f}-from`, type: 'searchDates', isDate: true });
             allFields.push({ name: `${f}-to`, type: 'searchDates', isDate: true });
@@ -80,7 +82,6 @@ export class ListManager {
             const key = `${this.config.controller}_${field.name}`;
             const value = localStorage.getItem(key) || '';
             
-            /* Salva il valore nell'oggetto di stato corretto */
             this.state[field.type][field.name] = value;
 
             const inputEl = document.getElementById(`${this.config.controller}-${field.name}`);
@@ -126,10 +127,7 @@ export class ListManager {
         searchBar.addEventListener('hidden.bs.collapse', () => localStorage.setItem(key, '0'));
     }
 
-    /* --- EVENTI --- */
     bindEvents() {
-
-        /* NUOVO: Impedisce cloni dei listener */
         if (this.eventsBound) return;
         this.eventsBound = true;
 
@@ -145,7 +143,6 @@ export class ListManager {
             });
         });
 
-        /* Paginazione e Ordinamento (Delegation sul container) */
         this.container.addEventListener('click', (e) => {
             const sortEl = e.target.closest(`a.sort`);
             if (sortEl) {
@@ -163,41 +160,26 @@ export class ListManager {
             }
         });
 
-        /* Modifica numero righe */
         document.getElementById('changeNumRows')?.addEventListener('change', (e) => {
             this.updateState('rows', e.target.value);
             this.resetSortingAndPagination();
             this.showAll();
         });
 
-        /* Azioni Toolbar */
-        // document.getElementById('link-reset-search')?.addEventListener('click', async (e) => {
-        //     e.preventDefault();
-            
-        //     this.isResetting = true; // ACCENDE IL SILENZIATORE
-            
-        //     this.resetFilters();
-        //     this.resetSortingAndPagination();
-        //     await this.showAll();
-            
-        //     this.isResetting = false; // SPEGNE IL SILENZIATORE
-        // });
-
         document.getElementById('link-reset-search')?.addEventListener('click', async (e) => {
             e.preventDefault();
             
-            this.isResetting = true; // ACCENDE IL SILENZIATORE
+            this.isResetting = true;
             
             this.resetFilters();
             this.resetSortingAndPagination();
             
-            /* Uccide i timer in sospeso e sblocca il semaforo per garantire l'esecuzione */
             clearTimeout(this.debounceTimer);
             this.isLoading = false;
             
             await this.showAll();
             
-            this.isResetting = false; // SPEGNE IL SILENZIATORE
+            this.isResetting = false;
         });
 
         document.getElementById('reset-sorting-link')?.addEventListener('click', (e) => {
@@ -211,7 +193,6 @@ export class ListManager {
             this.showAll();
         });
 
-        /* Input Ricerca (Generazione dinamica dei canali per testo e date) */
         const allFields = [];
 
         this.config.searchFields.forEach(f => {
@@ -232,8 +213,9 @@ export class ListManager {
                 if (this.isResetting) return;
 
                 const value = inputEl.value;
-                localStorage.setItem(`${this.config.controller}_${field.name}`, value);
-                this.state[field.type][field.name] = value;
+                
+                /* 3. Utilizzo del nuovo metodo per centralizzare lo stato nidificato */
+                this.updateNestedState(field.type, field.name, value);
 
                 const resetBtn = inputEl.closest('.input-group')?.querySelector('.reset-search-field');
                 if (resetBtn) resetBtn.style.display = value ? 'flex' : 'none';
@@ -251,7 +233,8 @@ export class ListManager {
 
                 if (useDebounce) {
                     clearTimeout(this.debounceTimer);
-                    this.debounceTimer = setTimeout(triggerSearch, 500);
+                    /* 4. Applicazione del debounceTime configurabile */
+                    this.debounceTimer = setTimeout(triggerSearch, this.config.debounceTime);
                 } else {
                     triggerSearch();
                 }
@@ -282,9 +265,14 @@ export class ListManager {
         });
     } 
 
-    /* --- METODI OPERATIVI --- */
     updateState(key, value) {
         this.state[key] = value;
+        localStorage.setItem(`${this.config.controller}_${key}`, value);
+    }
+
+    /* 5. Nuovo metodo per aggiornamento stato nidificato (Testi e Date) */
+    updateNestedState(group, key, value) {
+        this.state[group][key] = value;
         localStorage.setItem(`${this.config.controller}_${key}`, value);
     }
 
@@ -311,18 +299,17 @@ export class ListManager {
                     inputEl.value = '';
                 }
 
-                /* Nasconde forzatamente la "x" sia per le date che per i testi */
                 const resetBtn = inputEl.closest('.input-group')?.querySelector('.reset-search-field');
                 if (resetBtn) {
                     resetBtn.style.display = 'none';
                 }
             }
             
-            localStorage.setItem(`${this.config.controller}_${field.name}`, '');
-            this.state[field.type][field.name] = '';
+            /* Utilizzo del metodo centralizzato anche qui */
+            this.updateNestedState(field.type, field.name, '');
             
             const errorDiv = document.querySelector(`.error_${this.config.controller}-${field.name}`);
-            smoothReplace(errorDiv, '&nbsp;');
+            if (errorDiv) smoothReplace(errorDiv, '&nbsp;');
         });
         
         this.updateActiveSearchIndicator();
@@ -345,7 +332,6 @@ export class ListManager {
         linkSearch.classList.toggle('fw-bold', hasTextFields || hasDateFields);
     }
 
-    /* --- COMUNICAZIONE SERVER --- */
     async showAll() {
 
         if (this.isLoading) return;
@@ -353,7 +339,6 @@ export class ListManager {
 
         const urlParams = new URLSearchParams();
 
-        /* Costruzione dinamica parametri dividendo i due array strutturati */
         Object.keys(this.state).forEach(key => {
             if (key === 'searchFields') {
                 Object.entries(this.state.searchFields).forEach(([subKey, val]) => {
@@ -371,15 +356,13 @@ export class ListManager {
         if (typeof this.hooks.onShowBefore === 'function') {
             const stop = this.hooks.onShowBefore(urlParams);
             if (stop === false) {
-                this.isLoading = false; /* <--- AGGIUNTO */
+                this.isLoading = false;
                 return;
             }
         }
 
-        /* Pulizia immediata degli errori visivi prima dell'invio */
         document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
 
-        /* Chiamata Fetch */
         try {
             const response = await apiFetch(this.config.url, {
                 method: 'POST',
@@ -387,26 +370,20 @@ export class ListManager {
             });
 
             const data = await response.json();
-
-            /* Recupero centralizzato dell'elemento del DOM */
             const showAllEl = document.getElementById(this.config.containerId);
 
-            /* Controllo errori di validazione */
             if (data.errors) {
                 if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
                 
-                /* Se presente l'elemento, svuota la tabella mostrando l'errore centralizzato */
                 if (showAllEl && data.message) {
                     const errorTemplate = `<div class="text-center text-danger py-3 fw-bold">${data.message}</div>`;
                     smoothReplace(showAllEl, errorTemplate);
                 }
 
                 if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
-
                 return;
             }
 
-            /* Controllo fallimento logico generico */
             if (data.result === false) {
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('danger', data.message);
@@ -414,9 +391,7 @@ export class ListManager {
                 return;
             }
 
-            /* Successo (data.result === true) */
             if (data.result === true) {
-
                 if (showAllEl && data.output) {
                     smoothReplace(showAllEl, data.output);
                 }
@@ -427,15 +402,14 @@ export class ListManager {
             }
 
         } catch (error) {
-
-            /* Qui finiscono solo gli errori di rete o i crash del server */
             if (typeof this.hooks.onShowError === 'function') {
                 this.hooks.onShowError(error);
             }
             console.error("Errore ListManager:", error);
+            
+            /* 6. Rilancio dell'errore per il chiamante asincrono */
+            throw error;
         } finally {
-
-            /* NUOVO: Rilascia sempre il blocco */
             this.isLoading = false;
         }
     }

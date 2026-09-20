@@ -79,9 +79,11 @@ class ToolsClass
 	 */
 	public function getJsIndex(): array
 	{
+	    $locale = setting('Backend\General')->language;
+
 	    return [
 	        ['id' => 'flatpickr-js', 'path' => 'assets/vendor/flatpickr/js/flatpickr.min.js', 'position' => 'before', 'target' => 'audits-js'], 
-	        ['id' => 'it-js', 'path' => 'assets/vendor/flatpickr/js/it.js', 'position' => 'after', 'target' => 'flatpickr-js']
+	        ['id' => $locale . '-js', 'path' => 'assets/vendor/flatpickr/js/' . $locale . '.js', 'position' => 'after', 'target' => 'flatpickr-js']
 	    ];
 	}
 

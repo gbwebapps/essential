@@ -24,7 +24,8 @@ return [
 		'name' => '群组名称',
 		'description' => '群组描述',
 		'permissions' => '权限', 
-		'query' => '搜索字段'
+		'query' => '搜索字段', 
+		'groupNameBar' => '%s 组',
 	], 
 	'placeholders' => [
 		'groupName' => '请输入群组名称...', 

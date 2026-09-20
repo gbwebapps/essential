@@ -3,19 +3,14 @@
 namespace App\Cells;
 
 /**
- * Class BackendButtonsCell
- *
- * View Cell dedicata alla generazione e alla configurazione dinamica dei pulsanti
- * di controllo (es. Salva, Ripristina, Stampa) all'interno dei form e dei moduli del Backend.
+ * 
  */
 class BackendButtonsCell
 {
     /**
-     * Elabora e restituisce il codice HTML dei pulsanti associati all'azione corrente.
-     *
-     * @param string $controller Nome del controller di riferimento per caricare le etichette del modulo.
-     * @param string $action     L'azione in esecuzione (es. 'add', 'edit', 'show', 'edit_account').
-     * @return string Il frammento HTML dei pulsanti renderizzati, oppure una stringa vuota se l'azione non è supportata.
+     * @param  string
+     * @param  string
+     * @return [type]
      */
     public function render(string $controller, string $action): string
     {
@@ -32,11 +27,9 @@ class BackendButtonsCell
     }
 
     /**
-     * Mappa e restituisce i parametri specifici (testi, icone, classi CSS e messaggi di conferma) per ciascun pulsante.
-     *
-     * @param string $controller Nome del controller per la gestione delle traduzioni dinamiche.
-     * @param string $action     L'azione da cui ricavare il set di configurazione del pulsante.
-     * @return array Matrice contenente le proprietà grafiche e i messaggi dei pulsanti sinistro e destro.
+     * @param  [type]
+     * @param  [type]
+     * @return [type]
      */
     private function getButtonConfig($controller, $action): array
     {

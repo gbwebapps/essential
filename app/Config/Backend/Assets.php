@@ -5,17 +5,12 @@ namespace Config\Backend;
 use CodeIgniter\Config\BaseConfig;
 
 /**
- * Class Assets
- *
- * Configurazione centrale per la gestione degli asset nativi (CSS e JavaScript)
- * richiesti dal nucleo (Core) dell'ambiente di Backend.
+ * 
  */
 class Assets extends BaseConfig
 {
     /**
-     * Restituisce l'elenco dei file CSS fondamentali e obbligatori per il layout del backend.
-     *
-     * @return array Insieme degli asset CSS core con relativi identificativi e percorsi.
+     * @return [type]
      */
     public static function getCoreCss(): array
     {
@@ -27,11 +22,8 @@ class Assets extends BaseConfig
     }
 
     /**
-     * Genera l'elenco dei file JavaScript fondamentali, integrando dinamicamente
-     * l'eventuale script specifico associato al controller in esecuzione.
-     *
-     * @param string|null $controller Nome del controller corrente per l'inclusione del file dedicato.
-     * @return array Insieme degli asset JavaScript core e condizionali.
+     * @param  string|null
+     * @return [type]
      */
     public static function getCoreJs(?string $controller = null): array
     {
