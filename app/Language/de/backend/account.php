@@ -69,6 +69,13 @@ return [
 	'errors' => [
 		'id' => 'Ungültige ID.', 
 	], 
+	'audits' => [
+	    'updateData'     => 'Allgemeine Datenaktualisierung %s %s',
+	    'deleteToken'    => 'Token-Löschung %s %s',
+	    'resetPassword'  => 'Passwort zurücksetzen %s %s',
+	    'activateMethod' => '2FA-Methodeneinstellung %s %s',
+	    'activateTotp'   => '2FA-Methodeneinstellung %s %s',
+	],
 	'messages' => [
 		'noDataChanged' => 'Es wurden keine Änderungen vorgenommen.', 
 		'editSuccess' => 'Administrator %s %s erfolgreich aktualisiert.', 

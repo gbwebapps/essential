@@ -36,6 +36,18 @@ return [
 		'login' => 'Accedi', 
 		'resetPassword' => 'Resetta password'
 	], 
+	'audits' => [
+		'loginRefused' => 'Tentativo di accesso con account inesistente', 
+		'loginBlocked' => 'Accesso rifiutato, account bloccato %s %s', 
+		'loginFailed' => 'Tentativo di accesso fallito %s %s', 
+		'2faRequired' => 'Richiesto codice di verifica 2FA %s %s %s', 
+		'loginSuccess' => 'Accesso effettuato %s %s', 
+		'resetPasswordAuth' => 'Reset password %s %s', 
+		'setPassword' => 'Impostazione password %s %s', 
+		'verifyFailed' => 'Tentativo di accesso con account inesistente', 
+		'2faBlocked' => 'Blocco 2FA %s %s', 
+		'2faFailed' => 'Codice 2FA errato o scaduto %s %s', 
+	], 
 	'messages' => [
 		'goodbye' => 'Arrivederci %s %s.', 
 		'welcome' => 'Buongiorno %s %s.', 

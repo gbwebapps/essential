@@ -36,6 +36,18 @@ return [
 		'login' => '登录', 
 		'resetPassword' => '重置密码'
 	], 
+	'audits' => [
+	    'loginRefused'      => '使用不存在的账号登录尝试',
+	    'loginBlocked'      => '访问被拒绝，账号已被锁定 %s %s',
+	    'loginFailed'       => '登录尝试失败 %s %s',
+	    '2faRequired'       => '需要 2FA 验证码 %s %s %s',
+	    'loginSuccess'      => '登录成功 %s %s',
+	    'resetPasswordAuth' => '重置密码 %s %s',
+	    'setPassword'       => '设置密码 %s %s',
+	    'verifyFailed'      => '使用不存在的账号登录尝试',
+	    '2faBlocked'        => '2FA 锁定 %s %s',
+	    '2faFailed'         => '2FA 验证码错误或已过期 %s %s',
+	],
 	'messages' => [
 		'goodbye' => '再见 %s %s。', 
 		'welcome' => '早上好 %s %s。', 

@@ -160,6 +160,10 @@ return [
 		'second' => 'Deuxième option', 
 		'thirst' => 'Troisième option', 
 	], 
+	'audits' => [
+	    'saveSettings'   => 'Enregistrement des paramètres.',
+	    'deleteSettings' => 'Suppression des paramètres.',
+	],
 	'messages' => [
 		'validationErrors' => 'Erreurs de validation.', 
 		'saveSuccess' => 'Paramètres enregistrés avec succès dans la base de données.', 

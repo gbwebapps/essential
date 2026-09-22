@@ -69,6 +69,13 @@ return [
 	'errors' => [
 		'id' => 'ID no conforme.',
 	],
+	'audits' => [
+	    'updateData'     => 'Actualización de datos generales %s %s',
+	    'deleteToken'    => 'Eliminación de token %s %s',
+	    'resetPassword'  => 'Restablecimiento de contraseña %s %s',
+	    'activateMethod' => 'Configuración del método 2FA %s %s',
+	    'activateTotp'   => 'Configuración del método 2FA %s %s',
+	],
 	'messages' => [
 		'noDataChanged' => 'No se han realizado cambios.',
 		'editSuccess' => 'Administrador %s %s actualizado con éxito.',

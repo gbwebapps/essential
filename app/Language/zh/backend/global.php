@@ -73,6 +73,9 @@ return [
         'next' => '下一页',
         'previous' => '上一页',
     ],
+    'audits' => [
+        'importData' => '将数据导入表 %s。已插入 %d 条记录，已更新 %d 条记录。',
+    ],
     'messages' => [
         'getDataError' => '获取列表操作时出错。',
         'getUUIDError' => '获取详情操作时出错。', 

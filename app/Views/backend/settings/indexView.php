@@ -30,7 +30,7 @@
                                     </h2>
                                 </button>
                             </h2>
-                            <div id="main_collapse_<?= $env; ?>" class="accordion-collapse collapse" aria-labelledby="main_heading_<?= $env; ?>">
+                            <div id="main_collapse_<?= $env; ?>" class="accordion-collapse collapse" aria-labelledby="main_heading_<?= $env; ?>" data-bs-parent="#mainSettingsDashboard">
                                 <div id="<?= $env; ?>-settings-container" class="accordion-body bg-white border-top mb-0"></div>
                             </div>
                         </div>

@@ -47,6 +47,26 @@ const assetsToCopy = [
         to: 'public/assets/vendor/flatpickr/js/it.js'
     },
     {
+        from: 'node_modules/flatpickr/dist/l10n/default.js',
+        to: 'public/assets/vendor/flatpickr/js/default.js'
+    },
+    {
+        from: 'node_modules/flatpickr/dist/l10n/es.js',
+        to: 'public/assets/vendor/flatpickr/js/es.js'
+    },
+    {
+        from: 'node_modules/flatpickr/dist/l10n/fr.js',
+        to: 'public/assets/vendor/flatpickr/js/fr.js'
+    },
+    {
+        from: 'node_modules/flatpickr/dist/l10n/de.js',
+        to: 'public/assets/vendor/flatpickr/js/de.js'
+    },
+    {
+        from: 'node_modules/flatpickr/dist/l10n/zh.js',
+        to: 'public/assets/vendor/flatpickr/js/zh.js'
+    },
+    {
         from: 'node_modules/flatpickr/dist/flatpickr.min.css',
         to: 'public/assets/vendor/flatpickr/css/flatpickr.min.css'
     },

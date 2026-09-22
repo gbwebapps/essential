@@ -36,6 +36,18 @@ return [
 		'login' => 'Se connecter', 
 		'resetPassword' => 'Réinitialiser le mot de passe'
 	], 
+	'audits' => [
+	    'loginRefused'      => 'Tentative de connexion avec un compte inexistant',
+	    'loginBlocked'      => 'Accès refusé, compte bloqué %s %s',
+	    'loginFailed'       => 'Échec de la tentative de connexion %s %s',
+	    '2faRequired'       => 'Code de vérification 2FA requis %s %s %s',
+	    'loginSuccess'      => 'Connexion réussie %s %s',
+	    'resetPasswordAuth' => 'Réinitialisation du mot de passe %s %s',
+	    'setPassword'       => 'Définition du mot de passe %s %s',
+	    'verifyFailed'      => 'Tentative de connexion avec un compte inexistant',
+	    '2faBlocked'        => 'Blocage 2FA %s %s',
+	    '2faFailed'         => 'Code 2FA incorrect ou expiré %s %s',
+	],
 	'messages' => [
 		'goodbye' => 'Au revoir %s %s.', 
 		'welcome' => 'Bonjour %s %s.', 

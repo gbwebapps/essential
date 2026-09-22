@@ -199,7 +199,7 @@ class AuthModel extends BackendModel
 
             /* Se l'utente non esiste, esce immediatamente con errore generico (sicurezza) */
             if ( ! $admin):
-                log_admin_activity(null, 'LOGIN_FAILED', 'auth', 'Tentativo di accesso con account inesistente');
+                log_admin_activity(null, 'LOGIN_REFUSED', 'auth', lang('backend/auth.audits.loginRefused'));
                 return ['result' => false, 'message' => lang('backend/auth.messages.loginFailed')];
             endif;
 
@@ -221,7 +221,7 @@ class AuthModel extends BackendModel
 
                     $this->db->transCommit();
 
-                    log_admin_activity('LOGIN_BLOCKED', 'auth', sprintf('Accesso rifiutato, account bloccato %s %s', esc($admin->firstname), esc($admin->lastname)), $admin);
+                    log_admin_activity('LOGIN_BLOCKED', 'auth', sprintf(lang('backend/auth.audits.loginBlocked'), esc($admin->firstname), esc($admin->lastname)), $admin);
 
                     return ['result' => false, 'message' => lang('backend/auth.messages.tooMAnyAttempts')];
                 endif;
@@ -240,7 +240,7 @@ class AuthModel extends BackendModel
 
                 $this->db->transCommit();
 
-                log_admin_activity('LOGIN_FAILED', 'auth', sprintf('Tentativo di accesso fallito %s %s', esc($admin->firstname), esc($admin->lastname)), $admin);
+                log_admin_activity('LOGIN_FAILED', 'auth', sprintf(lang('backend/auth.audits.loginFailed'), esc($admin->firstname), esc($admin->lastname)), $admin);
 
                 return ['result' => false, 'message' => lang('backend/auth.messages.loginFailed')];
                 
@@ -269,7 +269,7 @@ class AuthModel extends BackendModel
                         (new \App\Libraries\EmailOtpService())->send($admin->uuid);
                     endif;
 
-                    log_admin_activity('2FA_REQUIRED', 'auth', sprintf('Richiesto codice di verifica 2FA (' . $twofa->method . ') %s %s', esc($admin->firstname), esc($admin->lastname)), $admin);
+                    log_admin_activity('2FA_REQUIRED', 'auth', sprintf(lang('backend/auth.audits.2faRequired'), esc($twofa->method), esc($admin->firstname), esc($admin->lastname)), $admin);
 
                     /* Il client riceve solo la notifica del successo parziale senza dati sensibili esposti */
                     return ['result' => '2fa_required', 'method' => $twofa->method];
@@ -375,7 +375,7 @@ class AuthModel extends BackendModel
         /* Chiude la transazione aperta nel metodo principale prima di impostare gli stati del client */
         $this->db->transCommit();
 
-        log_admin_activity('LOGIN_SUCCESS', 'auth', sprintf('Accesso effettuato %s %s ', esc($admin->firstname), esc($admin->lastname)), $admin);
+        log_admin_activity('LOGIN_SUCCESS', 'auth', sprintf(lang('backend/auth.audits.loginSuccess'), esc($admin->firstname), esc($admin->lastname)), $admin);
 
         /* 5. Rigenerazione dell'ID di sessione per prevenire Session Fixation */
         session()->regenerate(true);
@@ -463,7 +463,7 @@ class AuthModel extends BackendModel
 
                 $this->db->transCommit();
 
-                log_admin_activity('RESET_PASSWORD_AUTH', 'auth', sprintf('Reset password %s %s ', esc($admin->firstname), esc($admin->lastname)), $admin);
+                log_admin_activity('RESET_PASSWORD_AUTH', 'auth', sprintf(lang('backend/auth.audits.resetPasswordAuth'), esc($admin->firstname), esc($admin->lastname)), $admin);
 
             } catch (\Throwable $e) {
                 $this->db->transRollback();
@@ -541,7 +541,7 @@ class AuthModel extends BackendModel
 
                 $this->db->transCommit();
 
-                log_admin_activity('SET_PASSWORD', 'auth', sprintf('Impostazione password %s %s ', esc($admin->firstname), esc($admin->lastname)), $admin);
+                log_admin_activity('SET_PASSWORD', 'auth', sprintf(lang('backend/auth.audits.setPassword'), esc($admin->firstname), esc($admin->lastname)), $admin);
 
                 $message = sprintf(lang('backend/auth.messages.setPasswordSuccess'), esc($admin->firstname), esc($admin->lastname));
 
@@ -641,7 +641,7 @@ class AuthModel extends BackendModel
             /* Recupero l'oggetto anagrafico dell'admin per il login finale, bloccando rigorosamente i record cestinati */
             $admin = $this->db->query("select * from admins where uuid = ? and status = 1 and deleted_at IS NULL limit 1", [$adminUuid])->getRow();
             if ( ! $admin):
-                log_admin_activity(null, 'VERIFY_FAILED', 'auth', 'Tentativo di accesso con account inesistente');
+                log_admin_activity(null, 'VERIFY_FAILED', 'auth', lang('backend/auth.audits.verifyFailed'));
                 return ['result' => false, 'message' => lang('backend/auth.messages.verifyFailed')];
             endif;
 
@@ -667,7 +667,7 @@ class AuthModel extends BackendModel
 
                 $this->db->transCommit();
 
-                log_admin_activity('2FA_BLOCKED', 'auth', sprintf('Blocco 2FA %s %s ', esc($admin->firstname), esc($admin->lastname)), $admin);
+                log_admin_activity('2FA_BLOCKED', 'auth', sprintf(lang('backend/auth.audits.2faBlocked'), esc($admin->firstname), esc($admin->lastname)), $admin);
 
                 return ['result' => false, 'message' => lang('backend/auth.messages.tooManyAttempts')];
             endif;
@@ -713,7 +713,7 @@ class AuthModel extends BackendModel
 
                 $this->db->transCommit();
 
-                log_admin_activity('2FA_FAILED', 'auth', sprintf('Codice 2FA errato o scaduto %s %s ', esc($admin->firstname), esc($admin->lastname)), $admin);
+                log_admin_activity('2FA_FAILED', 'auth', sprintf(lang('backend/auth.audits.2faFailed'), esc($admin->firstname), esc($admin->lastname)), $admin);
 
                 /* Scegliamo il messaggio specifico in base allo stato */
                 $errorMessage = $isExpired ? lang('backend/auth.messages.expiredCode') : lang('backend/auth.messages.wrongCode');

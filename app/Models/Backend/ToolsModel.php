@@ -136,7 +136,7 @@ class ToolsModel extends BackendModel
 	        $toLog = convertDate($dates['to'], 'conversational');
 
 			$currentAdmin = service('authorization')->currentAdmin();
-			log_admin_activity('DELETE_AUDITS', 'tools', sprintf(lang('Eliminazione audits dal %s al %s'), $fromLog, $toLog), $currentAdmin);
+			log_admin_activity('DELETE_AUDITS', 'tools', sprintf(lang('backend/tools.audits.deleteAudits'), $fromLog, $toLog), $currentAdmin);
 
 			return ['result' => true, 'message' => sprintf(lang('backend/tools.messages.deleteAuditsSuccess'), $deleted, $fromLog, $toLog)];
 
@@ -220,7 +220,7 @@ class ToolsModel extends BackendModel
             $toLog = convertDate($dates['to'], 'conversational');
 
     		$currentAdmin = service('authorization')->currentAdmin();
-    		log_admin_activity('DELETE_LOGS', 'tools', sprintf(lang('Eliminazione logs dal %s al %s'), $fromLog, $toLog), $currentAdmin);
+    		log_admin_activity('DELETE_LOGS', 'tools', sprintf(lang('backend/tools.audits.deleteLogs'), $fromLog, $toLog), $currentAdmin);
 
     		return ['result' => true, 'message' => sprintf(lang('backend/tools.messages.deleteLogsSuccess'), $deleted, $fromLog, $toLog)];
 
@@ -278,7 +278,7 @@ class ToolsModel extends BackendModel
 		/* Registrazione attività */
 		$currentAdmin = service('authorization')->currentAdmin();
 		$targetLog = is_string($target) ? "la tabella {$target}" : "tutte le tabelle del database";
-		log_admin_activity('OPTIMIZE_DB', 'tools', sprintf('Eseguita ottimizzazione su %s', $targetLog), $currentAdmin);
+		log_admin_activity('OPTIMIZE_DB', 'tools', sprintf(lang('backend/tools.audits.targetLog'), $targetLog), $currentAdmin);
 
 		/* Se la richiesta era per una tabella singola, estraiamo solo quella */
 		if (is_string($target)):
@@ -466,7 +466,7 @@ class ToolsModel extends BackendModel
 
 		/* Registrazione attività */
 		$currentAdmin = service('authorization')->currentAdmin();
-		log_admin_activity('GENERATE_BACKUP', 'tools', sprintf('Generato nuovo backup del database: %s', $zipFilename), $currentAdmin);
+		log_admin_activity('GENERATE_BACKUP', 'tools', sprintf(lang('backend/tools.audits.generateBackup'), $zipFilename), $currentAdmin);
 
 		return true;
 	}
@@ -481,7 +481,7 @@ class ToolsModel extends BackendModel
 				
 				/* Registrazione attività */
 				$currentAdmin = service('authorization')->currentAdmin();
-				log_admin_activity('DELETE_BACKUP', 'tools', sprintf('Eliminato backup del database: %s', basename($filename)), $currentAdmin);
+				log_admin_activity('DELETE_BACKUP', 'tools', sprintf(lang('backend/tools.audits.deleteBackup'), basename($filename)), $currentAdmin);
 				
 				return true;
 			endif;
@@ -566,7 +566,7 @@ class ToolsModel extends BackendModel
 
 	    /* Registrazione attività */
 	    $currentAdmin = service('authorization')->currentAdmin();
-	    log_admin_activity('CLEAN_' . strtoupper($folder), 'tools', sprintf("Svuotata cartella %s: eliminati %d file", $folder, $deletedCount), $currentAdmin);
+	    log_admin_activity('CLEAN_' . strtoupper($folder), 'tools', sprintf(lang('backend/tools.audits.cleanFolder'), $folder, $deletedCount), $currentAdmin);
 
 	    return ['result' => true, 'message' => sprintf(lang('backend/tools.messages.folderCleanSuccess'), $deletedCount, $folder)];
 	}

@@ -43,6 +43,9 @@ return [
 		'dateTo' => 'Nach Enddatum suchen...',
 		'searchLogoutReason' => 'Nach Abmeldegrund suchen...'
 	], 
+	'audits' => [
+	    'deleteToken' => 'Erzwungene Beendigung der aktuellen Sitzung',
+	],
 	'messages' => [
 		'noLogsFound' => 'Keine Protokolle gefunden.', 
 		'areYouSureHardDelete' => 'Sind Sie sicher, dass Sie <b>%s %s</b> abmelden möchten?', 

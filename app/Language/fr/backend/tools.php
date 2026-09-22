@@ -75,6 +75,14 @@ return [
 		'close' => 'Fermer', 
 		'cleanFolder' => 'Vider le dossier'
 	], 
+	'audits' => [
+	    'deleteAudits'   => 'Suppression des audits du %s au %s',
+	    'deleteLogs'     => 'Suppression des journaux du %s au %s',
+	    'targetLog'      => 'Optimisation effectuée sur %s',
+	    'generateBackup' => 'Nouvelle sauvegarde de la base de données générée : %s',
+	    'deleteBackup'   => 'Sauvegarde de la base de données supprimée : %s',
+	    'cleanFolder'    => "Dossier %s vidé : %d fichiers supprimés",
+	],
 	'messages' => [
 		'areYouSureToResetData' => 'Êtes-vous sûr de vouloir réinitialiser les données ?', 
 		'areYouSureToDeleteAudits' => '<p>Êtes-vous sûr de vouloir supprimer les activités du <b>%s</b> au <b>%s</b> ?</p> <p><b>%d</b> activités seront supprimées.</p>', 

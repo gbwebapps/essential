@@ -49,6 +49,9 @@ return [
 		'dateFrom' => 'Rechercher par date de début...', 
 		'dateTo' => 'Rechercher par date de fin...',
 	], 
+	'audits' => [
+	    'deleteToken' => 'Supprimer le jeton %s %s',
+	],
 	'messages' => [
 		'validationErrors' => 'Erreurs de validation.', 
 		'validationToastErrors' => '%s', 

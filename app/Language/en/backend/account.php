@@ -69,6 +69,13 @@ return [
 	'errors' => [
 		'id' => 'Invalid ID.', 
 	], 
+	'audits' => [
+	    'updateData'     => 'General data update %s %s',
+	    'deleteToken'    => 'Token deletion %s %s',
+	    'resetPassword'  => 'Password reset %s %s',
+	    'activateMethod' => '2FA method setup %s %s',
+	    'activateTotp'   => '2FA method setup %s %s',
+	],
 	'messages' => [
 		'noDataChanged' => 'No changes were made.', 
 		'editSuccess' => 'Administrator %s %s updated successfully.', 

@@ -43,6 +43,12 @@ return [
 		'wrongUUID' => 'Incorrect UUID format.', 
 		'wrongID' => 'Incorrect ID format', 
 	],
+	'audits' => [
+	    'addGroup'       => 'Adding group %s',
+	    'editGroup'      => 'Updating group %s',
+	    'deleteGroup'    => 'Deleting group %s',
+	    'saveExceptions' => 'Inserting exception %s %s',
+	],
 	'messages' => [
 		'areYouSureDeleteGroup' => 'Are you sure you want to delete <b>%s</b> group?', 
 		'areYouSureToReload' => 'Are you sure you want to reload the data?', 

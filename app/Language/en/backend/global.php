@@ -73,6 +73,9 @@ return [
         'next' => 'Next',
         'previous' => 'Previous',
     ],
+    'audits' => [
+        'importData' => 'Data import into table %s. Inserted %d records, updated %d records.',
+    ],
     'messages' => [
         'getDataError' => 'Error during list retrieval operation.',
         'getUUIDError' => 'Error during detail retrieval operation.', 

@@ -12,6 +12,9 @@ return [
         'uploadImages' => 'Bilder auswählen',
         'sendImages' => 'Bilder senden',
     ], 
+    'audits' => [
+        'uploadPreviewImg' => 'Vorschatbilder speichern.',
+    ],
     'messages' => [
         'notImagesSelected' => 'Bitte wählen Sie mindestens ein Bild aus.',
         'saveImagesSuccess' => 'Die Bilder wurden erfolgreich gespeichert.',

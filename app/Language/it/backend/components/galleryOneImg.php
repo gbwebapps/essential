@@ -17,6 +17,11 @@ return [
     'buttons' => [
         'reload' => 'Ricarica galleria', 
     ], 
+    'audits' => [
+        'deleteImage' => 'Eliminazione immagine.',
+        'setCover' => 'Impostazione cover.', 
+        'removeCover' => 'Rimozione cover.',
+    ], 
     'messages' => [
         'areYouSureRemoveCover' => 'Sei sicuro di voler rimuovere la cover su questa immagine?',
         'areYouSureSetCover' => 'Sei sicuro di voler impostare la cover su questa immagine?',

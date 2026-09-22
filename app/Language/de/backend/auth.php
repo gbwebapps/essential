@@ -36,6 +36,18 @@ return [
 		'login' => 'Anmelden', 
 		'resetPassword' => 'Passwort zurücksetzen'
 	], 
+	'audits' => [
+	    'loginRefused'      => 'Anmeldeversuch mit nicht existierendem Konto',
+	    'loginBlocked'      => 'Zugriff verweigert, Konto gesperrt %s %s',
+	    'loginFailed'       => 'Fehlgeschlagener Anmeldeversuch %s %s',
+	    '2faRequired'       => '2FA-Bestätigungscode erforderlich %s %s %s',
+	    'loginSuccess'      => 'Anmeldung erfolgreich %s %s',
+	    'resetPasswordAuth' => 'Passwort zurücksetzen %s %s',
+	    'setPassword'       => 'Passwort festlegen %s %s',
+	    'verifyFailed'      => 'Anmeldeversuch mit nicht existierendem Konto',
+	    '2faBlocked'        => '2FA-Sperre %s %s',
+	    '2faFailed'         => 'Falscher oder abgelaufener 2FA-Code %s %s',
+	],
 	'messages' => [
 		'goodbye' => 'Auf Wiedersehen %s %s.', 
 		'welcome' => 'Guten Tag %s %s.', 

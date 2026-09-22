@@ -160,6 +160,10 @@ return [
 		'second' => '第二选项', 
 		'thirst' => '第三选项', 
 	], 
+	'audits' => [
+	    'saveSettings'   => '保存设置。',
+	    'deleteSettings' => '删除设置。',
+	],
 	'messages' => [
 		'validationErrors' => '验证错误。', 
 		'saveSuccess' => '设置已成功保存到数据库。', 

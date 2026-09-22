@@ -49,6 +49,9 @@ return [
 		'dateFrom' => '按开始日期搜索...', 
 		'dateTo' => '按结束日期搜索...',
 	], 
+	'audits' => [
+	    'deleteToken' => '删除令牌 %s %s',
+	],
 	'messages' => [
 		'validationErrors' => '验证错误。', 
 		'validationToastErrors' => '%s', 

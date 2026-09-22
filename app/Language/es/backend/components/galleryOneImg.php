@@ -17,6 +17,11 @@ return [
     'buttons' => [
         'reload' => 'Recargar galería',
     ],
+    'audits' => [
+        'deleteImage' => 'Eliminando imagen.',
+        'setCover'    => 'Estableciendo portada.',
+        'removeCover' => 'Eliminando portada.',
+    ],
     'messages' => [
         'areYouSureRemoveCover' => '¿Estás seguro de que deseas quitar la portada de esta imagen?',
         'areYouSureSetCover' => '¿Estás seguro de que deseas establecer esta imagen como portada?',

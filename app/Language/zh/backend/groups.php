@@ -43,6 +43,12 @@ return [
 		'wrongUUID' => 'UUID 格式不正确。', 
 		'wrongID' => 'ID 格式不正确', 
 	],
+	'audits' => [
+	    'addGroup'       => '添加群组 %s',
+	    'editGroup'      => '更新群组 %s',
+	    'deleteGroup'    => '删除群组 %s',
+	    'saveExceptions' => '插入异常 %s %s',
+	],
 	'messages' => [
 		'areYouSureDeleteGroup' => '您确定要删除群组 <b>%s</b> 吗？', 
 		'areYouSureToReload' => '您确定要重新加载数据吗？', 

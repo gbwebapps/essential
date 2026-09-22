@@ -425,7 +425,7 @@ class SettingsModel extends BackendModel
         $this->db->query($sql, $params);
 
         $currentAdmin = service('authorization')->currentAdmin();
-        log_admin_activity('SAVE_SETTINGS', 'settings', 'Salvataggio impostazioni.', $currentAdmin);
+        log_admin_activity('SAVE_SETTINGS', 'settings', lang('backend/settings.audits.saveSettings'), $currentAdmin);
 
         return ['result' => true, 'message' => lang('backend/settings.messages.saveSuccess')];
     }
@@ -494,7 +494,7 @@ class SettingsModel extends BackendModel
         $this->db->query($sql, [$namespace]);
 
         $currentAdmin = service('authorization')->currentAdmin();
-        log_admin_activity('DELETE_SETTINGS', 'settings', 'Eliminazione impostazioni.', $currentAdmin);
+        log_admin_activity('DELETE_SETTINGS', 'settings', lang('backend/settings.audits.deleteSettings'), $currentAdmin);
 
         return true;
     }

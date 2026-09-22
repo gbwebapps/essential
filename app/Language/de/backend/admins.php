@@ -118,6 +118,17 @@ return [
 		'id' => 'Ungültige ID.', 
 		'permission' => 'Ungültige Berechtigung.', 
 	], 
+	'audits' => [
+	    'addAdmin'             => 'Admin %s %s hinzufügen',
+	    'editAdmin'            => 'Admin %s %s aktualisieren',
+	    'hardDeleteAdmin'      => 'Admin %s %s löschen',
+	    'softDeleteAdmin'      => 'Admin %s %s in den Papierkorb verschieben',
+	    'restoreDeleteAdmin'   => 'Admin %s %s wiederherstellen',
+	    'resetPasswordAdmin'   => 'Passwort zurücksetzen %s %s',
+	    'changeStatusAdmin'    => 'Status aktualisieren %s %s',
+	    'changePermissionAdmin'=> 'Berechtigung aktualisieren %s %s',
+	    'deleteTokenAdmin'     => 'Token %s %s löschen',
+	],
 	'messages' => [
 		'areYouSureResetData' => 'Sind Sie sicher, dass Sie die Daten zurücksetzen möchten?', 
 		'areYouSureRefreshData' => 'Sind Sie sicher, dass Sie die Daten neu laden möchten?', 

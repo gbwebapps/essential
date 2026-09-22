@@ -75,6 +75,14 @@ return [
 		'close' => 'Cerrar',
 		'cleanFolder' => 'Vaciar carpeta'
 	],
+	'audits' => [
+	    'deleteAudits'   => 'Eliminación de auditorías del %s al %s',
+	    'deleteLogs'     => 'Eliminación de registros del %s al %s',
+	    'targetLog'      => 'Optimización realizada en %s',
+	    'generateBackup' => 'Nueva copia de seguridad de la base de datos generada: %s',
+	    'deleteBackup'   => 'Copia de seguridad de la base de datos eliminada: %s',
+	    'cleanFolder'    => "Carpeta %s vaciada: %d archivos eliminados",
+	],
 	'messages' => [
 		'areYouSureToResetData' => '¿Estás seguro de que deseas restablecer los datos?',
 		'areYouSureToDeleteAudits' => '<p>¿Estás seguro de que deseas eliminar las actividades desde el <b>%s</b> hasta el <b>%s</b>?</p> <p>Se eliminarán <b>%d</b> actividades.</p>',

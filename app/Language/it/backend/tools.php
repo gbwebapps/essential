@@ -75,6 +75,14 @@ return [
 		'close' => 'Chiudi', 
 		'cleanFolder' => 'Svuota cartella'
 	], 
+	'audits' => [
+		'deleteAudits' => 'Eliminazione audits dal %s al %s', 
+		'deleteLogs' => 'Eliminazione logs dal %s al %s', 
+		'targetLog' => 'Eseguita ottimizzazione su %s', 
+		'generateBackup' => 'Generato nuovo backup del database: %s', 
+		'deleteBackup' => 'Eliminato backup del database: %s', 
+		'cleanFolder' => "Svuotata cartella %s: eliminati %d file", 
+	], 
 	'messages' => [
 		'areYouSureToResetData' => 'Sei sicuro di voler resettare i dati?', 
 		'areYouSureToDeleteAudits' => '<p>Sei sicuro di voler eliminare le attività dal <b>%s</b> al <b>%s</b>?</p> <p>Verranno eliminate <b>%d</b> attività.</p>', 

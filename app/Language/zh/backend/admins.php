@@ -118,6 +118,17 @@ return [
 		'id' => 'ID 不符合规范。', 
 		'permission' => '权限不符合规范。', 
 	], 
+	'audits' => [
+	    'addAdmin'             => '添加管理员 %s %s',
+	    'editAdmin'            => '更新管理员 %s %s',
+	    'hardDeleteAdmin'      => '删除管理员 %s %s',
+	    'softDeleteAdmin'      => '将管理员放入回收站 %s %s',
+	    'restoreDeleteAdmin'   => '恢复管理员 %s %s',
+	    'resetPasswordAdmin'   => '重置密码 %s %s',
+	    'changeStatusAdmin'    => '更新状态 %s %s',
+	    'changePermissionAdmin'=> '更新权限 %s %s',
+	    'deleteTokenAdmin'     => '删除令牌 %s %s',
+	],
 	'messages' => [
 		'areYouSureResetData' => '您确定要重置数据吗？', 
 		'areYouSureRefreshData' => '您确定要重新加载数据吗？', 

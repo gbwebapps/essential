@@ -36,6 +36,18 @@ return [
 		'login' => 'Iniciar sesión',
 		'resetPassword' => 'Restablecer contraseña'
 	],
+	'audits' => [
+	    'loginRefused'      => 'Intento de inicio de sesión con cuenta inexistente',
+	    'loginBlocked'      => 'Acceso denegado, cuenta bloqueada %s %s',
+	    'loginFailed'       => 'Intento de inicio de sesión fallido %s %s',
+	    '2faRequired'       => 'Código de verificación 2FA requerido %s %s %s',
+	    'loginSuccess'      => 'Inicio de sesión exitoso %s %s',
+	    'resetPasswordAuth' => 'Restablecimiento de contraseña %s %s',
+	    'setPassword'       => 'Configuración de contraseña %s %s',
+	    'verifyFailed'      => 'Intento de inicio de sesión con cuenta inexistente',
+	    '2faBlocked'        => 'Bloqueo 2FA %s %s',
+	    '2faFailed'         => 'Código 2FA incorrecto o caducado %s %s',
+	],
 	'messages' => [
 		'goodbye' => 'Hasta luego %s %s.',
 		'welcome' => 'Buenos días %s %s.',

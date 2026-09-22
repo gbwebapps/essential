@@ -17,6 +17,11 @@ return [
     'buttons' => [
         'reload' => '重新加载画廊', 
     ], 
+    'audits' => [
+        'deleteImage' => '删除图片。',
+        'setCover'    => '设置封面。',
+        'removeCover' => '移除封面。',
+    ],
     'messages' => [
         'areYouSureRemoveCover' => '您确定要移除此图片的封面设置吗？',
         'areYouSureSetCover' => '您确定要将此图片设置为封面吗？',

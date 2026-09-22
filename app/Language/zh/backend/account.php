@@ -69,6 +69,13 @@ return [
 	'errors' => [
 		'id' => 'ID 不符合规范。', 
 	], 
+	'audits' => [
+	    'updateData'     => '更新通用数据 %s %s',
+	    'deleteToken'    => '删除令牌 %s %s',
+	    'resetPassword'  => '重置密码 %s %s',
+	    'activateMethod' => '设置 2FA 方法 %s %s',
+	    'activateTotp'   => '设置 2FA 方法 %s %s',
+	],
 	'messages' => [
 		'noDataChanged' => '未进行任何更改。', 
 		'editSuccess' => '管理员 %s %s 更新成功。', 

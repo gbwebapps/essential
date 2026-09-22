@@ -43,6 +43,9 @@ return [
 		'dateTo' => 'Search by end date...',
 		'searchLogoutReason' => 'Search by logout reason...'
 	], 
+	'audits' => [
+	    'deleteToken' => 'Forced termination of current session',
+	],
 	'messages' => [
 		'noLogsFound' => 'No logs found.', 
 		'areYouSureHardDelete' => 'Are you sure you want to disconnect <b>%s %s</b>?', 

@@ -43,6 +43,9 @@ return [
 		'dateTo' => 'Cerca per data fine...',
 		'searchLogoutReason' => 'Cerca per motivo di disconnessione...'
 	], 
+	'audits' => [
+		'deleteToken' => 'Interruzione forzata sessione in corso', 
+	], 
 	'messages' => [
 		'noLogsFound' => 'Nessun log trovato.', 
 		'areYouSureHardDelete' => 'Sei sicuro di voler disconnettere <b>%s %s?</b>', 

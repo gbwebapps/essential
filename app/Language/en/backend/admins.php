@@ -118,6 +118,17 @@ return [
 		'id' => 'Invalid ID.', 
 		'permission' => 'Invalid permission.', 
 	], 
+	'audits' => [
+	    'addAdmin'             => 'Add admin %s %s',
+	    'editAdmin'            => 'Update admin %s %s',
+	    'hardDeleteAdmin'      => 'Delete admin %s %s',
+	    'softDeleteAdmin'      => 'Trash admin %s %s',
+	    'restoreDeleteAdmin'   => 'Restore admin %s %s',
+	    'resetPasswordAdmin'   => 'Reset password %s %s',
+	    'changeStatusAdmin'    => 'Update status %s %s',
+	    'changePermissionAdmin'=> 'Update permission %s %s',
+	    'deleteTokenAdmin'     => 'Delete token %s %s',
+	],
 	'messages' => [
 		'areYouSureResetData' => 'Are you sure you want to reset the data?', 
 		'areYouSureRefreshData' => 'Are you sure you want to reload the data?', 

@@ -75,6 +75,14 @@ return [
 		'close' => 'Close', 
 		'cleanFolder' => 'Empty Folder'
 	], 
+	'audits' => [
+	    'deleteAudits'   => 'Deletion of audits from %s to %s',
+	    'deleteLogs'     => 'Deletion of logs from %s to %s',
+	    'targetLog'      => 'Optimization performed on %s',
+	    'generateBackup' => 'New database backup generated: %s',
+	    'deleteBackup'   => 'Database backup deleted: %s',
+	    'cleanFolder'    => "Folder %s emptied: %d files deleted",
+	],
 	'messages' => [
 		'areYouSureToResetData' => 'Are you sure you want to reset the data?', 
 		'areYouSureToDeleteAudits' => '<p>Are you sure you want to delete activities from <b>%s</b> to <b>%s</b>?</p> <p><b>%d</b> activities will be deleted.</p>', 

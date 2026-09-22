@@ -17,6 +17,11 @@ return [
     'buttons' => [
         'reload' => 'Reload gallery', 
     ], 
+    'audits' => [
+        'deleteImage' => 'Deleting image.',
+        'setCover'    => 'Setting cover.',
+        'removeCover' => 'Removing cover.',
+    ],
     'messages' => [
         'areYouSureRemoveCover' => 'Are you sure you want to remove the cover from this image?',
         'areYouSureSetCover' => 'Are you sure you want to set the cover for this image?',

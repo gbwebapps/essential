@@ -43,6 +43,9 @@ return [
 		'dateTo' => '按结束日期搜索...',
 		'searchLogoutReason' => '按退出原因搜索...'
 	], 
+	'audits' => [
+	    'deleteToken' => '强制终止当前会话',
+	],
 	'messages' => [
 		'noLogsFound' => '未找到日志。', 
 		'areYouSureHardDelete' => '您确定要断开 <b>%s %s</b> 的连接吗？', 

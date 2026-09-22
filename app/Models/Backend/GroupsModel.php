@@ -381,7 +381,7 @@ class GroupsModel extends BackendModel
             $this->db->transCommit();
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('ADD_GROUP', 'groups', sprintf('Aggiunta gruppo %s ', esc($posts['name'])), $currentAdmin);
+            log_admin_activity('ADD_GROUP', 'groups', sprintf(lang('backend/groups.audits.addGroup'), esc($posts['name'])), $currentAdmin);
 
             return ['result' => true, 'message' => lang('backend/groups.messages.addSuccess')];
         } 
@@ -457,7 +457,7 @@ class GroupsModel extends BackendModel
             $this->db->transCommit();
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('EDIT_GROUP', 'groups', sprintf('Aggiornamento gruppo %s ', esc($posts['name'])), $currentAdmin);
+            log_admin_activity('EDIT_GROUP', 'groups', sprintf(lang('backend/groups.audits.editGroup'), esc($posts['name'])), $currentAdmin);
 
             return ['result' => true, 'message' => lang('backend/groups.messages.editSuccess')];
         } 
@@ -497,7 +497,7 @@ class GroupsModel extends BackendModel
             $this->db->transCommit();
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('DELETE_GROUP', 'groups', sprintf('Eliminazione gruppo %s ', esc($group->name)), $currentAdmin);
+            log_admin_activity('DELETE_GROUP', 'groups', sprintf(lang('backend/groups.audits.deleteGroup'), esc($group->name)), $currentAdmin);
 
             return ['result' => true, 'message' => lang('backend/groups.messages.delSuccess')];
 
@@ -710,7 +710,7 @@ class GroupsModel extends BackendModel
             $this->db->transCommit();
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('SAVE_EXCEPTIONS', 'groups', sprintf('Inserimento eccezione %s %s ', esc($admin->firstname), esc($admin->lastname)), $currentAdmin);
+            log_admin_activity('SAVE_EXCEPTIONS', 'groups', sprintf(lang('backend/groups.audits.saveExceptions'), esc($admin->firstname), esc($admin->lastname)), $currentAdmin);
 
             return ['result' => true, 'message' => sprintf(lang('backend/groups.messages.saveExceptionsSuccess'), esc($admin->firstname), esc($admin->lastname))];
 

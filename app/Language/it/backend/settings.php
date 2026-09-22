@@ -160,6 +160,10 @@ return [
 		'second' => 'Seconda opzione', 
 		'thirst' => 'Terza opzione', 
 	], 
+	'audits' => [
+		'saveSettings' => 'Salvataggio impostazioni.', 
+		'deleteSettings' => 'Eliminazione impostazioni.', 
+	], 
 	'messages' => [
 		'validationErrors' => 'Errori di validazione.', 
 		'saveSuccess' => 'Impostazioni salvate nel database con successo.', 

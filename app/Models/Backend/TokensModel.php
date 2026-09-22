@@ -199,7 +199,7 @@ class TokensModel extends BackendModel
             if($this->db->affectedRows() > 0):
 
                 $currentAdmin = service('authorization')->currentAdmin();
-                log_admin_activity('DELETE_TOKEN', 'tokens', sprintf('Delete token %s %s', esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+                log_admin_activity('DELETE_TOKEN', 'tokens', sprintf(lang('backend/tokens.audits.deleteToken'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
 
                 return ['result' => true, 'message' => sprintf(lang('backend/tokens.messages.deleteTokenSuccess'), esc($data['row']->firstname), esc($data['row']->lastname)), 'admin' => $data['row']];
             endif;

@@ -179,7 +179,7 @@ class LogsModel extends BackendModel
 
                 /* 4. Log dell'azione per l'audit di sistema (opzionale ma consigliato) */
                 $currentAdmin = service('authorization')->currentAdmin();
-                log_admin_activity('DELETE_TOKEN', 'logs', 'Interruzione forzata sessione in corso', $currentAdmin);
+                log_admin_activity('DELETE_TOKEN', 'logs', lang('backend/logs.audits.deleteToken'), $currentAdmin);
 
                 return ['result' => true, 'message' => sprintf(lang('backend/logs.messages.deleteTokenSuccess'), esc($tokenRow->firstname), esc($tokenRow->lastname))];
                 

@@ -75,6 +75,14 @@ return [
 		'close' => 'Schließen', 
 		'cleanFolder' => 'Ordner leeren'
 	], 
+	'audits' => [
+	    'deleteAudits'   => 'Löschung der Audits vom %s bis %s',
+	    'deleteLogs'     => 'Löschung der Logs vom %s bis %s',
+	    'targetLog'      => 'Optimierung durchgeführt an %s',
+	    'generateBackup' => 'Neues Datenbank-Backup erstellt: %s',
+	    'deleteBackup'   => 'Datenbank-Backup gelöscht: %s',
+	    'cleanFolder'    => "Ordner %s geleert: %d Dateien gelöscht",
+	],
 	'messages' => [
 		'areYouSureToResetData' => 'Sind Sie sicher, dass Sie die Daten zurücksetzen möchten?', 
 		'areYouSureToDeleteAudits' => '<p>Sind Sie sicher, dass Sie die Aktivitäten vom <b>%s</b> bis zum <b>%s</b> löschen möchten?</p> <p>Es werden <b>%d</b> Aktivitäten gelöscht.</p>', 

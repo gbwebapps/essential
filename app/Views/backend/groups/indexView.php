@@ -16,7 +16,7 @@
                                 </h2>
                             </button>
                         </h2>
-                        <div id="main_collapse_add" class="accordion-collapse collapse" aria-labelledby="main_heading_add">
+                        <div id="main_collapse_add" class="accordion-collapse collapse" aria-labelledby="main_heading_add" data-bs-parent="#mainGroupsDashboard">
                             <div id="add-groups-container" class="accordion-body bg-white border-top mb-0"></div>
                         </div>
                     </div>
@@ -29,7 +29,7 @@
                                 </h2>
                             </button>
                         </h2>
-                        <div id="main_collapse_list" class="accordion-collapse collapse" aria-labelledby="main_heading_list">
+                        <div id="main_collapse_list" class="accordion-collapse collapse" aria-labelledby="main_heading_list" data-bs-parent="#mainGroupsDashboard">
                             <div id="showAll-groups-container" class="accordion-body bg-white border-top"></div>
                         </div>
                     </div>
@@ -42,7 +42,7 @@
                                 </h2>
                             </button>
                         </h2>
-                        <div id="main_collapse_exceptions" class="accordion-collapse collapse" aria-labelledby="main_heading_exceptions">
+                        <div id="main_collapse_exceptions" class="accordion-collapse collapse" aria-labelledby="main_heading_exceptions" data-bs-parent="#mainGroupsDashboard">
                             <div id="exceptions-groups-container" class="accordion-body bg-white border-top"></div>
                         </div>
                     </div>

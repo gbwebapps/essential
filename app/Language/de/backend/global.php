@@ -73,6 +73,9 @@ return [
         'next' => 'Nächste',
         'previous' => 'Vorherige',
     ],
+    'audits' => [
+        'importData' => 'Datenimport in Tabelle %s. %d Datensätze eingefügt, %d Datensätze aktualisiert.',
+    ],
     'messages' => [
         'getDataError' => 'Fehler beim Abrufen der Liste.',
         'getUUIDError' => 'Fehler beim Abrufen der Details.', 

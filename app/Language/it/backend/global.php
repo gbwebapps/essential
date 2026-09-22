@@ -73,6 +73,9 @@ return [
         'next' => 'Prossimo',
         'previous' => 'Precedente',
     ],
+    'audits' => [
+        'importData' => 'Importazione dati nella tabella %s. Inseriti %d records, aggiornati %d records.',
+    ], 
     'messages' => [
         'getDataError' => 'Errore durante operazione di recupero lista.',
         'getUUIDError' => 'Errore durante operazione di recupero dettaglio.', 

@@ -118,6 +118,17 @@ return [
 		'id' => 'ID non conforme.', 
 		'permission' => 'Autorisation non conforme.', 
 	], 
+	'audits' => [
+	    'addAdmin'             => 'Ajouter l\'administrateur %s %s',
+	    'editAdmin'            => 'Mettre à jour l\'administrateur %s %s',
+	    'hardDeleteAdmin'      => 'Supprimer l\'administrateur %s %s',
+	    'softDeleteAdmin'      => 'Mettre à la corbeille l\'administrateur %s %s',
+	    'restoreDeleteAdmin'   => 'Restaurer l\'administrateur %s %s',
+	    'resetPasswordAdmin'   => 'Réinitialiser le mot de passe %s %s',
+	    'changeStatusAdmin'    => 'Mettre à jour le statut %s %s',
+	    'changePermissionAdmin'=> 'Mettre à jour la permission %s %s',
+	    'deleteTokenAdmin'     => 'Supprimer le jeton %s %s',
+	],
 	'messages' => [
 		'areYouSureResetData' => 'Êtes-vous sûr de vouloir réinitialiser les données ?', 
 		'areYouSureRefreshData' => 'Êtes-vous sûr de vouloir recharger les données ?', 

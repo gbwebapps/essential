@@ -12,6 +12,9 @@ return [
         'uploadImages' => 'Seleziona immagini',
         'sendImages' => 'Invia immagini',
     ], 
+    'audits' => [
+        'uploadPreviewImg' => 'Salvataggio immagini.', 
+    ], 
     'messages' => [
         'notImagesSelected' => 'Selezionare almeno una immagine.',
         'saveImagesSuccess' => 'Le immagini sono state salvate con successo.',

@@ -49,6 +49,9 @@ return [
 		'dateFrom' => 'Search by start date...', 
 		'dateTo' => 'Search by start date...',
 	], 
+	'audits' => [
+	    'deleteToken' => 'Delete token %s %s',
+	],
 	'messages' => [
 		'validationErrors' => 'Validation errors.', 
 		'validationToastErrors' => '%s', 

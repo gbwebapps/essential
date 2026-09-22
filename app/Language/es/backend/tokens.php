@@ -49,6 +49,9 @@ return [
 		'dateFrom' => 'Buscar por fecha de inicio...',
 		'dateTo' => 'Buscar por fecha de fin...',
 	],
+	'audits' => [
+	    'deleteToken' => 'Eliminar token %s %s',
+	],
 	'messages' => [
 		'validationErrors' => 'Errores de validación.',
 		'validationToastErrors' => '%s',

@@ -118,6 +118,17 @@ return [
 		'id' => 'ID no conforme.',
 		'permission' => 'Permiso no conforme.',
 	],
+	'audits' => [
+	    'addAdmin'             => 'Añadir administrador %s %s',
+	    'editAdmin'            => 'Actualizar administrador %s %s',
+	    'hardDeleteAdmin'      => 'Eliminar administrador %s %s',
+	    'softDeleteAdmin'      => 'Enviar a la papelera administrador %s %s',
+	    'restoreDeleteAdmin'   => 'Restaurar administrador %s %s',
+	    'resetPasswordAdmin'   => 'Restablecer contraseña %s %s',
+	    'changeStatusAdmin'    => 'Actualizar estado %s %s',
+	    'changePermissionAdmin'=> 'Actualizar permiso %s %s',
+	    'deleteTokenAdmin'     => 'Eliminar token %s %s',
+	],
 	'messages' => [
 		'areYouSureResetData' => '¿Estás seguro de que deseas restablecer los datos?',
 		'areYouSureRefreshData' => '¿Estás seguro de que deseas actualizar los datos?',

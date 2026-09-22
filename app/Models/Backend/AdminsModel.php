@@ -820,7 +820,7 @@ class AdminsModel extends BackendModel
             endif;
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('ADD_ADMIN', 'admins', sprintf('Aggiunta admin %s %s', esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+            log_admin_activity('ADD_ADMIN', 'admins', sprintf(lang('backend/admins.audits.addAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
 
         } catch (\Throwable $e) {
             
@@ -957,7 +957,7 @@ class AdminsModel extends BackendModel
             $data['row']->updated_at = $updated_at;
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('EDIT_ADMIN', 'admins', sprintf('Aggiornamento admin %s %s', esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+            log_admin_activity('EDIT_ADMIN', 'admins', sprintf(lang('backend/admins.audits.editAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
 
             return [
                 'result'  => true, 
@@ -1082,7 +1082,7 @@ class AdminsModel extends BackendModel
             $this->db->transCommit();
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('HARD_DELETE_ADMINS', 'admins', sprintf('Eliminazione admin %s %s', esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+            log_admin_activity('HARD_DELETE_ADMINS', 'admins', sprintf(lang('backend/admins.audits.hardDeleteAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
 
             \App\Libraries\ImageFileSystemService::removeAllImages('admins', $posts['uuid']);
 
@@ -1148,7 +1148,7 @@ class AdminsModel extends BackendModel
 
             /* Registrazione attività */
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('SOFT_DELETE_ADMINS', 'admins', sprintf('Cestinato admin %s %s', esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+            log_admin_activity('SOFT_DELETE_ADMINS', 'admins', sprintf(lang('backend/admins.audits.softDeleteAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
 
             /* Nota: usa una stringa di lingua dedicata come softDelSuccess se l'hai creata */
             return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.softDeleteSuccess'), esc($data['row']->firstname), esc($data['row']->lastname))];
@@ -1223,7 +1223,7 @@ class AdminsModel extends BackendModel
 
             /* Registrazione attività */
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('RESTORE_DELETE_ADMINS', 'admins', sprintf('Ripristinato admin %s %s', esc($row->firstname), esc($row->lastname)), $currentAdmin);
+            log_admin_activity('RESTORE_DELETE_ADMINS', 'admins', sprintf(lang('backend/admins.audits.restoreDeleteAdmin'), esc($row->firstname), esc($row->lastname)), $currentAdmin);
 
             return ['result' => true, 'message' => $message];
 
@@ -1311,7 +1311,7 @@ class AdminsModel extends BackendModel
             $this->db->transCommit();
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('RESET_PASSWORD_ADMIN', 'admins', sprintf('Reset password %s %s', esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+            log_admin_activity('RESET_PASSWORD_ADMIN', 'admins', sprintf(lang('backend/admins.audits.resetPasswordAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
 
         } catch (\Throwable $e) {
 
@@ -1418,7 +1418,7 @@ class AdminsModel extends BackendModel
             $this->db->transCommit();
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('CHANGE_STATUS_ADMIN', 'admins', sprintf('Aggiornamento status %s %s', esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+            log_admin_activity('CHANGE_STATUS_ADMIN', 'admins', sprintf(lang('backend/admins.audits.changeStatusAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
 
             return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.changeStatusSuccess'), esc($data['row']->firstname), esc($data['row']->lastname)), 'admin' => $data['row']];
 
@@ -1521,7 +1521,7 @@ class AdminsModel extends BackendModel
             $this->db->transCommit();
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('CHANGE_PERMISSION_ADMIN', 'admins', sprintf('Aggiornamento permesso %s %s', esc($admin->firstname), esc($admin->lastname)), $currentAdmin);
+            log_admin_activity('CHANGE_PERMISSION_ADMIN', 'admins', sprintf(lang('backend/admins.audits.changePermissionAdmin'), esc($admin->firstname), esc($admin->lastname)), $currentAdmin);
 
             $admin->updated_at = $updatedAt;
 
@@ -1593,7 +1593,7 @@ class AdminsModel extends BackendModel
             if($this->db->affectedRows() > 0):
 
                 $currentAdmin = service('authorization')->currentAdmin();
-                log_admin_activity('DELETE_TOKEN_ADMIN', 'admins', sprintf('Delete token %s %s', esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+                log_admin_activity('DELETE_TOKEN_ADMIN', 'admins', sprintf(lang('backend/admins.audits.deleteTokenAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
 
                 return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.deleteTokenSuccess'), esc($data['row']->firstname), esc($data['row']->lastname)), 'admin' => $data['row']];
             endif;

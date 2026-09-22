@@ -35,6 +35,18 @@ return [
 		'login' => 'Login', 
 		'resetPassword' => 'Reset Password'
 	], 
+	'audits' => [
+	    'loginRefused'      => 'Login attempt with non-existent account',
+	    'loginBlocked'      => 'Access denied, account blocked %s %s',
+	    'loginFailed'       => 'Failed login attempt %s %s',
+	    '2faRequired'       => '2FA verification code required %s %s %s',
+	    'loginSuccess'      => 'Login successful %s %s',
+	    'resetPasswordAuth' => 'Password reset %s %s',
+	    'setPassword'       => 'Password setting %s %s',
+	    'verifyFailed'      => 'Login attempt with non-existent account',
+	    '2faBlocked'        => '2FA block %s %s',
+	    '2faFailed'         => 'Incorrect or expired 2FA code %s %s',
+	],
 	'messages' => [
 		'goodbye' => 'Goodbye %s %s.', 
 		'welcome' => 'Good morning %s %s.', 

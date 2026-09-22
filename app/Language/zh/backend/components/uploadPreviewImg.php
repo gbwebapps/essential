@@ -11,6 +11,9 @@ return [
     'buttons' => [
         'uploadImages' => '选择图片',
         'sendImages' => '发送图片',
+    ],
+    'audits' => [
+        'uploadPreviewImg' => '保存预览图片。',
     ], 
     'messages' => [
         'notImagesSelected' => '请至少选择一张图片。',

@@ -75,6 +75,14 @@ return [
 		'close' => '关闭', 
 		'cleanFolder' => '清空文件夹'
 	], 
+	'audits' => [
+	    'deleteAudits'   => '删除 %s 至 %s 的审计记录',
+	    'deleteLogs'     => '删除 %s 至 %s 的日志',
+	    'targetLog'      => '已对 %s 执行优化',
+	    'generateBackup' => '已生成新的数据库备份：%s',
+	    'deleteBackup'   => '已删除数据库备份：%s',
+	    'cleanFolder'    => "已清空文件夹 %s：删除了 %d 个文件",
+	],
 	'messages' => [
 		'areYouSureToResetData' => '您确定要重置数据吗？', 
 		'areYouSureToDeleteAudits' => '<p>您确定要删除从 <b>%s</b> 到 <b>%s</b> 的活动记录吗？</p> <p>将删除 <b>%d</b> 条活动记录。</p>', 

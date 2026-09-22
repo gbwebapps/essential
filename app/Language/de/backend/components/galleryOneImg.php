@@ -17,6 +17,11 @@ return [
     'buttons' => [
         'reload' => 'Galerie neu laden', 
     ], 
+    'audits' => [
+        'deleteImage' => 'Bild löschen.',
+        'setCover'    => 'Cover festlegen.',
+        'removeCover' => 'Cover entfernen.',
+    ],
     'messages' => [
         'areYouSureRemoveCover' => 'Sind Sie sicher, dass Sie das Cover für dieses Bild entfernen möchten?',
         'areYouSureSetCover' => 'Sind Sie sicher, dass Sie dieses Bild als Cover festlegen möchten?',

@@ -17,6 +17,11 @@ return [
     'buttons' => [
         'reload' => 'Recharger la galerie', 
     ], 
+    'audits' => [
+        'deleteImage' => 'Suppression de l\'image.',
+        'setCover'    => 'Définition de la couverture.',
+        'removeCover' => 'Suppression de la couverture.',
+    ],
     'messages' => [
         'areYouSureRemoveCover' => 'Êtes-vous sûr de vouloir supprimer la couverture de cette image ?',
         'areYouSureSetCover' => 'Êtes-vous sûr de vouloir définir cette image comme couverture ?',
