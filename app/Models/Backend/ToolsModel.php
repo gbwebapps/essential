@@ -4,34 +4,17 @@ namespace App\Models\Backend;
 
 use App\Models\Backend\BackendModel;
 
-/**
- * 
- */
 class ToolsModel extends BackendModel
 {
-	/**
-	 * [$manageAuditsAllowedFields description]
-	 * @var [type]
-	 */
 	protected array $manageAuditsAllowedFields = ['fromDate', 'toDate']; 
 
-	/**
-	 * [$manageLogsAllowedFields description]
-	 * @var [type]
-	 */
 	protected array $manageLogsAllowedFields = ['fromDate', 'toDate']; 
 
-	/**
-	 * @return [type]
-	 */
 	protected function initModel(): void 
 	{
 		parent::initModel();
 	}
 
-	/**
-	 * @return [type]
-	 */
 	public function validateManageAuditsRules(): array
 	{
 		return [
@@ -46,7 +29,6 @@ class ToolsModel extends BackendModel
 		];
 	}
 
-	/* Regole di validazione per i nuovi campi HTML5 */
 	public function validateManageLogsRules(): array
 	{
 		return [
@@ -61,11 +43,6 @@ class ToolsModel extends BackendModel
 		];
 	}
 
-	/**
-	 * Recupera le statistiche generali degli audit (totale, prima e ultima data).
-	 *
-	 * @return array
-	 */
 	public function getAuditsStats(): array
 	{
 		$sql = 'select count(*) as total_audits, min(created_at) as min_date, max(created_at) as max_date from admins_audits';
@@ -82,7 +59,6 @@ class ToolsModel extends BackendModel
 		];
 	}
 
-	/* Prepara e valida le date di inizio e fine intervallo */
 	protected function buildAuditDates(array $posts): array|bool
 	{
 		$posts = $this->checkAllowedFields($posts, $this->manageAuditsAllowedFields);
@@ -99,7 +75,6 @@ class ToolsModel extends BackendModel
 		return ['from' => $from, 'to' => $to];
 	}
 
-	/* Conta gli audits presenti nel range di date indicato */
 	public function countAuditsToDelete(array $posts): array|bool
     {
         $dates = $this->buildAuditDates($posts);
@@ -145,11 +120,6 @@ class ToolsModel extends BackendModel
 		return ['result' => false, 'message' => lang('backend/tools.messages.noAuditsDeleted')];
 	}
 
-	/**
-	 * Recupera le statistiche generali degli log (totale, prima e ultima data).
-	 *
-	 * @return array
-	 */
 	public function getLogsStats(): array
 	{
 		$sql = 'select count(*) as total_logs, min(created_at) as min_date, max(created_at) as max_date from admins_logs';
@@ -166,7 +136,6 @@ class ToolsModel extends BackendModel
 		];
 	}
 
-	/* Prepara e valida le date di inizio e fine intervallo */
 	protected function buildLogDates(array $posts): array|bool
 	{
 		$posts = $this->checkAllowedFields($posts, $this->manageLogsAllowedFields);
@@ -183,7 +152,6 @@ class ToolsModel extends BackendModel
 		return ['from' => $from, 'to' => $to];
 	}
 
-	/* Conta gli logs presenti nel range di date indicato */
 	public function countLogsToDelete(array $posts): array|bool
     {
         $dates = $this->buildLogDates($posts);
@@ -229,7 +197,6 @@ class ToolsModel extends BackendModel
     	return ['result' => false, 'message' => lang('backend/tools.messages.noLogsDeleted')];
     }
 
-	/* Recupera le statistiche di una o di tutte le tabelle del database */
 	public function getTablesStatus(?string $tableName = null): array
 	{
 		/* Se è presente un nome, filtriamo la query per quella specifica tabella */
@@ -261,7 +228,6 @@ class ToolsModel extends BackendModel
 		return $result;
 	}
 
-	/* Esegue l'ottimizzazione e restituisce i dati aggiornati */
 	public function runOptimization(string|array $target): array|bool
 	{
 		/* Normalizziamo l'input in un array per processare le query */
@@ -341,12 +307,6 @@ class ToolsModel extends BackendModel
         return $backups;
     }
 
-    /**
-     * Estrae la data dal nome del file e la restituisce in formato standard MySQL (Y-m-d H:i:s).
-     *
-     * @param string $filename Il nome del file
-     * @return string|bool Restituisce la data formattata o false in caso di fallimento.
-     */
     private function extractDateFromFilename(string $filename): string|bool
     {
         /* Regex rigorosa: backup_YYYY-MM-DD_HH-MM-SS.zip */
@@ -490,20 +450,8 @@ class ToolsModel extends BackendModel
 		return false;
 	}
 
-	/**
-	 * Whitelist delle cartelle di sistema svuotabili (relative a WRITEPATH).
-	 * Previene attacchi di Path Traversal.
-	 * 
-	 * @var array
-	 */
 	protected array $cleanableFolders = ['backups/database', 'backups/imports', 'cache', 'debugbar', 'exports', 'logs', 'session', 'uploads/staging'];
 
-	/**
-	 * Scansiona le cartelle autorizzate e restituisce il conteggio dei file eliminabili.
-	 * Esclude i puntatori di sistema e i file index.html di protezione.
-	 *
-	 * @return array
-	 */
 	public function getWritableFoldersStatus(): array
 	{
 	    $status = [];
@@ -532,12 +480,6 @@ class ToolsModel extends BackendModel
 	    return $status;
 	}
 
-	/**
-	 * Svuota fisicamente i file di una cartella autorizzata.
-	 *
-	 * @param string $folder Nome della cartella
-	 * @return array
-	 */
 	public function cleanWritableFolder(string $folder): array
 	{
 	    /* Validazione di Sicurezza (Whitelist) */
@@ -571,11 +513,6 @@ class ToolsModel extends BackendModel
 	    return ['result' => true, 'message' => sprintf(lang('backend/tools.messages.folderCleanSuccess'), $deletedCount, $folder)];
 	}
 
-	/**
-	 * Recupera le informazioni di diagnostica su Sistema, PHP e Ambiente.
-	 *
-	 * @return array
-	 */
 	public function getSystemInfo(): array
 	{
 		return [

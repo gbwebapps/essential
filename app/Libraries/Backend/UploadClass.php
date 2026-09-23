@@ -18,10 +18,6 @@ class UploadClass
         $this->config = setting('Backend\Upload');
     }
 
-    /**
-     * Esegue l'upload e il ridimensionamento multilivello delle immagini.
-     * Accetta un array di oggetti UploadedFile di CodeIgniter 4.
-     */
     public function doUpload(array $files, string $entity, string $uuid): array|false
     {
         $uploaded = [];
@@ -100,10 +96,6 @@ class UploadClass
         return $uploaded ?: false;
     }
 
-    /**
-     * Esegue un ritaglio centrale forzato (Center Crop) dell'immagine.
-     * Calcola le proporzioni per riempire l'area target e ritaglia le eccedenze in modo simmetrico.
-     */
     protected function cropImage(string $srcPath, string $destPath, int $targetX, int $targetY): bool
     {
         [$width, $height, $type] = getimagesize($srcPath);

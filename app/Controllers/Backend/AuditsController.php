@@ -12,35 +12,26 @@ use App\Libraries\Backend\AuditsClass;
 use App\Controllers\Backend\BackendController; 
 
 /**
- * Class AuditsController
- *
- * Controller centrale per la gestione completa delle utenze amministrative (Audits).
- * Coordina le operazioni CRUD, l'assegnazione dei permessi RBAC granulari, la sicurezza 
- * delle sessioni, la revoca dei token e i caricamenti dinamici delle viste asincrone via AJAX.
+ * Gestisce la visualizzazione e il filtraggio dei log di controllo (audit), tracciando le operazioni e le modifiche effettuate dagli utenti nel sistema.
  */
 class AuditsController extends BackendController 
 {
     /**
-     * Istanza del modello dedicato alla persistenza e manipolazione dei dati degli amministratori.
-     * 
-     * @var AuditsModel 
+     * @var AuditsModel Istanza del modello dedicato all'interazione con il database per il recupero e la ricerca dei record di audit
      */
     protected AuditsModel $auditsModel;
 
     /**
-     * Istanza della libreria logica per l'elaborazione dei flussi e delle operazioni del modulo.
-     * 
-     * @var AuditsClass 
+     * @var AuditsClass Istanza della libreria contenente le logiche di formattazione e di supporto specifiche per gli audit
      */
     protected AuditsClass $auditsClass;
 
     /**
-     * Inizializza il controller impostando il contesto del modulo e istanziando modello e libreria specifici.
+     * Inizializza il controller, configura i metadati della pagina e istanzia le dipendenze necessarie per la gestione degli audit.
      *
-     * @param RequestInterface  $request  Oggetto della richiesta HTTP corrente.
-     * @param ResponseInterface $response Oggetto della risposta HTTP corrente.
-     * @param LoggerInterface   $logger   Istanza del sistema di tracciamento log.
-     * @return void
+     * @param RequestInterface $request Istanza della richiesta HTTP corrente
+     * @param ResponseInterface $response Istanza della risposta HTTP per il client
+     * @param LoggerInterface $logger Istanza del sistema di log per la registrazione degli eventi
      */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
@@ -54,9 +45,9 @@ class AuditsController extends BackendController
     }
 
     /**
-     * Renderizza la pagina principale del modulo di gestione degli amministratori.
+     * Gestisce il caricamento e il filtraggio asincrono della tabella contenente lo storico degli audit, oppure renderizza l'interfaccia principale.
      *
-     * @return string La vista HTML iniziale dell'indice.
+     * @return string|ResponseInterface Risposta JSON con i dati filtrati o l'HTML renderizzato della vista generale
      */
     public function index(): string|ResponseInterface
     {

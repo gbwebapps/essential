@@ -7,20 +7,25 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 
 /**
- * Filtro di sicurezza per l'enforcement dei permessi granulari sulle rotte.
- *
- * Verifica che l'utente loggato possieda i privilegi necessari per accedere alla risorsa.
- * Intercetta le richieste standard respingendole con un redirect e le richieste AJAX
- * bloccandole con una risposta JSON strutturata.
+ * Filtro di sicurezza (middleware) basato sul controllo degli accessi (ACL).
+ * 
+ * Protegge le singole rotte del pannello di controllo verificando che l'amministratore 
+ * disponga dei privilegi specifici richiesti per l'operazione. Implementa un bypass automatico 
+ * per gli account di livello Superadmin, garantendo loro l'accesso incondizionato.
  */
 class PermissionFilter implements FilterInterface
 {
     /**
-     * Esegue il controllo del permesso prima dell'esecuzione del controller.
+     * Intercetta la richiesta in ingresso per validare i privilegi dell'amministratore corrente rispetto alla rotta.
+     * 
+     * Analizza gli argomenti associati al filtro per identificare il permesso specifico richiesto.
+     * Se l'utente non possiede il requisito (e non è un Superadmin), il metodo interrompe l'esecuzione,
+     * restituendo un payload JSON di errore per le richieste asincrone (AJAX) o forzando un reindirizzamento
+     * standard verso la dashboard.
      *
-     * @param RequestInterface $request
-     * @param array|null       $arguments Elenco dei permessi passati dalla rotta (es. ['admins_index']).
-     * @return mixed
+     * @param RequestInterface $request L'oggetto rappresentante la richiesta HTTP in ingresso
+     * @param array|null $arguments Array configurato nelle rotte contenente il permesso richiesto (es. ['manage_users'])
+     * @return \CodeIgniter\HTTP\RedirectResponse|\CodeIgniter\HTTP\ResponseInterface|null Restituisce null se l'accesso è autorizzato, oppure una risposta (JSON o Redirect) per negare l'accesso
      */
     public function before(RequestInterface $request, $arguments = null)
     {
@@ -64,7 +69,14 @@ class PermissionFilter implements FilterInterface
     }
 
     /**
-     * Logica post-esecuzione (non richiesta per il controllo accessi).
+     * Intercetta la risposta HTTP in uscita dopo l'elaborazione da parte del controller di destinazione.
+     * 
+     * Essendo un filtro di sbarramento preventivo, tutte le verifiche avvengono nella fase di pre-elaborazione (before).
+     * Il metodo non effettua quindi alcuna manipolazione sulla risposta in uscita.
+     *
+     * @param RequestInterface $request L'oggetto rappresentante la richiesta HTTP elaborata
+     * @param ResponseInterface $response L'oggetto rappresentante la risposta HTTP generata dal controller
+     * @param array|null $arguments Parametri opzionali configurati per il filtro
      */
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {

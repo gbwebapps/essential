@@ -6,25 +6,13 @@ use App\Models\Backend\BackendModel;
 
 class SettingsModel extends BackendModel
 {
-    /**
-     * Elenco dei campi POST autorizzati per la configurazione General.
-     * Evita tentativi di mass-assignment (assegnazione massiva).
-     *
-     * @var array
-     */
     private array $allowedGeneralFields = [
         'timezone',
         'language',
         'dateFormat'
     ];
 
-	/**
-     * Elenco dei campi POST autorizzati per la configurazione Auth.
-     * Evita tentativi di mass-assignment (assegnazione massiva).
-     *
-     * @var array
-     */
-    private array $allowedAuthFields = [
+	private array $allowedAuthFields = [
         'attempts',
         'attemptsLimit',
         'attemptsInterval',
@@ -41,12 +29,6 @@ class SettingsModel extends BackendModel
         'activationTime',
     ];
 
-    /**
-     * Elenco dei campi POST autorizzati per la configurazione Upload.
-     * Evita tentativi di mass-assignment (assegnazione massiva).
-     *
-     * @var array
-     */
     private array $allowedUploadFields = [
         'renameImages',
         'overwriteImages',
@@ -60,12 +42,6 @@ class SettingsModel extends BackendModel
         'allowedExtensions'
     ];
 
-    /**
-     * Elenco dei campi POST autorizzati per la configurazione email.
-     * Evita tentativi di mass-assignment (assegnazione massiva).
-     *
-     * @var array
-     */
     private array $allowedEmailFields = [
         'fromEmail',
         'fromName',
@@ -82,18 +58,8 @@ class SettingsModel extends BackendModel
         'priority',
     ];
 
-    /**
-     * Cache in-memory per memorizzare i gruppi già estratti durante la singola esecuzione.
-     *
-     * @var array
-     */
     protected array $settingsCache = [];
 
-    /**
-     * Elenco dei campi critici che richiedono il reload della pagina.
-     *
-     * @var array
-     */
     protected array $requiresReloadFields = [
         'language',
         'timezone'
@@ -104,11 +70,6 @@ class SettingsModel extends BackendModel
 		parent::initModel();
 	}
 
-	/**
-     * Ritorna le regole di validazione specifiche per il form Auth Settings.
-     *
-     * @return array
-     */
     public function authSettingsValidateRules(array $posts = []): array
     {
         return [
@@ -171,11 +132,6 @@ class SettingsModel extends BackendModel
         ];
     }
 
-    /*
-     * Ritorna le regole di validazione specifiche per il form Upload Settings.
-     *
-     * @return array
-     */
     public function uploadSettingsValidateRules(array $posts = []): array
     {
         return [
@@ -226,11 +182,6 @@ class SettingsModel extends BackendModel
         ];
     }
 
-    /*
-     * Ritorna le regole di validazione specifiche per il form Email Settings.
-     *
-     * @return array
-     */
     public function emailSettingsValidateRules(array $posts = []): array
     {
         /* Verifichiamo se il protocollo inviato dal form è smtp */
@@ -311,14 +262,6 @@ class SettingsModel extends BackendModel
         ];
     }
 
-    /**
-     * Recupera le impostazioni combinando il Database con i valori di default dei file Config.
-     * Sfrutta una variabile interna come cache al volo per la singola richiesta HTTP.
-     *
-     * @param string     $namespace Es. 'Backend\Auth'
-     * @param array|null $keys      Es. ['attemptsLimit'] o null per tutto il gruppo
-     * @return array
-     */
     public function getSettings(string $namespace, ?array $keys = null): array
     {
         /* Se il gruppo non è ancora presente nella nostra cache in-memory, lo estraiamo dal DB */
@@ -361,12 +304,6 @@ class SettingsModel extends BackendModel
         return $finalSettings;
     }
 
-    /**
-     * Verifica se esistono già record salvati nel database per il namespace specificato.
-     *
-     * @param string $namespace Es. 'Backend\Auth'
-     * @return bool
-     */
     public function hasDatabaseSettings(string $namespace): bool
     {
         $sql = "SELECT COUNT(*) as total FROM `settings` WHERE `class` = ?";
@@ -376,9 +313,6 @@ class SettingsModel extends BackendModel
         return isset($row['total']) && (int) $row['total'] > 0;
     }
 
-    /**
-     * Salva o aggiorna le impostazioni nel database e svuota la cache in-memory.
-     */
     public function saveSettings(string $namespace, array $posts): ?array
     {
         /* 1. Recuperiamo la lista dei campi consentiti in base al namespace */
@@ -430,14 +364,6 @@ class SettingsModel extends BackendModel
         return ['result' => true, 'message' => lang('backend/settings.messages.saveSuccess')];
     }
 
-    /**
-     * Verifica quali dati inviati differiscono da quelli attualmente salvati.
-     * Ritorna un array contenente le chiavi modificate.
-     *
-     * @param string $namespace
-     * @param array $posts
-     * @return array
-     */
     public function getChangedKeys(string $namespace, array $posts): array
     {
         $current = $this->getSettings($namespace);
@@ -470,13 +396,6 @@ class SettingsModel extends BackendModel
         return $changed;
     }
 
-    /**
-     * Rimuove tutti i settaggi del rispettivo namespace e ne svuota la cache in-memory.
-     * Ritorna true se i record sono stati eliminati, false se non era presente nulla a DB.
-     *
-     * @param string $namespace Es. 'Backend\Auth'
-     * @return bool
-     */
     public function deleteSettings(string $namespace): bool
     {
         /* Verifica preliminare se ci sono effettivamente dati da cancellare */
@@ -499,10 +418,6 @@ class SettingsModel extends BackendModel
         return true;
     }
 
-    /* 
-       Verifica se i dati inviati dal form differiscono da quelli attualmente salvati.
-       Utilizza la cache interna del modello per azzerare le query.
-    */
     public function hasSettingsChanged(string $namespace, array $posts): bool
     {
         $current = $this->getSettings($namespace);

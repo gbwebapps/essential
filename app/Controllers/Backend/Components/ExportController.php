@@ -6,15 +6,29 @@ use App\Controllers\Backend\BackendController;
 use App\Models\Backend\Components\ExportModel;
 use CodeIgniter\HTTP\ResponseInterface;
 
+/**
+ * Gestisce il processo asincrono di esportazione dei dati in formato CSV, includendo l'interfaccia, la generazione a blocchi e il download.
+ */
 class ExportController extends BackendController
 {
+    /**
+     * @var ExportModel Istanza del modello dedicato alle logiche e all'estrazione dei dati per l'esportazione
+     */
     private ExportModel $exportModel;
 
+    /**
+     * Inizializza il controller e carica il modello di riferimento per le esportazioni.
+     */
     public function __construct()
     {
         $this->exportModel = model(ExportModel::class);
     }
 
+    /**
+     * Valida la richiesta e renderizza l'interfaccia della finestra modale per la selezione delle colonne da esportare.
+     *
+     * @return ResponseInterface Risposta JSON contenente l'esito della validazione e l'HTML generato per la modale
+     */
     public function showModal(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -44,6 +58,11 @@ class ExportController extends BackendController
         endif;
     }
 
+    /**
+     * Elabora e accoda progressivamente i record nel file di esportazione lavorando per scaglioni (chunk) per non sovraccaricare il server.
+     *
+     * @return ResponseInterface Risposta JSON con lo stato di avanzamento, il cursore ID e il nome del file per il ciclo successivo
+     */
     public function generate(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')): 
@@ -85,6 +104,11 @@ class ExportController extends BackendController
         endif;
     }
 
+    /**
+     * Elimina fisicamente dal file system il file temporaneo di esportazione al termine del download o in caso di annullamento.
+     *
+     * @return ResponseInterface Risposta JSON di conferma dell'avvenuta eliminazione
+     */
     public function remove(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -101,6 +125,13 @@ class ExportController extends BackendController
         endif;
     }
 
+    /**
+     * Invia al client l'intestazione HTTP necessaria per forzare il download del file di esportazione generato.
+     *
+     * @param string|null $fileName Nome del file CSV da scaricare
+     * @return ResponseInterface Risposta HTTP per il download del file
+     * @throws \CodeIgniter\Exceptions\PageNotFoundException Se il nome del file è vuoto o il file non esiste sul disco
+     */
     public function download(?string $fileName = null): ResponseInterface
     {
         if (empty($fileName)):

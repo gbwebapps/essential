@@ -11,34 +11,30 @@ use App\Libraries\Backend\DashboardClass;
 use App\Controllers\Backend\BackendController; 
 
 /**
- * Class DashboardController
- *
- * Controller principale del pannello di controllo (Dashboard) del Backend.
- * Coordina l'inizializzazione dei servizi di reportistica e la visualizzazione della pagina principale dell'area riservata.
+ * Controller per la gestione della dashboard principale.
+ * 
+ * Si occupa di fornire l'interfaccia di atterraggio (landing) a seguito dell'autenticazione, 
+ * predisponendo la vista che ospita widget informativi, riepiloghi statistici e notifiche globali.
  */
 class DashboardController extends BackendController 
 {
     /**
-     * Istanza del modello dedicato alla gestione dei dati della dashboard.
-     * 
-     * @var DashboardModel 
+     * @var DashboardModel Istanza del modello incaricato di recuperare eventuali dati statistici o di riepilogo dal database.
      */
     protected DashboardModel $dashboardModel;
 
     /**
-     * Istanza della libreria logica associata per l'elaborazione dei dati del modulo.
-     * 
-     * @var DashboardClass 
+     * @var DashboardClass Istanza della libreria di supporto per l'elaborazione di dati formattati specifici per la dashboard.
      */
     protected DashboardClass $dashboardClass;
 
     /**
-     * Inizializza il controller impostando il contesto, caricando il modello e la libreria logica specifica.
+     * Inizializza le dipendenze specifiche della dashboard, dichiarando l'identificativo del controller 
+     * e istanziando il modello e la classe di supporto associati.
      *
-     * @param RequestInterface  $request  Oggetto della richiesta HTTP corrente.
-     * @param ResponseInterface $response Oggetto della risposta HTTP corrente.
-     * @param LoggerInterface   $logger   Istanza del sistema di tracciamento log.
-     * @return void
+     * @param RequestInterface $request Oggetto contenente la richiesta HTTP.
+     * @param ResponseInterface $response Oggetto deputato alla costruzione della risposta HTTP.
+     * @param LoggerInterface $logger L'interfaccia per il tracciamento dei log.
      */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
@@ -51,9 +47,10 @@ class DashboardController extends BackendController
     }
 
     /**
-     * Renderizza la pagina principale (Home/Index) della dashboard amministrativa.
+     * Elabora e restituisce la vista principale della dashboard, configurando i metadati essenziali (titolo e icona) 
+     * prima di delegare la renderizzazione al BackendController.
      *
-     * @return string La vista HTML complessiva della dashboard.
+     * @return string HTML renderizzato della schermata di riepilogo.
      */
     public function index()
     {

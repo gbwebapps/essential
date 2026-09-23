@@ -2,12 +2,6 @@
 
 namespace App\Validation\Backend;
 
-/**
- * Class SettingsRules
- *
- * Raccolta di regole di validazione personalizzate (Custom Validation Rules)
- * dedicate alle procedure di impostazioni delle preferenze nel database.
- */
 class SettingsRules
 {
     /* Metodo di validazione personalizzato */

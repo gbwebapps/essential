@@ -7,15 +7,29 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 use App\Models\Backend\Components\UploadPreviewModel;
 
+/**
+ * Gestisce il caricamento e il salvataggio asincrono delle immagini di anteprima (Upload Preview) per i componenti del backend.
+ */
 class UploadPreviewController extends BackendController 
 {
+    /**
+     * @var UploadPreviewModel Istanza del modello responsabile della validazione, elaborazione e salvataggio fisico dei file immagine
+     */
     protected UploadPreviewModel $uploadPreview;
 
+    /**
+     * Inizializza il controller e carica il modello dedicato alle operazioni di upload delle anteprime.
+     */
     public function __construct()
     {
         $this->uploadPreview = model(UploadPreviewModel::class);
     }
 
+    /**
+     * Elabora la richiesta di caricamento multiplo, validando i parametri di contesto e i file inviati prima di delegarne il salvataggio al modello.
+     *
+     * @return string|ResponseInterface Risposta JSON contenente l'esito dell'operazione, i dati processati o gli eventuali errori di validazione
+     */
     public function saveImages(): string|ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')) :

@@ -4,56 +4,20 @@ namespace App\Models\Backend;
 
 use App\Models\Backend\BackendModel;
 
-/**
- * Descrizione classe
- */
 class LogsModel extends BackendModel
 {
-    /**
-     * Identificativo testuale del modulo associato per la gestione dei permessi e delle rotte.
-     *
-     * @var string|null
-     */
     protected ?string $module = 'admins_logs';
 
-    /**
-     * Colonna di ordinamento predefinita utilizzata nelle query di estrazione se non specificata.
-     *
-     * @var string|null
-     */
     protected ?string $defaultColumn = 'id';
 
-    /**
-     * Elenco dei parametri di input autorizzati per il filtraggio e l'impaginazione della vista tabellare globale.
-     *
-     * @var array
-     */
     protected array $showAllAllowedFields = ['column', 'order', 'page', 'rows', 'searchFields'];
 
-    /**
-     * Corrispondenza rigida tra gli indici dell'interfaccia utente e le colonne reali della tabella per l'ordinamento.
-     *
-     * @var array
-     */
     protected array $allowedOrderColumns = ['username', 'login', 'logout', 'logout_reason']; 
 
-    /**
-     * Elenco dei campi su cui è consentita l'applicazione dei filtri di ricerca testuale nella vista globale.
-     *
-     * @var array
-     */
     protected array $showAllSearchAllowedFields = ['username', 'logout_reason']; 
 
-    /**
-     * [$showAllSearchAllowedDates description]
-     * @var array
-     */
     protected array $showAllSearchAllowedDates = ['login'];
 
-    /**
-     * [$getDataQuery description]
-     * @var string
-     */
     protected ?string $getDataQuery = "select admins_logs.*, admins_tokens.token_expire, admins_tokens.last_activity, admins_tokens.id as token_id_val, admins.firstname, admins.lastname, admins.superadmin  
                                         from admins_logs 
                                         left join admins_tokens 
@@ -62,39 +26,15 @@ class LogsModel extends BackendModel
                                         on admins.uuid = admins_logs.admin_uuid 
                                         where 1 = 1";
 
-    /**
-     * [$getNumRowsQuery description]
-     * @var string
-     */
     protected ?string $getNumRowsQuery = "select count(*) as count from admins_logs where 1 = 1";
 
-    /**
-     * [$getUUIDQuery description]
-     * @var string
-     */
     protected ?string $getUUIDQuery = "select * from admins_logs where id = ?";
 
-    /**
-     * Inizializza il modello eseguendo le configurazioni di base ereditate dalla classe madre.
-     *
-     * Sincronizza lo stato del modello impostando le dipendenze native e i driver di connessione
-     * necessari al funzionamento del modulo amministratori.
-     *
-     * @return void
-     */
     protected function initModel(): void 
     {
         parent::initModel();
     }
 
-    /**
-     * Definisce i vincoli di ordinamento e paginazione per la griglia tabellare.
-     *
-     * Restituisce le regole di validazione necessarie a blindare i parametri della richiesta DataTables,
-     * verificando l'integrità della colonna bersaglio, il verso di ordinamento e la naturalità degli indici di pagina.
-     *
-     * @return array Mappa dei criteri di validazione per i flussi di paginazione.
-     */
     public function showAllValidationRules(): array
     {
         return [
@@ -113,9 +53,6 @@ class LogsModel extends BackendModel
         ];
     }
 
-    /**
-     * @return [type]
-     */
     public function showAllSearchValidationRules(): array
     {
         return [
@@ -138,10 +75,6 @@ class LogsModel extends BackendModel
         ];
     }
 
-    /**
-     * @param  int
-     * @return [type]
-     */
     public function deleteToken(int $tokenId): array
     {
         try {

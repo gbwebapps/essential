@@ -3,14 +3,16 @@
 namespace App\Cells;
 
 /**
- * 
+ * Gestisce la generazione dinamica dei pulsanti di interfaccia per le viste del pannello di controllo.
  */
 class BackendButtonsCell
 {
     /**
-     * @param  string
-     * @param  string
-     * @return [type]
+     * Renderizza il componente dei pulsanti in base al controller e all'azione corrente.
+     *
+     * @param string $controller Nome del controller di riferimento
+     * @param string $action Azione corrente eseguita nel backend
+     * @return string Restituisce l'HTML renderizzato della vista dei pulsanti o stringa vuota se l'azione non è ammessa
      */
     public function render(string $controller, string $action): string
     {
@@ -25,11 +27,13 @@ class BackendButtonsCell
 
         return view('backend/cells/backendButtons', $data);
     }
-
+    
     /**
-     * @param  [type]
-     * @param  [type]
-     * @return [type]
+     * Restituisce la configurazione dei parametri e delle classi grafiche per i pulsanti in base all'azione richiesta.
+     *
+     * @param string $controller Nome del controller per la risoluzione delle stringhe localizzate
+     * @param string $action Azione associata alla configurazione dei pulsanti
+     * @return array Array associativo contenente gli attributi e i testi dei pulsanti
      */
     private function getButtonConfig($controller, $action): array
     {

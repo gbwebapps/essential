@@ -5,38 +5,27 @@ namespace Config\Backend;
 use CodeIgniter\Config\BaseConfig;
 
 /**
- * Class Menu
- *
- * Configurazione centrale per la struttura, la localizzazione e la mappatura 
- * dei menu di navigazione utilizzati all'interno del pannello di amministrazione.
+ * Gestisce la configurazione e la struttura dei menu di navigazione del pannello di controllo.
  */
 class Menu extends BaseConfig
 {
     /**
-     * Elenco delle voci di menu configurate per la sezione superiore destra (es. utilità utente).
-     * 
-     * @var array 
+     * @var array Elenco delle voci di menu posizionate nell'area superiore destra
      */
     public array $topRight = [];
 
     /**
-     * Elenco delle voci di menu configurate per la sezione inferiore sinistra (es. navigazione principale).
-     * 
-     * @var array 
+     * @var array Elenco delle voci di menu posizionate nell'area inferiore sinistra
      */
     public array $bottomLeft = [];
 
     /**
-     * Elenco delle voci di menu configurate per la sezione inferiore destra (es. strumenti e impostazioni).
-     * 
-     * @var array 
+     * @var array Elenco delle voci di menu posizionate nell'area inferiore destra
      */
     public array $bottomRight = [];
 
     /**
-     * Costruttore della classe.
-     * Inizializza gli array dei menu traducendo dinamicamente le etichette tramite il servizio lang()
-     * e definendo rotte, elementi grafici (icone) e controller associati a ciascuna voce.
+     * Inizializza la configurazione dei menu popolando le sezioni di navigazione con le rispettive voci localizzate e rotte.
      */
     public function __construct()
     {

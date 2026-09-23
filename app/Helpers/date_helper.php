@@ -1,26 +1,27 @@
 <?php declare(strict_types = 1);
 
 /**
- * Date Helper
- *
- * Raccolta di funzioni di utilità globale dedicate alla manipolazione,
- * formattazione e localizzazione (i18n) delle date nel sistema.
+ * Helper globale per la manipolazione e la formattazione delle date.
+ * 
+ * Centralizza la logica di conversione temporale dell'applicativo, garantendo che 
+ * tutte le date esposte nell'interfaccia utente rispettino in modo uniforme 
+ * il fuso orario (timezone) e le regole di localizzazione (locale) configurati nel sistema.
  */
 
-/* Evita la ridefinizione della funzione se il file helper viene caricato più volte */
-/* Evita la ridefinizione della funzione se il file helper viene caricato più volte */
-if (! function_exists('convertDate')):
+if ( ! function_exists('convertDate')):
 
     /**
-     * Converte una stringa data nel formato localizzato e nel fuso orario dell'utente.
+     * Converte e formatta una stringa temporale, applicando il fuso orario e la lingua correnti.
+     * 
+     * Il metodo elabora la data in ingresso (tipicamente in formato UTC proveniente dal database), 
+     * ne esegue il parsing sfruttando le librerie native I18n di CodeIgniter e restituisce 
+     * una rappresentazione localizzata. Supporta l'iniezione di formati personalizzati, 
+     * l'uso di un formato testuale 'conversational' e gestisce eventuali eccezioni di parsing 
+     * restituendo il dato grezzo (graceful degradation).
      *
-     * Gestisce la conversione di timezones (dal fuso orario di default dell'applicazione
-     * a quello scelto dall'utente) e traduce nomi di mesi/giorni in base al locale attuale.
-     *
-     * @param string|null $date   La data originaria da elaborare.
-     * @param string|null $format Il pattern desiderato ('conversational' o pattern custom).
-     *
-     * @return string La data formattata e localizzata, o la stringa originale in caso di errore di parsing.
+     * @param string|null $date La stringa temporale originale da processare (es. '2026-09-23 18:50:00')
+     * @param string|null $format Il pattern di formattazione ICU desiderato o la keyword speciale 'conversational'
+     * @return string La stringa formattata e localizzata, un'istanza vuota se l'input manca, o la stringa originale in caso di errore
      */
     function convertDate(?string $date, ?string $format = null): string
     {

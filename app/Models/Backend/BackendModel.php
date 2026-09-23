@@ -4,115 +4,38 @@ namespace App\Models\Backend;
 
 use App\Models\BaseModel;
 
-/**
- * Class BackendModel
- *
- * Modello astratto centrale per la gestione strutturata dei dati nel Backend.
- * Centralizza le operazioni di paginazione, ricerca tramite filtri dinamici,
- * whitelist dei campi per la sicurezza dei dati e tracciamento delle modifiche.
- */
 abstract class BackendModel extends BaseModel
 {
-	/**
-	 * Identificativo del modulo di backend corrente (es. 'admins').
-	 * 
-	 * @var string|null 
-	 */
 	protected ?string $module = null;
 
 	protected bool $hasSoftDelete = false;
 
-	/**
-	 * Query SQL predefinita per la selezione dei record principali.
-	 *
-	 * @var string|null
-	 */
 	protected ?string $getDataQuery = null;
 
-	/**
-	 * Query SQL per il recupero di un record tramite il suo UUID.
-	 * 
-	 * @var string|null 
-	 */
 	protected ?string $getUUIDQuery = null;
 
-	/**
-	 * Query SQL per il conteggio totale dei record presenti nel modulo.
-	 * 
-	 * @var string|null 
-	 */
 	protected ?string $getNumRowsQuery = null;
 
-	/**
-	 * Colonna di ordinamento predefinita applicata alle query.
-	 * 
-	 * @var string|null 
-	 */
 	protected ?string $defaultColumn = null;
 
-	/**
-	 * Elenco dei campi da confrontare per verificare se i dati hanno subito variazioni.
-	 * 
-	 * @var array 
-	 */
 	protected array $toCompare = [];
 
-	/**
-	 * Campi della tabella consentiti per la visualizzazione nell'elenco generale.
-	 * 
-	 * @var array 
-	 */
 	protected array $showAllAllowedFields = [];
 
 	protected array $showAllAllowedDates = [];
 
-	/**
-	 * Campi della tabella consentiti durante l'operazione di inserimento (Add).
-	 * 
-	 * @var array 
-	 */
 	protected array $addAllowedFields = [];
 
-	/**
-	 * Campi della tabella consentiti durante l'operazione di modifica (Edit).
-	 * 
-	 * @var array 
-	 */
 	protected array $editAllowedFields = [];
 
-	/**
-	 * Campi della tabella consentiti per la gestione della cancellazione (Delete).
-	 * 
-	 * @var array 
-	 */
 	protected array $delAllowedFields = [];
 
-	/**
-	 * Campi della tabella consentiti per la variazione rapida dello stato (Status).
-	 * 
-	 * @var array 
-	 */
 	protected array $changeStatusAllowedFields = [];
 
-	/**
-	 * Colonne sulle quali il sistema permette l'ordinamento dei dati (Order BY).
-	 *  
-	 * @var array 
-	 */
 	protected array $allowedOrderColumns = [];
 
-	/**
-	 * Elenco dei campi su cui è autorizzata l'esecuzione di filtri di ricerca.
-	 *  
-	 * @var array 
-	 */
 	protected array $showAllSearchAllowedFields = [];
-	
-	/**
-	 * Esegue l'inizializzazione del modello richiamando le connessioni del modello padre.
-	 *
-	 * @return void
-	 */
+
 	protected function initModel(): void 
 	{
 		parent::initModel();
@@ -120,12 +43,6 @@ abstract class BackendModel extends BaseModel
 		helper('audits');
 	}
 
-	/**
-	 * Elabora l'estrazione paginata dei record applicando ordinamenti, filtri di ricerca, limiti e stato cestino.
-	 *
-	 * @param array $posts Parametri di input per la paginazione, l'ordinamento e i filtri.
-	 * @return array Esito dell'operazione contenente i record estratti e la configurazione della paginazione.
-	 */
 	public function getData(array $posts): array
 	{
 		try
@@ -185,12 +102,6 @@ abstract class BackendModel extends BaseModel
 		}
 	}
 
-	/**
-	 * Calcola il numero totale di righe corrispondenti ai parametri di ricerca attivi.
-	 *
-	 * @param array $paramsFilter Array contenente i filtri di ricerca attivi.
-	 * @return int Numero complessivo di record rilevati.
-	 */
 	private function getNumRows(array $paramsFilter): int
 	{
 		$params = [];
@@ -211,13 +122,6 @@ abstract class BackendModel extends BaseModel
 		return (int) $this->db->query($sql, $params)->getRow()->count;
 	}
 
-	/**
-	 * Genera dinamicamente la stringa SQL dei filtri e mappa i parametri di binding.
-	 *
-	 * @param array $searchFields Campi di ricerca inviati dal client.
-	 * @param array $params       Riferimento all'array dei parametri SQL per il binding (passato per riferimento).
-	 * @return string La stringa SQL contenente le condizioni WHERE aggiuntive.
-	 */
 	private function buildFilters(array $searchFields, array &$params): string
 	{
 		$whereClause = '';
@@ -255,13 +159,6 @@ abstract class BackendModel extends BaseModel
 		return $whereClause;
 	}
 
-	/**
-	 * Genera la clausola SQL per filtrare i record in base allo stato del cestino.
-	 *
-	 * @param string $filter Tipo di filtro richiesto ('active', 'trashed', 'all').
-	 * @param string $table  Nome della tabella principale per evitare ambiguità SQL in caso di JOIN.
-	 * @return string Clausola SQL generata.
-	 */
 	private function buildTrashFilter(string $filter, string $table, bool $hasSoftDelete = true): string
 	{
 	    /* Sanitizzazione rigorosa del nome tabella per prevenire SQL injection strutturali */
@@ -284,12 +181,6 @@ abstract class BackendModel extends BaseModel
 	    return " and {$table}.deleted_at IS NULL";
 	}
 
-	/**
-	 * Recupera un singolo record specifico estraendolo tramite il valore UUID.
-	 *
-	 * @param string $uuid Identificativo univoco globale del record richiesto.
-	 * @return array Esito dell'operazione combinato con l'oggetto del record o il messaggio di errore.
-	 */
 	public function getByUUID(string $uuid): array 
 	{
 	    try 
@@ -309,13 +200,6 @@ abstract class BackendModel extends BaseModel
 	    }
 	}
 
-	/**
-	 * Determina se i dati inviati nel form contengono differenze rispetto al record originale del DB.
-	 *
-	 * @param array  $posts    Dati inviati per il salvataggio.
-	 * @param object $original Oggetto del record originale memorizzato nel database.
-	 * @return bool True se i dati o gli allegati differiscono dall'originale, altrimenti false.
-	 */
 	protected function hasDataChanged(array $posts, object $original): bool
 	{
 	    /* 1. Controllo dei campi nativi della tabella (Valido per TUTTI i moduli) */
@@ -389,9 +273,6 @@ abstract class BackendModel extends BaseModel
 	    $this->db->query($sql, $bind);
 	}
 
-	/**
-     * Rimozione ricorsiva di una directory e di tutto il suo contenuto.
-     */
     protected function rrmdir(string $dir): void
     {
         if ( ! is_dir($dir)):
@@ -412,11 +293,6 @@ abstract class BackendModel extends BaseModel
         @rmdir($dir);
     }
 
-	/**
-	 * Genera un identificativo univoco crittograficamente sicuro conforme allo standard UUID versione 4.
-	 *
-	 * @return string Stringa formattata dell'UUID generato.
-	 */
 	protected function generateUUID(): string
 	{
 	    $data = random_bytes(16);
@@ -429,13 +305,6 @@ abstract class BackendModel extends BaseModel
 	    return vsprintf('%08s-%04s-%04s-%04s-%12s', sscanf($hex, '%8s%4s%4s%4s%12s'));
 	}
 
-	/**
-	 * Intercetta l'array di input e rimuove qualsiasi chiave non inclusa nella whitelist dei campi consentiti.
-	 *
-	 * @param array $posts         Insieme di dati grezzi in ingresso da ripulire.
-	 * @param array $allowedFields Elenco dei soli campi autorizzati per l'operazione corrente.
-	 * @return array L'array filtrato e sicuro per la manipolazione.
-	 */
 	protected function checkAllowedFields(array $posts, array $allowedFields): array
 	{
 	    foreach (array_keys($posts) as $key):

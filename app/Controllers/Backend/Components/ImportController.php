@@ -6,15 +6,29 @@ use App\Controllers\Backend\BackendController;
 use App\Models\Backend\Components\ImportModel;
 use CodeIgniter\HTTP\ResponseInterface;
 
+/**
+ * Gestisce le operazioni di importazione dei dati tramite file CSV, includendo il download dei template, la validazione strutturale, l'anteprima e l'elaborazione a blocchi.
+ */
 class ImportController extends BackendController
 {
+    /**
+     * @var ImportModel Istanza del modello responsabile della logica di validazione, del parsing e del salvataggio dei dati importati
+     */
     private ImportModel $importModel;
 
+    /**
+     * Inizializza il controller e carica il modello dedicato alle operazioni di importazione.
+     */
     public function __construct()
     {
         $this->importModel = model(ImportModel::class);
     }
 
+    /**
+     * Valida la richiesta e renderizza l'interfaccia della finestra modale iniziale per il caricamento del file CSV.
+     *
+     * @return ResponseInterface Risposta JSON contenente l'esito della validazione e l'HTML generato per la modale
+     */
     public function showModal(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -36,6 +50,12 @@ class ImportController extends BackendController
         endif;
     }
 
+    /**
+     * Genera in memoria e scarica un file CSV vuoto, configurato come template con le intestazioni di colonna corrette per l'entità specificata.
+     *
+     * @param string $entity Nome della tabella o entità per la quale generare il template
+     * @return ResponseInterface Risposta HTTP per forzare il download del CSV oppure redirect in caso di parametri non validi
+     */
     public function download(string $entity): ResponseInterface
     {
         /* Validazione basilare per prevenire input malevoli */
@@ -73,6 +93,11 @@ class ImportController extends BackendController
         return $this->response->download($filename, $csvData)->setContentType('text/csv');
     }
 
+    /**
+     * Riceve il file CSV caricato, esegue la validazione strutturale incrociata con il database e genera l'interfaccia con la tabella di anteprima e il piano delle modifiche.
+     *
+     * @return ResponseInterface Risposta JSON contenente l'esito della validazione e l'HTML dell'anteprima dati, oppure l'elenco degli errori bloccanti
+     */
     public function processCsv(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -132,6 +157,11 @@ class ImportController extends BackendController
         endif;
     }
 
+    /**
+     * Esegue l'importazione progressiva (chunking) dei dati validati nel database, occupandosi di creare un backup della tabella interessata prima di iniziare.
+     *
+     * @return ResponseInterface Risposta JSON con lo stato di avanzamento, il cursore (offset) per il blocco successivo e i messaggi di notifica
+     */
     public function executeImport(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -200,6 +230,11 @@ class ImportController extends BackendController
         endif;
     }
 
+    /**
+     * Rimuove fisicamente il file CSV temporaneo dalla directory di staging quando l'utente annulla l'operazione o chiude la finestra modale.
+     *
+     * @return ResponseInterface Risposta JSON di conferma dell'avvenuta eliminazione del file
+     */
     public function deleteFile(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):

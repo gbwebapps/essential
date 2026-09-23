@@ -7,20 +7,24 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 
 /**
- * Class SuperAdminFilter
- *
- * Filtro di protezione (Middleware) di livello critico.
- * Limita l'accesso ad aree e funzionalità sensibili del sistema esclusivamente 
- * agli utenti amministratori dotati di privilegi di livello Superadmin (SuperAdmin).
+ * Filtro di massima sicurezza (middleware) riservato agli amministratori di sistema (Superadmin).
+ * 
+ * Protegge le rotte critiche dell'applicativo consentendo l'accesso esclusivamente 
+ * agli account dotati del flag di superadmin, bloccando incondizionatamente qualsiasi 
+ * altro livello di privilegio, indipendentemente dai permessi specifici posseduti.
  */
 class SuperAdminFilter implements FilterInterface
 {
     /**
-     * Intercetta la richiesta HTTP in ingresso per validare i privilegi SuperAdmin dell'operatore.
+     * Intercetta la richiesta in ingresso per verificare il privilegio di superadmin dell'utente corrente.
+     * 
+     * Se l'utente non dispone del livello di accesso massimo, il filtro interrompe immediatamente 
+     * l'esecuzione del controller di destinazione. Risponde con un payload JSON di errore per 
+     * le chiamate asincrone (AJAX) oppure forza un reindirizzamento verso la dashboard per il flusso standard.
      *
-     * @param RequestInterface $request   Oggetto della richiesta HTTP corrente.
-     * @param array|null       $arguments Argomenti opzionali configurati nella rotta.
-     * @return ResponseInterface|null Restituisce un oggetto Response (Redirect o JSON) se l'utente non dispone dei privilegi, altrimenti null.
+     * @param RequestInterface $request L'oggetto rappresentante la richiesta HTTP in ingresso
+     * @param array|null $arguments Parametri opzionali configurati a livello di routing
+     * @return \CodeIgniter\HTTP\RedirectResponse|\CodeIgniter\HTTP\ResponseInterface|null Restituisce null per consentire l'accesso, oppure una risposta (JSON o Redirect) per negarlo
      */
     public function before(RequestInterface $request, $arguments = null)
     {
@@ -45,6 +49,16 @@ class SuperAdminFilter implements FilterInterface
         return redirect()->to(base_url('backend/dashboard'));
     }
 
+    /**
+     * Intercetta la risposta HTTP in uscita dopo l'elaborazione da parte del controller di destinazione.
+     * 
+     * La logica di sbarramento e protezione si esaurisce interamente nella fase preventiva (before), 
+     * pertanto questo metodo non esegue alcuna operazione o manipolazione sulla risposta.
+     *
+     * @param RequestInterface $request L'oggetto rappresentante la richiesta HTTP elaborata
+     * @param ResponseInterface $response L'oggetto rappresentante la risposta HTTP generata dal framework
+     * @param array|null $arguments Parametri opzionali configurati a livello di routing
+     */
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
         /* In questo filtro non è necessaria alcuna operazione post-risposta */

@@ -5,22 +5,17 @@ namespace Config\Backend;
 use CodeIgniter\Config\BaseConfig;
 
 /**
- * Class Permissions
- *
- * Configurazione centrale per la definizione e la mappatura dei permessi
- * di accesso (RBAC) associati ai singoli moduli amministrativi del Backend.
+ * Gestisce la configurazione e la mappatura dei permessi di accesso alle sezioni e funzionalità del backend.
  */
 class Permissions extends BaseConfig
 {
 	/**
-	 * Elenco strutturato dei permessi di sicurezza configurati nell'applicazione.
-	 * 
-	 * @var array 
+	 * @var array Elenco dei permessi di sistema configurati
 	 */
 	public array $permissions = [];
 
 	/**
-	 * Costruttore della classe.
+	 * Inizializza la configurazione dei permessi di accesso.
 	 */
 	public function __construct()
     {
@@ -28,10 +23,9 @@ class Permissions extends BaseConfig
 	}
 
 	/**
-	 * Restituisce la matrice completa dei permessi del backend organizzati per modulo,
-	 * traducendo dinamicamente le etichette descrittive tramite il servizio lang().
+	 * Restituisce la struttura completa dei permessi suddivisi per controller e relative azioni consentite.
 	 *
-	 * @return array Struttura gerarchica dei moduli con i relativi permessi atomici verificabili.
+	 * @return array Array multidimensionale contenente i titoli, i controller, le icone e l'elenco dei permessi localizzati
 	 */
 	public function getPermissions(): array
 	{

@@ -84,9 +84,6 @@ class GalleryOneImgModel extends BackendModel
         ];
     }
 
-    /**
-     * Recupera tutte le immagini associate a un'entità e al suo UUID.
-     */
     public function getImages(array $posts): array
     {
         $posts = $this->checkAllowedFields($posts, $this->getImagesFields); 
@@ -95,9 +92,6 @@ class GalleryOneImgModel extends BackendModel
         return $this->db->query($sql, [$posts['entity'], $posts['uuid']])->getResultArray();
     }
 
-    /**
-     * Elimina il record dell'immagine dal database.
-     */
     public function deleteImage(array $posts): bool
     {
         $posts = $this->checkAllowedFields($posts, $this->allowedDeleteFields);
@@ -113,9 +107,6 @@ class GalleryOneImgModel extends BackendModel
         return $this->db->affectedRows() > 0;
     }
 
-    /**
-     * Imposta un'immagine come copertina, azzerando le altre della stessa entità.
-     */
     public function setCover(array $posts): bool
     {
         try {
@@ -150,9 +141,6 @@ class GalleryOneImgModel extends BackendModel
         }
     }
 
-    /**
-     * Rimuove lo stato di copertina da una specifica immagine.
-     */
     public function removeCover(array $posts): bool
     {
         $posts = $this->checkAllowedFields($posts, $this->coverFields); 

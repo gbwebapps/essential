@@ -2,18 +2,8 @@
 
 namespace App\Validation\Backend;
 
-/**
- * Class ImagesRules
- *
- * Raccolta di regole di validazione personalizzate (Custom Validation Rules)
- * dedicate alle validazioni di allegati.
- */
 class ImagesRules
 {
-    /**
-     * Valida un array associativo di immagini con etichette flessibili (chiave:valore).
-     * Sintassi: checkImages[size:2048,width:1920,height:1080,ext:png|jpg|webp]
-     */
     public function checkImages(...$args): bool
     {
         /* Recuperiamo i parametri passati dinamicamente da CodeIgniter */

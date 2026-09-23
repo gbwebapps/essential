@@ -1,15 +1,28 @@
-<?php
+<?php declare(strict_types = 1);
+
+/**
+ * Helper globale per la registrazione e il tracciamento delle attività di sistema (audit log).
+ * 
+ * Centralizza e semplifica l'inserimento di eventi operativi all'interno del database, 
+ * rendendo la funzione di logging rapidamente richiamabile da qualsiasi controller, libreria o filtro del framework.
+ */
 
 use App\Models\Backend\AuditsModel;
 
 if ( ! function_exists('log_admin_activity')) :
+
     /**
-     * Helper globale per registrare un'azione nel registro delle attività (Audit Log) degli amministratori.
+     * Registra in modo persistente sul database un'operazione o un evento generato da un amministratore.
      * 
-     * @param string $action L'azione compiuta (es. 'INSERT', 'UPDATE', 'DELETE')
-     * @param string $section La sezione interessata (es. 'settings', 'users')
-     * @param string|null $details Dettagli aggiuntivi, preferibilmente in formato JSON o testo descrittivo
-     * @return bool Ritorna true se l'inserimento è andato a buon fine, altrimenti false
+     * Agisce come un wrapper globale attorno ad AuditsModel, nascondendo la logica di istanziazione. 
+     * Garantisce la tracciabilità e il monitoraggio delle azioni critiche (modifiche, eliminazioni, accessi) 
+     * compiute all'interno dell'area riservata.
+     *
+     * @param string $action Chiave identificativa dell'operazione eseguita (es. 'UPDATE', 'DELETE', 'LOGIN')
+     * @param string $section Il modulo o il perimetro applicativo interessato dall'evento (es. 'admins', 'settings')
+     * @param string $details Descrizione testuale estesa e contestuale dell'operazione registrata
+     * @param object|null $currentAdmin L'oggetto che rappresenta l'amministratore esecutore. Se omesso, la logica sottostante tenterà l'identificazione automatica
+     * @return bool Esito dell'operazione: true se il record di audit è stato memorizzato con successo, false altrimenti
      */
     function log_admin_activity(string $action, string $section, string $details, ?object $currentAdmin = null): bool 
     {

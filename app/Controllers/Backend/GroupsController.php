@@ -11,33 +11,29 @@ use App\Libraries\Backend\GroupsClass;
 use App\Controllers\Backend\BackendController; 
 
 /**
- * Class GroupsController
- *
- * Controller dedicato alla gestione delle impostazioni globali e delle configurazioni di sistema del Backend.
+ * Controller per la gestione dei gruppi di amministratori e dei relativi livelli di accesso (ACL).
+ * 
+ * Permette la creazione, modifica ed eliminazione dei gruppi, l'assegnazione dei permessi di base 
+ * e la configurazione di eccezioni specifiche per singoli amministratori.
  */
 class GroupsController extends BackendController 
 {
     /**
-     * Istanza del modello dedicato alla persistenza delle impostazioni di sistema.
-     * 
-     * @var GroupsModel 
+     * @var GroupsModel Istanza del modello per le operazioni CRUD sui gruppi e la gestione delle tabelle dei permessi associati.
      */
     protected GroupsModel $groupsModel;
 
     /**
-     * Istanza della libreria logica per l'elaborazione delle configurazioni.
-     * 
-     * @var GroupsClass 
-     */
+     * @var GroupsClass Istanza della libreria helper contenente funzioni per la formattazione dei dati relativi ai gruppi.
+     */ 
     protected GroupsClass $groupsClass;
 
     /**
-     * Inizializza il controller impostando il contesto operativo e istanziando modello e libreria specifici.
+     * Inizializza le dipendenze specifiche per la gestione dei gruppi, caricando le relative classi e modelli.
      *
-     * @param RequestInterface  $request  Oggetto della richiesta HTTP corrente.
-     * @param ResponseInterface $response Oggetto della risposta HTTP corrente.
-     * @param LoggerInterface   $logger   Istanza del sistema di tracciamento log.
-     * @return void
+     * @param RequestInterface $request L'oggetto rappresentante la richiesta HTTP.
+     * @param ResponseInterface $response L'oggetto rappresentante la risposta HTTP.
+     * @param LoggerInterface $logger Istanza del sistema di log.
      */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
@@ -50,8 +46,9 @@ class GroupsController extends BackendController
     }
 
     /**
-     * Renderizza la pagina principale (Dashboard) del modulo gruppi.
-     * Carica in sincrono solo la struttura e i permessi vuoti per la sezione di aggiunta.
+     * Genera la vista principale per il modulo gruppi, predisponendo i metadati della pagina.
+     *
+     * @return string HTML compilato della vista index.
      */
     public function index()
     {
@@ -63,7 +60,12 @@ class GroupsController extends BackendController
         return $this->render('backend/groups/indexView', $this->data);
     }
 
-    /* Effettua la chiamata asincrona per l'apertura del pannello di aggiunta nuovo gruppo */
+    /**
+     * Gestisce la richiesta AJAX per l'apertura del modulo di inserimento di un nuovo gruppo.
+     * Estrae la mappa globale dei permessi per generare i controlli dell'interfaccia.
+     *
+     * @return ResponseInterface Risposta JSON contenente la porzione di codice HTML del modulo.
+     */
     public function openAdd(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -79,8 +81,11 @@ class GroupsController extends BackendController
     }
 
     /**
-     * Risponde alla chiamata AJAX (Primo livello) al click su "Lista gruppi".
-     * Restituisce lo scheletro dell'accordion con l'elenco reale dei gruppi.
+     * Recupera asincronamente l'elenco completo dei gruppi dal database.
+     * 
+     * Viene impiegato per generare la struttura ad accordion nella vista principale senza forzare un refresh della pagina.
+     *
+     * @return ResponseInterface Risposta JSON con l'HTML contenente l'elenco dei gruppi.
      */
     public function getGroups(): ResponseInterface
     {
@@ -98,9 +103,11 @@ class GroupsController extends BackendController
     }
 
     /**
-     * Risponde alla chiamata AJAX (Secondo livello) al click sul singolo gruppo.
-     * Restituisce il form di modifica pre-popolato con la matrice dei permessi del gruppo.
-     */
+     * Richiede i dettagli di uno specifico gruppo (identificato tramite ID) per il popolamento del modulo di modifica.
+     * Incrocia la mappa dei permessi globali con le impostazioni attuali del gruppo.
+     *
+     * @return ResponseInterface Risposta JSON contenente l'HTML del modulo di aggiornamento precompilato.
+     */ 
     public function getGroup(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -134,7 +141,12 @@ class GroupsController extends BackendController
         endif;
     }
 
-    /* Gestisce la chiamata ajax per l'aggiunta di un nuovo gruppo con nome, descrizione e permessi, poi vediamo cosa fargli restituire */
+    /**
+     * Processa l'inserimento di un nuovo record di gruppo nel database previa validazione.
+     * Prevede anche un percorso alternativo per resettare e ricaricare il form iniziale.
+     *
+     * @return ResponseInterface Risposta JSON indicante il successo, il fallimento o gli errori di validazione del payload.
+     */
     public function add(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -172,7 +184,12 @@ class GroupsController extends BackendController
         endif;
     }
 
-    /* Gestisce la chiamata ajax per l'aggiornamento di un gruppo con nome, descrizione e permessi, poi vediamo cosa fargli restituire */
+    /**
+     * Gestisce il salvataggio delle modifiche applicate a un gruppo esistente.
+     * Include una direttiva specifica per annullare l'azione e ricaricare asincronamente i dati originali persistenti nel DB.
+     *
+     * @return ResponseInterface Risposta JSON con l'esito dell'operazione di aggiornamento o il rinfresco del blocco HTML.
+     */
     public function edit(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -243,7 +260,12 @@ class GroupsController extends BackendController
         endif;
     }
 
-    /* Gestisce la chiamata ajax per l'eliminazione di un gruppo */
+    /**
+     * Procede all'eliminazione permanente di un record di gruppo dal sistema.
+     * Effettua controlli preliminari per impedire l'eliminazione se risultano amministratori tuttora associati all'ID target.
+     *
+     * @return ResponseInterface Risposta JSON con l'esito della cancellazione o il dettaglio del vincolo violato.
+     */
     public function del(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -274,8 +296,10 @@ class GroupsController extends BackendController
     }
 
     /**
-     * Esegue un controllo pre-volo (Pre-flight) per verificare se il gruppo
-     * può essere eliminato o se ci sono vincoli di integrità referenziale.
+     * Esegue un controllo di integrità referenziale preliminare sull'ID del gruppo fornito, 
+     * verificando l'assenza di amministratori associati, per autorizzare un'eventuale azione distruttiva.
+     *
+     * @return ResponseInterface Risposta JSON booleana (true se la cancellazione è permessa, false con messaggio di errore se bloccata).
      */
     public function checkDeleteConstraints(): ResponseInterface
     {
@@ -298,7 +322,11 @@ class GroupsController extends BackendController
         endif;
     }
 
-    /* Chiamata asincrona con click sulla barra Eccezioni per visualizzare il campo di autocomplete per la ricerca di un admin  */
+    /**
+     * Fornisce asincronamente il frammento HTML contenente il campo di ricerca iniziale per la sezione "Eccezioni".
+     *
+     * @return ResponseInterface Risposta JSON con l'interfaccia di inserimento ricerca.
+     */
     public function openExceptions(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -311,6 +339,12 @@ class GroupsController extends BackendController
         endif;
     }
 
+    /**
+     * Elabora le stringhe immesse dall'utente e restituisce in risposta una tendina interattiva contenente l'elenco 
+     * degli amministratori i cui dati anagrafici corrispondono al parametro di ricerca.
+     *
+     * @return ResponseInterface Risposta JSON contenente la visualizzazione parziale dei risultati trovati.
+     */
     public function getDropdownAdmins(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -335,6 +369,13 @@ class GroupsController extends BackendController
         endif;
     }
 
+    /**
+     * Fornisce il dettaglio della configurazione attuale dei permessi per un amministratore specifico.
+     * Svolge una comparazione tecnica fra i permessi concessi al gruppo di appartenenza e le variazioni 
+     * (delta/eccezioni) precedentemente registrate a livello di singolo utente.
+     *
+     * @return ResponseInterface Risposta JSON contenente l'HTML con la griglia dettagliata dei permessi utente.
+     */
     public function getAdminPermissions(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -374,6 +415,12 @@ class GroupsController extends BackendController
         endif;
     }
 
+    /**
+     * Sottopone a validazione e memorizza sul database le modifiche ai permessi (eccezioni) impostate 
+     * per l'amministratore identificato dall'UUID fornito nella richiesta AJAX.
+     *
+     * @return ResponseInterface Risposta JSON contenente l'esito della transazione.
+     */
     public function saveExceptions(): ResponseInterface
     {
         /* Verifichiamo che la richiesta sia esclusivamente AJAX e POST */

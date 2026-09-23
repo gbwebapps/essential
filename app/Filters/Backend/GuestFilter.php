@@ -7,20 +7,24 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 
 /**
- * Class GuestFilter
- *
- * Filtro di protezione (Middleware) dedicato agli utenti ospiti (non autenticati).
- * Inibisce l'accesso alle pagine di login o recupero credenziali agli amministratori
- * che possiedono già una sessione attiva, reindirizzandoli automaticamente alla dashboard.
+ * Filtro di restrizione (middleware) per le rotte accessibili esclusivamente agli utenti non autenticati (guest).
+ * 
+ * Impedisce agli amministratori con una sessione già attiva di accedere a pagine destinate 
+ * ai visitatori (come il modulo di login o il recupero della password). In caso di sessione attiva, 
+ * il filtro interrompe l'accesso alla rotta richiesta e reindirizza automaticamente l'utente verso la dashboard.
  */
 class GuestFilter implements FilterInterface
 {
     /**
-     * Intercetta la richiesta HTTP in ingresso per verificare lo stato di ospite dell'utente.
+     * Intercetta la richiesta HTTP in ingresso per verificare l'assenza di una sessione amministrativa attiva.
+     * 
+     * Se l'utente è già autenticato, impedisce l'esecuzione del controller di destinazione, imposta 
+     * un messaggio di notifica (flashdata) e interrompe il flusso, restituendo un payload JSON di blocco 
+     * per le chiamate asincrone (AJAX) o un redirect HTTP standard verso il pannello di controllo.
      *
-     * @param RequestInterface $request   Oggetto della richiesta HTTP corrente.
-     * @param array|null       $arguments Argomenti opzionali configurati nella rotta.
-     * @return ResponseInterface|null Restituisce un oggetto Response (Redirect o JSON) se l'utente è già loggato, altrimenti null.
+     * @param RequestInterface $request L'oggetto rappresentante la richiesta HTTP in ingresso
+     * @param array|null $arguments Parametri opzionali configurati per il filtro
+     * @return \CodeIgniter\HTTP\RedirectResponse|\CodeIgniter\HTTP\ResponseInterface|null Restituisce null per consentire l'accesso ai guest, oppure una risposta (JSON o Redirect) per bloccare gli utenti già connessi
      */
     public function before(RequestInterface $request, $arguments = null)
     {
@@ -47,6 +51,16 @@ class GuestFilter implements FilterInterface
         return redirect()->to(base_url('backend/dashboard'));
     }
 
+    /**
+     * Intercetta la risposta HTTP in uscita dopo l'elaborazione da parte del controller.
+     * 
+     * Per la logica di questo specifico filtro non è richiesta alcuna manipolazione 
+     * dei dati post-elaborazione, pertanto il metodo non esegue alcuna operazione.
+     *
+     * @param RequestInterface $request L'oggetto rappresentante la richiesta HTTP elaborata
+     * @param ResponseInterface $response L'oggetto rappresentante la risposta HTTP generata dal controller
+     * @param array|null $arguments Parametri opzionali configurati per il filtro
+     */
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
         /* In questo filtro non è necessaria alcuna operazione post-risposta */

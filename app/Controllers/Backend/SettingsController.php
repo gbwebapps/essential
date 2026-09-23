@@ -11,32 +11,35 @@ use App\Libraries\Backend\SettingsClass;
 use App\Controllers\Backend\BackendController; 
 
 /**
- * Class SettingsController
- *
- * Controller parametrizzato, ottimizzato e blindato contro manomissioni esterne dei parametri di configurazione.
+ * Controller per la configurazione globale delle variabili e dei parametri del sistema.
+ * 
+ * Gestisce l'interfaccia preposta all'impostazione di parametri applicativi (generali, autenticazione, upload, email), 
+ * applicando un pattern in cui i dati persistenti a livello di DB sovrascrivono i default cablati nei file di configurazione.
  */
 class SettingsController extends BackendController 
 {
     /**
-     * @var SettingsModel 
+     * @var SettingsModel Istanza del modello che esegue query SQL di base (senza l'impiego dell'ORM) per manipolare la tabella delle configurazioni.
      */
     protected SettingsModel $settingsModel;
 
     /**
-     * @var SettingsClass 
+     * @var SettingsClass Istanza della classe di supporto che genera o estrae dizionari fissi, quali elenchi dei fusi orari, delle lingue o formati ammessi.
      */
     protected SettingsClass $settingsClass;
 
     /**
-     * Whitelist dei moduli di configurazione autorizzati nel sistema.
-     * Impedisce attacchi di iniezione di codice e path traversal.
-     *
-     * @var array
+     * @var array Elenco che definisce i soli ambiti (namespace) consentiti dalla logica del controller, atto a respingere richieste arbitrarie di configurazione.
      */
     protected array $allowedEnvs = ['general', 'auth', 'upload', 'email'];
 
     /**
-     * Inizializza il controller impostando il contesto operativo.
+     * Esegue le procedure di inizializzazione standard estendendo BackendController, instanziando il modello base 
+     * e la classe helper per le configurazioni.
+     *
+     * @param RequestInterface $request L'oggetto contenente la richiesta in arrivo.
+     * @param ResponseInterface $response L'oggetto per la risposta.
+     * @param LoggerInterface $logger Il gestore dei file di logging locale.
      */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
@@ -50,7 +53,10 @@ class SettingsController extends BackendController
     }
 
     /**
-     * Renderizza la pagina principale caricando i valori di fallback iniziali.
+     * Elabora la struttura HTML iniziale della pagina impostazioni, fornendo i collegamenti per il caricamento asincrono 
+     * dei singoli pannelli funzionali.
+     *
+     * @return string HTML elaborato della pagina principale.
      */
     public function index()
     {
@@ -63,7 +69,10 @@ class SettingsController extends BackendController
     }
 
     /**
-     * Forza l'apertura e il rendering asincrono del pannello accordion basato sul parametro env.
+     * Riceve una richiesta AJAX per l'ambiente specificato, controlla la legittimità del payload e recupera i dati attivi 
+     * (identificando l'origine, DB o file base) restituendo quindi l'HTML parziale del modulo dedicato.
+     *
+     * @return ResponseInterface Risposta JSON che include il codice del form precompilato.
      */
     public function openSettings(): ResponseInterface
     {
@@ -97,7 +106,11 @@ class SettingsController extends BackendController
     }
 
     /**
-     * Convalida e memorizza in modo massivo o mirato i parametri di configurazione inviati in POST.
+     * Sottopone a validazione (mediante regole dinamiche definite sul modello) l'insieme di valori per uno specifico ambiente di sistema,
+     * per poi delegarne l'archiviazione. Gestisce automaticamente la rigenerazione in tempo reale di frammenti d'interfaccia 
+     * se i cambiamenti (es. localizzazione) impattano aree critiche dell'applicativo.
+     *
+     * @return ResponseInterface Risposta JSON includente l'esito dell'operazione e i potenziali snippet per l'aggiornamento del DOM.
      */
     public function saveSettings(): ResponseInterface
     {
@@ -172,7 +185,11 @@ class SettingsController extends BackendController
     }
 
     /**
-     * Recupera una selezione mirata di chiavi configurate o l'intero set.
+     * Restituisce tramite JSON puro l'insieme delle configurazioni attive appartenenti a uno specifico ambiente.
+     * 
+     * Implementa controlli sulla validità del parametro ambientale e accetta array filtro opzionali (keys) per ridurre l'output.
+     *
+     * @return ResponseInterface Payload asincrono contenente il dizionario chiave/valore dei settings richiesti.
      */
     public function getSettings(): ResponseInterface
     {
@@ -204,7 +221,10 @@ class SettingsController extends BackendController
     }
 
     /**
-     * Rimuove elementi di configurazione specifici o pulisce l'intero namespace.
+     * Esegue un comando di rimozione per annullare ogni preferenza archiviata a livello di database per il dato ambiente, 
+     * ripristinando in modo forzato il sistema ad aderire ai valori di default definiti a monte dall'applicazione.
+     *
+     * @return ResponseInterface Esito dell'operazione di pulizia restituito in formato JSON.
      */
     public function deleteSettings(): ResponseInterface
     {
@@ -233,8 +253,10 @@ class SettingsController extends BackendController
     }
 
     /**
-     * Verifica preventivamente l'esistenza di impostazioni nel database per il modulo richiesto.
-     * Utilizzato per bloccare il modale lato client se non ci sono dati da eliminare.
+     * Interroga in modo preliminare il modello per individuare la presenza effettiva di customizzazioni 
+     * nell'ambiente specificato, permettendo al client di determinare se attivare o precludere la comparsa dell'avviso modale di ripristino.
+     *
+     * @return ResponseInterface Risposta JSON di controllo logico (true: record rinvenuti, false: database vuoto per tale dominio).
      */
     public function checkDeleteSettings(): ResponseInterface
     {

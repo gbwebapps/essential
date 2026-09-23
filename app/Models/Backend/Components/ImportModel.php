@@ -18,7 +18,6 @@ class ImportModel extends BackendModel
         return null;
     }
 
-    /* Nota: Se non è chiamato dal controller, cambia public in private */
     public function getTableStructure(string $table): array
     {
         /* Controllo di sicurezza sull'esistenza della tabella */
@@ -532,7 +531,6 @@ class ImportModel extends BackendModel
         return true;
     }
 
-    /* Genera regole di validazione dinamiche basate sullo schema reale del DB */
     protected function buildDynamicRules(array $structure): array
     {
         $rules = [];

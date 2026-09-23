@@ -6,17 +6,28 @@ use App\Controllers\Backend\BackendController;
 use App\Models\Backend\Components\GalleryOneImgModel;
 use CodeIgniter\HTTP\ResponseInterface;
 
+/**
+ * Gestisce le operazioni asincrone del componente galleria immagini singola (Gallery One), inclusa la visualizzazione, l'eliminazione e la gestione delle copertine.
+ */
 class GalleryOneController extends BackendController
 {
+	/**
+	 * @var GalleryOneImgModel Istanza del modello dedicato alla gestione dei file e dei record della galleria
+	 */
     private GalleryOneImgModel $galleryModel;
 
+    /**
+     * Inizializza il controller e carica il modello di riferimento per le operazioni sulla galleria.
+     */
     public function __construct()
     {
         $this->galleryModel = model(GalleryOneImgModel::class);
     }
 
     /**
-     * Mostra la galleria di immagini filtrata per entità e uuid.
+     * Valida la richiesta e restituisce l'interfaccia renderizzata della galleria con le immagini associate all'entità.
+     *
+     * @return ResponseInterface Risposta JSON contenente l'esito della validazione e l'HTML generato per la galleria
      */
     public function showGallery(): ResponseInterface
     {
@@ -46,7 +57,9 @@ class GalleryOneController extends BackendController
     }
 
     /**
-     * Elimina un'immagine dal database e dal disco.
+     * Elimina fisicamente e logicamente un'immagine dalla galleria e restituisce la vista aggiornata.
+     *
+     * @return ResponseInterface Risposta JSON con l'esito dell'eliminazione, il messaggio di notifica e l'HTML aggiornato
      */
     public function deleteImage(): ResponseInterface
     {
@@ -81,7 +94,9 @@ class GalleryOneController extends BackendController
     }
 
     /**
-     * Imposta un'immagine come copertina principale dell'entità.
+     * Imposta un'immagine specifica come copertina principale della galleria e aggiorna l'interfaccia.
+     *
+     * @return ResponseInterface Risposta JSON con l'esito dell'assegnazione, la notifica e l'HTML aggiornato
      */
     public function setCover(): ResponseInterface
     {
@@ -115,7 +130,9 @@ class GalleryOneController extends BackendController
     }
 
     /**
-     * Rimuove lo stato di copertina da un'immagine.
+     * Rimuove lo stato di copertina dall'immagine selezionata e aggiorna l'interfaccia della galleria.
+     *
+     * @return ResponseInterface Risposta JSON con l'esito della rimozione, la notifica e l'HTML aggiornato
      */
     public function removeCover(): ResponseInterface
     {

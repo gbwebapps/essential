@@ -11,35 +11,26 @@ use App\Libraries\Backend\AuthClass;
 use App\Controllers\Backend\BackendController; 
 
 /**
- * Class AuthController
- *
- * Controller centrale per la gestione del ciclo di vita delle sessioni di autenticazione.
- * Coordina i flussi di accesso (Login), recupero credenziali (Reset Password), 
- * inizializzazione account (Set Password) e disconnessione sicura (Logout).
+ * Gestisce l'autenticazione degli amministratori nel pannello di controllo, includendo login, recupero password, verifica a due fattori (2FA) e disconnessione.
  */
 class AuthController extends BackendController 
 {
     /**
-     * Istanza del modello dedicato alla persistenza e validazione dei dati di autenticazione.
-     * 
-     * @var AuthModel 
+     * @var AuthModel Istanza del modello responsabile delle logiche di accesso, validazione credenziali e gestione dei token
      */
     protected AuthModel $authModel;
 
     /**
-     * Istanza della libreria logica per l'elaborazione dei flussi di sicurezza.
-     * 
-     * @var AuthClass 
+     * @var AuthClass Istanza della libreria per funzioni di supporto, criptazione o formattazione legate all'autenticazione
      */
     protected AuthClass $authClass;
 
     /**
-     * Inizializza il controller impostando il contesto grafico di atterraggio e istanziando modello e libreria core.
+     * Inizializza il controller, configura il layout centrato per le maschere di accesso e istanzia le dipendenze del modulo di autenticazione.
      *
-     * @param RequestInterface  $request  Oggetto della richiesta HTTP corrente.
-     * @param ResponseInterface $response Oggetto della risposta HTTP corrente.
-     * @param LoggerInterface   $logger   Istanza del sistema di tracciamento log.
-     * @return void
+     * @param RequestInterface $request Istanza della richiesta HTTP corrente
+     * @param ResponseInterface $response Istanza della risposta HTTP per il client
+     * @param LoggerInterface $logger Istanza del sistema di log per la registrazione degli eventi
      */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
@@ -53,9 +44,9 @@ class AuthController extends BackendController
     }
 
     /**
-     * Mostra la pagina di selezione iniziale (hub) per le macro-funzionalità di autenticazione.
+     * Renderizza la pagina di atterraggio principale che offre i collegamenti alle maschere di accesso e recupero password.
      *
-     * @return string La vista HTML della dashboard di autenticazione.
+     * @return string HTML renderizzato della vista index
      */
     public function index()
     {
@@ -83,10 +74,9 @@ class AuthController extends BackendController
     }
 
     /**
-     * Gestisce la visualizzazione della maschera di accesso (GET) e l'elaborazione asincrona delle credenziali (POST AJAX).
-     * Intercetta l'eventuale URL memorizzato dai filtri di protezione per effettuare il reindirizzamento post-login.
+     * Gestisce il caricamento del modulo di accesso e l'elaborazione asincrona delle credenziali (login), inclusi redirect condizionali o invio al processo 2FA.
      *
-     * @return ResponseInterface|string Risposta JSON con l'esito del login o la vista HTML della pagina di accesso.
+     * @return string|ResponseInterface Risposta JSON con l'esito dell'autenticazione e redirect, oppure l'HTML della maschera di login
      */
     public function login()
     {
@@ -123,9 +113,9 @@ class AuthController extends BackendController
     }
 
     /**
-     * Gestisce la richiesta di generazione del token per il ripristino della password (GET) e il relativo invio dati (POST AJAX).
+     * Gestisce il caricamento del modulo per il recupero password e l'invio asincrono dell'email contenente il token di sblocco.
      *
-     * @return ResponseInterface|string Risposta JSON con l'esito della richiesta o la vista HTML del form di recupero.
+     * @return string|ResponseInterface Risposta JSON con l'esito della richiesta oppure l'HTML della maschera di recupero
      */
     public function resetPassword()
     {
@@ -154,10 +144,10 @@ class AuthController extends BackendController
     }
 
     /**
-     * Gestisce la form di configurazione di una nuova password (GET) pre-validando il token e il salvataggio dei dati (POST AJAX).
+     * Gestisce il caricamento del modulo, verifica la validità temporale e l'esistenza del token di sblocco, permettendo all'utente di definire una nuova password di accesso.
      *
-     * @param string|null $token Il token univoco di sicurezza passato nell'URL per autorizzare l'operazione.
-     * @return ResponseInterface|string Risposta JSON in POST, vista HTML in GET o reindirizzamento forzato se il token è invalido.
+     * @param string|null $token Codice univoco di sicurezza per autorizzare il reset della password
+     * @return string|ResponseInterface Risposta JSON post-aggiornamento, HTML della maschera di reset o redirect in caso di token non valido
      */
     public function setPassword(?string $token = null)
     {
@@ -194,13 +184,10 @@ class AuthController extends BackendController
     }
 
     /**
-     * Gestisce la pagina e la verifica del codice di sicurezza (2FA).
-     * Come funziona:
-     * -> Se l'utente ha appena cliccato "Invia", controlla che il codice sia scritto bene.
-     * -> Invia il codice al database per vedere se è quello corretto e non è scaduto.
-     * -> Se il codice è giusto, effettua il login definitivo ed entra nel pannello.
-     * -> Se l'utente sta solo guardando la pagina (senza cliccare), mostra la maschera di inserimento.
-     * @return  string|\CodeIgniter\HTTP\Response La pagina HTML da mostrare oppure una risposta JSON con l'esito del controllo.
+     * Gestisce la maschera di convalida e il controllo asincrono del codice OTP (email o app) richiesto per completare l'autenticazione a due fattori.
+     *
+     * @return string|ResponseInterface Risposta JSON con l'esito della verifica oppure l'HTML della maschera di inserimento codice 2FA
+     * @throws \CodeIgniter\Exceptions\PageNotFoundException Se la funzionalità 2FA è disabilitata a livello di configurazione globale
      */
     public function verify()
     {
@@ -238,9 +225,9 @@ class AuthController extends BackendController
     }
 
     /**
-     * Esegue la disconnessione completa dell'amministratore corrente, invalidando in sicurezza cookie o sessioni attive.
+     * Termina esplicitamente la sessione di lavoro dell'amministratore (logout), invalidando i token attivi (sessione o "remember me") e reindirizzando al login.
      *
-     * @return ResponseInterface Oggetto di redirect verso la radice di autenticazione con cookie aggiornati.
+     * @return \CodeIgniter\HTTP\RedirectResponse Redirect alla pagina di accesso con i messaggi di conferma in flashdata
      */
     public function logout()
     {

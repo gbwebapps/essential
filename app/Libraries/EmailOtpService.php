@@ -2,16 +2,23 @@
 
 namespace App\Libraries;
 
+/**
+ * Servizio dedicato all'autenticazione a due fattori (2FA) tramite messaggi di posta elettronica.
+ * 
+ * Gestisce l'intero ciclo di vita di un codice OTP (One-Time Password): la generazione crittografica, 
+ * l'archiviazione sul database con relativa scadenza, l'elaborazione del template e-mail 
+ * e la successiva validazione durante il tentativo di accesso.
+ */
 class EmailOtpService
 {
     /**
-     * Database connection instance.
-     * @var \CodeIgniter\Database\BaseConnection
+     * @var \CodeIgniter\Database\BaseConnection Istanza della connessione al database per la persistenza dei codici temporanei.
      */
     protected $db;
 
     /**
-     * Constructor initialization.
+     * Inizializza il servizio stabilendo la connessione nativa al database, 
+     * necessaria per registrare e interrogare i codici generati.
      */
     public function __construct()
     {
@@ -19,14 +26,14 @@ class EmailOtpService
     }
 
     /**
-     * Genera un codice OTP, lo salva sul database e invia l'e-mail all'amministratore.
-     * Come funziona:
-     * -> Crea un numero casuale di 6 cifre e imposta la scadenza leggendo la configurazione.
-     * -> Salva il record nella tabella `admins_2fa_codes`.
-     * -> Recupera i dati anagrafici dell'amministratore.
-     * -> Prepara e invia l'e-mail utilizzando il servizio nativo di CodeIgniter.
-     * @param string $adminUuid L'identificativo univoco dell'amministratore.
-     * @return bool True se l'e-mail è stata inviata con successo, altrimenti False.
+     * Genera un nuovo codice OTP temporaneo e lo trasmette attraverso posta elettronica all'indirizzo e-mail dell'amministratore.
+     * 
+     * Il metodo esegue diverse operazioni in sequenza: calcola un codice numerico casuale basato 
+     * sui parametri di configurazione, determina l'esatto momento di scadenza, salva il record nel database 
+     * e utilizza il servizio e-mail nativo del framework per compilare e recapitare il messaggio HTML.
+     *
+     * @param string $adminUuid L'identificativo univoco (UUID) dell'amministratore che sta effettuando il login
+     * @return bool Esito del processo: true se il codice è stato salvato e il messaggio affidato al servizio di posta, false altrimenti
      */
     public function send(string $adminUuid): bool
     {
@@ -83,13 +90,15 @@ class EmailOtpService
     }
 
     /**
-     * Verifica se il codice OTP inserito dall'utente è valido e non è ancora scaduto.
-     * Come funziona:
-     * -> Cerca nella tabella un record che corrisponda all'utente e al codice digitato.
-     * -> Controlla che la data di scadenza sia maggiore o uguale al momento attuale.
-     * @param string $adminUuid L'identificativo univoco dell'amministratore.
-     * @param string $code Il codice OTP digitato dall'utente.
-     * @return bool True se il codice esiste ed è valido, altrimenti False.
+     * Valida il codice OTP fornito dall'utente confrontandolo con i dati registrati a sistema.
+     * 
+     * Esegue un'interrogazione mirata al database per assicurarsi che il codice corrisponda 
+     * esattamente a quello assegnato all'UUID specificato e che l'attuale marcatore temporale (timestamp) 
+     * non abbia superato la data di scadenza (expires_at) prevista.
+     *
+     * @param string $adminUuid L'identificativo univoco (UUID) dell'amministratore da validare
+     * @param string $code Il codice temporaneo digitato nel modulo di autenticazione
+     * @return bool Esito della validazione: true in caso di corrispondenza valida e tempestiva, false se il codice è errato o scaduto
      */
     public function verify(string $adminUuid, string $code): bool
     {

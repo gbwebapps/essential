@@ -12,35 +12,33 @@ use App\Libraries\Backend\TokensClass;
 use App\Controllers\Backend\BackendController; 
 
 /**
- * Class TokensController
- *
- * Controller centrale per la gestione completa delle utenze amministrative (Tokens).
- * Coordina le operazioni CRUD, l'assegnazione dei permessi RBAC granulari, la sicurezza 
- * delle sessioni, la revoca dei token e i caricamenti dinamici delle viste asincrone via AJAX.
+ * Controller dedicato alla gestione globale dei token di sessione e dei dispositivi connessi.
+ * Consente agli amministratori di monitorare le sessioni attive nel pannello di controllo, 
+ * verificare i dettagli dei client connessi (es. user agent, indirizzi IP) e revocare selettivamente 
+ * gli accessi al sistema invalidando i token specifici.
  */
 class TokensController extends BackendController 
 {
     /**
-     * Istanza del modello dedicato alla persistenza e manipolazione dei dati degli amministratori.
-     * 
-     * @var TokensModel 
+     * @var TokensModel Istanza del modello di riferimento per le operazioni sui token. Si occupa dell'interrogazione 
+     * del database, dell'applicazione dei filtri di ricerca e della cancellazione fisica dei record.
      */
     protected TokensModel $tokensModel;
 
     /**
-     * Istanza della libreria logica per l'elaborazione dei flussi e delle operazioni del modulo.
-     * 
-     * @var TokensClass 
+     * @var TokensClass Istanza della libreria di supporto contenente logiche dedicate ai token, utile per 
+     * isolare dal controller le operazioni di formattazione e preparazione avanzata dei dati.
      */
     protected TokensClass $tokensClass;
 
     /**
-     * Inizializza il controller impostando il contesto del modulo e istanziando modello e libreria specifici.
+     * Metodo di inizializzazione che estende le funzionalità di base del BackendController.
+     * Configura le variabili di contesto ('controller' ed 'entity') fondamentali per il corretto 
+     * instradamento delle risorse nelle viste, e istanzia i modelli e le classi necessarie al modulo.
      *
-     * @param RequestInterface  $request  Oggetto della richiesta HTTP corrente.
-     * @param ResponseInterface $response Oggetto della risposta HTTP corrente.
-     * @param LoggerInterface   $logger   Istanza del sistema di tracciamento log.
-     * @return void
+     * @param RequestInterface $request L'oggetto rappresentante la richiesta HTTP in ingresso
+     * @param ResponseInterface $response L'oggetto deputato alla generazione della risposta HTTP
+     * @param LoggerInterface $logger L'interfaccia per la registrazione degli eventi nel sistema di log
      */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
@@ -54,9 +52,11 @@ class TokensController extends BackendController
     }
 
     /**
-     * Renderizza la pagina principale del modulo di gestione degli amministratori.
+     * Gestisce la visualizzazione della tabella principale contenente l'elenco storico dei token.
+     * Se invocato tramite richiesta AJAX (es. durante una ricerca), valida i filtri immessi, interroga il modello 
+     * e restituisce in JSON il frammento HTML della tabella parziale, consentendo un aggiornamento asincrono dell'interfaccia.
      *
-     * @return string La vista HTML iniziale dell'indice.
+     * @return string|ResponseInterface Codice HTML della vista index (su GET) o risposta JSON con la tabella ricalcolata (su POST)
      */
     public function index(): string|ResponseInterface
     {
@@ -115,6 +115,13 @@ class TokensController extends BackendController
         return $this->render('backend/tokens/indexView', $this->data);
     }
 
+    /**
+     * Elabora le richieste asincrone per l'eliminazione definitiva e irreversibile di un singolo token dal database.
+     * Previa validazione formale dei dati in ingresso, forza la rimozione del record, revocando conseguentemente 
+     * l'accesso al client o dispositivo remoto associato a tale sessione.
+     *
+     * @return ResponseInterface Risposta JSON indicante l'esito dell'operazione di cancellazione e gli eventuali errori
+     */
     public function hardDelete(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):

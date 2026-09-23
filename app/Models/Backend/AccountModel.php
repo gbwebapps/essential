@@ -9,25 +9,10 @@ class AccountModel extends BackendModel
 
 	protected ?string $module = 'account';
 
-	/**
-	 * Elenco dei campi consentiti per la persistenza dei dati durante la fase di aggiornamento del profilo corrente.
-	 *
-	 * @var array
-	 */
 	protected array $editAllowedFields = ['firstname', 'lastname', 'email', 'phone', 'note'];
 
-	/**
-	 * Campi consentiti per l'identificazione e la revoca forzata di un token memorizzato.
-	 *
-	 * @var array
-	 */
 	protected array $deleteTokenAllowedFields = ['id'];
 
-	/**
-     * Elenco delle proprietà anagrafiche utilizzate per la comparazione dei dati storici o per il tracciamento dei log.
-     *
-     * @var array
-     */
     protected array $toCompare = ['firstname', 'lastname', 'email', 'phone', 'note'];
 
 	protected function initModel(): void 
@@ -64,14 +49,6 @@ class AccountModel extends BackendModel
 	    ];
 	}
 
-	/**
-	 * Controlla i parametri necessari alla revoca immediata di un token dal database.
-	 *
-	 * Richiede obbligatoriamente l'UUID dell'utente e l'indice intero sequenziale (id) del record token
-	 * per l'esecuzione della cancellazione atomica.
-	 *
-	 * @return array Criteri per l'eliminazione mirata delle sessioni.
-	 */
 	public function deleteTokenValidationRules(): array
 	{
 	    return [
@@ -86,16 +63,6 @@ class AccountModel extends BackendModel
 	    ];
 	}
 
-	/**
-	 * Recupera l'elenco piatto dei permessi associati a un determinato gruppo.
-	 *
-	 * Interroga la tabella `admins_groups_permissions` per estrarre tutti i codici
-	 * di permesso assegnati al gruppo specificato. Il risultato viene appiattito
-	 * in un array di stringhe per facilitare la comparazione con i permessi dell'utente.
-	 *
-	 * @param int $groupId L'ID del gruppo amministrativo.
-	 * @return array Un array piatto contenente i codici dei permessi (es. ['users_index', 'users_show']).
-	 */
 	public function getGroupPermissions(int $groupId): array
 	{
 	    $sql = "select permission from admins_groups_permissions where group_id = ?";
@@ -111,16 +78,6 @@ class AccountModel extends BackendModel
 	    }, $result);
 	}
 
-	/**
-	 * Recupera le eccezioni sui permessi specifiche per un determinato amministratore.
-	 *
-	 * Interroga la tabella `admins_permissions` per raccogliere le personalizzazioni
-	 * introdotte sull'utente (permessi extra concessi o permessi del gruppo revocati).
-	 * Il risultato viene strutturato come array associativo per ottimizzare le performance di lettura.
-	 *
-	 * @param string $uuid L'UUID dell'amministratore.
-	 * @return array Array associativo dove la chiave è il codice permesso e il valore è lo stato 'allow' (0 o 1).
-	 */
 	public function getAdminExceptions(string $uuid): array
 	{
 	    $sql = "select permission, allow from admins_permissions where admin_uuid = ?";
@@ -139,15 +96,6 @@ class AccountModel extends BackendModel
 	    return $exceptions;
 	}
 
-	/**
-	 * Recupera lo storico e lo stato dei token di sessione, persistenza o attivazione emessi per l'utente.
-	 *
-	 * Esegue un'estrazione mirata sulla tabella dei token per raccogliere i dati di tracciamento ambientali
-	 * quali gli indirizzi IP, gli User Agent e i relativi formati DATETIME di creazione e scadenza.
-	 *
-	 * @param string $uuid Identificativo univoco dell'amministratore.
-	 * @return array Lista dei token associati all'anagrafica.
-	 */
 	public function getTokens(string $uuid): array
 	{
 	    /* Estrazione log dei tokens di sessione o reset */
@@ -202,10 +150,6 @@ class AccountModel extends BackendModel
 	    }
 	}
 
-	/**
-     * Recupera l'ID del token di sessione attualmente in uso.
-     * Gestisce internamente la lettura della sessione e l'interrogazione al DB.
-     */
     public function getCurrentTokenId(): ?int
     {
         if (session()->has('backendSession')):
@@ -224,17 +168,6 @@ class AccountModel extends BackendModel
         return null;
     }
 
-	/**
-	 * Revoca ed elimina permanentemente un singolo token identificativo (sessione o persistenza) dal database.
-	 *
-	 * Filtra i dati in ingresso tramite whitelisting ed esegue la verifica preventiva sull'esistenza dell'account.
-	 * Interroga la tabella dei token per cancellare il record corrispondente all'UUID dell'amministratore e all'ID 
-	 * incrementale fornito. Valida l'esito dell'operazione basandosi sul conteggio delle righe effettivamente coinvolte 
-	 * dalla query (`affectedRows`), confermando l'avvenuta disconnessione forzata del dispositivo associato.
-	 *
-	 * @param array $posts Dataset contenente l'UUID dell'amministratore e l'ID sequenziale del token da revocare.
-	 * @return array Matrice di risposta contenente l'esito logico dell'epurazione e il messaggio per l'interfaccia.
-	 */
 	public function deleteToken(array $posts, \stdClass $currentAdmin, ?int $currentTokenId = null): array
     {
         /* Match dei posts con i campi consentiti */
@@ -370,12 +303,6 @@ class AccountModel extends BackendModel
 	    return $expiringDate;
 	}
 
-	/**
-	 * Recupera il metodo 2FA attualmente attivo per l'amministratore corrente.
-	 *
-	 * @param string $adminUuid L'UUID dell'amministratore corrente.
-	 * @return string Il nome del metodo attivo ('none', 'email', 'totp').
-	 */
 	public function getActiveMethod(string $adminUuid): string
 	{
 	    $sql = "select method from admins_2fa where admin_uuid = ? and enabled = 1 limit 1";
@@ -416,13 +343,6 @@ class AccountModel extends BackendModel
         }
     }
 
-	/**
-     * Salva nel database il secret TOTP temporaneo in stato disattivato.
-     *
-     * @param string $adminUuid L'UUID dell'amministratore.
-     * @param string $secret Il codice segreto generato per il TOTP.
-     * @return bool True in caso di successo, false altrimenti.
-     */
     public function saveTemporarySecret(string $adminUuid, string $secret): bool
     {
         try {
@@ -438,12 +358,6 @@ class AccountModel extends BackendModel
         }
     }
 
-	/**
-     * Recupera il secret TOTP temporaneo non ancora attivato per la verifica.
-     *
-     * @param string $adminUuid L'UUID dell'amministratore.
-     * @return string|null Il codice segreto se trovato, altrimenti null.
-     */
     public function getTemporarySecret(string $adminUuid): ?string
     {
         $sql = "select secret from admins_2fa where admin_uuid = ? and method = 'totp' and enabled = 0 limit 1";
@@ -456,12 +370,6 @@ class AccountModel extends BackendModel
         return (string) $row->secret;
     }
 
-	/**
-     * Attiva definitivamente il metodo TOTP e disattiva gli altri canali 2FA.
-     *
-     * @param string $adminUuid L'UUID dell'amministratore.
-     * @return bool True in caso di successo, false altrimenti.
-     */
     public function activateTotpMethod(string $adminUuid, \stdClass $currentAdmin): bool
     {
         try {

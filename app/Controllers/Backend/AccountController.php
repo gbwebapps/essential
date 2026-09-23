@@ -14,36 +14,31 @@ use App\Controllers\Backend\BackendController;
 use App\Models\Backend\Components\GalleryOneImgModel;
 
 /**
- * Class AccountController
- *
- * Controller dedicato alla gestione completa del profilo, delle impostazioni personali,
- * dei permessi, della sicurezza e dei token dell'operatore correntemente autenticato nel Backend.
+ * Gestisce il profilo, le preferenze personali, la sicurezza e le impostazioni dell'amministratore correntemente autenticato.
  */
 class AccountController extends BackendController 
 {
     /**
-     * Istanza del modello dedicato alla persistenza dei dati del profilo utente.
-     * 
-     * @var AccountModel 
+     * @var AccountModel Istanza del modello dedicato alla gestione dei dati e delle operazioni sul database per l'account
      */
     protected AccountModel $accountModel;
 
     /**
-     * Istanza della libreria logica per l'elaborazione delle funzionalità dell'account.
-     * 
-     * @var AccountClass 
+     * @var AccountClass Istanza della libreria contenente le logiche operative e di formattazione specifiche dell'account
      */
     protected AccountClass $accountClass;
 
+    /**
+     * @var GalleryOneImgModel Istanza del modello per la gestione e l'elaborazione dell'immagine di profilo (avatar)
+     */
     protected GalleryOneImgModel $galleryOneImgModel;
 
     /**
-     * Inizializza il controller impostando l'albero di navigazione interno (sub-menu) e istanziando i relativi componenti core.
+     * Inizializza il controller, configura i metadati della pagina e definisce la struttura dinamica del menu di navigazione dell'account.
      *
-     * @param RequestInterface  $request  Oggetto della richiesta HTTP corrente.
-     * @param ResponseInterface $response Oggetto della risposta HTTP corrente.
-     * @param LoggerInterface   $logger   Istanza del sistema di tracciamento log.
-     * @return void
+     * @param RequestInterface $request Istanza della richiesta HTTP corrente
+     * @param ResponseInterface $response Istanza della risposta HTTP per il client
+     * @param LoggerInterface $logger Istanza del sistema di log per la registrazione degli eventi
      */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
@@ -114,9 +109,9 @@ class AccountController extends BackendController
     }
 
     /**
-     * Mostra la pagina principale (hub di navigazione) del pannello di gestione dell'account.
+     * Renderizza la vista principale di atterraggio del pannello di gestione dell'account.
      *
-     * @return string La vista HTML dell'indice dell'account.
+     * @return string HTML renderizzato della vista index
      */
     public function index()
     {
@@ -128,9 +123,9 @@ class AccountController extends BackendController
     }
 
     /**
-     * Mostra la sezione contenente i dati anagrafici e le informazioni generali del profilo.
+     * Renderizza la vista contenente le informazioni generali, anagrafiche e di riepilogo in sola lettura.
      *
-     * @return string La vista HTML dei dati generali dell'account.
+     * @return string HTML renderizzato della vista generale
      */
     public function general()
     {
@@ -140,9 +135,9 @@ class AccountController extends BackendController
     }
 
     /**
-     * Mostra la maschera di configurazione e modifica dei dati del profilo dell'operatore.
+     * Gestisce la visualizzazione e l'aggiornamento asincrono dei dati personali e anagrafici del profilo amministratore.
      *
-     * @return string La vista HTML del form di modifica.
+     * @return string|ResponseInterface Risposta JSON con l'esito dell'aggiornamento o l'HTML della vista di modifica
      */
     public function edit(): string|ResponseInterface
     {
@@ -185,9 +180,9 @@ class AccountController extends BackendController
     }
 
     /**
-     * Mostra l'elenco e il riepilogo dei permessi RBAC associati e attivi per l'operatore corrente.
+     * Gestisce la visualizzazione dei permessi e delle eccezioni assegnate all'account, consentendo il rinfresco asincrono delle autorizzazioni.
      *
-     * @return string|\CodeIgniter\HTTP\Response La vista HTML o la risposta JSON per AJAX.
+     * @return string|ResponseInterface Risposta JSON per l'aggiornamento dinamico o l'HTML della vista dei permessi
      */
     public function permissions(): string|ResponseInterface
     {
@@ -220,9 +215,9 @@ class AccountController extends BackendController
     }
 
     /**
-     * Mostra la sezione dedicata alla gestione dell'avatar e dei file multimediali associati al profilo.
+     * Renderizza l'interfaccia dedicata all'upload, alla rimozione e alla gestione dell'immagine di profilo (avatar).
      *
-     * @return string La vista HTML della gestione immagini.
+     * @return string HTML renderizzato della vista per le immagini
      */
     public function images()
     {
@@ -238,9 +233,9 @@ class AccountController extends BackendController
     }
 
     /**
-     * Mostra l'elenco, lo stato di validità e la cronologia dei token di sicurezza legati all'account.
+     * Gestisce la visualizzazione dei dispositivi attualmente connessi e delle sessioni (token) attive per l'account corrente.
      *
-     * @return string La vista HTML della sezione token.
+     * @return string|ResponseInterface Risposta JSON per il ricaricamento della lista o l'HTML della vista dei token
      */
     public function tokens(): string|ResponseInterface
     {
@@ -262,9 +257,9 @@ class AccountController extends BackendController
     }
 
     /**
-     * Revoca e rimuove in modo permanente un determinato token (sessione o cookie persistente) associato all'amministratore corrente.
+     * Valida ed elimina asincronamente una specifica sessione attiva (token) per disconnettere forzatamente un dispositivo remoto.
      *
-     * @return ResponseInterface Risposta JSON con l'esito e la tabella parziale dei token aggiornata.
+     * @return ResponseInterface Risposta JSON con l'esito dell'eliminazione e l'interfaccia della lista aggiornata
      */
     public function deleteToken(): ResponseInterface
     {
@@ -298,9 +293,9 @@ class AccountController extends BackendController
     }
 
     /**
-     * Avvia la procedura amministrativa di invio o rigenerazione guidata della password di un operatore.
+     * Gestisce la procedura di modifica della password dell'account, validando i requisiti di robustezza e le scadenze temporali.
      *
-     * @return ResponseInterface Risposta JSON con l'esito dell'operazione.
+     * @return string|ResponseInterface Risposta JSON con l'esito dell'operazione o l'HTML della vista per il reset
      */
     public function resetPassword(): string|ResponseInterface
     {
@@ -321,7 +316,6 @@ class AccountController extends BackendController
 
             endif;
 
-
             return $this->jsonResponse($json);
 
         endif;
@@ -334,9 +328,9 @@ class AccountController extends BackendController
     }
 
     /**
-     * Mostra i log di controllo degli accessi, le sessioni attive e i parametri di sicurezza del profilo.
+     * Renderizza l'interfaccia principale per la scelta e la gestione dei metodi di autenticazione a due fattori (2FA).
      *
-     * @return string La vista HTML della sezione sicurezza.
+     * @return string HTML renderizzato della vista di sicurezza
      */
     public function security()
     {
@@ -347,6 +341,11 @@ class AccountController extends BackendController
         return $this->render('backend/account/securityView', $this->data);
     }
 
+    /**
+     * Valida e salva in modo asincrono il metodo di autenticazione a due fattori di base selezionato (es. email o disattivato).
+     *
+     * @return ResponseInterface Risposta JSON con l'esito dell'aggiornamento delle preferenze
+     */
     public function saveBasicMethod()
     {
         if ($this->request->isAJAX() && $this->request->is('post')) :
@@ -372,12 +371,9 @@ class AccountController extends BackendController
     }
 
     /**
-     * Inizializza la configurazione del secondo fattore tramite TOTP.
-     * * Genera un codice segreto univoco e temporaneo, lo registra nel database
-     * in uno stato non ancora attivo (enabled = 0) e restituisce la vista parziale
-     * contenente il QR Code e il secret in chiaro per l'applicazione di autenticazione.
+     * Inizializza la configurazione per l'app Authenticator (TOTP), generando un codice segreto temporaneo e il relativo QR Code visivo per il pairing.
      *
-     * @return \CodeIgniter\HTTP\ResponseInterface Risposta JSON con l'esito dell'operazione e il codice HTML della vista parziale.
+     * @return ResponseInterface Risposta JSON contenente il QR Code generato e l'interfaccia parziale per l'inserimento del codice
      */
     public function setupTotp()
     {
@@ -421,12 +417,9 @@ class AccountController extends BackendController
     }
 
     /**
-     * Valida il codice di verifica OTP e attiva definitivamente il metodo TOTP.
-     * * Recupera il secret temporaneo associato all'amministratore (enabled = 0), 
-     * ne verifica la validità tramite il codice inviato dall'utente e, in caso di 
-     * esito positivo, attiva il TOTP (enabled = 1) disattivando gli altri canali.
+     * Verifica il primo codice OTP inserito dall'utente per validare l'associazione e attivare definitivamente l'autenticazione tramite app.
      *
-     * @return \CodeIgniter\HTTP\ResponseInterface Risposta JSON con l'esito dell'operazione.
+     * @return ResponseInterface Risposta JSON con l'esito dell'attivazione e il messaggio di conferma finale
      */
     public function confirmTotp()
     {

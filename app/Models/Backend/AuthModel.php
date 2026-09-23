@@ -4,26 +4,20 @@ namespace App\Models\Backend;
 
 use App\Models\Backend\BackendModel;
 
-/**
- * Modello transazionale per la gestione dei processi di autenticazione e sicurezza del backend.
- *
- * Questa classe governa i flussi ad alta sensibilità legati alla sicurezza degli accessi. Implementa
- * i meccanismi di verifica delle credenziali, la limitazione e il tracciamento dei tentativi falliti
- * per la mitigazione di attacchi Brute Force, l'intercettazione del secondo fattore di autenticazione (2FA),
- * il rilascio dei token di sessione/cookie e le procedure di ripristino sicuro delle password (procedura di reset).
- */
 class AuthModel extends BackendModel
 {
     private object $config;
 
-    /**
-     * Inizializza il modello ereditando i comportamenti base e caricando le configurazioni di sicurezza.
-     *
-     * Rinvigorisce l'istanza valorizzando l'espressione regolare per il controllo delle password
-     * prelevandola centralmente dal file di configurazione della sicurezza backend.
-     *
-     * @return void
-     */
+    public ?string $module = 'auth';
+
+    protected array $loginAllowedFields = ['email', 'password', 'rememberMe']; 
+
+    protected array $resetPasswordAllowedFields = ['email'];
+
+    protected array $setPasswordAllowedFields = ['password', 'token'];
+
+    protected array $verifyAllowedFields = ['code'];
+
     protected function initModel(): void 
     {
         parent::initModel();
@@ -31,41 +25,6 @@ class AuthModel extends BackendModel
         $this->config = setting('Backend\Auth');
     }
 
-    /**
-     * Elenco dei campi di input autorizzati per l'elaborazione del modulo di login.
-     *
-     * @var array
-     */
-    protected array $loginAllowedFields = ['email', 'password', 'rememberMe']; 
-
-    /**
-     * Elenco dei campi di input autorizzati per la richiesta di ripristino della password.
-     *
-     * @var array
-     */
-    protected array $resetPasswordAllowedFields = ['email'];
-
-    /**
-     * Elenco dei campi di input autorizzati per l'impostazione finale della nuova password.
-     *
-     * @var array
-     */
-    protected array $setPasswordAllowedFields = ['password', 'token'];
-
-    /**
-     * Elenco dei campi di input autorizzati per la verifica del secondo fattore di autenticazione.
-     * @var array
-     */
-    protected array $verifyAllowedFields = ['code'];
-
-    /**
-     * Definisce le regole rigide di validazione per il modulo di autenticazione iniziale.
-     *
-     * Restituisce i vincoli per i campi email e password, applicando la regex di complessità
-     * dinamica e associando messaggi di errore personalizzati per il backend.
-     *
-     * @return array Mappa delle regole e degli errori per il componente di validazione.
-     */
     public function validateLoginRules(): array
     {
         return [
@@ -83,14 +42,6 @@ class AuthModel extends BackendModel
         ];
     }
 
-    /**
-     * Definisce le regole di validazione per la richiesta di reset della password tramite email.
-     *
-     * Imposta i vincoli di obbligatorietà, formato standard dell'indirizzo email e pulizia
-     * degli spazi vuoti tramite trim.
-     *
-     * @return array Mappa delle regole di validazione per l'email.
-     */
     public function validateResetPasswordRules()
     {
         return [
@@ -101,14 +52,6 @@ class AuthModel extends BackendModel
         ];
     }
 
-    /**
-     * Definisce le regole di validazione per l'inserimento della nuova password di sblocco.
-     *
-     * Struttura i vincoli per la password (con regex), il controllo di uguaglianza del campo
-     * di conferma e l'obbligatorietà del token di attivazione agganciato a una regola custom.
-     *
-     * @return array Mappa completa dei vincoli del modulo di impostazione password.
-     */
     public function validateSetPasswordRules()
     {
         return [
@@ -133,11 +76,6 @@ class AuthModel extends BackendModel
         ];    
     }
 
-    /**
-     * Definisce le regole di validazione per la verifica del codice del secondo fattore di autenticazione.
-     * Imposta i vincoli di obbligatorietà, di essere un numero e di avere una lunghezza esatta di 6 cifre.
-     * @return array Mappa delle regole di validazione per il codice.
-     */
     public function validateVerifyRules(): array
     {
         return [
@@ -149,18 +87,6 @@ class AuthModel extends BackendModel
         ];
     }
 
-    /**
-     * Esegue la pipeline di controllo per l'autenticazione dell'amministratore nel sistema.
-     *
-     * Isola i campi consentiti, analizza i limiti di Brute Force basati sull'intervallo temporale,
-     * interroga il database in modalità read-only (ottimizzazione delle prestazioni) e verifica l'hash
-     * della password. Gestisce l'interruzione controllata per il Secondo Fattore (2FA) e traccia i fallimenti
-     * aprendo transazioni atomiche solo in caso di effettiva scrittura sul database.
-     *
-     * @param array $posts I dati grezzi prelevati dal modulo di login.
-     * @param \CodeIgniter\HTTP\IncomingRequest $request L'oggetto della richiesta HTTP corrente per IP e User Agent.
-     * @return array Risultato dell'operazione contenente l'esito logico ed eventuali messaggi o stati (2fa).
-     */
     public function login(array $posts, \CodeIgniter\HTTP\IncomingRequest $request)
     {
         try 
@@ -302,18 +228,6 @@ class AuthModel extends BackendModel
         }
     }
 
-    /**
-     * Finalizza la persistenza dello stato di login sul client e sul database ad autorizzazione avvenuta.
-     *
-     * Calcola i tempi di scadenza in base alla persistenza scelta (cookie/sessione), genera e inserisce un nuovo
-     * token crittografico sul database, rigenera l'ID di sessione per prevenire attacchi di Session Fixation,
-     * cifra il token per l'invio tramite cookie sicuro e imposta i messaggi flash di notifica interfaccia.
-     *
-     * @param object $admin Record anagrafico dell'amministratore autenticato.
-     * @param bool $rememberMe Flag indicante la richiesta di persistenza a lungo termine via cookie.
-     * @param \CodeIgniter\HTTP\IncomingRequest $request Oggetto della richiesta per l'estrazione dei metadati di tracciamento.
-     * @return array Esito positivo della finalizzazione del login.
-     */
     private function innerLogin(object $admin, bool $rememberMe, \CodeIgniter\HTTP\IncomingRequest $request): array
     {
         if ($rememberMe):
@@ -414,16 +328,6 @@ class AuthModel extends BackendModel
         return ['result' => true];
     }
 
-    /**
-     * Applica la nuova password associata a un token di attivazione valido e verificato.
-     *
-     * Risolve l'identità dell'utente attraverso l'hash del token fornito. In caso di riscontro, esegue una
-     * transazione per aggiornare l'hash della password (PASSWORD_DEFAULT), azzera la data di reset e
-     * revoca il token di attivazione utilizzato per impedire riutilizzi fraudolenti.
-     *
-     * @param array $posts Array di input contenente la nuova password e il token di sblocco.
-     * @return array Array di risposta con l'esito dell'operazione e il messaggio per il client.
-     */
     public function resetPassword(array $posts, \CodeIgniter\HTTP\IncomingRequest $request): array
     {
         $posts = $this->checkAllowedFields($posts, $this->resetPasswordAllowedFields);
@@ -498,16 +402,6 @@ class AuthModel extends BackendModel
         return ['result' => false, 'message' => lang('backend/auth.messages.resetPasswordFailed')];
     }
 
-    /**
-     * Applica la nuova password associata a un token di attivazione valido e verificato.
-     *
-     * Risolve l'identità dell'utente attraverso l'hash del token fornito. In caso di riscontro, esegue una
-     * transazione per aggiornare l'hash della password (PASSWORD_DEFAULT), azzera la data di reset e
-     * revoca il token di attivazione utilizzato per impedire riutilizzi fraudolenti.
-     *
-     * @param array $posts Array di input contenente la nuova password e il token di sblocco.
-     * @return array Array di risposta con l'esito dell'operazione e il messaggio per il client.
-     */
     public function setPassword(array $posts): array
     {
         try
@@ -519,7 +413,7 @@ class AuthModel extends BackendModel
             $tokenHash = $token->getHash($this->config->hashKey);
 
             /* 2. Sostituito fetch() con getRow() */
-            $sql = "select uuid, firstname, lastname from admins as u join admins_tokens as t on u.uuid = t.admin_uuid where t.token_hash = ? and t.token_type = ? limit 1";
+            $sql = "select uuid, firstname, lastname, email from admins as u join admins_tokens as t on u.uuid = t.admin_uuid where t.token_hash = ? and t.token_type = ? limit 1";
             $admin = $this->db->query($sql, [$tokenHash, 'activation'])->getRow();
 
             if($admin):
@@ -565,15 +459,6 @@ class AuthModel extends BackendModel
         }
     }
 
-    /**
-     * Ispeziona l'integrità e la validità temporale di un token di attivazione.
-     *
-     * Calcola l'hash del token in chiaro e interroga il database verificando la corrispondenza tipologica
-     * con il tipo 'activation' e controllando che la data corrente sia inferiore alla data di scadenza del token.
-     *
-     * @param string $token Stringa del token in chiaro ricevuto dal client.
-     * @return bool True se il token è valido e attivo, false in tutti gli altri casi.
-     */
     public function checkAuthToken(string $token): bool
     {
         try 
@@ -603,22 +488,6 @@ class AuthModel extends BackendModel
         }
     }
 
-    /**
-     * Controlla e valida il codice del secondo fattore (2FA).
-     *
-     * Funzionamento del metodo:
-     * -> Verifica se il secondo fattore (2FA) è attivo nel sistema.
-     * -> Controlla se la sessione temporanea dell'utente è ancora valida.
-     * -> Blocca i tentativi continui di inserimento per evitare attacchi forzati (Brute-Force).
-     * -> Verifica se il codice inserito esiste (per Email) o corrisponde alla chiave (per TOTP).
-     * -> Controlla se il codice è scaduto (distinguendo tra codice sbagliato e scaduto nel tempo).
-     * -> Se il codice è corretto, pulisce i dati temporanei e completa il login dell'utente.
-     *
-     * @param array $posts I dati inviati dal modulo (contiene il codice inserito dall'utente).
-     * @param \CodeIgniter\HTTP\IncomingRequest $request La richiesta del browser (serve per prendere l'IP dell'utente).
-     * @return array Restituisce un array con le chiavi 'result' (bool) e 'message' (string).
-     * @throws \CodeIgniter\Exceptions\PageNotFoundException Mostra un errore 404 se il 2FA è disattivato.
-     */
     public function verify(array $posts, \CodeIgniter\HTTP\IncomingRequest $request): array
     {
         try 
@@ -744,15 +613,6 @@ class AuthModel extends BackendModel
         }
     }
 
-    /**
-     * Esegue la distruzione della sessione di autenticazione standard.
-     *
-     * Verifica la presenza della chiave in sessione, ne estrae il valore in chiaro per ricavarne
-     * l'hash di memorizzazione, elimina il record corrispondente sul database per revocare l'autorizzazione
-     * e rimuove la chiave dallo storage di sessione del server.
-     *
-     * @return void
-     */
     public function logoutBySession(string $reason = 'manual'): void
     {
         try {
@@ -802,16 +662,6 @@ class AuthModel extends BackendModel
         }
     }
 
-    /**
-     * Esegue la distruzione del cookie di persistenza a lungo termine (Remember Me).
-     *
-     * Riceve il valore cifrato del cookie, provvede alla sua decifratura mediante il servizio di crittografia,
-     * risale all'hash del token per rimuovere permanentemente la riga dal database dei token e invia
-     * l'istruzione di cancellazione fisica del cookie al browser del client.
-     *
-     * @param string $cookieValue Valore crittografato prelevato dal cookie del client.
-     * @return void
-     */
     public function logoutByCookie(string $cookieValue, string $reason = 'manual'): void
     {
         try {

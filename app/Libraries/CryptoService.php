@@ -3,32 +3,28 @@
 namespace App\Libraries;
 
 /**
- * Class CryptoService
- *
- * Servizio centrale per la cifratura e decifratura simmetrica bidirezionale dei dati,
- * con utilizzo dell'algoritmo sicuro AES-256-GCM per garantire la riservatezza e l'integrità del payload.
+ * Servizio crittografico dedicato alla cifratura e decifratura sicura dei dati sensibili.
+ * 
+ * Implementa l'algoritmo AES-256 in modalità GCM (Galois/Counter Mode), uno standard di crittografia 
+ * autenticata (AEAD) che garantisce simultaneamente la confidenzialità del payload e la sua integrità 
+ * contro tentativi di manipolazione.
  */
 class CryptoService
 {
     /**
-     * Chiave crittografica segreta utilizzata per le operazioni di cifratura e decifratura.
-     * 
-     * @var string 
+     * @var string Chiave segreta master (simmetrica) utilizzata per le operazioni di crittografia.
      */
     protected string $key;
 
     /**
-     * Metodo e modalità dell'algoritmo crittografico impostato (predefinito: 'aes-256-gcm').
-     * 
-     * @var string 
+     * @var string Definizione dell'algoritmo crittografico e della modalità operativa (AES a 256 bit in modalità GCM).
      */
     protected string $cipher = 'aes-256-gcm';
 
     /**
-     * Costruttore della classe.
-     * Inizializza il servizio crittografico memorizzando la chiave segreta iniettata dall'esterno.
+     * Inizializza il servizio crittografico iniettando la chiave segreta necessaria all'algoritmo.
      *
-     * @param string $key La chiave crittografica da associare al servizio.
+     * @param string $key La stringa che funge da chiave di cifratura simmetrica.
      */
     public function __construct(string $key)
     {
@@ -36,10 +32,14 @@ class CryptoService
     }
 
     /**
-     * Cifra una stringa di testo in chiaro generando un payload sicuro, integro e autenticato.
+     * Esegue la cifratura di una stringa di testo in chiaro garantendone l'autenticazione.
+     * 
+     * Il metodo genera crittograficamente un Vettore di Inizializzazione (IV) pseudo-casuale e affida 
+     * all'algoritmo GCM la creazione di un Tag di autenticazione. I tre elementi risultanti (IV, Tag e Testo Cifrato) 
+     * vengono uniti in un singolo blocco contiguo e codificati in Base64 per facilitarne l'archiviazione sicura.
      *
-     * @param string $plaintext Il testo in chiaro da sottoporre a cifratura.
-     * @return string Stringa finale codificata in Base64 contenente l'unione sequenziale di IV, Tag e testo cifrato.
+     * @param string $plaintext La stringa di testo in chiaro (non cifrata) da proteggere
+     * @return string Il payload finale protetto e codificato in Base64, pronto per l'archiviazione
      */
     public function encrypt(string $plaintext): string
     {
@@ -63,10 +63,15 @@ class CryptoService
     }
 
     /**
-     * Decifra un payload protetto estraendone i componenti e verificandone l'autenticità.
+     * Decifra e autentica un payload crittografico precedentemente elaborato.
+     * 
+     * Il metodo esegue il processo inverso: decodifica la stringa Base64 ed estrae in base a offset fissi 
+     * il Vettore di Inizializzazione (IV) e il Tag di autenticazione originali. L'algoritmo GCM utilizza 
+     * il Tag per validare crittograficamente l'integrità del dato prima di restituire il testo in chiaro, 
+     * impedendo così attacchi di manipolazione (ciphertext tampering).
      *
-     * @param string $ciphertextBlob Il blocco di dati cifrati codificato in Base64 da elaborare.
-     * @return string|null Il testo originale decifrato in chiaro, oppure null se il payload è alterato o corrotto.
+     * @param string $ciphertextBlob Il payload crittografico codificato in Base64 (contenente IV, Tag e testo cifrato)
+     * @return string|null Il testo in chiaro originale, oppure null se i dati sono corrotti o la validazione dell'integrità fallisce
      */
     public function decrypt(string $ciphertextBlob): ?string
     {

@@ -12,35 +12,30 @@ use App\Libraries\Backend\LogsClass;
 use App\Controllers\Backend\BackendController; 
 
 /**
- * Class LogsController
- *
- * Controller centrale per la gestione completa delle utenze amministrative (Logs).
- * Coordina le operazioni CRUD, l'assegnazione dei permessi RBAC granulari, la sicurezza 
- * delle sessioni, la revoca dei log e i caricamenti dinamici delle viste asincrone via AJAX.
+ * Controller dedicato alla consultazione dei registri (log) di sistema.
+ * 
+ * Permette di monitorare la cronologia degli accessi (login/logout), le sessioni utente attive 
+ * e di esaminare i metadati relativi ai dispositivi o ai browser utilizzati per accedere all'applicazione.
  */
 class LogsController extends BackendController 
 {
     /**
-     * Istanza del modello dedicato alla persistenza e manipolazione dei dati degli amministratori.
-     * 
-     * @var LogsModel 
+     * @var LogsModel Istanza del modello predisposto all'estrazione, filtraggio e gestione dei record dei log dal database.
      */
     protected LogsModel $logsModel;
 
     /**
-     * Istanza della libreria logica per l'elaborazione dei flussi e delle operazioni del modulo.
-     * 
-     * @var LogsClass 
+     * @var LogsClass Istanza della libreria che fornisce routine specifiche per la formattazione visiva dei log e l'analisi del client.
      */
     protected LogsClass $logsClass;
 
     /**
-     * Inizializza il controller impostando il contesto del modulo e istanziando modello e libreria specifici.
+     * Instanzia e prepara le dipendenze essenziali del controller impostando l'identificativo entità 
+     * per garantire una corretta interpretazione e un routing accurato delle viste.
      *
-     * @param RequestInterface  $request  Oggetto della richiesta HTTP corrente.
-     * @param ResponseInterface $response Oggetto della risposta HTTP corrente.
-     * @param LoggerInterface   $logger   Istanza del sistema di tracciamento log.
-     * @return void
+     * @param RequestInterface $request L'oggetto della richiesta HTTP.
+     * @param ResponseInterface $response L'oggetto della risposta HTTP.
+     * @param LoggerInterface $logger L'interfaccia di logging di sistema.
      */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
@@ -54,9 +49,10 @@ class LogsController extends BackendController
     }
 
     /**
-     * Renderizza la pagina principale del modulo di gestione degli amministratori.
+     * Renderizza l'interfaccia iniziale del pannello logs o gestisce le richieste AJAX per aggiornare in modo asincrono la tabella dei risultati.
+     * Il metodo si occupa di validare i criteri di ricerca passati come payload prima di interrogare il modello.
      *
-     * @return string La vista HTML iniziale dell'indice.
+     * @return string|ResponseInterface Codice HTML della pagina o risposta JSON con la porzione di tabella ricalcolata.
      */
     public function index(): string|ResponseInterface
     {
@@ -116,7 +112,9 @@ class LogsController extends BackendController
     }
 
     /**
-     * @return 
+     * Provvede alla rimozione definitiva di un singolo record di accesso (log session) identificato in modo esplicito dal suo token ID.
+     *
+     * @return string|ResponseInterface Risposta JSON contenente l'esito dell'operazione di cancellazione.
      */
     public function hardDelete(): string|ResponseInterface
     {

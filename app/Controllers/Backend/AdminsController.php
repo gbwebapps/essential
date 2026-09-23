@@ -15,37 +15,31 @@ use App\Controllers\Backend\BackendController;
 use App\Models\Backend\Components\GalleryOneImgModel;
 
 /**
- * Class AdminsController
- *
- * Controller centrale per la gestione completa delle utenze amministrative (Admins).
- * Coordina le operazioni CRUD, l'assegnazione dei permessi RBAC granulari, la sicurezza 
- * delle sessioni, la revoca dei token e i caricamenti dinamici delle viste asincrone via AJAX.
+ * Gestisce la sezione amministrativa dedicata alla gestione degli utenti con privilegi di sistema (amministratori), controllandone permessi, sessioni e anagrafiche.
  */
 class AdminsController extends BackendController 
 {
     /**
-     * Istanza del modello dedicato alla persistenza e manipolazione dei dati degli amministratori.
-     * 
-     * @var AdminsModel 
+     * @var AdminsModel Istanza del modello dedicato all'interazione con il database per i dati degli amministratori
      */
     protected AdminsModel $adminsModel;
 
     /**
-     * Istanza della libreria logica per l'elaborazione dei flussi e delle operazioni del modulo.
-     * 
-     * @var AdminsClass 
+     * @var AdminsClass Istanza della libreria contenente logiche di controllo e formattazione specifiche per gli amministratori
      */
     protected AdminsClass $adminsClass;
 
+    /**
+     * @var GalleryOneImgModel Istanza del modello responsabile della gestione dell'immagine di profilo (avatar) dell'amministratore
+     */
     protected GalleryOneImgModel $galleryOneImgModel;
 
     /**
-     * Inizializza il controller impostando il contesto del modulo e istanziando modello e libreria specifici.
+     * Inizializza il controller, configura i metadati della pagina e istanzia i modelli e le classi necessarie.
      *
-     * @param RequestInterface  $request  Oggetto della richiesta HTTP corrente.
-     * @param ResponseInterface $response Oggetto della risposta HTTP corrente.
-     * @param LoggerInterface   $logger   Istanza del sistema di tracciamento log.
-     * @return void
+     * @param RequestInterface $request Istanza della richiesta HTTP corrente
+     * @param ResponseInterface $response Istanza della risposta HTTP per il client
+     * @param LoggerInterface $logger Istanza del sistema di log per la registrazione degli eventi
      */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
@@ -61,24 +55,24 @@ class AdminsController extends BackendController
     }
 
     /**
-     * Renderizza la pagina principale del modulo di gestione degli amministratori.
+     * Renderizza la vista iniziale (dashboard/riepilogo) della sezione amministratori.
      *
-     * @return string La vista HTML iniziale dell'indice.
+     * @return string|ResponseInterface HTML renderizzato della vista index
      */
-    // public function index(): string|ResponseInterface
-    // {
-    //     $this->data['action'] = 'index';
+    public function index(): string|ResponseInterface
+    {
+        $this->data['action'] = 'index';
         
-    //     $this->data['title'] = lang('backend/admins.titles.index');
-    //     $this->data['icon'] = '<i class="fa-solid fa-chart-simple"></i>';
+        $this->data['title'] = lang('backend/admins.titles.index');
+        $this->data['icon'] = '<i class="fa-solid fa-chart-simple"></i>';
 
-    //     return $this->render('backend/admins/indexView', $this->data);
-    // }
+        return $this->render('backend/admins/indexView', $this->data);
+    }
 
     /**
-     * Gestisce la visualizzazione della tabella degli amministratori (GET) e il caricamento asincrono filtrato dei record (POST AJAX).
+     * Gestisce il caricamento e il filtraggio asincrono della tabella contenente l'elenco di tutti gli amministratori.
      *
-     * @return string|ResponseInterface La vista HTML completa o la risposta JSON parziale con i dati tabellari.
+     * @return string|ResponseInterface Risposta JSON con i dati filtrati o l'HTML della vista per l'elenco generale
      */
     public function showAll(): string|ResponseInterface
     {
@@ -133,9 +127,9 @@ class AdminsController extends BackendController
     }
 
     /**
-     * Gestisce la maschera di inserimento di un nuovo amministratore (GET), l'azione di reset (AJAX) e il salvataggio dei dati (POST AJAX).
+     * Gestisce la creazione di un nuovo amministratore, includendo la validazione dei dati anagrafici e l'upload dell'immagine profilo.
      *
-     * @return string|ResponseInterface La vista HTML completa o la risposta JSON parziale con l'esito dell'operazione.
+     * @return string|ResponseInterface Risposta JSON con l'esito del salvataggio o l'HTML del modulo di inserimento
      */
     public function add(): string|ResponseInterface
     {
@@ -178,10 +172,11 @@ class AdminsController extends BackendController
     }
 
     /**
-     * Gestisce la maschera di modifica di un amministratore esistente (GET), il refresh parziale (AJAX) e il salvataggio dei dati (POST AJAX).
+     * Gestisce la modifica di un amministratore esistente, verificandone i privilegi (protezione superadmin e cestino) e aggiornando permessi o anagrafica.
      *
-     * @param string|null $uuid L'identificativo unico dell'amministratore da modificare (richiesto per GET).
-     * @return string|ResponseInterface La vista HTML completa o la risposta JSON parziale con l'esito dell'operazione.
+     * @param string|null $uuid Identificativo univoco dell'amministratore da modificare
+     * @return string|ResponseInterface Risposta JSON con l'esito dell'aggiornamento o l'HTML del modulo di modifica
+     * @throws \CodeIgniter\Exceptions\PageNotFoundException Se l'identificativo non è valido o l'utente non esiste
      */
     public function edit(string $uuid = null): string|ResponseInterface
     {
@@ -301,13 +296,9 @@ class AdminsController extends BackendController
     }
 
     /**
-     * Gestisce il cambio dinamico del gruppo tramite richiesta AJAX.
+     * Ricalcola dinamicamente e restituisce l'interfaccia dei permessi quando viene selezionato un nuovo gruppo di appartenenza durante la fase di modifica.
      *
-     * Il metodo intercetta la selezione di un nuovo gruppo dall'interfaccia,
-     * ne valida i dati e restituisce il codice HTML parziale della matrice dei permessi
-     * allineata ai poteri nativi del nuovo gruppo, azzerando visivamente le eccezioni.
-     *
-     * @return ResponseInterface Risposta JSON contenente il parziale HTML aggiornato o gli errori di validazione.
+     * @return ResponseInterface Risposta JSON contenente la vista aggiornata dei permessi assegnabili
      */
     public function changeGroup(): ResponseInterface
     {
@@ -346,10 +337,10 @@ class AdminsController extends BackendController
     }
 
     /**
-     * Mostra la scheda informativa completa di un amministratore, dettagliando permessi, dispositivi e token attivi.
+     * Renderizza la vista di dettaglio di un singolo amministratore, mostrando anagrafica, permessi attuali e sessioni attive.
      *
-     * @param string $uuid L'identificativo univoco dell'amministratore da visualizzare.
-     * @return RedirectResponse|string Oggetto di reindirizzamento in caso di errore o la vista HTML dei dettagli.
+     * @param string $uuid Identificativo univoco dell'amministratore
+     * @return RedirectResponse|string Redirect in caso di parametri non validi o l'HTML renderizzato della vista di dettaglio
      */
     public function show(string $uuid): RedirectResponse|string
     {
@@ -394,11 +385,11 @@ class AdminsController extends BackendController
 
         return $this->render('backend/admins/showView', $this->data);
     }
-    /**
 
-     * Esegue la rimozione o cancellazione di un amministratore tramite richiesta asincrona.
+    /**
+     * Elimina in modo irreversibile dal database i dati dell'amministratore e i record ad esso associati.
      *
-     * @return ResponseInterface Risposta JSON contenente l'esito dell'operazione.
+     * @return ResponseInterface Risposta JSON con l'esito dell'eliminazione definitiva
      */
     public function hardDelete(): ResponseInterface
     {
@@ -420,6 +411,11 @@ class AdminsController extends BackendController
         endif;
     }
 
+    /**
+     * Sposta temporaneamente un amministratore nel cestino, revocandone l'accesso senza cancellare i dati dal database (eliminazione logica).
+     *
+     * @return ResponseInterface Risposta JSON con l'esito della disattivazione
+     */
     public function softDelete(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -440,6 +436,11 @@ class AdminsController extends BackendController
         endif;
     }
 
+    /**
+     * Ripristina un amministratore precedentemente inserito nel cestino, riabilitandone l'account.
+     *
+     * @return ResponseInterface Risposta JSON con l'esito dell'operazione di ripristino
+     */
     public function restoreDelete(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
@@ -461,9 +462,9 @@ class AdminsController extends BackendController
     }
 
     /**
-     * Avvia la procedura amministrativa di invio o rigenerazione guidata della password di un operatore.
+     * Genera e invia via email un link temporaneo per consentire all'amministratore di reimpostare la propria password.
      *
-     * @return ResponseInterface Risposta JSON con l'esito dell'operazione.
+     * @return ResponseInterface Risposta JSON con l'esito dell'invio della richiesta
      */
     public function resetPassword(): ResponseInterface
     {
@@ -486,9 +487,9 @@ class AdminsController extends BackendController
     }
 
     /**
-     * Modifica lo stato di attivazione (attivo/sospeso) di un amministratore e ne aggiorna i relativi partial grafici.
+     * Modifica asincronamente lo stato di un amministratore (es. da attivo a sospeso) e aggiorna la porzione di interfaccia interessata.
      *
-     * @return ResponseInterface Risposta JSON contenente l'esito e i frammenti HTML aggiornati.
+     * @return ResponseInterface Risposta JSON con l'esito del cambio di stato e l'HTML aggiornato
      */
     public function changeStatus(): ResponseInterface
     {
@@ -526,9 +527,9 @@ class AdminsController extends BackendController
     }
 
     /**
-     * Aggiorna o alterna l'assegnazione di un singolo permesso RBAC per l'utente selezionato.
+     * Aggiunge o rimuove un permesso specifico, generando un'eccezione rispetto alle regole predefinite del gruppo di appartenenza dell'amministratore.
      *
-     * @return ResponseInterface Risposta JSON contenente l'esito e le viste parziali dei permessi e metadati aggiornate.
+     * @return ResponseInterface Risposta JSON con l'esito dell'operazione e l'interfaccia dei permessi aggiornata
      */
     public function changePermission(): ResponseInterface
     {
@@ -567,9 +568,9 @@ class AdminsController extends BackendController
     }
 
     /**
-     * Recupera e renderizza asincronamente il frammento HTML dei dati anagrafici in base al contesto operativo richiesto (show/edit).
+     * Recupera e ricarica i dati anagrafici e generali dell'amministratore aggiornando la singola porzione della vista di dettaglio o di modifica.
      *
-     * @return ResponseInterface Risposta JSON con il codice HTML parziale renderizzato.
+     * @return ResponseInterface Risposta JSON contenente l'HTML aggiornato dei dati generali
      */
     public function getGeneralData(): ResponseInterface
     {
@@ -619,9 +620,9 @@ class AdminsController extends BackendController
     }
 
     /**
-     * Recupera e renderizza asincronamente il frammento HTML relativo ai metadati cronologici di tracciamento del record.
+     * Ricarica i metadati di sistema dell'amministratore (date di creazione, modifica, ultimo accesso, ecc.) per l'aggiornamento dell'interfaccia.
      *
-     * @return ResponseInterface Risposta JSON con il codice HTML parziale renderizzato.
+     * @return ResponseInterface Risposta JSON contenente l'HTML aggiornato dei metadati
      */
     public function getMetaData(): ResponseInterface
     {
@@ -659,9 +660,9 @@ class AdminsController extends BackendController
     }
 
     /**
-     * Recupera e renderizza asincronamente il blocco HTML contenente l'elenco dei permessi dell'utente (show/edit).
+     * Ricarica l'intera struttura dei permessi, calcolando dinamicamente la fusione tra i permessi di gruppo e le eccezioni dell'utente.
      *
-     * @return ResponseInterface Risposta JSON con il codice HTML parziale renderizzato.
+     * @return ResponseInterface Risposta JSON contenente l'interfaccia aggiornata dei permessi assegnati
      */
     public function getPermissions(): ResponseInterface
     {
@@ -716,9 +717,9 @@ class AdminsController extends BackendController
     }
 
     /**
-     * Recupera e renderizza asincronamente il frammento HTML della tabella dei token di sicurezza attivi dell'utente.
+     * Ricarica e restituisce la lista dei dispositivi attualmente connessi e delle sessioni attive dell'amministratore.
      *
-     * @return ResponseInterface Risposta JSON con il codice HTML parziale renderizzato.
+     * @return ResponseInterface Risposta JSON contenente l'interfaccia aggiornata con l'elenco dei token
      */
     public function getTokens(): ResponseInterface
     {
@@ -759,9 +760,9 @@ class AdminsController extends BackendController
     }
 
     /**
-     * Revoca e rimuove in modo permanente un determinato token (sessione o cookie persistente) associato all'amministratore.
+     * Disconnette forzatamente un dispositivo remoto, invalidando ed eliminando il token di sessione corrispondente.
      *
-     * @return ResponseInterface Risposta JSON con l'esito e la tabella parziale dei token aggiornata.
+     * @return ResponseInterface Risposta JSON con l'esito della disconnessione e l'elenco aggiornato dei dispositivi attivi
      */
     public function deleteToken(): ResponseInterface
     {

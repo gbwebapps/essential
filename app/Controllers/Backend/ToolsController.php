@@ -11,41 +11,37 @@ use App\Libraries\Backend\ToolsClass;
 use App\Controllers\Backend\BackendController; 
 
 /**
- * Class ToolsController
- *
- * Controller dedicato alla gestione degli strumenti di utilità, diagnostica e manutenzione del sistema di Backend.
+ * Controller per la gestione degli strumenti e della manutenzione del sistema.
+ * Fornisce funzionalità per l'ottimizzazione del database, la rotazione dei log, la gestione dei backup,
+ * e il monitoraggio o la pulizia dello spazio occupato dalle cartelle temporanee dell'applicativo.
  */
 class ToolsController extends BackendController 
 {
     /**
-     * Istanza del modello dedicato alla gestione dei dati degli strumenti.
-     * 
-     * @var ToolsModel 
+     * @var ToolsModel Istanza del modello responsabile dell'estrazione dei dati di monitoraggio, 
+     * della compattazione delle tabelle, e delle operazioni di pulizia fisica sul file system.
      */
     protected ToolsModel $toolsModel;
 
     /**
-     * Istanza della libreria logica per l'esecuzione dei tool di utilità del sistema.
-     * 
-     * @var ToolsClass 
+     * @var ToolsClass Istanza della libreria contenente routine di calcolo (es. conversioni byte) 
+     * e formattazione tecnica per i dati esposti nel pannello strumenti.
      */
     protected ToolsClass $toolsClass;
 
     /**
-     * Whitelist dei moduli di strumenti autorizzati nel sistema.
-     * Impedisce attacchi di iniezione di codice e path traversal.
-     *
-     * @var array
+     * @var array Struttura di sbarramento: elenca unicamente le sezioni (ambienti) 
+     * che possono essere invocate e caricate asincronamente dall'utente.
      */
     protected array $allowedEnvs = ['system', 'manageAudits', 'dbMaintenance', 'backups', 'cleanSpace', 'manageLogs'];
 
     /**
-     * Inizializza il controller impostando il contesto operativo e istanziando modello e libreria specifici.
+     * Inizializzazione standard che estende il BackendController, configurando il namespace di lavoro
+     * (controller = 'tools') e instanziando i modelli preposti alle funzioni di diagnostica e manutenzione.
      *
-     * @param RequestInterface  $request  Oggetto della richiesta HTTP corrente.
-     * @param ResponseInterface $response Oggetto della risposta HTTP corrente.
-     * @param LoggerInterface   $logger   Istanza del sistema di tracciamento log.
-     * @return void
+     * @param RequestInterface $request Oggetto contenente i dati della richiesta.
+     * @param ResponseInterface $response Oggetto deputato alla generazione della risposta HTTP.
+     * @param LoggerInterface $logger Sistema di tracciamento degli eventi.
      */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
@@ -58,9 +54,10 @@ class ToolsController extends BackendController
     }
 
     /**
-     * Renderizza la pagina principale contenente il set di strumenti e utilità di amministrazione.
+     * Elabora la vista di atterraggio principale per l'area strumenti.
+     * Configura il layout base in attesa delle richieste asincrone che popoleranno i singoli pannelli di servizio.
      *
-     * @return string La vista HTML complessiva del modulo tools.
+     * @return string Layout HTML iniziale della sezione.
      */
     public function index()
     {
@@ -73,7 +70,11 @@ class ToolsController extends BackendController
     }
 
     /**
-     * Forza l'apertura e il rendering asincrono del pannello accordion basato sul parametro env.
+     * Intercetta le richieste AJAX per l'apertura dinamica di un determinato ambiente di manutenzione (es. dbMaintenance, cleanSpace).
+     * Valida la legittimità della richiesta e interroga il Model pertinente per estrarre le statistiche correnti, 
+     * restituendo il parziale HTML pronto per l'iniezione nel DOM.
+     *
+     * @return ResponseInterface Risposta JSON con l'HTML del pannello popolato con i dati in tempo reale.
      */
     public function openTools(): ResponseInterface
     {
@@ -108,7 +109,11 @@ class ToolsController extends BackendController
     }
 
     /**
-     * Esegue la validazione preventiva delle date prima di aprire modali o eseguire azioni.
+     * Esegue una validazione preventiva sulle date fornite per la cancellazione degli Audit Log.
+     * Controlla l'esistenza di record nel periodo indicato e restituisce il totale calcolato 
+     * per consentire all'interfaccia client (JS) di richiedere conferma all'amministratore prima di procedere.
+     *
+     * @return ResponseInterface Risposta JSON contenente il conteggio dei record identificati e il testo localizzato per il prompt di conferma.
      */
     public function validateAuditsDateRequest(): ResponseInterface
     {
@@ -147,7 +152,10 @@ class ToolsController extends BackendController
     }
 
     /**
-     * Esegue la cancellazione degli audits in base ai parametri inviati.
+     * Procedura esecutiva per l'eliminazione massiva dei record di Audit all'interno dell'intervallo temporale validato.
+     * Interfaccia direttamente con il Model per l'esecuzione della query distruttiva.
+     *
+     * @return ResponseInterface Risposta JSON indicante il successo dell'operazione di pulizia.
      */
     public function deleteAudits(): ResponseInterface
     {
@@ -168,7 +176,11 @@ class ToolsController extends BackendController
     }
 
     /**
-     * Esegue la validazione preventiva delle date prima di aprire modali o eseguire azioni.
+     * Esegue una validazione sulle date immesse per la procedura di rimozione dei file di Log fisici.
+     * Identifica quanti documenti corrispondono ai parametri e trasmette i dati al client per innescare 
+     * la finestra modale di sicurezza (Double Opt-In).
+     *
+     * @return ResponseInterface Risposta JSON con le statistiche dei file rintracciati.
      */
     public function validateLogsDateRequest(): ResponseInterface
     {
@@ -207,7 +219,9 @@ class ToolsController extends BackendController
     }
 
     /**
-     * Esegue la cancellazione dei logs in base ai parametri inviati.
+     * Processa l'eliminazione fisica dei file di Log applicativi (su file system) generati nel periodo richiesto.
+     *
+     * @return ResponseInterface Risposta JSON con l'esito della cancellazione dei file.
      */
     public function deleteLogs(): ResponseInterface
     {
@@ -228,7 +242,10 @@ class ToolsController extends BackendController
     }
 
     /**
-     * Esegue le operazioni di manutenzione sul database e le tabelle.
+     * Gestisce la richiesta asincrona per l'ottimizzazione e la deframmentazione delle tabelle del database MySQL.
+     * Supporta sia il comando rivolto a una singola tabella sia un array per processi massivi (es. "ottimizza tutto").
+     *
+     * @return ResponseInterface Risposta JSON contenente lo status dell'operazione e i dati post-ottimizzazione.
      */
     public function optimizeTable(): ResponseInterface
     {
@@ -261,7 +278,11 @@ class ToolsController extends BackendController
     }
 
     /**
-     * Esegue la generazione del backup per DB e/o file.
+     * Sistema di smistamento (router interno) per le operazioni sui backup del database.
+     * Tramite la direttiva 'action', gestisce validazioni e reindirizza logicamente il flusso verso:
+     * creazione (dump SQL + rotazione), cancellazione, o validazione preparatoria per il download.
+     *
+     * @return ResponseInterface Payload JSON strutturato in base all'esito dell'azione specificata.
      */
     public function backups()
     {
@@ -323,7 +344,11 @@ class ToolsController extends BackendController
     }
 
     /**
-     * Gestisce lo scaricamento fisico del file di backup
+     * Metodo di endpoint puro (GET) che gestisce l'output in streaming del file compresso di backup.
+     * Implementa restrizioni di base contro il directory traversal (basename) e logga l'azione di scaricamento a scopo di tracciatura.
+     *
+     * @param string $filename Il nome testuale dell'archivio da trasferire.
+     * @return ResponseInterface Risposta HTTP configurata per il download (o redirect in caso di file compromesso/assente).
      */
     public function downloadBackups(string $filename)
     {
@@ -344,7 +369,10 @@ class ToolsController extends BackendController
     }
 
     /**
-     * Svuota i file all'interno di una determinata cartella writable.
+     * Coordina le operazioni di svuotamento (flush) delle directory temporanee o di staging (es. /writable/uploads/staging).
+     * Impiega un filtro regex per evitare l'esecuzione di cancellazioni fuori perimetro (directory traversal escape).
+     *
+     * @return ResponseInterface Risposta JSON ritornata dal Model attestante l'esito della pulizia della cartella.
      */
     public function cleanFolder(): ResponseInterface
     {

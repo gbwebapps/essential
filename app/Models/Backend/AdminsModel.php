@@ -14,93 +14,33 @@ class AdminsModel extends BackendModel
 
     protected array $showAllAllowedFields = ['column', 'order', 'page', 'rows', 'searchFields', 'trash_filter'];
 
-    /**
-     * Elenco dei campi anagrafici e relazionali consentiti durante la fase di inserimento di un nuovo amministratore.
-     *
-     * @var array
-     */
     protected array $addAllowedFields = ['firstname', 'lastname', 'email', 'phone', 'status', 'note', 'group_id', 'images'];
 
-    /**
-     * Elenco dei campi consentiti per la persistenza dei dati durante la fase di aggiornamento di un profilo esistente.
-     *
-     * @var array
-     */
     protected array $editAllowedFields = ['uuid', 'firstname', 'lastname', 'email', 'phone', 'status', 'note', 'group_id', 'permissions', 'images'];
 
-    /**
-     * Campi di input autorizzati per l'identificazione e l'esecuzione della procedura di cancellazione.
-     *
-     * @var array
-     */
     protected array $delAllowedFields = ['uuid'];
 
-    /**
-     * Campi consentiti per l'invocazione del flusso di ripristino e generazione del token di reset password.
-     *
-     * @var array
-     */
     protected array $resetPasswordAllowedFields = ['uuid'];
 
-    /**
-     * Campi autorizzati per la ricezione dell'istruzione di commutazione dello stato attivo o inattivo.
-     *
-     * @var array
-     */
     protected array $changeStatusAllowedFields = ['uuid'];
 
-    /**
-     * Campi di input consentiti per la modifica rapida e isolata di un singolo privilegio utente.
-     *
-     * @var array
-     */
     protected array $changePermissionAllowedFields = ['uuid', 'permission'];
 
-    /**
-     * Campi consentiti per l'identificazione e la revoca forzata di un token memorizzato.
-     *
-     * @var array
-     */
     protected array $deleteTokenAllowedFields = ['id', 'uuid'];
 
-    /**
-     * Corrispondenza rigida tra gli indici dell'interfaccia utente e le colonne reali della tabella per l'ordinamento.
-     *
-     * @var array
-     */
     protected array $allowedOrderColumns = ['firstname', 'lastname', 'email', 'phone', 'status']; 
 
-    /**
-     * Elenco dei campi su cui è consentita l'applicazione dei filtri di ricerca testuale nella vista globale.
-     *
-     * @var array
-     */
     protected array $showAllSearchAllowedFields = ['firstname', 'lastname', 'email', 'phone']; 
 
     protected array $showAllSearchAllowedDates = ['created_at', 'updated_at'];
 
-    /**
-     * Elenco delle proprietà anagrafiche utilizzate per la comparazione dei dati storici o per il tracciamento dei log.
-     *
-     * @var array
-     */
     protected array $toCompare = ['firstname', 'lastname', 'email', 'phone', 'status', 'group_id', 'note'];
 
-    /**
-     * Stringa SQL per l'estrazione massiva degli amministratori con inclusione dei conteggi per immagini e documenti.
-     *
-     * @var string|null
-     */
     protected ?string $getDataQuery = "select uuid, firstname, lastname, email, phone, status, superadmin, created_at, updated_at, resetted_at, suspended_at, deleted_at,
                                         (select images.filename from images where images.entity_uuid = admins.uuid and images.entity = 'admins' and images.is_cover = 1 limit 1) as cover, 
                                         (select count(*) from images where images.entity_uuid = admins.uuid and images.entity = 'admins') as images_num 
                                         from admins where 1 = 1";
 
-    /**
-     * Stringa SQL per il recupero puntuale dei dettagli anagrafici e di stato di un singolo amministratore tramite UUID.
-     *
-     * @var string|null
-     */
     protected ?string $getUUIDQuery = "select 
                                             admins_groups.name as groupName, 
                                             uuid, 
@@ -122,34 +62,13 @@ class AdminsModel extends BackendModel
                                         on admins.group_id = admins_groups.id 
                                         where admins.uuid = ? limit 1";
 
-    /**
-     * Stringa SQL ottimizzata per il conteggio totale dei record presenti, utile al calcolo dell'impaginazione.
-     *
-     * @var string|null
-     */
     protected ?string $getNumRowsQuery = 'select count(*) as count from admins where 1 = 1';
 
-    /**
-     * Inizializza il modello eseguendo le configurazioni di base ereditate dalla classe madre.
-     *
-     * Sincronizza lo stato del modello impostando le dipendenze native e i driver di connessione
-     * necessari al funzionamento del modulo amministratori.
-     *
-     * @return void
-     */
     protected function initModel(): void 
     {
         parent::initModel();
     }
 
-    /**
-     * Definisce i vincoli di ordinamento e paginazione per la griglia tabellare.
-     *
-     * Restituisce le regole di validazione necessarie a blindare i parametri della richiesta DataTables,
-     * verificando l'integrità della colonna bersaglio, il verso di ordinamento e la naturalità degli indici di pagina.
-     *
-     * @return array Mappa dei criteri di validazione per i flussi di paginazione.
-     */
     public function showAllValidationRules(): array
     {
         return [
@@ -171,14 +90,6 @@ class AdminsModel extends BackendModel
         ];
     }
 
-    /**
-     * Valida i criteri di ricerca applicati ai singoli campi della visualizzazione massiva.
-     *
-     * Applica espressioni regolari specifiche e mappate per intercettare pattern testuali non conformi
-     * su nomi, cognomi, stringhe email e formati telefonici inviati tramite array nidificato.
-     *
-     * @return array Regole di Whitelisting per la sanitizzazione dei filtri di ricerca.
-     */
     public function showAllSearchValidationRules(): array
     {
         return [
@@ -209,14 +120,6 @@ class AdminsModel extends BackendModel
         ];
     }
 
-    /**
-     * Stabilisce i criteri di validazione per la registrazione iniziale di un nuovo amministratore.
-     *
-     * Blinda i moduli di inserimento verificando l'univocità di email e telefono sul database,
-     * la congruenza del set di permessi e l'assenza di payload nocivi nelle note tramite la regola safeText.
-     *
-     * @return array Mappa di validazione per la creazione delle entità.
-     */
     public function addValidationRules(): array
     {
         return [
@@ -258,15 +161,6 @@ class AdminsModel extends BackendModel
         ];
     }
 
-    /**
-     * Configura i vincoli di convalida per l'aggiornamento dei profili esistenti.
-     *
-     * Riceve i dati correnti per isolare le regole di univocità (is_unique) condizionate tramite l'UUID,
-     * blinda il formato dell'identificativo e controlla la formattazione dei dati modificati.
-     *
-     * @param array $posts Dataset dei parametri inviati dal modulo di modifica.
-     * @return array Set di regole contestuali basate sullo stato dell'entità corrente.
-     */
     public function editValidationRules(array $posts): array
     {
         /* Recuperiamo l'array multidimensionale dalla configurazione per estrarre le chiavi valide */
@@ -330,14 +224,6 @@ class AdminsModel extends BackendModel
         ];
     }
 
-    /**
-     * Restituisce le regole di validazione per il cambio dinamico del gruppo via AJAX.
-     *
-     * Definisce i vincoli di integrità per l'ID del gruppo (che deve esistere nella
-     * tabella `admins_groups`) e per l'UUID dell'amministratore su cui si sta operando.
-     *
-     * @return array Le regole di validazione strutturate per il Validator di CodeIgniter 4.
-     */
     public function changeGroupValidationRules(): array
     {
         return [
@@ -352,14 +238,6 @@ class AdminsModel extends BackendModel
         ];
     }
 
-    /**
-     * Valida i parametri per l'invocazione della procedura di cancellazione sicura.
-     *
-     * Assicura che l'UUID fornito per l'eliminazione dell'amministratore sia presente e conforme
-     * allo standard formale delle espressioni regolari per gli identificativi a 128 bit.
-     *
-     * @return array Criteri di validazione per la revoca e rimozione del record.
-     */
     public function delValidationRules(): array
     {
         return [
@@ -374,14 +252,6 @@ class AdminsModel extends BackendModel
         ];
     }
 
-    /**
-     * Controlla i requisiti di input per l'inoltro della richiesta di rigenerazione credenziali.
-     *
-     * Verifica la correttezza formale dell'UUID dell'operatore designato per l'invio del link
-     * di ripristino password.
-     *
-     * @return array Vincoli per l'attivazione della pipeline di reset.
-     */
     public function resetPasswordValidationRules(): array
     {
         return [
@@ -396,14 +266,6 @@ class AdminsModel extends BackendModel
         ];
     }
 
-    /**
-     * Valida i parametri per il cambio di stato operativo (attivo/sospeso) di un profilo.
-     *
-     * Verifica la correttezza dell'identificativo dell'amministratore e la conformità del contesto
-     * di provenienza dell'azione per preservare l'integrità dei flussi AJAX dell'interfaccia.
-     *
-     * @return array Regole per la commutazione di stato.
-     */
     public function changeStatusValidationRules(): array
     {
         return [
@@ -425,14 +287,6 @@ class AdminsModel extends BackendModel
         ];
     }
 
-    /**
-     * Controlla i criteri di richiesta per il recupero dei token attivi legati a un utente.
-     *
-     * Valida la stringa UUID necessaria all'interrogazione mirata dei dispositivi e delle sessioni
-     * collegate all'amministratore in esame.
-     *
-     * @return array Regole di accesso alla griglia dei token.
-     */
     public function getTokensValidationRules(): array
     {
         return [
@@ -447,14 +301,6 @@ class AdminsModel extends BackendModel
         ]; 
     }
 
-    /**
-     * Valida le richieste di accesso ai dati anagrafici di base in modalità lettura.
-     *
-     * Controlla la presenza di un UUID valido e la coerenza del contesto operativo, limitando
-     * l'interazione esclusivamente alle azioni esplicite di visualizzazione (show) o modifica (edit).
-     *
-     * @return array Regole per l'estrazione sicura dei dati anagrafici.
-     */
     public function generalDataValidationRules(): array
     {
         return [
@@ -491,14 +337,6 @@ class AdminsModel extends BackendModel
         ];
     }
 
-    /**
-     * Configura i parametri di convalida per l'estrazione della griglia dei permessi assegnati.
-     *
-     * Garantisce l'integrità dell'ispezione visiva dei privilegi incrociando l'UUID dell'operatore
-     * con le autorizzazioni di contesto previste per la scheda utente.
-     *
-     * @return array Vincoli di richiesta per l'albero dei privilegi.
-     */
     public function getPermissionsValidationRules(): array
     {
         return [
@@ -521,14 +359,6 @@ class AdminsModel extends BackendModel
         ];
     }
 
-    /**
-     * Controlla i parametri necessari alla revoca immediata di un token dal database.
-     *
-     * Richiede obbligatoriamente l'UUID dell'utente e l'indice intero sequenziale (id) del record token
-     * per l'esecuzione della cancellazione atomica.
-     *
-     * @return array Criteri per l'eliminazione mirata delle sessioni.
-     */
     public function deleteTokenValidationRules(): array
     {
         return [
@@ -551,15 +381,6 @@ class AdminsModel extends BackendModel
         ];
     }
 
-    /**
-     * Valida l'assegnazione o la revoca immediata di un singolo privilegio in tempo reale (on the fly).
-     *
-     * Estrae l'albero complessivo delle autorizzazioni applicative dalle configurazioni, ne mappa le chiavi
-     * in una lista lineare e compila dinamicamente la regola in_list per bloccare l'inserimento di permessi
-     * orfani o non censiti nel file di configurazione core.
-     *
-     * @return array Regole di validazione dinamica e restrittiva per i singoli permessi applicativi.
-     */
     public function changePermissionValidationRules(): array 
     {
         /* Recupero l'array multidimensionale dalla configurazione */
@@ -594,15 +415,6 @@ class AdminsModel extends BackendModel
         ];
     }
 
-    /**
-     * Estrae l'elenco completo dei singoli privilegi espliciti assegnati all'amministratore.
-     *
-     * Interroga la tabella delle autorizzazioni per recuperare tutte le righe associate all'identificativo
-     * univoco fornito, permettendo l'analisi puntuale delle eccezioni al ruolo base.
-     *
-     * @param string $uuid Identificativo univoco dell'amministratore.
-     * @return array Lista dei record contenenti i permessi espliciti.
-     */
     public function getPermissions(string $uuid): array
     {
         /* Estrazione permessi assegnati all'admin */
@@ -610,15 +422,6 @@ class AdminsModel extends BackendModel
         return $this->db->query($sql, [$uuid])->getResult();
     }
 
-    /**
-     * Recupera lo storico e lo stato dei token di sessione, persistenza o attivazione emessi per l'utente.
-     *
-     * Esegue un'estrazione mirata sulla tabella dei token per raccogliere i dati di tracciamento ambientali
-     * quali gli indirizzi IP, gli User Agent e i relativi formati DATETIME di creazione e scadenza.
-     *
-     * @param string $uuid Identificativo univoco dell'amministratore.
-     * @return array Lista dei token associati all'anagrafica.
-     */
     public function getTokens(string $uuid): array
     {
         /* Estrazione log dei tokens di sessione o reset */
@@ -640,15 +443,6 @@ class AdminsModel extends BackendModel
         return $this->db->query($sql, [$uuid])->getResult();
     }
 
-    /**
-     * Estrae l'elenco dei codici di backup e ripristino per l'autenticazione a due fattori.
-     *
-     * Restituisce sia le chiavi monouso ancora attive sia quelle già consumate dall'operatore,
-     * consentendo la verifica dello stato di saturazione dei sistemi di recovery del profilo.
-     *
-     * @param string $uuid Identificativo univoco dell'amministratore.
-     * @return array Elenco dei codici di backup mappati sul database.
-     */
     public function getTwoFaCodes(string $uuid): array
     {
         /* Estrazione codici di backup 2FA attivi o consumati */
@@ -656,15 +450,6 @@ class AdminsModel extends BackendModel
         return $this->db->query($sql, [$uuid])->getResult();
     }
 
-    /**
-     * Recupera la configurazione e lo stato corrente del modulo di autenticazione a due fattori dell'utente.
-     *
-     * Estrae il record singolo contenente le impostazioni core del sistema 2FA, inclusi lo stato di abilitazione,
-     * il metodo prescelto (es. email, app) e i relativi segreti crittografici di sincronizzazione.
-     *
-     * @param string $uuid Identificativo univoco dell'amministratore.
-     * @return object|null Oggetto contenente i parametri di configurazione 2FA, o null se non configurato.
-     */
     public function getTwoFa(string $uuid): ?object
     {
         /* Estrazione configurazione principale 2FA (record singolo, uso getRow) */
@@ -672,32 +457,12 @@ class AdminsModel extends BackendModel
         return $this->db->query($sql, [$uuid])->getRow();
     }
 
-    /**
-     * Recupera l'elenco completo dei gruppi amministrativi disponibili nel sistema.
-     *
-     * Il metodo esegue una query diretta sulla tabella `admins_groups` per prelevare tutti
-     * i record dei ruoli censiti. Viene utilizzato principalmente nei moduli di gestione
-     * degli amministratori (es. maschere di inserimento e modifica) per popolare i componenti
-     * di selezione (select) dell'interfaccia utente.
-     *
-     * @return array Elenco di oggetti rappresentanti le righe della tabella dei gruppi.
-     */
     public function getGroups(): array
     {
         $sql = "select * from admins_groups";
         return $this->db->query($sql)->getResult();
     }
 
-    /**
-     * Recupera l'elenco piatto dei permessi associati a un determinato gruppo.
-     *
-     * Interroga la tabella `admins_groups_permissions` per estrarre tutti i codici
-     * di permesso assegnati al gruppo specificato. Il risultato viene appiattito
-     * in un array di stringhe per facilitare la comparazione con i permessi dell'utente.
-     *
-     * @param int $groupId L'ID del gruppo amministrativo.
-     * @return array Un array piatto contenente i codici dei permessi (es. ['users_index', 'users_show']).
-     */
     public function getGroupPermissions(int $groupId): array
     {
         $sql = "select permission from admins_groups_permissions where group_id = ?";
@@ -713,16 +478,6 @@ class AdminsModel extends BackendModel
         }, $result);
     }
 
-    /**
-     * Recupera le eccezioni sui permessi specifiche per un determinato amministratore.
-     *
-     * Interroga la tabella `admins_permissions` per raccogliere le personalizzazioni
-     * introdotte sull'utente (permessi extra concessi o permessi del gruppo revocati).
-     * Il risultato viene strutturato come array associativo per ottimizzare le performance di lettura.
-     *
-     * @param string $uuid L'UUID dell'amministratore.
-     * @return array Array associativo dove la chiave è il codice permesso e il valore è lo stato 'allow' (0 o 1).
-     */
     public function getAdminExceptions(string $uuid): array
     {
         $sql = "select permission, allow from admins_permissions where admin_uuid = ?";
@@ -741,19 +496,6 @@ class AdminsModel extends BackendModel
         return $exceptions;
     }
 
-    /**
-     * Gestisce la logica di business e la transazione per l'inserimento di un nuovo amministratore.
-     *
-     * Il metodo esegue la pulizia dei dati in ingresso tramite `checkAllowedFields` e avvia una 
-     * transazione database. Registra l'utente nella tabella `admins` associandolo al gruppo specificato, 
-     * scrive il token di attivazione in `admins_tokens`, configura il metodo 2FA predefinito via email 
-     * in `admins_2fa` e, in caso di successo complessivo, delega a `EmailService` l'invio dell'email 
-     * di attivazione. Gestisce il rollback automatico in caso di anomalie o fallimenti SQL.
-     *
-     * @param array $posts I dati provenienti dal form di inserimento.
-     * @param \CodeIgniter\HTTP\IncomingRequest $request L'oggetto della richiesta HTTP corrente.
-     * @return array Esito dell'operazione con flag 'result' e stringa informativa 'message'.
-     */
     public function add(array $posts, \CodeIgniter\HTTP\IncomingRequest $request): array
     {
         try 
@@ -851,17 +593,6 @@ class AdminsModel extends BackendModel
         endif;
     }
 
-    /**
-     * Gestisce l'aggiornamento dei dati anagrafici, del gruppo e delle eccezioni sui permessi di un amministratore.
-     *
-     * Il metodo avvia una transazione database. Aggiorna la tabella principale `admins` inserendo il nuovo `group_id`
-     * e, successivamente, esegue il calcolo differenziale dei permessi. Rimuove le vecchie eccezioni e inserisce in
-     * `admins_permissions` solo i record relativi a revoche esplicite (permessi del gruppo deselezionati, `allow = 0`)
-     * o concessioni extra (permessi fuori dal gruppo selezionati, `allow = 1`). In caso di anomalie effettua il rollback.
-     *
-     * @param array $posts I dati provenienti dal form di modifica.
-     * @return array Esito dell'operazione con il flag 'result', la stringa 'message' e l'oggetto 'row' aggiornato.
-     */
     public function edit(array $posts): array
     {
         try 
@@ -972,14 +703,6 @@ class AdminsModel extends BackendModel
         }
     }
 
-    /**
-     * Verifica se i dati inviati dal form (campi base o matrice dei permessi)
-     * differiscono da quelli attualmente memorizzati nel database.
-     *
-     * @param array $posts I dati ricevuti dal form POST.
-     * @param object $original L'oggetto record originale dell'amministratore prima della modifica.
-     * @return bool True se c'è stata almeno una modifica, false altrimenti.
-     */
     public function hasAdminChanged(array $posts, object $original): bool
     {
         /* 1. Controlla i campi base (incluso group_id presente in $toCompare) e i file */
@@ -1030,18 +753,6 @@ class AdminsModel extends BackendModel
         return false;
     }
 
-    /**
-     * Esegue la rimozione fisica e definitiva (hard delete) del record dell'amministratore.
-     *
-     * Filtra l'input mediante whitelisting dei campi e recupera l'anagrafica storica per conservare
-     * i riferimenti nominali utili alla messaggistica di successo. Successivamente, apre una transazione
-     * database atomica per eseguire l'istruzione di cancellazione sulla tabella principale, affidando i vincoli
-     * di integrità referenziale sulle tabelle correlate (es. permessi, token) alle regole ON DELETE CASCADE
-     * del motore relazionale. Intercetta eventuali anomalie o eccezioni d'esecuzione forzando il rollback.
-     *
-     * @param array $posts Dataset contenente l'identificativo univoco del profilo da rimuovere.
-     * @return array Esito dell'operazione corredato dal messaggio localizzato di avvenuta cancellazione.
-     */
     public function hardDelete(array $posts): array
     {
         try 
@@ -1238,20 +949,6 @@ class AdminsModel extends BackendModel
         }
     }
 
-    /**
-     * Gestisce la generazione transazionale di un token di ripristino credenziali (procedura di reset).
-     *
-     * Filtra l'input tramite whitelisting, verifica l'esistenza dell'account e acquisisce i metadati 
-     * ambientali del client. Genera un oggetto token calcolandone l'hash di sicurezza e la scadenza temporale. 
-     * Avvia una transazione database integrando due operazioni atomiche: l'aggiornamento della colonna `resetted_at` 
-     * sulla tabella dell'anagrafica principale (per tracciare la storicizzazione della richiesta) e l'inserimento 
-     * del nuovo token di tipo 'activation' nella tabella delle sessioni. In caso di anomalie, esegue il rollback 
-     * automatico dello stato.
-     *
-     * @param array $posts Dataset contenente l'identificativo univoco del profilo per cui generare il reset.
-     * @param \CodeIgniter\HTTP\IncomingRequest $request Oggetto della richiesta HTTP per l'estrazione di IP e User Agent.
-     * @return array Esito logico dell'operazione e relativo messaggio di stato o di errore.
-     */
     public function resetPassword(array $posts, \CodeIgniter\HTTP\IncomingRequest $request): array
     {
         try 
@@ -1343,18 +1040,6 @@ class AdminsModel extends BackendModel
         endif;
     }
 
-    /**
-     * Gestisce la commutazione transazionale dello stato operativo (attivo/inattivo) di un profilo.
-     *
-     * Filtra i parametri in ingresso tramite whitelisting ed estrae l'entità storica per valutarne lo stato corrente.
-     * Implementa una logica condizionale binaria: se l'utente è disattivato (0), ne forza l'attivazione (1) azzerando
-     * il flag di sospensione; se è attivo (1), ne esegue la disattivazione (0) storicizzando il timestamp corrente
-     * nella colonna `suspended_at`. Alimenta infine una transazione atomica per aggiornare permanentemente il record 
-     * sul database e riallinea l'oggetto entità in memoria prima della restituzione.
-     *
-     * @param array $posts Dataset contenente l'identificativo univoco dell'amministratore da variare.
-     * @return array Matrice di risposta contenente l'esito logico, il messaggio localizzato e l'istanza aggiornata.
-     */
     public function changeStatus(array $posts): array
     {
         try 
@@ -1433,22 +1118,6 @@ class AdminsModel extends BackendModel
         }
     }
 
-    /**
-     * Esegue la commutazione asincrona e transazionale (toggle) di un singolo privilegio utente.
-     *
-     * Filtra i dati in ingresso tramite whitelisting e verifica l'esistenza del profilo amministrativo. 
-     * Interroga la tabella dei permessi per intercettare la presenza del privilegio specificato: se il record 
-     * esiste, ne esegue la revoca immediata (delete); se non è presente, ne valida l'assegnazione (insert). 
-     * Alimenta infine una transazione atomica che include l'aggiornamento del timestamp `updated_at` sulla tabella 
-     * dell'anagrafica principale e riallinea l'istanza in memoria prima della risposta.
-     *
-     * @param array $posts Dataset contenente l'UUID dell'amministratore e la chiave testuale del permesso da variare.
-     * @return array Matrice di risposta contenente l'esito logico, il messaggio localizzato e l'istanza aggiornata.
-     */
-    /**
-     * Modifica lo stato di un singolo permesso per l'utente, inserendo, aggiornando
-     * o rimuovendo un record dalla tabella delle eccezioni (admins_permissions).
-     */
     public function changePermission(array $posts): array
     {
         try 
@@ -1538,17 +1207,6 @@ class AdminsModel extends BackendModel
         }
     }
 
-    /**
-     * Revoca ed elimina permanentemente un singolo token identificativo (sessione o persistenza) dal database.
-     *
-     * Filtra i dati in ingresso tramite whitelisting ed esegue la verifica preventiva sull'esistenza dell'account.
-     * Interroga la tabella dei token per cancellare il record corrispondente all'UUID dell'amministratore e all'ID 
-     * incrementale fornito. Valida l'esito dell'operazione basandosi sul conteggio delle righe effettivamente coinvolte 
-     * dalla query (`affectedRows`), confermando l'avvenuta disconnessione forzata del dispositivo associato.
-     *
-     * @param array $posts Dataset contenente l'UUID dell'amministratore e l'ID sequenziale del token da revocare.
-     * @return array Matrice di risposta contenente l'esito logico dell'epurazione e il messaggio per l'interfaccia.
-     */
     public function deleteToken(array $posts): array
     {
         /* Match dei posts con i campi consentiti */
@@ -1608,16 +1266,6 @@ class AdminsModel extends BackendModel
         }
     }
 
-    /**
-     * Rimuove incondizionatamente tutte le associazioni ai permessi espliciti legati all'utente.
-     *
-     * Svuota integralmente le righe di privilegio memorizzate nella tabella relazionale per l'UUID fornito.
-     * Questo metodo agisce come operazione distruttiva preliminare sia durante la fase di cancellazione (hard delete)
-     * dell'account, sia durante le routine di aggiornamento anagrafico per il successivo riallineamento dei dati.
-     *
-     * @param string $admin_uuid Identificativo univoco dell'amministratore da ripulire.
-     * @return void
-     */
     public function deletePermissions($admin_uuid)
     {
         $sql = "delete from admins_permissions where admin_uuid = ?";

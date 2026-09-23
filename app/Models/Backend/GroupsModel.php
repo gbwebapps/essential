@@ -4,87 +4,29 @@ namespace App\Models\Backend;
 
 use App\Models\Backend\BackendModel;
 
-/**
- * 
- */
 class GroupsModel extends BackendModel
 {
-	/**
-     * Elenco dei campi anagrafici e relazionali consentiti durante la fase di inserimento di un nuovo gruppo.
-     *
-     * @var array
-     */
-    protected array $addAllowedFields = ['name', 'description', 'permissions'];
+	protected array $addAllowedFields = ['name', 'description', 'permissions'];
 
-    /**
-     * Elenco dei campi consentiti per la persistenza dei dati durante la fase di aggiornamento di un gruppo esistente.
-     *
-     * @var array
-     */
     protected array $editAllowedFields = ['id', 'name', 'description', 'permissions'];
 
-    /**
-     * Campi di input autorizzati per l'identificazione e l'esecuzione della procedura di cancellazione.
-     *
-     * @var array
-     */
     protected array $delAllowedFields = ['id'];
 
-    /**
-     * Campi di input autorizzati per il recupero di un gruppo.
-     *
-     * @var array
-     */
     protected array $getGroupByIdAllowedFields = ['id'];
 
-    /**
-     * Campi di input autorizzati per il salvataggio delle eccezioni.
-     *
-     * @var array
-     */
     protected array $saveExceptionsAllowedFields = ['uuid', 'permissions'];
 
-    /**
-     * Campi di input autorizzati per la ricerca di un admin.
-     *
-     * @var array
-     */
     protected array $dropdownAdminsFields = ['query'];
 
-    /**
-     * Campi di input autorizzati per l'identificazione e l'esecuzione della procedura di cancellazione.
-     *
-     * @var array
-     */
     protected array $getAdminByUuidFields = ['uuid'];
 
-    /**
-     * Elenco delle proprietà principali utilizzate per la comparazione dei dati storici o per il tracciamento dei log.
-     *
-     * @var array
-     */
     protected array $toCompare = ['name', 'description'];
 
-    /**
-	 * Inizializza il modello eseguendo le configurazioni di base ereditate dalla classe madre.
-	 *
-	 * Sincronizza lo stato del modello impostando le dipendenze native e i driver di connessione
-	 * necessari al funzionamento del modulo gruppi.
-	 *
-	 * @return void
-	 */
 	protected function initModel(): void 
 	{
 		parent::initModel();
 	}
 
-	/**
-	 * Stabilisce i criteri di validazione per la registrazione iniziale di un nuovo gruppo.
-	 *
-	 * Blinda i moduli di inserimento verificando l'univocità del nome del gruppo nel database.
-	 *
-	 * @return array Mappa di validazione per la creazione delle entità.
-	 */
 	public function addValidationRules(): array
 	{
         /* Recuperiamo l'array multidimensionale dalla configurazione per estrarre le chiavi valide */
@@ -117,13 +59,6 @@ class GroupsModel extends BackendModel
 	    ];
 	}
 
-    /**
-     * Valida i parametri per il recupero del gruppo.
-     *
-     * Assicura che l'id fornito per il recupero del gruppo sia presente.
-     *
-     * @return array Criteri di validazione per il recupero del gruppo.
-     */
     public function getGroupByIdValidationRules(): array
     {
         return [
@@ -134,15 +69,6 @@ class GroupsModel extends BackendModel
         ];
     }
 
-	/**
-     * Configura i vincoli di convalida per l'aggiornamento dei gruppi esistenti.
-     *
-     * Riceve i dati correnti per isolare le regole di univocità (is_unique) condizionate tramite l'id,
-     * blinda il formato dell'identificativo e controlla la formattazione dei dati modificati.
-     *
-     * @param array $posts Dataset dei parametri inviati dal modulo di modifica.
-     * @return array Set di regole contestuali basate sullo stato dell'entità corrente.
-     */
     public function editValidationRules(array $posts): array
     {
         /* Recuperiamo l'array multidimensionale dalla configurazione per estrarre le chiavi valide */
@@ -179,13 +105,6 @@ class GroupsModel extends BackendModel
         ];
     }
 
-    /**
-     * Valida i parametri per l'invocazione della procedura di cancellazione sicura.
-     *
-     * Assicura che l'id fornito per l'eliminazione dell'amministratore sia presente.
-     *
-     * @return array Criteri di validazione per la revoca e rimozione del record.
-     */
     public function delValidationRules(): array
     {
         return [
@@ -196,13 +115,6 @@ class GroupsModel extends BackendModel
         ];
     }
 
-    /**
-     * Valida i parametri per il salvataggio delle eccezioni.
-     *
-     * Assicura che l'id fornito per l'eliminazione dell'amministratore sia presente.
-     *
-     * @return array Criteri di validazione per la revoca e rimozione del record.
-     */
     public function saveExceptionsValidationRules(): array
     {
         /* Recuperiamo l'array multidimensionale dalla configurazione per estrarre le chiavi valide */
@@ -235,9 +147,6 @@ class GroupsModel extends BackendModel
         ];
     }
 
-    /**
-     * @return [type]
-     */
     public function dropdownAdminsRules()
     {
         return [
@@ -262,11 +171,6 @@ class GroupsModel extends BackendModel
         ];
     }
 
-    /**
-     * Estrae tutti i gruppi presenti nel database per il primo livello dell'accordion.
-     *
-     * @return array Elenco dei gruppi trovati.
-     */
     public function getGroups(): array
     {
         try 
@@ -283,12 +187,6 @@ class GroupsModel extends BackendModel
         }
     }
 
-    /**
-     * Estrae i codici dei permessi associati a un determinato gruppo.
-     *
-     * @param int $groupId ID del gruppo.
-     * @return array Array piatto dei codici permesso (es. ['users_index', 'users_create']).
-     */
     public function getGroup(int $groupId): array
     {
         try 
@@ -306,12 +204,6 @@ class GroupsModel extends BackendModel
         }
     }
 
-    /**
-     * Recupera i dettagli di un singolo gruppo tramite il suo ID.
-     *
-     * @param int $id ID del gruppo.
-     * @return object|null I dati del gruppo o null se non trovato.
-     */
     public function getGroupById(array $posts): ?object
     {
         try 
@@ -331,12 +223,6 @@ class GroupsModel extends BackendModel
         }
     }
 
-    /**
-     * Registra un nuovo gruppo di amministratori e associa i relativi permessi.
-     *
-     * @param array $posts Dataset dei parametri validati.
-     * @return array Esito dell'operazione per la risposta JSON.
-     */
     public function add(array $posts): array
     {
         try 
@@ -394,12 +280,6 @@ class GroupsModel extends BackendModel
         }
     }
 
-    /**
-     * Aggiorna l'anagrafica di un gruppo esistente e ne risincronizza i permessi associati.
-     *
-     * @param array $posts Dataset dei parametri inviati dal modulo di modifica.
-     * @return array Esito dell'operazione per la risposta JSON.
-     */
     public function edit(array $posts): array
     {
         try 
@@ -470,7 +350,6 @@ class GroupsModel extends BackendModel
         }
     }
 
-    /* Elimina un gruppo */
     public function del(array $posts): array
     {
         try {
@@ -536,10 +415,6 @@ class GroupsModel extends BackendModel
         return false;
     }
 
-    /**
-     * Recupera l'elenco degli amministratori filtrati per nome/username
-     * per il dropdown delle eccezioni permessi.
-     */
     public function getDropdownAdmins(array $posts): array
     {
         try 
@@ -569,9 +444,6 @@ class GroupsModel extends BackendModel
         }
     }
 
-    /**
-     * Recupera i dati di base di un amministratore tramite il suo UUID.
-     */
     public function getAdminByUuid(array $posts): ?array
     {
         try {
@@ -593,9 +465,6 @@ class GroupsModel extends BackendModel
         }
     }
 
-    /**
-     * Restituisce un array piatto contenente solo le stringhe dei permessi del gruppo.
-     */
     public function getGroupPermissionsArray(int $groupId): array
     {
         $sql = 'select permission from admins_groups_permissions where group_id = ?';
@@ -603,9 +472,6 @@ class GroupsModel extends BackendModel
         return array_column($res, 'permission');
     }
 
-    /**
-     * Restituisce un array associativo [permission => allow] delle eccezioni dell'admin.
-     */
     public function getAdminExceptionsArray(string $adminUuid): array
     {
         $sql = 'select permission, allow from admins_permissions where admin_uuid = ?';
@@ -721,12 +587,6 @@ class GroupsModel extends BackendModel
         }
     }
 
-    /**
-     * Verifica se un gruppo possiede amministratori associati.
-     *
-     * @param int $groupId ID del gruppo da controllare.
-     * @return bool True se esistono vincoli, False altrimenti.
-     */
     public function hasAdminsAttached(int $groupId): bool
     {
         $sql = 'select count(uuid) as total from admins where group_id = ?';

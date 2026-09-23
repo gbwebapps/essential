@@ -4,14 +4,23 @@ namespace Config\Backend;
 
 use CodeIgniter\Config\BaseConfig;
 
+/**
+ * Gestisce la configurazione delle impostazioni generali, della localizzazione e dei formati di visualizzazione del backend.
+ */
 class General extends BaseConfig
 {
-    /* Imposta un valore di default valido per PHP */
+    /**
+     * @var string Fuso orario predefinito del sistema
+     */
     public string $timezone = 'Europe/Rome';
     
-    /* Imposta il codice lingua di default */
+    /**
+     * @var string Codice della lingua predefinita utilizzata nell'interfaccia
+     */
     public string $language = 'en';
 
-    /* Imposta il formato data/ora di default per la visualizzazione */
+    /**
+     * @var string Formato predefinito per la visualizzazione di date e ore
+     */
     public string $dateFormat = 'd MMMM yyyy HH:mm:ss';
 }

@@ -3,18 +3,23 @@
 namespace App\Libraries; 
 
 /**
- * Class RegExp
- *
- * Libreria di utilità globale dedicata alla validazione strutturale di stringhe e dati complessi
- * mediante l'utilizzo di espressioni regolari (Regex) centralizzate.
+ * Libreria di utilità dedicata alla validazione dei dati tramite espressioni regolari (RegEx).
+ * 
+ * Centralizza e incapsula i pattern di controllo complessi, garantendo che le stringhe critiche 
+ * all'interno del sistema (come gli identificatori univoci o le credenziali di accesso) 
+ * rispettino rigorosamente i requisiti formali e di sicurezza previsti.
  */
 class RegExp 
 {
 	/**
-	 * Valida la conformità sintattica di una stringa rispetto al formato standard internazionale UUID (versioni da 1 a 5).
+	 * Valida la conformità di una stringa allo standard UUID (Universally Unique Identifier).
+	 * 
+	 * L'espressione regolare applicata verifica che la struttura rispetti il formato canonico a 36 caratteri 
+	 * (inclusi i trattini) e che corrisponda formalmente alle specifiche delle versioni dalla 1 alla 5. 
+	 * Questo controllo previene l'immissione di identificatori corrotti o contraffatti nelle query al database.
 	 *
-	 * @param string $uuid La stringa dell'identificativo UUID da verificare.
-	 * @return bool True se l'UUID rispetta l'espressione regolare standard, altrimenti false.
+	 * @param string $uuid La stringa da sottoporre al controllo di validità formale
+	 * @return bool Esito della validazione: true se il formato corrisponde a un UUID valido, false altrimenti
 	 */
 	public function validateUUID(string $uuid): bool
 	{
@@ -22,11 +27,15 @@ class RegExp
 	}
 
 	/**
-	 * Verifica i criteri di robustezza di una password in conformità con le policy di sicurezza del sistema.
-	 * Richiede obbligatoriamente: almeno una lettera maiuscola, un numero, un carattere speciale e un minimo di 8 caratteri.
+	 * Valida la robustezza e la complessità di una password secondo le policy di sicurezza di base.
+	 * 
+	 * Il pattern impone che la stringa abbia una lunghezza minima di 8 caratteri e richiede 
+	 * la presenza simultanea (tramite lookahead) di almeno una lettera maiuscola, un carattere numerico 
+	 * e un carattere speciale (incluso l'underscore). Il metodo è fondamentale per respingere 
+	 * la registrazione o l'aggiornamento di credenziali considerate deboli o facilmente violabili.
 	 *
-	 * @param string $password La stringa della password da sottoporre a validazione.
-	 * @return bool True se la password soddisfa tutti i requisiti di complessità, altrimenti false.
+	 * @param string $password La stringa in chiaro contenente la password da analizzare
+	 * @return bool Esito della validazione: true se tutti i requisiti di complessità sono soddisfatti, false altrimenti
 	 */
 	public function validatePassword(string $password): bool
 	{

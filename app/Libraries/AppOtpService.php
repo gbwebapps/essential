@@ -4,18 +4,32 @@ namespace App\Libraries;
 
 use OTPHP\TOTP;
 
+/**
+ * Servizio dedicato alla gestione dell'autenticazione a due fattori (2FA) basata su protocollo TOTP (Time-based One-Time Password).
+ * 
+ * Interfaccia la libreria crittografica sottostante per generare chiavi segrete, fornire gli URI 
+ * di configurazione per le applicazioni client (es. Google Authenticator, Authy) e validare 
+ * matematicamente i codici temporanei immessi dagli utenti.
+ */
 class AppOtpService
 {
+    /**
+     * Costruttore del servizio.
+     * Inizializza le dipendenze basilari, caricando in memoria l'helper necessario 
+     * al recupero dinamico delle configurazioni del modulo di autenticazione.
+     */
     public function __construct()
     {
         helper('settings');
     }
 
     /**
-     * Genera una chiave segreta (secret) univoca in formato Base32 per l'utente.
-     * Come funziona:
-     * -> Crea una stringa casuale protetta che verrà salvata sul database dell'utente.
-     * @return string La chiave segreta generata.
+     * Genera crittograficamente un nuovo codice segreto condiviso univoco (in formato base32).
+     * 
+     * Questo segreto rappresenta la chiave master per l'algoritmo TOTP e deve essere associato 
+     * in modo permanente e sicuro al profilo dell'amministratore all'interno del database.
+     *
+     * @return string La stringa alfanumerica rappresentante il nuovo segreto generato
      */
     public function generateSecret(): string
     {
@@ -23,13 +37,15 @@ class AppOtpService
     }
 
     /**
-     * Genera l'indirizzo URI standard da convertire in codice QR per le App di autenticazione.
-     * Come funziona:
-     * -> Prende la chiave segreta dell'utente e imposta il nome del sito e dell'utente.
-     * -> Restituisce il testo che diventerà il QR Code da inquadrare con lo smartphone.
-     * @param string $secret La chiave segreta Base32 dell'amministratore.
-     * @param string $label L'identificativo visibile nell'app (es. l'email dell'utente).
-     * @return string L'indirizzo URI di provisioning.
+     * Compila e restituisce l'URI di provisioning standard richiesto per l'accoppiamento del dispositivo.
+     * 
+     * Legge le impostazioni globali del sistema (numero di cifre, nome dell'emittente) e struttura 
+     * un URI formattato secondo le specifiche otpauth://. Questo URI viene tipicamente trasformato 
+     * in un codice QR per facilitare la configurazione dell'app sullo smartphone dell'utente.
+     *
+     * @param string $secret La chiave segreta univoca associata all'amministratore
+     * @param string $label L'etichetta identificativa da mostrare nell'applicazione client (es. l'indirizzo email)
+     * @return string L'URI formattato e pronto per la generazione del codice QR
      */
     public function getProvisioningUri(string $secret, string $label): string
     {
@@ -44,13 +60,16 @@ class AppOtpService
     }
 
     /**
-     * Verifica se il codice numerico inserito corrisponde alla chiave segreta dell'utente.
-     * Come funziona:
-     * -> Controlla il codice attuale basandosi sul tempo reale del server.
-     * -> Accetta una finestra di tolleranza impostata nelle configurazioni per evitare problemi di fuso orario.
-     * @param string $secret La chiave segreta Base32 salvata sul database.
-     * @param string $code Il codice di 6 cifre inserito a schermo dall'utente.
-     * @return bool True se il codice è valido, altrimenti False.
+     * Esegue la validazione algoritmica del codice temporaneo (OTP) fornito dall'amministratore.
+     * 
+     * Ricostruisce il validatore TOTP applicando i medesimi parametri utilizzati durante la generazione 
+     * dell'URI (periodo, algoritmo, lunghezza). Integra inoltre una finestra temporale di tolleranza (window) 
+     * definita nelle configurazioni, fondamentale per compensare lievi desincronizzazioni fisiologiche 
+     * tra l'orologio del server e quello dello smartphone del client.
+     *
+     * @param string $secret La chiave segreta univoca memorizzata nel profilo dell'amministratore
+     * @param string $code Il codice numerico inserito dall'utente per tentare l'accesso
+     * @return bool Esito della verifica crittografica: true se il codice è valido e tempestivo, false altrimenti
      */
     public function verify(string $secret, string $code): bool
     {

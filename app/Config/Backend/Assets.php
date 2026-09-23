@@ -5,12 +5,14 @@ namespace Config\Backend;
 use CodeIgniter\Config\BaseConfig;
 
 /**
- * 
+ * Gestisce la configurazione centralizzata delle risorse statiche (CSS e JavaScript) per il backend.
  */
 class Assets extends BaseConfig
 {
     /**
-     * @return [type]
+     * Restituisce l'elenco dei fogli di stile CSS di base necessari al backend.
+     *
+     * @return array Array multidimensionale contenente gli identificativi e i percorsi dei file CSS
      */
     public static function getCoreCss(): array
     {
@@ -22,8 +24,10 @@ class Assets extends BaseConfig
     }
 
     /**
-     * @param  string|null
-     * @return [type]
+     * Restituisce l'elenco dei file JavaScript di base, includendo opzionalmente lo script specifico del controller.
+     *
+     * @param string|null $controller Nome del controller corrente per l'inclusione dello script dedicato, oppure null
+     * @return array Array multidimensionale contenente gli attributi e i percorsi dei file JavaScript
      */
     public static function getCoreJs(?string $controller = null): array
     {
