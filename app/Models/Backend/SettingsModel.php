@@ -4,14 +4,28 @@ namespace App\Models\Backend;
 
 use App\Models\Backend\BackendModel;
 
+/*
+ * Modello principale per la gestione delle Impostazioni globali del sistema (Settings).
+ * 
+ * Centralizza il recupero, la validazione e il salvataggio massivo delle configurazioni. 
+ * Implementa un livello di Cache in memoria per evitare query multiple al database 
+ * durante lo stesso caricamento di pagina, e garantisce che i dati inviati dai moduli 
+ * rispettino regole rigorose prima di sovrascrivere le impostazioni.
+ */
 class SettingsModel extends BackendModel
 {
+    /*
+     * @var array Whitelist dei campi consentiti per le impostazioni Generali (lingua, data, fuso orario).
+     */
     private array $allowedGeneralFields = [
         'timezone',
         'language',
         'dateFormat'
     ];
 
+    /*
+     * @var array Whitelist dei campi consentiti per le impostazioni di Autenticazione (sicurezza e sessioni).
+     */
 	private array $allowedAuthFields = [
         'attempts',
         'attemptsLimit',
@@ -29,6 +43,9 @@ class SettingsModel extends BackendModel
         'activationTime',
     ];
 
+    /*
+     * @var array Whitelist dei campi consentiti per le impostazioni di Upload (dimensionamento, policy immagini).
+     */
     private array $allowedUploadFields = [
         'renameImages',
         'overwriteImages',
@@ -42,6 +59,9 @@ class SettingsModel extends BackendModel
         'allowedExtensions'
     ];
 
+    /*
+     * @var array Whitelist dei campi consentiti per le impostazioni E-mail (configurazione SMTP).
+     */
     private array $allowedEmailFields = [
         'fromEmail',
         'fromName',
@@ -58,18 +78,40 @@ class SettingsModel extends BackendModel
         'priority',
     ];
 
+    /*
+     * @var array Cache in memoria. Conserva i dati letti dal database per ogni sezione (namespace). 
+     * Se viene richiesto più volte lo stesso gruppo di impostazioni, il sistema lo legge da qui senza interrogare di nuovo il DB.
+     */
     protected array $settingsCache = [];
 
+    /*
+     * @var array Elenco di chiavi (impostazioni) critiche che, se modificate, richiedono 
+     * un ricaricamento forzato o particolare attenzione da parte del frontend (es. cambio lingua).
+     */
     protected array $requiresReloadFields = [
         'language',
         'timezone'
     ];
 
+    /*
+     * Metodo di inizializzazione nativo di CodeIgniter.
+     * 
+     * Prepara il modello caricando le dipendenze essenziali ereditate dal BackendModel padre.
+     */
 	protected function initModel(): void 
 	{
 		parent::initModel();
 	}
 
+    /*
+     * Fornisce le regole di validazione per i parametri di Autenticazione.
+     * 
+     * Verifica che i tempi di sessione, limiti di tentativi e parametri 2FA inviati 
+     * dall'amministratore siano numeri, mail valide o booleani sicuri.
+     *
+     * @param array $posts I dati inviati dal form (opzionali per permettere controlli condizionali in futuro)
+     * @return array Regole native di CI4
+     */
     public function authSettingsValidateRules(array $posts = []): array
     {
         return [
@@ -132,6 +174,15 @@ class SettingsModel extends BackendModel
         ];
     }
 
+    /*
+     * Fornisce le regole di validazione per i parametri di Upload.
+     * 
+     * Verifica, ad esempio, che i limiti di peso siano numeri validi, o che le estensioni 
+     * consentite siano stringhe alfanumeriche (senza caratteri strani).
+     *
+     * @param array $posts I dati inviati dal form
+     * @return array Regole native di CI4
+     */
     public function uploadSettingsValidateRules(array $posts = []): array
     {
         return [
@@ -182,6 +233,15 @@ class SettingsModel extends BackendModel
         ];
     }
 
+    /*
+     * Fornisce le regole di validazione per i parametri E-mail (SMTP).
+     * 
+     * Contiene una logica dinamica: se l'operatore seleziona "smtp" come protocollo, 
+     * i parametri di connessione (host, porta, tipo di auth) diventano improvvisamente obbligatori ('required').
+     *
+     * @param array $posts I dati inviati dal form (necessari per rilevare il tipo di protocollo scelto)
+     * @return array Regole native di CI4
+     */
     public function emailSettingsValidateRules(array $posts = []): array
     {
         /* Verifichiamo se il protocollo inviato dal form è smtp */
@@ -244,6 +304,15 @@ class SettingsModel extends BackendModel
         ];
     }
 
+    /*
+     * Fornisce le regole di validazione per le impostazioni Generali.
+     * 
+     * Controlla che le stringhe inviate (fuso orario, formato data, lingua) corrispondano 
+     * esattamente a quelle previste dalle liste interne di CodeIgniter o del progetto.
+     *
+     * @param array $posts I dati inviati dal form
+     * @return array Regole native di CI4
+     */
     public function generalSettingsValidateRules(array $posts = []): array
     {
         return [
@@ -262,6 +331,18 @@ class SettingsModel extends BackendModel
         ];
     }
 
+    /*
+     * Recupera e fonde le impostazioni lette dal database con i valori di default.
+     * 
+     * Il cuore di questo modello. Controlla prima se il gruppo di chiavi è già in memoria (cache). 
+     * Se non c'è, fa una singola query al DB e salva i dati. Successivamente, carica la classe di 
+     * configurazione nativa (`Config\NomeSezione`) e sovrascrive i suoi valori di default 
+     * con quelli personalizzati trovati nel DB.
+     *
+     * @param string $namespace Il percorso/nome della classe (es. 'Backend\Auth')
+     * @param array|null $keys (Opzionale) Permette di filtrare e restituire solo alcune chiavi specifiche dell'array risultante
+     * @return array Array associativo con tutte le configurazioni finali pronte all'uso
+     */
     public function getSettings(string $namespace, ?array $keys = null): array
     {
         /* Se il gruppo non è ancora presente nella nostra cache in-memory, lo estraiamo dal DB */
@@ -304,6 +385,15 @@ class SettingsModel extends BackendModel
         return $finalSettings;
     }
 
+    /*
+     * Controlla fisicamente sul database se esiste almeno un salvataggio per un dato namespace.
+     * 
+     * Viene usato prima di provare a cancellare o aggiornare dati per capire 
+     * se si tratta del primo salvataggio in assoluto o di una modifica.
+     *
+     * @param string $namespace Il nome della sezione (es. 'Backend\General')
+     * @return bool True se c'è almeno un record nel DB, False altrimenti
+     */
     public function hasDatabaseSettings(string $namespace): bool
     {
         $sql = "SELECT COUNT(*) as total FROM `settings` WHERE `class` = ?";
@@ -313,6 +403,19 @@ class SettingsModel extends BackendModel
         return isset($row['total']) && (int) $row['total'] > 0;
     }
 
+    /*
+     * Salva (o aggiorna) massivamente le impostazioni inviate dall'interfaccia web.
+     * 
+     * Il metodo prende i dati, li filtra in base alla Whitelist della sezione (scartando input pericolosi). 
+     * Esegue un controllo rapido per assicurarsi che i dati siano davvero cambiati (evitando query inutili). 
+     * Se ci sono novità, svuota la cache locale, prepara i dati (es. unendo le estensioni dei file in una stringa separata da '|') 
+     * e lancia una velocissima "Bulk Insert" che inserisce i dati o, in caso esistano già, li aggiorna ("on duplicate key update"). 
+     * Alla fine, registra l'operazione nei log di sistema.
+     *
+     * @param string $namespace Il nome della sezione (es. 'Backend\Upload')
+     * @param array $posts I dati inviati dal modulo web
+     * @return array|null Esito (result) e messaggio da visualizzare
+     */
     public function saveSettings(string $namespace, array $posts): ?array
     {
         /* 1. Recuperiamo la lista dei campi consentiti in base al namespace */
@@ -364,6 +467,18 @@ class SettingsModel extends BackendModel
         return ['result' => true, 'message' => lang('backend/settings.messages.saveSuccess')];
     }
 
+    /*
+     * Confronta i dati in arrivo con quelli salvati e restituisce la lista esatta delle chiavi modificate.
+     * 
+     * Estrae le impostazioni attuali (compresi i default uniti col DB), prende i nuovi input 
+     * e li confronta uno a uno. Svolge anche un lavoro di "normalizzazione" rapida: se una chiave 
+     * è un array (es. la selezione multipla delle estensioni), la ordina e la trasforma in stringa prima 
+     * di fare il paragone per evitare finti rilevamenti dovuti solo all'ordine disordinato degli elementi.
+     *
+     * @param string $namespace Il nome della sezione da analizzare
+     * @param array $posts I nuovi dati proposti dal form
+     * @return array Elenco delle chiavi che hanno subìto una reale modifica
+     */
     public function getChangedKeys(string $namespace, array $posts): array
     {
         $current = $this->getSettings($namespace);
@@ -396,6 +511,16 @@ class SettingsModel extends BackendModel
         return $changed;
     }
 
+    /*
+     * Ripristina un'intera sezione ai suoi valori di default ("Ripristina predefiniti").
+     * 
+     * Esegue un controllo rapido per capire se ci sono personalizzazioni nel DB. Se ci sono, 
+     * cancella fisicamente tutti i record legati a quel namespace, svuota la cache locale, e 
+     * scrive un evento nell'Audit log per mantenere traccia dell'operazione.
+     *
+     * @param string $namespace Il nome della sezione da ripulire
+     * @return bool True se l'eliminazione è avvenuta con successo, False se non c'era nulla da eliminare
+     */
     public function deleteSettings(string $namespace): bool
     {
         /* Verifica preliminare se ci sono effettivamente dati da cancellare */
@@ -418,6 +543,17 @@ class SettingsModel extends BackendModel
         return true;
     }
 
+    /*
+     * Rilevatore rapido di cambiamenti (True/False).
+     * 
+     * Simile a `getChangedKeys()`, ma ottimizzato per le performance. Al primo campo che 
+     * risulta diverso rispetto al database, interrompe il ciclo e risponde "True". 
+     * Molto utile per decidere velocemente se fermare o meno l'azione di salvataggio.
+     *
+     * @param string $namespace Il nome della sezione da analizzare
+     * @param array $posts I nuovi dati proposti
+     * @return bool True se è stato trovato almeno un parametro modificato, False se è tutto identico
+     */
     public function hasSettingsChanged(string $namespace, array $posts): bool
     {
         $current = $this->getSettings($namespace);

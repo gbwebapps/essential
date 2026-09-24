@@ -5,19 +5,43 @@ namespace App\Libraries\Backend;
 use CodeIgniter\Config\BaseConfig;
 use CodeIgniter\HTTP\Files\UploadedFile;
 
+/**
+ * Servizio dedicato alla gestione avanzata dei caricamenti (upload) e all'elaborazione delle immagini.
+ * 
+ * Centralizza la logica di salvataggio fisico dei file multimediali, occupandosi della 
+ * validazione base, della sanitizzazione della nomenclatura, della creazione dinamica delle 
+ * alberature di directory e della generazione automatica delle miniature (thumbnail) tramite ritaglio intelligente.
+ */
 class UploadClass
 {
     /**
-     * @var object
+     * @var object Contenitore delle direttive di configurazione per i caricamenti (es. dimensioni di ritaglio, policy di sovrascrittura).
      */
     private object $config;
 
+    /**
+     * Inizializza il servizio caricando dinamicamente le configurazioni specifiche del modulo di upload 
+     * tramite l'helper globale del pannello di amministrazione.
+     */
     public function __construct()
     {
         /* Sostituiamo il caricamento nativo con l'helper globale */
         $this->config = setting('Backend\Upload');
     }
 
+    /**
+     * Elabora un array di file caricati, posizionandoli e ridimensionandoli nelle rispettive directory.
+     * 
+     * Genera automaticamente la struttura di cartelle (large, medium, small) basata sull'entità e sull'UUID 
+     * specificati. Applica le policy di nomenclatura (nome casuale o sanitizzato) e di sovrascrittura. 
+     * L'immagine originale viene depositata nella cartella 'large', dopodiché vengono generate le versioni 
+     * ritagliate per le cartelle 'medium' e 'small'.
+     *
+     * @param array $files Array di istanze UploadedFile provenienti dalla richiesta HTTP
+     * @param string $entity Il nome dell'entità o del modulo di riferimento (es. 'gallery', 'users')
+     * @param string $uuid L'identificatore univoco del record associato
+     * @return array|false Restituisce un array con i nomi finali dei file caricati con successo, o false in caso di fallimento totale
+     */
     public function doUpload(array $files, string $entity, string $uuid): array|false
     {
         $uploaded = [];
@@ -96,6 +120,20 @@ class UploadClass
         return $uploaded ?: false;
     }
 
+    /**
+     * Esegue il ridimensionamento e il ritaglio esatto dal centro (center crop) di un'immagine.
+     * 
+     * Il metodo sfrutta le librerie GD native per calcolare le proporzioni tra l'immagine sorgente e il target. 
+     * Scarta l'eccedenza visiva (verticale o orizzontale) partendo rigorosamente dal centro, in modo da riempire 
+     * perfettamente le dimensioni richieste senza distorcere l'immagine. Supporta e preserva i canali alfa 
+     * (trasparenza) per i formati compatibili (PNG, GIF, WEBP, AVIF).
+     *
+     * @param string $srcPath Il percorso fisico assoluto dell'immagine sorgente (originale)
+     * @param string $destPath Il percorso fisico assoluto dove salvare l'immagine elaborata
+     * @param int $targetX La larghezza esatta in pixel richiesta per il ritaglio
+     * @param int $targetY L'altezza esatta in pixel richiesta per il ritaglio
+     * @return bool Esito dell'operazione grafico/fisica: true se il ritaglio e il salvataggio hanno avuto successo, false altrimenti
+     */
     protected function cropImage(string $srcPath, string $destPath, int $targetX, int $targetY): bool
     {
         [$width, $height, $type] = getimagesize($srcPath);

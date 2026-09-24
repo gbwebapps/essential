@@ -4,17 +4,48 @@ namespace App\Models\Backend;
 
 use App\Models\Backend\BackendModel;
 
+/**
+ * Modello dedicato agli Strumenti di sistema (Tools).
+ * 
+ * Gestisce tutte le operazioni di manutenzione del pannello di controllo: pulizia massiva dei log 
+ * e degli audit, ottimizzazione delle tabelle del database, generazione e rotazione dei backup, 
+ * svuotamento delle cartelle temporanee (cache) e raccolta delle informazioni sul server.
+ */
 class ToolsModel extends BackendModel
 {
+	/**
+	 * @var array Whitelist dei campi POST consentiti durante le operazioni di filtraggio o eliminazione degli Audit.
+	 */
 	protected array $manageAuditsAllowedFields = ['fromDate', 'toDate']; 
 
+	/**
+	 * @var array Whitelist dei campi POST consentiti durante le operazioni di filtraggio o eliminazione dei Log.
+	 */
 	protected array $manageLogsAllowedFields = ['fromDate', 'toDate']; 
 
+	/**
+	 * @var array Elenco (Whitelist) delle cartelle interne che possono essere svuotate in sicurezza (es. log, cache).
+	 */
+	protected array $cleanableFolders = ['backups/database', 'backups/imports', 'cache', 'debugbar', 'exports', 'logs', 'session', 'uploads/staging'];1
+
+	/**
+	 * Metodo di inizializzazione nativo di CodeIgniter.
+	 * 
+	 * Richiama il setup della classe genitore (BackendModel) per preparare le dipendenze di base.
+	 */
 	protected function initModel(): void 
 	{
 		parent::initModel();
 	}
 
+	/**
+	 * Regole di validazione per i form di gestione degli Audit.
+	 * 
+	 * Verifica che l'utente abbia compilato le date di inizio (Da) e fine (A) e che 
+	 * queste siano in un formato temporale valido per il database.
+	 *
+	 * @return array Regole native di CodeIgniter
+	 */
 	public function validateManageAuditsRules(): array
 	{
 		return [
@@ -29,6 +60,13 @@ class ToolsModel extends BackendModel
 		];
 	}
 
+	/**
+	 * Regole di validazione per i form di gestione dei Log.
+	 * 
+	 * Verifica che le date di inizio e fine per la ricerca o cancellazione siano presenti e corrette.
+	 *
+	 * @return array Regole native di CodeIgniter
+	 */
 	public function validateManageLogsRules(): array
 	{
 		return [
@@ -43,6 +81,14 @@ class ToolsModel extends BackendModel
 		];
 	}
 
+	/**
+	 * Calcola le statistiche generali della tabella degli Audit.
+	 * 
+	 * Recupera con una singola query il numero totale dei record salvati e 
+	 * identifica la data del primo e dell'ultimo evento registrato.
+	 *
+	 * @return array Statistiche (totale, data minima e data massima)
+	 */
 	public function getAuditsStats(): array
 	{
 		$sql = 'select count(*) as total_audits, min(created_at) as min_date, max(created_at) as max_date from admins_audits';
@@ -59,6 +105,15 @@ class ToolsModel extends BackendModel
 		];
 	}
 
+	/**
+	 * Filtra e normalizza le date inviate dal form per la gestione degli Audit.
+	 * 
+	 * Applica la whitelist per sicurezza e controlla a livello logico che la data di partenza 
+	 * non sia successiva a quella di fine, impedendo intervalli temporali impossibili (es. Da: 2026, A: 2024).
+	 *
+	 * @param array $posts I dati provenienti dal form (Da, A)
+	 * @return array|bool Array con le date normalizzate, oppure false se l'intervallo non ha senso
+	 */
 	protected function buildAuditDates(array $posts): array|bool
 	{
 		$posts = $this->checkAllowedFields($posts, $this->manageAuditsAllowedFields);
@@ -75,6 +130,15 @@ class ToolsModel extends BackendModel
 		return ['from' => $from, 'to' => $to];
 	}
 
+	/**
+	 * Conta quanti record di Audit rientrano nell'intervallo di date specificato.
+	 * 
+	 * Utile per mostrare all'operatore un'anteprima (es. "Stai per eliminare 150 record") 
+	 * prima di procedere con la cancellazione irreversibile.
+	 *
+	 * @param array $posts Le date inviate dal form
+	 * @return array|bool Struttura con il conteggio e le date validate, false in caso di errore
+	 */
 	public function countAuditsToDelete(array $posts): array|bool
     {
         $dates = $this->buildAuditDates($posts);
@@ -90,6 +154,16 @@ class ToolsModel extends BackendModel
         return ['count' => (int) $result->total, 'from' => $dates['from'], 'to' => $dates['to']];
     }
 
+    /**
+     * Elimina definitivamente i record di Audit compresi nel range temporale richiesto.
+     * 
+     * Esegue la cancellazione fisica (DELETE) sul database. Se l'operazione rimuove 
+     * effettivamente dei record, converte le date in un formato leggibile e 
+     * registra l'avvenuta pulizia nello storico di sistema.
+     *
+     * @param array $posts Le date inviate dal form
+     * @return array Risposta con esito e messaggio per l'interfaccia
+     */
 	public function deleteAudits(array $posts): array
 	{
 		$dates = $this->buildAuditDates($posts);
@@ -120,6 +194,14 @@ class ToolsModel extends BackendModel
 		return ['result' => false, 'message' => lang('backend/tools.messages.noAuditsDeleted')];
 	}
 
+	/**
+	 * Calcola le statistiche generali della tabella dei Log di accesso.
+	 * 
+	 * Interroga il database per sapere quanti login/logout sono stati registrati 
+	 * e da quanto tempo (data del log più vecchio e del log più recente).
+	 *
+	 * @return array Statistiche (totale, data minima e data massima)
+	 */
 	public function getLogsStats(): array
 	{
 		$sql = 'select count(*) as total_logs, min(created_at) as min_date, max(created_at) as max_date from admins_logs';
@@ -136,6 +218,15 @@ class ToolsModel extends BackendModel
 		];
 	}
 
+	/**
+	 * Filtra e normalizza le date inviate dal form per la gestione dei Log.
+	 * 
+	 * Verifica che l'intervallo temporale inserito (Da, A) abbia senso logico 
+	 * e scarta eventuali campi non permessi.
+	 *
+	 * @param array $posts I dati provenienti dal form
+	 * @return array|bool Array con le date normalizzate, oppure false in caso di incoerenza
+	 */
 	protected function buildLogDates(array $posts): array|bool
 	{
 		$posts = $this->checkAllowedFields($posts, $this->manageLogsAllowedFields);
@@ -152,6 +243,15 @@ class ToolsModel extends BackendModel
 		return ['from' => $from, 'to' => $to];
 	}
 
+	/**
+	 * Conta quanti record di Log rientrano nell'intervallo di date specificato.
+	 * 
+	 * Fornisce il numero esatto dei record che verrebbero cancellati, permettendo 
+	 * al controller di chiedere una conferma sicura all'utente.
+	 *
+	 * @param array $posts Le date inviate dal form
+	 * @return array|bool Struttura con il conteggio totale, false in caso di errore
+	 */
 	public function countLogsToDelete(array $posts): array|bool
     {
         $dates = $this->buildLogDates($posts);
@@ -167,6 +267,15 @@ class ToolsModel extends BackendModel
         return ['count' => (int) $result->total, 'from' => $dates['from'], 'to' => $dates['to']];
     }
 
+    /**
+     * Elimina definitivamente i record di Log compresi nell'intervallo temporale.
+     * 
+     * Dopo aver rimosso i dati, genera una stringa esplicativa per l'Audit log, 
+     * così da tracciare sempre chi ha svuotato lo storico e per quale periodo.
+     *
+     * @param array $posts Le date inviate dal form
+     * @return array Esito e messaggio dell'operazione
+     */
     public function deleteLogs(array $posts): array
     {
     	$dates = $this->buildLogDates($posts);
@@ -197,6 +306,16 @@ class ToolsModel extends BackendModel
     	return ['result' => false, 'message' => lang('backend/tools.messages.noLogsDeleted')];
     }
 
+    /**
+     * Interroga MySQL per ottenere lo stato fisico e lo spazio occupato dalle tabelle.
+     * 
+     * Calcola matematicamente le dimensioni dei dati e degli indici convertendole in Megabyte (MB). 
+     * Calcola inoltre l'Overhead, ovvero lo spazio vuoto/frammentato che può essere recuperato 
+     * ottimizzando la tabella.
+     *
+     * @param string|null $tableName Nome specifico di una tabella (opzionale, altrimenti le estrae tutte)
+     * @return array Lista dettagliata delle tabelle con righe, peso (MB) e frammentazione
+     */
 	public function getTablesStatus(?string $tableName = null): array
 	{
 		/* Se è presente un nome, filtriamo la query per quella specifica tabella */
@@ -228,6 +347,16 @@ class ToolsModel extends BackendModel
 		return $result;
 	}
 
+	/**
+	 * Avvia la manutenzione fisica del database (Deframmentazione).
+	 * 
+	 * Accetta una o più tabelle ed esegue in sequenza i comandi nativi MySQL: 
+	 * ANALYZE (statistiche), CHECK (integrità) e OPTIMIZE (recupero spazio frammentato). 
+	 * Una volta finito, restituisce lo stato aggiornato (pesi in MB) da mostrare all'utente.
+	 *
+	 * @param string|array $target Il nome della singola tabella o l'array di tutte le tabelle da ottimizzare
+	 * @return array|bool Lo stato aggiornato della/e tabella/e elaborata/e
+	 */
 	public function runOptimization(string|array $target): array|bool
 	{
 		/* Normalizziamo l'input in un array per processare le query */
@@ -255,6 +384,14 @@ class ToolsModel extends BackendModel
 		return $this->getTablesStatus();
 	}
 
+	/**
+	 * Recupera i parametri essenziali di connessione al database attivo.
+	 * 
+	 * Utile per la pagina delle informazioni di sistema (mostra il nome del DB, 
+	 * il driver PDO in uso e la versione del server MySQL/MariaDB).
+	 *
+	 * @return array Dati base del database
+	 */
 	public function getDatabase(): array
 	{
 		return [
@@ -264,6 +401,15 @@ class ToolsModel extends BackendModel
 		];
 	}
 
+	/**
+	 * Esplora la cartella dei backup e restituisce la lista dei file disponibili.
+	 * 
+	 * Cerca tutti gli archivi `.zip`, ne formatta il peso in MB e recupera la data 
+	 * esatta (leggendola dal nome del file). Ordina poi i risultati mostrando i backup 
+	 * più recenti in cima alla lista.
+	 *
+	 * @return array Elenco strutturato dei file di backup pronti per il download o l'eliminazione
+	 */
 	public function getBackups(): array
     {
         /* Definisce il percorso assoluto alla cartella backups di CodeIgniter */
@@ -307,6 +453,15 @@ class ToolsModel extends BackendModel
         return $backups;
     }
 
+    /**
+     * Funzione di utilità (Helper) che estrae data e ora leggendo il nome del file di backup.
+     * 
+     * Sfrutta una RegEx (espressione regolare) per analizzare file come "backup_2026-09-24_10-00-00.zip" 
+     * e trasformarli in una data comprensibile per PHP (2026-09-24 10:00:00).
+     *
+     * @param string $filename Il nome del file da analizzare
+     * @return string|bool La data formattata, oppure false se il nome non rispetta lo standard
+     */
     private function extractDateFromFilename(string $filename): string|bool
     {
         /* Regex rigorosa: backup_YYYY-MM-DD_HH-MM-SS.zip */
@@ -323,6 +478,16 @@ class ToolsModel extends BackendModel
         return false;
     }
 
+    /**
+     * Genera un backup completo del database (struttura e dati) salvandolo su disco.
+     * 
+     * Operazione massiva: cicla tutte le tabelle, genera le query per ricrearle (CREATE TABLE) 
+     * e per reinserire i dati (INSERT INTO), proteggendo stringhe e caratteri speciali.
+     * Salva tutto in un file `.sql`, lo comprime in uno `.zip` per risparmiare spazio, 
+     * cancella l'originale in chiaro ed elimina eventuali backup vecchi mantenendo solo gli ultimi 10.
+     *
+     * @return bool True se il file zip è stato creato con successo, false altrimenti
+     */
 	public function generateDatabaseBackups(): bool
 	{
 		$path = WRITEPATH . 'backups/database/';
@@ -431,6 +596,16 @@ class ToolsModel extends BackendModel
 		return true;
 	}
 
+	/**
+	 * Elimina definitivamente un file di backup (.zip) dal server.
+	 * 
+	 * Scudo di sicurezza: utilizza basename() per isolare solo il nome del file, 
+	 * ignorando eventuali percorsi completi. Questo blocca attacchi di "Path Traversal" 
+	 * (tentativi di cancellare file fuori dalla cartella consentita usando stringhe come "../").
+	 *
+	 * @param string $filename Il nome del file zip da rimuovere
+	 * @return bool True se eliminato, false se il file non esiste o l'operazione fallisce
+	 */
 	public function deleteBackups(string $filename): bool
 	{
 		/* basename protegge il percorso assicurando che sia solo il nome del file */
@@ -450,8 +625,15 @@ class ToolsModel extends BackendModel
 		return false;
 	}
 
-	protected array $cleanableFolders = ['backups/database', 'backups/imports', 'cache', 'debugbar', 'exports', 'logs', 'session', 'uploads/staging'];
-
+	/**
+	 * Scansiona le cartelle temporanee del server per capire quanti file contengono.
+	 * 
+	 * Cicla la whitelist delle directory (es. la cache di CodeIgniter), conta i file 
+	 * al loro interno escludendo i file nascosti o di sistema (come index.html) e 
+	 * restituisce la mappa completa all'interfaccia.
+	 *
+	 * @return array Lista delle cartelle analizzate con il relativo conteggio dei file
+	 */
 	public function getWritableFoldersStatus(): array
 	{
 	    $status = [];
@@ -480,6 +662,16 @@ class ToolsModel extends BackendModel
 	    return $status;
 	}
 
+	/**
+	 * Svuota fisicamente il contenuto di una specifica cartella di sistema.
+	 * 
+	 * Controlla prima che la directory richiesta sia presente nella whitelist per evitare 
+	 * cancellazioni pericolose. Elimina solo i file (ignorando index.html e sottocartelle) 
+	 * per liberare spazio su disco e registra l'avvenuta pulizia nell'audit log.
+	 *
+	 * @param string $folder Il nome della cartella da pulire (es. 'cache')
+	 * @return array Esito dell'operazione e messaggio di riepilogo
+	 */
 	public function cleanWritableFolder(string $folder): array
 	{
 	    /* Validazione di Sicurezza (Whitelist) */
@@ -513,6 +705,15 @@ class ToolsModel extends BackendModel
 	    return ['result' => true, 'message' => sprintf(lang('backend/tools.messages.folderCleanSuccess'), $deletedCount, $folder)];
 	}
 
+	/**
+	 * Aggrega e restituisce tutte le informazioni vitali del Server e del Framework.
+	 * 
+	 * Estrae dati fondamentali come la versione di PHP, la versione di CodeIgniter, 
+	 * i limiti di memoria (es. memory_limit, upload_max_filesize), il sistema operativo 
+	 * e lo stato delle estensioni indispensabili (come curl e zip).
+	 *
+	 * @return array Mappa strutturata con tutte le informazioni tecniche di sistema
+	 */
 	public function getSystemInfo(): array
 	{
 		return [

@@ -4,29 +4,52 @@ namespace App\Models\Backend;
 
 use App\Models\Backend\BackendModel;
 
+/**
+ * Modello principale per la gestione dei Gruppi di Amministrazione e delle policy di Permesso.
+ * 
+ * Estende il BackendModel. Si occupa di incapsulare tutta la business logic legata alla creazione, 
+ * aggiornamento ed eliminazione dei ruoli di sistema (es. Superadmin, Editor, ecc.), 
+ * oltre a gestire in modo avanzato l'assegnazione massiva (Bulk Insert) dei permessi e 
+ * la risoluzione delle eccezioni (override) assegnate ai singoli utenti.
+ */
 class GroupsModel extends BackendModel
 {
+    /**
+     * @var array Elenchi Whitelist anti Mass-Assignment.
+     * Definiscono in modo esplicito quali chiavi array (es. provenienti da richieste POST) 
+     * sono autorizzate a passare ai metodi di inserimento (add), modifica (edit), 
+     * eliminazione (del) e gestione delle eccezioni, filtrando automaticamente dati malevoli o non richiesti.
+     */
 	protected array $addAllowedFields = ['name', 'description', 'permissions'];
-
     protected array $editAllowedFields = ['id', 'name', 'description', 'permissions'];
-
     protected array $delAllowedFields = ['id'];
-
     protected array $getGroupByIdAllowedFields = ['id'];
-
     protected array $saveExceptionsAllowedFields = ['uuid', 'permissions'];
-
     protected array $dropdownAdminsFields = ['query'];
-
     protected array $getAdminByUuidFields = ['uuid'];
-
     protected array $toCompare = ['name', 'description'];
 
+    /**
+     * Hook di inizializzazione nativo di CodeIgniter 4.
+     * 
+     * Richiama l'inizializzazione del BackendModel genitore, assicurando il corretto 
+     * setup di connessioni al database, classi helper e proprietà ereditate 
+     * prima di qualsiasi operazione sul modello.
+     */
 	protected function initModel(): void 
 	{
 		parent::initModel();
 	}
 
+    /**
+     * Genera il set di regole di validazione per la creazione di un nuovo Gruppo.
+     * 
+     * Legge dinamicamente il file di configurazione centrale dei permessi (Permissions config) 
+     * ed estrae tutte le chiavi valide in modo da costruire una regola `in_list` stringente. 
+     * Questo garantisce che nessun permesso inventato o malevolo possa essere salvato a database.
+     *
+     * @return array Array strutturato con le regole native di CodeIgniter
+     */
 	public function addValidationRules(): array
 	{
         /* Recuperiamo l'array multidimensionale dalla configurazione per estrarre le chiavi valide */
@@ -59,6 +82,15 @@ class GroupsModel extends BackendModel
 	    ];
 	}
 
+    /**
+     * Regole di validazione per l'estrazione di un singolo Gruppo tramite ID.
+     * 
+     * Assicura che l'ID fornito sia un numero intero naturale e, soprattutto, 
+     * controlla (tramite `is_not_unique`) che esista effettivamente nella tabella admins_groups, 
+     * bloccando richieste per record inesistenti.
+     *
+     * @return array Regole per la validazione dell'ID
+     */
     public function getGroupByIdValidationRules(): array
     {
         return [
@@ -69,6 +101,16 @@ class GroupsModel extends BackendModel
         ];
     }
 
+    /**
+     * Regole di validazione per la modifica di un Gruppo esistente.
+     * 
+     * Simile a addValidationRules(), ma aggiunge la protezione sull'ID da modificare e 
+     * adatta la regola `is_unique` sul nome del gruppo in modo da escludere l'ID corrente, 
+     * permettendo di salvare il modulo senza che il sistema segnali falsi conflitti sul nome stesso.
+     *
+     * @param array $posts I dati in ingresso (necessari per estrarre l'ID corrente)
+     * @return array Array strutturato con le regole
+     */
     public function editValidationRules(array $posts): array
     {
         /* Recuperiamo l'array multidimensionale dalla configurazione per estrarre le chiavi valide */
@@ -105,6 +147,14 @@ class GroupsModel extends BackendModel
         ];
     }
 
+    /**
+     * Regole di validazione per l'eliminazione fisica di un Gruppo.
+     * 
+     * Applica i filtri sull'ID assicurandosi che il gruppo esista a database prima 
+     * di tentare la query di DELETE.
+     *
+     * @return array Regole per la validazione dell'ID
+     */
     public function delValidationRules(): array
     {
         return [
@@ -115,6 +165,15 @@ class GroupsModel extends BackendModel
         ];
     }
 
+    /**
+     * Regole di validazione per il salvataggio delle eccezioni utente.
+     * 
+     * Verifica che l'UUID dell'amministratore sia in un formato valido (tramite Regex) 
+     * e compila dinamicamente la whitelist dei permessi concessi, analogamente a quanto 
+     * fatto per l'inserimento dei gruppi.
+     *
+     * @return array Regole di validazione strutturate
+     */
     public function saveExceptionsValidationRules(): array
     {
         /* Recuperiamo l'array multidimensionale dalla configurazione per estrarre le chiavi valide */
@@ -147,6 +206,14 @@ class GroupsModel extends BackendModel
         ];
     }
 
+    /**
+     * Regole di validazione per la ricerca degli amministratori tramite dropdown (AJAX).
+     * 
+     * Filtra la stringa immessa dall'utente (query) consentendo lettere, spazi 
+     * e caratteri accentati (utili per i cognomi), scartando input complessi o pericolosi.
+     *
+     * @return array Regole per la chiave 'query'
+     */
     public function dropdownAdminsRules()
     {
         return [
@@ -157,6 +224,14 @@ class GroupsModel extends BackendModel
         ];
     }
 
+    /**
+     * Regola base per validare rapidamente l'UUID di un amministratore.
+     * 
+     * Verifica esclusivamente che la stringa fornita rispetti l'esatto formato di un UUID versione 4, 
+     * rispondendo con messaggi di errore localizzati.
+     *
+     * @return array Regole di validazione
+     */
     public function adminPermissionsValidationRules()
     {
         return [
@@ -171,6 +246,14 @@ class GroupsModel extends BackendModel
         ];
     }
 
+    /**
+     * Estrae l'elenco completo dei Gruppi disponibili a database.
+     * 
+     * Query base utile per popolare selettori, filtri o liste. Restituisce semplicemente 
+     * ID e nome del gruppo ordinati per data di creazione.
+     *
+     * @return array Array di oggetti (risultati), array vuoto in caso di errore
+     */
     public function getGroups(): array
     {
         try 
@@ -187,6 +270,15 @@ class GroupsModel extends BackendModel
         }
     }
 
+    /**
+     * Estrae l'elenco dei permessi (stringhe) attualmente associati a uno specifico gruppo.
+     * 
+     * Appiattisce i risultati della query su una singola dimensione estraendo solo il valore 
+     * della colonna 'permission', semplificando i successivi confronti logici.
+     *
+     * @param int $groupId L'identificativo del gruppo
+     * @return array Array monodimensionale di stringhe (es. ['manage_users', 'view_logs'])
+     */
     public function getGroup(int $groupId): array
     {
         try 
@@ -204,6 +296,15 @@ class GroupsModel extends BackendModel
         }
     }
 
+    /**
+     * Recupera i dettagli anagrafici (ID, nome, descrizione) di un gruppo specifico.
+     * 
+     * Applica la whitelist al parametro ID in ingresso per prevenire injection e 
+     * restituisce un singolo oggetto corrispondente al record.
+     *
+     * @param array $posts I dati POST filtrati (deve contenere 'id')
+     * @return object|null Oggetto con i dati del gruppo, o null se non trovato
+     */
     public function getGroupById(array $posts): ?object
     {
         try 
@@ -223,6 +324,17 @@ class GroupsModel extends BackendModel
         }
     }
 
+    /**
+     * Crea un nuovo Gruppo e gli associa i permessi selezionati.
+     * 
+     * Esegue l'operazione all'interno di una Transazione. Scrive prima i dati base 
+     * nella tabella `admins_groups`, recupera l'ID appena generato e lo utilizza per 
+     * collegare tutti i permessi richiesti eseguendo una singola e performante "Bulk Insert". 
+     * In caso di fallimento effettua il rollback automatico e registra tutto nei log di sistema.
+     *
+     * @param array $posts Dataset sanificato e validato contenente nome, descrizione e permessi
+     * @return array Risposta strutturata (result, message) per il controller
+     */
     public function add(array $posts): array
     {
         try 
@@ -280,6 +392,18 @@ class GroupsModel extends BackendModel
         }
     }
 
+    /**
+     * Aggiorna i dati anagrafici e i permessi di un Gruppo esistente.
+     * 
+     * Implementa un controllo "Sbarramento": se non ci sono differenze reali tra 
+     * i dati inviati e quelli a database, blocca subito l'esecuzione ottimizzando il carico.
+     * Se ci sono differenze, apre una transazione, aggiorna nome e descrizione, 
+     * svuota (DELETE) fisicamente i vecchi permessi e inserisce i nuovi (Bulk Insert), 
+     * prevenendo accavallamenti o doppioni.
+     *
+     * @param array $posts Dataset sanificato con ID, nome, descrizione e nuovi permessi
+     * @return array Risposta strutturata per l'utente
+     */
     public function edit(array $posts): array
     {
         try 
@@ -350,6 +474,15 @@ class GroupsModel extends BackendModel
         }
     }
 
+    /**
+     * Rimuove definitivamente un Gruppo dal sistema.
+     * 
+     * In transazione, estrae prima il nome del gruppo per poterlo scrivere chiaramente 
+     * nell'Audit Log e procede poi all'eliminazione (DELETE) fisica dalla tabella.
+     * 
+     * @param array $posts I dati POST filtrati (deve contenere 'id')
+     * @return array Risultato dell'operazione e messaggio
+     */
     public function del(array $posts): array
     {
         try {
@@ -390,6 +523,17 @@ class GroupsModel extends BackendModel
         }
     }
 
+    /**
+     * Controlla in modo intelligente se i dati (o i permessi) di un Gruppo sono stati alterati.
+     * 
+     * Prima sfrutta il metodo globale per le stringhe (hasDataChanged), dopodiché scarica 
+     * i permessi attuali, li ordina in modo speculare rispetto a quelli ricevuti dal form, 
+     * ed esegue un confronto assoluto. Se gli array non combaciano, rileva la modifica.
+     *
+     * @param array $posts Dataset aggiornato proveniente dal form
+     * @param object $original Oggetto contenente lo stato originale del record a database
+     * @return bool True se sono stati rilevati cambiamenti, false altrimenti
+     */
     private function hasGroupChanged(array $posts, object $original): bool
     {
         /* 1. Controllo i campi base della tabella admins_groups (name, description) via metodo globale */
@@ -415,6 +559,16 @@ class GroupsModel extends BackendModel
         return false;
     }
 
+    /**
+     * Popola il menu a tendina asincrono per la ricerca degli amministratori.
+     * 
+     * Cerca la stringa immessa dall'utente sia sul nome che sul cognome ignorando 
+     * la formattazione (trasforma tutto in minuscolo con `lower` ed elimina gli spazi). 
+     * Restituisce una lista (UUID e nome completo concatenato) facile da leggere lato client.
+     *
+     * @param array $posts Dati POST contenenti la chiave 'query'
+     * @return array Array associativo formattato per il frontend
+     */
     public function getDropdownAdmins(array $posts): array
     {
         try 
@@ -444,6 +598,15 @@ class GroupsModel extends BackendModel
         }
     }
 
+    /**
+     * Recupera le informazioni base di un Amministratore (e il suo Gruppo) partendo dall'UUID.
+     * 
+     * Sfrutta una JOIN per ricavare contemporaneamente il nome del gruppo di appartenenza. 
+     * Molto utile per popolare viste o elaborare logiche in contesti legati alla profilazione.
+     *
+     * @param array $posts Dati POST filtrati (deve contenere 'uuid')
+     * @return array|null Array associativo con i dati estratti o null/vuoto se non trovato
+     */
     public function getAdminByUuid(array $posts): ?array
     {
         try {
@@ -465,6 +628,15 @@ class GroupsModel extends BackendModel
         }
     }
 
+    /**
+     * Metodo alias/helper per estrarre la matrice permessi di un gruppo come Array.
+     * 
+     * Fa esattamente il lavoro di getGroup() ma con un nome più esplicito, restituendo 
+     * una lista monodimensionale pulita delle chiavi di permesso attive per l'ID richiesto.
+     *
+     * @param int $groupId L'ID del gruppo in esame
+     * @return array Elenco dei permessi attivi
+     */
     public function getGroupPermissionsArray(int $groupId): array
     {
         $sql = 'select permission from admins_groups_permissions where group_id = ?';
@@ -472,6 +644,15 @@ class GroupsModel extends BackendModel
         return array_column($res, 'permission');
     }
 
+    /**
+     * Estrae le Eccezioni di permesso (Positive o Negative) assegnate a un utente.
+     * 
+     * Ricava i record dalla tabella `admins_permissions` (quindi staccati dal gruppo) e li converte 
+     * in un array associativo dove la chiave è il permesso e il valore è 1 (concesso) o 0 (revocato).
+     *
+     * @param string $adminUuid L'identificatore utente
+     * @return array Dizionario [permesso => 0/1]
+     */
     public function getAdminExceptionsArray(string $adminUuid): array
     {
         $sql = 'select permission, allow from admins_permissions where admin_uuid = ?';
@@ -485,6 +666,19 @@ class GroupsModel extends BackendModel
         return $exceptions;
     }
 
+    /**
+     * Ricalcola e salva le eccezioni di permesso esclusive applicate al singolo Utente (Override).
+     * 
+     * Metodo denso e fondamentale. Include "Scudi Enterprise": blocca l'operazione se l'utente è un 
+     * superadmin (ha già tutti i diritti per definizione) o se è stato cestinato. 
+     * Ricalcola matematicamente quali permessi l'utente possiede tramite il gruppo e li confronta 
+     * con quelli sottomessi dal modulo. Crea due liste (i permessi da concedere in extra e quelli 
+     * ereditati da revocare), pulisce la tabella dalle vecchie eccezioni chiamando l'AdminsModel 
+     * e salva le nuove differenze con un rapido Bulk Insert.
+     *
+     * @param array $posts Dati sanificati con 'uuid' e la nuova matrice 'permissions'
+     * @return array Esito, messaggio ed eventuali errori bloccanti
+     */
     public function saveExceptions(array $posts): array
     {
         try 
@@ -587,6 +781,15 @@ class GroupsModel extends BackendModel
         }
     }
 
+    /**
+     * Verifica se un Gruppo ha attualmente degli amministratori associati.
+     * 
+     * Metodo di utilità per impedire eliminazioni accidentali di Gruppi ancora in uso. 
+     * Conta semplicemente gli UUID agganciati all'ID del gruppo interrogato.
+     *
+     * @param int $groupId L'ID del gruppo da verificare
+     * @return bool True se ci sono utenti agganciati, false se è vuoto
+     */
     public function hasAdminsAttached(int $groupId): bool
     {
         $sql = 'select count(uuid) as total from admins where group_id = ?';

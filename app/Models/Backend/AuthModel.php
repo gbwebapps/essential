@@ -4,20 +4,56 @@ namespace App\Models\Backend;
 
 use App\Models\Backend\BackendModel;
 
+/**
+ * Modello principale dedicato all'Autenticazione e alla Sicurezza degli accessi (Auth).
+ * 
+ * Estende il BackendModel e incapsula tutta la complessa business logic legata all'ingresso 
+ * nel sistema. Gestisce il flusso di Login a più step (incluso il controllo 2FA), il sistema 
+ * anti brute-force (throttling dei tentativi falliti), il recupero delle credenziali, 
+ * la generazione di token crittografici (sessioni o cookie "Remember Me") e la tracciatura 
+ * rigorosa di ogni accesso o disconnessione nell'Audit Log.
+ */
 class AuthModel extends BackendModel
 {
+    /**
+     * @var object Contenitore per i parametri di configurazione globali del modulo Auth 
+     * (es. limiti di tentativi, durata sessioni, espressioni regolari per le password).
+     */
     private object $config;
 
+    /**
+     * @var string|null Nome identificativo del modulo corrente, utilizzato per instradare i log o risolvere i template email.
+     */
     public ?string $module = 'auth';
 
+    /**
+     * @var array Whitelist dei campi HTTP POST consentiti in fase di Login.
+     * Blocca l'immissione di parametri non previsti prima dell'elaborazione delle credenziali.
+     */
     protected array $loginAllowedFields = ['email', 'password', 'rememberMe']; 
 
+    /**
+     * @var array Whitelist dei campi consentiti per la richiesta di reset della password (solo email).
+     */
     protected array $resetPasswordAllowedFields = ['email'];
 
+    /**
+     * @var array Whitelist dei campi consentiti durante l'impostazione fisica di una nuova password 
+     * (tramite link di ripristino o attivazione).
+     */
     protected array $setPasswordAllowedFields = ['password', 'token'];
 
+    /**
+     * @var array Whitelist dei campi consentiti durante la verifica OTP per il Secondo Fattore di Autenticazione (2FA).
+     */
     protected array $verifyAllowedFields = ['code'];
 
+    /**
+     * Hook di inizializzazione nativo di CodeIgniter 4.
+     * 
+     * Richiama il setup genitore e inietta immediatamente in memoria le configurazioni 
+     * del modulo Auth, rendendole disponibili a tutti i metodi della classe per evitare query ripetitive.
+     */
     protected function initModel(): void 
     {
         parent::initModel();
@@ -25,6 +61,14 @@ class AuthModel extends BackendModel
         $this->config = setting('Backend\Auth');
     }
 
+    /**
+     * Regole di validazione per il form di Login.
+     * 
+     * Verifica che l'email sia in un formato valido e che la password rispetti rigorosamente 
+     * l'espressione regolare di sicurezza (Regex) definita dinamicamente nelle configurazioni di sistema.
+     *
+     * @return array Regole native di CodeIgniter
+     */
     public function validateLoginRules(): array
     {
         return [
@@ -42,6 +86,13 @@ class AuthModel extends BackendModel
         ];
     }
 
+    /**
+     * Regole di validazione per la richiesta di Reset della Password (Form "Password Dimenticata").
+     * 
+     * Controlla esclusivamente la correttezza formale dell'indirizzo email prima di interrogare il database.
+     *
+     * @return array Regole native di CodeIgniter
+     */
     public function validateResetPasswordRules()
     {
         return [
@@ -52,6 +103,15 @@ class AuthModel extends BackendModel
         ];
     }
 
+    /**
+     * Regole di validazione per l'impostazione di una nuova password.
+     * 
+     * Verifica che la nuova password rispetti la Regex di sicurezza, che il campo di conferma combaci 
+     * perfettamente (`matches[password]`) e applica una regola personalizzata (`checkTokenRule`) 
+     * per validare l'autenticità del token nascosto inviato dal form.
+     *
+     * @return array Regole strutturate
+     */
     public function validateSetPasswordRules()
     {
         return [
@@ -76,6 +136,14 @@ class AuthModel extends BackendModel
         ];    
     }
 
+    /**
+     * Regole di validazione per la verifica del codice OTP (2FA).
+     * 
+     * Assicura che il codice immesso sia un numero intero naturale e che sia composto 
+     * esattamente da 6 cifre (`exact_length[6]`), bloccando stringhe malformate o tentativi di injection.
+     *
+     * @return array Regole per il campo code
+     */
     public function validateVerifyRules(): array
     {
         return [
@@ -87,6 +155,22 @@ class AuthModel extends BackendModel
         ];
     }
 
+    /**
+     * Orchestratore principale del flusso di Autenticazione (Login).
+     * 
+     * Metodo denso e protetto:
+     * 1. Filtra i dati in ingresso e legge le configurazioni (es. limiti tentativi, 2FA).
+     * 2. Estrae l'utente verificando subito gli Scudi (deve essere attivo, non cestinato, non sospeso).
+     * 3. Applica il controllo Throttling: se l'utente ha superato il limite di tentativi falliti nel tempo previsto, slitta il blocco e respinge l'accesso.
+     * 4. Valida l'hash della password. Se fallisce, registra il tentativo errato a DB in transazione.
+     * 5. Se la password è corretta ma il 2FA è attivo, parcheggia i dati sicuri in una sessione temporanea server-side, 
+     *    invia l'eventuale OTP via email e avvisa il controller di richiedere il secondo fattore (`result => '2fa_required'`).
+     * 6. Se il 2FA non è richiesto, azzera i tentativi falliti e demanda la creazione della sessione a `innerLogin()`.
+     *
+     * @param array $posts Credenziali pulite sottomesse dal form
+     * @param \CodeIgniter\HTTP\IncomingRequest $request Richiesta per estrarre Indirizzo IP
+     * @return array Risposta strutturata con esito e messaggi per il router o il client
+     */
     public function login(array $posts, \CodeIgniter\HTTP\IncomingRequest $request)
     {
         try 
@@ -228,6 +312,20 @@ class AuthModel extends BackendModel
         }
     }
 
+    /**
+     * Conclude positivamente l'autenticazione generando i token e i cookie necessari.
+     * 
+     * Valuta se l'utente ha richiesto la funzione "Ricordami" per decidere la scadenza (cookie lungo o sessione breve).
+     * Genera un nuovo token crittografico univoco, lo salva nella tabella `admins_tokens`, 
+     * e inserisce un record di ingresso (Login) nella tabella `admins_logs` per l'auditing.
+     * Successivamente rigenera l'ID di sessione PHP (protezione da Session Fixation) e imposta 
+     * il cookie cifrato o la sessione standard, restituendo al frontend un messaggio flash di benvenuto.
+     *
+     * @param object $admin I dati validati dell'amministratore
+     * @param bool $rememberMe Flag che indica se il client ha spuntato "Ricordami"
+     * @param \CodeIgniter\HTTP\IncomingRequest $request Richiesta per tracciare User Agent e IP
+     * @return array Esito positivo
+     */
     private function innerLogin(object $admin, bool $rememberMe, \CodeIgniter\HTTP\IncomingRequest $request): array
     {
         if ($rememberMe):
@@ -328,6 +426,18 @@ class AuthModel extends BackendModel
         return ['result' => true];
     }
 
+    /**
+     * Gestisce la richiesta di ripristino per "Password dimenticata".
+     * 
+     * Cerca l'utente tramite email, assicurandosi che non sia cestinato. Se trovato, 
+     * inizia una transazione per generare un token di attivazione univoco, ne calcola la scadenza, 
+     * lo salva a DB eliminando eventuali vecchi token pendenti e invia l'email transazionale 
+     * contenente il link di recupero.
+     *
+     * @param array $posts Dati POST contenenti l'email
+     * @param \CodeIgniter\HTTP\IncomingRequest $request Richiesta HTTP per logging dati connessione
+     * @return array Esito dell'operazione e relativo messaggio utente
+     */
     public function resetPassword(array $posts, \CodeIgniter\HTTP\IncomingRequest $request): array
     {
         $posts = $this->checkAllowedFields($posts, $this->resetPasswordAllowedFields);
@@ -402,6 +512,16 @@ class AuthModel extends BackendModel
         return ['result' => false, 'message' => lang('backend/auth.messages.resetPasswordFailed')];
     }
 
+    /**
+     * Salva la nuova password dopo la convalida del token di reset/attivazione.
+     * 
+     * Recupera l'utente a partire dall'hash del token fornito. Esegue in transazione 
+     * la rigenerazione dell'hash della password (`password_hash`), azzera la data di reset 
+     * ed elimina il token ormai consumato (monouso) dal database, chiudendo il ciclo di recupero.
+     *
+     * @param array $posts Dati POST contenenti la nuova password e il token
+     * @return array Esito del salvataggio
+     */
     public function setPassword(array $posts): array
     {
         try
@@ -459,6 +579,16 @@ class AuthModel extends BackendModel
         }
     }
 
+    /**
+     * Verifica l'autenticità e la validità temporale di un token di reset/attivazione.
+     * 
+     * Metodo di utilità usato frequentemente per proteggere le rotte (es. form di reset password). 
+     * Controlla che il token esista nel database e che il timestamp attuale non abbia 
+     * superato la data di scadenza prestabilita (`token_expire`).
+     *
+     * @param string $token La stringa raw del token da verificare
+     * @return bool True se il token è valido e non scaduto, false altrimenti
+     */
     public function checkAuthToken(string $token): bool
     {
         try 
@@ -488,6 +618,20 @@ class AuthModel extends BackendModel
         }
     }
 
+    /**
+     * Convalida l'inserimento del codice OTP (Autenticazione a Due Fattori).
+     * 
+     * Estrae in sicurezza i dati pre-autorizzati dalla sessione temporanea `auth_2fa_pending`. 
+     * Applica il Throttling specifico per il 2FA: se si sbaglia il codice troppe volte, rinnova il blocco e respinge.
+     * Verifica il codice immesso valutando sia la corrispondenza (Tramite App Authenticator o DB per OTP Email) 
+     * sia la scadenza temporale. In caso di errore, incrementa i fallimenti in transazione. 
+     * In caso di successo, svuota le tabelle temporanee, distrugge la sessione di parcheggio e 
+     * finalizza l'ingresso invocando `innerLogin()`.
+     *
+     * @param array $posts Il payload contenente il codice (OTP)
+     * @param \CodeIgniter\HTTP\IncomingRequest $request Richiesta HTTP per l'estrazione dell'IP
+     * @return array Esito dell'operazione (successo o messaggio d'errore specifico se scaduto o errato)
+     */
     public function verify(array $posts, \CodeIgniter\HTTP\IncomingRequest $request): array
     {
         try 
@@ -613,6 +757,16 @@ class AuthModel extends BackendModel
         }
     }
 
+    /**
+     * Esegue il Logout (Disconnessione) per gli utenti autenticati via Sessione standard.
+     * 
+     * Recupera il token dalla sessione locale, identifica il log aperto nella tabella `admins_logs` 
+     * (tramite `login_log_id` salvato durante il login) e lo chiude formalmente inserendo 
+     * l'ora di uscita (`last_activity`) e la causale (es. 'manual' o 'timeout'). 
+     * Infine distrugge il record del token dal database e resetta completamente la sessione PHP locale.
+     *
+     * @param string $reason Motivo della disconnessione (default: 'manual')
+     */
     public function logoutBySession(string $reason = 'manual'): void
     {
         try {
@@ -662,6 +816,16 @@ class AuthModel extends BackendModel
         }
     }
 
+    /**
+     * Esegue il Logout (Disconnessione) per gli utenti autenticati via Cookie "Ricordami".
+     * 
+     * Funzionamento analogo a `logoutBySession`, ma estrae l'hash partendo dal valore crittografato 
+     * del cookie inviato dal browser. Chiude il log aperto registrando il timestamp di logout 
+     * ed elimina definitivamente il token di tipo 'cookie' dal database, invalidando gli accessi futuri.
+     *
+     * @param string $cookieValue Il valore decifrato del cookie 'backendRememberMe'
+     * @param string $reason Motivo della disconnessione (default: 'manual')
+     */
     public function logoutByCookie(string $cookieValue, string $reason = 'manual'): void
     {
         try {
