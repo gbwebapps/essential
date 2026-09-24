@@ -19,12 +19,14 @@ use App\Controllers\Backend\BackendController;
 class DashboardController extends BackendController 
 {
     /**
-     * @var DashboardModel Istanza del modello incaricato di recuperare eventuali dati statistici o di riepilogo dal database.
+     * Istanza del modello incaricato di recuperare eventuali dati statistici o di riepilogo dal database.
+     * @var DashboardModel 
      */
     protected DashboardModel $dashboardModel;
 
     /**
-     * @var DashboardClass Istanza della libreria di supporto per l'elaborazione di dati formattati specifici per la dashboard.
+     * Istanza della libreria di supporto per l'elaborazione di dati formattati specifici per la dashboard.
+     * @var DashboardClass 
      */
     protected DashboardClass $dashboardClass;
 

@@ -15,53 +15,127 @@ use App\Models\Backend\BackendModel;
 class AdminsModel extends BackendModel
 {
     /**
-     * @var string Nome identificativo del modulo (tabella principale 'admins') usato dal motore genitore.
+     * Nome identificativo del modulo (tabella principale 'admins') usato dal motore genitore.
+     * 
+     * @var string 
      */
     protected ?string $module = 'admins';
 
     /**
-     * @var bool Flag strutturale che abilita la gestione del "Cestino" (Soft Delete). 
+     * Flag strutturale che abilita la gestione del "Cestino" (Soft Delete). 
      * Se impostato a true, le query di estrazione nasconderanno di default i record con 'deleted_at' valorizzato.
+     * 
+     * @var bool 
      */
     protected bool $hasSoftDelete = true;
 
     /**
-     * @var string La colonna predefinita per l'ordinamento dei dati (es. 'id').
+     * La colonna predefinita per l'ordinamento dei dati (es. 'id').
+     * 
+     * @var string 
      */
     protected ?string $defaultColumn = 'id';
 
     /**
-     * @var array Elenchi Whitelist (es. $showAllAllowedFields, $addAllowedFields,$editAllowedFields, ecc.).
-     * Definiscono in modo esplicito e granulare quali campi HTTP POST sono ammessi per ogni specifica operazione, 
-     * fungendo da scudo primario contro attacchi di Mass-Assignment o iniezione di parametri non previsti.
+     * Whitelist dei campi consentiti durante la richiesta di visualizzazione dell'elenco amministratori.
+     * Include i parametri strutturali per la paginazione, l'ordinamento e la gestione della vista cestino.
+     *
+     * @var array
      */
     protected array $showAllAllowedFields = ['column', 'order', 'page', 'rows', 'searchFields', 'trash_filter'];
+
+    /**
+     * Whitelist dei campi consentiti per la creazione di un nuovo amministratore.
+     * Include i dati anagrafici, di contatto, l'assegnazione al gruppo principale e i media (immagini).
+     *
+     * @var array
+     */
     protected array $addAllowedFields = ['firstname', 'lastname', 'email', 'phone', 'status', 'note', 'group_id', 'images'];
+
+    /**
+     * Whitelist dei campi consentiti per la modifica di un amministratore esistente.
+     * Estende i campi di creazione aggiungendo l'obbligatorietà dell'UUID e la gestione della matrice permessi ad personam.
+     *
+     * @var array
+     */
     protected array $editAllowedFields = ['uuid', 'firstname', 'lastname', 'email', 'phone', 'status', 'note', 'group_id', 'permissions', 'images'];
+
+    /**
+     * Whitelist dei campi consentiti per l'eliminazione (Soft Delete) di un amministratore.
+     * Restringe il payload al solo UUID per prevenire cancellazioni multiple o accidentali.
+     *
+     * @var array
+     */
     protected array $delAllowedFields = ['uuid'];
+
+    /**
+     * Whitelist dei campi consentiti per forzare il ripristino della password dal pannello di controllo.
+     * Richiede unicamente l'UUID dell'amministratore bersaglio per innescare la generazione del token.
+     *
+     * @var array
+     */
     protected array $resetPasswordAllowedFields = ['uuid'];
+
+    /**
+     * Whitelist dei campi consentiti per l'operazione di cambio stato rapido (es. da attivo a sospeso).
+     *
+     * @var array
+     */
     protected array $changeStatusAllowedFields = ['uuid'];
+
+    /**
+     * Whitelist dei campi consentiti per l'aggiornamento asincrono di un singolo permesso (toggle).
+     * Richiede l'identificativo dell'amministratore e la chiave testuale del permesso da invertire.
+     *
+     * @var array
+     */
     protected array $changePermissionAllowedFields = ['uuid', 'permission'];
+
+    /**
+     * Whitelist dei campi consentiti per invalidare una sessione o un token di accesso remoto.
+     * Necessita dell'ID univoco del token e dell'UUID dell'amministratore per confermare la proprietà.
+     *
+     * @var array
+     */
     protected array $deleteTokenAllowedFields = ['id', 'uuid'];
+
+    /**
+     * Whitelist delle colonne anagrafiche e di contatto su cui è attiva la ricerca testuale (LIKE).
+     * Limita il motore di ricerca ai soli campi pertinenti per tutelare le performance e la sicurezza.
+     *
+     * @var array
+     */
     protected array $showAllSearchAllowedFields = ['firstname', 'lastname', 'email', 'phone']; 
+
+    /**
+     * Whitelist delle colonne temporali su cui è possibile effettuare filtri per intervallo di date (Da - A).
+     *
+     * @var array
+     */
     protected array $showAllSearchAllowedDates = ['created_at', 'updated_at'];
 
     /**
-     * @var array Array combinato che indica quali colonne sono esposte all'ordinamento (DataTables) 
+     * Array combinato che indica quali colonne sono esposte all'ordinamento (DataTables) 
      * e alla ricerca testuale o temporale, validando rigorosamente l'input dell'operatore.
+     * 
+     * @var array 
      */
     protected array $allowedOrderColumns = ['firstname', 'lastname', 'email', 'phone', 'status']; 
 
     /**
-     * @var array Elenco dei campi anagrafici monitorati per rilevare cambiamenti effettivi 
+     * Elenco dei campi anagrafici monitorati per rilevare cambiamenti effettivi 
      * prima di lanciare una query di UPDATE a database.
+     * 
+     * @var array 
      */
     protected array $toCompare = ['firstname', 'lastname', 'email', 'phone', 'status', 'group_id', 'note'];
 
     /**
-     * @var string Query principale per il caricamento della griglia utenti. 
+     * Query principale per il caricamento della griglia utenti. 
      * Include sub-query ottimizzate per calcolare dinamicamente il numero di immagini associate 
      * e recuperare l'eventuale immagine di copertina (avatar) dell'utente.
+     * 
+     * @var string 
      */
     protected ?string $getDataQuery = "select uuid, firstname, lastname, email, phone, status, superadmin, created_at, updated_at, resetted_at, suspended_at, deleted_at,
                                         (select images.filename from images where images.entity_uuid = admins.uuid and images.entity = 'admins' and images.is_cover = 1 limit 1) as cover, 
@@ -69,8 +143,10 @@ class AdminsModel extends BackendModel
                                         from admins where 1 = 1";
 
     /**
-     * @var string Query utilizzata per estrarre il profilo completo di un singolo amministratore tramite UUID. 
+     * Query utilizzata per estrarre il profilo completo di un singolo amministratore tramite UUID. 
      * Esegue una JOIN con `admins_groups` per recuperare il nome del ruolo assegnato.
+     * 
+     * @var string 
      */
     protected ?string $getUUIDQuery = "select 
                                             admins_groups.name as groupName, 
@@ -94,8 +170,10 @@ class AdminsModel extends BackendModel
                                         where admins.uuid = ? limit 1";
 
     /**
-     * @var string Query SQL essenziale per calcolare il numero totale degli amministratori, 
+     * Query SQL essenziale per calcolare il numero totale degli amministratori, 
      * necessaria al frontend per creare i bottoni della paginazione.
+     *
+     * @var string 
      */
     protected ?string $getNumRowsQuery = 'select count(*) as count from admins where 1 = 1';
 

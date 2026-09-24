@@ -14,15 +14,17 @@ use App\Models\Backend\LogsModel;
 class LogsClass 
 {
 	/**
-	 * @var LogsModel Istanza del modello di riferimento, a disposizione per eventuali interrogazioni 
+	 * Istanza del modello di riferimento, a disposizione per eventuali interrogazioni 
 	 * o formattazioni propedeutiche alla costruzione dell'interfaccia di analisi dei log.
+	 * @var LogsModel 
 	 */
 	protected LogsModel $logsModel;
 
 	/**
 	 * Inizializza la libreria di supporto iniettando il modello associato alla sezione dei log applicativi.
+	 * $logsModel Il modello preposto alla lettura, al parsing e all'estrazione dei log di sistema
 	 *
-	 * @param LogsModel $logsModel Il modello preposto alla lettura, al parsing e all'estrazione dei log di sistema
+	 * @param LogsModel 
 	 */
 	public function __construct(LogsModel $logsModel) 
 	{

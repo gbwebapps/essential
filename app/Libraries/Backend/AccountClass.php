@@ -15,15 +15,17 @@ use App\Models\Backend\AccountModel;
 class AccountClass 
 {
 	/**
-	 * @var AccountModel Istanza del modello di riferimento, impiegata per estrarre eventuali dati 
+	 * Istanza del modello di riferimento, impiegata per estrarre eventuali dati 
 	 * o configurazioni dal database necessari alla costruzione degli elementi dell'interfaccia.
+	 * @var AccountModel 
 	 */
 	protected AccountModel $accountModel;
 
 	/**
 	 * Inizializza la libreria di supporto iniettando il modello associato alla sezione.
+	 * $accountModel L'istanza del modello preposto alla gestione dei dati dell'account.
 	 *
-	 * @param AccountModel $accountModel L'istanza del modello preposto alla gestione dei dati dell'account.
+	 * @param AccountModel 
 	 */
 	public function __construct(AccountModel $accountModel) 
 	{

@@ -14,8 +14,9 @@ use App\Models\Backend\AuthModel;
 class AuthClass 
 {
 	/**
-	 * @var AuthModel Istanza del modello di riferimento, utilizzabile per estrarre 
+	 * Istanza del modello di riferimento, utilizzabile per estrarre 
 	 * parametri di sicurezza o validare stati logici propedeutici alla costruzione dell'interfaccia.
+	 * @var AuthModel 
 	 */
 	protected AuthModel $authModel;
 

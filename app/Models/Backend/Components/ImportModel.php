@@ -4,9 +4,28 @@ namespace App\Models\Backend\Components;
 
 use App\Models\Backend\BackendModel;
 
+/**
+ * Modello dedicato al Componente Globale di Importazione Dati (ImportModel).
+ * 
+ * Estende il BackendModel e orchestra l'intero ciclo di vita dell'importazione massiva da file CSV. 
+ * Implementa un approccio a due fasi (Parsing/Staging e Esecuzione asincrona) per gestire 
+ * file di grandi dimensioni senza bloccare il server. Integra funzionalità avanzate come 
+ * la validazione dinamica dedotta dallo schema SQL, il calcolo differenziale per gli aggiornamenti (Upsert) 
+ * e la creazione di backup di sicurezza preventivi.
+ */
 class ImportModel extends BackendModel 
 {
-    /* Type Hinting rigoroso: restituisce un Model di CI4 o null */
+    /**
+     * Tenta di istanziare dinamicamente il modello specifico associato all'entità bersaglio.
+     * 
+     * Sfrutta il nome della tabella (es. 'admins') per cercare la classe corrispondente 
+     * (es. 'App\Models\Backend\AdminsModel'). Questo permette al motore di importazione 
+     * di recuperare e utilizzare le regole di validazione esplicite scritte dallo sviluppatore, 
+     * ignorando i comportamenti di default se esiste una logica dedicata.
+     *
+     * @param string $entity Il nome della tabella/modulo (es. 'users', 'logs')
+     * @return \CodeIgniter\Model|null L'istanza del modello se esiste, altrimenti null
+     */
     private function getTargetModelInstance(string $entity)
     {
         $modelName = 'App\\Models\\Backend\\' . ucfirst($entity) . 'Model';
@@ -18,6 +37,17 @@ class ImportModel extends BackendModel
         return null;
     }
 
+    /**
+     * Estrae e formatta la struttura fisica (Schema) di una tabella del database.
+     * 
+     * Interroga il motore del database per ottenere l'elenco delle colonne, i tipi di dato (es. varchar, int), 
+     * i limiti massimi di lunghezza e le configurazioni delle chiavi (Primary Key e Indici). 
+     * Costituisce la base su cui il motore di importazione mappa le colonne del CSV e deduce 
+     * le regole di validazione di fallback.
+     *
+     * @param string $table Il nome esatto della tabella
+     * @return array Mappa strutturata delle colonne e dei relativi vincoli fisici
+     */
     public function getTableStructure(string $table): array
     {
         /* Controllo di sicurezza sull'esistenza della tabella */
@@ -55,6 +85,20 @@ class ImportModel extends BackendModel
         return $structure;
     }
 
+    /**
+     * Fase 1: Analisi, validazione e preparazione del file CSV (Staging).
+     * 
+     * Metodo estremamente denso che esegue i controlli preliminari prima di scrivere a database.
+     * 1. Confronta le intestazioni del CSV con le colonne reali della tabella (bloccando colonne estranee).
+     * 2. Estrae gli ID dal CSV e scarica i record già esistenti dal DB per eseguire un diff in memoria.
+     * 3. Analizza riga per riga: se i dati cambiano pianifica un 'update', se il record non esiste pianifica un 'insert', se sono identici fa 'skip'.
+     * 4. Valida ogni riga tramite le regole del Model (o quelle dinamiche di fallback).
+     * 5. Scrive le righe validate in un file temporaneo sicuro di Staging, aggiungendo la direttiva operativa (`__import_action`).
+     *
+     * @param \CodeIgniter\HTTP\Files\UploadedFile $file L'oggetto file caricato dalla richiesta HTTP
+     * @param string $entity Il nome della tabella di destinazione
+     * @return array Struttura dati con l'esito, le statistiche dell'operazione (plan) e i primi record da mostrare in anteprima
+     */
     public function parseAndValidateCsv(\CodeIgniter\HTTP\Files\UploadedFile $file, string $entity): array
     {
         $structure = $this->getTableStructure($entity);
@@ -289,6 +333,20 @@ class ImportModel extends BackendModel
         ];
     }
 
+    /**
+     * Fase 2: Esecuzione materiale dell'importazione leggendo il file di Staging.
+     * 
+     * Opera in modalità asincrona (Chunking) e Transazionale. Scorre il file temporaneo 
+     * leggendo la direttiva `__import_action` per decidere l'operazione SQL (Insert o Update).
+     * Inietta in automatico i timestamp di sistema (`created_at` e `updated_at`), ignorando eventuali 
+     * date fornite nel CSV per preservare l'integrità dello storico. Al termine del file, 
+     * effettua il commit della transazione, cancella il file di staging e registra l'audit.
+     *
+     * @param string $entity Nome della tabella
+     * @param string $tempFile Il nome del file CSV di staging generato dal metodo parseAndValidateCsv
+     * @param int $offset L'indice della riga da cui partire per il blocco corrente
+     * @return array Esito strutturato con il totale dei record inseriti/aggiornati e il flag di completamento
+     */
     public function executeImport(string $entity, string $tempFile, int $offset = 0): array
     {
         /* FIX SICUREZZA: Prevenzione Directory Traversal */
@@ -479,6 +537,17 @@ class ImportModel extends BackendModel
         ];
     }
 
+    /**
+     * Genera un backup SQL completo della tabella bersaglio prima di avviare l'importazione.
+     * 
+     * Implementa uno scudo contro sovrascritture accidentali o importazioni distruttive. 
+     * Crea un file .sql contenente la struttura TRUNCATE e le query di INSERT relative a 
+     * tutti i record attuali. Utilizza l'estrazione a blocchi (Limit/Offset) per non 
+     * saturare la memoria RAM (Memory Leak) in caso di tabelle molto capienti.
+     *
+     * @param string $entity Nome della tabella da salvaguardare
+     * @return bool True se il backup viene completato con successo (o se la tabella è vuota), false in caso di errore di scrittura
+     */
     public function backupTableBeforeImport(string $entity): bool
     {
         $builder = $this->db->table($entity);
@@ -531,6 +600,17 @@ class ImportModel extends BackendModel
         return true;
     }
 
+    /**
+     * Traduce lo schema fisico del database in un set di regole di validazione (Fallback Rules).
+     * 
+     * Funzione cruciale che entra in azione quando il modulo non ha regole scritte a mano nel Model. 
+     * Legge i metadati estratti da `getTableStructure` e mappa i tipi SQL nelle rispettive regole di CodeIgniter: 
+     * es. `varchar(255)` diventa `string|max_length[255]`, `int` diventa `integer`, `datetime` diventa `valid_date`.
+     * Garantisce che l'importazione rispetti i limiti stringenti del database prevenendo eccezioni PDO.
+     *
+     * @param array $structure Lo schema delle colonne generato da getTableStructure
+     * @return array Dizionario di regole di validazione nel formato nativo di CodeIgniter
+     */
     protected function buildDynamicRules(array $structure): array
     {
         $rules = [];

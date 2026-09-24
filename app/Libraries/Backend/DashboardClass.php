@@ -14,8 +14,9 @@ use App\Models\Backend\DashboardModel;
 class DashboardClass 
 {
 	/**
-	 * @var DashboardModel Istanza del modello di riferimento, a disposizione per aggregare 
+	 * Istanza del modello di riferimento, a disposizione per aggregare 
 	 * metriche, KPI, statistiche o dati di riepilogo necessari al popolamento dinamico dell'interfaccia.
+	 * @var DashboardModel 
 	 */
 	protected DashboardModel $dashboardModel;
 

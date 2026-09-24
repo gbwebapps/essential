@@ -14,12 +14,16 @@ use CodeIgniter\Database\ConnectionInterface;
 class AuthorizationClass
 {
     /**
-     * @var ConnectionInterface Istanza della connessione al database per l'interrogazione diretta dei token e degli utenti.
+     * Istanza della connessione al database per l'interrogazione diretta dei token e degli utenti.
+     * 
+     * @var ConnectionInterface 
      */
     private ConnectionInterface $db;
 
     /**
-     * @var object|null Cache in-memory (singleton-like) per conservare i dati dell'amministratore autenticato, prevenendo query ridondanti nel medesimo ciclo HTTP.
+     * Cache in-memory (singleton-like) per conservare i dati dell'amministratore autenticato, prevenendo query ridondanti nel medesimo ciclo HTTP.
+     * 
+     * @var object|null 
      */
     private ?object $currentAdminCache;
 

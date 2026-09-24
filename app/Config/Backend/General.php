@@ -10,17 +10,23 @@ use CodeIgniter\Config\BaseConfig;
 class General extends BaseConfig
 {
     /**
-     * @var string Fuso orario predefinito del sistema
+     * Fuso orario predefinito del sistema
+     * 
+     * @var string 
      */
     public string $timezone = 'Europe/Rome';
     
     /**
-     * @var string Codice della lingua predefinita utilizzata nell'interfaccia
+     * Codice della lingua predefinita utilizzata nell'interfaccia
+     * 
+     * @var string 
      */
     public string $language = 'en';
 
     /**
-     * @var string Formato predefinito per la visualizzazione di date e ore
+     * Formato predefinito per la visualizzazione di date e ore
+     * 
+     * @var string 
      */
     public string $dateFormat = 'd MMMM yyyy HH:mm:ss';
 }

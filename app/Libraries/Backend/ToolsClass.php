@@ -14,8 +14,9 @@ use App\Models\Backend\ToolsModel;
 class ToolsClass 
 {
 	/**
-	 * @var ToolsModel Istanza del modello di riferimento, a disposizione per eventuali interrogazioni 
+	 * Istanza del modello di riferimento, a disposizione per eventuali interrogazioni 
 	 * propedeutiche alla costruzione dell'interfaccia o all'esecuzione degli strumenti di sistema.
+	 * @var ToolsModel 
 	 */
 	protected ToolsModel $toolsModel;
 

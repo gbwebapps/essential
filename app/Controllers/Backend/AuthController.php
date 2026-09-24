@@ -16,12 +16,14 @@ use App\Controllers\Backend\BackendController;
 class AuthController extends BackendController 
 {
     /**
-     * @var AuthModel Istanza del modello responsabile delle logiche di accesso, validazione credenziali e gestione dei token
+     * Istanza del modello responsabile delle logiche di accesso, validazione credenziali e gestione dei token
+     * @var AuthModel 
      */
     protected AuthModel $authModel;
 
     /**
-     * @var AuthClass Istanza della libreria per funzioni di supporto, criptazione o formattazione legate all'autenticazione
+     * Istanza della libreria per funzioni di supporto, criptazione o formattazione legate all'autenticazione
+     * @var AuthClass 
      */
     protected AuthClass $authClass;
 

@@ -18,20 +18,23 @@ use App\Controllers\Backend\BackendController;
 class ToolsController extends BackendController 
 {
     /**
-     * @var ToolsModel Istanza del modello responsabile dell'estrazione dei dati di monitoraggio, 
+     * Istanza del modello responsabile dell'estrazione dei dati di monitoraggio, 
      * della compattazione delle tabelle, e delle operazioni di pulizia fisica sul file system.
+     * @var ToolsModel 
      */
     protected ToolsModel $toolsModel;
 
     /**
-     * @var ToolsClass Istanza della libreria contenente routine di calcolo (es. conversioni byte) 
+     * Istanza della libreria contenente routine di calcolo (es. conversioni byte) 
      * e formattazione tecnica per i dati esposti nel pannello strumenti.
+     * @var ToolsClass 
      */
     protected ToolsClass $toolsClass;
 
     /**
-     * @var array Struttura di sbarramento: elenca unicamente le sezioni (ambienti) 
+     * Struttura di sbarramento: elenca unicamente le sezioni (ambienti) 
      * che possono essere invocate e caricate asincronamente dall'utente.
+     * @var array 
      */
     protected array $allowedEnvs = ['system', 'manageAudits', 'dbMaintenance', 'backups', 'cleanSpace', 'manageLogs'];
 

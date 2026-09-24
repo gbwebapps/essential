@@ -10,12 +10,16 @@ use CodeIgniter\Config\BaseConfig;
 class Auth extends BaseConfig
 {
     /**
-     * @var string Chiave di cifratura utilizzata per le funzioni di hash
+     * Chiave di cifratura utilizzata per le funzioni di hash
+     * 
+     * @var string 
      */
 	public string $hashKey = '';
 
     /**
-     * @var string Chiave crittografica dedicata alla sicurezza delle sessioni
+     * Chiave crittografica dedicata alla sicurezza delle sessioni
+     * 
+     * @var string 
      */
 	public string $sessionCryptoKey = '';
 
@@ -43,82 +47,114 @@ class Auth extends BaseConfig
     }
 
     /**
-     * @var bool Indica se il controllo dei tentativi di accesso falliti è attivo
+     * Indica se il controllo dei tentativi di accesso falliti è attivo
+     * 
+     * @var bool 
      */
     public bool $attempts = true;
 
     /**
-     * @var int Intervallo di tempo in secondi per il blocco dei tentativi di accesso
+     * Intervallo di tempo in secondi per il blocco dei tentativi di accesso
+     * 
+     * @var int 
      */
     public int $attemptsInterval = 600;
 
     /**
-     * @var int Numero massimo consentito di tentativi di accesso prima del blocco
+     * Numero massimo consentito di tentativi di accesso prima del blocco
+     * 
+     * @var int 
      */
     public int $attemptsLimit = 3; 
 
     /**
-     * @var bool Indica se l'autenticazione a due fattori (2FA) è abilitata globalmente
+     * Indica se l'autenticazione a due fattori (2FA) è abilitata globalmente
+     * 
+     * @var bool 
      */
     public bool $twoFactor = true;
 
     /**
-     * @var int Limite massimo di tentativi errati consentiti per la verifica del codice 2FA
+     * Limite massimo di tentativi errati consentiti per la verifica del codice 2FA
+     * 
+     * @var int 
      */
     public int $twoFactorLimit = 3;
 
     /**
-     * @var int Finestra temporale di validità in secondi per il codice 2FA
+     * Finestra temporale di validità in secondi per il codice 2FA
+     * 
+     * @var int 
      */
     public int $twoFactorTime = 600;
 
     /**
-     * @var string Nome dell'emittente associato alla generazione dei codici OTP
+     * Nome dell'emittente associato alla generazione dei codici OTP
+     * 
+     * @var string 
      */
     public string $twoFactorIssuer = 'Essential';
 
     /**
-     * @var int Numero di cifre che compongono il codice di verifica 2FA
+     * Numero di cifre che compongono il codice di verifica 2FA
+     * 
+     * @var int 
      */
     public int $twoFactorDigits = 6;
 
     /**
-     * @var int Tolleranza temporale in finestre temporali per la verifica 2FA
+     * Tolleranza temporale in finestre temporali per la verifica 2FA
+     * 
+     * @var int 
      */
     public int $twoFactorWindow = 1;
 
     /**
-     * @var int Tempo di scadenza in secondi per il codice 2FA inviato via email
+     * Tempo di scadenza in secondi per il codice 2FA inviato via email
+     * 
+     * @var int 
      */
     public int $twoFactorEmailExpiry = 60;
 
     /**
-     * @var string Indirizzo email predefinito utilizzato per l'invio dei codici 2FA
+     * Indirizzo email predefinito utilizzato per l'invio dei codici 2FA
+     * 
+     * @var string 
      */
     public string $twoFactorEmailFrom = 'superadmin@essential.it';
 
     /**
-     * @var array Elenco dei metodi di autenticazione a due fattori supportati
+     * Elenco dei metodi di autenticazione a due fattori supportati
+     * 
+     * @var array 
      */
     public array $twoFactorMethods = ['none', 'email', 'totp'];
 
     /**
-     * @var int Durata in secondi della sessione di ricordo dell'accesso (Remember Me)
+     * Durata in secondi della sessione di ricordo dell'accesso (Remember Me)
+     * 
+     * @var int 
      */
     public int $rememberMeTime = 864000;
 
     /**
-     * @var int Durata massima in secondi di inattività prima della scadenza della sessione
+     * Durata massima in secondi di inattività prima della scadenza della sessione
+     * 
+     * @var int 
      */
     public int $sessionTime = 1200;
 
     /**
-     * @var int Tempo di validità in secondi per il link o codice di attivazione dell'account
+     * Tempo di validità in secondi per il link o codice di attivazione dell'account
+     * 
+     * @var int 
      */
     public int $activationTime = 43200;
 
     /**
-     * @var string Espressione regolare per la validazione della robustezza delle password
+     * Espressione regolare per la validazione della robustezza delle password
+     * 
+     * @var string 
      */
     public string $passwordRegex = '/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/';
 }

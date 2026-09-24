@@ -6,121 +6,182 @@ use CodeIgniter\Config\BaseConfig;
 
 class Email extends BaseConfig
 {
+    /**
+     * Indirizzo email predefinito del mittente per le comunicazioni in uscita.
+     *
+     * @var string
+     */
     public string $fromEmail  = 'essential@essential.com';
+
+    /**
+     * Nome predefinito del mittente visualizzato nelle comunicazioni in uscita.
+     *
+     * @var string
+     */
     public string $fromName   = 'Essential';
+
+    /**
+     * Indirizzi email dei destinatari predefiniti (separati da virgola), se necessario.
+     *
+     * @var string
+     */
     public string $recipients = '';
 
     /**
-     * The "user agent"
+     * L'"user agent" inviato nelle intestazioni dell'email.
+     *
+     * @var string
      */
     public string $userAgent = 'CodeIgniter';
 
     /**
-     * The mail sending protocol: mail, sendmail, smtp
+     * Il protocollo di invio delle email: mail, sendmail, smtp.
+     *
+     * @var string
      */
     public string $protocol = 'smtp';
 
     /**
-     * The server path to Sendmail.
+     * Il percorso del server per l'eseguibile Sendmail.
+     *
+     * @var string
      */
     public string $mailPath = '/usr/sbin/sendmail';
 
     /**
-     * SMTP Server Hostname
+     * Nome dell'host del server SMTP.
+     *
+     * @var string
      */
     public string $SMTPHost = 'sandbox.smtp.mailtrap.io';
 
     /**
-     * Which SMTP authentication method to use: login, plain
+     * Metodo di autenticazione SMTP da utilizzare: login, plain.
+     *
+     * @var string
      */
     public string $SMTPAuthMethod = 'LOGIN';
 
     /**
-     * SMTP Username
+     * Nome utente (Username) per l'autenticazione SMTP.
+     *
+     * @var string
      */
     public string $SMTPUser = '2136f4b6976b87';
 
     /**
-     * SMTP Password
+     * Password per l'autenticazione SMTP.
+     *
+     * @var string
      */
     public string $SMTPPass = 'e866a6da928c72';
 
     /**
-     * SMTP Port
+     * Porta di connessione al server SMTP.
+     *
+     * @var int
      */
     public int $SMTPPort = 2525;
 
     /**
-     * SMTP Timeout (in seconds)
+     * Tempo massimo di attesa (in secondi) per le connessioni SMTP.
+     *
+     * @var int
      */
     public int $SMTPTimeout = 5;
 
     /**
-     * Enable persistent SMTP connections
+     * Abilita le connessioni SMTP persistenti.
+     *
+     * @var bool
      */
     public bool $SMTPKeepAlive = false;
 
     /**
-     * SMTP Encryption.
+     * Crittografia SMTP.
+     * 
+     * Può essere '', 'tls' o 'ssl'. 
+     * 'tls' invierà un comando STARTTLS al server. 'ssl' indica una connessione SSL implicita. 
+     * Per connessioni sulla porta 465, questo valore dovrebbe essere impostato su ''.
      *
-     * @var string '', 'tls' or 'ssl'. 'tls' will issue a STARTTLS command
-     *             to the server. 'ssl' means implicit SSL. Connection on port
-     *             465 should set this to ''.
+     * @var string
      */
     public string $SMTPCrypto = 'tls';
 
     /**
-     * Enable word-wrap
+     * Abilita l'a capo automatico delle parole (word-wrap).
+     *
+     * @var bool
      */
     public bool $wordWrap = true;
 
     /**
-     * Character count to wrap at
+     * Numero di caratteri a cui forzare l'a capo automatico.
+     *
+     * @var int
      */
     public int $wrapChars = 76;
 
     /**
-     * Type of mail, either 'text' or 'html'
+     * Tipo di formato per le email, può essere 'text' (testo normale) o 'html'.
+     *
+     * @var string
      */
     public string $mailType = 'html';
 
     /**
-     * Character set (utf-8, iso-8859-1, etc.)
+     * Set di caratteri utilizzato (utf-8, iso-8859-1, ecc.).
+     *
+     * @var string
      */
     public string $charset = 'UTF-8';
 
     /**
-     * Whether to validate the email address
+     * Determina se convalidare formalmente l'indirizzo email prima dell'invio.
+     *
+     * @var bool
      */
     public bool $validate = false;
 
     /**
-     * Email Priority. 1 = highest. 5 = lowest. 3 = normal
+     * Priorità dell'email. 1 = massima, 5 = minima, 3 = normale.
+     *
+     * @var int
      */
     public int $priority = 3;
 
     /**
-     * Newline character. (Use “\r\n” to comply with RFC 822)
+     * Carattere di ritorno a capo. (Usa "\r\n" per rispettare lo standard RFC 822).
+     *
+     * @var string
      */
     public string $CRLF = "\r\n";
 
     /**
-     * Newline character. (Use “\r\n” to comply with RFC 822)
+     * Carattere di nuova riga. (Usa "\r\n" per rispettare lo standard RFC 822).
+     *
+     * @var string
      */
     public string $newline = "\r\n";
 
     /**
-     * Enable BCC Batch Mode.
+     * Abilita la modalità a blocchi (batch) per i destinatari in copia nascosta (BCC).
+     *
+     * @var bool
      */
     public bool $BCCBatchMode = false;
 
     /**
-     * Number of emails in each BCC batch
+     * Numero di email incluse in ogni blocco BCC.
+     *
+     * @var int
      */
     public int $BCCBatchSize = 200;
 
     /**
-     * Enable notify message from server
+     * Abilita i messaggi di notifica di stato della consegna (DSN) dal server.
+     *
+     * @var bool
      */
     public bool $DSN = false;
 }

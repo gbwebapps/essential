@@ -36,6 +36,9 @@ return [
 		'login' => '登录', 
 		'resetPassword' => '重置密码'
 	], 
+	'errors' => [
+	    'passwordFormatNotValid' => '密码不符合安全要求。',
+	],
 	'audits' => [
 	    'loginRefused'      => '使用不存在的账号登录尝试',
 	    'loginBlocked'      => '访问被拒绝，账号已被锁定 %s %s',

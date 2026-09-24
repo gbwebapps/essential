@@ -10,22 +10,29 @@ use CodeIgniter\Config\BaseConfig;
 class Menu extends BaseConfig
 {
     /**
-     * @var array Elenco delle voci di menu posizionate nell'area superiore destra
+     * Elenco delle voci di menu posizionate nell'area superiore destra
+     * 
+     * @var array 
      */
     public array $topRight = [];
 
     /**
-     * @var array Elenco delle voci di menu posizionate nell'area inferiore sinistra
+     * Elenco delle voci di menu posizionate nell'area inferiore sinistra
+     * 
+     * @var array 
      */
     public array $bottomLeft = [];
 
     /**
-     * @var array Elenco delle voci di menu posizionate nell'area inferiore destra
+     * Elenco delle voci di menu posizionate nell'area inferiore destra
+     * 
+     * @var array 
      */
     public array $bottomRight = [];
 
     /**
      * Inizializza la configurazione dei menu popolando le sezioni di navigazione con le rispettive voci localizzate e rotte.
+     * 
      */
     public function __construct()
     {

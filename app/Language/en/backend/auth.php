@@ -35,6 +35,9 @@ return [
 		'login' => 'Login', 
 		'resetPassword' => 'Reset Password'
 	], 
+	'errors' => [
+	    'passwordFormatNotValid' => 'The password does not meet the security requirements.',
+	],
 	'audits' => [
 	    'loginRefused'      => 'Login attempt with non-existent account',
 	    'loginBlocked'      => 'Access denied, account blocked %s %s',

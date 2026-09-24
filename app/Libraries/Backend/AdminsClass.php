@@ -14,15 +14,17 @@ use App\Models\Backend\AdminsModel;
 class AdminsClass 
 {
 	/**
-	 * @var AdminsModel Istanza del modello di riferimento, a disposizione per estrarre 
+	 * Istanza del modello di riferimento, a disposizione per estrarre 
 	 * informazioni dal database utili alla generazione dinamica degli elementi dell'interfaccia.
+	 * @var AdminsModel 
 	 */
 	protected AdminsModel $adminsModel;
 
 	/**
 	 * Inizializza la libreria di supporto iniettando il modello associato alla sezione.
+	 * $adminsModel Il modello preposto alla gestione dei dati degli amministratori
 	 *
-	 * @param AdminsModel $adminsModel Il modello preposto alla gestione dei dati degli amministratori
+	 * @param AdminsModel 
 	 */
 	public function __construct(AdminsModel $adminsModel) 
 	{

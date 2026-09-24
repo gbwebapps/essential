@@ -15,18 +15,68 @@ use App\Models\Backend\BackendModel;
 class GroupsModel extends BackendModel
 {
     /**
-     * @var array Elenchi Whitelist anti Mass-Assignment.
-     * Definiscono in modo esplicito quali chiavi array (es. provenienti da richieste POST) 
-     * sono autorizzate a passare ai metodi di inserimento (add), modifica (edit), 
-     * eliminazione (del) e gestione delle eccezioni, filtrando automaticamente dati malevoli o non richiesti.
+     * Whitelist dei campi consentiti durante la creazione di un nuovo gruppo di ruoli.
+     * Include i dati anagrafici del gruppo (nome, descrizione) e la matrice dei permessi predefiniti associati.
+     *
+     * @var array 
      */
-	protected array $addAllowedFields = ['name', 'description', 'permissions'];
+    protected array $addAllowedFields = ['name', 'description', 'permissions'];
+
+    /**
+     * Whitelist dei campi consentiti durante la modifica di un gruppo esistente.
+     * Estende i campi di creazione richiedendo l'identificativo numerico (ID) per puntare al record corretto.
+     *
+     * @var array 
+     */
     protected array $editAllowedFields = ['id', 'name', 'description', 'permissions'];
+
+    /**
+     * Whitelist dei campi consentiti per l'eliminazione fisica o logica di un gruppo.
+     * Restringe il payload HTTP al solo ID numerico, prevenendo cancellazioni di massa o accidentali.
+     *
+     * @var array 
+     */
     protected array $delAllowedFields = ['id'];
+
+    /**
+     * Whitelist dei campi consentiti per la richiesta di estrazione dei dettagli di un gruppo.
+     * Limita la ricezione dei parametri al solo ID, isolando le query di lettura (SELECT) da injection esterne.
+     *
+     * @var array 
+     */
     protected array $getGroupByIdAllowedFields = ['id'];
+
+    /**
+     * Whitelist dei campi consentiti per l'assegnazione delle eccezioni sui permessi (ad personam).
+     * Gestisce le chiamate che sovrascrivono i permessi ereditati dal gruppo per un singolo amministratore (tramite UUID).
+     *
+     * @var array 
+     */
     protected array $saveExceptionsAllowedFields = ['uuid', 'permissions'];
+
+    /**
+     * Whitelist dei campi consentiti per le interrogazioni asincrone delle interfacce a comparsa (es. Dropdown o Select2).
+     * Accetta unicamente la stringa di ricerca ('query') digitata dall'operatore per filtrare gli amministratori.
+     *
+     * @var array 
+     */
     protected array $dropdownAdminsFields = ['query'];
+
+    /**
+     * Whitelist dei campi consentiti per l'estrazione in lettura dei dati di un singolo amministratore.
+     * Richiede esclusivamente l'UUID, agendo come controllo preliminare prima di instradare la query.
+     *
+     * @var array 
+     */
     protected array $getAdminByUuidFields = ['uuid'];
+
+    /**
+     * Elenco dei campi strutturali utilizzati dal motore del modello per il calcolo differenziale (Diffing).
+     * Permette al sistema di capire rapidamente se le anagrafiche di base (nome e descrizione) sono state modificate, 
+     * ignorando intenzionalmente proprietà relazionali complesse come le matrici dei permessi.
+     *
+     * @var array 
+     */
     protected array $toCompare = ['name', 'description'];
 
     /**

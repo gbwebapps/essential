@@ -4,8 +4,25 @@ namespace App\Models\Backend\Components;
 
 use App\Models\Backend\BackendModel;
 
+/**
+ * Modello dedicato al Componente Globale di Esportazione Dati (ExportModel).
+ * 
+ * Estende BackendModel. Implementa un motore di estrazione asincrono e scalabile 
+ * basato sulla "Keyset Pagination" (o Cursor Pagination). Permette di esportare grandi volumi 
+ * di dati (CSV) senza esaurire la memoria (OOM) suddividendo l'estrazione in blocchi sequenziali 
+ * e scrivendoli in append sul file temporaneo.
+ */
 class ExportModel extends BackendModel 
 {
+    /**
+     * Genera le regole di validazione per il form di esportazione.
+     * 
+     * Verifica che la tabella richiesta (`entity`) esista e sia un nome formattato in sicurezza. 
+     * Controlla inoltre la coerenza dei parametri strutturali come l'ordinamento e la colonna base, 
+     * prevenendo manipolazioni HTTP.
+     *
+     * @return array Regole di validazione native
+     */
     public function generateValidationRules(): array 
     {
         return [
@@ -32,6 +49,16 @@ class ExportModel extends BackendModel
         ];
     }
 
+    /**
+     * Estrae dinamicamente la struttura delle colonne di una specifica tabella.
+     * 
+     * Interroga il database per ottenere lo schema, ma filtra intenzionalmente le chiavi primarie 
+     * fisiche e la colonna logica 'id'. Questo previene che identificatori interni (privi di utilità per l'operatore finale) 
+     * inquinino l'esportazione CSV.
+     *
+     * @param string $table Il nome esatto della tabella nel DB
+     * @return array Lista dei nomi delle colonne esportabili
+     */
     public function getExportColumns(string $table): array 
     {
         /* Controllo di sicurezza */
@@ -54,6 +81,15 @@ class ExportModel extends BackendModel
         return $columns;
     }
 
+    /**
+     * Interroga il database per individuare il nome esatto della chiave primaria di una tabella.
+     * 
+     * Metodo fondamentale perché il motore di esportazione necessita di una chiave su cui 
+     * agganciare il cursore. Scorre i campi e restituisce il primo contrassegnato come `primary_key`.
+     *
+     * @param string $table Nome della tabella
+     * @return string|null Il nome della colonna PK, o null in caso di assenza
+     */
     public function getPrimaryKey(string $table): ?string
     {
         if ( ! $this->db->tableExists($table)):
@@ -71,6 +107,26 @@ class ExportModel extends BackendModel
         return null;
     }
 
+    /**
+     * Motore ricorsivo asincrono per l'esportazione progressiva in CSV.
+     * 
+     * Questa funzione è il cuore pulsante.
+     * 1. Accetta filtri dinamici (es. estrarre solo utenti attivi di uno specifico gruppo).
+     * 2. Riceve le colonne esplicitamente scelte dall'operatore.
+     * 3. Forza per sicurezza l'inserimento della colonna `id` nella query SELECT, poiché indispensabile per 
+     *    muovere il cursore (limit/offset) al blocco successivo, pur omettendola poi dalla scrittura sul CSV finale.
+     * 4. Genera (o appende a) un file CSV in locale inserendo il marcatore BOM per la compatibilità UTF-8.
+     * 5. Segnala al Javascript client quando il blocco è concluso e restituisce l'URL di download finale se 
+     *    l'estrazione è terminata.
+     * 
+     * NOTA: Il `$limit` attualmente è forzato a 5 per facilitare i test architetturali sul Chunking, 
+     * dovrà essere aumentato (es. 500/1000) per la produzione.
+     *
+     * @param array $posts I parametri filtrati inviati dal client e i payload di stato
+     * @param int|null $lastId L'ID su cui si è fermata l'ultima estrazione (il "Cursore")
+     * @param string|null $fileName Il nome del file CSV temporaneo generato (mantenuto tra una chiamata e l'altra)
+     * @return array Struttura dati complessa per mantenere in sync Frontend e Backend (esito, blocco completato, url)
+     */
     public function generate(array $posts, ?int $lastId = null, ?string $fileName = null): array
     {
         /* Recuperiamo il conteggio precedente o partiamo da zero */

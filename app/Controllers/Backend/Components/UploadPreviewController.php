@@ -13,7 +13,8 @@ use App\Models\Backend\Components\UploadPreviewModel;
 class UploadPreviewController extends BackendController 
 {
     /**
-     * @var UploadPreviewModel Istanza del modello responsabile della validazione, elaborazione e salvataggio fisico dei file immagine
+     * Istanza del modello responsabile della validazione, elaborazione e salvataggio fisico dei file immagine
+     * @var UploadPreviewModel 
      */
     protected UploadPreviewModel $uploadPreview;
 

@@ -20,14 +20,16 @@ use App\Controllers\Backend\BackendController;
 class TokensController extends BackendController 
 {
     /**
-     * @var TokensModel Istanza del modello di riferimento per le operazioni sui token. Si occupa dell'interrogazione 
+     * Istanza del modello di riferimento per le operazioni sui token. Si occupa dell'interrogazione 
      * del database, dell'applicazione dei filtri di ricerca e della cancellazione fisica dei record.
+     * @var TokensModel 
      */
     protected TokensModel $tokensModel;
 
     /**
-     * @var TokensClass Istanza della libreria di supporto contenente logiche dedicate ai token, utile per 
+     * Istanza della libreria di supporto contenente logiche dedicate ai token, utile per 
      * isolare dal controller le operazioni di formattazione e preparazione avanzata dei dati.
+     * @var TokensClass 
      */
     protected TokensClass $tokensClass;
 

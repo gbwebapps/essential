@@ -15,39 +15,53 @@ use App\Models\Backend\BackendModel;
 class AuditsModel extends BackendModel
 {
     /**
-     * @var string Nome della tabella principale di riferimento per le interrogazioni del modello.
+     * Nome della tabella principale di riferimento per le interrogazioni del modello.
+     * 
+     * @var string 
      */
     protected ?string $module = 'admins_audits';
 
     /**
-     * @var string Colonna di default utilizzata per ordinare i risultati al caricamento della pagina.
+     * Colonna di default utilizzata per ordinare i risultati al caricamento della pagina.
+     * 
+     * @var string 
      */
     protected ?string $defaultColumn = 'id';
 
     /**
-     * @var array Whitelist dei parametri di paginazione accettati dal server (pagina, righe, ordine, colonna).
+     * Whitelist dei parametri di paginazione accettati dal server (pagina, righe, ordine, colonna).
+     * 
+     * @var array 
      */
     protected array $showAllAllowedFields = ['column', 'order', 'page', 'rows', 'searchFields'];
 
     /**
-     * @var array Elenco delle colonne su cui l'operatore è autorizzato a cliccare per ordinare la tabella.
+     * Elenco delle colonne su cui l'operatore è autorizzato a cliccare per ordinare la tabella.
+     * 
+     * @var array 
      */
     protected array $allowedOrderColumns = ['username', 'action', 'section', 'details']; 
 
     /**
-     * @var array Whitelist dei campi di database abilitati per la ricerca tramite testo libero.
+     * Whitelist dei campi di database abilitati per la ricerca tramite testo libero.
+     * 
+     * @var array 
      */
     protected array $showAllSearchAllowedFields = ['username', 'section', 'action', 'details']; 
 
     /**
-     * @var array Whitelist delle colonne di database filtrabili tramite un intervallo temporale (Da/A).
+     * Whitelist delle colonne di database filtrabili tramite un intervallo temporale (Da/A).
+     * 
+     * @var array 
      */
     protected array $showAllSearchAllowedDates = ['created_at'];
 
     /**
-     * @var string Query SQL principale per caricare la tabella dei dati. 
+     * Query SQL principale per caricare la tabella dei dati. 
      * Esegue una JOIN con la tabella `admins` per recuperare i dettagli anagrafici e i permessi 
      * di chi ha eseguito l'azione, mostrando così un quadro completo dell'evento.
+     * 
+     * @var string 
      */
     protected ?string $getDataQuery = "select admins_audits.id, admin_uuid, username, action, section, details, ip_address, user_agent, admins_audits.created_at, superadmin 
                                        from admins_audits 
@@ -56,8 +70,10 @@ class AuditsModel extends BackendModel
                                        where 1 = 1";
 
     /**
-     * @var string Query SQL essenziale per calcolare il numero totale delle attività registrate, 
+     * Query SQL essenziale per calcolare il numero totale delle attività registrate, 
      * necessaria al frontend per creare i bottoni della paginazione.
+     * 
+     * @var string 
      */
     protected ?string $getNumRowsQuery = 'select count(*) as count from admins_audits where 1 = 1';
 

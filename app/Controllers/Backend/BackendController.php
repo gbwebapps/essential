@@ -22,42 +22,50 @@ use App\Libraries\RegExp;
 abstract class BackendController extends BaseController 
 {
     /**
-     * @var array Array di helper precaricati da CodeIgniter per essere disponibili in tutto il backend.
+     * Array di helper precaricati da CodeIgniter per essere disponibili in tutto il backend.
+     * @var array 
      */
     protected $helpers = ['date', 'array', 'cookie', 'settings'];
 
     /**
-     * @var array Array associativo globale utilizzato per passare variabili e contesti strutturati alle viste.
+     * Array associativo globale utilizzato per passare variabili e contesti strutturati alle viste.
+     * @var array 
      */
     protected array $data = [];
 
     /**
-     * @var Session Istanza del gestore nativo delle sessioni di CodeIgniter.
+     * Istanza del gestore nativo delle sessioni di CodeIgniter.
+     * @var Session 
      */
     protected Session $session;
 
     /**
-     * @var BackendClass Istanza della classe helper contenente le logiche di supporto e formattazione generali.
+     * Istanza della classe helper contenente le logiche di supporto e formattazione generali.
+     * @var BackendClass 
      */
     protected BackendClass $backendClass;
 
     /**
-     * @var RegExp Istanza del servizio dedicato alla validazione e manipolazione tramite espressioni regolari.
+     * Istanza del servizio dedicato alla validazione e manipolazione tramite espressioni regolari.
+     * @var RegExp 
      */
     protected RegExp $regexp;
 
     /**
-     * @var array Elenco dei percorsi per i fogli di stile (CSS) personalizzati che devono essere accodati al rendering.
+     * Elenco dei percorsi per i fogli di stile (CSS) personalizzati che devono essere accodati al rendering.
+     * @var array 
      */
     protected array $customCss = [];
 
     /**
-     * @var array Elenco dei percorsi per gli script (JS) personalizzati che devono essere accodati al rendering.
+     * Elenco dei percorsi per gli script (JS) personalizzati che devono essere accodati al rendering.
+     * @var array 
      */
     protected array $customJs  = [];
 
     /**
-     * @var object|null Oggetto rappresentante l'amministratore attualmente autenticato.
+     * Oggetto rappresentante l'amministratore attualmente autenticato.
+     * @var object|null 
      */
     protected ?object $currentAdmin;
 

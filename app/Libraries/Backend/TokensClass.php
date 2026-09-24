@@ -14,15 +14,17 @@ use App\Models\Backend\TokensModel;
 class TokensClass 
 {
 	/**
-	 * @var TokensModel Istanza del modello di riferimento, a disposizione per eventuali interrogazioni 
+	 * Istanza del modello di riferimento, a disposizione per eventuali interrogazioni 
 	 * propedeutiche alla costruzione dell'interfaccia di gestione dei token di autenticazione.
+	 * @var TokensModel 
 	 */
 	protected TokensModel $tokensModel;
 
 	/**
 	 * Inizializza la libreria di supporto iniettando il modello associato ai token.
+	 * $tokensModel Il modello preposto alla gestione e all'estrazione dei token di sistema
 	 *
-	 * @param TokensModel $tokensModel Il modello preposto alla gestione e all'estrazione dei token di sistema
+	 * @param TokensModel 
 	 */
 	public function __construct(TokensModel $tokensModel) 
 	{

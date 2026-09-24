@@ -19,17 +19,20 @@ use App\Controllers\Backend\BackendController;
 class SettingsController extends BackendController 
 {
     /**
-     * @var SettingsModel Istanza del modello che esegue query SQL di base (senza l'impiego dell'ORM) per manipolare la tabella delle configurazioni.
+     * Istanza del modello che esegue query SQL di base (senza l'impiego dell'ORM) per manipolare la tabella delle configurazioni.
+     * @var SettingsModel 
      */
     protected SettingsModel $settingsModel;
 
     /**
-     * @var SettingsClass Istanza della classe di supporto che genera o estrae dizionari fissi, quali elenchi dei fusi orari, delle lingue o formati ammessi.
+     * Istanza della classe di supporto che genera o estrae dizionari fissi, quali elenchi dei fusi orari, delle lingue o formati ammessi.
+     * @var SettingsClass 
      */
     protected SettingsClass $settingsClass;
 
     /**
-     * @var array Elenco che definisce i soli ambiti (namespace) consentiti dalla logica del controller, atto a respingere richieste arbitrarie di configurazione.
+     * Elenco che definisce i soli ambiti (namespace) consentiti dalla logica del controller, atto a respingere richieste arbitrarie di configurazione.
+     * @var array 
      */
     protected array $allowedEnvs = ['general', 'auth', 'upload', 'email'];
 

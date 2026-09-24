@@ -13,7 +13,8 @@ namespace App\Libraries;
 class Token
 {
     /**
-     * @var string La stringa alfanumerica rappresentante il token nel suo formato in chiaro.
+     * La stringa alfanumerica rappresentante il token nel suo formato in chiaro.
+     * @var string 
      */
     protected string $token;
 

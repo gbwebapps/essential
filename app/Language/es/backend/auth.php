@@ -36,6 +36,9 @@ return [
 		'login' => 'Iniciar sesión',
 		'resetPassword' => 'Restablecer contraseña'
 	],
+	'errors' => [
+	    'passwordFormatNotValid' => 'La contraseña no cumple con los requisitos de seguridad.',
+	],
 	'audits' => [
 	    'loginRefused'      => 'Intento de inicio de sesión con cuenta inexistente',
 	    'loginBlocked'      => 'Acceso denegado, cuenta bloqueada %s %s',

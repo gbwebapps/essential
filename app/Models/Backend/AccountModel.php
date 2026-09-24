@@ -15,24 +15,32 @@ use App\Models\Backend\BackendModel;
 class AccountModel extends BackendModel
 {
 	/**
-	 * @var string|null Identificativo del modulo corrente, impiegato per la risoluzione dinamica delle viste (es. template e-mail) e dei percorsi.
+	 * Identificativo del modulo corrente, impiegato per la risoluzione dinamica delle viste (es. template e-mail) e dei percorsi.
+	 * 
+	 * @var string|null 
 	 */
 	protected ?string $module = 'account';
 
 	/**
-	 * @var array Whitelist dei campi consentiti durante l'aggiornamento del profilo.
+	 * Whitelist dei campi consentiti durante l'aggiornamento del profilo.
 	 * Previene vulnerabilità di Mass Assignment filtrando severamente l'array $posts in ingresso.
+	 * 
+	 * @var array 
 	 */
 	protected array $editAllowedFields = ['firstname', 'lastname', 'email', 'phone', 'note'];
 
 	/**
-	 * @var array Whitelist dei campi ammessi per l'operazione di revoca (eliminazione) di un token di sessione.
+	 * Whitelist dei campi ammessi per l'operazione di revoca (eliminazione) di un token di sessione.
+	 * 
+	 * @var array 
 	 */
 	protected array $deleteTokenAllowedFields = ['id'];
 
 	/**
-	 * @var array Elenco delle chiavi da confrontare per verificare l'effettiva mutazione dei dati 
+	 * Elenco delle chiavi da confrontare per verificare l'effettiva mutazione dei dati 
 	 * prima di innescare una query di UPDATE a database (ottimizzazione delle performance).
+	 * 
+	 * @var array 
 	 */
     protected array $toCompare = ['firstname', 'lastname', 'email', 'phone', 'note'];
 

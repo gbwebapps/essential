@@ -17,12 +17,14 @@ use App\Controllers\Backend\BackendController;
 class AuditsController extends BackendController 
 {
     /**
-     * @var AuditsModel Istanza del modello dedicato all'interazione con il database per il recupero e la ricerca dei record di audit
+     * Istanza del modello dedicato all'interazione con il database per il recupero e la ricerca dei record di audit
+     * @var AuditsModel 
      */
     protected AuditsModel $auditsModel;
 
     /**
-     * @var AuditsClass Istanza della libreria contenente le logiche di formattazione e di supporto specifiche per gli audit
+     * Istanza della libreria contenente le logiche di formattazione e di supporto specifiche per gli audit
+     * @var AuditsClass 
      */
     protected AuditsClass $auditsClass;
 

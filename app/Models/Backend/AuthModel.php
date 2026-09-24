@@ -16,35 +16,47 @@ use App\Models\Backend\BackendModel;
 class AuthModel extends BackendModel
 {
     /**
-     * @var object Contenitore per i parametri di configurazione globali del modulo Auth 
+     * Contenitore per i parametri di configurazione globali del modulo Auth 
      * (es. limiti di tentativi, durata sessioni, espressioni regolari per le password).
+     * 
+     * @var object 
      */
     private object $config;
 
     /**
-     * @var string|null Nome identificativo del modulo corrente, utilizzato per instradare i log o risolvere i template email.
+     * Nome identificativo del modulo corrente, utilizzato per instradare i log o risolvere i template email.
+     * 
+     * @var string|null 
      */
     public ?string $module = 'auth';
 
     /**
-     * @var array Whitelist dei campi HTTP POST consentiti in fase di Login.
+     * Whitelist dei campi HTTP POST consentiti in fase di Login.
      * Blocca l'immissione di parametri non previsti prima dell'elaborazione delle credenziali.
+     * 
+     * @var array 
      */
     protected array $loginAllowedFields = ['email', 'password', 'rememberMe']; 
 
     /**
-     * @var array Whitelist dei campi consentiti per la richiesta di reset della password (solo email).
+     * Whitelist dei campi consentiti per la richiesta di reset della password (solo email).
+     * 
+     * @var array 
      */
     protected array $resetPasswordAllowedFields = ['email'];
 
     /**
-     * @var array Whitelist dei campi consentiti durante l'impostazione fisica di una nuova password 
+     * Whitelist dei campi consentiti durante l'impostazione fisica di una nuova password 
      * (tramite link di ripristino o attivazione).
+     * 
+     * @var array 
      */
     protected array $setPasswordAllowedFields = ['password', 'token'];
 
     /**
-     * @var array Whitelist dei campi consentiti durante la verifica OTP per il Secondo Fattore di Autenticazione (2FA).
+     * Whitelist dei campi consentiti durante la verifica OTP per il Secondo Fattore di Autenticazione (2FA).
+     * 
+     * @var array 
      */
     protected array $verifyAllowedFields = ['code'];
 
@@ -80,7 +92,7 @@ class AuthModel extends BackendModel
                 'label' => 'Password',
                 'rules' => ['required', 'min_length[8]', 'max_length[255]', "regex_match[{$this->config->passwordRegex}]"],
                 'errors' => [
-                    'regex_match' => 'La password non rispetta i requisiti di sicurezza.'
+                    'regex_match' => lang('backend/auth.errors.passwordFormatNotValid')
                 ]
             ]
         ];
@@ -119,7 +131,7 @@ class AuthModel extends BackendModel
                 'label' => 'Password',
                 'rules' => ['required', "regex_match[{$this->config->passwordRegex}]"],
                 'errors' => [
-                    'regex_match' => 'La password non rispetta i requisiti di sicurezza.'
+                    'regex_match' => lang('backend/auth.errors.passwordFormatNotValid')
                 ]
             ], 
             'confirmPassword' => [

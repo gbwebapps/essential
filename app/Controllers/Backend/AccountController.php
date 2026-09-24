@@ -19,17 +19,20 @@ use App\Models\Backend\Components\GalleryOneImgModel;
 class AccountController extends BackendController 
 {
     /**
-     * @var AccountModel Istanza del modello dedicato alla gestione dei dati e delle operazioni sul database per l'account
+     * Istanza del modello dedicato alla gestione dei dati e delle operazioni sul database per l'account
+     * @var AccountModel 
      */
     protected AccountModel $accountModel;
 
     /**
-     * @var AccountClass Istanza della libreria contenente le logiche operative e di formattazione specifiche dell'account
+     * Istanza della libreria contenente le logiche operative e di formattazione specifiche dell'account
+     * @var AccountClass 
      */
     protected AccountClass $accountClass;
 
     /**
-     * @var GalleryOneImgModel Istanza del modello per la gestione e l'elaborazione dell'immagine di profilo (avatar)
+     * Istanza del modello per la gestione e l'elaborazione dell'immagine di profilo (avatar)
+     * @var GalleryOneImgModel 
      */
     protected GalleryOneImgModel $galleryOneImgModel;
 

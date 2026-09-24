@@ -12,7 +12,8 @@ use CodeIgniter\HTTP\ResponseInterface;
 class ExportController extends BackendController
 {
     /**
-     * @var ExportModel Istanza del modello dedicato alle logiche e all'estrazione dei dati per l'esportazione
+     * Istanza del modello dedicato alle logiche e all'estrazione dei dati per l'esportazione
+     * @var ExportModel 
      */
     private ExportModel $exportModel;
 

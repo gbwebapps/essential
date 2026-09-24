@@ -14,43 +14,59 @@ use App\Models\Backend\BackendModel;
 class TokensModel extends BackendModel
 {
     /**
-     * @var string Nome della tabella principale di riferimento per questo modello.
+     * Nome della tabella principale di riferimento per questo modello.
+     * 
+     * @var string 
      */
     protected ?string $module = 'admins_tokens';
 
     /**
-     * @var string Colonna utilizzata per l'ordinamento di default quando la pagina viene caricata.
+     * Colonna utilizzata per l'ordinamento di default quando la pagina viene caricata.
+     * 
+     * @var string 
      */
     protected ?string $defaultColumn = 'id';
 
     /**
-     * @var array Whitelist dei parametri di paginazione accettati dal server (es. numero pagina, righe per pagina).
+     * Whitelist dei parametri di paginazione accettati dal server (es. numero pagina, righe per pagina).
+     * 
+     * @var array 
      */
     protected array $showAllAllowedFields = ['column', 'order', 'page', 'rows', 'searchFields'];
 
     /**
-     * @var array Elenco delle colonne su cui l'utente è autorizzato a cliccare per ordinare la tabella.
+     * Elenco delle colonne su cui l'utente è autorizzato a cliccare per ordinare la tabella.
+     * 
+     * @var array 
      */
     protected array $allowedOrderColumns = ['email', 'token_create', 'token_expire', 'token_type']; 
 
     /**
-     * @var array Whitelist dei campi HTTP POST consentiti per l'operazione di cancellazione del token.
+     * Whitelist dei campi HTTP POST consentiti per l'operazione di cancellazione del token.
+     * 
+     * @var array 
      */
     protected array $delAllowedFields = ['id', 'uuid'];
 
     /**
-     * @var array Whitelist delle colonne di database abilitate per la ricerca tramite testo (es. cerca per email).
+     * Whitelist delle colonne di database abilitate per la ricerca tramite testo (es. cerca per email).
+     * 
+     * @var array 
      */
     protected array $showAllSearchAllowedFields = ['email', 'token_type']; 
 
     /**
-     * @var array Whitelist delle colonne di database abilitate per la ricerca tramite intervallo di date (Da/A).
+     * Whitelist delle colonne di database abilitate per la ricerca tramite intervallo di date (Da/A).
+     * 
+     * @var array 
      */
     protected array $showAllSearchAllowedDates = ['token_create'];
 
     /**
-     * @var string Query principale per caricare la tabella dei dati. 
+     * Query principale per caricare la tabella dei dati. 
      * Esegue una JOIN con la tabella `admins` per associare ogni token ai dati anagrafici del proprietario (nome, email, ecc.).
+     * 
+     * @var string 
      */
     protected ?string $getDataQuery = "select admins_tokens.*, admins.uuid, admins.firstname, admins.lastname, admins.email, admins.superadmin 
                                         from admins_tokens 
@@ -58,7 +74,9 @@ class TokensModel extends BackendModel
                                         on admins.uuid = admins_tokens.admin_uuid 
                                         where 1 = 1";
     /**
-     * @var string Query utilizzata dal motore di paginazione per contare il numero totale di record disponibili.
+     * Query utilizzata dal motore di paginazione per contare il numero totale di record disponibili.
+     * 
+     * @var string 
      */
     protected ?string $getNumRowsQuery = "select count(*) as count 
                                             from admins_tokens 
@@ -67,7 +85,9 @@ class TokensModel extends BackendModel
                                             where 1 = 1";
 
     /**
-     * @var string Query per recuperare i dettagli di un singolo token (e del suo proprietario) tramite il suo ID.
+     * Query per recuperare i dettagli di un singolo token (e del suo proprietario) tramite il suo ID.
+     * 
+     * @var string 
      */
     protected ?string $getUUIDQuery = "select admins_tokens.id, admins.uuid, admins.firstname, admins.lastname, admins.deleted_at, admins.superadmin 
                                         from admins_tokens 

@@ -14,17 +14,23 @@ use App\Models\Backend\BackendModel;
 class ToolsModel extends BackendModel
 {
 	/**
-	 * @var array Whitelist dei campi POST consentiti durante le operazioni di filtraggio o eliminazione degli Audit.
+	 * Whitelist dei campi POST consentiti durante le operazioni di filtraggio o eliminazione degli Audit.
+	 * 
+	 * @var array 
 	 */
 	protected array $manageAuditsAllowedFields = ['fromDate', 'toDate']; 
 
 	/**
-	 * @var array Whitelist dei campi POST consentiti durante le operazioni di filtraggio o eliminazione dei Log.
+	 * Whitelist dei campi POST consentiti durante le operazioni di filtraggio o eliminazione dei Log.
+	 * 
+	 * @var array 
 	 */
 	protected array $manageLogsAllowedFields = ['fromDate', 'toDate']; 
 
 	/**
-	 * @var array Elenco (Whitelist) delle cartelle interne che possono essere svuotate in sicurezza (es. log, cache).
+	 * Elenco (Whitelist) delle cartelle interne che possono essere svuotate in sicurezza (es. log, cache).
+	 * 
+	 * @var array 
 	 */
 	protected array $cleanableFolders = ['backups/database', 'backups/imports', 'cache', 'debugbar', 'exports', 'logs', 'session', 'uploads/staging'];1
 

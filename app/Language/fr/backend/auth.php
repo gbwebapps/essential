@@ -36,6 +36,9 @@ return [
 		'login' => 'Se connecter', 
 		'resetPassword' => 'Réinitialiser le mot de passe'
 	], 
+	'errors' => [
+	    'passwordFormatNotValid' => 'Le mot de passe ne répond pas aux exigences de sécurité.',
+	],
 	'audits' => [
 	    'loginRefused'      => 'Tentative de connexion avec un compte inexistant',
 	    'loginBlocked'      => 'Accès refusé, compte bloqué %s %s',

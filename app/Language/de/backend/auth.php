@@ -36,6 +36,9 @@ return [
 		'login' => 'Anmelden', 
 		'resetPassword' => 'Passwort zurücksetzen'
 	], 
+	'errors' => [
+	    'passwordFormatNotValid' => 'Das Passwort erfüllt nicht die Sicherheitsanforderungen.',
+	],
 	'audits' => [
 	    'loginRefused'      => 'Anmeldeversuch mit nicht existierendem Konto',
 	    'loginBlocked'      => 'Zugriff verweigert, Konto gesperrt %s %s',

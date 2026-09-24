@@ -12,7 +12,8 @@ namespace App\Libraries;
 class EmailOtpService
 {
     /**
-     * @var \CodeIgniter\Database\BaseConnection Istanza della connessione al database per la persistenza dei codici temporanei.
+     * Istanza della connessione al database per la persistenza dei codici temporanei.
+     * @var \CodeIgniter\Database\BaseConnection 
      */
     protected $db;
 

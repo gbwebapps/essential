@@ -12,7 +12,8 @@ use CodeIgniter\HTTP\ResponseInterface;
 class ImportController extends BackendController
 {
     /**
-     * @var ImportModel Istanza del modello responsabile della logica di validazione, del parsing e del salvataggio dei dati importati
+     * Istanza del modello responsabile della logica di validazione, del parsing e del salvataggio dei dati importati
+     * @var ImportModel 
      */
     private ImportModel $importModel;
 

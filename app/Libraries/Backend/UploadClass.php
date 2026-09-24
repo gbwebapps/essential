@@ -15,7 +15,8 @@ use CodeIgniter\HTTP\Files\UploadedFile;
 class UploadClass
 {
     /**
-     * @var object Contenitore delle direttive di configurazione per i caricamenti (es. dimensioni di ritaglio, policy di sovrascrittura).
+     * Contenitore delle direttive di configurazione per i caricamenti (es. dimensioni di ritaglio, policy di sovrascrittura).
+     * @var object 
      */
     private object $config;
 

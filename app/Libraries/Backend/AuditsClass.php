@@ -14,15 +14,17 @@ use App\Models\Backend\AuditsModel;
 class AuditsClass 
 {
 	/**
-	 * @var AuditsModel Istanza del modello di riferimento, a disposizione per eventuali interrogazioni 
+	 * AuditsModel Istanza del modello di riferimento, a disposizione per eventuali interrogazioni 
 	 * propedeutiche alla costruzione dell'interfaccia o per la lettura delle opzioni di tracciamento.
+	 * @var 
 	 */
 	protected AuditsModel $auditsModel;
 
 	/**
 	 * Inizializza la libreria di supporto iniettando il modello associato alla sezione degli audit log.
+	 * $auditsModel Il modello preposto alla gestione e all'estrazione dei log di sistema
 	 *
-	 * @param AuditsModel $auditsModel Il modello preposto alla gestione e all'estrazione dei log di sistema
+	 * @param AuditsModel 
 	 */
 	public function __construct(AuditsModel $auditsModel) 
 	{

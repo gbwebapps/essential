@@ -12,7 +12,8 @@ use CodeIgniter\HTTP\ResponseInterface;
 class GalleryOneController extends BackendController
 {
 	/**
-	 * @var GalleryOneImgModel Istanza del modello dedicato alla gestione dei file e dei record della galleria
+	 * Istanza del modello dedicato alla gestione dei file e dei record della galleria
+	 * @var GalleryOneImgModel 
 	 */
     private GalleryOneImgModel $galleryModel;
 

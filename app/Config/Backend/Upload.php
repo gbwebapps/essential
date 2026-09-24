@@ -10,52 +10,72 @@ use CodeIgniter\Config\BaseConfig;
 class Upload extends BaseConfig
 {
 	/**
-	 * @var int Specifica se abilitare la ridenominazione automatica delle immagini caricate
+	 * Specifica se abilitare la ridenominazione automatica delle immagini caricate
+	 * 
+	 * @var int 
 	 */
 	public int $renameImages = 0;
 
 	/**
-	 * @var int Specifica se consentire la sovrascrizione dei file esistenti con lo stesso nome
+	 * Specifica se consentire la sovrascrizione dei file esistenti con lo stesso nome
+	 * 
+	 * @var int 
 	 */
 	public int $overwriteImages = 0;
 
 	/**
-	 * @var int Dimensione orizzontale in pixel per il ridimensionamento medio delle immagini
+	 * Dimensione orizzontale in pixel per il ridimensionamento medio delle immagini
+	 * 
+	 * @var int 
 	 */
 	public int $resizeMediumX = 960;
 
 	/**
-	 * @var int Dimensione verticale in pixel per il ridimensionamento medio delle immagini
+	 * Dimensione verticale in pixel per il ridimensionamento medio delle immagini
+	 * 
+	 * @var int 
 	 */
 	public int $resizeMediumY = 540;
 
 	/**
-	 * @var int Dimensione orizzontale in pixel per la versione ridotta (miniatura) delle immagini
+	 * Dimensione orizzontale in pixel per la versione ridotta (miniatura) delle immagini
+	 * 
+	 * @var int 
 	 */
 	public int $resizeSmallX = 96;
 
 	/**
-	 * @var int Dimensione verticale in pixel per la versione ridotta (miniatura) delle immagini
+	 * Dimensione verticale in pixel per la versione ridotta (miniatura) delle immagini
+	 * 
+	 * @var int 
 	 */
 	public int $resizeSmallY = 54;
 
 	/**
-	 * @var int Dimensione massima consentita per il file caricato espressa in kilobyte
+	 * Dimensione massima consentita per il file caricato espressa in kilobyte
+	 * 
+	 * @var int 
 	 */
 	public int $maxFileSize = 4096;
 
 	/**
-	 * @var int Larghezza massima consentita in pixel per le immagini caricate
+	 * Larghezza massima consentita in pixel per le immagini caricate
+	 * 
+	 * @var int 
 	 */
 	public int $maxImageX = 1920;
 
 	/**
-	 * @var int Altezza massima consentita in pixel per le immagini caricate
+	 * Altezza massima consentita in pixel per le immagini caricate
+	 * 
+	 * @var int 
 	 */
 	public int $maxImageY = 1080;
 
 	/**
-	 * @var string Elenco delle estensioni di file consentite per l'upload
+	 * Elenco delle estensioni di file consentite per l'upload
+	 * 
+	 * @var string 
 	 */
 	public string $allowedExtensions = 'png|jpg|jpeg|webp';
 }

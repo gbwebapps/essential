@@ -20,12 +20,14 @@ use App\Controllers\Backend\BackendController;
 class LogsController extends BackendController 
 {
     /**
-     * @var LogsModel Istanza del modello predisposto all'estrazione, filtraggio e gestione dei record dei log dal database.
+     * Istanza del modello predisposto all'estrazione, filtraggio e gestione dei record dei log dal database.
+     * @var LogsModel 
      */
     protected LogsModel $logsModel;
 
     /**
-     * @var LogsClass Istanza della libreria che fornisce routine specifiche per la formattazione visiva dei log e l'analisi del client.
+     * Istanza della libreria che fornisce routine specifiche per la formattazione visiva dei log e l'analisi del client.
+     * @var LogsClass 
      */
     protected LogsClass $logsClass;
 

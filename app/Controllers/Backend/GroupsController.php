@@ -19,12 +19,14 @@ use App\Controllers\Backend\BackendController;
 class GroupsController extends BackendController 
 {
     /**
-     * @var GroupsModel Istanza del modello per le operazioni CRUD sui gruppi e la gestione delle tabelle dei permessi associati.
+     * Istanza del modello per le operazioni CRUD sui gruppi e la gestione delle tabelle dei permessi associati.
+     * @var GroupsModel 
      */
     protected GroupsModel $groupsModel;
 
     /**
-     * @var GroupsClass Istanza della libreria helper contenente funzioni per la formattazione dei dati relativi ai gruppi.
+     * Istanza della libreria helper contenente funzioni per la formattazione dei dati relativi ai gruppi.
+     * @var GroupsClass 
      */ 
     protected GroupsClass $groupsClass;
 

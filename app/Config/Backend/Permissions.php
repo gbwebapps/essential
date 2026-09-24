@@ -10,7 +10,9 @@ use CodeIgniter\Config\BaseConfig;
 class Permissions extends BaseConfig
 {
 	/**
-	 * @var array Elenco dei permessi di sistema configurati
+	 * Elenco dei permessi di sistema configurati
+	 * 
+	 * @var array 
 	 */
 	public array $permissions = [];
 

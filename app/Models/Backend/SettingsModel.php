@@ -4,7 +4,7 @@ namespace App\Models\Backend;
 
 use App\Models\Backend\BackendModel;
 
-/*
+/**
  * Modello principale per la gestione delle Impostazioni globali del sistema (Settings).
  * 
  * Centralizza il recupero, la validazione e il salvataggio massivo delle configurazioni. 
@@ -14,8 +14,10 @@ use App\Models\Backend\BackendModel;
  */
 class SettingsModel extends BackendModel
 {
-    /*
-     * @var array Whitelist dei campi consentiti per le impostazioni Generali (lingua, data, fuso orario).
+    /**
+     * Whitelist dei campi consentiti per le impostazioni Generali (lingua, data, fuso orario).
+     * 
+     * @var array 
      */
     private array $allowedGeneralFields = [
         'timezone',
@@ -23,8 +25,10 @@ class SettingsModel extends BackendModel
         'dateFormat'
     ];
 
-    /*
-     * @var array Whitelist dei campi consentiti per le impostazioni di Autenticazione (sicurezza e sessioni).
+    /**
+     * Whitelist dei campi consentiti per le impostazioni di Autenticazione (sicurezza e sessioni).
+     * 
+     * @var array 
      */
 	private array $allowedAuthFields = [
         'attempts',
@@ -43,8 +47,10 @@ class SettingsModel extends BackendModel
         'activationTime',
     ];
 
-    /*
-     * @var array Whitelist dei campi consentiti per le impostazioni di Upload (dimensionamento, policy immagini).
+    /**
+     * Whitelist dei campi consentiti per le impostazioni di Upload (dimensionamento, policy immagini).
+     * 
+     * @var array 
      */
     private array $allowedUploadFields = [
         'renameImages',
@@ -59,8 +65,10 @@ class SettingsModel extends BackendModel
         'allowedExtensions'
     ];
 
-    /*
-     * @var array Whitelist dei campi consentiti per le impostazioni E-mail (configurazione SMTP).
+    /**
+     * Whitelist dei campi consentiti per le impostazioni E-mail (configurazione SMTP).
+     * 
+     * @var array 
      */
     private array $allowedEmailFields = [
         'fromEmail',
@@ -78,22 +86,26 @@ class SettingsModel extends BackendModel
         'priority',
     ];
 
-    /*
-     * @var array Cache in memoria. Conserva i dati letti dal database per ogni sezione (namespace). 
+    /**
+     * Cache in memoria. Conserva i dati letti dal database per ogni sezione (namespace). 
      * Se viene richiesto più volte lo stesso gruppo di impostazioni, il sistema lo legge da qui senza interrogare di nuovo il DB.
+     * 
+     * @var array 
      */
     protected array $settingsCache = [];
 
-    /*
-     * @var array Elenco di chiavi (impostazioni) critiche che, se modificate, richiedono 
+    /**
+     * Elenco di chiavi (impostazioni) critiche che, se modificate, richiedono 
      * un ricaricamento forzato o particolare attenzione da parte del frontend (es. cambio lingua).
+     * 
+     * @var array 
      */
     protected array $requiresReloadFields = [
         'language',
         'timezone'
     ];
 
-    /*
+    /**
      * Metodo di inizializzazione nativo di CodeIgniter.
      * 
      * Prepara il modello caricando le dipendenze essenziali ereditate dal BackendModel padre.
@@ -103,7 +115,7 @@ class SettingsModel extends BackendModel
 		parent::initModel();
 	}
 
-    /*
+    /**
      * Fornisce le regole di validazione per i parametri di Autenticazione.
      * 
      * Verifica che i tempi di sessione, limiti di tentativi e parametri 2FA inviati 
@@ -174,7 +186,7 @@ class SettingsModel extends BackendModel
         ];
     }
 
-    /*
+    /**
      * Fornisce le regole di validazione per i parametri di Upload.
      * 
      * Verifica, ad esempio, che i limiti di peso siano numeri validi, o che le estensioni 
@@ -233,7 +245,7 @@ class SettingsModel extends BackendModel
         ];
     }
 
-    /*
+    /**
      * Fornisce le regole di validazione per i parametri E-mail (SMTP).
      * 
      * Contiene una logica dinamica: se l'operatore seleziona "smtp" come protocollo, 
@@ -244,7 +256,7 @@ class SettingsModel extends BackendModel
      */
     public function emailSettingsValidateRules(array $posts = []): array
     {
-        /* Verifichiamo se il protocollo inviato dal form è smtp */
+        /** Verifichiamo se il protocollo inviato dal form è smtp */
         $isSmtp = (isset($posts['protocol']) && $posts['protocol'] === 'smtp');
 
         return [
@@ -266,7 +278,7 @@ class SettingsModel extends BackendModel
             ],
             'SMTPHost' => [
                 'label' => lang('backend/settings.labels.SMTPHost'),
-                /* Se è smtp forziamo required, altrimenti permit_empty */
+                /** Se è smtp forziamo required, altrimenti permit_empty */
                 'rules' => [$isSmtp ? 'required' : 'permit_empty', 'regex_match[/^[a-zA-Z0-9.-]+$/]', 'max_length[255]'],
             ],
             'SMTPPort' => [
@@ -304,7 +316,7 @@ class SettingsModel extends BackendModel
         ];
     }
 
-    /*
+    /**
      * Fornisce le regole di validazione per le impostazioni Generali.
      * 
      * Controlla che le stringhe inviate (fuso orario, formato data, lingua) corrispondano 
@@ -331,7 +343,7 @@ class SettingsModel extends BackendModel
         ];
     }
 
-    /*
+    /**
      * Recupera e fonde le impostazioni lette dal database con i valori di default.
      * 
      * Il cuore di questo modello. Controlla prima se il gruppo di chiavi è già in memoria (cache). 
@@ -345,7 +357,7 @@ class SettingsModel extends BackendModel
      */
     public function getSettings(string $namespace, ?array $keys = null): array
     {
-        /* Se il gruppo non è ancora presente nella nostra cache in-memory, lo estraiamo dal DB */
+        /** Se il gruppo non è ancora presente nella nostra cache in-memory, lo estraiamo dal DB */
         if ( ! isset($this->settingsCache[$namespace])) :
             
             $sql = "SELECT `key`, `value` FROM `settings` WHERE `class` = ?";
@@ -357,15 +369,15 @@ class SettingsModel extends BackendModel
                 $dbSettings[$row['key']] = $row['value'];
             endforeach;
 
-            /* Salviamo il blocco intero nella variabile di classe */
+            /** Salviamo il blocco intero nella variabile di classe */
             $this->settingsCache[$namespace] = $dbSettings;
 
         endif;
 
-        /* Recuperiamo i valori memorizzati nella nostra variabile del modello */
+        /** Recuperiamo i valori memorizzati nella nostra variabile del modello */
         $cachedData = $this->settingsCache[$namespace];
 
-        /* Carichiamo i valori nativi di fallback presenti nel file Config di CodeIgniter */
+        /** Carichiamo i valori nativi di fallback presenti nel file Config di CodeIgniter */
         $configClass = '\\Config\\' . $namespace;
         $defaultSettings = [];
 
@@ -374,10 +386,10 @@ class SettingsModel extends BackendModel
             $defaultSettings = get_object_vars($configInstance);
         endif;
 
-        /* Uniamo i default con i dati in-memory (il DB vince sui default) */
+        /** Uniamo i default con i dati in-memory (il DB vince sui default) */
         $finalSettings = array_merge($defaultSettings, $cachedData);
 
-        /* Se sono state richieste chiavi specifiche, filtriamo l'array */
+        /** Se sono state richieste chiavi specifiche, filtriamo l'array */
         if ($keys !== null) :
             $finalSettings = array_intersect_key($finalSettings, array_flip($keys));
         endif;
@@ -385,7 +397,7 @@ class SettingsModel extends BackendModel
         return $finalSettings;
     }
 
-    /*
+    /**
      * Controlla fisicamente sul database se esiste almeno un salvataggio per un dato namespace.
      * 
      * Viene usato prima di provare a cancellare o aggiornare dati per capire 
@@ -403,7 +415,7 @@ class SettingsModel extends BackendModel
         return isset($row['total']) && (int) $row['total'] > 0;
     }
 
-    /*
+    /**
      * Salva (o aggiorna) massivamente le impostazioni inviate dall'interfaccia web.
      * 
      * Il metodo prende i dati, li filtra in base alla Whitelist della sezione (scartando input pericolosi). 
@@ -418,15 +430,15 @@ class SettingsModel extends BackendModel
      */
     public function saveSettings(string $namespace, array $posts): ?array
     {
-        /* 1. Recuperiamo la lista dei campi consentiti in base al namespace */
+        /** 1. Recuperiamo la lista dei campi consentiti in base al namespace */
         $section = str_replace('Backend\\', '', $namespace);
         $propertyName = 'allowed' . $section . 'Fields';
         $allowedFields = isset($this->{$propertyName}) ? $this->{$propertyName} : [];
 
-        /* 2. Filtriamo immediatamente l'input lasciando solo i campi autorizzati */
+        /** 2. Filtriamo immediatamente l'input lasciando solo i campi autorizzati */
         $posts = $this->checkAllowedFields($posts, $allowedFields);
 
-        /* 3. Controllo di sbarramento e rilevazione campi critici */
+        /** 3. Controllo di sbarramento e rilevazione campi critici */
         if ($this->hasDatabaseSettings($namespace)) :
 
             $changedKeys = $this->getChangedKeys($namespace, $posts);
@@ -437,7 +449,7 @@ class SettingsModel extends BackendModel
 
         endif;
 
-        /* 4. Svuota la cache locale */
+        /** 4. Svuota la cache locale */
         if (isset($this->settingsCache[$namespace])) :
             unset($this->settingsCache[$namespace]);
         endif;
@@ -446,7 +458,7 @@ class SettingsModel extends BackendModel
             $posts['allowedExtensions'] = implode('|', $posts['allowedExtensions']);
         endif;
 
-        /* 5. Costruzione della scrittura massiva */
+        /** 5. Costruzione della scrittura massiva */
         $valuesQueries = [];
         $params = [];
 
@@ -467,7 +479,7 @@ class SettingsModel extends BackendModel
         return ['result' => true, 'message' => lang('backend/settings.messages.saveSuccess')];
     }
 
-    /*
+    /**
      * Confronta i dati in arrivo con quelli salvati e restituisce la lista esatta delle chiavi modificate.
      * 
      * Estrae le impostazioni attuali (compresi i default uniti col DB), prende i nuovi input 
@@ -489,7 +501,7 @@ class SettingsModel extends BackendModel
                 continue;
             endif;
 
-            /* Normalizzazione immediata */
+            /** Normalizzazione immediata */
             if (is_array($value)) :
                 $filtered = array_filter($value);
                 sort($filtered);
@@ -511,7 +523,7 @@ class SettingsModel extends BackendModel
         return $changed;
     }
 
-    /*
+    /**
      * Ripristina un'intera sezione ai suoi valori di default ("Ripristina predefiniti").
      * 
      * Esegue un controllo rapido per capire se ci sono personalizzazioni nel DB. Se ci sono, 
@@ -523,17 +535,17 @@ class SettingsModel extends BackendModel
      */
     public function deleteSettings(string $namespace): bool
     {
-        /* Verifica preliminare se ci sono effettivamente dati da cancellare */
+        /** Verifica preliminare se ci sono effettivamente dati da cancellare */
         if ( ! $this->hasDatabaseSettings($namespace)):
             return false;
         endif;
 
-        /* Svuota la cache locale in memoria per questo namespace */
+        /** Svuota la cache locale in memoria per questo namespace */
         if (isset($this->settingsCache[$namespace])) :
             unset($this->settingsCache[$namespace]);
         endif;
 
-        /* Esegue l'eliminazione globale del namespace */
+        /** Esegue l'eliminazione globale del namespace */
         $sql = "delete from `settings` where `class` = ?";
         $this->db->query($sql, [$namespace]);
 
@@ -543,7 +555,7 @@ class SettingsModel extends BackendModel
         return true;
     }
 
-    /*
+    /**
      * Rilevatore rapido di cambiamenti (True/False).
      * 
      * Simile a `getChangedKeys()`, ma ottimizzato per le performance. Al primo campo che 
@@ -563,7 +575,7 @@ class SettingsModel extends BackendModel
                 continue;
             endif;
 
-            /* Normalizzazione immediata: se è un array, lo ordina e lo unisce con il pipe */
+            /** Normalizzazione immediata: se è un array, lo ordina e lo unisce con il pipe */
             if (is_array($value)) :
                 $filtered = array_filter($value);
                 sort($filtered);

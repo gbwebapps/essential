@@ -36,6 +36,9 @@ return [
 		'login' => 'Accedi', 
 		'resetPassword' => 'Resetta password'
 	], 
+	'errors' => [
+		'passwordFormatNotValid' => 'La password non rispetta i requisiti di sicurezza.',
+	], 
 	'audits' => [
 		'loginRefused' => 'Tentativo di accesso con account inesistente', 
 		'loginBlocked' => 'Accesso rifiutato, account bloccato %s %s', 

@@ -2,8 +2,32 @@
 
 namespace App\Validation\Backend;
 
+/**
+ * Classe dedicata alle regole di validazione personalizzate per il caricamento delle immagini (Upload).
+ * 
+ * Fornisce un motore di controllo avanzato per la validazione di array di file multimediali, 
+ * colmando le limitazioni native del framework nell'elaborazione di upload multipli (multi-file) 
+ * e integrandosi direttamente con le impostazioni globali configurate a database.
+ */
 class ImagesRules
 {
+    /**
+     * Valida dinamicamente un lotto di immagini (array) caricate tramite form HTTP.
+     * 
+     * L'algoritmo opera secondo un principio di configurazione a cascata (Fallback):
+     * 1. Estrae i limiti globali di sicurezza salvati nel database (peso, estensioni, dimensioni in pixel).
+     * 2. Se la regola di validazione nel Model definisce dei parametri espliciti (es. checkImages[size:2048,ext:jpg]), 
+     *    questi sovrascrivono temporaneamente i limiti globali per la singola operazione.
+     * 3. Analizza i file uno ad uno tramite il FileLocator di sistema e le funzioni GD (getimagesize).
+     * 
+     * NOTA TECNICA SUL RITORNO: Il metodo restituisce deliberatamente sempre 'true'. Se ritornasse 'false', 
+     * CodeIgniter genererebbe un singolo messaggio d'errore generico per l'intero array di input. 
+     * Per garantire precisione, il metodo inietta invece i messaggi d'errore localizzati direttamente nell'istanza 
+     * del Validatore, agganciandoli alla chiave esatta del file problematico (es. 'images.0', 'images.1').
+     *
+     * @param mixed ...$args Parametri variadici passati nativamente dal motore CI4 (array dei file, stringa parametri, dati POST)
+     * @return bool True (forzato) per demandare la segnalazione degli errori al livello dei singoli file
+     */
     public function checkImages(...$args): bool
     {
         /* Recuperiamo i parametri passati dinamicamente da CodeIgniter */

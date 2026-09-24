@@ -14,15 +14,17 @@ use App\Models\Backend\SettingsModel;
 class SettingsClass 
 {
 	/**
-	 * @var SettingsModel Istanza del modello di riferimento, a disposizione per estrarre 
+	 * Istanza del modello di riferimento, a disposizione per estrarre 
 	 * o confrontare parametri di configurazione globali propedeutici alla costruzione dell'interfaccia.
+	 * @var SettingsModel 
 	 */
 	protected SettingsModel $settingsModel;
 
 	/**
 	 * Inizializza la libreria di supporto iniettando il modello associato alle impostazioni di sistema.
+	 * $settingsModel Il modello preposto alla gestione e all'elaborazione dei parametri globali
 	 *
-	 * @param SettingsModel $settingsModel Il modello preposto alla gestione e all'elaborazione dei parametri globali
+	 * @param SettingsModel 
 	 */
 	public function __construct(SettingsModel $settingsModel) 
 	{

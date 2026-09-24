@@ -14,40 +14,54 @@ use App\Models\Backend\BackendModel;
  */
 class LogsModel extends BackendModel
 {
-    /*
-     * @var string Nome della tabella principale usata dal motore del BackendModel per costruire dinamicamente query e filtri.
+    /**
+     * Nome della tabella principale usata dal motore del BackendModel per costruire dinamicamente query e filtri.
+     * 
+     * @var string 
      */
     protected ?string $module = 'admins_logs';
 
-    /*
-     * @var string Colonna di fallback usata per l'ordinamento della tabella se l'utente non ne seleziona una esplicitamente.
+    /**
+     * Colonna di fallback usata per l'ordinamento della tabella se l'utente non ne seleziona una esplicitamente.
+     * 
+     * @var string 
      */
     protected ?string $defaultColumn = 'id';
 
-    /*
-     * @var array Whitelist strutturale per le richieste di paginazione. 
+    /**
+     * Whitelist strutturale per le richieste di paginazione. 
      * Definisce i parametri strettamente necessari (colonna, ordine, pagina, righe, filtri) accettati dal server.
+     * 
+     * @var array 
      */
     protected array $showAllAllowedFields = ['column', 'order', 'page', 'rows', 'searchFields'];
 
-    /*
-     * @var array Elenco esclusivo delle colonne su cui l'operatore è autorizzato a ordinare la griglia dati (ordinamento sicuro).
+    /**
+     * Elenco esclusivo delle colonne su cui l'operatore è autorizzato a ordinare la griglia dati (ordinamento sicuro).
+     * 
+     * @var array 
      */
     protected array $allowedOrderColumns = ['username', 'login', 'logout', 'logout_reason']; 
 
-    /*
-     * @var array Whitelist dei campi di database su cui è consentito applicare la ricerca testuale libera (filtri LIKE).
+    /**
+     * Whitelist dei campi di database su cui è consentito applicare la ricerca testuale libera (filtri LIKE).
+     * 
+     * @var array 
      */
     protected array $showAllSearchAllowedFields = ['username', 'logout_reason']; 
 
-    /*
-     * @var array Whitelist delle colonne di tipo data filtrabili tramite un intervallo temporale (range Da/A).
+    /**
+     * Whitelist delle colonne di tipo data filtrabili tramite un intervallo temporale (range Da/A).
+     * 
+     * @var array 
      */
     protected array $showAllSearchAllowedDates = ['login'];
 
-    /*
-     * @var string Query SQL principale per l'estrazione paginata dei log. 
+    /**
+     * Query SQL principale per l'estrazione paginata dei log. 
      * Utilizza le JOIN per arricchire la riga di log con i dettagli della sessione (token) e l'anagrafica dell'amministratore.
+     * 
+     * @var string 
      */
     protected ?string $getDataQuery = "select admins_logs.*, admins_tokens.token_expire, admins_tokens.last_activity, admins_tokens.id as token_id_val, admins.firstname, admins.lastname, admins.superadmin  
                                         from admins_logs 
@@ -57,17 +71,21 @@ class LogsModel extends BackendModel
                                         on admins.uuid = admins_logs.admin_uuid 
                                         where 1 = 1";
 
-    /*
-     * @var string Query SQL essenziale per contare il numero totale assoluto dei log, necessaria al frontend per calcolare le pagine.
+    /**
+     * Query SQL principale per l'estrazione paginata dei log. 
+     * 
+     * @var string x
      */
     protected ?string $getNumRowsQuery = "select count(*) as count from admins_logs where 1 = 1";
 
-    /*
-     * @var string Query SQL per recuperare un singolo record di log partendo dal suo ID univoco.
+    /**
+     *      * Utilizza le JOIN per arricchire la riga di log con i dettagli della sessione (token) e l'anagrafica dell'amministratore.
+     *      
+     * @var string x
      */
     protected ?string $getUUIDQuery = "select * from admins_logs where id = ?";
 
-    /*
+    /**
      * Metodo di inizializzazione nativo di CodeIgniter.
      * 
      * Richiama l'impostazione della classe genitore per preparare le dipendenze di base (es. l'helper per tracciare le attività).

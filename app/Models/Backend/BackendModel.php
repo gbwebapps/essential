@@ -15,57 +15,120 @@ use App\Models\BaseModel;
 abstract class BackendModel extends BaseModel
 {
 	/**
-	 * @var string|null Nome identificativo del modulo di pertinenza (es. 'admins', 'logs'). 
+	 * Nome identificativo del modulo di pertinenza (es. 'admins', 'logs'). 
 	 * Utilizzato a runtime per individuare la tabella di riferimento, la risoluzione dinamica delle colonne, 
 	 * per l'applicazione dei prefissi nelle query (prevenendo ambiguità nelle JOIN) e per il partizionamento strutturale dei percorsi.
+	 * 
+	 * @var string|null 
 	 */
 	protected ?string $module = null;
 
 	/**
-	 * @var bool Definisce se l'entità corrente supporta la cancellazione logica (Soft Delete). 
+	 * Definisce se l'entità corrente supporta la cancellazione logica (Soft Delete). 
 	 * Se true, il motore di estrazione inietterà in automatico i filtri protettivi sulla colonna 'deleted_at'.
+	 * 
+	 * @var bool 
 	 */
 	protected bool $hasSoftDelete = false;
 
 	/**
-	 * @var string|null Costrutto SQL nativo preparato per l'estrazione paginata dei record (metodo getData).
+	 * Costrutto SQL nativo preparato per l'estrazione paginata dei record (metodo getData).
+	 * 
+	 * @var string|null 
 	 */
 	protected ?string $getDataQuery = null;
 
 	/**
-	 * @var string|null Costrutto SQL nativo preparato per la singola estrazione tramite identificatore (metodo getByUUID).
+	 * Costrutto SQL nativo preparato per la singola estrazione tramite identificatore (metodo getByUUID).
+	 * 
+	 * @var string|null 
 	 */
 	protected ?string $getUUIDQuery = null;
 
 	/**
-	 * @var string|null Costrutto SQL nativo (COUNT) indispensabile per il calcolo matematico della paginazione (metodo getNumRows).
+	 * Costrutto SQL nativo (COUNT) indispensabile per il calcolo matematico della paginazione (metodo getNumRows).
+	 * 
+	 * @var string|null 
 	 */
 	protected ?string $getNumRowsQuery = null;
 
 	/**
-	 * @var string|null La colonna di default a cui ricorrere per l'ordinamento (ORDER BY) in assenza di direttive del client.
+	 * La colonna di default a cui ricorrere per l'ordinamento (ORDER BY) in assenza di direttive del client.
+	 * 
+	 * @var string|null 
 	 */
 	protected ?string $defaultColumn = null;
 
 	/**
-	 * @var array Elenco dei campi tabella soggetti al controllo euristico di mutazione dati (metodo hasDataChanged).
+	 * Elenco dei campi tabella soggetti al controllo euristico di mutazione dati (metodo hasDataChanged).
+	 * 
+	 * @var array 
 	 */
 	protected array $toCompare = [];
 
 	/**
-	 * @var array Insieme di proprietà Whitelist (anti Mass-Assignment e SQL Injection strutturale).
-	 * Ciascun array ($showAllAllowedFields, $addAllowedFields,$editAllowedFields, ecc.) stabilisce in modo 
-	 * rigoroso e contestuale il perimetro esclusivo delle chiavi ammesse nelle operazioni HTTP POST, 
-	 * impedendo la manipolazione non autorizzata dei payload e l'ordinamento su colonne protette.
-	 */
-	protected array $showAllAllowedFields = [];
-	protected array $showAllAllowedDates = [];
-	protected array $addAllowedFields = [];
-	protected array $editAllowedFields = [];
-	protected array $delAllowedFields = [];
-	protected array $changeStatusAllowedFields = [];
-	protected array $allowedOrderColumns = [];
-	protected array $showAllSearchAllowedFields = [];
+     * Whitelist dei campi consentiti durante la richiesta di visualizzazione dell'elenco record (es. DataTables). 
+     * Protegge i parametri di paginazione, i limiti e i filtri generici da manipolazioni esterne.
+     *
+     * @var array
+     */
+    protected array $showAllAllowedFields = [];
+
+    /**
+     * Whitelist specifica per i campi data ammessi come filtri temporali nell'elenco record. 
+     * Garantisce che le interrogazioni al database basate su intervalli temporali avvengano solo su colonne abilitate.
+     *
+     * @var array
+     */
+    protected array $showAllAllowedDates = [];
+
+    /**
+     * Whitelist dei campi consentiti durante la creazione (INSERT) di un nuovo record. 
+     * Agisce come scudo primario anti Mass-Assignment, scartando sistematicamente qualsiasi parametro POST non dichiarato.
+     *
+     * @var array
+     */
+    protected array $addAllowedFields = [];
+
+    /**
+     * Whitelist dei campi consentiti durante la modifica (UPDATE) di un record esistente. 
+     * Impedisce che un utente malevolo possa forzare l'aggiornamento di colonne protette (es. ID o UUID) alterando il payload HTTP.
+     *
+     * @var array
+     */
+    protected array $editAllowedFields = [];
+
+    /**
+     * Whitelist dei campi consentiti durante la richiesta di eliminazione (Soft Delete o fisica) di un record. 
+     * Valida rigorosamente i parametri identificativi necessari per confermare il target dell'operazione.
+     *
+     * @var array
+     */
+    protected array $delAllowedFields = [];
+
+    /**
+     * Whitelist dei campi ammessi per l'operazione di cambio stato rapido (es. toggle attivazione/disattivazione). 
+     * Previene l'alterazione collaterale di altre proprietà del record durante una chiamata asincrona di aggiornamento.
+     *
+     * @var array
+     */
+    protected array $changeStatusAllowedFields = [];
+
+    /**
+     * Whitelist delle colonne del database su cui è consentito applicare l'ordinamento (ORDER BY) nelle viste ad elenco. 
+     * Costituisce la difesa strutturale assoluta contro le SQL Injection veicolate tramite parametri di ordinamento.
+     *
+     * @var array
+     */
+    protected array $allowedOrderColumns = [];
+
+    /**
+     * Whitelist dei campi su cui è abilitata l'esecuzione della ricerca testuale (barra di ricerca globale). 
+     * Circoscrive le istruzioni SQL LIKE esclusivamente alle colonne pertinenti, tutelando sia la sicurezza che le performance.
+     *
+     * @var array
+     */
+    protected array $showAllSearchAllowedFields = [];
 
 	/**
 	 * Hook nativo di CodeIgniter 4, invocato automaticamente durante l'inizializzazione dell'istanza.
