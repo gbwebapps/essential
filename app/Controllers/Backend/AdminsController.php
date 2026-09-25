@@ -21,18 +21,21 @@ class AdminsController extends BackendController
 {
     /**
      * Istanza del modello dedicato all'interazione con il database per i dati degli amministratori
+     * 
      * @var AdminsModel 
      */
     protected AdminsModel $adminsModel;
 
     /**
      * Istanza della libreria contenente logiche di controllo e formattazione specifiche per gli amministratori
+     * 
      * @var AdminsClass 
      */
     protected AdminsClass $adminsClass;
 
     /**
      * Istanza del modello responsabile della gestione dell'immagine di profilo (avatar) dell'amministratore
+     * 
      * @var GalleryOneImgModel 
      */
     protected GalleryOneImgModel $galleryOneImgModel;

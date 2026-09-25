@@ -857,6 +857,9 @@ class AdminsModel extends BackendModel
             
             $this->db->transRollback();
 
+            /* STAMPIAMO L'ERRORE E LA RIGA ESATTA */
+            var_dump("ERRORE: " . $e->getMessage() . " | RIGA: " . $e->getLine());
+
             log_message('error', lang('backend/admins.messages.addError') . ' - ' . $e);
             return ['result' => false, 'message' => lang('backend/admins.messages.addError')];
         }
