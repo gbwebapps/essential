@@ -3,7 +3,7 @@
 namespace App\Controllers\Backend\Components;
 
 use App\Controllers\Backend\BackendController;
-use App\Models\Backend\Components\GalleryOneImgModel;
+use App\Models\Backend\Components\GalleryOneModel;
 use CodeIgniter\HTTP\ResponseInterface;
 
 /**
@@ -13,16 +13,16 @@ class GalleryOneController extends BackendController
 {
 	/**
 	 * Istanza del modello dedicato alla gestione dei file e dei record della galleria
-	 * @var GalleryOneImgModel 
+	 * @var GalleryOneModel 
 	 */
-    private GalleryOneImgModel $galleryModel;
+    private GalleryOneModel $galleryModel;
 
     /**
      * Inizializza il controller e carica il modello di riferimento per le operazioni sulla galleria.
      */
     public function __construct()
     {
-        $this->galleryModel = model(GalleryOneImgModel::class);
+        $this->galleryModel = model(GalleryOneModel::class);
     }
 
     /**
@@ -40,7 +40,7 @@ class GalleryOneController extends BackendController
 	    	/* Validazione campi nascosti */
 	    	if ( ! $this->validateData($posts, $rules)) :
 	    	    $errorMessage = implode('<br>', $this->validator->getErrors());
-	    	    return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/components/galleryOneImg.messages.validationToastErrors'), $errorMessage)]);
+	    	    return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/components/galleryOne.messages.validationToastErrors'), $errorMessage)]);
 	    	endif;
 
 	        $data = [
@@ -50,7 +50,7 @@ class GalleryOneController extends BackendController
 	            'images'  => $this->galleryModel->getImages($posts) ?? []
 	        ];
 
-	        $output = view('backend/components/galleryOneImg/galleryOneImgView', $data);
+	        $output = view('backend/components/galleryOne/galleryOneView', $data);
 
 	        return $this->jsonResponse(['result' => true, 'output' => $output]);
 
@@ -72,11 +72,11 @@ class GalleryOneController extends BackendController
 	    	/* Validazione campi nascosti */
 	    	if ( ! $this->validateData($posts, $rules)) :
 	    	    $errorMessage = implode('<br>', $this->validator->getErrors());
-	    	    return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/components/galleryOneImg.messages.validationToastErrors'), $errorMessage)]);
+	    	    return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/components/galleryOne.messages.validationToastErrors'), $errorMessage)]);
 	    	endif;
 
 	        if ( ! $this->galleryModel->deleteImage($posts)):
-	            return $this->jsonResponse(['result' => false, 'message' => lang('backend/components/galleryOneImg.messages.deleteError')]);
+	            return $this->jsonResponse(['result' => false, 'message' => lang('backend/components/galleryOne.messages.deleteError')]);
 	        endif;
 
 	        $data = [
@@ -87,9 +87,9 @@ class GalleryOneController extends BackendController
 	            'images'  => $this->galleryModel->getImages($posts) ?? []
 	        ];
 
-	        $output = view('backend/components/galleryOneImg/galleryOneImgView', $data);
+	        $output = view('backend/components/galleryOne/galleryOneView', $data);
 
-	        return $this->jsonResponse(['result' => true, 'message' => lang('backend/components/galleryOneImg.messages.deleteSuccess'), 'output'  => $output]);
+	        return $this->jsonResponse(['result' => true, 'message' => lang('backend/components/galleryOne.messages.deleteSuccess'), 'output'  => $output]);
 
 		endif;
     }
@@ -109,11 +109,11 @@ class GalleryOneController extends BackendController
 	    	/* Validazione campi nascosti */
 	    	if ( ! $this->validateData($posts, $rules)) :
 	    	    $errorMessage = implode('<br>', $this->validator->getErrors());
-	    	    return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/components/galleryOneImg.messages.validationToastErrors'), $errorMessage)]);
+	    	    return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/components/galleryOne.messages.validationToastErrors'), $errorMessage)]);
 	    	endif;
 
 	        if ( ! $this->galleryModel->setCover($posts)):
-	            return $this->jsonResponse(['result' => false, 'message' => lang('backend/components/galleryOneImg.messages.setCoverError')]);
+	            return $this->jsonResponse(['result' => false, 'message' => lang('backend/components/galleryOne.messages.setCoverError')]);
 	        endif;
 
 	        $data = [
@@ -123,9 +123,9 @@ class GalleryOneController extends BackendController
 	            'images'  => $this->galleryModel->getImages($posts) ?? []
 	        ];
 
-	        $output = view('backend/components/galleryOneImg/galleryOneImgView', $data);
+	        $output = view('backend/components/galleryOne/galleryOneView', $data);
 
-	        return $this->jsonResponse(['result'  => true, 'message' => lang('backend/components/galleryOneImg.messages.setCoverSuccess'), 'output'  => $output ]);
+	        return $this->jsonResponse(['result'  => true, 'message' => lang('backend/components/galleryOne.messages.setCoverSuccess'), 'output'  => $output ]);
 
 	    endif;
     }
@@ -145,11 +145,11 @@ class GalleryOneController extends BackendController
 	    	/* Validazione campi nascosti */
 	    	if ( ! $this->validateData($posts, $rules)) :
 	    	    $errorMessage = implode('<br>', $this->validator->getErrors());
-	    	    return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/components/galleryOneImg.messages.validationToastErrors'), $errorMessage)]);
+	    	    return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/components/galleryOne.messages.validationToastErrors'), $errorMessage)]);
 	    	endif;
 
 	        if ( ! $this->galleryModel->removeCover($posts)):
-	            return $this->jsonResponse(['result'  => false, 'message' => lang('backend/components/galleryOneImg.messages.removeCoverError') ]);
+	            return $this->jsonResponse(['result'  => false, 'message' => lang('backend/components/galleryOne.messages.removeCoverError') ]);
 	        endif;
 
 	        $data = [
@@ -159,9 +159,9 @@ class GalleryOneController extends BackendController
 	            'images'  => $this->galleryModel->getImages($posts) ?? []
 	        ];
 
-	        $output = view('backend/components/galleryOneImg/galleryOneImgView', $data);
+	        $output = view('backend/components/galleryOne/galleryOneView', $data);
 
-	        return $this->jsonResponse(['result'  => true, 'message' => lang('backend/components/galleryOneImg.messages.removeCoverSuccess'), 'output'  => $output ]);
+	        return $this->jsonResponse(['result'  => true, 'message' => lang('backend/components/galleryOne.messages.removeCoverSuccess'), 'output'  => $output ]);
 
 	    endif;
     }

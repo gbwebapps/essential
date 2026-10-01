@@ -2,7 +2,7 @@
 import { langDefinitions, apiFetch, urlbase, handleValidationImages, showAlert } from '../backend.js';
 
 export class UploadPreviewImgManager {
-    constructor(galleryOneImgManager = null) {
+    constructor(galleryOneManager = null) {
 
         if (UploadPreviewImgManager.instance) {
             return UploadPreviewImgManager.instance;
@@ -15,7 +15,7 @@ export class UploadPreviewImgManager {
         this.triggerSelector = '#buttonImages';
         this.dropZoneSelector = '#drop-zone-area';
 
-        this.galleryOneImgManager = galleryOneImgManager;
+        this.galleryOneManager = galleryOneManager;
 
         this.files = []; 
 
@@ -278,12 +278,12 @@ export class UploadPreviewImgManager {
                 this.reset();
 
                 /* Aggiornamento automatico della galleria esistente (Decoupling) */
-                if (this.galleryOneImgManager) {
+                if (this.galleryOneManager) {
                     /* Recuperiamo il form di reload nascosto della galleria (#getImages) */
                     const galleryForm = document.querySelector('#getImages');
                     if (galleryForm) {
                         const reloadData = new FormData(galleryForm);
-                        await this.galleryOneImgManager.refresh(reloadData);
+                        await this.galleryOneManager.refresh(reloadData);
                     }
                 }
             }

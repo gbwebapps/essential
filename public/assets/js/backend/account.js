@@ -6,7 +6,7 @@ import { EditManager, GetPermissionsManager, GetTokensManager, DeleteTokenManage
 
 /* Import componenti immagini */
 import { UploadPreviewImgManager } from './components/UploadPreview.js';
-import { GalleryOneImgManager } from './components/GalleryOne.js';
+import { GalleryOneManager } from './components/GalleryOne.js';
 
 const actions = {
     index: function() {}, 
@@ -25,8 +25,8 @@ const actions = {
     }, 
     images: function() {
 
-        const galleryOneImgManager = new GalleryOneImgManager();
-        const imagePreviewManager = new UploadPreviewImgManager(galleryOneImgManager);
+        const galleryOneManager = new GalleryOneManager();
+        const imagePreviewManager = new UploadPreviewImgManager(galleryOneManager);
 
     }, 
     tokens: function() {

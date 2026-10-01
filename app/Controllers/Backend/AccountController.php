@@ -11,7 +11,7 @@ use App\Models\Backend\AccountModel;
 use App\Libraries\Backend\AccountClass;
 use App\Controllers\Backend\BackendController; 
 
-use App\Models\Backend\Components\GalleryOneImgModel;
+use App\Models\Backend\Components\GalleryOneModel;
 
 /**
  * Gestisce il profilo, le preferenze personali, la sicurezza e le impostazioni dell'amministratore correntemente autenticato.
@@ -32,9 +32,9 @@ class AccountController extends BackendController
 
     /**
      * Istanza del modello per la gestione e l'elaborazione dell'immagine di profilo (avatar)
-     * @var GalleryOneImgModel 
+     * @var GalleryOneModel 
      */
-    protected GalleryOneImgModel $galleryOneImgModel;
+    protected GalleryOneModel $galleryOneModel;
 
     /**
      * Inizializza il controller, configura i metadati della pagina e definisce la struttura dinamica del menu di navigazione dell'account.
@@ -56,7 +56,7 @@ class AccountController extends BackendController
         $this->accountModel = model(AccountModel::class);
         $this->accountClass = new AccountClass($this->accountModel);
 
-        $this->galleryOneImgModel = model(GalleryOneImgModel::class);
+        $this->galleryOneModel = model(GalleryOneModel::class);
 
         $this->data['sections'] = [
             'general' => [
@@ -227,7 +227,7 @@ class AccountController extends BackendController
         $this->data['action'] = 'images';
 
         $this->data['context'] = 'edit';
-        $this->data['images'] = $this->galleryOneImgModel->getImages(['entity' => 'admins', 'uuid' => $this->currentAdmin->uuid]);
+        $this->data['images'] = $this->galleryOneModel->getImages(['entity' => 'admins', 'uuid' => $this->currentAdmin->uuid]);
 
         $this->data['saveImages'] = true;
         $this->data['uuid'] = $this->currentAdmin->uuid;

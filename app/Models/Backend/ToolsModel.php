@@ -32,7 +32,7 @@ class ToolsModel extends BackendModel
 	 * 
 	 * @var array 
 	 */
-	protected array $cleanableFolders = ['backups/database', 'backups/imports', 'cache', 'debugbar', 'exports', 'logs', 'session', 'uploads/staging'];1
+	protected array $cleanableFolders = ['backups/database', 'backups/imports', 'cache', 'debugbar', 'exports', 'logs', 'session', 'uploads/staging'];
 
 	/**
 	 * Metodo di inizializzazione nativo di CodeIgniter.

@@ -225,7 +225,7 @@ abstract class BackendModel extends BaseModel
 	 * @param array $paramsFilter Array contenente i flag e i valori validati (trash_filter, searchFields, searchDates)
 	 * @return int Il conteggio intero dei record validi estratti dal database
 	 */
-	private function getNumRows(array $paramsFilter): int
+	protected function getNumRows(array $paramsFilter): int
 	{
 		$params = [];
 		$sql = $this->getNumRowsQuery;
@@ -256,7 +256,7 @@ abstract class BackendModel extends BaseModel
 	 * @param array &$params Riferimento all'array PDO per il data binding
 	 * @return string Porzione di query SQL formattata (es. " AND table.column LIKE ?")
 	 */
-	private function buildFilters(array $searchFields, array &$params): string
+	protected function buildFilters(array $searchFields, array &$params): string
 	{
 		$whereClause = '';
 
@@ -281,7 +281,7 @@ abstract class BackendModel extends BaseModel
 	 * @param array &$params Riferimento all'array PDO per il data binding
 	 * @return string Porzione di query SQL formattata (es. " AND table.date_col >= ? AND table.date_col <= ?")
 	 */
-	private function buildDateFilters(array $searchDates, array &$params): string
+	protected function buildDateFilters(array $searchDates, array &$params): string
 	{
 		$whereClause = '';
 
@@ -317,7 +317,7 @@ abstract class BackendModel extends BaseModel
 	 * @param bool $hasSoftDelete Flag strutturale sulla persistenza logica (default true)
 	 * @return string Clausola condizionale SQL mirata (es. " AND table.deleted_at IS NULL") o vuota
 	 */
-	private function buildTrashFilter(string $filter, string $table, bool $hasSoftDelete = true): string
+	protected function buildTrashFilter(string $filter, string $table, bool $hasSoftDelete = true): string
 	{
 	    /* Sanitizzazione rigorosa del nome tabella per prevenire SQL injection strutturali */
 	    $table = preg_replace('/[^a-zA-Z0-9_]/', '', $table);
@@ -425,7 +425,7 @@ abstract class BackendModel extends BaseModel
 	 * @param string $entity Lo slug/nome dell'entità proprietaria associata (es. 'admins')
 	 * @param string $action Parametro comportamentale ('add' per prima allocazione, 'edit' per accodamento)
 	 */
-	protected function insertImages(array $filenames, string $uuid, string $entity, string $action = 'add'): void
+	protected function insertImages(array $filenames, string $uuid, string $entity, string $action = 'add')
 	{
 	    $dataImage = [];
 	    $flag = false;
@@ -538,4 +538,18 @@ abstract class BackendModel extends BaseModel
 
 	    return $posts;
 	}
+
+	/**
+     * Restituisce l'istanza del servizio di upload.
+     * 
+     * Metodo wrapper utilizzato per incapsulare l'istanziazione diretta 
+     * della libreria, facilitando l'iniezione delle dipendenze (Mocking) 
+     * durante l'esecuzione dei test unitari tramite il pattern Extract Method.
+     *
+     * @return \App\Libraries\Backend\UploadClass
+     */
+    protected function getUploadService()
+    {
+        return new \App\Libraries\Backend\UploadClass();
+    }
 }

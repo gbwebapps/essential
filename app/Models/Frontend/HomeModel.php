@@ -2,9 +2,9 @@
 
 namespace App\Models\Frontend;
 
-use App\Models\BaseModel;
+use App\Models\Frontend\FrontendModel;
 
-abstract class FrontendModel extends BaseModel
+class HomeModel extends FrontendModel
 {
 	protected function initModel(): void
 	{

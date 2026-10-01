@@ -1,13 +1,13 @@
 /* Import delle utility risalendo di un livello */
 import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace } from '../backend.js';
 
-export class GalleryOneImgManager {
+export class GalleryOneManager {
     constructor() {
 
-        if (GalleryOneImgManager.instance) {
-            return GalleryOneImgManager.instance;
+        if (GalleryOneManager.instance) {
+            return GalleryOneManager.instance;
         }
-        GalleryOneImgManager.instance = this;
+        GalleryOneManager.instance = this;
         
         this.containerId = '#imagesData';
         /* Rimosso this.container per evitare nodi orfani (fantasma) */
@@ -28,7 +28,7 @@ export class GalleryOneImgManager {
     }
 
     async onClick(e) {
-        const btn = e.target.closest('.galleryOneImgAction');
+        const btn = e.target.closest('.galleryOneAction');
         if (!btn) return;
 
         e.preventDefault();
@@ -57,7 +57,7 @@ export class GalleryOneImgManager {
 
     async refresh(formData) {
         try {
-            const response = await apiFetch(urlbase + 'backend/galleryOneImg/showGallery', {
+            const response = await apiFetch(urlbase + 'backend/galleryOne/showGallery', {
                 method: 'POST',
                 body: formData
             });
@@ -70,7 +70,7 @@ export class GalleryOneImgManager {
 
     async handleAction(action, formData) {
         try {
-            const response = await apiFetch(urlbase + 'backend/galleryOneImg/' + action, {
+            const response = await apiFetch(urlbase + 'backend/galleryOne/' + action, {
                 method: 'POST',
                 body: formData
             });

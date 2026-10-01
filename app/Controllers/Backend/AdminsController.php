@@ -12,7 +12,7 @@ use App\Models\Backend\AdminsModel;
 use App\Libraries\Backend\AdminsClass;
 use App\Controllers\Backend\BackendController; 
 
-use App\Models\Backend\Components\GalleryOneImgModel;
+use App\Models\Backend\Components\GalleryOneModel;
 
 /**
  * Gestisce la sezione amministrativa dedicata alla gestione degli utenti con privilegi di sistema (amministratori), controllandone permessi, sessioni e anagrafiche.
@@ -36,9 +36,9 @@ class AdminsController extends BackendController
     /**
      * Istanza del modello responsabile della gestione dell'immagine di profilo (avatar) dell'amministratore
      * 
-     * @var GalleryOneImgModel 
+     * @var GalleryOneModel 
      */
-    protected GalleryOneImgModel $galleryOneImgModel;
+    protected GalleryOneModel $galleryOneModel;
 
     /**
      * Inizializza il controller, configura i metadati della pagina e istanzia i modelli e le classi necessarie.
@@ -57,7 +57,7 @@ class AdminsController extends BackendController
         $this->adminsModel = model(AdminsModel::class);
         $this->adminsClass = new AdminsClass($this->adminsModel);
 
-        $this->galleryOneImgModel = model(GalleryOneImgModel::class);
+        $this->galleryOneModel = model(GalleryOneModel::class);
     }
 
     /**
@@ -221,7 +221,7 @@ class AdminsController extends BackendController
                 $this->data['uuid'] = $posts['uuid'];
 
                 $this->data['context'] = 'edit';
-                $this->data['images'] = $this->galleryOneImgModel->getImages(['entity' => 'admins', 'uuid' => $posts['uuid']]);
+                $this->data['images'] = $this->galleryOneModel->getImages(['entity' => 'admins', 'uuid' => $posts['uuid']]);
 
                 return $this->jsonResponse(['result' => true,'output' => view('backend/admins/partials/edit/editPartial', $this->data)]);
             endif;
@@ -253,7 +253,7 @@ class AdminsController extends BackendController
                 $this->data['uuid'] = $posts['uuid'];
 
                 $this->data['context'] = 'edit';
-                $this->data['images'] = $this->galleryOneImgModel->getImages(['entity' => 'admins', 'uuid' => $posts['uuid']]);
+                $this->data['images'] = $this->galleryOneModel->getImages(['entity' => 'admins', 'uuid' => $posts['uuid']]);
                 
                 $json['output'] = view('backend/admins/partials/edit/editPartial', $this->data);
             endif;
@@ -292,7 +292,7 @@ class AdminsController extends BackendController
         $this->data['uuid'] = $uuid;
 
         $this->data['context'] = 'edit';
-        $this->data['images'] = $this->galleryOneImgModel->getImages(['entity' => 'admins', 'uuid' => $uuid]);
+        $this->data['images'] = $this->galleryOneModel->getImages(['entity' => 'admins', 'uuid' => $uuid]);
 
         /* Caso Caricamento standard: passo le matrici separate alla vista */
         $this->data['group_perms'] = $this->adminsModel->getGroupPermissions((int) $admin['row']->group_id);
@@ -379,7 +379,7 @@ class AdminsController extends BackendController
         $this->data['uuid'] = $uuid;
 
         $this->data['context'] = 'show';
-        $this->data['images'] = $this->galleryOneImgModel->getImages(['entity' => 'admins', 'uuid' => $uuid]);
+        $this->data['images'] = $this->galleryOneModel->getImages(['entity' => 'admins', 'uuid' => $uuid]);
 
         /* Struttura per mappare i gruppi e le eccezioni */
         $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
@@ -447,7 +447,7 @@ class AdminsController extends BackendController
      *
      * @return ResponseInterface Risposta JSON con l'esito dell'operazione di ripristino
      */
-    public function restoreDelete(): ResponseInterface
+    public function restoreDelete(): ?ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -465,6 +465,8 @@ class AdminsController extends BackendController
             return $this->jsonResponse($json);
 
         endif;
+
+        return null;
     }
 
     /**

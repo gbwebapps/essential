@@ -584,7 +584,7 @@ class GroupsModel extends BackendModel
      * @param object $original Oggetto contenente lo stato originale del record a database
      * @return bool True se sono stati rilevati cambiamenti, false altrimenti
      */
-    private function hasGroupChanged(array $posts, object $original): bool
+    protected function hasGroupChanged(array $posts, object $original): bool
     {
         /* 1. Controllo i campi base della tabella admins_groups (name, description) via metodo globale */
         if ($this->hasDataChanged($posts, $original)):

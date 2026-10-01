@@ -656,7 +656,7 @@ export class EditManager {
             refreshSelector: '', 
             containerId: '', 
             imagePreviewManager: null,
-            galleryOneImgManager: null
+            galleryOneManager: null
         }, config);
 
         /* Inizializza eventuali callback esterni da eseguire in momenti chiave */

@@ -73,7 +73,7 @@ $routes->group('backend', function($routes) {
         });
 
         /* GALLERY ONE */
-        $routes->group('galleryOneImg', ['filter' => 'authorization'], function($routes) {
+        $routes->group('galleryOne', ['filter' => 'authorization'], function($routes) {
             $routes->post('showGallery', '\App\Controllers\Backend\Components\GalleryOneController::showGallery');
             $routes->post('deleteImage', '\App\Controllers\Backend\Components\GalleryOneController::deleteImage');
             $routes->post('removeCover', '\App\Controllers\Backend\Components\GalleryOneController::removeCover');

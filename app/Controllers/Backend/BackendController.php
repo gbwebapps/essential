@@ -201,24 +201,33 @@ abstract class BackendController extends BaseController
      *
      * @return object|null L'istanza dell'helper trovato, oppure null.
      */
-    private function getHelperClass(): ?object
+    protected function getHelperClass(): ?object
     {
         /* Recuperiamo le proprietà dell'istanza corrente tramite Reflection */
         $reflection = new \ReflectionClass($this);
-        
-        /* Filtriamo solo le proprietà che non sono del BackendController stesso */
+
+        $baseClass = \App\Controllers\Backend\BackendController::class;
+
         foreach ($reflection->getProperties() as $property):
+            $declaring = $property->getDeclaringClass()->getName();
+
+            /* Filtriamo realmente le proprietà native del BackendController stesso */
+            if ($declaring === $baseClass):
+                continue;
+            endif;
+
             $name = $property->getName();
-            
-            /* Verifichiamo il suffisso 'Class' */
+
             if (str_ends_with($name, 'Class')):
+
                 /* In PHP 8.1+ getValue() accede automaticamente alle proprietà protected */
                 $value = $property->getValue($this);
-                
+
                 if (is_object($value)):
                     return $value;
                 endif;
             endif;
+
         endforeach;
 
         return null;

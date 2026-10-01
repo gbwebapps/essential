@@ -1,6 +1,6 @@
 <div id="imagesData">
     <div class="card-body">
-        <div class="row" id="galleryOneImg-container-<?= esc($uuid); ?>">
+        <div class="row" id="galleryOne-container-<?= esc($uuid); ?>">
             <?php if ( ! empty($images) && is_array($images)): ?>
                 <?php foreach ($images as $img): ?>
                     <div class="col-6 col-lg-3 mb-3 text-center">
@@ -26,29 +26,29 @@
                                 
                                 <div class="gallery-one-overlay d-flex justify-content-center align-items-center">
                                     <?php if ((int) $img['is_cover'] === 1): ?>
-                                        <i class="fa-solid fa-minus galleryOneImgAction text-white mx-2 fs-5"
-                                           title="<?= lang('backend/components/galleryOneImg.labels.removeCover'); ?>"
+                                        <i class="fa-solid fa-minus galleryOneAction text-white mx-2 fs-5"
+                                           title="<?= lang('backend/components/galleryOne.labels.removeCover'); ?>"
                                            data-action="removeCover"
-                                           data-message="<?= lang('backend/components/galleryOneImg.messages.areYouSureRemoveCover'); ?>">
+                                           data-message="<?= lang('backend/components/galleryOne.messages.areYouSureRemoveCover'); ?>">
                                         </i>
                                     <?php else: ?>
-                                        <i class="fa-solid fa-check galleryOneImgAction text-white mx-2 fs-5"
-                                           title="<?= lang('backend/components/galleryOneImg.labels.setCover'); ?>"
+                                        <i class="fa-solid fa-check galleryOneAction text-white mx-2 fs-5"
+                                           title="<?= lang('backend/components/galleryOne.labels.setCover'); ?>"
                                            data-action="setCover"
-                                           data-message="<?= lang('backend/components/galleryOneImg.messages.areYouSureSetCover'); ?>">
+                                           data-message="<?= lang('backend/components/galleryOne.messages.areYouSureSetCover'); ?>">
                                         </i>
                                     <?php endif; ?>
                                     
-                                    <i class="fa-solid fa-trash galleryOneImgAction text-white mx-2 fs-5"
-                                       title="<?= lang('backend/components/galleryOneImg.labels.delete'); ?>"
+                                    <i class="fa-solid fa-trash galleryOneAction text-white mx-2 fs-5"
+                                       title="<?= lang('backend/components/galleryOne.labels.delete'); ?>"
                                        data-action="deleteImage"
-                                       data-message="<?= lang('backend/components/galleryOneImg.messages.areYouSureDeleteImage'); ?>">
+                                       data-message="<?= lang('backend/components/galleryOne.messages.areYouSureDeleteImage'); ?>">
                                     </i>
                                     
                                     <a href="<?= base_url('images/backend/' . $entity . '/' . esc($uuid) . '/large/' . esc($img['filename'])); ?>"
                                        target="_blank"
                                        class="text-white mx-2 fs-5"
-                                       title="<?= lang('backend/components/galleryOneImg.labels.viewImage'); ?>">
+                                       title="<?= lang('backend/components/galleryOne.labels.viewImage'); ?>">
                                         <i class="fa-solid fa-image"></i>
                                     </a>
                                 </div>
@@ -75,7 +75,7 @@
                 <?php endforeach; ?>
             <?php else: ?>
                 <div class="col-12 text-center fw-bold">
-                    <?= lang('backend/components/galleryOneImg.labels.noImagesFound'); ?>
+                    <?= lang('backend/components/galleryOne.labels.noImagesFound'); ?>
                 </div>
             <?php endif; ?>
         </div>

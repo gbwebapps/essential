@@ -8,7 +8,7 @@ import { ExportCsvManager } from './components/ExportCsv.js';
 import { ImportCsvManager } from './components/ImportCsv.js';
 
 import { UploadPreviewImgManager } from './components/UploadPreview.js';
-import { GalleryOneImgManager } from './components/GalleryOne.js';
+import { GalleryOneManager } from './components/GalleryOne.js';
 
 const actions = {
     index: function(){},
@@ -93,7 +93,7 @@ const actions = {
     edit: function() {
 
         const imagePreviewManager = new UploadPreviewImgManager();
-        const galleryOneImgManager = new GalleryOneImgManager();
+        const galleryOneManager = new GalleryOneManager();
 
         const editManager = new EditManager({
             formSelector: '#admins-edit',
@@ -101,7 +101,7 @@ const actions = {
             refreshSelector: '#edit-refresh',
             containerId: 'edit-admins-container', 
             imagePreviewManager: imagePreviewManager,
-            galleryOneImgManager: galleryOneImgManager
+            galleryOneManager: galleryOneManager
         });
         editManager.init();
 
@@ -152,7 +152,7 @@ const actions = {
         });
         generalDataManager.init();
 
-        const galleryOneImgManager = new GalleryOneImgManager();
+        const galleryOneManager = new GalleryOneManager();
 
         const metaDataManager = new MetaDataManager({
             url: urlbase + 'backend/admins/getMetaData', 

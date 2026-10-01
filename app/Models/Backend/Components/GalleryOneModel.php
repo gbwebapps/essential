@@ -7,13 +7,13 @@ use App\Libraries\ImageFileSystemService;
 use App\Models\Backend\BackendModel;
 
 /**
- * Modello dedicato al Componente Globale per la gestione delle Immagini (GalleryOneImg).
+ * Modello dedicato al Componente Globale per la gestione delle Immagini (GalleryOne).
  * 
  * Fornisce la business logic per il recupero, l'eliminazione fisica e logica, e la gestione 
  * delle immagini di copertina (cover) associate a una specifica entità del sistema 
  * (es. un singolo amministratore, un prodotto, un articolo).
  */
-class GalleryOneImgModel extends BackendModel 
+class GalleryOneModel extends BackendModel 
 {
     /**
      * Whitelist dei campi consentiti per la richiesta di caricamento della galleria.
@@ -46,15 +46,15 @@ class GalleryOneImgModel extends BackendModel
     {
         return [
             'entity' => [
-                'label' => lang('backend/components/galleryOneImg.labels.entity'),
+                'label' => lang('backend/components/galleryOne.labels.entity'),
                 'rules' => ['required', 'alpha'],
             ],
             'uuid' => [
-                'label' => lang('backend/components/galleryOneImg.labels.uuid'),
+                'label' => lang('backend/components/galleryOne.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
             ],
             'context' => [
-                'label' => lang('backend/components/galleryOneImg.labels.context'),
+                'label' => lang('backend/components/galleryOne.labels.context'),
                 'rules' => ['required', 'in_list[show,edit]'],
             ],
         ];
@@ -73,23 +73,23 @@ class GalleryOneImgModel extends BackendModel
     {
         return [
             'id' => [
-                'label' => lang('backend/components/galleryOneImg.labels.id'),
+                'label' => lang('backend/components/galleryOne.labels.id'),
                 'rules' => ['required', 'is_natural_no_zero'],
             ],
             'context' => [
-                'label' => lang('backend/components/galleryOneImg.labels.context'),
+                'label' => lang('backend/components/galleryOne.labels.context'),
                 'rules' => ['required', 'in_list[show,edit]'],
             ],
             'entity' => [
-                'label' => lang('backend/components/galleryOneImg.labels.entity'),
+                'label' => lang('backend/components/galleryOne.labels.entity'),
                 'rules' => ['required', 'alpha'],
             ],
             'uuid' => [
-                'label' => lang('backend/components/galleryOneImg.labels.uuid'),
+                'label' => lang('backend/components/galleryOne.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
             ],
             'filename' => [
-                'label' => lang('backend/components/galleryOneImg.labels.filename'),
+                'label' => lang('backend/components/galleryOne.labels.filename'),
                 'rules' => ['required', 'regex_match[/^[A-Za-z0-9\-\_\(\)]+\.[A-Za-z]{3,4}$/]', 'max_length[255]'],
             ],
         ];
@@ -107,23 +107,23 @@ class GalleryOneImgModel extends BackendModel
     {
         return [
             'id' => [
-                'label' => lang('backend/components/galleryOneImg.labels.id'),
+                'label' => lang('backend/components/galleryOne.labels.id'),
                 'rules' => ['required', 'is_natural_no_zero'],
             ],
             'entity' => [
-                'label' => lang('backend/components/galleryOneImg.labels.entity'),
+                'label' => lang('backend/components/galleryOne.labels.entity'),
                 'rules' => ['required', 'alpha'],
             ],
             'uuid' => [
-                'label' => lang('backend/components/galleryOneImg.labels.uuid'),
+                'label' => lang('backend/components/galleryOne.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
             ],
             'context' => [
-                'label' => lang('backend/components/galleryOneImg.labels.context'),
+                'label' => lang('backend/components/galleryOne.labels.context'),
                 'rules' => ['required', 'in_list[show,edit]'],
             ],
             'filename' => [
-                'label' => lang('backend/components/galleryOneImg.labels.filename'),
+                'label' => lang('backend/components/galleryOne.labels.filename'),
                 'rules' => ['required', 'regex_match[/^[A-Za-z0-9\-\_\(\)]+\.[A-Za-z]{3,4}$/]', 'max_length[255]'],
             ],
         ];

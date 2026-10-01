@@ -307,7 +307,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* ==========================================================================
-   Componente GalleryOneImg
+   Componente GalleryOne
    ========================================================================== */
 
 /* Overlay della galleria: nascosto di default */
@@ -328,13 +328,13 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* Stile per le icone cliccabili della galleria */
-.galleryOneImgAction {
+.galleryOneAction {
     cursor: pointer;
     transition: transform 0.15s ease;
 }
 
 /* Effetto ingrandimento all'hover sulle singole icone */
-.galleryOneImgAction:hover {
+.galleryOneAction:hover {
     transform: scale(1.2);
 }
 

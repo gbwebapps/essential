@@ -30,7 +30,7 @@ class ImportController extends BackendController
      *
      * @return ResponseInterface Risposta JSON contenente l'esito della validazione e l'HTML generato per la modale
      */
-    public function showModal(): ResponseInterface
+    public function showModal(): ?ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -49,6 +49,8 @@ class ImportController extends BackendController
             return $this->jsonResponse(['result' => true, 'output' => $output]);
 
         endif;
+
+        return null;
     }
 
     /**
@@ -99,7 +101,7 @@ class ImportController extends BackendController
      *
      * @return ResponseInterface Risposta JSON contenente l'esito della validazione e l'HTML dell'anteprima dati, oppure l'elenco degli errori bloccanti
      */
-    public function processCsv(): ResponseInterface
+    public function processCsv(): ?ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -156,6 +158,8 @@ class ImportController extends BackendController
             return $this->jsonResponse(['result' => true, 'output' => $output, 'hasProcessableData' => $hasProcessableData]);
 
         endif;
+
+        return null;
     }
 
     /**
@@ -163,7 +167,7 @@ class ImportController extends BackendController
      *
      * @return ResponseInterface Risposta JSON con lo stato di avanzamento, il cursore (offset) per il blocco successivo e i messaggi di notifica
      */
-    public function executeImport(): ResponseInterface
+    public function executeImport(): ?ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -229,6 +233,8 @@ class ImportController extends BackendController
             ]);
 
         endif;
+
+        return null;
     }
 
     /**
@@ -236,7 +242,7 @@ class ImportController extends BackendController
      *
      * @return ResponseInterface Risposta JSON di conferma dell'avvenuta eliminazione del file
      */
-    public function deleteFile(): ResponseInterface
+    public function deleteFile(): ?ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -261,5 +267,7 @@ class ImportController extends BackendController
             return $this->jsonResponse(['result' => true]);
 
         endif;
+
+        return null;
     }
 }

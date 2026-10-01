@@ -62,7 +62,7 @@ class ToolsController extends BackendController
      *
      * @return string Layout HTML iniziale della sezione.
      */
-    public function index()
+    public function index(): string 
     {
         $this->data['action'] = 'index';
         
@@ -79,7 +79,7 @@ class ToolsController extends BackendController
      *
      * @return ResponseInterface Risposta JSON con l'HTML del pannello popolato con i dati in tempo reale.
      */
-    public function openTools(): ResponseInterface
+    public function openTools(): ?ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -109,6 +109,8 @@ class ToolsController extends BackendController
             return $this->jsonResponse(['result' => true, 'output' => view('backend/tools/partials/index/' . $env . 'ToolsPartial', $this->data)]);
 
         endif;
+
+        return null;
     }
 
     /**
@@ -118,7 +120,7 @@ class ToolsController extends BackendController
      *
      * @return ResponseInterface Risposta JSON contenente il conteggio dei record identificati e il testo localizzato per il prompt di conferma.
      */
-    public function validateAuditsDateRequest(): ResponseInterface
+    public function validateAuditsDateRequest(): ?ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -152,6 +154,8 @@ class ToolsController extends BackendController
             return $this->jsonResponse($json);
 
         endif;
+
+        return null;
     }
 
     /**
@@ -160,7 +164,7 @@ class ToolsController extends BackendController
      *
      * @return ResponseInterface Risposta JSON indicante il successo dell'operazione di pulizia.
      */
-    public function deleteAudits(): ResponseInterface
+    public function deleteAudits(): ?ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -176,6 +180,8 @@ class ToolsController extends BackendController
             return $this->jsonResponse($json);
 
         endif;
+
+        return null;
     }
 
     /**
@@ -185,7 +191,7 @@ class ToolsController extends BackendController
      *
      * @return ResponseInterface Risposta JSON con le statistiche dei file rintracciati.
      */
-    public function validateLogsDateRequest(): ResponseInterface
+    public function validateLogsDateRequest(): ?ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -219,6 +225,8 @@ class ToolsController extends BackendController
             return $this->jsonResponse($json);
 
         endif;
+
+        return null;
     }
 
     /**
@@ -226,7 +234,7 @@ class ToolsController extends BackendController
      *
      * @return ResponseInterface Risposta JSON con l'esito della cancellazione dei file.
      */
-    public function deleteLogs(): ResponseInterface
+    public function deleteLogs(): ?ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -242,6 +250,8 @@ class ToolsController extends BackendController
             return $this->jsonResponse($json);
 
         endif;
+
+        return null;
     }
 
     /**
@@ -250,7 +260,7 @@ class ToolsController extends BackendController
      *
      * @return ResponseInterface Risposta JSON contenente lo status dell'operazione e i dati post-ottimizzazione.
      */
-    public function optimizeTable(): ResponseInterface
+    public function optimizeTable(): ?ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
             
@@ -278,6 +288,8 @@ class ToolsController extends BackendController
             return $this->jsonResponse(['result' => true, 'message'   => $message, 'tableData' => $optimizationResult]);
 
         endif;
+
+        return null;
     }
 
     /**
@@ -287,7 +299,7 @@ class ToolsController extends BackendController
      *
      * @return ResponseInterface Payload JSON strutturato in base all'esito dell'azione specificata.
      */
-    public function backups()
+    public function backups(): ?ResponseInterface 
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -344,6 +356,8 @@ class ToolsController extends BackendController
             endif;
 
         endif;
+
+        return null;
     }
 
     /**
@@ -353,7 +367,7 @@ class ToolsController extends BackendController
      * @param string $filename Il nome testuale dell'archivio da trasferire.
      * @return ResponseInterface Risposta HTTP configurata per il download (o redirect in caso di file compromesso/assente).
      */
-    public function downloadBackups(string $filename)
+    public function downloadBackups(string $filename): ResponseInterface
     {
         /* basename() impedisce tentativi di directory traversal (sicurezza) */
         $path = WRITEPATH . 'backups/database/' . basename($filename);
@@ -362,7 +376,7 @@ class ToolsController extends BackendController
 
             /* Registrazione attività (da inserire nel Controller) */
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('DOWNLOAD_BACKUP', 'tools', sprintf('Scaricato backup del database: %s', $fileName), $currentAdmin);
+            log_admin_activity('DOWNLOAD_BACKUP', 'tools', sprintf('Scaricato backup del database: %s', $filename), $currentAdmin);
 
             return $this->response->download($path, null);
         endif;
@@ -377,7 +391,7 @@ class ToolsController extends BackendController
      *
      * @return ResponseInterface Risposta JSON ritornata dal Model attestante l'esito della pulizia della cartella.
      */
-    public function cleanFolder(): ResponseInterface
+    public function cleanFolder(): ?ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
             
@@ -396,5 +410,7 @@ class ToolsController extends BackendController
             return $this->jsonResponse($cleanResult);
 
         endif;
+
+        return null;
     }
 }
