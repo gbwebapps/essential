@@ -137,7 +137,17 @@ class UploadClass
      */
     protected function cropImage(string $srcPath, string $destPath, int $targetX, int $targetY): bool
     {
-        [$width, $height, $type] = getimagesize($srcPath);
+        if ( ! file_exists($srcPath)):
+            return false;
+        endif;
+
+        $imageInfo = getimagesize($srcPath);
+
+        if ($imageInfo === false):
+            return false;
+        endif;
+
+        [$width, $height, $type] = $imageInfo;
 
         switch ($type):
             case IMAGETYPE_JPEG: $src = imagecreatefromjpeg($srcPath); break;

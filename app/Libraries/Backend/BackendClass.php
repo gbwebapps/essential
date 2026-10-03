@@ -2,8 +2,6 @@
 
 namespace App\Libraries\Backend;
 
-use App\Libraries\BaseClass;
-
 /**
  * Classe core di supporto per l'elaborazione globale dell'interfaccia del pannello di controllo.
  * 

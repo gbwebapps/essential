@@ -81,7 +81,7 @@ class BackendButtonsCell
                 return [
                     'id_output' => 'edit-refresh',
                     'text_left' => lang('backend/' . $controller . '.buttons.reloadData'),
-                    'btn_left' => 'btn btn-warming text-dark btn-sm',
+                    'btn_left' => 'btn btn-warning text-dark btn-sm',
                     'icon_left' => '<i class="fa-solid fa-refresh"></i>',
                     'message' => lang('backend/' . $controller . '.messages.areYouSureRefreshData'),
                     'text_right' => lang('backend/' . $controller . '.buttons.sendData'),

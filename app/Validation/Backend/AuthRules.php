@@ -25,7 +25,7 @@ class AuthRules
      */
     public function checkTokenRule(string $str): bool
     {
-        $model = new AuthModel();
+        $model = model(AuthModel::class);
         return $model->checkAuthToken($str);
     }
 }

@@ -26,7 +26,7 @@ if ( ! function_exists('removeDot')) {
         $formatted = [];
 
         foreach ($array as $key => $value):
-            $cleanKey = str_replace($prefix, '', $key);
+            $cleanKey = str_starts_with($key, $prefix) ? substr($key, strlen($prefix)) : $key;
             $formatted[$cleanKey] = $value;
         endforeach;
 

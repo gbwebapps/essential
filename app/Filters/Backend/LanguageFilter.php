@@ -70,7 +70,7 @@ class LanguageFilter implements FilterInterface
      *
      * @return string Il codice ISO della lingua individuata (es. 'it', 'en')
      */
-    private function getStoredLanguage(): string
+    protected function getStoredLanguage(): string
     {
         /* Fallback di base */
         $language = 'en';
@@ -84,7 +84,7 @@ class LanguageFilter implements FilterInterface
 
         /* Tenta la lettura diretta dal database (sovrascrive il config se esiste) */
         try {
-            $db = Database::connect();
+            $db = $this->getDatabase();
             $row = $db->table('settings')
                       ->whereIn('class', ['Backend\General', 'App\Config\Backend\General'])
                       ->where('key', 'language')
@@ -95,9 +95,14 @@ class LanguageFilter implements FilterInterface
                 $language = $row->value;
             endif;
         } catch (\Exception $e) {
-            /* Ignora silenziosamente se la tabella non è ancora stata creata */
+            log_message('debug', 'LanguageFilter: impossibile leggere la lingua dal database: ' . $e->getMessage());
         }
 
         return $language;
+    }
+
+    protected function getDatabase()
+    {
+        return Database::connect();
     }
 }

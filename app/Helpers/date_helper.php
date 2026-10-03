@@ -56,7 +56,7 @@ if ( ! function_exists('convertDate')):
             return $timeObject->toLocalizedString($userFormat);
 
         } catch (\Throwable $e) {
-            /* Graceful degradation: in caso di eccezione restituisce l'input non processato */
+            log_message('debug', 'convertDate: impossibile convertire la data "' . $date . '": ' . $e->getMessage());
             return $date;
         }
     }

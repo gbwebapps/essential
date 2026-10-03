@@ -36,7 +36,15 @@ class SuperAdminFilter implements FilterInterface
         endif;
 
         /* Impostazione sessione di errore per accesso negato */
-        session()->setFlashdata('message', sprintf(lang('backend/global.messages.permissionDenied'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)));
+        $message = lang('backend/global.messages.permissionDenied');
+
+        if ($currentAdmin):
+            $message = sprintf($message, esc($currentAdmin->firstname), esc($currentAdmin->lastname));
+        else:
+            $message = lang('backend/auth.messages.loginNeeded');
+        endif;
+
+        session()->setFlashdata('message', $message);
         session()->setFlashdata('class', 'light text-danger fw-bold');
         session()->setFlashdata('icon', '<i class="fa-solid fa-ban"></i>');
 
