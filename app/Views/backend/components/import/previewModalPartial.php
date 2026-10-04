@@ -83,7 +83,7 @@
     ?>
         <div class="text-center text-muted small mt-2">
             <i class="fa-solid fa-info-circle me-1"></i>
-            <?= lkang('backend/components/import.messages.previewNotice'); ?>
+            <?= lang('backend/components/import.messages.previewNotice'); ?>
         </div>
     <?php endif; ?>
 

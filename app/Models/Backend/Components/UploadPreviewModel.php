@@ -112,6 +112,8 @@ class UploadPreviewModel extends BackendModel
 
 		    endif;
 
+			return ['result' => false, 'message' => lang('backend/components/uploadPreviewImg.messages.saveImagesError')];
+
 		} catch(\Throwable $e) {
 
 		    /* Qualsiasi errore strutturale finisce qui dentro in sicurezza */

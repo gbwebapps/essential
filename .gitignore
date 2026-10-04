@@ -137,6 +137,5 @@ node_modules/
 public/guide/
 public/images/
 .doctum_cache/
-tests/
 build/
 .phpunit.result.cache

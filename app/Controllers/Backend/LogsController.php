@@ -116,9 +116,9 @@ class LogsController extends BackendController
     /**
      * Provvede alla rimozione definitiva di un singolo record di accesso (log session) identificato in modo esplicito dal suo token ID.
      *
-     * @return string|ResponseInterface Risposta JSON contenente l'esito dell'operazione di cancellazione.
+     * @return ResponseInterface|null Risposta JSON contenente l'esito dell'operazione di cancellazione.
      */
-    public function hardDelete(): string|ResponseInterface
+    public function hardDelete(): ?ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -135,5 +135,7 @@ class LogsController extends BackendController
             return $this->jsonResponse($json);
 
         endif;
+
+        return null;
     }
 }

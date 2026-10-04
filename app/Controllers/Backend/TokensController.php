@@ -122,9 +122,9 @@ class TokensController extends BackendController
      * Previa validazione formale dei dati in ingresso, forza la rimozione del record, revocando conseguentemente 
      * l'accesso al client o dispositivo remoto associato a tale sessione.
      *
-     * @return ResponseInterface Risposta JSON indicante l'esito dell'operazione di cancellazione e gli eventuali errori
+     * @return ResponseInterface|null Risposta JSON indicante l'esito dell'operazione di cancellazione e gli eventuali errori
      */
-    public function hardDelete(): ResponseInterface
+    public function hardDelete(): ?ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -142,5 +142,7 @@ class TokensController extends BackendController
             return $this->jsonResponse($json);
 
         endif;
+
+        return null;
     }
 }
