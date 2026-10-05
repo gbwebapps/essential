@@ -274,7 +274,7 @@ class SettingsModel extends BackendModel
             ],
             'protocol' => [
                 'label' => lang('backend/settings.labels.protocol'),
-                'rules' => ['required', 'in_list[smtp,mail,sendemail]'],
+                'rules' => ['required', 'in_list[smtp,mail,sendmail]'],
             ],
             'SMTPHost' => [
                 'label' => lang('backend/settings.labels.SMTPHost'),

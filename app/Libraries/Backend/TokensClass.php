@@ -22,9 +22,8 @@ class TokensClass
 
 	/**
 	 * Inizializza la libreria di supporto iniettando il modello associato ai token.
-	 * $tokensModel Il modello preposto alla gestione e all'estrazione dei token di sistema
 	 *
-	 * @param TokensModel 
+	 * @param TokensModel $tokensModel Il modello preposto alla gestione e all'estrazione dei token di sistema
 	 */
 	public function __construct(TokensModel $tokensModel) 
 	{

@@ -22,9 +22,8 @@ class SettingsClass
 
 	/**
 	 * Inizializza la libreria di supporto iniettando il modello associato alle impostazioni di sistema.
-	 * $settingsModel Il modello preposto alla gestione e all'elaborazione dei parametri globali
 	 *
-	 * @param SettingsModel 
+	 * @param SettingsModel $settingsModel Il modello preposto alla gestione e all'elaborazione dei parametri globali
 	 */
 	public function __construct(SettingsModel $settingsModel) 
 	{

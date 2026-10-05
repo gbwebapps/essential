@@ -45,9 +45,9 @@ class ImagesRules
         /* Mappiamo i valori predefiniti presi dall'helper */
         $config = [
             'size' => isset($globalUploadSettings->maxFileSize) ? (int) $globalUploadSettings->maxFileSize : null,
-            'width' => isset($globalUploadSettings->maxImageX) ? (int) $globalUploadSettings->maxImageX : null,
-            'height' => isset($globalUploadSettings->maxImageY) ? (int) $globalUploadSettings->maxImageY : null,
-            'ext' => isset($globalUploadSettings->allowedExtensions) ? explode('|', $globalUploadSettings->allowedExtensions) : []
+            'width' => isset($globalUploadSettings->maxImageX) && (int) $globalUploadSettings->maxImageX > 0 ? (int) $globalUploadSettings->maxImageX : null,
+            'height' => isset($globalUploadSettings->maxImageY) && (int) $globalUploadSettings->maxImageY > 0 ? (int) $globalUploadSettings->maxImageY : null,
+            'ext' => isset($globalUploadSettings->allowedExtensions) ? array_map('strtolower', explode('|', $globalUploadSettings->allowedExtensions)) : []
         ];
 
         /* 2. Parsing e sovrascrittura condizionale tramite gli argomenti espliciti della regola (se presenti) */
@@ -64,47 +64,58 @@ class ImagesRules
                 $value = trim($value);
 
                 if ($key === 'ext') :
-                    $config['ext'] = explode('|', $value);
+                    $config['ext'] = array_map('strtolower', explode('|', $value));
                 elseif (array_key_exists($key, $config)) :
-                    $config[$key] = (int) $value;
+                    $numericValue = (int) $value;
+                    $config[$key] = in_array($key, ['width', 'height'], true) && $numericValue <= 0 ? null : $numericValue;
                 endif;
             endforeach;
         endif;
 
         $validator = \Config\Services::validation();
-        $hasErrors = false;
 
         /* 3. Ciclo di validazione sulle immagini reali basato sulla configurazione unificata */
         foreach ($files as $jsKey => $file) :
             if ( ! $file->isValid()) :
+                if ($file->getError() !== UPLOAD_ERR_NO_FILE) :
+                    $validator->setError("images.{$jsKey}", $file->getErrorString());
+                endif;
+
                 continue;
             endif;
 
             /* Controllo Peso (KB) */
             if ($config['size'] !== null && $file->getSizeByUnit('kb') > $config['size']) :
                 $validator->setError("images.{$jsKey}", lang('backend/upload.maxSize', [$config['size']]));
-                $hasErrors = true;
+                continue;
             endif;
 
-            /* Controllo Estensioni */
-            if ( ! empty($config['ext']) && ! in_array($file->getClientExtension(), $config['ext'], true)) :
+            /* Verifica che il contenuto sia realmente un'immagine */
+            $dimensions = @getimagesize($file->getTempName());
+
+            if ($dimensions === false) :
+                $validator->setError("images.{$jsKey}", lang('Validation.is_image', ["images.{$jsKey}"]));
+                continue;
+            endif;
+
+            [$width, $height] = $dimensions;
+
+            /* Controllo dell'estensione determinata dal MIME reale */
+            $extension = strtolower($file->guessExtension());
+
+            if ( ! empty($config['ext']) && ! in_array($extension, $config['ext'], true)) :
                 $validator->setError("images.{$jsKey}", lang('backend/upload.extIn', [implode(', ', $config['ext'])]));
-                $hasErrors = true;
+                continue;
             endif;
 
             /* Controllo Dimensioni in Pixel (Larghezza / Altezza) */
-            if ($config['width'] !== null || $config['height'] !== null) :
-                [$width, $height] = getimagesize($file->getTempName());
+            if ($config['width'] !== null && $width > $config['width']) :
+                $validator->setError("images.{$jsKey}", lang('backend/upload.maxWidth', [$config['width']]));
+                continue;
+            endif;
 
-                if ($config['width'] !== null && $width > $config['width']) :
-                    $validator->setError("images.{$jsKey}", lang('backend/upload.maxWidth', [$config['width']]));
-                    $hasErrors = true;
-                endif;
-
-                if ($config['height'] !== null && $height > $config['height']) :
-                    $validator->setError("images.{$jsKey}", lang('backend/upload.maxHeight', [$config['height']]));
-                    $hasErrors = true;
-                endif;
+            if ($config['height'] !== null && $height > $config['height']) :
+                $validator->setError("images.{$jsKey}", lang('backend/upload.maxHeight', [$config['height']]));
             endif;
         endforeach;
 

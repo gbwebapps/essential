@@ -37,6 +37,17 @@ class ArrayHelperTest extends CIUnitTestCase
         ], $result);
     }
 
+    public function testRemoveDotDoesNotRemovePrefixFromTheMiddleOfAKey(): void
+    {
+        $result = removeDot('searchFields.', [
+            'nested.searchFields.name' => 'Error name'
+        ]);
+
+        $this->assertSame([
+            'nested.searchFields.name' => 'Error name'
+        ], $result);
+    }
+
     public function testRemoveDotReturnsEmptyArrayForEmptyInput(): void
     {
         $this->assertSame([], removeDot('test.', []));
@@ -65,5 +76,23 @@ class ArrayHelperTest extends CIUnitTestCase
         $this->assertSame([
             'name' => 'Name error'
         ], $result);
+    }
+
+    public function testRemoveDotPermissionsDoesNotGroupPrefixFromTheMiddleOfAKey(): void
+    {
+        $result = removeDotPermissions('permissions', [
+            'other.permissions.0' => 'Other error',
+            'permissionsExtra.0' => 'Extra error'
+        ]);
+
+        $this->assertSame([
+            'other.permissions.0' => 'Other error',
+            'permissionsExtra.0' => 'Extra error'
+        ], $result);
+    }
+
+    public function testRemoveDotPermissionsReturnsEmptyArrayForEmptyInput(): void
+    {
+        $this->assertSame([], removeDotPermissions('permissions', []));
     }
 }

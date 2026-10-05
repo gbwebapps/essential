@@ -31,7 +31,7 @@ class SuperAdminFilter implements FilterInterface
         $currentAdmin = service('authorization')->currentAdmin();
 
         /* Se l'utente è loggato ed è superadmin, prosegue normalmente */
-        if ($currentAdmin && (int) $currentAdmin->superadmin === 1):
+        if ($currentAdmin && isset($currentAdmin->superadmin) && (int) $currentAdmin->superadmin === 1):
             return null;
         endif;
 
@@ -50,7 +50,7 @@ class SuperAdminFilter implements FilterInterface
 
         /* Blocco AJAX: restituisce esito negativo e messaggio */
         if ($request->isAJAX() && $request->is('post')):
-            return service('response')->setJSON(['result' => false, 'message' => lang('backend/global.messages.permissionDenied')]);
+            return service('response')->setJSON(['result' => false, 'message' => $message]);
         endif;
 
         /* Blocco Standard: reindirizza alla dashboard */

@@ -61,7 +61,7 @@
                         <select id="email_protocol" name="protocol" class="form-select shadow-none">
                             <option value="smtp" <?= $emailSettings['protocol'] === 'smtp' ? 'selected' : ''; ?>><?= lang('backend/settings.labels.smtp'); ?></option>
                             <option value="mail" <?= $emailSettings['protocol'] === 'mail' ? 'selected' : ''; ?>><?= lang('backend/settings.labels.mail'); ?></option>
-                            <option value="sendemail" <?= $emailSettings['protocol'] === 'sendemail' ? 'selected' : ''; ?>><?= lang('backend/settings.labels.sendEmail'); ?></option>
+                            <option value="sendmail" <?= $emailSettings['protocol'] === 'sendmail' ? 'selected' : ''; ?>><?= lang('backend/settings.labels.sendEmail'); ?></option>
                         </select>
                         <div class="error_protocol text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>

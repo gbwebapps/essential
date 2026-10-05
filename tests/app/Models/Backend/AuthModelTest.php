@@ -7,11 +7,11 @@ use CodeIgniter\Test\CIUnitTestCase;
 /* Funzione isolata per evitare che i test scrivano audit reali. */
 if ( ! function_exists(__NAMESPACE__ . '\log_admin_activity')):
     function log_admin_activity(
-        $admin = null, 
-        $action = null, 
-        $module = null, 
-        $message = null
-    ) {
+        string $action,
+        string $section,
+        string $details,
+        ?object $currentAdmin = null
+    ): bool {
         return true;
     }
 endif;
@@ -150,8 +150,8 @@ class AuthModelTest extends CIUnitTestCase
         if (
             ! function_exists('setting')
         ):
-            /* Aggiunta la proprietà twoFactorEmailExpiry richiesta dal servizio OTP */
-            eval("function setting(\$key = null) { return (object)['twoFactorDigits' => 6, 'twoFactorEmailExpiry' => 300]; }");
+            /* Proprietà richieste dai servizi OTP email e TOTP. */
+            eval("function setting(\$key = null) { return (object)['twoFactorDigits' => 6, 'twoFactorEmailExpiry' => 300, 'twoFactorWindow' => 1]; }");
         endif;
         
         $mockEmail = 
@@ -3980,7 +3980,9 @@ class AuthModelTest extends CIUnitTestCase
                 'uuid' => '1234', 
                 'firstname' => 'Test', 
                 'lastname' => 'User', 
+                'email' => 'test@test.com',
                 'password_hash' => $fakeHash,
+                'times' => 0,
                 'status' => 1,
                 'deleted_at' => null
             ];
@@ -3988,10 +3990,18 @@ class AuthModelTest extends CIUnitTestCase
         $mockResultAdmin->method('getRow')
                         ->willReturn($mockRow);
 
+        $queries = [];
+
         $mockDb->method('query')
-               ->willReturn(
-                   $mockResultAdmin
+               ->willReturnCallback(
+                   static function(string $sql, array $params = []) use (&$queries, $mockResultAdmin) {
+                       $queries[] = [$sql, $params];
+                       return $mockResultAdmin;
+                   }
                );
+
+        $mockDb->method('insertID')
+               ->willReturnOnConsecutiveCalls(10, 20);
 
         $mockDb->method('transBegin')
                ->willReturn(true);
@@ -4003,7 +4013,10 @@ class AuthModelTest extends CIUnitTestCase
             (object)[
                 'attempts' => 1,
                 'twoFactor' => 0,
-                'attemptsInterval' => 900
+                'attemptsInterval' => 900,
+                'attemptsLimit' => 5,
+                'sessionTime' => 3600,
+                'hashKey' => 'test_hash_key'
             ];
 
         $injector = 
@@ -4042,14 +4055,27 @@ class AuthModelTest extends CIUnitTestCase
         $request->method('getIPAddress')
                 ->willReturn('127.0.0.1');
 
+        $userAgent =
+            $this->createMock(\CodeIgniter\HTTP\UserAgent::class);
+
+        $userAgent->method('getAgentString')
+                  ->willReturn('PHPUnit');
+
+        $request->method('getUserAgent')
+                ->willReturn($userAgent);
+
         $result = 
             $model->login(
                 $posts,
                 $request
             );
 
-        $this->assertIsArray(
-            $result
+        $this->assertSame(['result' => true], $result);
+        $this->assertNotEmpty(session()->get('backendSession'));
+        $this->assertSame(20, session()->get('login_log_id'));
+        $this->assertContains(
+            'delete from admins_attempts where admin_uuid = ?',
+            array_column($queries, 0)
         );
     }
 
@@ -4140,7 +4166,7 @@ class AuthModelTest extends CIUnitTestCase
         );
     }
 
-    public function testVerifyExecutesTotpVerification(): void
+    public function testVerifyReturnsSessionExpiredWhenPendingSessionIsMissing(): void
     {
         $model = 
             new \App\Models\Backend\AuthModel();
@@ -4212,12 +4238,16 @@ class AuthModelTest extends CIUnitTestCase
                 $request
             );
 
-        $this->assertIsArray(
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => lang('backend/auth.messages.sessionExpired')
+            ],
             $result
         );
     }
 
-    public function testVerifyExecutesTotpBranch(): void
+    public function testVerifyTotpRejectsInvalidCodeAndRecordsAttempt(): void
     {
         $model = 
             new \App\Models\Backend\AuthModel();
@@ -4232,10 +4262,14 @@ class AuthModelTest extends CIUnitTestCase
                ->willReturn(true);
 
         /* Callback intelligente: risponde in base alla query che il model sta eseguendo */
+        $queries = [];
+
         $queryHandler = 
             function (
                 $sql
-            ) {
+            ) use (&$queries) {
+                $queries[] = $sql;
+
                 $mockResult = 
                     $this->createMock(\CodeIgniter\Database\BaseResult::class);
 
@@ -4349,12 +4383,20 @@ class AuthModelTest extends CIUnitTestCase
                 $request
             );
 
-        $this->assertIsArray(
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => lang('backend/auth.messages.wrongCode')
+            ],
             $result
+        );
+        $this->assertContains(
+            'insert into admins_2fa_attempts (admin_uuid, method, ip_address, timestamp) values (?, ?, ?, ?)',
+            $queries
         );
     }
 
-    public function testVerifyExecutesEmailBranch(): void
+    public function testVerifyEmailCodeCompletesLogin(): void
     {
         $model = 
             new \App\Models\Backend\AuthModel();
@@ -4367,6 +4409,9 @@ class AuthModelTest extends CIUnitTestCase
 
         $mockDb->method('transCommit')
                ->willReturn(true);
+
+        $mockDb->method('insertID')
+               ->willReturnOnConsecutiveCalls(10, 20);
 
         /* Usiamo lo stesso cervello, ma con la risposta specifica per le Email */
         $queryHandler = 
@@ -4387,7 +4432,8 @@ class AuthModelTest extends CIUnitTestCase
                         (object)[
                             'uuid' => '1234',
                             'firstname' => 'Test',
-                            'lastname' => 'User'
+                            'lastname' => 'User',
+                            'email' => 'test@test.com'
                         ];
                     $mockResult->method('getRow')
                                ->willReturn($mockRow);
@@ -4438,7 +4484,9 @@ class AuthModelTest extends CIUnitTestCase
         $fakeConfig = 
             (object)[
                 'twoFactorTime' => 300,
-                'twoFactorLimit' => 5
+                'twoFactorLimit' => 5,
+                'sessionTime' => 3600,
+                'hashKey' => 'test_hash_key'
             ];
 
         $injector = 
@@ -4484,14 +4532,24 @@ class AuthModelTest extends CIUnitTestCase
         $request->method('getIPAddress')
                 ->willReturn('127.0.0.1');
 
+        $userAgent =
+            $this->createMock(\CodeIgniter\HTTP\UserAgent::class);
+
+        $userAgent->method('getAgentString')
+                  ->willReturn('PHPUnit');
+
+        $request->method('getUserAgent')
+                ->willReturn($userAgent);
+
         $result = 
             $model->verify(
                 $posts,
                 $request
             );
 
-        $this->assertIsArray(
-            $result
-        );
+        $this->assertSame(['result' => true], $result);
+        $this->assertNull(session()->get('auth_2fa_pending'));
+        $this->assertNotEmpty(session()->get('backendSession'));
+        $this->assertSame(20, session()->get('login_log_id'));
     }
 }

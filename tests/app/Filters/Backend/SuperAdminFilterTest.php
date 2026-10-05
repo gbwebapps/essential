@@ -139,4 +139,44 @@ class SuperAdminFilterTest extends CIUnitTestCase
         $this->assertSame(base_url('backend/dashboard'), $result->getHeaderLine('Location'));
         $this->assertSame(lang('backend/auth.messages.loginNeeded'), session()->getFlashdata('message'));
     }
+
+    public function testBeforeReturnsLoginNeededJsonWhenAdminIsNotAuthenticated(): void
+    {
+        Services::injectMock('authorization', $this->createAuthorizationMock(null));
+
+        $request = $this->createMock(IncomingRequest::class);
+        $request->method('isAJAX')->willReturn(true);
+        $request->method('is')->with('post')->willReturn(true);
+
+        $response = $this->createMock(ResponseInterface::class);
+        $response->expects($this->once())
+            ->method('setJSON')
+            ->with([
+                'result' => false,
+                'message' => lang('backend/auth.messages.loginNeeded')
+            ])
+            ->willReturnSelf();
+
+        Services::injectMock('response', $response);
+
+        $this->assertSame($response, (new SuperAdminFilter())->before($request));
+    }
+
+    public function testBeforeDeniesAdminWithoutSuperadminProperty(): void
+    {
+        $admin = (object) [
+            'firstname' => 'Mario',
+            'lastname' => 'Rossi'
+        ];
+
+        Services::injectMock('authorization', $this->createAuthorizationMock($admin));
+
+        $request = $this->createMock(IncomingRequest::class);
+        $request->method('isAJAX')->willReturn(false);
+
+        $result = (new SuperAdminFilter())->before($request);
+
+        $this->assertSame(302, $result->getStatusCode());
+        $this->assertSame(base_url('backend/dashboard'), $result->getHeaderLine('Location'));
+    }
 }

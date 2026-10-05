@@ -6,54 +6,26 @@ use CodeIgniter\Test\CIUnitTestCase;
 use CodeIgniter\Test\ControllerTestTrait;
 use CodeIgniter\Test\DatabaseTestTrait;
 use Config\Services;
+use Tests\Support\Libraries\MocksSettings;
 
 class ToolsClassTest extends CIUnitTestCase
 {
+	use MocksSettings;
+
+	protected function setUp(): void
+    {
+        parent::setUp();
+        $this->mockSettings(['Backend\General' => ['language' => 'en']]);
+    }
+
+	protected function tearDown(): void
+    {
+        $this->resetSettingsMocks();
+        parent::tearDown();
+    }
+
 	public function testGetJsIndexReturnsCorrectConfigurationWithLocale()
     {
-        $generalConfig
-            =
-            new \stdClass();
-
-        $generalConfig
-            ->language
-            =
-            'en';
-
-        if (
-            ! function_exists(
-                'setting'
-            )
-        ):
-            function setting(
-                $key
-            ) {
-                $fallbackConf
-                    =
-                    new \stdClass();
-
-                $fallbackConf
-                    ->language
-                    =
-                    'en';
-
-                return
-                    $fallbackConf;
-            }
-        endif;
-
-        if (
-            class_exists(
-                '\CodeIgniter\Config\Factories'
-            )
-        ):
-            \CodeIgniter\Config\Factories::injectMock(
-                'config',
-                'Backend\General',
-                $generalConfig
-            );
-        endif;
-
         $modelMock = $this->createMock(\App\Models\Backend\ToolsModel::class);
 
         $result

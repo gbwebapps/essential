@@ -2,12 +2,20 @@
 
 namespace App\Validation\Backend;
 
+use CodeIgniter\Config\Services;
 use CodeIgniter\Test\CIUnitTestCase;
 
 use App\Validation\Backend\SettingsRules;
 
 class SettingsRulesTest extends CIUnitTestCase
 {
+    protected function tearDown(): void
+    {
+        Services::reset();
+
+        parent::tearDown();
+    }
+
     public function testRequiredIfFieldReturnsFalseWhenConditionMatchesAndValueIsEmpty(): void
     {
         $rules = new SettingsRules();
@@ -64,5 +72,50 @@ class SettingsRulesTest extends CIUnitTestCase
         );
 
         $this->assertTrue($result);
+    }
+
+    public function testRequiredIfFieldRejectsWhitespaceWhenConditionMatches(): void
+    {
+        $result = (new SettingsRules())->required_if_field(
+            '   ',
+            'protocol,smtp',
+            ['protocol' => 'smtp']
+        );
+
+        $this->assertFalse($result);
+    }
+
+    public function testRequiredIfFieldTrimsRuleParameters(): void
+    {
+        $result = (new SettingsRules())->required_if_field(
+            '',
+            ' protocol , smtp ',
+            ['protocol' => 'smtp']
+        );
+
+        $this->assertFalse($result);
+    }
+
+    public function testRequiredIfFieldRejectsMalformedParameters(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        (new SettingsRules())->required_if_field('', 'protocol', []);
+    }
+
+    public function testRequiredIfFieldIsRegisteredInValidationService(): void
+    {
+        $validation = Services::validation();
+        $validation->setRule(
+            'host',
+            'Host',
+            'required_if_field[protocol,smtp]'
+        );
+
+        $this->assertFalse($validation->run([
+            'host' => '',
+            'protocol' => 'smtp',
+        ]));
+        $this->assertNotSame('', $validation->getError('host'));
     }
 }

@@ -37,13 +37,30 @@ class LanguageFilter implements FilterInterface
         endif;
 
         /* 1. Determina la lingua: priorità al POST, poi al DB/Config */
-        $activeLanguage = $request->getPost('language') ?: $this->getStoredLanguage();
+        $appConfig = config('App');
+        $requestedLanguage = $request->getPost('language');
+
+        if (
+            is_string($requestedLanguage)
+            &&
+            in_array($requestedLanguage, $appConfig->supportedLocales, true)
+        ):
+            $activeLanguage = $requestedLanguage;
+        else:
+            $activeLanguage = $this->getStoredLanguage();
+        endif;
+
+        if ( ! in_array($activeLanguage, $appConfig->supportedLocales, true)):
+            $activeLanguage = in_array($appConfig->defaultLocale, $appConfig->supportedLocales, true)
+                ? $appConfig->defaultLocale
+                : ($appConfig->supportedLocales[0] ?? 'en');
+        endif;
 
         /* 2. Applica la lingua a tutti i livelli del framework */
         $request->setLocale($activeLanguage);
         Services::request()->setLocale($activeLanguage);
         Services::language()->setLocale($activeLanguage);
-        config('App')->defaultLocale = $activeLanguage;
+        $appConfig->defaultLocale = $activeLanguage;
     }
 
     /**

@@ -1014,12 +1014,21 @@ class ExportModelTest extends CIUnitTestCase
                 []
             );
 
+        $executedSql = null;
+
         $dbMock
+            ->expects(
+                $this
+                    ->once()
+            )
             ->method(
                 'query'
             )
-            ->willReturn(
-                $resMock
+            ->willReturnCallback(
+                static function(string $sql) use (&$executedSql, $resMock) {
+                    $executedSql = $sql;
+                    return $resMock;
+                }
             );
 
         $model
@@ -1085,15 +1094,18 @@ class ExportModelTest extends CIUnitTestCase
                 $posts
             );
 
-        $this
-            ->assertIsArray(
-                $result
-            );
+        $this->assertStringStartsWith(
+            'select id, title from real_table where 1 = 1',
+            $executedSql
+        );
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => lang('backend/components/export.messages.noDataFound')
+            ],
+            $result
+        );
 
-        $this
-            ->assertFalse(
-                $result['result']
-            );
     }
 
     public function testGenerateFirstChunkReturnsNotFinished()
@@ -1237,12 +1249,21 @@ class ExportModelTest extends CIUnitTestCase
                 ]
             );
 
+        $executedSql = null;
+
         $dbMock
+            ->expects(
+                $this
+                    ->once()
+            )
             ->method(
                 'query'
             )
-            ->willReturn(
-                $resMock
+            ->willReturnCallback(
+                static function(string $sql) use (&$executedSql, $resMock) {
+                    $executedSql = $sql;
+                    return $resMock;
+                }
             );
 
         $model
@@ -1308,10 +1329,10 @@ class ExportModelTest extends CIUnitTestCase
                 $posts
             );
 
-        $this
-            ->assertIsArray(
-                $result
-            );
+        $this->assertStringStartsWith(
+            'select id, title from real_table where 1 = 1',
+            $executedSql
+        );
 
         $this
             ->assertTrue(
@@ -1668,12 +1689,21 @@ class ExportModelTest extends CIUnitTestCase
                 []
             );
 
+        $executedSql = null;
+
         $dbMock
+            ->expects(
+                $this
+                    ->once()
+            )
             ->method(
                 'query'
             )
-            ->willReturn(
-                $resMock
+            ->willReturnCallback(
+                static function(string $sql) use (&$executedSql, $resMock) {
+                    $executedSql = $sql;
+                    return $resMock;
+                }
             );
 
         /* Forza l'ingresso nel blocco if ($primaryKey !== null) */
@@ -1740,10 +1770,17 @@ class ExportModelTest extends CIUnitTestCase
                 $posts
             );
 
-        $this
-            ->assertIsArray(
-                $result
-            );
+        $this->assertStringStartsWith(
+            'select uuid, id, title from real_table where 1 = 1',
+            $executedSql
+        );
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => lang('backend/components/export.messages.noDataFound')
+            ],
+            $result
+        );
     }
 
     public function testGenerateAppliesTrashedFilter()
@@ -1829,12 +1866,21 @@ class ExportModelTest extends CIUnitTestCase
                 []
             );
 
+        $executedSql = null;
+
         $dbMock
+            ->expects(
+                $this
+                    ->once()
+            )
             ->method(
                 'query'
             )
-            ->willReturn(
-                $resMock
+            ->willReturnCallback(
+                static function(string $sql) use (&$executedSql, $resMock) {
+                    $executedSql = $sql;
+                    return $resMock;
+                }
             );
 
         $model
@@ -1904,10 +1950,17 @@ class ExportModelTest extends CIUnitTestCase
                 $posts
             );
 
-        $this
-            ->assertIsArray(
-                $result
-            );
+        $this->assertStringContainsString(
+            'select id, title from real_table where 1 = 1 and deleted_at is not null',
+            $executedSql
+        );
+        $this->assertSame(
+            [
+                'result' => false,
+                'message' => lang('backend/components/export.messages.noDataFound')
+            ],
+            $result
+        );
     }
 
     public function testGenerateCreatesExportDirectoryWhenMissing()

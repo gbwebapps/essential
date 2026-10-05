@@ -30,9 +30,9 @@ class EmailService
     {
         /* Compilazione della vista Email */
         $emailData = [
-            'firstname' => esc($row->firstname),
-            'lastname'  => esc($row->lastname),
-            'email'     => esc($row->email),
+            'firstname' => $row->firstname,
+            'lastname'  => $row->lastname,
+            'email'     => $row->email,
             'token'     => $rawToken
         ];
         
@@ -40,10 +40,10 @@ class EmailService
 
         /* Configurazione e invio email */
         $emailService = \Config\Services::email();
-        $emailService->setTo(esc($row->email));
+        $emailService->setTo($row->email);
         
         /* Uso la chiave lingua dinamica */
-        $emailService->setSubject(sprintf(lang($subjectLangKey), esc($row->firstname), esc($row->lastname)));
+        $emailService->setSubject(sprintf(lang($subjectLangKey), $row->firstname, $row->lastname));
         $emailService->setMessage($emailHTML);
 
         /* Restituisce true se inviata, false in caso di errore */

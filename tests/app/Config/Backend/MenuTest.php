@@ -2,12 +2,20 @@
 
 namespace Config\Backend;
 
+use CodeIgniter\Config\Services;
 use CodeIgniter\Test\CIUnitTestCase;
 
 use Config\Backend\Menu;
 
 class MenuTest extends CIUnitTestCase
 {
+    protected function tearDown(): void
+    {
+        Services::reset();
+
+        parent::tearDown();
+    }
+
     public function testConstructorBuildsTopRightMenu(): void
     {
         $config = new Menu();
@@ -35,5 +43,29 @@ class MenuTest extends CIUnitTestCase
         $this->assertCount(2, $config->bottomRight);
         $this->assertSame('backend/tools', $config->bottomRight[0]['route']);
         $this->assertSame('backend/settings', $config->bottomRight[1]['route']);
+    }
+
+    public function testEveryMenuItemHasACompleteUniqueAndRoutableDefinition(): void
+    {
+        $config = new Menu();
+        $items = array_merge($config->topRight, $config->bottomLeft, $config->bottomRight);
+        $routes = Services::routes(false);
+        $routes->loadRoutes();
+        $getRoutes = $routes->getRoutes('GET');
+        $configuredRoutes = [];
+        $controllers = [];
+
+        foreach ($items as $item):
+            $this->assertSame(['label', 'route', 'icon', 'controller'], array_keys($item));
+            $this->assertNotSame('', $item['label']);
+            $this->assertNotSame('', $item['icon']);
+            $this->assertArrayHasKey($item['route'], $getRoutes, $item['route']);
+
+            $configuredRoutes[] = $item['route'];
+            $controllers[] = $item['controller'];
+        endforeach;
+
+        $this->assertSame($configuredRoutes, array_values(array_unique($configuredRoutes)));
+        $this->assertSame($controllers, array_values(array_unique($controllers)));
     }
 }

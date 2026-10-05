@@ -58,4 +58,25 @@ class AuthRulesTest extends CIUnitTestCase
 
         $this->assertFalse($result);
     }
+
+    public function testCheckTokenRuleDoesNotHideModelExceptions(): void
+    {
+        $authModel = $this->createMock(AuthModel::class);
+
+        $authModel->expects($this->once())
+            ->method('checkAuthToken')
+            ->with('token')
+            ->willThrowException(new \RuntimeException('Token lookup failed'));
+
+        Factories::injectMock(
+            'models',
+            AuthModel::class,
+            $authModel
+        );
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Token lookup failed');
+
+        (new AuthRules())->checkTokenRule('token');
+    }
 }

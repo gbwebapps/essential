@@ -221,7 +221,7 @@ class AuthModel extends BackendModel
 
             /* Se l'utente non esiste, esce immediatamente con errore generico (sicurezza) */
             if ( ! $admin):
-                log_admin_activity(null, 'LOGIN_REFUSED', 'auth', lang('backend/auth.audits.loginRefused'));
+                log_admin_activity('LOGIN_REFUSED', 'auth', lang('backend/auth.audits.loginRefused'));
                 return ['result' => false, 'message' => lang('backend/auth.messages.loginFailed')];
             endif;
 
@@ -666,7 +666,7 @@ class AuthModel extends BackendModel
             /* Recupero l'oggetto anagrafico dell'admin per il login finale, bloccando rigorosamente i record cestinati */
             $admin = $this->db->query("select * from admins where uuid = ? and status = 1 and deleted_at IS NULL limit 1", [$adminUuid])->getRow();
             if ( ! $admin):
-                log_admin_activity(null, 'VERIFY_FAILED', 'auth', lang('backend/auth.audits.verifyFailed'));
+                log_admin_activity('VERIFY_FAILED', 'auth', lang('backend/auth.audits.verifyFailed'));
                 return ['result' => false, 'message' => lang('backend/auth.messages.verifyFailed')];
             endif;
 

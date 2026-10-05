@@ -6,9 +6,12 @@ use CodeIgniter\HTTP\Files\UploadedFile;
 use CodeIgniter\Test\CIUnitTestCase;
 
 use App\Libraries\Backend\UploadClass;
+use Tests\Support\Libraries\MocksSettings;
 
 class UploadClassTest extends CIUnitTestCase
 {
+    use MocksSettings;
+
     private string $testDir;
     private string $entity = 'phpunit-upload';
     private string $uuid = 'test-uuid';
@@ -16,6 +19,17 @@ class UploadClassTest extends CIUnitTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->mockSettings([
+            'Backend\Upload' => [
+                'renameImages' => true,
+                'overwriteImages' => true,
+                'resizeMediumX' => 100,
+                'resizeMediumY' => 100,
+                'resizeSmallX' => 50,
+                'resizeSmallY' => 50
+            ]
+        ]);
 
         $this->testDir = WRITEPATH . 'tests/upload_class/';
 
@@ -31,6 +45,8 @@ class UploadClassTest extends CIUnitTestCase
         $uploadDir = rtrim(FCPATH, '/\\') . '/images/backend/' . $this->entity;
 
         $this->deleteDirectory($uploadDir);
+
+        $this->resetSettingsMocks();
 
         parent::tearDown();
     }
@@ -119,7 +135,7 @@ class UploadClassTest extends CIUnitTestCase
 
         $this->assertIsArray($result);
         $this->assertCount(1, $result);
-        $this->assertIsString($result[0]);
+        $this->assertSame('random-image.png', $result[0]);
     }
 
     public function testDoUploadReturnsFalseWhenMoveThrowsException(): void

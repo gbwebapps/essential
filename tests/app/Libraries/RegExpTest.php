@@ -9,6 +9,31 @@ use Config\Services;
 
 class RegExpTest extends CIUnitTestCase
 {
+	public function testValidateUuidAcceptsCanonicalVersionFourUuid()
+    {
+        $this->assertTrue((new \App\Libraries\RegExp())->validateUUID('550e8400-e29b-41d4-a716-446655440000'));
+    }
+
+    public function testValidateUuidAcceptsUppercaseHexadecimalCharacters()
+    {
+        $this->assertTrue((new \App\Libraries\RegExp())->validateUUID('550E8400-E29B-41D4-A716-446655440000'));
+    }
+
+    public function testValidateUuidRejectsUnsupportedVersion()
+    {
+        $this->assertFalse((new \App\Libraries\RegExp())->validateUUID('550e8400-e29b-61d4-a716-446655440000'));
+    }
+
+    public function testValidateUuidRejectsInvalidVariant()
+    {
+        $this->assertFalse((new \App\Libraries\RegExp())->validateUUID('550e8400-e29b-41d4-7716-446655440000'));
+    }
+
+    public function testValidateUuidRejectsMalformedValue()
+    {
+        $this->assertFalse((new \App\Libraries\RegExp())->validateUUID('not-a-uuid'));
+    }
+
 	public function testValidatePasswordReturnsTrueForStrongPassword()
     {
         $regexClass

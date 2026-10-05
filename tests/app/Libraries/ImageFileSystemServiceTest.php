@@ -192,14 +192,29 @@ class ImageFileSystemServiceTest extends CIUnitTestCase
             =
             'non_existent_uuid';
 
+        $basePath
+            =
+            rtrim(
+                FCPATH,
+                '/\\'
+            )
+            .
+            '/images/backend/'
+            .
+            $entity
+            .
+            '/'
+            .
+            $uuid;
+
         \App\Libraries\ImageFileSystemService::removeAllImages(
             $entity,
             $uuid
         );
 
         $this
-            ->assertTrue(
-                true
+            ->assertDirectoryDoesNotExist(
+                $basePath
             );
     }
 }

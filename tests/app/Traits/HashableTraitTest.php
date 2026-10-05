@@ -42,4 +42,38 @@ class HashableTraitTest extends CIUnitTestCase
 
         $this->assertNotSame($first, $second);
     }
+
+    public function testGenerateHashSupportsSingleByte(): void
+    {
+        $object = new class
+        {
+            use HashableTrait;
+        };
+
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{2}$/', $object->generateHash(1));
+    }
+
+    public function testGenerateHashRejectsZeroLength(): void
+    {
+        $object = new class
+        {
+            use HashableTrait;
+        };
+
+        $this->expectException(\ValueError::class);
+
+        $object->generateHash(0);
+    }
+
+    public function testGenerateHashRejectsNegativeLength(): void
+    {
+        $object = new class
+        {
+            use HashableTrait;
+        };
+
+        $this->expectException(\ValueError::class);
+
+        $object->generateHash(-1);
+    }
 }

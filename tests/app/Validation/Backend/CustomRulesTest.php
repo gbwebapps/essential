@@ -42,4 +42,25 @@ class CustomRulesTest extends CIUnitTestCase
 
         $this->assertFalse($rules->valid_email('test@example.com.deleted.123'));
     }
+
+    public function testValidEmailRejectsSoftDeleteSuffixWithExtraContent(): void
+    {
+        $rules = new CustomRules();
+
+        $this->assertFalse($rules->valid_email('test@example.com.deleted.1691234567.extra'));
+    }
+
+    public function testValidEmailRejectsSoftDeleteSuffixWithElevenDigitTimestamp(): void
+    {
+        $rules = new CustomRules();
+
+        $this->assertFalse($rules->valid_email('test@example.com.deleted.16912345670'));
+    }
+
+    public function testValidEmailAcceptsDeletedWordInsideNormalLocalPart(): void
+    {
+        $rules = new CustomRules();
+
+        $this->assertTrue($rules->valid_email('test.deleted@example.com'));
+    }
 }

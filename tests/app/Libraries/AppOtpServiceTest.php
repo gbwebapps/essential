@@ -6,25 +6,36 @@ use CodeIgniter\Test\CIUnitTestCase;
 use CodeIgniter\Test\ControllerTestTrait;
 use CodeIgniter\Test\DatabaseTestTrait;
 use Config\Services;
+use Tests\Support\Libraries\MocksSettings;
 
 class AppOtpServiceTest extends CIUnitTestCase
 {
+    use MocksSettings;
     use ControllerTestTrait;
     use DatabaseTestTrait;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->mockSettings([
+            'Backend\Auth' => [
+                'twoFactorDigits' => 6,
+                'twoFactorIssuer' => 'Essential',
+                'twoFactorWindow' => 1
+            ]
+        ]);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->resetSettingsMocks();
+
+        parent::tearDown();
+    }
+
     public function testGenerateSecretReturnsValidString()
     {
-        if (
-            ! function_exists(
-                'helper'
-            )
-        ):
-            function helper(
-                $name
-            ) {
-            }
-        endif;
-
         $serviceClass
             =
             \App\Libraries\AppOtpService::class;
@@ -51,17 +62,6 @@ class AppOtpServiceTest extends CIUnitTestCase
 
     public function testGetProvisioningUriReturnsCorrectlyFormattedUri()
     {
-        if (
-            ! function_exists(
-                'helper'
-            )
-        ):
-            function helper(
-                $name
-            ) {
-            }
-        endif;
-
         $authConfig
             =
             new \stdClass();
@@ -80,37 +80,6 @@ class AppOtpServiceTest extends CIUnitTestCase
             ->twoFactorWindow
             =
             1;
-
-        if (
-            ! function_exists(
-                'setting'
-            )
-        ):
-            function setting(
-                $key
-            ) {
-                $fallbackConf
-                    =
-                    new \stdClass();
-
-                $fallbackConf
-                    ->twoFactorDigits
-                    =
-                    6;
-
-                $fallbackConf
-                    ->twoFactorIssuer
-                    =
-                    'Essential';
-
-                $fallbackConf
-                    ->twoFactorWindow
-                    =
-                    1;
-
-                return $fallbackConf;
-            }
-        endif;
 
         if (
             class_exists(
@@ -177,17 +146,6 @@ class AppOtpServiceTest extends CIUnitTestCase
 
     public function testVerifyReturnsTrueForValidCode()
     {
-        if (
-            ! function_exists(
-                'helper'
-            )
-        ):
-            function helper(
-                $name
-            ) {
-            }
-        endif;
-
         $authConfig
             =
             new \stdClass();
@@ -206,37 +164,6 @@ class AppOtpServiceTest extends CIUnitTestCase
             ->twoFactorWindow
             =
             1;
-
-        if (
-            ! function_exists(
-                'setting'
-            )
-        ):
-            function setting(
-                $key
-            ) {
-                $fallbackConf
-                    =
-                    new \stdClass();
-
-                $fallbackConf
-                    ->twoFactorDigits
-                    =
-                    6;
-
-                $fallbackConf
-                    ->twoFactorIssuer
-                    =
-                    'Essential';
-
-                $fallbackConf
-                    ->twoFactorWindow
-                    =
-                    1;
-
-                return $fallbackConf;
-            }
-        endif;
 
         if (
             class_exists(
@@ -296,17 +223,6 @@ class AppOtpServiceTest extends CIUnitTestCase
 
     public function testVerifyReturnsFalseForInvalidCode()
     {
-        if (
-            ! function_exists(
-                'helper'
-            )
-        ):
-            function helper(
-                $name
-            ) {
-            }
-        endif;
-
         $authConfig
             =
             new \stdClass();
@@ -325,37 +241,6 @@ class AppOtpServiceTest extends CIUnitTestCase
             ->twoFactorWindow
             =
             1;
-
-        if (
-            ! function_exists(
-                'setting'
-            )
-        ):
-            function setting(
-                $key
-            ) {
-                $fallbackConf
-                    =
-                    new \stdClass();
-
-                $fallbackConf
-                    ->twoFactorDigits
-                    =
-                    6;
-
-                $fallbackConf
-                    ->twoFactorIssuer
-                    =
-                    'Essential';
-
-                $fallbackConf
-                    ->twoFactorWindow
-                    =
-                    1;
-
-                return $fallbackConf;
-            }
-        endif;
 
         if (
             class_exists(

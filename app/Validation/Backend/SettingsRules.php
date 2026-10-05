@@ -30,11 +30,17 @@ class SettingsRules
     public function required_if_field(string $str, string $fields, array $data): bool
     {
         /* Esplodiamo i parametri passati nella regola, es: "protocol,smtp" */
-        list($field, $value) = explode(',', $fields);
+        $parameters = array_map('trim', explode(',', $fields));
+
+        if (count($parameters) !== 2 || $parameters[0] === '' || $parameters[1] === ''):
+            throw new \InvalidArgumentException('required_if_field richiede esattamente due parametri non vuoti.');
+        endif;
+
+        [$field, $value] = $parameters;
 
         /* Se il campo di controllo corrisponde al valore atteso, questo campo diventa obbligatorio */
         if (isset($data[$field]) && $data[$field] === $value):
-            return $str !== '';
+            return trim($str) !== '';
         endif;
 
         return true;

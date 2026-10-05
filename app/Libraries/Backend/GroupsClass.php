@@ -22,9 +22,8 @@ class GroupsClass
 
 	/**
 	 * Inizializza la libreria di supporto iniettando il modello associato ai gruppi di sistema.
-	 * $groupsModel Il modello preposto alla gestione e all'estrazione dei ruoli e dei permessi
 	 *
-	 * @param GroupsModel 
+	 * @param GroupsModel $groupsModel Il modello preposto alla gestione e all'estrazione dei ruoli e dei permessi
 	 */
 	public function __construct(GroupsModel $groupsModel) 
 	{

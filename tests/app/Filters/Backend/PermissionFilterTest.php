@@ -68,6 +68,36 @@ class PermissionFilterTest extends CIUnitTestCase
         $this->assertNull($filter->before($request, ['users.view']));
     }
 
+    public function testBeforeDeniesAccessWhenPermissionValueIsFalse(): void
+    {
+        $admin = (object) [
+            'permissions' => (object) ['users.view' => false]
+        ];
+
+        Services::injectMock('authorization', $this->createAuthorizationMock($admin));
+
+        $request = $this->createMock(IncomingRequest::class);
+        $request->method('isAJAX')->willReturn(false);
+
+        $result = (new PermissionFilter())->before($request, ['users.view']);
+
+        $this->assertSame(302, $result->getStatusCode());
+        $this->assertSame(base_url('backend/dashboard'), $result->getHeaderLine('Location'));
+    }
+
+    public function testBeforeDeniesAccessWhenPermissionsObjectIsMissing(): void
+    {
+        Services::injectMock('authorization', $this->createAuthorizationMock((object) ['uuid' => 'admin-uuid']));
+
+        $request = $this->createMock(IncomingRequest::class);
+        $request->method('isAJAX')->willReturn(false);
+
+        $result = (new PermissionFilter())->before($request, ['users.view']);
+
+        $this->assertSame(302, $result->getStatusCode());
+        $this->assertSame(base_url('backend/dashboard'), $result->getHeaderLine('Location'));
+    }
+
     public function testBeforeReturnsJsonWhenPermissionIsMissingOnAjaxPost(): void
     {
         $admin = (object) [
@@ -139,6 +169,10 @@ class PermissionFilterTest extends CIUnitTestCase
         $result = $filter->before($request);
 
         $this->assertSame(302, $result->getStatusCode());
+        $this->assertSame(base_url('backend/dashboard'), $result->getHeaderLine('Location'));
+        $this->assertSame(lang('backend/global.messages.permissionDenied'), session()->getFlashdata('message'));
+        $this->assertSame('light text-danger fw-bold', session()->getFlashdata('class'));
+        $this->assertSame('<i class="fa-solid fa-ban"></i>', session()->getFlashdata('icon'));
     }
 
     public function testAfterReturnsNull(): void

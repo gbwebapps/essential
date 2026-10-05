@@ -10,13 +10,30 @@ use CodeIgniter\I18n\Time;
 use CodeIgniter\Test\CIUnitTestCase;
 
 use App\Libraries\Backend\AuthorizationClass;
+use Tests\Support\Libraries\MocksSettings;
 
 class AuthorizationClassTest extends CIUnitTestCase
 {
+    use MocksSettings;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->mockSettings([
+            'Backend\Auth' => [
+                'hashKey' => 'phpunit-hash-key',
+                'sessionCryptoKey' => 'phpunit-session-crypto-key-32b',
+                'sessionTime' => 1200
+            ]
+        ]);
+    }
+
     protected function tearDown(): void
     {
         session()->remove('backendSession');
         Services::reset();
+        $this->resetSettingsMocks();
 
         parent::tearDown();
     }
@@ -146,10 +163,12 @@ class AuthorizationClassTest extends CIUnitTestCase
         $adminResult->method('getRow')->willReturn($adminRow);
 
         $queries = 0;
+        $capturedParams = [];
 
         $db = $this->createMock(ConnectionInterface::class);
-        $db->method('query')->willReturnCallback(function(string $sql, array $params = []) use (&$queries, $tokenResult, $adminResult) {
+        $db->method('query')->willReturnCallback(function(string $sql, array $params = []) use (&$queries, &$capturedParams, $tokenResult, $adminResult) {
             $queries++;
+            $capturedParams[] = $params;
 
             if (str_contains($sql, 'select * from admins_tokens')):
                 return $tokenResult;
@@ -173,6 +192,11 @@ class AuthorizationClassTest extends CIUnitTestCase
         $this->assertSame($adminRow, $result);
         $this->assertTrue($result->permissions->all);
         $this->assertSame(3, $queries);
+        $expectedHash = hash_hmac('sha256', $plainToken, 'phpunit-hash-key');
+        $this->assertSame([$expectedHash, 'session'], $capturedParams[0]);
+        $this->assertSame($expectedHash, $capturedParams[1][2]);
+        $this->assertSame('session', $capturedParams[1][3]);
+        $this->assertSame(['admin-uuid'], $capturedParams[2]);
     }
 
     public function testGetAdminFromSessionReturnsNullWhenAdminCannotBeResolved(): void
@@ -513,8 +537,11 @@ class AuthorizationClassTest extends CIUnitTestCase
         $adminResult->method('getRow')->willReturn($adminRow);
 
         $db = $this->createMock(ConnectionInterface::class);
+        $capturedParams = [];
 
-        $db->method('query')->willReturnCallback(function(string $sql, array $params = []) use ($tokenResult, $adminResult) {
+        $db->method('query')->willReturnCallback(function(string $sql, array $params = []) use (&$capturedParams, $tokenResult, $adminResult) {
+            $capturedParams[] = $params;
+
             if (str_contains($sql, 'select * from admins_tokens')):
                 return $tokenResult;
             endif;
@@ -536,6 +563,11 @@ class AuthorizationClassTest extends CIUnitTestCase
 
         $this->assertSame($adminRow, $result);
         $this->assertTrue($result->permissions->all);
+        $expectedHash = hash_hmac('sha256', 'phpunit-valid-cookie', 'phpunit-hash-key');
+        $this->assertSame([$expectedHash, 'cookie'], $capturedParams[0]);
+        $this->assertSame($expectedHash, $capturedParams[1][1]);
+        $this->assertSame('cookie', $capturedParams[1][2]);
+        $this->assertSame(['admin-uuid'], $capturedParams[2]);
     }
 
     public function testGetAdminFromCookieReturnsNullWhenCookieIsValidButAdminDoesNotExist(): void

@@ -28,4 +28,23 @@ class UploadTest extends CIUnitTestCase
 
         $this->assertSame('png|jpg|jpeg|webp', $config->allowedExtensions);
     }
+
+    public function testImageLimitsArePositiveAndInternallyConsistent(): void
+    {
+        $config = new Upload();
+        $extensions = explode('|', $config->allowedExtensions);
+
+        $this->assertGreaterThan(0, $config->maxFileSize);
+        $this->assertGreaterThan(0, $config->resizeSmallX);
+        $this->assertGreaterThan(0, $config->resizeSmallY);
+        $this->assertGreaterThan($config->resizeSmallX, $config->resizeMediumX);
+        $this->assertGreaterThan($config->resizeSmallY, $config->resizeMediumY);
+        $this->assertGreaterThanOrEqual($config->resizeMediumX, $config->maxImageX);
+        $this->assertGreaterThanOrEqual($config->resizeMediumY, $config->maxImageY);
+        $this->assertSame($extensions, array_values(array_unique($extensions)));
+
+        foreach ($extensions as $extension):
+            $this->assertMatchesRegularExpression('/^[a-z0-9]+$/', $extension);
+        endforeach;
+    }
 }

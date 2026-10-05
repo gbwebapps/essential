@@ -55,9 +55,9 @@ $routes->group('backend', function($routes) {
 
         /* MESSAGES */
         $routes->group('messages', ['filter' => 'authorization'], function($routes) {
-            $routes->get('/', '\App\Controllers\Backend\MessagesController::index', ['filter' => 'permission:users_show']);
-            $routes->get('showAll', '\App\Controllers\Backend\MessagesController::showAll', ['filter' => 'permission:users_showAll']);
-            $routes->get('show', '\App\Controllers\Backend\MessagesController::show', ['filter' => 'permission:users_show']);
+            $routes->get('/', '\App\Controllers\Backend\MessagesController::index', ['filter' => 'permission:messages_index']);
+            $routes->get('showAll', '\App\Controllers\Backend\MessagesController::showAll', ['filter' => 'permission:messages_showall']);
+            $routes->get('show', '\App\Controllers\Backend\MessagesController::show', ['filter' => 'permission:messages_show']);
         });
 
         /* USERS */
@@ -124,7 +124,6 @@ $routes->group('backend', function($routes) {
             $routes->post('deleteLogs', '\App\Controllers\Backend\ToolsController::deleteLogs');
             $routes->post('validateLogsDateRequest', '\App\Controllers\Backend\ToolsController::validateLogsDateRequest');
 
-            $routes->get('dbMaintenance', '\App\Controllers\Backend\ToolsController::dbMaintenance');
             $routes->post('optimizeTable', '\App\Controllers\Backend\ToolsController::optimizeTable');
 
             $routes->post('backups', '\App\Controllers\Backend\ToolsController::backups');

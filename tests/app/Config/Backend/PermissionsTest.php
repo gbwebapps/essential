@@ -36,4 +36,26 @@ class PermissionsTest extends CIUnitTestCase
         $this->assertArrayHasKey('messages_show', $result[1]['perms']);
         $this->assertArrayHasKey('messages_delete', $result[1]['perms']);
     }
+
+    public function testPermissionCatalogHasCompleteAndUniqueEntries(): void
+    {
+        $groups = (new Permissions())->getPermissions();
+        $permissionNames = [];
+
+        foreach ($groups as $group):
+            $this->assertSame(['title', 'controller', 'icon', 'perms'], array_keys($group));
+            $this->assertNotSame('', $group['title']);
+            $this->assertNotSame('', $group['controller']);
+            $this->assertNotSame('', $group['icon']);
+            $this->assertNotEmpty($group['perms']);
+
+            foreach ($group['perms'] as $permission => $label):
+                $this->assertStringStartsWith($group['controller'] . '_', $permission);
+                $this->assertNotSame('', $label);
+                $permissionNames[] = $permission;
+            endforeach;
+        endforeach;
+
+        $this->assertSame($permissionNames, array_values(array_unique($permissionNames)));
+    }
 }

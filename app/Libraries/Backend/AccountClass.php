@@ -23,9 +23,8 @@ class AccountClass
 
 	/**
 	 * Inizializza la libreria di supporto iniettando il modello associato alla sezione.
-	 * $accountModel L'istanza del modello preposto alla gestione dei dati dell'account.
 	 *
-	 * @param AccountModel 
+	 * @param AccountModel $accountModel L'istanza del modello preposto alla gestione dei dati dell'account.
 	 */
 	public function __construct(AccountModel $accountModel) 
 	{

@@ -22,9 +22,8 @@ class AdminsClass
 
 	/**
 	 * Inizializza la libreria di supporto iniettando il modello associato alla sezione.
-	 * $adminsModel Il modello preposto alla gestione dei dati degli amministratori
 	 *
-	 * @param AdminsModel 
+	 * @param AdminsModel $adminsModel Il modello preposto alla gestione dei dati degli amministratori
 	 */
 	public function __construct(AdminsModel $adminsModel) 
 	{

@@ -6,53 +6,26 @@ use CodeIgniter\Test\CIUnitTestCase;
 use CodeIgniter\Test\ControllerTestTrait;
 use CodeIgniter\Test\DatabaseTestTrait;
 use Config\Services;
+use Tests\Support\Libraries\MocksSettings;
 
 class AuditsClassTest extends CIUnitTestCase
 {
+	use MocksSettings;
+
+	protected function setUp(): void
+    {
+        parent::setUp();
+        $this->mockSettings(['Backend\General' => ['language' => 'it']]);
+    }
+
+	protected function tearDown(): void
+    {
+        $this->resetSettingsMocks();
+        parent::tearDown();
+    }
+
 	public function testGetJsIndexReturnsCorrectConfigurationWithLocale()
     {
-        $generalConfig
-            =
-            new \stdClass();
-
-        $generalConfig
-            ->language
-            =
-            'it';
-
-        if (
-            ! function_exists(
-                'setting'
-            )
-        ):
-            function setting(
-                $key
-            ) {
-                $fallbackConf
-                    =
-                    new \stdClass();
-
-                $fallbackConf
-                    ->language
-                    =
-                    'it';
-
-                return $fallbackConf;
-            }
-        endif;
-
-        if (
-            class_exists(
-                '\CodeIgniter\Config\Factories'
-            )
-        ):
-            \CodeIgniter\Config\Factories::injectMock(
-                'config',
-                'Backend\General',
-                $generalConfig
-            );
-        endif;
-
         $class
             =
             \App\Libraries\Backend\AuditsClass::class;
@@ -87,13 +60,13 @@ class AuditsClassTest extends CIUnitTestCase
 
         $this
             ->assertSame(
-                'en-js',
+                'it-js',
                 $result[1]['id']
             );
 
         $this
             ->assertSame(
-                'assets/vendor/flatpickr/js/en.js',
+                'assets/vendor/flatpickr/js/it.js',
                 $result[1]['path']
             );
     }

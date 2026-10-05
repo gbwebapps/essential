@@ -4,8 +4,6 @@ namespace App\Validation\Backend;
 
 use CodeIgniter\Test\CIUnitTestCase;
 
-use App\Validation\Backend\AdminRules;
-
 class AdminsRulesTest extends CIUnitTestCase
 {
     public function testSafeTextReturnsTrueForValidText(): void
@@ -41,5 +39,21 @@ class AdminsRulesTest extends CIUnitTestCase
         $rules = new AdminsRules();
 
         $this->assertTrue($rules->safeText(''));
+    }
+
+    public function testSafeTextRejectsEncodedHtmlCharacters(): void
+    {
+        $rules = new AdminsRules();
+
+        $this->assertFalse($rules->safeText('Testo &lt;script&gt; pericoloso'));
+        $this->assertFalse($rules->safeText('Testo &#60;script&#62; pericoloso'));
+        $this->assertFalse($rules->safeText('Testo &#96; pericoloso'));
+    }
+
+    public function testSafeTextAllowsQuotesWhenMarkupCharactersAreAbsent(): void
+    {
+        $rules = new AdminsRules();
+
+        $this->assertTrue($rules->safeText('Testo con "virgolette" e apostrofo'));
     }
 }

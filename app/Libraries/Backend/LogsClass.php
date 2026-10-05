@@ -22,9 +22,8 @@ class LogsClass
 
 	/**
 	 * Inizializza la libreria di supporto iniettando il modello associato alla sezione dei log applicativi.
-	 * $logsModel Il modello preposto alla lettura, al parsing e all'estrazione dei log di sistema
 	 *
-	 * @param LogsModel 
+	 * @param LogsModel $logsModel Il modello preposto alla lettura, al parsing e all'estrazione dei log di sistema
 	 */
 	public function __construct(LogsModel $logsModel) 
 	{

@@ -646,6 +646,8 @@ class AdminsModelTest extends CIUnitTestCase
     {
         $db = db_connect();
 
+        $db->resetTransStatus();
+
         $testEmails = [
             'mario.rossi@phpunit.local',
             'luigi.verdi@phpunit.local',
@@ -5339,10 +5341,17 @@ class AdminsModelTest extends CIUnitTestCase
                 $mockRequest
             );
             
-        $this
-            ->assertIsArray(
-                $result
-            );
+        $this->assertTrue($result['result']);
+        $this->assertSame(
+            sprintf(
+                lang('backend/admins.messages.editSuccess'),
+                'Mario',
+                'Rossi'
+            ),
+            $result['message']
+        );
+        $this->assertInstanceOf(\stdClass::class, $result['row']);
+        $this->assertSame($uuid, $result['row']->uuid);
             
         \Config\Services::reset();
     }
@@ -7105,9 +7114,12 @@ class AdminsModelTest extends CIUnitTestCase
             );
             
         $this
-            ->assertIsArray(
-                $result
+            ->assertTrue(
+                $result['result']
             );
+
+        $this->assertStringContainsString('Mario', $result['message']);
+        $this->assertStringContainsString('Rossi', $result['message']);
             
         \Config\Services::reset();
     }

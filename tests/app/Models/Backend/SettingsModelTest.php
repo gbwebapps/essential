@@ -2,6 +2,17 @@
 
 namespace App\Models\Backend;
 
+if ( ! function_exists(__NAMESPACE__ . '\log_admin_activity')):
+    function log_admin_activity(
+        string $action,
+        string $section,
+        string $details,
+        ?object $currentAdmin = null
+    ): bool {
+        return true;
+    }
+endif;
+
 class SettingsModelTest extends \CodeIgniter\Test\CIUnitTestCase
 {
 	protected function setUp(): void
@@ -13,6 +24,14 @@ class SettingsModelTest extends \CodeIgniter\Test\CIUnitTestCase
         $model = new $modelClass();
 
         $this->model = $model;
+    }
+
+    protected function tearDown(): void
+    {
+        \Config\Services::reset();
+        \CodeIgniter\Config\Factories::reset();
+
+        parent::tearDown();
     }
 
 	public function testAuthSettingsValidateRulesReturnsArrayWithExpectedKeys()
@@ -67,6 +86,16 @@ class SettingsModelTest extends \CodeIgniter\Test\CIUnitTestCase
         $rule = $result['SMTPHost']['rules'][0];
 
         $this->assertSame('required', $rule);
+    }
+
+    public function testEmailSettingsValidateRulesSupportsFrameworkSendmailProtocol(): void
+    {
+        $result = $this->model->emailSettingsValidateRules(['protocol' => 'sendmail']);
+        $protocolRules = $result['protocol']['rules'];
+
+        $this->assertContains('in_list[smtp,mail,sendmail]', $protocolRules);
+        $this->assertNotContains('in_list[smtp,mail,sendemail]', $protocolRules);
+        $this->assertSame('permit_empty', $result['SMTPHost']['rules'][0]);
     }
 
     public function testGeneralSettingsValidateRulesReturnsArrayWithExpectedKeys()
@@ -289,16 +318,6 @@ class SettingsModelTest extends \CodeIgniter\Test\CIUnitTestCase
 
     public function testDeleteSettingsDeletesCacheAndReturnsTrueWhenSettingsExist()
     {
-        if (
-            ! function_exists(
-                __NAMESPACE__ . '\log_admin_activity'
-            )
-        ):
-            function log_admin_activity()
-            {
-            }
-        endif;
-
         $modelClass
             =
             \App\Models\Backend\SettingsModel::class;
@@ -409,7 +428,7 @@ class SettingsModelTest extends \CodeIgniter\Test\CIUnitTestCase
 
         $authMock
             ->method('currentAdmin')
-            ->willReturn(1);
+            ->willReturn((object) ['uuid' => 'admin-uuid']);
 
         \Config\Services::injectMock(
             'authorization',
@@ -735,16 +754,6 @@ class SettingsModelTest extends \CodeIgniter\Test\CIUnitTestCase
 
     public function testSaveSettingsSuccessWithArrayConversionAndDatabaseUpsert()
     {
-        if (
-            ! function_exists(
-                __NAMESPACE__ . '\log_admin_activity'
-            )
-        ):
-            function log_admin_activity()
-            {
-            }
-        endif;
-
         $modelClass
             =
             \App\Models\Backend\SettingsModel::class;
@@ -856,7 +865,7 @@ class SettingsModelTest extends \CodeIgniter\Test\CIUnitTestCase
 
         $authMock
             ->method('currentAdmin')
-            ->willReturn(1);
+            ->willReturn((object) ['uuid' => 'admin-uuid']);
 
         \Config\Services::injectMock(
             'authorization',
@@ -1130,21 +1139,6 @@ class SettingsModelTest extends \CodeIgniter\Test\CIUnitTestCase
 
     public function testSaveSettingsClearsCacheWhenPresent()
     {
-        if (
-            ! function_exists(
-                __NAMESPACE__ . '\log_admin_activity'
-            )
-        ):
-            function log_admin_activity(
-                string $action,
-                string $entity,
-                string $message,
-                ?object $admin
-            ): void
-            {
-            }
-        endif;
-
         $modelClass
             =
             \App\Models\Backend\SettingsModel::class;

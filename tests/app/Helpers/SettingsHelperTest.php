@@ -91,4 +91,49 @@ class SettingsHelperTest extends CIUnitTestCase
         $this->assertSame('it', $result->language);
         $this->assertSame('Europe/Rome', $result->timezone);
     }
+
+    public function testSettingPreservesFalsyValues(): void
+    {
+        $model = $this->createMock(SettingsModel::class);
+
+        $model->expects($this->exactly(3))
+            ->method('getSettings')
+            ->with('Backend\Example')
+            ->willReturn([
+                'enabled' => false,
+                'limit' => 0,
+                'label' => '',
+            ]);
+
+        Factories::injectMock(
+            'models',
+            SettingsModel::class,
+            $model
+        );
+
+        $this->assertFalse(setting('Backend\Example', 'enabled'));
+        $this->assertSame(0, setting('Backend\Example', 'limit'));
+        $this->assertSame('', setting('Backend\Example', 'label'));
+    }
+
+    public function testSettingDoesNotHideModelExceptions(): void
+    {
+        $model = $this->createMock(SettingsModel::class);
+
+        $model->expects($this->once())
+            ->method('getSettings')
+            ->with('Backend\General')
+            ->willThrowException(new \RuntimeException('Settings failure'));
+
+        Factories::injectMock(
+            'models',
+            SettingsModel::class,
+            $model
+        );
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Settings failure');
+
+        setting('Backend\General');
+    }
 }

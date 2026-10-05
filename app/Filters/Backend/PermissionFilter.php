@@ -46,7 +46,15 @@ class PermissionFilter implements FilterInterface
             $requiredPermission = $arguments[0];
 
             /* Verifichiamo se la proprietà associata al permesso esiste nell'oggetto permissions dell'admin */
-            if (property_exists($currentAdmin->permissions, $requiredPermission)):
+            if (
+                isset($currentAdmin->permissions)
+                &&
+                is_object($currentAdmin->permissions)
+                &&
+                property_exists($currentAdmin->permissions, $requiredPermission)
+                &&
+                $currentAdmin->permissions->{$requiredPermission} === true
+            ):
                 return null;
             endif;
         endif;

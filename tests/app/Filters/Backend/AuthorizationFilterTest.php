@@ -167,6 +167,9 @@ class AuthorizationFilterTest extends CIUnitTestCase
         $result = $filter->before($request);
 
         $this->assertSame($response, $result);
+        $this->assertSame(lang('backend/auth.messages.loginNeeded'), session()->getFlashdata('message'));
+        $this->assertSame('light text-danger fw-bold', session()->getFlashdata('class'));
+        $this->assertSame('<i class="fa-solid fa-triangle-exclamation"></i>', session()->getFlashdata('icon'));
     }
 
     public function testBeforeReturnsRedirectForStandardRequest(): void
@@ -219,6 +222,51 @@ class AuthorizationFilterTest extends CIUnitTestCase
         $filter->before($request);
 
         $this->assertSame(current_url(), session()->get('intended_url'));
+    }
+
+    public function testBeforeDoesNotStoreLogoutUrlAsIntendedUrl(): void
+    {
+        $authorization = $this->createMock(\App\Libraries\Backend\AuthorizationClass::class);
+        $authorization->method('currentAdmin')->willReturn(null);
+        Services::injectMock('authorization', $authorization);
+
+        $authModel = $this->createMock(AuthModel::class);
+        $authModel->expects($this->once())->method('logoutBySession')->with('timeout');
+        Factories::injectMock('models', AuthModel::class, $authModel);
+
+        $request = $this->createMock(IncomingRequest::class);
+        $request->method('getCookie')->with('backendRememberMe')->willReturn(null);
+        $request->method('isAJAX')->willReturn(false);
+        $request->method('is')->with('get')->willReturn(true);
+        $request->method('getUri')->willReturn(
+            new \CodeIgniter\HTTP\SiteURI(config('App'), 'backend/auth/logout')
+        );
+        $request->method('getProtocolVersion')->willReturn('1.1');
+        Services::injectMock('request', $request);
+
+        (new AuthorizationFilter())->before($request);
+
+        $this->assertNull(session()->get('intended_url'));
+    }
+
+    public function testBeforeDoesNotStoreIntendedUrlForPostRequest(): void
+    {
+        $authorization = $this->createMock(\App\Libraries\Backend\AuthorizationClass::class);
+        $authorization->method('currentAdmin')->willReturn(null);
+        Services::injectMock('authorization', $authorization);
+
+        $authModel = $this->createMock(AuthModel::class);
+        $authModel->method('logoutBySession');
+        Factories::injectMock('models', AuthModel::class, $authModel);
+
+        $request = $this->createMock(IncomingRequest::class);
+        $request->method('getCookie')->willReturn(null);
+        $request->method('isAJAX')->willReturn(false);
+        $request->method('is')->willReturnCallback(static fn(string $method): bool => $method === 'post');
+
+        (new AuthorizationFilter())->before($request);
+
+        $this->assertNull(session()->get('intended_url'));
     }
 
     public function testAfterReturnsNull(): void

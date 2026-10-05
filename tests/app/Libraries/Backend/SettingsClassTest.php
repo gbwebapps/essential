@@ -118,6 +118,12 @@ class SettingsClassTest extends CIUnitTestCase
                 'Europe/Rome',
                 $result
             );
+
+        $this
+            ->assertSame(
+                timezone_identifiers_list(),
+                $result
+            );
     }
 
     public function testGetLanguagesReturnsExpectedArray()
@@ -153,6 +159,12 @@ class SettingsClassTest extends CIUnitTestCase
                 'en',
                 $result
             );
+
+        $this
+            ->assertSame(
+                ['it', 'en', 'es', 'fr', 'de', 'zh'],
+                array_keys($result)
+            );
     }
 
     public function testGetDateFormatsReturnsExpectedArray()
@@ -187,6 +199,18 @@ class SettingsClassTest extends CIUnitTestCase
             ->assertArrayHasKey(
                 'dd/MM/yyyy HH:mm',
                 $result
+            );
+
+        $this
+            ->assertSame(
+                [
+                    'd MMMM yyyy HH:mm:ss',
+                    'dd/MM/yyyy HH:mm',
+                    'MMMM d yyyy h:mm:ss a',
+                    'MM/dd/yyyy h:mm a',
+                    'yyyy-MM-dd HH:mm:ss'
+                ],
+                array_keys($result)
             );
     }
 }

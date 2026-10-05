@@ -23,8 +23,29 @@ class BackendButtonsCellTest extends CIUnitTestCase
 
         $result = $cell->render('users', 'add');
 
-        $this->assertIsString($result);
-        $this->assertNotSame('', $result);
+        $this->assertStringContainsString('<form method="post" id="add-reset"', $result);
+        $this->assertStringContainsString('class="btn&#x20;btn-warning&#x20;text-dark&#x20;btn-sm"', $result);
+        $this->assertStringContainsString('class="fa-solid fa-refresh"', $result);
+        $this->assertStringContainsString('class="btn&#x20;btn-success&#x20;btn-sm"', $result);
+        $this->assertStringContainsString('form="users-add"', $result);
+        $this->assertStringContainsString('class="fa-solid fa-floppy-disk"', $result);
+    }
+
+    public function testRenderReturnsShowButtonsWithExpectedIdentifiers(): void
+    {
+        $result = (new BackendButtonsCell())->render('users', 'show');
+
+        $this->assertStringContainsString('id="show-print-button"', $result);
+        $this->assertStringContainsString('id="show-export-button"', $result);
+        $this->assertStringNotContainsString('<form', $result);
+    }
+
+    public function testRenderEscapesControllerInFormAttribute(): void
+    {
+        $result = (new BackendButtonsCell())->render('users" onmouseover="alert(1)', 'add');
+
+        $this->assertStringNotContainsString('form="users" onmouseover=', $result);
+        $this->assertStringContainsString('form="users&quot;&#x20;onmouseover&#x3D;&quot;alert&#x28;1&#x29;-add"', $result);
     }
 
     public function testGetButtonConfigReturnsAddConfiguration(): void
