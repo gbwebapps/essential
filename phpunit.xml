@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="vendor/codeigniter4/framework/system/Test/bootstrap.php" colors="true" stopOnFailure="false" displayDetailsOnTestsThatTriggerDeprecations="true">
+
+    <testsuites>
+        <testsuite name="App">
+            <directory>./tests/app</directory>
+        </testsuite>
+    </testsuites>
+
+    <php>
+        <server name="app.baseURL" value="http://essential.test"/>
+        <server name="CODEIGNITER_ENV" value="testing"/>
+        <!-- Costanti di sistema richieste da CIUnitTestCase -->
+        <const name="HOMEPATH" value="./"/>
+        <const name="CONFIGPATH" value="./app/Config/"/>
+        <const name="PUBLICPATH" value="./public/"/>
+        <const name="TESTPATH" value="./tests/"/>
+    </php>
+
+    <!-- Configurazione per PHPUnit 10+ -->
+    <source>
+        <include>
+            <directory suffix=".php">./app/Cells</directory>
+            <directory suffix=".php">./app/Config/Backend</directory>
+            <file>./app/Config/App.php</file>
+            <file>./app/Config/Cookie.php</file>
+            <file>./app/Config/Email.php</file>
+            <file>./app/Config/Filters.php</file>
+            <file>./app/Config/Routes.php</file>
+            <file>./app/Config/Security.php</file>
+            <file>./app/Config/Services.php</file>
+            <file>./app/Config/Session.php</file>
+            <file>./app/Config/Validation.php</file>
+            <directory suffix=".php">./app/Controllers</directory>
+            <directory suffix=".php">./app/Filters</directory>
+            <directory suffix=".php">./app/Helpers</directory>
+            <directory suffix=".php">./app/Libraries</directory>
+            <directory suffix=".php">./app/Models</directory>
+            <directory suffix=".php">./app/Traits</directory>
+            <directory suffix=".php">./app/Validation</directory>
+        </include>
+        <exclude>
+            <file>./app/Config/Backend/Routes.php</file>
+        </exclude>
+    </source>
+
+    <coverage>
+        <report>
+            <html outputDirectory="tests/coverage-report"/>
+        </report>
+    </coverage>
+
+</phpunit>
