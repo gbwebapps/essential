@@ -80,8 +80,13 @@ $routes->group('backend', function($routes) {
             $routes->post('setCover', '\App\Controllers\Backend\Components\GalleryOneController::setCover');
         });
 
+    });
+
+    /* SUPERADMIN */
+    $routes->group('', ['filter' => ['authorization', 'superadmin']], function($routes) {
+
         /* EXPORT CSV */
-        $routes->group('export', ['filter' => 'authorization'], function($routes) {
+        $routes->group('export', function($routes) {
             $routes->post('showModal', '\App\Controllers\Backend\Components\ExportController::showModal');
             $routes->post('generate', '\App\Controllers\Backend\Components\ExportController::generate');
             $routes->post('remove', '\App\Controllers\Backend\Components\ExportController::remove');
@@ -89,17 +94,13 @@ $routes->group('backend', function($routes) {
         });
 
         /* IMPORT CSV */
-        $routes->group('import', ['filter' => 'authorization'], function($routes) {
+        $routes->group('import', function($routes) {
             $routes->post('showModal', '\App\Controllers\Backend\Components\ImportController::showModal');
             $routes->get('download/(:any)', '\App\Controllers\Backend\Components\ImportController::download/$1');
             $routes->post('processCsv', '\App\Controllers\Backend\Components\ImportController::processCsv');
             $routes->post('executeImport', '\App\Controllers\Backend\Components\ImportController::executeImport');
             $routes->post('deleteFile', '\App\Controllers\Backend\Components\ImportController::deleteFile');
         });
-    });
-
-    /* SUPERADMIN */
-    $routes->group('', ['filter' => ['authorization', 'superadmin']], function($routes) {
         
         /* SETTINGS */
         $routes->group('settings', function($routes) {

@@ -152,6 +152,7 @@ return [
 		'noDataChanged' => '未进行任何更改。', 
 		'hardDeleteSuccess' => '管理员 %s %s 已成功彻底删除。',
 		'hardDeleteError' => '彻底删除管理员失败。',
+		'hardDeleteImagesError' => '图像文件清理未完成，请检查日志。',
 		'softDeleteSuccess' => '管理员 %s %s 删除成功。', 
 		'softDeleteError' => '删除管理员失败。', 
 		'restoreDeleteSuccess' => '管理员 %s %s 恢复成功。', 
@@ -168,6 +169,8 @@ return [
 		'deleteTokenError' => '删除令牌失败。', 
 		'protectedAdmin' => '受保护，无法修改。', 
 		'cannotModifyDeleted' => '无法修改已删除的管理员。', 
+		'hardDeleteRequiresTrash' => '仅允许永久删除回收站中的管理员。',
+		'restoreRequiresTrash' => '仅允许恢复回收站中的管理员。',
 		'emailAlreadyInUse' => '电子邮件已被使用。', 
 		'restoreDeleteConflict' => "管理员已恢复并禁用。原始电子邮件已被使用，请修改记录以分配新地址。"
 	]

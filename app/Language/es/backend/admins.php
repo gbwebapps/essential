@@ -152,6 +152,7 @@ return [
 		'noDataChanged' => 'No se han realizado cambios.',
 		'hardDeleteSuccess' => 'Administrador %s %s eliminado definitivamente con éxito.',
 		'hardDeleteError' => 'La eliminación definitiva del administrador no se ha podido completar.',
+		'hardDeleteImagesError' => 'La limpieza de los archivos de imagen no se completó; revise los registros.',
 		'softDeleteSuccess' => 'Administrador %s %s eliminado con éxito.',
 		'softDeleteError' => 'La eliminación del administrador no se ha podido completar.',
 		'restoreDeleteSuccess' => 'Administrador %s %s restaurado con éxito.',
@@ -168,6 +169,8 @@ return [
 		'deleteTokenError' => 'La eliminación del token no se ha podido completar',
 		'protectedAdmin' => 'Protegido contra modificaciones.',
 		'cannotModifyDeleted' => 'No es posible modificar un administrador eliminado.',
+		'hardDeleteRequiresTrash' => 'La eliminación definitiva solo está permitida para un administrador en la papelera.',
+		'restoreRequiresTrash' => 'La restauración solo está permitida para un administrador en la papelera.',
 		'emailAlreadyInUse' => 'Correo electrónico ya en uso.',
 		'restoreDeleteConflict' => 'Administrador restaurado y desactivado. El correo original ya está en uso, modifica el registro para asignar una nueva dirección.'
 	]

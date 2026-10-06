@@ -178,7 +178,7 @@ class ExportModelTest extends CIUnitTestCase
             =
             1;
 
-        $field4
+		$field4
             =
             new \stdClass();
 
@@ -187,10 +187,14 @@ class ExportModelTest extends CIUnitTestCase
             =
             'title';
 
-        $field4
-            ->primary_key
-            =
-            0;
+		$field4
+			->primary_key
+			=
+			0;
+
+		$field5 = new \stdClass();
+		$field5->name = 'password_hash';
+		$field5->primary_key = 0;
 
         $dbMock
             ->method(
@@ -201,7 +205,8 @@ class ExportModelTest extends CIUnitTestCase
                     $field1,
                     $field2,
                     $field3,
-                    $field4
+					$field4,
+					$field5
                 ]
             );
 
@@ -236,7 +241,7 @@ class ExportModelTest extends CIUnitTestCase
             =
             $model
             ->getExportColumns(
-                'real_table'
+				'admins'
             );
 
         $this

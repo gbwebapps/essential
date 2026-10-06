@@ -14,6 +14,19 @@ use App\Models\Backend\BackendModel;
  */
 class ExportModel extends BackendModel 
 {
+	private array $sensitiveColumns = [
+		'admins' => ['password_hash'],
+		'admins_tokens' => ['token_hash'],
+		'admins_2fa' => ['secret'],
+		'admins_2fa_codes' => ['code'],
+		'admins_sessions' => ['data'],
+	];
+
+	private function getSensitiveColumns(string $table): array
+	{
+		return $this->sensitiveColumns[$table] ?? [];
+	}
+
     /**
      * Genera le regole di validazione per il form di esportazione.
      * 
@@ -72,7 +85,7 @@ class ExportModel extends BackendModel
         foreach ($fields as $field):
 
             /* Escludiamo la chiave primaria e l'id dal form */
-            if ($field->primary_key !== 1 && $field->name !== 'id'):
+			if ($field->primary_key !== 1 && $field->name !== 'id' && ! in_array($field->name, $this->getSensitiveColumns($table), true)):
                 $columns[] = $field->name;
             endif;
 
@@ -141,7 +154,8 @@ class ExportModel extends BackendModel
             return ['result' => false, 'message' => lang('backend/components/export.messages.invalidEntity')];
         endif;
 
-        $allowedColumns = $this->db->getFieldNames($entity);
+		$schemaColumns = $this->db->getFieldNames($entity);
+		$allowedColumns = array_values(array_diff($schemaColumns, $this->getSensitiveColumns($entity)));
 
         /* Controllo di sicurezza: la tabella deve avere la colonna id numerica per il cursore (keyset pagination) */
         if ( ! in_array('id', $allowedColumns)):
@@ -183,7 +197,7 @@ class ExportModel extends BackendModel
         $validSelectedColumns = array_unique($validSelectedColumns);
 
         $dateKeys = [];
-        foreach ($allowedColumns as $col):
+		foreach ($schemaColumns as $col):
             $dateKeys[] = $col . '-from';
             $dateKeys[] = $col . '-to';
         endforeach;
@@ -191,7 +205,7 @@ class ExportModel extends BackendModel
         /* Aggiungiamo 'selected_columns' tra le chiavi di sistema per bypassare il checkAllowedFields e il generatore di WHERE */
         $systemKeys = ['entity', 'column', 'order', 'page', 'rows', 'trash_filter', 'search_bar_visible', 'lastId', 'fileName', 'processedCount', 'selected_columns'];
 
-        $allowedFields = array_merge($allowedColumns, $dateKeys, $systemKeys);
+		$allowedFields = array_merge($schemaColumns, $dateKeys, $systemKeys);
         $posts = $this->checkAllowedFields($posts, $allowedFields);
                 
         /* Costruiamo la query limitandola rigorosamente alle sole colonne richieste e validate */
@@ -204,23 +218,23 @@ class ExportModel extends BackendModel
 
             if (str_ends_with($key, '-from')):
                 $realField = str_replace('-from', '', $key);
-                if (in_array($realField, $allowedColumns)):
+				if (in_array($realField, $schemaColumns)):
                     $sql .= " and {$realField} >= ?";
                     $bindings[] = $value; 
                 endif;
             elseif (str_ends_with($key, '-to')):
                 $realField = str_replace('-to', '', $key);
-                if (in_array($realField, $allowedColumns)):
+				if (in_array($realField, $schemaColumns)):
                     $sql .= " and {$realField} <= ?";
                     $bindings[] = $value;
                 endif;
-            elseif (in_array($key, $allowedColumns)):
+			elseif (in_array($key, $schemaColumns)):
                 $sql .= " and {$key} like ?";
                 $bindings[] = "%{$value}%";
             endif;
         endforeach;
 
-        if (isset($posts['trash_filter']) && in_array('deleted_at', $allowedColumns)):
+		if (isset($posts['trash_filter']) && in_array('deleted_at', $schemaColumns)):
             if ($posts['trash_filter'] === 'active'):
                 $sql .= " and deleted_at is null";
             elseif ($posts['trash_filter'] === 'trashed'):

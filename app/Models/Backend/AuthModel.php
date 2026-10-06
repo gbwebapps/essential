@@ -478,8 +478,8 @@ class AuthModel extends BackendModel
                 $sql = "delete from admins_tokens where admin_uuid = ? and token_type = ?";
                 $this->db->query($sql, [$admin->uuid, 'activation']);
 
-                $sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, token_expire, token_type, user_agent, ip_address, created_at) values(?,?,?,?,?,?,?,?)";
-                $this->db->query($sql, [$admin->uuid,$tokenHash, $tokenCreate, $tokenExpire, 'activation', $request->getUserAgent()->getAgentString(), $request->getIPAddress(), date('Y-m-d H:i:s')]);
+				$sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, last_activity, token_expire, token_type, user_agent, ip_address, created_at) values(?,?,?,?,?,?,?,?,?)";
+				$this->db->query($sql, [$admin->uuid, $tokenHash, $tokenCreate, null, $tokenExpire, 'activation', $request->getUserAgent()->getAgentString(), $request->getIPAddress(), date('Y-m-d H:i:s')]);
 
                 if ($this->db->transStatus() === false):
                     $this->db->transRollback();

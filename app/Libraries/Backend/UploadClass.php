@@ -70,7 +70,11 @@ class UploadClass
                 continue;
             endif;
 
-            $ext   = $file->getClientExtension();
+			$ext   = strtolower((string) image_type_to_extension($imgInfo[2], false));
+
+			if ( ! in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'avif'])):
+				continue;
+			endif;
             $fname = pathinfo($file->getClientName(), PATHINFO_FILENAME);
 
             /* Configurazione: Rinomina */

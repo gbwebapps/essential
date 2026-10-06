@@ -5212,8 +5212,8 @@ class AdminsControllerTest extends CIUnitTestCase
         );
     }
 
-    /* 1. SCENARIO: Ritorna null se la richiesta non è AJAX */
-    public function testRestoreDeleteReturnsNullIfNotAjaxOrPost(): void
+	/* 1. SCENARIO: Rifiuta una richiesta non AJAX */
+	public function testRestoreDeleteRejectsRequestIfNotAjaxOrPost(): void
     {
         $request = 
             $this->createMock(\CodeIgniter\HTTP\IncomingRequest::class);
@@ -5224,18 +5224,19 @@ class AdminsControllerTest extends CIUnitTestCase
         $controller = 
             new \App\Controllers\Backend\AdminsController();
 
-        $controller->initController(
-            $request,
-            $this->createMock(\CodeIgniter\HTTP\ResponseInterface::class),
+		$response = service('response');
+
+		$controller->initController(
+			$request,
+			$response,
             $this->createMock(\Psr\Log\LoggerInterface::class)
         );
 
         $result = 
             $controller->restoreDelete();
 
-        $this->assertNull(
-            $result
-        );
+		$this->assertSame(400, $result->getStatusCode());
+		$this->assertFalse(json_decode($result->getBody(), true)['result']);
     }
 
     /* 2. SCENARIO: Richiesta corretta ma validazione fallita */

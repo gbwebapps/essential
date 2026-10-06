@@ -192,9 +192,10 @@ class AdminsModelTest extends CIUnitTestCase
         $model = new AdminsModel();
         $result = $model->add($data, $request);
 
-        /* Asserzioni: L'utente deve essere nel DB, ma il risultato del controller deve essere FALSE */
-        $this->seeInDatabase('admins', ['email' => 'paolo.bianchi@phpunit.local']);
-        $this->assertFalse($result['result']);
+		/* Il salvataggio resta riuscito: il fallimento email è riportato separatamente */
+		$this->seeInDatabase('admins', ['email' => 'paolo.bianchi@phpunit.local']);
+		$this->assertTrue($result['result']);
+		$this->assertFalse($result['emailSent']);
     }
 
     public function testAddAdminRollbackOnDatabaseError(): void
@@ -1039,10 +1040,11 @@ class AdminsModelTest extends CIUnitTestCase
               ->willReturnArgument(0);
 
         /* Simuliamo un record valido esistente e vulnerabile */
-        $mockRow = 
-            (object)[
-                'superadmin' => 0,
-                'firstname'  => 'Utente',
+		$mockRow =
+			(object)[
+				'superadmin' => 0,
+				'deleted_at' => '2026-09-25 15:00:00',
+				'firstname'  => 'Utente',
                 'lastname'   => 'DaRimuovere'
             ];
 
@@ -1197,11 +1199,13 @@ class AdminsModelTest extends CIUnitTestCase
     public function testRestoreDeleteSucceedsNoConflict(): void
     {
         /* 1. MOCK RECORD TROVATO */
-        $mockAdmin = 
-            (object)[
-                'firstname' => 'Utente',
-                'lastname'  => 'Recuperato',
-                'email'     => 'test@example.com.deleted.123456789'
+		$mockAdmin =
+			(object)[
+				'deleted_at' => '2026-09-25 15:00:00',
+				'superadmin' => 0,
+				'firstname' => 'Utente',
+				'lastname'  => 'Recuperato',
+				'email'     => 'test@example.com.deleted.1234567890'
             ];
 
         /* 2. MOCK RESULT */
@@ -1289,9 +1293,11 @@ class AdminsModelTest extends CIUnitTestCase
     public function testRestoreDeleteSucceedsWithConflict(): void
     {
         /* 1. MOCK RECORD TROVATO */
-        $mockAdmin = 
-            (object)[
-                'firstname' => 'Utente',
+		$mockAdmin =
+			(object)[
+				'deleted_at' => '2026-09-25 15:00:00',
+				'superadmin' => 0,
+				'firstname' => 'Utente',
                 'lastname'  => 'Conflitto',
                 'email'     => 'test@example.com'
             ];
@@ -1857,10 +1863,11 @@ class AdminsModelTest extends CIUnitTestCase
             );
 
         /* 7. ASSERZIONI */
-        $this->assertFalse(
-            $result['result'],
-            'Il test avrebbe dovuto restituire result => false a causa del fallimento dell\'email'
-        );
+		$this->assertTrue(
+			$result['result'],
+			'Il reset è stato salvato anche se l\'invio email è fallito'
+		);
+		$this->assertFalse($result['emailSent']);
         
         $this->assertEquals(
             sprintf(lang('backend/admins.messages.resetPasswordSuccessNoEmail'), 'Utente', 'SenzaMail'),
@@ -2961,8 +2968,11 @@ class AdminsModelTest extends CIUnitTestCase
         $mockDb->method('query')
                ->willReturn($mockQuery);
 
-        $mockDb->method('affectedRows')
-               ->willReturn(1);
+		$mockDb->method('affectedRows')
+			   ->willReturn(1);
+
+		$mockDb->method('transStatus')
+			   ->willReturn(true);
 
         /* 3. MOCK MODEL */
         $model = 
@@ -4104,10 +4114,18 @@ class AdminsModelTest extends CIUnitTestCase
                 'label' => lang('backend/admins.labels.dateFrom'),
                 'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]'],
             ],
-            'searchDates.created_at-to' => [
-                'label' => lang('backend/admins.labels.dateTo'),
-                'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]'],
-            ],
+			'searchDates.created_at-to' => [
+				'label' => lang('backend/admins.labels.dateTo'),
+				'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]'],
+			],
+			'searchDates.updated_at-from' => [
+				'label' => lang('backend/admins.labels.dateFrom'),
+				'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]'],
+			],
+			'searchDates.updated_at-to' => [
+				'label' => lang('backend/admins.labels.dateTo'),
+				'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]'],
+			],
         ];
 
         /* Verifica che il risultato coincida con le attese */
@@ -4179,7 +4197,7 @@ class AdminsModelTest extends CIUnitTestCase
             ],
             'email' => [
                 'label' => lang('backend/admins.labels.email'),
-                'rules' => ['required', 'trim', 'valid_email', 'max_length[255]', "is_unique[admins.email,uuid,123e4567-e89b-12d3-a456-426614174000]"],
+				'rules' => ['required', 'trim', 'valid_email', 'max_length[236]', "is_unique[admins.email,uuid,123e4567-e89b-12d3-a456-426614174000]"],
             ],
             'phone' => [
                 'label' => lang('backend/admins.labels.phone'),
@@ -4876,8 +4894,7 @@ class AdminsModelTest extends CIUnitTestCase
             'note' => ''
         ];
         
-        /* Blocca l'output a schermo del var_dump presente nel catch */
-        ob_start();
+		$this->expectOutputString('');
         
         $result 
             = 
@@ -4887,8 +4904,6 @@ class AdminsModelTest extends CIUnitTestCase
                 , 
                 $mockRequest
             );
-            
-        ob_end_clean();
             
         $this
             ->assertFalse(
@@ -7121,6 +7136,55 @@ class AdminsModelTest extends CIUnitTestCase
         $this->assertStringContainsString('Mario', $result['message']);
         $this->assertStringContainsString('Rossi', $result['message']);
             
-        \Config\Services::reset();
-    }
+		\Config\Services::reset();
+	}
+
+	public function testHardDeleteRejectsActiveAdmin(): void
+	{
+		$model = $this->getMockBuilder(AdminsModel::class)
+			->disableOriginalConstructor()
+			->onlyMethods(['checkAllowedFields', 'getByUUID'])
+			->getMock();
+
+		$model->method('checkAllowedFields')->willReturnArgument(0);
+		$model->method('getByUUID')->willReturn([
+			'result' => true,
+			'row' => (object) ['superadmin' => 0, 'deleted_at' => null]
+		]);
+
+		$result = $model->hardDelete(['uuid' => '123-abc']);
+
+		$this->assertFalse($result['result']);
+		$this->assertSame(lang('backend/admins.messages.hardDeleteRequiresTrash'), $result['message']);
+	}
+
+	public function testRestoreDeleteRejectsActiveAdmin(): void
+	{
+		$query = $this->getMockBuilder(\CodeIgniter\Database\BaseResult::class)
+			->disableOriginalConstructor()
+			->onlyMethods(['getRow'])
+			->getMockForAbstractClass();
+		$query->method('getRow')->willReturn((object) ['deleted_at' => null, 'superadmin' => 0]);
+
+		$db = $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class)
+			->disableOriginalConstructor()
+			->getMock();
+		$db->expects($this->once())->method('query')->willReturn($query);
+
+		$model = $this->getMockBuilder(AdminsModel::class)
+			->disableOriginalConstructor()
+			->onlyMethods(['checkAllowedFields'])
+			->getMock();
+		$model->method('checkAllowedFields')->willReturnArgument(0);
+
+		$inject = function() use ($db) {
+			$this->db = $db;
+		};
+		\Closure::bind($inject, $model, AdminsModel::class)();
+
+		$result = $model->restoreDelete(['uuid' => '123-abc']);
+
+		$this->assertFalse($result['result']);
+		$this->assertSame(lang('backend/admins.messages.restoreRequiresTrash'), $result['message']);
+	}
 }

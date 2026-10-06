@@ -364,8 +364,8 @@ class AccountModel extends BackendModel
 	        $this->db->query($sql, [$currentAdmin->uuid, 'activation']);
 
 	        /* Scrittura del token di attivazione */
-	        $sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, token_expire, token_type, user_agent, ip_address, created_at) values (?, ?, ?, ?, ?, ?, ?, ?)";
-	        $this->db->query($sql, [$currentAdmin->uuid, $tokenHash, date('Y-m-d H:i:s'), $expireTime, 'activation', $userAgent, $ip_address, date('Y-m-d_H-i-s')]);
+			$sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, last_activity, token_expire, token_type, user_agent, ip_address, created_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			$this->db->query($sql, [$currentAdmin->uuid, $tokenHash, date('Y-m-d H:i:s'), null, $expireTime, 'activation', $userAgent, $ip_address, date('Y-m-d H:i:s')]);
 
 	        if ($this->db->transStatus() === false):
 

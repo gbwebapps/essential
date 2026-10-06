@@ -119,7 +119,7 @@ class UploadClassTest extends CIUnitTestCase
         $file->method('isValid')->willReturn(true);
         $file->method('hasMoved')->willReturn(false);
         $file->method('getTempName')->willReturn($tmpFile);
-        $file->method('getClientExtension')->willReturn('png');
+		$file->expects($this->never())->method('getClientExtension');
         $file->method('getClientName')->willReturn('test image.png');
         $file->method('getRandomName')->willReturn('random-image.png');
 

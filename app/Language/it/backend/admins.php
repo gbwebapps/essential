@@ -152,6 +152,7 @@ return [
 		'noDataChanged' => 'Non sono state effettuate modifiche.', 
 		'hardDeleteSuccess' => 'Amministratore %s %s eliminato definitivamente con successo.',
 		'hardDeleteError' => 'Eliminazione definitiva amministratore non andata a buon fine.',
+		'hardDeleteImagesError' => 'La pulizia dei file immagine non è stata completata; verificare i log.',
 		'softDeleteSuccess' => 'Amministratore %s %s eliminato con successo.', 
 		'softDeleteError' => 'Eliminazione definitiva amministratore non andata a buon fine.', 
 		'restoreDeleteSuccess' => 'Amministratore %s %s ripristinato con successo.', 
@@ -167,7 +168,9 @@ return [
 		'deleteTokenSuccess' => 'Il token di %s %s è stato eliminato con successo.', 
 		'deleteTokenError' => 'Eliminazione del token non è andata a buon fine', 
 		'protectedAdmin' => 'Protetto da modifiche.', 
-		'cannotModifyDeleted' => 'Non è possibile modificare un admin eliminato.', 
+		'cannotModifyDeleted' => 'Non è possibile modificare un admin eliminato.',
+			'hardDeleteRequiresTrash' => 'L\'eliminazione definitiva è consentita solo per un admin già nel cestino.',
+			'restoreRequiresTrash' => 'Il ripristino è consentito solo per un admin presente nel cestino.',
 		'emailAlreadyInUse' => 'Email già utilizzata.', 
 		'restoreDeleteConflict' => "Admin ripristinato e disattivato. L'email originale è già in uso, modifica il record per assegnare un nuovo indirizzo."
 	]

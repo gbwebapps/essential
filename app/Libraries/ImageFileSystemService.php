@@ -20,15 +20,17 @@ class ImageFileSystemService
      *
      * @param string $entity Il nome dell'entità o del modulo di riferimento (es. 'gallery', 'users')
      * @param string $uuid L'identificatore univoco del record a cui appartiene la cartella da eliminare
-     * @return void
-     */
-    public static function removeAllImages(string $entity, string $uuid): void
-    {
-        $path = rtrim(FCPATH, '/\\') . "/images/backend/{$entity}/{$uuid}";
-        
-        if (is_dir($path)):
-            self::rrmdir($path);
-        endif;
+	 * @return bool
+	 */
+	public static function removeAllImages(string $entity, string $uuid): bool
+	{
+		$path = rtrim(FCPATH, '/\\') . "/images/backend/{$entity}/{$uuid}";
+
+		if (is_dir($path)):
+			return self::rrmdir($path);
+		endif;
+
+		return true;
     }
 
     /**
@@ -65,22 +67,32 @@ class ImageFileSystemService
      * non venga interrotta in caso di restrizioni impreviste sui permessi del file system.
      *
      * @param string $dir Il percorso assoluto della directory da svuotare ed eliminare
-     * @return void
-     */
-    private static function rrmdir(string $dir): void
-    {
-        if (is_dir($dir)):
-            $objects = scandir($dir);
-            foreach ($objects as $object):
-                if ($object !== "." && $object !== ".."):
-                    if (is_dir($dir . DIRECTORY_SEPARATOR . $object) && ! is_link($dir . DIRECTORY_SEPARATOR . $object)):
-                        self::rrmdir($dir . DIRECTORY_SEPARATOR . $object);
-                    else:
-                        @unlink($dir . DIRECTORY_SEPARATOR . $object);
-                    endif;
-                endif;
-            endforeach;
-            @rmdir($dir);
-        endif;
-    }
+	 * @return bool
+	 */
+	private static function rrmdir(string $dir): bool
+	{
+		if ( ! is_dir($dir)):
+			return true;
+		endif;
+
+		$objects = @scandir($dir);
+
+		if ($objects === false):
+			return false;
+		endif;
+
+		$result = true;
+		foreach ($objects as $object):
+			if ($object !== "." && $object !== ".."):
+				$path = $dir . DIRECTORY_SEPARATOR . $object;
+				if (is_dir($path) && ! is_link($path)):
+					$result = self::rrmdir($path) && $result;
+				else:
+					$result = @unlink($path) && $result;
+				endif;
+			endif;
+		endforeach;
+
+		return @rmdir($dir) && $result;
+	}
 }

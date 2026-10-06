@@ -152,6 +152,7 @@ return [
 		'noDataChanged' => 'Aucune modification n\'a été effectuée.', 
 		'hardDeleteSuccess' => 'Administrateur %s %s supprimé définitivement avec succès.',
 		'hardDeleteError' => 'La suppression définitive de l\'administrateur a échoué.',
+		'hardDeleteImagesError' => 'Le nettoyage des fichiers image n’a pas été terminé ; consultez les journaux.',
 		'softDeleteSuccess' => 'Administrateur %s %s supprimé avec succès.', 
 		'softDeleteError' => 'La suppression de l\'administrateur a échoué.', 
 		'restoreDeleteSuccess' => 'Administrateur %s %s restauré avec succès.', 
@@ -168,6 +169,8 @@ return [
 		'deleteTokenError' => 'La suppression du jeton a échoué.', 
 		'protectedAdmin' => 'Protégé contre les modifications.', 
 		'cannotModifyDeleted' => 'Impossible de modifier un administrateur supprimé.', 
+		'hardDeleteRequiresTrash' => 'La suppression définitive est autorisée uniquement pour un administrateur placé dans la corbeille.',
+		'restoreRequiresTrash' => 'La restauration est autorisée uniquement pour un administrateur placé dans la corbeille.',
 		'emailAlreadyInUse' => 'Adresse e-mail déjà utilisée.', 
 		'restoreDeleteConflict' => "Administrateur restauré et désactivé. L'adresse e-mail d'origine est déjà utilisée, veuillez modifier la fiche pour attribuer une nouvelle adresse."
 	]

@@ -152,6 +152,7 @@ return [
 		'noDataChanged' => 'Es wurden keine Änderungen vorgenommen.', 
 		'hardDeleteSuccess' => 'Administrator %s %s erfolgreich endgültig gelöscht.',
 		'hardDeleteError' => 'Endgültiges Löschen des Administrators fehlgeschlagen.',
+		'hardDeleteImagesError' => 'Die Bereinigung der Bilddateien wurde nicht abgeschlossen; prüfen Sie die Protokolle.',
 		'softDeleteSuccess' => 'Administrator %s %s erfolgreich gelöscht.', 
 		'softDeleteError' => 'Löschen des Administrators fehlgeschlagen.', 
 		'restoreDeleteSuccess' => 'Administrator %s %s erfolgreich wiederhergestellt.', 
@@ -168,6 +169,8 @@ return [
 		'deleteTokenError' => 'Löschen des Tokens fehlgeschlagen.', 
 		'protectedAdmin' => 'Vor Änderungen geschützt.', 
 		'cannotModifyDeleted' => 'Ein gelöschter Administrator kann nicht bearbeitet werden.', 
+		'hardDeleteRequiresTrash' => 'Die endgültige Löschung ist nur für einen Administrator im Papierkorb erlaubt.',
+		'restoreRequiresTrash' => 'Die Wiederherstellung ist nur für einen Administrator im Papierkorb erlaubt.',
 		'emailAlreadyInUse' => 'E-Mail-Adresse wird bereits verwendet.', 
 		'restoreDeleteConflict' => "Administrator wiederhergestellt und deaktiviert. Die ursprüngliche E-Mail-Adresse wird bereits verwendet, bitte bearbeiten Sie den Datensatz, um eine neue Adresse zuzuweisen."
 	]

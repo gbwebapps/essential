@@ -37,9 +37,13 @@ class BackendModelTest extends CIUnitTestCase
         $mockDb = 
             $builderDb->getMock();
             
-        $mockDb->method('query')->willReturn(
-            $mockQuery
-        );
+		$mockDb->expects($this->once())
+			->method('query')
+			->with(
+				$this->callback(fn(string $sql): bool => str_contains(strtolower($sql), 'order by id asc')),
+				$this->isType('array')
+			)
+			->willReturn($mockQuery);
 
         /* 2. MOCK MODEL ASTRATTO E INIEZIONE */
         $builderModel = 

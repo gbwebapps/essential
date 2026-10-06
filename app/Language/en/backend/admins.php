@@ -152,6 +152,7 @@ return [
 		'noDataChanged' => 'No changes were made.', 
 		'hardDeleteSuccess' => 'Administrator %s %s permanently deleted successfully.',
 		'hardDeleteError' => 'Permanent administrator deletion failed.',
+		'hardDeleteImagesError' => 'Image file cleanup was not completed; check the logs.',
 		'softDeleteSuccess' => 'Administrator %s %s deleted successfully.', 
 		'softDeleteError' => 'Administrator deletion failed.', 
 		'restoreDeleteSuccess' => 'Administrator %s %s restored successfully.', 
@@ -168,6 +169,8 @@ return [
 		'deleteTokenError' => 'Token deletion failed.', 
 		'protectedAdmin' => 'Protected from modifications.', 
 		'cannotModifyDeleted' => 'Cannot modify a deleted admin.', 
+		'hardDeleteRequiresTrash' => 'Permanent deletion is allowed only for an admin already in the trash.',
+		'restoreRequiresTrash' => 'Restore is allowed only for an admin in the trash.',
 		'emailAlreadyInUse' => 'Email already in use.', 
 		'restoreDeleteConflict' => 'Admin restored and deactivated. The original email is already in use, modify the record to assign a new address.'
 	]

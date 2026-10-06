@@ -245,10 +245,18 @@ class AdminsModel extends BackendModel
                 'label' => lang('backend/admins.labels.dateFrom'),
                 'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]'],
             ],
-            'searchDates.created_at-to' => [
-                'label' => lang('backend/admins.labels.dateTo'),
-                'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]'],
-            ],
+			'searchDates.created_at-to' => [
+				'label' => lang('backend/admins.labels.dateTo'),
+				'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]'],
+			],
+			'searchDates.updated_at-from' => [
+				'label' => lang('backend/admins.labels.dateFrom'),
+				'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]'],
+			],
+			'searchDates.updated_at-to' => [
+				'label' => lang('backend/admins.labels.dateTo'),
+				'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]'],
+			],
         ];
     }
 
@@ -273,7 +281,7 @@ class AdminsModel extends BackendModel
             ],
             'email' => [
                 'label' => lang('backend/admins.labels.email'),
-                'rules' => ['required', 'trim', 'valid_email', 'max_length[255]', 'is_unique[admins.email]'],
+				'rules' => ['required', 'trim', 'valid_email', 'max_length[236]', 'is_unique[admins.email]'],
             ],
             'phone' => [
                 'label' => lang('backend/admins.labels.phone'),
@@ -338,7 +346,7 @@ class AdminsModel extends BackendModel
             ],
             'email' => [
                 'label' => lang('backend/admins.labels.email'),
-                'rules' => ['required', 'trim', 'valid_email', 'max_length[255]', "is_unique[admins.email,uuid,{$posts['uuid']}]"],
+				'rules' => ['required', 'trim', 'valid_email', 'max_length[236]', "is_unique[admins.email,uuid,{$posts['uuid']}]"],
             ],
             'phone' => [
                 'label' => lang('backend/admins.labels.phone'),
@@ -795,8 +803,7 @@ class AdminsModel extends BackendModel
             /* Genero uuid */
             $uuid = $this->generateUUID();
 
-            /* Istanzio la classe request per ricavare User Agent e IP */
-            $request = service('request');
+			/* Ricavo User Agent e IP dalla richiesta ricevuta */
             $userAgent = $request->getUserAgent()->getAgentString();
             $ip_address = $request->getIPAddress();
 
@@ -815,8 +822,8 @@ class AdminsModel extends BackendModel
             $expireTime = date('Y-m-d H:i:s', time() + setting('Backend\Auth')->activationTime);
 
             /* Scrittura del token di attivazione */
-            $sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, token_expire, token_type, user_agent, ip_address, created_at) values (?, ?, ?, ?, ?, ?, ?, ?)";
-            $this->db->query($sql, [$uuid, $tokenHash, date('Y-m-d H:i:s'), $expireTime, 'activation', $userAgent, $ip_address, date('Y-m-d H:i:s')]);
+			$sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, last_activity, token_expire, token_type, user_agent, ip_address, created_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			$this->db->query($sql, [$uuid, $tokenHash, date('Y-m-d H:i:s'), null, $expireTime, 'activation', $userAgent, $ip_address, date('Y-m-d H:i:s')]);
 
             /* Metodo email di default */
             $sql = "insert into admins_2fa (admin_uuid, method, secret, enabled) values (?, 'email', NULL, 1)";
@@ -859,10 +866,7 @@ class AdminsModel extends BackendModel
             
             $this->db->transRollback();
 
-            /* STAMPIAMO L'ERRORE E LA RIGA ESATTA */
-            var_dump("ERRORE: " . $e->getMessage() . " | RIGA: " . $e->getLine());
-
-            log_message('error', lang('backend/admins.messages.addError') . ' - ' . $e);
+			log_message('error', lang('backend/admins.messages.addError') . ' - ' . $e);
             return ['result' => false, 'message' => lang('backend/admins.messages.addError')];
         }
 
@@ -877,7 +881,7 @@ class AdminsModel extends BackendModel
         if ( ! $emailService->sendActivationEmail($data['row'], $token->getValue(), $this->module, $template, $subjectLangKey)):
 
             $message = sprintf(lang('backend/admins.messages.addSuccessNoEmail'), esc($data['row']->firstname), esc($data['row']->lastname));
-            return ['result' => false, 'message' => $message];
+			return ['result' => true, 'emailSent' => false, 'message' => $message];
             
         else:
             
@@ -919,11 +923,11 @@ class AdminsModel extends BackendModel
             endif;
 
             /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il superadmin */
-            if ((int) $data['row']->superadmin === 1):
-                return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
-            endif;
+			if ((int) $data['row']->superadmin === 1):
+				return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
+			endif;
 
-            /* Se non è stato effettuato alcun cambio sui dati gestiti, interrompiamo subito */
+			/* Se non è stato effettuato alcun cambio sui dati gestiti, interrompiamo subito */
             if( ! $this->hasAdminChanged($posts, $data['row'])):
                 return ['result' => false, 'message' => lang('backend/admins.messages.noDataChanged')];
             endif;
@@ -1097,9 +1101,13 @@ class AdminsModel extends BackendModel
             endif;
 
             /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il superadmin */
-            if ((int) $data['row']->superadmin === 1):
-                return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
-            endif;
+			if ((int) $data['row']->superadmin === 1):
+				return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
+			endif;
+
+			if ($data['row']->deleted_at === null):
+				return ['result' => false, 'message' => lang('backend/admins.messages.hardDeleteRequiresTrash')];
+			endif;
 
             $this->db->transBegin();
 
@@ -1124,9 +1132,16 @@ class AdminsModel extends BackendModel
             $currentAdmin = service('authorization')->currentAdmin();
             log_admin_activity('HARD_DELETE_ADMINS', 'admins', sprintf(lang('backend/admins.audits.hardDeleteAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
 
-            \App\Libraries\ImageFileSystemService::removeAllImages('admins', $posts['uuid']);
+			if ( ! \App\Libraries\ImageFileSystemService::removeAllImages('admins', $posts['uuid'])):
+				log_message('error', lang('backend/admins.messages.hardDeleteImagesError'));
+				return [
+					'result' => true,
+					'cleanup' => false,
+					'message' => sprintf(lang('backend/admins.messages.hardDeleteSuccess'), esc($data['row']->firstname), esc($data['row']->lastname)) . ' ' . lang('backend/admins.messages.hardDeleteImagesError')
+				];
+			endif;
 
-            return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.hardDeleteSuccess'), esc($data['row']->firstname), esc($data['row']->lastname))];
+			return ['result' => true, 'cleanup' => true, 'message' => sprintf(lang('backend/admins.messages.hardDeleteSuccess'), esc($data['row']->firstname), esc($data['row']->lastname))];
 
         } catch (\Throwable $e) {
 
@@ -1238,27 +1253,31 @@ class AdminsModel extends BackendModel
             $sql = "select * from admins where uuid = ?";
             $row = $this->db->query($sql, [$posts['uuid']])->getRow();
 
-            if (empty($row)):
-                return ['result' => false, 'message' => lang('backend/admins.messages.notFound')];
-            endif;
+			if (empty($row)):
+				return ['result' => false, 'message' => lang('backend/admins.messages.notFound')];
+			endif;
+
+			if ($row->deleted_at === null):
+				return ['result' => false, 'message' => lang('backend/admins.messages.restoreRequiresTrash')];
+			endif;
+
+			if ((int) $row->superadmin === 1):
+				return ['result' => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
+			endif;
 
             /* Ripulisco l'email dal marcatore generato durante il soft delete */
-            if (strpos($row->email, '.deleted.') !== false):
-                $cleanEmail = explode('.deleted.', $row->email)[0];
-            else:
-                $cleanEmail = $row->email;
-            endif;
+			$cleanEmail = preg_replace('/\.deleted\.\d{10}$/', '', $row->email);
 
             /* Scudo di sicurezza: verifico se nel frattempo l'email è stata presa da un utente attivo */
-            $sqlCheck = "select uuid from admins where email = ? and deleted_at IS NULL";
-            $emailExists = $this->db->query($sqlCheck, [$cleanEmail])->getRow();
+			$sqlCheck = "select uuid from admins where email = ? and uuid != ? and deleted_at is null";
+			$emailExists = $this->db->query($sqlCheck, [$cleanEmail, $posts['uuid']])->getRow();
 
             $this->db->transBegin();
 
             if ( ! empty($emailExists)):
                 
                 /* CONFLITTO: Ripristino forzando a inattivo e mantenendo la mail offuscata */
-                $tempEmail = time() . '@temp.local';
+				$tempEmail = $posts['uuid'] . '@temp.local';
                 $sqlUpdate = "update admins set email = ?, status = 0, deleted_at = NULL where uuid = ?";
                 $this->db->query($sqlUpdate, [$tempEmail, $posts['uuid']]);
                 
@@ -1357,8 +1376,8 @@ class AdminsModel extends BackendModel
             $this->db->query($sql, [$posts['uuid'], 'activation']);
 
             /* Scrittura del token di attivazione */
-            $sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, token_expire, token_type, user_agent, ip_address, created_at) values (?, ?, ?, ?, ?, ?, ?, ?)";
-            $this->db->query($sql, [$posts['uuid'], $tokenHash, date('Y-m-d H:i:s'), $expireTime, 'activation', $userAgent, $ip_address, date('Y-m-d_H-i-s')]);
+			$sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, last_activity, token_expire, token_type, user_agent, ip_address, created_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			$this->db->query($sql, [$posts['uuid'], $tokenHash, date('Y-m-d H:i:s'), null, $expireTime, 'activation', $userAgent, $ip_address, date('Y-m-d H:i:s')]);
 
             if ($this->db->transStatus() === false):
 
@@ -1393,7 +1412,7 @@ class AdminsModel extends BackendModel
         if ( ! $emailService->sendActivationEmail($data['row'], $token->getValue(), $this->module, $template, $subjectLangKey)):
 
             $message = sprintf(lang('backend/admins.messages.resetPasswordSuccessNoEmail'), esc($data['row']->firstname), esc($data['row']->lastname));
-            return ['result' => false, 'message' => $message];
+			return ['result' => true, 'emailSent' => false, 'message' => $message];
             
         else:
             
@@ -1621,38 +1640,47 @@ class AdminsModel extends BackendModel
             endif;
 
             /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il superadmin */
-            if ((int) $data['row']->superadmin === 1):
-                return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
-            endif;
+			if ((int) $data['row']->superadmin === 1):
+				return ['result'  => false, 'message' => lang('backend/admins.messages.protectedAdmin')];
+			endif;
 
-            /* 1. Recupero il token per leggere last_activity */
+			$this->db->transBegin();
+
+			/* 1. Recupero il token per leggere last_activity */
             $tokenSql = "select id, last_activity, token_type from admins_tokens where admin_uuid = ? and id = ?";
             $tokenRow = $this->db->query($tokenSql, [$posts['uuid'], $posts['id']])->getRow();
 
-            if ($tokenRow):
+			if ($tokenRow):
                 /* 2. Aggiorno il log registrando la forzatura (banned) */
-                if (in_array($tokenRow->token_type, ['cookie', 'session'])):
-                    $logoutTime = ! empty($tokenRow->last_activity) ? $tokenRow->last_activity : date('Y-m-d H:i:s');
-                    $logUpdateSql = "update admins_logs set logout = ?, logout_reason = 'banned' where token_id = ?";
-                    $this->db->query($logUpdateSql, [$logoutTime, $tokenRow->id]);
-                endif;
-            endif;
+				if (in_array($tokenRow->token_type, ['cookie', 'session'])):
+					$logoutTime = ! empty($tokenRow->last_activity) ? $tokenRow->last_activity : date('Y-m-d H:i:s');
+					$logUpdateSql = "update admins_logs set logout = ?, logout_reason = 'banned' where token_id = ?";
+					$this->db->query($logUpdateSql, [$logoutTime, $tokenRow->id]);
+				endif;
+			else:
+				$this->db->transRollback();
+				return ['result' => false, 'message' => lang('backend/admins.messages.deleteTokenError')];
+			endif;
 
             /* 3. Elimino fisicamente il token */
             $sql = "delete from admins_tokens where admin_uuid = ? and id = ?";
             $this->db->query($sql, [$posts['uuid'], $posts['id']]);
 
-            if($this->db->affectedRows() > 0):
+			if($this->db->affectedRows() > 0 && $this->db->transStatus() !== false):
+				$this->db->transCommit();
 
                 $currentAdmin = service('authorization')->currentAdmin();
                 log_admin_activity('DELETE_TOKEN_ADMIN', 'admins', sprintf(lang('backend/admins.audits.deleteTokenAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
 
                 return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.deleteTokenSuccess'), esc($data['row']->firstname), esc($data['row']->lastname)), 'admin' => $data['row']];
-            endif;
+			endif;
+
+			$this->db->transRollback();
 
             return ['result' => false, 'message' => lang('backend/admins.messages.deleteTokenError')];
 
-        } catch(\Throwable $e) {
+		} catch(\Throwable $e) {
+			$this->db->transRollback();
 
             log_message('error', lang('backend/admins.messages.deleteTokenError') . ' - ' . $e);
             return ['result' => false, 'message' => lang('backend/admins.messages.deleteTokenError')];

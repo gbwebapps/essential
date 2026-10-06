@@ -63,7 +63,9 @@ class RoutesTest extends CIUnitTestCase
             'backend/audits',
             'backend/tokens',
             'backend/logs',
-            'backend/admins',
+			'backend/admins',
+			'backend/export',
+			'backend/import',
         ];
 
         foreach (['GET', 'POST'] as $method):

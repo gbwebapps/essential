@@ -19,6 +19,28 @@ use App\Models\Backend\Components\GalleryOneModel;
  */
 class AdminsController extends BackendController 
 {
+	private function invalidRequest(): ResponseInterface
+	{
+		return $this->jsonResponse(['result' => false, 'message' => lang('backend/global.errors.err403')], 400);
+	}
+
+	private function targetAccessError(array $record): ?ResponseInterface
+	{
+		if ($record['result'] === false):
+			return $this->jsonResponse(['result' => false, 'message' => $record['message']]);
+		endif;
+
+		if (($record['row']->deleted_at ?? null) !== null):
+			return $this->jsonResponse(['result' => false, 'message' => lang('backend/admins.messages.cannotModifyDeleted')]);
+		endif;
+
+		if ((int) ($record['row']->superadmin ?? 0) === 1):
+			return $this->jsonResponse(['result' => false, 'message' => lang('backend/admins.messages.protectedAdmin')]);
+		endif;
+
+		return null;
+	}
+
     /**
      * Istanza del modello dedicato all'interazione con il database per i dati degli amministratori
      * 
@@ -201,9 +223,13 @@ class AdminsController extends BackendController
 
             $admin = $this->adminsModel->getByUUID($posts['uuid']);
 
-            if($admin['result'] === false):
-                return $this->jsonResponse(['result' => false, 'message' => $admin['message']]);
-            endif;
+			if($admin['result'] === false):
+				return $this->jsonResponse(['result' => false, 'message' => $admin['message']]);
+			endif;
+
+			if (($admin['row']->deleted_at ?? null) !== null):
+				return $this->jsonResponse(['result' => false, 'message' => lang('backend/admins.messages.cannotModifyDeleted')]);
+			endif;
 
             /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il superadmin */
             if ((int) $admin['row']->superadmin === 1):
@@ -325,7 +351,11 @@ class AdminsController extends BackendController
             $this->data['group_perms'] = $this->adminsModel->getGroupPermissions((int) $posts['group_id']);
 
             /* 3. Controllo di sbarramento: recuperiamo i veri dati dell'admin dal DB */
-            $dbAdmin = $this->adminsModel->getByUUID($posts['uuid']);
+			$dbAdmin = $this->adminsModel->getByUUID($posts['uuid']);
+
+			if (($accessError = $this->targetAccessError($dbAdmin)) !== null):
+				return $accessError;
+			endif;
             
             if ($dbAdmin['result'] === true && (int) $dbAdmin['row']->group_id === (int) $posts['group_id']):
 
@@ -335,11 +365,13 @@ class AdminsController extends BackendController
 
                 /* Se il gruppo è cambiato, mostriamo la configurazione pulita del nuovo gruppo */
                 $this->data['admin_exceptions'] = [];
-            endif;
+			endif;
 
-            return $this->jsonResponse(['result' => true, 'output' => view('backend/admins/partials/edit/permissionsPartial', $this->data)]);
+			return $this->jsonResponse(['result' => true, 'output' => view('backend/admins/partials/edit/permissionsPartial', $this->data)]);
 
-        endif;
+		endif;
+
+		return $this->invalidRequest();
     }
 
     /**
@@ -412,10 +444,12 @@ class AdminsController extends BackendController
 
             $json = $this->adminsModel->hardDelete($posts);
 
-            return $this->jsonResponse($json);
+			return $this->jsonResponse($json);
 
-        endif;
-    }
+		endif;
+
+		return $this->invalidRequest();
+	}
 
     /**
      * Sposta temporaneamente un amministratore nel cestino, revocandone l'accesso senza cancellare i dati dal database (eliminazione logica).
@@ -437,17 +471,19 @@ class AdminsController extends BackendController
 
             $json = $this->adminsModel->softDelete($posts);
 
-            return $this->jsonResponse($json);
+			return $this->jsonResponse($json);
 
-        endif;
-    }
+		endif;
+
+		return $this->invalidRequest();
+	}
 
     /**
      * Ripristina un amministratore precedentemente inserito nel cestino, riabilitandone l'account.
      *
      * @return ResponseInterface Risposta JSON con l'esito dell'operazione di ripristino
      */
-    public function restoreDelete(): ?ResponseInterface
+	public function restoreDelete(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -466,7 +502,7 @@ class AdminsController extends BackendController
 
         endif;
 
-        return null;
+		return $this->invalidRequest();
     }
 
     /**
@@ -489,10 +525,12 @@ class AdminsController extends BackendController
 
             $json = $this->adminsModel->resetPassword($posts, $this->request);
 
-            return $this->jsonResponse($json);
+			return $this->jsonResponse($json);
 
-        endif;
-    }
+		endif;
+
+		return $this->invalidRequest();
+	}
 
     /**
      * Modifica asincronamente lo stato di un amministratore (es. da attivo a sospeso) e aggiorna la porzione di interfaccia interessata.
@@ -529,10 +567,12 @@ class AdminsController extends BackendController
 
             unset($json['admin']);
 
-            return $this->jsonResponse($json);
+			return $this->jsonResponse($json);
 
-        endif;
-    }
+		endif;
+
+		return $this->invalidRequest();
+	}
 
     /**
      * Aggiunge o rimuove un permesso specifico, generando un'eccezione rispetto alle regole predefinite del gruppo di appartenenza dell'amministratore.
@@ -570,10 +610,12 @@ class AdminsController extends BackendController
 
             unset($json['admin']);
 
-            return $this->jsonResponse($json);
+			return $this->jsonResponse($json);
 
-        endif;
-    }
+		endif;
+
+		return $this->invalidRequest();
+	}
 
     /**
      * Recupera e ricarica i dati anagrafici e generali dell'amministratore aggiornando la singola porzione della vista di dettaglio o di modifica.
@@ -592,16 +634,20 @@ class AdminsController extends BackendController
                 return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/admins.messages.validationToastErrors'), $errorMessage)]);
             endif;
 
-            $record = $this->adminsModel->getByUUID($posts['uuid']);
+			$record = $this->adminsModel->getByUUID($posts['uuid']);
 
-            if($record['result'] === true):
+			if (($accessError = $this->targetAccessError($record)) !== null):
+				return $accessError;
+			endif;
+
+			if($record['result'] === true):
 
                 $json = ['result' => true];
                 $this->data['admin'] = $record['row'];
 
-                if(isset($posts['context']) && $posts['context'] === 'show'):
-                    $json['output'] = view('backend/admins/partials/show/generalDataPartial', $this->data);
-                endif;
+				if(isset($posts['context']) && $posts['context'] === 'show'):
+					$json['output'] = view('backend/admins/partials/show/generalDataPartial', $this->data);
+				endif;
 
                 if(isset($posts['context']) && $posts['context'] === 'edit'):
                     $this->data['groups'] = $this->adminsModel->getGroups();
@@ -622,9 +668,11 @@ class AdminsController extends BackendController
 
             endif;
 
-            return $this->jsonResponse($json);
+			return $this->jsonResponse($json);
 
-        endif;
+		endif;
+
+		return $this->invalidRequest();
     }
 
     /**
@@ -645,9 +693,13 @@ class AdminsController extends BackendController
                 return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/admins.messages.validationToastErrors'), $errorMessage)]);
             endif;
 
-            $record = $this->adminsModel->getByUUID($posts['uuid']);
+			$record = $this->adminsModel->getByUUID($posts['uuid']);
 
-            if($record['result'] === true):
+			if (($accessError = $this->targetAccessError($record)) !== null):
+				return $accessError;
+			endif;
+
+			if($record['result'] === true):
 
                 $json = ['result' => true];
 
@@ -660,11 +712,13 @@ class AdminsController extends BackendController
                 $json = ['result' => false];
                 $json['message'] = $record['message'];
 
-            endif;
+			endif;
 
-            return $this->jsonResponse($json);
+			return $this->jsonResponse($json);
 
-        endif;
+		endif;
+
+		return $this->invalidRequest();
     }
 
     /**
@@ -684,9 +738,13 @@ class AdminsController extends BackendController
                 return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/admins.messages.validationToastErrors'), $errorMessage)]);
             endif;
 
-            $record = $this->adminsModel->getByUUID($posts['uuid']);
+			$record = $this->adminsModel->getByUUID($posts['uuid']);
 
-            if ($record['result'] === true):
+			if (($accessError = $this->targetAccessError($record)) !== null):
+				return $accessError;
+			endif;
+
+			if ($record['result'] === true):
 
                 $json = ['result' => true];
                 $adminRow = $record['row'];
@@ -703,9 +761,9 @@ class AdminsController extends BackendController
                 $this->data['admin_exceptions'] = $this->adminsModel->getAdminExceptions($adminRow->uuid);
 
                 /* Renderizzazione differenziata in base al contesto della richiesta */
-                if (isset($posts['context']) && $posts['context'] === 'show'):
-                    $json['output'] = view('backend/admins/partials/show/permissionsPartial', $this->data);
-                endif;
+				if (isset($posts['context']) && $posts['context'] === 'show'):
+					$json['output'] = view('backend/admins/partials/show/permissionsPartial', $this->data);
+				endif;
 
                 if (isset($posts['context']) && $posts['context'] === 'edit'):
 					/* Inseriamo l'ID del gruppo reale corrente nel JSON di risposta per sincronizzare la select lato JS */
@@ -719,9 +777,11 @@ class AdminsController extends BackendController
 
             endif;
 
-            return $this->jsonResponse($json);
+			return $this->jsonResponse($json);
 
-        endif;
+		endif;
+
+		return $this->invalidRequest();
     }
 
     /**
@@ -742,9 +802,13 @@ class AdminsController extends BackendController
                 return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/admins.messages.validationToastErrors'), $errorMessage)]);
             endif;
 
-            $record = $this->adminsModel->getByUUID($posts['uuid']);
+			$record = $this->adminsModel->getByUUID($posts['uuid']);
 
-            if($record['result'] === true):
+			if (($accessError = $this->targetAccessError($record)) !== null):
+				return $accessError;
+			endif;
+
+			if($record['result'] === true):
 
                 $json = ['result' => true];
 
@@ -760,11 +824,13 @@ class AdminsController extends BackendController
                 $json = ['result' => false];
                 $json['message'] = $record['message'];
 
-            endif;
+			endif;
 
-            return $this->jsonResponse($json);
+			return $this->jsonResponse($json);
 
-        endif;
+		endif;
+
+		return $this->invalidRequest();
     }
 
     /**
@@ -802,8 +868,10 @@ class AdminsController extends BackendController
 
             endif;
 
-            return $this->jsonResponse($json);
+			return $this->jsonResponse($json);
 
-        endif;
-    }
+		endif;
+
+		return $this->invalidRequest();
+	}
 }

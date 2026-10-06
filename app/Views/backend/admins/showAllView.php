@@ -78,10 +78,11 @@
                                         <a href="#" id="export-entity" data-export-entity="admins" class="cmd-link">
                                             <i class="fa-solid fa-file-export"></i> <?= lang('backend/components/export.links.export'); ?>
                                         </a>
-                                        
-                                        <a href="#" id="import-entity" data-import-entity="admins" class="cmd-link">
-                                            <i class="fa-solid fa-file-import"></i> <?= lang('backend/components/import.links.import'); ?>
-                                        </a>
+
+										<a href="#" id="import-entity" data-import-entity="admins" class="cmd-link">
+											<i class="fa-solid fa-file-import"></i> <?= lang('backend/components/import.links.import'); ?>
+										</a>
+
                                         <!-- End Azioni e Filtri -->
 
                                     </div>

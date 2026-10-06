@@ -106,10 +106,10 @@ class ImageFileSystemServiceTest extends CIUnitTestCase
                 );
         endforeach;
 
-        \App\Libraries\ImageFileSystemService::removeAllImages(
-            $entity,
-            $uuid
-        );
+		$this->assertTrue(\App\Libraries\ImageFileSystemService::removeAllImages(
+			$entity,
+			$uuid
+		));
     }
 
     public function testRemoveAllImagesDeletesDirectoryTree()
@@ -169,10 +169,10 @@ class ImageFileSystemServiceTest extends CIUnitTestCase
             'content'
         );
 
-        \App\Libraries\ImageFileSystemService::removeAllImages(
-            $entity,
-            $uuid
-        );
+		$this->assertTrue(\App\Libraries\ImageFileSystemService::removeAllImages(
+			$entity,
+			$uuid
+		));
 
         $this
             ->assertFalse(
@@ -207,10 +207,10 @@ class ImageFileSystemServiceTest extends CIUnitTestCase
             .
             $uuid;
 
-        \App\Libraries\ImageFileSystemService::removeAllImages(
-            $entity,
-            $uuid
-        );
+		$this->assertTrue(\App\Libraries\ImageFileSystemService::removeAllImages(
+			$entity,
+			$uuid
+		));
 
         $this
             ->assertDirectoryDoesNotExist(

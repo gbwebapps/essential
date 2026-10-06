@@ -1785,5 +1785,42 @@ class GalleryOneControllerTest extends CIUnitTestCase
             $expectedResponse, 
             $result
         );
-    }
+	}
+
+	public function testDeleteImageRejectsDifferentAdminGallery(): void
+	{
+		$postData = [
+			'entity' => 'admins',
+			'uuid' => 'target-uuid',
+			'context' => 'profile',
+			'filename' => 'image.jpg'
+		];
+
+		$request = $this->createMock(\CodeIgniter\HTTP\IncomingRequest::class);
+		$request->method('isAJAX')->willReturn(true);
+		$request->method('is')->with('post')->willReturn(true);
+		$request->method('getPost')->willReturn($postData);
+
+		$galleryModel = $this->createMock(\App\Models\Backend\Components\GalleryOneModel::class);
+		$galleryModel->method('deleteImageValidateFields')->willReturn(['rule' => 'required']);
+		$galleryModel->expects($this->never())->method('deleteImage');
+		\CodeIgniter\Config\Factories::injectMock('models', \App\Models\Backend\Components\GalleryOneModel::class, $galleryModel);
+
+		$expectedResponse = $this->createMock(\CodeIgniter\HTTP\ResponseInterface::class);
+		$controller = $this->getMockBuilder(\App\Controllers\Backend\Components\GalleryOneController::class)
+			->onlyMethods(['validateData', 'jsonResponse'])
+			->getMock();
+		$controller->method('validateData')->willReturn(true);
+		$controller->expects($this->once())->method('jsonResponse')
+			->with($this->callback(fn(array $data): bool => $data['result'] === false), 403)
+			->willReturn($expectedResponse);
+
+		$inject = function() use ($request) {
+			$this->request = $request;
+			$this->currentAdmin = (object) ['uuid' => 'current-uuid', 'superadmin' => 0];
+		};
+		\Closure::bind($inject, $controller, $controller)();
+
+		$this->assertSame($expectedResponse, $controller->deleteImage());
+	}
 }

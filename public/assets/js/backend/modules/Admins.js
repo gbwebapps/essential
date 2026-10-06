@@ -158,26 +158,29 @@ export class ChangeGroupManager {
 
             if (!groupId || !uuid) return;
 
-            /* Aggiorno il vecchio valore con quello nuovo solo dopo la conferma */
-            previousGroupId = groupId;
+			const formData = new FormData();
+			formData.append('group_id', groupId);
+			formData.append('uuid', uuid);
 
-            const formData = new FormData();
-            formData.append('group_id', groupId);
-            formData.append('uuid', uuid);
+			const changed = await this.changeGroup(formData);
 
-            await this.changeGroup(formData);
+			if (changed === true) {
+				previousGroupId = groupId;
+			} else {
+				selectEl.value = previousGroupId;
+			}
         });
     }
 
     async changeGroup(formData) {
-        if (this.isSubmitting) return;
+		if (this.isSubmitting) return false;
         this.isSubmitting = true;
 
         if (typeof this.hooks.onGroupBefore === 'function') {
             const stop = this.hooks.onGroupBefore(formData);
             if (stop === false) {
                 this.isSubmitting = false;
-                return;
+				return false;
             }
         }
 
@@ -189,9 +192,9 @@ export class ChangeGroupManager {
 
             const data = await response.json();
 
-            if (data.result === false) {
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
-                return;
+			if (data.result === false) {
+				if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+				return false;
             }
 
             if (data.result === true) {
@@ -202,16 +205,21 @@ export class ChangeGroupManager {
                     smoothReplace(permissionsEl, data.output);
                 }
 
-                if (typeof this.hooks.onGroupAfter === 'function') {
-                    this.hooks.onGroupAfter(data);
-                }
-            }
+				if (typeof this.hooks.onGroupAfter === 'function') {
+					this.hooks.onGroupAfter(data);
+				}
+
+				return true;
+			}
+
+			return false;
 
         } catch (error) {
             if (typeof this.hooks.onGroupError === 'function') {
                 this.hooks.onGroupError(error);
-            }
-            console.error("Errore ChangeGroup:", error);
+			}
+			console.error("Errore ChangeGroup:", error);
+			return false;
         } finally {
             this.isSubmitting = false;
         }
