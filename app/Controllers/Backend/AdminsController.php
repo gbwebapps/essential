@@ -206,7 +206,7 @@ class AdminsController extends BackendController
      * @return string|ResponseInterface Risposta JSON con l'esito dell'aggiornamento o l'HTML del modulo di modifica
      * @throws \CodeIgniter\Exceptions\PageNotFoundException Se l'identificativo non è valido o l'utente non esiste
      */
-    public function edit(string $uuid = null): string|ResponseInterface
+    public function edit(?string $uuid = null): string|ResponseInterface
     {
         $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
 
@@ -289,7 +289,7 @@ class AdminsController extends BackendController
         endif;
 
         /* GET Request - Caricamento iniziale della pagina */
-        if(( ! isset($uuid)) || ( ! $this->regexp->validateUUID($uuid))):
+        if (($uuid === null) || ( ! $this->regexp->validateUUID($uuid))):
             return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.errors.uuid'))->with('class', 'light text-danger fw-bold');
         endif;
 
@@ -382,7 +382,7 @@ class AdminsController extends BackendController
      */
     public function show(string $uuid): RedirectResponse|string
     {
-        if (( ! isset($uuid)) || ( ! $this->regexp->validateUUID($uuid))):
+        if ( ! $this->regexp->validateUUID($uuid)):
             return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.errors.uuid'))->with('class', 'light text-danger fw-bold');
         endif;
 

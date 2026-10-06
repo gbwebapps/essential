@@ -77,7 +77,7 @@ class CryptoService
      */
     public function decrypt(string $ciphertextBlob): ?string
     {
-        $raw = base64_decode($ciphertextBlob);
+        $raw = base64_decode($ciphertextBlob, true);
         $ivLen = openssl_cipher_iv_length($this->cipher);
         $tagLen = 16; /* Lunghezza standard per il tag GCM */
 

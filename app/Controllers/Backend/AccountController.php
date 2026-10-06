@@ -116,7 +116,7 @@ class AccountController extends BackendController
      *
      * @return string HTML renderizzato della vista index
      */
-    public function index()
+    public function index(): string
     {
         $this->data['action'] = 'index';
 
@@ -130,7 +130,7 @@ class AccountController extends BackendController
      *
      * @return string HTML renderizzato della vista generale
      */
-    public function general()
+    public function general(): string
     {
         $this->data['action'] = 'general';
 
@@ -293,6 +293,8 @@ class AccountController extends BackendController
 
             return $this->jsonResponse($json);
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -335,7 +337,7 @@ class AccountController extends BackendController
      *
      * @return string HTML renderizzato della vista di sicurezza
      */
-    public function security()
+    public function security(): string
     {
         $this->data['action'] = 'security';
 
@@ -349,7 +351,7 @@ class AccountController extends BackendController
      *
      * @return ResponseInterface Risposta JSON con l'esito dell'aggiornamento delle preferenze
      */
-    public function saveBasicMethod()
+    public function saveBasicMethod(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')) :
 
@@ -371,6 +373,8 @@ class AccountController extends BackendController
             return $this->jsonResponse(['result' => true, 'message' => lang('backend/account.messages.updateSecuritySettingsSuccess')]);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -378,7 +382,7 @@ class AccountController extends BackendController
      *
      * @return ResponseInterface Risposta JSON contenente il QR Code generato e l'interfaccia parziale per l'inserimento del codice
      */
-    public function setupTotp()
+    public function setupTotp(): ResponseInterface 
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -417,6 +421,8 @@ class AccountController extends BackendController
             return $this->jsonResponse(['result' => true, 'output' => $output]);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -424,7 +430,7 @@ class AccountController extends BackendController
      *
      * @return ResponseInterface Risposta JSON con l'esito dell'attivazione e il messaggio di conferma finale
      */
-    public function confirmTotp()
+    public function confirmTotp(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')) :
 
@@ -465,5 +471,7 @@ class AccountController extends BackendController
             return $this->jsonResponse(['result' => true, 'message' => lang('backend/account.messages.totpConfigurationSuccess')]);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 }

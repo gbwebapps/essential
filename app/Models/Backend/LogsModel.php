@@ -3,6 +3,7 @@
 namespace App\Models\Backend;
 
 use App\Models\Backend\BackendModel;
+use App\Interfaces\ImportValidationInterface;
 
 /*
  * Modello dedicato alla consultazione dei log di accesso e alla gestione delle sessioni (Logs).
@@ -12,7 +13,7 @@ use App\Models\Backend\BackendModel;
  * dell'utente e della sessione) e fornisce la logica operativa per disconnettere 
  * forzatamente (ban/kick) una sessione specifica in caso di necessità.
  */
-class LogsModel extends BackendModel
+class LogsModel extends BackendModel  
 {
     /**
      * Nome della tabella principale usata dal motore del BackendModel per costruire dinamicamente query e filtri.

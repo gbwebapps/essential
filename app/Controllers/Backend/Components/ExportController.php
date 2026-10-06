@@ -57,6 +57,8 @@ class ExportController extends BackendController
             return $this->jsonResponse(['result' => true, 'output' => $output]);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -103,6 +105,8 @@ class ExportController extends BackendController
             ]);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -113,6 +117,7 @@ class ExportController extends BackendController
     public function remove(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
+
             $fileName = $this->request->getPost('fileName');
             
             if ($fileName):
@@ -123,7 +128,10 @@ class ExportController extends BackendController
             endif;
 
             return $this->jsonResponse(['result' => true]);
+            
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Models\Backend;
 
 use App\Models\Backend\BackendModel;
+use App\Interfaces\ImportValidationInterface;
 
 /**
  * Modello dedicato agli Strumenti di sistema (Tools).
@@ -11,7 +12,7 @@ use App\Models\Backend\BackendModel;
  * e degli audit, ottimizzazione delle tabelle del database, generazione e rotazione dei backup, 
  * svuotamento delle cartelle temporanee (cache) e raccolta delle informazioni sul server.
  */
-class ToolsModel extends BackendModel
+class ToolsModel extends BackendModel 
 {
 	/**
 	 * Whitelist dei campi POST consentiti durante le operazioni di filtraggio o eliminazione degli Audit.
@@ -734,7 +735,7 @@ class ToolsModel extends BackendModel
 			'server' => [
 				/* Recupera il sistema operativo, la release e l'architettura */
 				'os'       => php_uname('s') . ' ' . php_uname('r') . ' (' . php_uname('m') . ')',
-				'software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Sconosciuto',
+				'software' => service('superglobals')->server('SERVER_SOFTWARE') ?? 'Sconosciuto',
 			],
 			'php' => [
 				'version'             => PHP_VERSION,

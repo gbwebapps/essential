@@ -36,7 +36,6 @@
             <directory suffix=".php">./app/Helpers</directory>
             <directory suffix=".php">./app/Libraries</directory>
             <directory suffix=".php">./app/Models</directory>
-            <directory suffix=".php">./app/Traits</directory>
             <directory suffix=".php">./app/Validation</directory>
         </include>
         <exclude>

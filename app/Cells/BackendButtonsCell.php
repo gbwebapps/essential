@@ -35,7 +35,7 @@ class BackendButtonsCell
      * @param string $action Azione associata alla configurazione dei pulsanti
      * @return array Array associativo contenente gli attributi e i testi dei pulsanti
      */
-    private function getButtonConfig($controller, $action): array
+    private function getButtonConfig(string $controller, string $action): array
     {
         switch($action):
 
@@ -88,6 +88,9 @@ class BackendButtonsCell
                     'btn_right' => 'btn btn-success btn-sm',
                     'icon_right' => '<i class="fa-solid fa-floppy-disk"></i>',
                 ];
+
+            default:
+                throw new \InvalidArgumentException('Unsupported action: ' . $action);
 
         endswitch;
     }

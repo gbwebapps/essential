@@ -61,7 +61,7 @@ class SettingsController extends BackendController
      *
      * @return string HTML elaborato della pagina principale.
      */
-    public function index()
+    public function index(): string
     {
         $this->data['action'] = 'index';
         
@@ -106,6 +106,8 @@ class SettingsController extends BackendController
             return $this->jsonResponse(['result' => true, 'output' => view('backend/settings/partials/index/' . $env . 'SettingsPartial', $this->data)]);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -185,6 +187,8 @@ class SettingsController extends BackendController
             return $this->jsonResponse($json);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -221,6 +225,8 @@ class SettingsController extends BackendController
             return $this->jsonResponse(['result' => true, 'data' => $this->data[$env . 'Settings']]);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -253,6 +259,8 @@ class SettingsController extends BackendController
             return $this->jsonResponse(['result'  => true, 'message' => lang('backend/settings.messages.deleteSuccess')]);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -285,5 +293,7 @@ class SettingsController extends BackendController
             return $this->jsonResponse(['result' => true]);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 }

@@ -1916,9 +1916,8 @@ class AccountControllerTest extends CIUnitTestCase
         $result = 
             $controller->saveBasicMethod();
             
-        $this->assertNull(
-            $result
-        );
+        $this->assertInstanceOf(\CodeIgniter\HTTP\ResponseInterface::class, $result);
+        $this->assertSame(400, $result->getStatusCode());
     }
 
     public function testSaveBasicMethodReturnsFalseOnInvalidMethod(): void
@@ -2251,9 +2250,8 @@ class AccountControllerTest extends CIUnitTestCase
         $result = 
             $controller->setupTotp();
             
-        $this->assertNull(
-            $result
-        );
+        $this->assertInstanceOf(\CodeIgniter\HTTP\ResponseInterface::class, $result);
+        $this->assertSame(400, $result->getStatusCode());
     }
 
     public function testSetupTotpReturnsFalseOnModelFailure(): void
@@ -2495,9 +2493,8 @@ class AccountControllerTest extends CIUnitTestCase
         $result = 
             $controller->confirmTotp();
             
-        $this->assertNull(
-            $result
-        );
+        $this->assertInstanceOf(\CodeIgniter\HTTP\ResponseInterface::class, $result);
+        $this->assertSame(400, $result->getStatusCode());
     }
 
     public function testConfirmTotpReturnsValidationErrors(): void

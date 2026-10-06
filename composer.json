@@ -17,8 +17,11 @@
     },
     "require-dev": {
         "code-lts/doctum": "^5.6",
+        "codeigniter/phpstan-codeigniter": "^2.2",
         "fakerphp/faker": "^1.9",
         "mikey179/vfsstream": "^1.6",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.3",
         "phpunit/phpunit": "^10.5.16"
     },
     "autoload": {
@@ -38,7 +41,10 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
     },
     "scripts": {
         "test": "phpunit"

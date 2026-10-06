@@ -3021,9 +3021,7 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
     public function testGetSystemInfoReturnsCorrectArray(): void
     {
         /* Imposta la variabile server per il contesto CLI */
-        $_SERVER
-        ['SERVER_SOFTWARE'] = 
-        'PHPUnit Test Server';
+        service('superglobals')->setServer('SERVER_SOFTWARE', 'PHPUnit Test Server');
 
         /* Inizializzazione modello */
         $model = 

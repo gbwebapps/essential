@@ -23,7 +23,7 @@ abstract class BackendController extends BaseController
 {
     /**
      * Array di helper precaricati da CodeIgniter per essere disponibili in tutto il backend.
-     * @var array 
+     * @var list<string>
      */
     protected $helpers = ['date', 'array', 'cookie', 'settings'];
 

@@ -75,12 +75,20 @@ abstract class BackendModel extends BaseModel
     protected array $showAllAllowedFields = [];
 
     /**
+     * Whitelist dei campi su cui è abilitata l'esecuzione della ricerca testuale (barra di ricerca globale). 
+     * Circoscrive le istruzioni SQL LIKE esclusivamente alle colonne pertinenti, tutelando sia la sicurezza che le performance.
+     *
+     * @var array
+     */
+    protected array $showAllSearchAllowedFields = [];
+
+    /**
      * Whitelist specifica per i campi data ammessi come filtri temporali nell'elenco record. 
      * Garantisce che le interrogazioni al database basate su intervalli temporali avvengano solo su colonne abilitate.
      *
      * @var array
      */
-    protected array $showAllAllowedDates = [];
+    protected array $showAllSearchAllowedDates = [];
 
     /**
      * Whitelist dei campi consentiti durante la creazione (INSERT) di un nuovo record. 
@@ -122,21 +130,6 @@ abstract class BackendModel extends BaseModel
      */
     protected array $allowedOrderColumns = [];
 
-    /**
-     * Whitelist dei campi su cui è abilitata l'esecuzione della ricerca testuale (barra di ricerca globale). 
-     * Circoscrive le istruzioni SQL LIKE esclusivamente alle colonne pertinenti, tutelando sia la sicurezza che le performance.
-     *
-     * @var array
-     */
-    protected array $showAllSearchAllowedFields = [];
-
-	/**
-	 * Hook nativo di CodeIgniter 4, invocato automaticamente durante l'inizializzazione dell'istanza.
-	 * 
-	 * Invoca il costruttore padre per predisporre la connessione al database e carica preventivamente 
-	 * l'helper globale 'audits', garantendo a tutti i modelli figli l'immediata disponibilità 
-	 * delle funzioni di tracciamento (log_admin_activity).
-	 */
 	protected function initModel(): void 
 	{
 		parent::initModel();

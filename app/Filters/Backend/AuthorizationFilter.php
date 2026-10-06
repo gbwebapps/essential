@@ -5,6 +5,7 @@ namespace App\Filters\Backend;
 use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\HTTP\IncomingRequest;
 
 /**
  * Filtro di autorizzazione (middleware) per la protezione delle rotte del pannello di controllo.
@@ -29,6 +30,10 @@ class AuthorizationFilter implements FilterInterface
      */
     public function before(RequestInterface $request, $arguments = null)
     {
+        if ( ! $request instanceof IncomingRequest):
+            return null;
+        endif;
+
         $currentAdmin = service('authorization')->currentAdmin();
 
         /* Se l'utente è loggato, lasciamo proseguire la richiesta */
@@ -79,8 +84,8 @@ class AuthorizationFilter implements FilterInterface
      * @param ResponseInterface $response L'oggetto rappresentante la risposta HTTP generata dal controller
      * @param array|null $arguments Parametri opzionali configurati per il filtro
      */
-    public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
+    public function after(RequestInterface $request, ResponseInterface $response, $arguments = null): ?ResponseInterface
     {
-        /* In questo filtro non è necessaria alcuna operazione post-risposta */
+        return null;
     }
 }

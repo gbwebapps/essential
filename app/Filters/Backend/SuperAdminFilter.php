@@ -5,6 +5,7 @@ namespace App\Filters\Backend;
 use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\HTTP\IncomingRequest;
 
 /**
  * Filtro di massima sicurezza (middleware) riservato agli amministratori di sistema (Superadmin).
@@ -28,6 +29,10 @@ class SuperAdminFilter implements FilterInterface
      */
     public function before(RequestInterface $request, $arguments = null)
     {
+        if ( ! $request instanceof IncomingRequest):
+            return null;
+        endif;
+
         $currentAdmin = service('authorization')->currentAdmin();
 
         /* Se l'utente è loggato ed è superadmin, prosegue normalmente */
@@ -67,8 +72,8 @@ class SuperAdminFilter implements FilterInterface
      * @param ResponseInterface $response L'oggetto rappresentante la risposta HTTP generata dal framework
      * @param array|null $arguments Parametri opzionali configurati a livello di routing
      */
-    public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
+    public function after(RequestInterface $request, ResponseInterface $response, $arguments = null): ?ResponseInterface
     {
-        /* In questo filtro non è necessaria alcuna operazione post-risposta */
+        return null;
     }
 }

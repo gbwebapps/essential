@@ -255,7 +255,7 @@ class AccountModel extends BackendModel
             
             $sessionValue = session()->get('backendSession');
             $token = new \App\Libraries\Token($sessionValue);
-            $tokenHash = $token->getHash(config('Backend/Auth')->hashKey);
+            $tokenHash = $token->getHash(config(\Config\Backend\Auth::class)->hashKey);
 
             $sql = "select id from admins_tokens where token_hash = ? and token_type = 'session'";
             $row = $this->db->query($sql, [$tokenHash])->getRow();

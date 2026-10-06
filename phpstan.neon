@@ -1,0 +1,18 @@
+parameters:
+    level: 5
+
+    paths:
+        - app/Controllers
+        - app/Models
+        - app/Libraries
+        - app/Filters
+        - app/Validation
+        - app/Cells
+        - app/Helpers
+
+    bootstrapFiles:
+        - phpstan-bootstrap.php
+
+    ignoreErrors:
+        -
+            identifier: codeigniter.modelArgumentInstanceof

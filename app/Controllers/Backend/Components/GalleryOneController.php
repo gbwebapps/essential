@@ -57,7 +57,7 @@ class GalleryOneController extends BackendController
                 return $this->accessDenied();
             endif;
 
-            $data = ['entity' => $posts['entity'], 'uuid' => $posts['uuid'], 'context' => $posts['context'], 'images' => $this->galleryModel->getImages($posts) ?? []];
+            $data = ['entity' => $posts['entity'], 'uuid' => $posts['uuid'], 'context' => $posts['context'], 'images' => $this->galleryModel->getImages($posts)];
             return $this->jsonResponse(['result' => true, 'output' => view('backend/components/galleryOne/galleryOneView', $data)]);
         endif;
 
@@ -83,7 +83,7 @@ class GalleryOneController extends BackendController
                 return $this->jsonResponse(['result' => false, 'message' => lang('backend/components/galleryOne.messages.deleteError')]);
             endif;
 
-            $data = ['entity' => $posts['entity'], 'uuid' => $posts['uuid'], 'context' => $posts['context'], 'filename' => $posts['filename'], 'images' => $this->galleryModel->getImages($posts) ?? []];
+            $data = ['entity' => $posts['entity'], 'uuid' => $posts['uuid'], 'context' => $posts['context'], 'filename' => $posts['filename'], 'images' => $this->galleryModel->getImages($posts)];
             return $this->jsonResponse(['result' => true, 'message' => lang('backend/components/galleryOne.messages.deleteSuccess'), 'output' => view('backend/components/galleryOne/galleryOneView', $data)]);
         endif;
 
@@ -109,7 +109,7 @@ class GalleryOneController extends BackendController
                 return $this->jsonResponse(['result' => false, 'message' => lang('backend/components/galleryOne.messages.setCoverError')]);
             endif;
 
-            $data = ['entity' => $posts['entity'], 'uuid' => $posts['uuid'], 'context' => $posts['context'], 'images' => $this->galleryModel->getImages($posts) ?? []];
+            $data = ['entity' => $posts['entity'], 'uuid' => $posts['uuid'], 'context' => $posts['context'], 'images' => $this->galleryModel->getImages($posts)];
             return $this->jsonResponse(['result' => true, 'message' => lang('backend/components/galleryOne.messages.setCoverSuccess'), 'output' => view('backend/components/galleryOne/galleryOneView', $data)]);
         endif;
 
@@ -135,7 +135,7 @@ class GalleryOneController extends BackendController
                 return $this->jsonResponse(['result' => false, 'message' => lang('backend/components/galleryOne.messages.removeCoverError')]);
             endif;
 
-            $data = ['entity' => $posts['entity'], 'uuid' => $posts['uuid'], 'context' => $posts['context'], 'images' => $this->galleryModel->getImages($posts) ?? []];
+            $data = ['entity' => $posts['entity'], 'uuid' => $posts['uuid'], 'context' => $posts['context'], 'images' => $this->galleryModel->getImages($posts)];
             return $this->jsonResponse(['result' => true, 'message' => lang('backend/components/galleryOne.messages.removeCoverSuccess'), 'output' => view('backend/components/galleryOne/galleryOneView', $data)]);
         endif;
 

@@ -3,6 +3,7 @@
 namespace App\Models\Backend;
 
 use App\Models\Backend\BackendModel;
+use App\Interfaces\ImportValidationInterface;
 
 /*
  * Modello dedicato alla gestione dell'Audit Log (lo storico delle attività di sistema).
@@ -12,7 +13,7 @@ use App\Models\Backend\BackendModel;
  * primario (logActivity) richiamato dall'helper globale per registrare fisicamente 
  * nel database ogni azione rilevante compiuta dagli amministratori.
  */
-class AuditsModel extends BackendModel
+class AuditsModel extends BackendModel 
 {
     /**
      * Nome della tabella principale di riferimento per le interrogazioni del modello.

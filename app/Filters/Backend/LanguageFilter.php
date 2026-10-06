@@ -27,13 +27,12 @@ class LanguageFilter implements FilterInterface
      *
      * @param RequestInterface $request L'oggetto rappresentante la richiesta HTTP in ingresso
      * @param array|null $arguments Parametri opzionali configurati per il filtro
-     * @return void Interrompe silenziosamente l'esecuzione solo se la richiesta non è di tipo web (CLI)
      */
     public function before(RequestInterface $request, $arguments = null)
     {
         /* Interrompe se non è una richiesta web HTTP */
         if ( ! $request instanceof IncomingRequest):
-            return;
+            return null;
         endif;
 
         /* 1. Determina la lingua: priorità al POST, poi al DB/Config */
@@ -61,6 +60,8 @@ class LanguageFilter implements FilterInterface
         Services::request()->setLocale($activeLanguage);
         Services::language()->setLocale($activeLanguage);
         $appConfig->defaultLocale = $activeLanguage;
+
+        return null;
     }
 
     /**
@@ -73,9 +74,9 @@ class LanguageFilter implements FilterInterface
      * @param ResponseInterface $response L'oggetto rappresentante la risposta HTTP generata dal framework
      * @param array|null $arguments Parametri opzionali configurati per il filtro
      */
-    public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
+    public function after(RequestInterface $request, ResponseInterface $response, $arguments = null): ?ResponseInterface
     {
-        /* Nessuna operazione in uscita */
+        return null;
     }
 
     /**
@@ -94,8 +95,8 @@ class LanguageFilter implements FilterInterface
 
         /* Tenta la lettura dal file di configurazione statico */
         $config = config('Backend\General');
-        
-        if ($config !== null && property_exists($config, 'language')):
+
+        if ($config !== null && property_exists($config, 'language')): // @phpstan-ignore notIdentical.alwaysTrue, function.alreadyNarrowedType
             $language = $config->language;
         endif;
 

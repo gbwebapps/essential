@@ -5,6 +5,7 @@ namespace App\Filters\Backend;
 use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\HTTP\IncomingRequest;
 
 /**
  * Filtro di sicurezza (middleware) basato sul controllo degli accessi (ACL).
@@ -29,6 +30,10 @@ class PermissionFilter implements FilterInterface
      */
     public function before(RequestInterface $request, $arguments = null)
     {
+        if ( ! $request instanceof IncomingRequest):
+            return null;
+        endif;
+
         $currentAdmin = service('authorization')->currentAdmin();
 
         /* Sbarramento preliminare: se l'utente non è loggato, lasciamo che se ne occupi l'AuthorizationFilter */
@@ -86,8 +91,8 @@ class PermissionFilter implements FilterInterface
      * @param ResponseInterface $response L'oggetto rappresentante la risposta HTTP generata dal controller
      * @param array|null $arguments Parametri opzionali configurati per il filtro
      */
-    public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
+    public function after(RequestInterface $request, ResponseInterface $response, $arguments = null): ?ResponseInterface
     {
-        /* ... Nessuna azione richiesta dopo il rendering ... */
+        return null;
     }
 }

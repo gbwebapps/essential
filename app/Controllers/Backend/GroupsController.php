@@ -52,7 +52,7 @@ class GroupsController extends BackendController
      *
      * @return string HTML compilato della vista index.
      */
-    public function index()
+    public function index(): string 
     {
         $this->data['action'] = 'index';
         
@@ -80,6 +80,8 @@ class GroupsController extends BackendController
             return $this->jsonResponse(['result' => true, 'output' => $output]);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -102,6 +104,8 @@ class GroupsController extends BackendController
             return $this->jsonResponse(['result' => true, 'output' => $output]);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -141,6 +145,8 @@ class GroupsController extends BackendController
             return $this->jsonResponse(['result' => true, 'output' => $output]);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -184,6 +190,8 @@ class GroupsController extends BackendController
             return $this->jsonResponse($result);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -260,6 +268,8 @@ class GroupsController extends BackendController
             return $this->jsonResponse($result);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -295,6 +305,8 @@ class GroupsController extends BackendController
             return $this->jsonResponse($result);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -322,6 +334,8 @@ class GroupsController extends BackendController
             return $this->jsonResponse(['result' => true]);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -339,6 +353,8 @@ class GroupsController extends BackendController
             return $this->jsonResponse(['result' => true, 'output' => $output]);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -369,6 +385,8 @@ class GroupsController extends BackendController
             return $this->jsonResponse(['result' => true, 'output' => $output]);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -415,6 +433,8 @@ class GroupsController extends BackendController
             return $this->jsonResponse(['result' => true, 'output' => $output]);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -436,7 +456,7 @@ class GroupsController extends BackendController
             endif;
 
             /* Recuperiamo le regole di validazione specifiche per le eccezioni dal Model */
-            $rules = $this->groupsModel->saveExceptionsValidationRules($posts);
+            $rules = $this->groupsModel->saveExceptionsValidationRules();
             
             if ( ! $this->validateData($posts, $rules)):
 
@@ -454,5 +474,7 @@ class GroupsController extends BackendController
             return $this->jsonResponse(['result'  => $result['result'], 'message' => $result['message']]);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 }

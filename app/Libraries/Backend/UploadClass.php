@@ -86,7 +86,7 @@ class UploadClass
                 $base = preg_replace('/-+/', '-', $base);
             endif;
 
-            $filename = $base . ($ext ? '.' . $ext : '');
+            $filename = $base . ('.' . $ext);
             $path     = $baseImg . '/large';
             $destination = $path . '/' . $filename;
 
@@ -94,7 +94,7 @@ class UploadClass
             if ( ! (bool) $this->config->overwriteImages):
                 $i = 1;
                 while (file_exists($destination)):
-                    $filename = $base . "($i)" . ($ext ? '.' . $ext : '');
+                    $filename = $base . "($i)" . ('.' . $ext);
                     $destination = $path . '/' . $filename;
                     $i++;
                 endwhile;

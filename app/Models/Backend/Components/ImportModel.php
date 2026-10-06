@@ -24,9 +24,9 @@ class ImportModel extends BackendModel
      * ignorando i comportamenti di default se esiste una logica dedicata.
      *
      * @param string $entity Il nome della tabella/modulo (es. 'users', 'logs')
-     * @return \CodeIgniter\Model|null L'istanza del modello se esiste, altrimenti null
+     * @return \App\Models\Backend\BackendModel|null L'istanza del modello se esiste, altrimenti null
      */
-    private function getTargetModelInstance(string $entity)
+    private function getTargetModelInstance(string $entity): ?BackendModel 
     {
         $modelName = 'App\\Models\\Backend\\' . ucfirst($entity) . 'Model';
         
@@ -147,7 +147,7 @@ class ImportModel extends BackendModel
 
         /* MAPPA IN MEMORIA OTTIMIZZATA */
         $existingDataMap = [];
-        if ($primaryKey !== null && $this->db->tableExists($entity)):
+        if ($this->db->tableExists($entity)):
             $pkIndex = array_search($primaryKey, $csvHeaders, true);
             if ($pkIndex !== false):
                 $csvIds = [];
@@ -299,7 +299,7 @@ class ImportModel extends BackendModel
             if (file_exists($stagingPath)):
                 unlink($stagingPath);
             endif;
-            return ['status' => false, 'message' => lang('backend/components/import.messages.emptyFile') ?? 'Il file CSV non contiene dati validi da elaborare.'];
+            return ['status' => false, 'message' => lang('backend/components/import.messages.emptyFile')];
         endif;
 
         if ( ! empty($errors)):
@@ -507,9 +507,7 @@ class ImportModel extends BackendModel
         if ($isFinished):
 
             /* Pulizia fisica del file temporaneo di staging */
-            if (file_exists($filePath)):
-                unlink($filePath);
-            endif;
+            unlink($filePath);
 
             $currentAdmin = service('authorization')->currentAdmin();
             log_admin_activity('IMPORT_DATA', $entity, sprintf(lang('Importazione dati nella tabella %s. Inseriti %d records, aggiornati %d records.'), $entity, $inserted, $updated), $currentAdmin);

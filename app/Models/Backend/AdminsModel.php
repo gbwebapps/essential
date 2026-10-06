@@ -3,6 +3,7 @@
 namespace App\Models\Backend;
 
 use App\Models\Backend\BackendModel;
+use App\Interfaces\ImportValidationInterface;
 
 /**
  * Modello principale per la gestione degli Amministratori di sistema.
@@ -12,7 +13,7 @@ use App\Models\Backend\BackendModel;
  * l'assegnazione ai gruppi, l'override dei permessi (eccezioni), i blocchi di sicurezza 
  * (es. protezione del Superadmin), le sospensioni temporanee e le eliminazioni (sia fisiche che logiche).
  */
-class AdminsModel extends BackendModel
+class AdminsModel extends BackendModel 
 {
     /**
      * Nome identificativo del modulo (tabella principale 'admins') usato dal motore genitore.
@@ -1457,6 +1458,9 @@ class AdminsModel extends BackendModel
             endif;
 
             $currentStatus = (int) $data['row']->status;
+
+            $newStatus = null;
+            $suspendedAt = null;
 
             /* Converte il risultato in un intero (0 o 1) per MySQL */
             if($currentStatus === 0):

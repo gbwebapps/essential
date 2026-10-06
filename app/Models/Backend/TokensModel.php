@@ -3,6 +3,7 @@
 namespace App\Models\Backend;
 
 use App\Models\Backend\BackendModel;
+use App\Interfaces\ImportValidationInterface;
 
 /**
  * Modello dedicato alla gestione e al monitoraggio dei token di sicurezza.
@@ -11,7 +12,7 @@ use App\Models\Backend\BackendModel;
  * Si occupa di mostrare l'elenco dei token attivi o passati (sessioni di login, cookie "ricordami", 
  * token per il reset della password) e permette di revocarli forzatamente, disconnettendo gli utenti.
  */
-class TokensModel extends BackendModel
+class TokensModel extends BackendModel 
 {
     /**
      * Nome della tabella principale di riferimento per questo modello.

@@ -29,9 +29,9 @@ class UploadPreviewController extends BackendController
     /**
      * Elabora la richiesta di caricamento multiplo, validando i parametri di contesto e i file inviati prima di delegarne il salvataggio al modello.
      *
-     * @return string|ResponseInterface Risposta JSON contenente l'esito dell'operazione, i dati processati o gli eventuali errori di validazione
+     * @return ResponseInterface Risposta JSON contenente l'esito dell'operazione, i dati processati o gli eventuali errori di validazione
      */
-    public function saveImages(): string|ResponseInterface
+    public function saveImages(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')) :
 
@@ -65,5 +65,7 @@ class UploadPreviewController extends BackendController
             return $this->jsonResponse($json);
 
         endif;
+
+        return service('response')->setStatusCode(400);
     }
 }
