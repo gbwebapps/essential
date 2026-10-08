@@ -23,18 +23,11 @@ class AuditsModel extends BackendModel
     protected ?string $module = 'admins_audits';
 
     /**
-     * Colonna di default utilizzata per ordinare i risultati al caricamento della pagina.
-     * 
-     * @var string 
-     */
-    protected ?string $defaultColumn = 'id';
-
-    /**
      * Whitelist dei parametri di paginazione accettati dal server (pagina, righe, ordine, colonna).
      * 
      * @var array 
      */
-    protected array $showAllAllowedFields = ['column', 'order', 'page', 'rows', 'searchFields'];
+    protected array $showAllAllowedFields = ['id', 'column', 'order', 'page', 'rows', 'searchFields', 'searchDates'];
 
     /**
      * Elenco delle colonne su cui l'operatore è autorizzato a cliccare per ordinare la tabella.

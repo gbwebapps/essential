@@ -192,10 +192,10 @@ class AdminsModelTest extends CIUnitTestCase
         $model = new AdminsModel();
         $result = $model->add($data, $request);
 
-		/* Il salvataggio resta riuscito: il fallimento email è riportato separatamente */
-		$this->seeInDatabase('admins', ['email' => 'paolo.bianchi@phpunit.local']);
-		$this->assertTrue($result['result']);
-		$this->assertFalse($result['emailSent']);
+        /* Il salvataggio resta riuscito: il fallimento email è riportato separatamente */
+        $this->seeInDatabase('admins', ['email' => 'paolo.bianchi@phpunit.local']);
+        $this->assertTrue($result['result']);
+        $this->assertFalse($result['emailSent']);
     }
 
     public function testAddAdminRollbackOnDatabaseError(): void
@@ -1040,11 +1040,11 @@ class AdminsModelTest extends CIUnitTestCase
               ->willReturnArgument(0);
 
         /* Simuliamo un record valido esistente e vulnerabile */
-		$mockRow =
-			(object)[
-				'superadmin' => 0,
-				'deleted_at' => '2026-09-25 15:00:00',
-				'firstname'  => 'Utente',
+        $mockRow =
+            (object)[
+                'superadmin' => 0,
+                'deleted_at' => '2026-09-25 15:00:00',
+                'firstname'  => 'Utente',
                 'lastname'   => 'DaRimuovere'
             ];
 
@@ -1199,13 +1199,13 @@ class AdminsModelTest extends CIUnitTestCase
     public function testRestoreDeleteSucceedsNoConflict(): void
     {
         /* 1. MOCK RECORD TROVATO */
-		$mockAdmin =
-			(object)[
-				'deleted_at' => '2026-09-25 15:00:00',
-				'superadmin' => 0,
-				'firstname' => 'Utente',
-				'lastname'  => 'Recuperato',
-				'email'     => 'test@example.com.deleted.1234567890'
+        $mockAdmin =
+            (object)[
+                'deleted_at' => '2026-09-25 15:00:00',
+                'superadmin' => 0,
+                'firstname' => 'Utente',
+                'lastname'  => 'Recuperato',
+                'email'     => 'test@example.com.deleted.1234567890'
             ];
 
         /* 2. MOCK RESULT */
@@ -1293,11 +1293,11 @@ class AdminsModelTest extends CIUnitTestCase
     public function testRestoreDeleteSucceedsWithConflict(): void
     {
         /* 1. MOCK RECORD TROVATO */
-		$mockAdmin =
-			(object)[
-				'deleted_at' => '2026-09-25 15:00:00',
-				'superadmin' => 0,
-				'firstname' => 'Utente',
+        $mockAdmin =
+            (object)[
+                'deleted_at' => '2026-09-25 15:00:00',
+                'superadmin' => 0,
+                'firstname' => 'Utente',
                 'lastname'  => 'Conflitto',
                 'email'     => 'test@example.com'
             ];
@@ -1863,11 +1863,11 @@ class AdminsModelTest extends CIUnitTestCase
             );
 
         /* 7. ASSERZIONI */
-		$this->assertTrue(
-			$result['result'],
-			'Il reset è stato salvato anche se l\'invio email è fallito'
-		);
-		$this->assertFalse($result['emailSent']);
+        $this->assertTrue(
+            $result['result'],
+            'Il reset è stato salvato anche se l\'invio email è fallito'
+        );
+        $this->assertFalse($result['emailSent']);
         
         $this->assertEquals(
             sprintf(lang('backend/admins.messages.resetPasswordSuccessNoEmail'), 'Utente', 'SenzaMail'),
@@ -2968,11 +2968,11 @@ class AdminsModelTest extends CIUnitTestCase
         $mockDb->method('query')
                ->willReturn($mockQuery);
 
-		$mockDb->method('affectedRows')
-			   ->willReturn(1);
+        $mockDb->method('affectedRows')
+               ->willReturn(1);
 
-		$mockDb->method('transStatus')
-			   ->willReturn(true);
+        $mockDb->method('transStatus')
+               ->willReturn(true);
 
         /* 3. MOCK MODEL */
         $model = 
@@ -4081,26 +4081,16 @@ class AdminsModelTest extends CIUnitTestCase
 
     public function testShowAllSearchValidationRules()
     {
-        /* Inizializza il model */
-        $model 
-            = new AdminsModel();
-
-        /* Ottiene l'array delle regole di validazione per la ricerca */
-        $rules 
-            = 
-            $model
-            ->showAllSearchValidationRules();
-
-        /* Definisce l'array atteso */
-        $expected 
-            = [
+        $model = new AdminsModel();
+        $rules = $model->showAllSearchValidationRules();
+        $expected = [
             'searchFields.firstname' => [
                 'label' => lang('backend/admins.labels.firstname'),
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'],
+                'rules' => ['permit_empty', 'regex_match[/^[\p{L}\p{M}]+(?:[ \'\x{2018}\x{2019}`\-\x{2010}\x{2011}\x{2012}\x{2013}\x{2014}][\p{L}\p{M}]+)*$/u]'],
             ],
             'searchFields.lastname' => [
                 'label' => lang('backend/admins.labels.lastname'),
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'],
+                'rules' => ['permit_empty', 'regex_match[/^[\p{L}\p{M}]+(?:[ \'\x{2018}\x{2019}`\-\x{2010}\x{2011}\x{2012}\x{2013}\x{2014}][\p{L}\p{M}]+)*$/u]'],
             ],
             'searchFields.email' => [
                 'label' => lang('backend/admins.labels.email'),
@@ -4114,90 +4104,57 @@ class AdminsModelTest extends CIUnitTestCase
                 'label' => lang('backend/admins.labels.dateFrom'),
                 'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]'],
             ],
-			'searchDates.created_at-to' => [
-				'label' => lang('backend/admins.labels.dateTo'),
-				'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]'],
-			],
-			'searchDates.updated_at-from' => [
-				'label' => lang('backend/admins.labels.dateFrom'),
-				'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]'],
-			],
-			'searchDates.updated_at-to' => [
-				'label' => lang('backend/admins.labels.dateTo'),
-				'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]'],
-			],
+            'searchDates.created_at-to' => [
+                'label' => lang('backend/admins.labels.dateTo'),
+                'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]'],
+            ],
+            'searchDates.updated_at-from' => [
+                'label' => lang('backend/admins.labels.dateFrom'),
+                'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]'],
+            ],
+            'searchDates.updated_at-to' => [
+                'label' => lang('backend/admins.labels.dateTo'),
+                'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]'],
+            ],
         ];
 
-        /* Verifica che il risultato coincida con le attese */
         $this->assertEquals($expected, $rules);
     }
 
     public function testEditValidationRules()
     {
-        /* Crea il mock per la configurazione dei permessi */
-        $mockConfig 
-            = 
-            $this
-            ->createMock(\Config\Backend\Permissions::class);
+        $mockConfig = $this->createMock(\Config\Backend\Permissions::class);
+        $mockConfig->method('getPermissions')->willReturn([
+            'test_group' => [
+                'perms' => [
+                    'perm1' => 'Descrizione 1',
+                    'perm2' => 'Descrizione 2',
+                ],
+            ],
+        ]);
+        \CodeIgniter\Config\Factories::injectMock('config', \Config\Backend\Permissions::class, $mockConfig);
 
-        $mockConfig
-            ->method('getPermissions')
-            ->willReturn([
-                'test_group' => [
-                    'perms' => [
-                        'perm1' => 'Descrizione 1',
-                        'perm2' => 'Descrizione 2'
-                    ]
-                ]
-            ]);
+        $model = new AdminsModel();
+        $posts = ['uuid' => '123e4567-e89b-12d3-a456-426614174000'];
+        $rules = $model->editValidationRules($posts);
+        $inListString = 'perm1,perm2';
 
-        /* Inietta il mock tramite le Factories di CI4 */
-        \CodeIgniter\Config\Factories::injectMock(
-            'config', 
-            \Config\Backend\Permissions::class, 
-            $mockConfig
-        );
-
-        /* Inizializza il model */
-        $model 
-            = new AdminsModel();
-
-        /* Definisce i dati in input */
-        $posts 
-            = [
-            'uuid' => '123e4567-e89b-12d3-a456-426614174000'
-        ];
-
-        /* Ottiene l'array delle regole di validazione */
-        $rules 
-            = 
-            $model
-            ->editValidationRules(
-                $posts
-            );
-
-        /* Stringa attesa per le eccezioni dei permessi */
-        $inListString 
-            = 'perm1,perm2';
-
-        /* Definisce l'array atteso */
-        $expected 
-            = [
+        $expected = [
             'uuid' => [
                 'label' => lang('backend/admins.labels.uuid'),
                 'rules' => ['required', "is_unique[admins.uuid,uuid,123e4567-e89b-12d3-a456-426614174000]", 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
             ],
             'firstname' => [
                 'label' => lang('backend/admins.labels.firstname'),
-                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'],
+                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[\p{L}\p{M}]+(?:[ \'\x{2018}\x{2019}`\-\x{2010}\x{2011}\x{2012}\x{2013}\x{2014}][\p{L}\p{M}]+)*$/u]'],
             ],
             'lastname' => [
                 'label' => lang('backend/admins.labels.lastname'),
-                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'],
+                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[\p{L}\p{M}]+(?:[ \'\x{2018}\x{2019}`\-\x{2010}\x{2011}\x{2012}\x{2013}\x{2014}][\p{L}\p{M}]+)*$/u]'],
             ],
             'email' => [
                 'label' => lang('backend/admins.labels.email'),
-				'rules' => ['required', 'trim', 'valid_email', 'max_length[236]', "is_unique[admins.email,uuid,123e4567-e89b-12d3-a456-426614174000]"],
+                'rules' => ['required', 'trim', 'valid_email', 'max_length[236]', "is_unique[admins.email,uuid,123e4567-e89b-12d3-a456-426614174000]"],
             ],
             'phone' => [
                 'label' => lang('backend/admins.labels.phone'),
@@ -4210,9 +4167,7 @@ class AdminsModelTest extends CIUnitTestCase
             'note' => [
                 'label' => lang('backend/admins.labels.note'),
                 'rules' => ['permit_empty', 'trim', 'max_length[500]', 'safeText'],
-                'errors' => [
-                    'safeText' => 'Caratteri non ammessi.'
-                ]
+                'errors' => ['safeText' => 'Caratteri non ammessi.'],
             ],
             'group_id' => [
                 'label' => lang('backend/admins.labels.group'),
@@ -4220,23 +4175,16 @@ class AdminsModelTest extends CIUnitTestCase
             ],
             'permissions.*' => [
                 'label' => lang('backend/admins.labels.permissions'),
-                'rules' => ['permit_empty', 'in_list[' . 
-                $inListString 
-                . ']'],
-                'errors' => [
-                    'in_list' => lang('Backend/admins.errors.permission')
-                ]
+                'rules' => ['permit_empty', 'in_list[' . $inListString . ']'],
+                'errors' => ['in_list' => lang('Backend/admins.errors.permission')],
             ],
             'images' => [
                 'label' => lang('backend/admins.labels.images'),
-                'rules' => ['permit_empty', 'checkImages']
-            ]
+                'rules' => ['permit_empty', 'checkImages'],
+            ],
         ];
 
-        /* Verifica che il risultato coincida con le attese */
-        $this->assertEquals($expected,$rules);
-
-        /* Pulisce la Factory per non interferire con i prossimi test */
+        $this->assertEquals($expected, $rules);
         \CodeIgniter\Config\Factories::reset('config');
     }
 
@@ -4894,7 +4842,7 @@ class AdminsModelTest extends CIUnitTestCase
             'note' => ''
         ];
         
-		$this->expectOutputString('');
+        $this->expectOutputString('');
         
         $result 
             = 
@@ -7136,55 +7084,55 @@ class AdminsModelTest extends CIUnitTestCase
         $this->assertStringContainsString('Mario', $result['message']);
         $this->assertStringContainsString('Rossi', $result['message']);
             
-		\Config\Services::reset();
-	}
+        \Config\Services::reset();
+    }
 
-	public function testHardDeleteRejectsActiveAdmin(): void
-	{
-		$model = $this->getMockBuilder(AdminsModel::class)
-			->disableOriginalConstructor()
-			->onlyMethods(['checkAllowedFields', 'getByUUID'])
-			->getMock();
+    public function testHardDeleteRejectsActiveAdmin(): void
+    {
+        $model = $this->getMockBuilder(AdminsModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['checkAllowedFields', 'getByUUID'])
+            ->getMock();
 
-		$model->method('checkAllowedFields')->willReturnArgument(0);
-		$model->method('getByUUID')->willReturn([
-			'result' => true,
-			'row' => (object) ['superadmin' => 0, 'deleted_at' => null]
-		]);
+        $model->method('checkAllowedFields')->willReturnArgument(0);
+        $model->method('getByUUID')->willReturn([
+            'result' => true,
+            'row' => (object) ['superadmin' => 0, 'deleted_at' => null]
+        ]);
 
-		$result = $model->hardDelete(['uuid' => '123-abc']);
+        $result = $model->hardDelete(['uuid' => '123-abc']);
 
-		$this->assertFalse($result['result']);
-		$this->assertSame(lang('backend/admins.messages.hardDeleteRequiresTrash'), $result['message']);
-	}
+        $this->assertFalse($result['result']);
+        $this->assertSame(lang('backend/admins.messages.hardDeleteRequiresTrash'), $result['message']);
+    }
 
-	public function testRestoreDeleteRejectsActiveAdmin(): void
-	{
-		$query = $this->getMockBuilder(\CodeIgniter\Database\BaseResult::class)
-			->disableOriginalConstructor()
-			->onlyMethods(['getRow'])
-			->getMockForAbstractClass();
-		$query->method('getRow')->willReturn((object) ['deleted_at' => null, 'superadmin' => 0]);
+    public function testRestoreDeleteRejectsActiveAdmin(): void
+    {
+        $query = $this->getMockBuilder(\CodeIgniter\Database\BaseResult::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getRow'])
+            ->getMockForAbstractClass();
+        $query->method('getRow')->willReturn((object) ['deleted_at' => null, 'superadmin' => 0]);
 
-		$db = $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class)
-			->disableOriginalConstructor()
-			->getMock();
-		$db->expects($this->once())->method('query')->willReturn($query);
+        $db = $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $db->expects($this->once())->method('query')->willReturn($query);
 
-		$model = $this->getMockBuilder(AdminsModel::class)
-			->disableOriginalConstructor()
-			->onlyMethods(['checkAllowedFields'])
-			->getMock();
-		$model->method('checkAllowedFields')->willReturnArgument(0);
+        $model = $this->getMockBuilder(AdminsModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['checkAllowedFields'])
+            ->getMock();
+        $model->method('checkAllowedFields')->willReturnArgument(0);
 
-		$inject = function() use ($db) {
-			$this->db = $db;
-		};
-		\Closure::bind($inject, $model, AdminsModel::class)();
+        $inject = function() use ($db) {
+            $this->db = $db;
+        };
+        \Closure::bind($inject, $model, AdminsModel::class)();
 
-		$result = $model->restoreDelete(['uuid' => '123-abc']);
+        $result = $model->restoreDelete(['uuid' => '123-abc']);
 
-		$this->assertFalse($result['result']);
-		$this->assertSame(lang('backend/admins.messages.restoreRequiresTrash'), $result['message']);
-	}
+        $this->assertFalse($result['result']);
+        $this->assertSame(lang('backend/admins.messages.restoreRequiresTrash'), $result['message']);
+    }
 }

@@ -1,24 +1,20 @@
-<?php declare(strict_types = 1); 
+<?php declare(strict_types = 1);
 
 namespace App\Controllers\Backend\Components;
 
 use App\Controllers\Backend\BackendController;
 use App\Models\Backend\Components\ExportModel;
+use CodeIgniter\Exceptions\PageNotFoundException;
 use CodeIgniter\HTTP\ResponseInterface;
 
-/**
- * Gestisce il processo asincrono di esportazione dei dati in formato CSV, includendo l'interfaccia, la generazione a blocchi e il download.
- */
 class ExportController extends BackendController
 {
-    /**
-     * Istanza del modello dedicato alle logiche e all'estrazione dei dati per l'esportazione
-     * @var ExportModel 
-     */
     private ExportModel $exportModel;
 
     /**
-     * Inizializza il controller e carica il modello di riferimento per le esportazioni.
+     * Inizializza il controller risolvendo il model dedicato all'esportazione.
+     *
+     * @return void
      */
     public function __construct()
     {
@@ -26,133 +22,166 @@ class ExportController extends BackendController
     }
 
     /**
-     * Valida la richiesta e renderizza l'interfaccia della finestra modale per la selezione delle colonne da esportare.
+     * Restituisce la modale di esportazione per il contesto CRUD.
      *
-     * @return ResponseInterface Risposta JSON contenente l'esito della validazione e l'HTML generato per la modale
+     * @return ResponseInterface Risposta JSON contenente la view oppure un errore di validazione.
      */
     public function showModal(): ResponseInterface
     {
-        if ($this->request->isAJAX() && $this->request->is('post')):
-
-            $posts = $this->request->getPost();
-            $rules = ['entity' => 'required|alpha_dash'];
-
-            /* Validazione campi nascosti */
-            if ( ! $this->validateData($posts, $rules)) :
-                $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/components/export.messages.validateToastErrors'), $errorMessage)]);
-            endif;
-
-            $entity = $posts['entity'];
-            
-            /* Otteniamo le colonne esportabili (esclusa la PK) */
-            $exportColumns = $this->exportModel->getExportColumns($entity);
-
-            /* Passiamo i dati alla view che creerà i checkbox */
-            $output = view('backend/components/export/showModalView', [
-                'entity'  => $entity,
-                'columns' => $exportColumns
-            ]);
-
-            return $this->jsonResponse(['result' => true, 'output' => $output]);
-
-        endif;
-
-        return service('response')->setStatusCode(400);
+        return $this->showModalForContext(ExportModel::CONTEXT_CRUD);
     }
 
     /**
-     * Elabora e accoda progressivamente i record nel file di esportazione lavorando per scaglioni (chunk) per non sovraccaricare il server.
+     * Restituisce la modale di esportazione per Tools > Database.
      *
-     * @return ResponseInterface Risposta JSON con lo stato di avanzamento, il cursore ID e il nome del file per il ciclo successivo
+     * @return ResponseInterface Risposta JSON contenente la view oppure un errore di validazione.
+     */
+    public function showDatabaseModal(): ResponseInterface
+    {
+        return $this->showModalForContext(ExportModel::CONTEXT_DATABASE);
+    }
+
+    /**
+     * Implementazione condivisa della modale export, vincolata al contesto deciso dall'endpoint server.
+     *
+     * @param string $context Contesto di esportazione da applicare.
+     * @return ResponseInterface Risposta HTTP/JSON della richiesta.
+     */
+    private function showModalForContext(string $context): ResponseInterface
+    {
+        if (! $this->request->isAJAX() || ! $this->request->is('post')):
+            return service('response')->setStatusCode(400);
+        endif;
+
+        $posts = $this->request->getPost();
+
+        if (! $this->validateData($posts, ['entity' => 'required|alpha_dash'])):
+            return $this->validationErrorResponse();
+        endif;
+
+        $entity = (string) $posts['entity'];
+        $columns = $this->exportModel->getExportColumns($entity, $context);
+
+        if ($columns === []):
+            return $this->jsonResponse(['result' => false, 'message' => lang('backend/components/export.messages.invalidEntity')]);
+        endif;
+
+        $output = view('backend/components/export/showModalView', [
+            'entity' => $entity,
+            'columns' => $columns,
+            'requiredColumns' => $this->exportModel->getRequiredExportColumns($entity, $context),
+        ]);
+
+        return $this->jsonResponse(['result' => true, 'output' => $output]);
+    }
+
+    /**
+     * Avvia o continua una esportazione nel contesto CRUD.
+     *
+     * @return ResponseInterface Risposta JSON con stato, progresso o completamento.
      */
     public function generate(): ResponseInterface
     {
-        if ($this->request->isAJAX() && $this->request->is('post')): 
-
-            $posts = $this->request->getPost();
-            $rules = $this->exportModel->generateValidationRules();
-            
-            /* Regole per il cursore numerico ID */
-            $rules['lastId'] = ['label' => 'Last ID', 'rules' => 'permit_empty|is_natural'];
-            $rules['processedCount'] = ['label' => 'Processed Count', 'rules' => 'permit_empty|is_natural'];
-            $rules['fileName'] = ['label' => 'File Name', 'rules' => 'permit_empty|string'];
-
-            if ( ! $this->validateData($posts, $rules)):
-                $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/components/export.messages.validateToastErrors'), $errorMessage)]);
-            endif;
-
-            $lastId = $this->request->getPost('lastId') !== '' ? (int) $this->request->getPost('lastId') : null;
-            $fileName = $this->request->getPost('fileName');
-            $processedCount = (int) $this->request->getPost('processedCount');
-
-            $exportResult = $this->exportModel->generate($posts, $lastId, $fileName);
-
-            if ($exportResult['result'] === false || $exportResult['isFinished'] === true):
-                return $this->jsonResponse($exportResult);
-            endif;
-
-            $currentTotal = $processedCount + $exportResult['chunkSize'];
-
-            return $this->jsonResponse([
-                'result' => true,
-                'isFinished' => false,
-                'lastId' => $exportResult['lastId'],
-                'fileName' => $exportResult['fileName'],
-                'processedCount' => $currentTotal,
-                'progressMessage' => sprintf(lang('backend/components/export.messages.processedRows'), $currentTotal)
-            ]);
-
-        endif;
-
-        return service('response')->setStatusCode(400);
+        return $this->generateForContext(ExportModel::CONTEXT_CRUD);
     }
 
     /**
-     * Elimina fisicamente dal file system il file temporaneo di esportazione al termine del download o in caso di annullamento.
+     * Avvia o continua una esportazione nel contesto Tools > Database.
      *
-     * @return ResponseInterface Risposta JSON di conferma dell'avvenuta eliminazione
+     * @return ResponseInterface Risposta JSON con stato, progresso o completamento.
+     */
+    public function generateDatabase(): ResponseInterface
+    {
+        return $this->generateForContext(ExportModel::CONTEXT_DATABASE);
+    }
+
+    /**
+     * Gestisce il protocollo HTTP stateful dell'export per il contesto specificato.
+     *
+     * La prima richiesta contiene entità, filtri e colonne; le continuazioni accettano soltanto exportId.
+     *
+     * @param string $context Contesto di esportazione determinato dall'endpoint.
+     * @return ResponseInterface Risposta JSON del model o errore di validazione.
+     */
+    private function generateForContext(string $context): ResponseInterface
+    {
+        if (! $this->request->isAJAX() || ! $this->request->is('post')):
+            return service('response')->setStatusCode(400);
+        endif;
+
+        $exportId = $this->request->getPost('exportId');
+
+        if (is_string($exportId) && $exportId !== ''):
+            if (! $this->validateData(['exportId' => $exportId], ['exportId' => 'required|regex_match[/^[a-f0-9]{64}$/]'])):
+                return $this->validationErrorResponse();
+            endif;
+
+            return $this->jsonResponse($this->exportModel->generate([], $exportId, $context));
+        endif;
+
+        $posts = $this->request->getPost();
+
+        if (! $this->validateData($posts, $this->exportModel->generateValidationRules())):
+            return $this->validationErrorResponse();
+        endif;
+
+        return $this->jsonResponse($this->exportModel->generate($posts, null, $context));
+    }
+
+    /**
+     * Cancella una sessione di export appartenente all'amministratore corrente.
+     *
+     * @return ResponseInterface Risposta JSON con l'esito della rimozione.
      */
     public function remove(): ResponseInterface
     {
-        if ($this->request->isAJAX() && $this->request->is('post')):
-
-            $fileName = $this->request->getPost('fileName');
-            
-            if ($fileName):
-                $filePath = WRITEPATH . 'exports/' . basename($fileName);
-                if (is_file($filePath)):
-                    unlink($filePath);
-                endif;
-            endif;
-
-            return $this->jsonResponse(['result' => true]);
-            
+        if (! $this->request->isAJAX() || ! $this->request->is('post')):
+            return service('response')->setStatusCode(400);
         endif;
 
-        return service('response')->setStatusCode(400);
+        $posts = $this->request->getPost();
+
+        if (! $this->validateData($posts, ['exportId' => 'required|regex_match[/^[a-f0-9]{64}$/]'])):
+            return $this->validationErrorResponse();
+        endif;
+
+        return $this->jsonResponse(['result' => $this->exportModel->deleteExport((string) $posts['exportId'])]);
     }
 
     /**
-     * Invia al client l'intestazione HTTP necessaria per forzare il download del file di esportazione generato.
+     * Scarica il CSV di una esportazione completata risolta tramite exportId.
      *
-     * @param string|null $fileName Nome del file CSV da scaricare
-     * @return ResponseInterface Risposta HTTP per il download del file
-     * @throws \CodeIgniter\Exceptions\PageNotFoundException Se il nome del file è vuoto o il file non esiste sul disco
+     * @param string|null $exportId Identificatore crittografico dell'export.
+     * @return ResponseInterface Risposta di download.
+     * @throws PageNotFoundException Se exportId è invalido, non appartiene alla sessione o il file non è disponibile.
      */
-    public function download(?string $fileName = null): ResponseInterface
+    public function download(?string $exportId = null): ResponseInterface
     {
-        if (empty($fileName)):
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        if ($exportId === null || preg_match('/^[a-f0-9]{64}$/', $exportId) !== 1):
+            throw PageNotFoundException::forPageNotFound();
         endif;
 
-        $filePath = WRITEPATH . 'exports/' . basename($fileName);
+        $download = $this->exportModel->getDownloadFile($exportId);
 
-        if ( ! is_file($filePath)):
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        if ($download === null):
+            throw PageNotFoundException::forPageNotFound();
         endif;
 
-        return $this->response->download($filePath, null);
+        return $this->response->download($download['path'], null)->setFileName($download['fileName']);
+    }
+
+    /**
+     * Converte gli errori del validator in una risposta JSON uniforme.
+     *
+     * @return ResponseInterface Risposta JSON contenente il messaggio di validazione.
+     */
+    private function validationErrorResponse(): ResponseInterface
+    {
+        $errorMessage = implode('<br>', $this->validator->getErrors());
+
+        return $this->jsonResponse([
+            'result' => false,
+            'message' => sprintf(lang('backend/components/export.messages.validateToastErrors'), $errorMessage),
+        ]);
     }
 }

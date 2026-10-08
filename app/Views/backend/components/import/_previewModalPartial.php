@@ -1,7 +1,8 @@
 <!-- Form per la conferma finale -->
 <form id="importForm">
     
-    <input type="hidden" name="importId" value="<?= esc($importId ?? ''); ?>">
+    <input type="hidden" name="entity" value="<?= esc($entity); ?>">
+    <input type="hidden" name="tempFile" value="<?= esc($tempFile); ?>">
     <input type="hidden" name="step" value="confirm">
 
     <?php if ($plan['insert'] === 0 && $plan['update'] === 0): ?>
@@ -37,20 +38,27 @@
                 <?php if ( ! empty($rows)): ?>
                     <?php foreach ($rows as $rowItem): ?>
                         <?php 
+                            /* Estrazione dei dati dal nuovo array strutturato */
                             $record = $rowItem['record'];
                             $action = $rowItem['action'];
                             $changed = $rowItem['changed'];
+                            
+                            /* Evidenzia l'intera riga se è un inserimento nuovo */
                             $rowClass = ($action === 'insert') ? 'table-success' : '';
                         ?>
                         <tr class="<?= $rowClass ?>">
                             <?php foreach ($headers as $header): ?>
                                 <?php 
                                     $cellValue = $record[$header] ?? '';
+                                    
+                                    /* Verifica se la colonna corrente rientra tra quelle modificate */
                                     $isChanged = in_array($header, $changed, true);
+                                    
+                                    /* Evidenzia la singola cella se è stata modificata */
                                     $cellClass = $isChanged ? 'table-warning fw-bold' : '';
                                 ?>
                                 <td class="<?= $cellClass ?>" <?= $isChanged ? 'title="Valore modificato"' : '' ?>>
-                                    <?= esc((string) $cellValue); ?>
+                                    <?= esc((string)$cellValue); ?>
                                 </td>
                             <?php endforeach; ?>
                         </tr>
@@ -67,6 +75,7 @@
     </div>
 
     <?php 
+        /* Calcolo per visualizzare l'avviso di record eccedenti l'anteprima */
         $totalToProcess = $plan['insert'] + $plan['update'];
         $previewCount = count($rows);
         
@@ -74,7 +83,7 @@
     ?>
         <div class="text-center text-muted small mt-2">
             <i class="fa-solid fa-info-circle me-1"></i>
-            <?= sprintf(lang('backend/components/import.labels.previewNotice'), $previewCount, $totalToProcess - $previewCount); ?>
+            <?= lang('backend/components/import.messages.previewNotice'); ?>
         </div>
     <?php endif; ?>
 

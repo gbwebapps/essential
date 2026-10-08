@@ -85,9 +85,9 @@ class AdminsController extends BackendController
     /**
      * Renderizza la vista iniziale (dashboard/riepilogo) della sezione amministratori.
      *
-     * @return string|ResponseInterface HTML renderizzato della vista index
+     * @return string HTML renderizzato della vista index
      */
-    public function index(): string|ResponseInterface
+    public function index(): string
     {
         $this->data['action'] = 'index';
         

@@ -4,7 +4,6 @@ namespace App\Models\Backend;
 
 use App\Models\Backend\BackendModel;
 use App\Interfaces\ImportValidationInterface;
-use App\Interfaces\ExportValidationInterface;
 
 /**
  * Modello principale per la gestione degli Amministratori di sistema.
@@ -14,7 +13,7 @@ use App\Interfaces\ExportValidationInterface;
  * l'assegnazione ai gruppi, l'override dei permessi (eccezioni), i blocchi di sicurezza 
  * (es. protezione del Superadmin), le sospensioni temporanee e le eliminazioni (sia fisiche che logiche).
  */
-class AdminsModel extends BackendModel implements ImportValidationInterface, ExportValidationInterface
+class AdminsModel extends BackendModel 
 {
     /**
      * Nome identificativo del modulo (tabella principale 'admins') usato dal motore genitore.
@@ -32,12 +31,19 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
     protected bool $hasSoftDelete = true;
 
     /**
+     * La colonna predefinita per l'ordinamento dei dati (es. 'id').
+     * 
+     * @var string 
+     */
+    protected ?string $defaultColumn = 'id';
+
+    /**
      * Whitelist dei campi consentiti durante la richiesta di visualizzazione dell'elenco amministratori.
      * Include i parametri strutturali per la paginazione, l'ordinamento e la gestione della vista cestino.
      *
      * @var array
      */
-    protected array $showAllAllowedFields = ['id', 'column', 'order', 'page', 'rows', 'searchFields', 'searchDates', 'trash_filter'];
+    protected array $showAllAllowedFields = ['column', 'order', 'page', 'rows', 'searchFields', 'trash_filter'];
 
     /**
      * Whitelist dei campi consentiti per la creazione di un nuovo amministratore.
@@ -110,12 +116,12 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
     protected array $showAllSearchAllowedDates = ['created_at', 'updated_at'];
 
     /**
-     * Array combinato che indica quali colonne sono esposte all'ordinamento  
+     * Array combinato che indica quali colonne sono esposte all'ordinamento (DataTables) 
      * e alla ricerca testuale o temporale, validando rigorosamente l'input dell'operatore.
      * 
      * @var array 
      */
-    protected array $allowedOrderColumns = ['id', 'firstname', 'lastname', 'email', 'phone', 'status']; 
+    protected array $allowedOrderColumns = ['firstname', 'lastname', 'email', 'phone', 'status']; 
 
     /**
      * Elenco dei campi anagrafici monitorati per rilevare cambiamenti effettivi 
@@ -222,11 +228,11 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
         return [
             'searchFields.firstname' => [
                 'label' => lang('backend/admins.labels.firstname'), 
-                'rules' => ['permit_empty', 'regex_match[/^[\p{L}\p{M}]+(?:[ \'\x{2018}\x{2019}`\-\x{2010}\x{2011}\x{2012}\x{2013}\x{2014}][\p{L}\p{M}]+)*$/u]'], 
+                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'], 
             ],
             'searchFields.lastname' => [
                 'label' => lang('backend/admins.labels.lastname'), 
-                'rules' => ['permit_empty', 'regex_match[/^[\p{L}\p{M}]+(?:[ \'\x{2018}\x{2019}`\-\x{2010}\x{2011}\x{2012}\x{2013}\x{2014}][\p{L}\p{M}]+)*$/u]'], 
+                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'], 
             ],
             'searchFields.email' => [
                 'label' => lang('backend/admins.labels.email'), 
@@ -268,11 +274,11 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
         return [
             'firstname' => [
                 'label' => lang('backend/admins.labels.firstname'),
-                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[\p{L}\p{M}]+(?:[ \'\x{2018}\x{2019}`\-\x{2010}\x{2011}\x{2012}\x{2013}\x{2014}][\p{L}\p{M}]+)*$/u]'],
+                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'],
             ],
             'lastname' => [
                 'label' => lang('backend/admins.labels.lastname'),
-                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[\p{L}\p{M}]+(?:[ \'\x{2018}\x{2019}`\-\x{2010}\x{2011}\x{2012}\x{2013}\x{2014}][\p{L}\p{M}]+)*$/u]'],
+                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'],
             ],
             'email' => [
                 'label' => lang('backend/admins.labels.email'),
@@ -333,11 +339,11 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
             ],
             'firstname' => [
                 'label' => lang('backend/admins.labels.firstname'),
-                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[\p{L}\p{M}]+(?:[ \'\x{2018}\x{2019}`\-\x{2010}\x{2011}\x{2012}\x{2013}\x{2014}][\p{L}\p{M}]+)*$/u]'],
+                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'],
             ],
             'lastname' => [
                 'label' => lang('backend/admins.labels.lastname'),
-                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[\p{L}\p{M}]+(?:[ \'\x{2018}\x{2019}`\-\x{2010}\x{2011}\x{2012}\x{2013}\x{2014}][\p{L}\p{M}]+)*$/u]'],
+                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'],
             ],
             'email' => [
                 'label' => lang('backend/admins.labels.email'),
@@ -375,153 +381,6 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
                 'rules' => ['permit_empty', 'checkImages'] // checkImages[size:2048,ext:png|jpg|jpeg|webp]
             ]
         ];
-    }
-
-    /**
-     * Whitelist dei campi fisici importabili dal CRUD amministratori.
-     * Esclude esplicitamente colonne di sicurezza e di stato gestite dal backend.
-     *
-     * @return list<string>
-     */
-    public function importAllowedFields(): array
-    {
-        return ['uuid', 'firstname', 'lastname', 'email', 'phone', 'status', 'group_id', 'note'];
-    }
-
-    /**
-     * Whitelist dei campi esportabili dal CRUD amministratori.
-     *
-     * @return list<string>
-     */
-    public function exportAllowedFields(): array
-    {
-        return ['uuid', 'firstname', 'lastname', 'email', 'phone', 'status', 'group_id', 'note'];
-    }
-
-    /**
-     * Regole applicative dedicate all'inserimento di amministratori tramite ImportModel.
-     *
-     * Restano separate dalle regole del form CRUD perché l'importazione non gestisce
-     * immagini, permessi o altri dati di interfaccia. Le regole vengono sovrapposte
-     * al fallback strutturale generato dallo schema della tabella.
-     *
-     * @return array Regole specifiche per i record admins pianificati come insert
-     */
-    public function importAddValidationRules(): array
-    {
-        return [
-            'uuid' => [
-                'label' => lang('backend/admins.labels.uuid'),
-                'rules' => ['permit_empty', 'is_unique[admins.uuid]', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
-            ],
-            'firstname' => [
-                'label' => lang('backend/admins.labels.firstname'),
-                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[\p{L}\p{M}]+(?:[ \'\x{2018}\x{2019}`\-\x{2010}\x{2011}\x{2012}\x{2013}\x{2014}][\p{L}\p{M}]+)*$/u]'],
-            ],
-            'lastname' => [
-                'label' => lang('backend/admins.labels.lastname'),
-                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[\p{L}\p{M}]+(?:[ \'\x{2018}\x{2019}`\-\x{2010}\x{2011}\x{2012}\x{2013}\x{2014}][\p{L}\p{M}]+)*$/u]'],
-            ],
-            'email' => [
-                'label' => lang('backend/admins.labels.email'),
-                'rules' => ['required', 'trim', 'valid_email', 'max_length[236]', 'is_unique[admins.email]'],
-            ],
-            'phone' => [
-                'label' => lang('backend/admins.labels.phone'),
-                'rules' => ['required', 'trim', 'regex_match[/^\+[0-9]{9,15}$/]'],
-            ],
-            'status' => [
-                'label' => lang('backend/admins.labels.status'),
-                'rules' => ['required', 'in_list[0,1]'],
-            ],
-            'note' => [
-                'label' => lang('backend/admins.labels.note'),
-                'rules' => ['permit_empty', 'trim', 'max_length[500]', 'safeText'],
-                'errors' => [
-                    'safeText' => 'Caratteri non ammessi.'
-                ]
-            ],
-            'group_id' => [
-                'label' => lang('backend/admins.labels.group'),
-                'rules' => ['required', 'is_natural_no_zero', 'is_not_unique[admins_groups.id]'],
-            ],
-        ];
-    }
-
-    /**
-     * Regole applicative dedicate alla modifica di amministratori tramite ImportModel.
-     *
-     * ImportModel applica queste regole solo alle colonne presenti nel CSV, permettendo
-     * aggiornamenti parziali. L'UUID resta il riferimento del record e le regole specifiche
-     * sostituiscono, per i campi interessati, il fallback derivato dallo schema SQL.
-     *
-     * @param array $data Dati di contesto del record, incluso l'UUID corrente
-     * @return array Regole specifiche per i record admins pianificati come update
-     */
-    public function importEditValidationRules(array $data): array
-    {
-        return [
-            'uuid' => [
-                'label' => lang('backend/admins.labels.uuid'),
-                'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
-            ],
-            'firstname' => [
-                'label' => lang('backend/admins.labels.firstname'),
-                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[\p{L}\p{M}]+(?:[ \'\x{2018}\x{2019}`\-\x{2010}\x{2011}\x{2012}\x{2013}\x{2014}][\p{L}\p{M}]+)*$/u]'],
-            ],
-            'lastname' => [
-                'label' => lang('backend/admins.labels.lastname'),
-                'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[\p{L}\p{M}]+(?:[ \'\x{2018}\x{2019}`\-\x{2010}\x{2011}\x{2012}\x{2013}\x{2014}][\p{L}\p{M}]+)*$/u]'],
-            ],
-            'email' => [
-                'label' => lang('backend/admins.labels.email'),
-                'rules' => ['required', 'trim', 'valid_email', 'max_length[236]', "is_unique[admins.email,uuid,{$data['uuid']}]"],
-            ],
-            'phone' => [
-                'label' => lang('backend/admins.labels.phone'),
-                'rules' => ['required', 'trim', 'regex_match[/^\+[0-9]{9,15}$/]'],
-            ],
-            'status' => [
-                'label' => lang('backend/admins.labels.status'),
-                'rules' => ['required', 'in_list[0,1]'],
-            ],
-            'note' => [
-                'label' => lang('backend/admins.labels.note'),
-                'rules' => ['permit_empty', 'trim', 'max_length[500]', 'safeText'],
-                'errors' => [
-                    'safeText' => 'Caratteri non ammessi.'
-                ]
-            ],
-            'group_id' => [
-                'label' => lang('backend/admins.labels.group'),
-                'rules' => ['required', 'is_natural_no_zero', 'is_not_unique[admins_groups.id]'],
-            ],
-        ];
-    }
-
-    /**
-     * Vincoli di dominio aggiuntivi per l'import CRUD degli amministratori.
-     *
-     * Le normali operazioni di modifica proteggono superadmin e record cestinati; l'importazione
-     * deve mantenere gli stessi invarianti anche se scrive tramite il motore generico.
-     *
-     * @return list<string>
-     */
-    public function importBusinessValidationErrors(string $action, array $data, ?array $currentRow): array
-    {
-        if ($action !== 'update' || $currentRow === null):
-            return [];
-        endif;
-
-        if (($currentRow['deleted_at'] ?? null) !== null):
-            return [lang('backend/admins.messages.cannotModifyDeleted')];
-        endif;
-
-        if ((int) ($currentRow['superadmin'] ?? 0) === 1):
-            return [lang('backend/admins.messages.protectedAdmin')];
-        endif;
-
-        return [];
     }
 
     /**

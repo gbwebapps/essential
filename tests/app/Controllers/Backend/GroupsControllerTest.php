@@ -20,7 +20,7 @@ use Config\Services;
 
 class GroupsControllerTest extends CIUnitTestCase
 {
-	public function testInitControllerSetsCorrectProperties(): void
+    public function testInitControllerSetsCorrectProperties(): void
     {
         /* Mock delle dipendenze richieste dal metodo */
         $request = 
@@ -771,7 +771,7 @@ class GroupsControllerTest extends CIUnitTestCase
             $postData
         )
         ->willReturn(
-            (object) ['id' => '1', 'name' => 'Admin']
+            (object) ['id' => '1', 'name' => 'Admin', 'description' => 'Administration group']
         );
 
         $groupsModel
@@ -2822,7 +2822,16 @@ class GroupsControllerTest extends CIUnitTestCase
             $postData
         )
         ->willReturn(
-            ['admin1', 'admin2']
+            [
+                [
+                    'uuid' => '11111111-1111-4111-8111-111111111111',
+                    'identity' => 'Mario Rossi',
+                ],
+                [
+                    'uuid' => '22222222-2222-4222-8222-222222222222',
+                    'identity' => 'Luigi Bianchi',
+                ],
+            ]
         );
 
         $controller = 
@@ -3905,7 +3914,7 @@ class GroupsControllerTest extends CIUnitTestCase
             $postData
         )
         ->willReturn(
-            (object) ['id' => 1]
+            (object) ['id' => 1, 'name' => 'Admin', 'description' => 'Administration group']
         );
 
         $groupsModel

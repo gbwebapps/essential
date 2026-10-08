@@ -17,15 +17,15 @@
                 
                     <form id="importForm" enctype="multipart/form-data">
                         
-                        <!-- Campo nascosto per mantenere il riferimento all'entità nella sola fase di upload -->
+                        <!-- Campo nascosto per mantenere il riferimento all'entità -->
                         <input type="hidden" name="entity" id="importEntity" value="<?= esc($entity); ?>">
 
                         <!-- Griglia struttura tabella -->
                         <div class="table-responsive mb-4">
 
-                            <!-- Link per il download del template CSV coerente con il contesto di importazione -->
+                            <!-- Link per il download del template CSV -->
                             <div class="d-flex justify-content-center mb-3 lead">
-                                <a href="<?= esc($downloadUrl, 'attr'); ?>">
+                                <a href="<?= base_url('backend/import/download/' . esc($entity)); ?>">
                                     <i class="fa-solid fa-download"></i> <?= sprintf(lang('backend/components/import.links.downloadTemplate'), esc($entity)); ?>
                                 </a>
                             </div>
@@ -69,7 +69,7 @@
                         <!-- Input per caricamento file CSV -->
                         <div class="mb-3">
                             <label for="csvFile" class="form-label fw-bold"><?= lang('backend/components/import.labels.uploadCsv'); ?></label>
-                            <input class="form-control form-control-sm" type="file" id="csvFile" name="csvFile" accept=".csv,.txt,text/csv,text/plain">
+                            <input class="form-control form-control-sm" type="file" id="csvFile" name="csvFile">
                         </div>
 
                     </form>

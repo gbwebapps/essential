@@ -86,18 +86,49 @@ $routes->group('backend', function($routes) {
     $routes->group('', ['filter' => ['authorization', 'superadmin']], function($routes) {
 
         /* EXPORT CSV */
+        // $routes->group('export', function($routes) {
+        //     $routes->post('showModal', '\App\Controllers\Backend\Components\ExportController::showModal');
+        //     $routes->post('generate', '\App\Controllers\Backend\Components\ExportController::generate');
+        //     $routes->post('remove', '\App\Controllers\Backend\Components\ExportController::remove');
+        //     $routes->get('download/(:any)', '\App\Controllers\Backend\Components\ExportController::download/$1');
+        // });
+        
         $routes->group('export', function($routes) {
             $routes->post('showModal', '\App\Controllers\Backend\Components\ExportController::showModal');
             $routes->post('generate', '\App\Controllers\Backend\Components\ExportController::generate');
             $routes->post('remove', '\App\Controllers\Backend\Components\ExportController::remove');
             $routes->get('download/(:any)', '\App\Controllers\Backend\Components\ExportController::download/$1');
+
+            $routes->group('database', function($routes) {
+                $routes->post('showModal', '\App\Controllers\Backend\Components\ExportController::showDatabaseModal');
+                $routes->post('generate', '\App\Controllers\Backend\Components\ExportController::generateDatabase');
+            });
         });
 
         /* IMPORT CSV */
+        // $routes->group('import', function($routes) {
+        //     $routes->post('showModal', '\App\Controllers\Backend\Components\ImportController::showModal');
+        //     $routes->get('download/(:any)', '\App\Controllers\Backend\Components\ImportController::download/$1');
+        //     $routes->post('processCsv', '\App\Controllers\Backend\Components\ImportController::processCsv');
+        //     $routes->post('executeImport', '\App\Controllers\Backend\Components\ImportController::executeImport');
+        //     $routes->post('deleteFile', '\App\Controllers\Backend\Components\ImportController::deleteFile');
+        // });
+        
+        /* IMPORT CSV */
         $routes->group('import', function($routes) {
+            /* Import applicativo CRUD: le regole del model di dominio sono opt-in. */
             $routes->post('showModal', '\App\Controllers\Backend\Components\ImportController::showModal');
             $routes->get('download/(:any)', '\App\Controllers\Backend\Components\ImportController::download/$1');
             $routes->post('processCsv', '\App\Controllers\Backend\Components\ImportController::processCsv');
+
+            /* Tools > Database: schema SQL raw, senza regole dei model CRUD. */
+            $routes->group('database', function($routes) {
+                $routes->post('showModal', '\App\Controllers\Backend\Components\ImportController::showDatabaseModal');
+                $routes->get('download/(:any)', '\App\Controllers\Backend\Components\ImportController::downloadDatabase/$1');
+                $routes->post('processCsv', '\App\Controllers\Backend\Components\ImportController::processDatabaseCsv');
+            });
+
+            /* Esecuzione e cleanup sono condivisi: il mode è già vincolato nel manifest server-side. */
             $routes->post('executeImport', '\App\Controllers\Backend\Components\ImportController::executeImport');
             $routes->post('deleteFile', '\App\Controllers\Backend\Components\ImportController::deleteFile');
         });

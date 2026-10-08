@@ -2,101 +2,48 @@
 
 namespace App\Libraries\Backend;
 
+use CodeIgniter\Config\Factories;
 use CodeIgniter\Test\CIUnitTestCase;
-use CodeIgniter\Test\ControllerTestTrait;
-use CodeIgniter\Test\DatabaseTestTrait;
-use Config\Services;
 use Tests\Support\Libraries\MocksSettings;
 
 class ToolsClassTest extends CIUnitTestCase
 {
-	use MocksSettings;
+    use MocksSettings;
 
-	protected function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
+        Factories::reset();
+        helper('settings');
         $this->mockSettings(['Backend\General' => ['language' => 'en']]);
     }
 
-	protected function tearDown(): void
+    protected function tearDown(): void
     {
         $this->resetSettingsMocks();
         parent::tearDown();
     }
 
-	public function testGetJsIndexReturnsCorrectConfigurationWithLocale()
+    public function testGetJsIndexReturnsCorrectConfigurationWithLocale(): void
     {
         $modelMock = $this->createMock(\App\Models\Backend\ToolsModel::class);
+        $result = (new \App\Libraries\Backend\ToolsClass($modelMock))->getJsIndex();
 
-        $result
-            =
-            (
-                new \App\Libraries\Backend\ToolsClass(new $modelMock)
-            )
-            ->getJsIndex();
-
-        $this
-            ->assertIsArray(
-                $result
-            );
-
-        $this
-            ->assertCount(
-                2,
-                $result
-            );
-
-        $this
-            ->assertSame(
-                'flatpickr-js',
-                $result[0]['id']
-            );
-
-        $this
-            ->assertSame(
-                'en-js',
-                $result[1]['id']
-            );
-
-        $this
-            ->assertSame(
-                'assets/vendor/flatpickr/js/en.js',
-                $result[1]['path']
-            );
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result);
+        $this->assertSame('flatpickr-js', $result[0]['id']);
+        $this->assertSame('default-js', $result[1]['id']);
+        $this->assertSame('assets/vendor/flatpickr/js/default.js', $result[1]['path']);
     }
 
-    public function testGetCssIndexReturnsCorrectConfiguration()
+    public function testGetCssIndexReturnsCorrectConfiguration(): void
     {
-    	$modelMock = $this->createMock(\App\Models\Backend\ToolsModel::class);
+        $modelMock = $this->createMock(\App\Models\Backend\ToolsModel::class);
+        $result = (new \App\Libraries\Backend\ToolsClass($modelMock))->getCssIndex();
 
-        $result
-            =
-            (
-                new \App\Libraries\Backend\ToolsClass(new $modelMock)
-            )
-            ->getCssIndex();
-
-        $this
-            ->assertIsArray(
-                $result
-            );
-
-        $this
-            ->assertCount(
-                1,
-                $result
-            );
-
-        $this
-            ->assertSame(
-                'flatpickr-css',
-                $result[0]['id']
-            );
-
-        $this
-            ->assertSame(
-                'assets/vendor/flatpickr/css/flatpickr.min.css',
-                $result[0]['path']
-            );
+        $this->assertIsArray($result);
+        $this->assertCount(1, $result);
+        $this->assertSame('flatpickr-css', $result[0]['id']);
+        $this->assertSame('assets/vendor/flatpickr/css/flatpickr.min.css', $result[0]['path']);
     }
 }

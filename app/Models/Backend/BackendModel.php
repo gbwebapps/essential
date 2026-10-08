@@ -60,6 +60,13 @@ abstract class BackendModel extends BaseModel
 	protected ?string $defaultColumn = null;
 
 	/**
+	 * L'ordinamento di default a cui ricorrere per l'ordinamento in assenza di direttive del client.
+	 * 
+	 * @var string|null 
+	 */
+	protected ?string $defaultOrder = null;
+
+	/**
 	 * Elenco dei campi tabella soggetti al controllo euristico di mutazione dati (metodo hasDataChanged).
 	 * 
 	 * @var array 
@@ -159,8 +166,8 @@ abstract class BackendModel extends BaseModel
 			$params = [];
 			$paramsFilter = [];
 
-				$posts['order'] = (isset($posts['order']) && in_array($posts['order'], ['asc', 'desc'])) ? $posts['order'] : 'desc';
-			$posts['column'] = (isset($posts['column']) && in_array($posts['column'], $this->allowedOrderColumns)) ? $posts['column'] : $this->defaultColumn;
+			$posts['order'] = (isset($posts['order']) && in_array($posts['order'], ['asc', 'desc'])) ? $posts['order'] : 'desc';
+			$posts['column'] = (isset($posts['column']) && in_array($posts['column'], $this->allowedOrderColumns)) ? $posts['column'] : 'id';
 
 			$sql = $this->getDataQuery;
 

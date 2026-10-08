@@ -10,13 +10,13 @@
             </div>
 
             <div class="modal-body">
-                
+
                 <div id="export-alert-container"></div>
 
                 <!-- FASE 1: Selezione Colonne -->
                 <div id="export-selection-area">
                     <p class="text-muted small mb-3"><?= lang('backend/components/export.labels.selectColumns'); ?></p>
-                    
+
                     <form id="export-columns-form">
                         <div class="form-check mb-3 border-bottom pb-2">
                             <input class="form-check-input" type="checkbox" id="export-check-all" checked>
@@ -24,13 +24,22 @@
                                 <?= lang('backend/components/export.labels.selectDeselectAll'); ?>
                             </label>
                         </div>
-                        
+
                         <div class="row px-2" style="max-height: 40vh; overflow-y: auto;">
                             <?php foreach ($columns as $column): ?>
+                                <?php $isRequired = in_array($column, $requiredColumns ?? [], true); ?>
                                 <div class="col-12 col-md-6 mb-1">
                                     <div class="form-check">
-                                        <input class="form-check-input export-col-cb" type="checkbox" name="selected_columns[]" value="<?= esc($column) ?>" id="col_<?= esc($column) ?>" checked>
-                                        <label class="form-check-label" for="col_<?= esc($column) ?>">
+                                        <input
+                                            class="form-check-input export-col-cb"
+                                            type="checkbox"
+                                            name="selected_columns[]"
+                                            value="<?= esc($column, 'attr') ?>"
+                                            id="col_<?= esc($column, 'attr') ?>"
+                                            <?= $isRequired ? 'data-required="1" disabled' : '' ?>
+                                            checked
+                                        >
+                                        <label class="form-check-label<?= $isRequired ? ' fw-bold' : '' ?>" for="col_<?= esc($column, 'attr') ?>">
                                             <?= esc($column) ?>
                                         </label>
                                     </div>

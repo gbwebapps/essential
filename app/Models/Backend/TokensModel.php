@@ -22,18 +22,11 @@ class TokensModel extends BackendModel
     protected ?string $module = 'admins_tokens';
 
     /**
-     * Colonna utilizzata per l'ordinamento di default quando la pagina viene caricata.
-     * 
-     * @var string 
-     */
-    protected ?string $defaultColumn = 'id';
-
-    /**
      * Whitelist dei parametri di paginazione accettati dal server (es. numero pagina, righe per pagina).
      * 
      * @var array 
      */
-    protected array $showAllAllowedFields = ['column', 'order', 'page', 'rows', 'searchFields'];
+    protected array $showAllAllowedFields = ['id', 'column', 'order', 'page', 'rows', 'searchFields', 'searchDates'];
 
     /**
      * Elenco delle colonne su cui l'utente è autorizzato a cliccare per ordinare la tabella.

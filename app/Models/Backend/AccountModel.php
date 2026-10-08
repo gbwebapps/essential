@@ -70,11 +70,11 @@ class AccountModel extends BackendModel
 	    return [
 	        'firstname' => [
 	            'label' => lang('backend/account.labels.firstname'),
-	            'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'],
+	            'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[\p{L}\p{M}]+(?:[ \'\x{2018}\x{2019}`\-\x{2010}\x{2011}\x{2012}\x{2013}\x{2014}][\p{L}\p{M}]+)*$/u]'],
 	        ],
 	        'lastname' => [
 	            'label' => lang('backend/account.labels.lastname'),
-	            'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'],
+	            'rules' => ['required', 'trim', 'min_length[2]', 'max_length[30]', 'regex_match[/^[\p{L}\p{M}]+(?:[ \'\x{2018}\x{2019}`\-\x{2010}\x{2011}\x{2012}\x{2013}\x{2014}][\p{L}\p{M}]+)*$/u]'],
 	        ],
 	        'email' => [
 	            'label' => lang('backend/account.labels.email'),

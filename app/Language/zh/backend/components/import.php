@@ -55,5 +55,10 @@ return [
         'insufficientColumns' => 'CSV 必须包含至少 2 列。', 
         'missingPrimaryKey' => '%s 列是必填项。', 
         'invalidColumns' => '以下列无效：%s', 
+        'emptyFile' => 'CSV 文件为空或不包含有效的表头。',
+        'duplicatePrimaryKeys' => 'CSV 包含重复的主键：%s。',
+        'recoveryRequired' => '导入在需要人工检查的状态下中断。请保留暂存数据和备份。导入 ID：%s。',
+        'stagingDeleteError' => '无法删除导入暂存数据。',
+        'additionalErrorsNotShown' => '... 由于内存限制，另有 %d 个错误未显示。',
     ],
 ];

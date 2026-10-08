@@ -2,1077 +2,485 @@
 
 namespace App\Controllers\Backend\Components;
 
+use App\Models\Backend\Components\ExportModel;
+use CodeIgniter\Config\Factories;
+use CodeIgniter\Exceptions\PageNotFoundException;
+use CodeIgniter\HTTP\IncomingRequest;
+use CodeIgniter\HTTP\Response;
+use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Test\CIUnitTestCase;
 use CodeIgniter\Test\ControllerTestTrait;
-use CodeIgniter\Test\DatabaseTestTrait;
+use CodeIgniter\Validation\ValidationInterface;
 use Config\Services;
+use CodeIgniter\HTTP\DownloadResponse;
 
 class ExportControllerTest extends CIUnitTestCase
 {
     use ControllerTestTrait;
-    use DatabaseTestTrait;
 
-    public function testConstructSetsCorrectProperties(): void
+    private const EXPORT_ID = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+
+    protected function setUp(): void
     {
-        $controller = 
-        new \App\Controllers\Backend\Components\ExportController();
+        parent::setUp();
+        Factories::reset();
+        Services::resetSingle('renderer');
+        Services::resetSingle('validation');
+        Services::resetSingle('language');
+    }
 
-        $closure = 
-        function() {
-            return 
-            $this
-            ->exportModel;
-        };
+    protected function tearDown(): void
+    {
+        Factories::reset();
+        Services::resetSingle('renderer');
+        Services::resetSingle('validation');
+        Services::resetSingle('language');
+        parent::tearDown();
+    }
 
-        $exportModel = 
-        \Closure::bind(
-            $closure, 
-            $controller, 
-            $controller
-        )();
+    public function testConstructSetsExportModel(): void
+    {
+        $exportModel = $this->createMock(ExportModel::class);
+        Factories::injectMock('models', ExportModel::class, $exportModel);
 
-        $this
-        ->assertIsObject(
-            $exportModel
-        );
+        $controller = new ExportController();
+        $property = new \ReflectionProperty(ExportController::class, 'exportModel');
+        $property->setAccessible(true);
+
+        $this->assertSame($exportModel, $property->getValue($controller));
+    }
+
+    public function testShowModalRejectsNonAjaxRequest(): void
+    {
+        $request = $this->createMock(IncomingRequest::class);
+        $request->method('isAJAX')->willReturn(false);
+
+        $controller = $this->createController($request, $this->createMock(ExportModel::class), ['validateData', 'jsonResponse']);
+
+        $this->assertSame(400, $controller->showModal()->getStatusCode());
     }
 
     public function testShowModalReturnsValidationErrorsForInvalidData(): void
     {
-        $request = 
-        $this
-        ->createMock(
-            \CodeIgniter\HTTP\IncomingRequest::class
-        );
+        $request = $this->ajaxPostRequest(['entity' => '']);
+        $validator = $this->createMock(ValidationInterface::class);
+        $validator->method('getErrors')->willReturn(['entity' => 'error message']);
 
-        $request
-        ->method(
-            'isAJAX'
-        )
-        ->willReturn(
-            true
-        );
+        $controller = $this->createController($request, $this->createMock(ExportModel::class), ['validateData', 'jsonResponse'], $validator);
+        $controller->method('validateData')->willReturn(false);
 
-        $request
-        ->method(
-            'is'
-        )
-        ->with(
-            'post'
-        )
-        ->willReturn(
-            true
-        );
+        $expectedResponse = $this->createMock(ResponseInterface::class);
 
-        $request
-        ->method(
-            'getPost'
-        )
-        ->willReturn(
-            ['entity' => '']
-        );
+        $controller->expects($this->once())->method('jsonResponse')->with($this->callback(function (array $data): bool {
+            $this->assertFalse($data['result']);
+            $this->assertStringContainsString('error message', $data['message']);
 
-        $validator = 
-        $this
-        ->createMock(
-            \CodeIgniter\Validation\ValidationInterface::class
-        );
+            return true;
+        }))->willReturn($expectedResponse);
 
-        $validator
-        ->method(
-            'getErrors'
-        )
-        ->willReturn(
-            ['entity' => 'error message']
-        );
-
-        $controller = 
-        $this
-        ->getMockBuilder(
-            \App\Controllers\Backend\Components\ExportController::class
-        )
-        ->onlyMethods([
-            'validateData',
-            'jsonResponse'
-        ])
-        ->getMock();
-
-        $controller
-        ->method(
-            'validateData'
-        )
-        ->willReturn(
-            false
-        );
-
-        $expectedResponse = 
-        $this
-        ->createMock(
-            \CodeIgniter\HTTP\ResponseInterface::class
-        );
-
-        $controller
-        ->method(
-            'jsonResponse'
-        )
-        ->willReturnCallback(
-            function(
-                $data
-            ) use (
-                $expectedResponse
-            ) {
-                $this
-                ->assertFalse(
-                    $data
-                    ['result']
-                );
-
-                $this
-                ->assertStringContainsString(
-                    'error message', 
-                    $data
-                    ['message']
-                );
-
-                return 
-                $expectedResponse;
-            }
-        );
-
-        $closure = 
-        function() use (
-            $request,
-            $validator
-        ) {
-            $this
-            ->request = 
-            $request;
-
-            $this
-            ->validator = 
-            $validator;
-        };
-
-        \Closure::bind(
-            $closure, 
-            $controller, 
-            $controller
-        )();
-
-        $result = 
-        $controller
-        ->showModal();
-
-        $this
-        ->assertSame(
-            $expectedResponse, 
-            $result
-        );
+        $this->assertSame($expectedResponse, $controller->showModal());
     }
 
     public function testShowModalReturnsJsonResponseWithOutputOnSuccess(): void
     {
-        $request = 
-        $this
-        ->createMock(
-            \CodeIgniter\HTTP\IncomingRequest::class
-        );
+        $request = $this->ajaxPostRequest(['entity' => 'users']);
 
-        $request
-        ->method(
-            'isAJAX'
-        )
-        ->willReturn(
-            true
-        );
+        $exportModel = $this->createMock(ExportModel::class);
+        $exportModel->expects($this->once())->method('getExportColumns')->with('users', ExportModel::CONTEXT_CRUD)->willReturn(['uuid', 'name']);
+        $exportModel->expects($this->once())->method('getRequiredExportColumns')->with('users', ExportModel::CONTEXT_CRUD)->willReturn(['uuid']);
 
-        $request
-        ->method(
-            'is'
-        )
-        ->with(
-            'post'
-        )
-        ->willReturn(
-            true
-        );
+        $controller = $this->createController($request, $exportModel, ['validateData', 'jsonResponse']);
+        $controller->method('validateData')->willReturn(true);
 
-        $request
-        ->method(
-            'getPost'
-        )
-        ->willReturn(
-            ['entity' => 'users']
-        );
+        $expectedResponse = $this->createMock(ResponseInterface::class);
 
-        $exportModel = 
-        $this
-        ->createMock(
-            \App\Models\Backend\Components\ExportModel::class
-        );
+        $controller->expects($this->once())->method('jsonResponse')->with($this->callback(function (array $data): bool {
+            $this->assertTrue($data['result']);
+            $this->assertArrayHasKey('output', $data);
+            $this->assertIsString($data['output']);
 
-        $exportModel
-        ->method(
-            'getExportColumns'
-        )
-        ->with(
-            'users'
-        )
-        ->willReturn(
-            ['id', 'name']
-        );
+            return true;
+        }))->willReturn($expectedResponse);
 
-        $controller = 
-        $this
-        ->getMockBuilder(
-            \App\Controllers\Backend\Components\ExportController::class
-        )
-        ->onlyMethods([
-            'validateData',
-            'jsonResponse'
-        ])
-        ->getMock();
-
-        $controller
-        ->method(
-            'validateData'
-        )
-        ->willReturn(
-            true
-        );
-
-        $expectedResponse = 
-        $this
-        ->createMock(
-            \CodeIgniter\HTTP\ResponseInterface::class
-        );
-
-        $controller
-        ->method(
-            'jsonResponse'
-        )
-        ->willReturnCallback(
-            function(
-                $data
-            ) use (
-                $expectedResponse
-            ) {
-                $this
-                ->assertTrue(
-                    $data
-                    ['result']
-                );
-
-                $this
-                ->assertArrayHasKey(
-                    'output', 
-                    $data
-                );
-
-                return 
-                $expectedResponse;
-            }
-        );
-
-        $closure = 
-        function() use (
-            $request,
-            $exportModel
-        ) {
-            $this
-            ->request = 
-            $request;
-
-            $this
-            ->exportModel = 
-            $exportModel;
-        };
-
-        \Closure::bind(
-            $closure, 
-            $controller, 
-            $controller
-        )();
-
-        $result = 
-        $controller
-        ->showModal();
-
-        $this
-        ->assertSame(
-            $expectedResponse, 
-            $result
-        );
+        $this->assertSame($expectedResponse, $controller->showModal());
     }
 
-    public function testGenerateReturnsValidationErrorsWhenValidationFails(): void
+    public function testShowModalFailsClosedWhenNoColumnsAreExportable(): void
     {
-        $request = 
-        $this
-        ->createMock(
-            \CodeIgniter\HTTP\IncomingRequest::class
-        );
+        $request = $this->ajaxPostRequest(['entity' => 'users']);
 
-        $request
-        ->method(
-            'isAJAX'
-        )
-        ->willReturn(
-            true
-        );
+        $exportModel = $this->createMock(ExportModel::class);
+        $exportModel->expects($this->once())->method('getExportColumns')->with('users', ExportModel::CONTEXT_CRUD)->willReturn([]);
+        $exportModel->expects($this->never())->method('getRequiredExportColumns');
 
-        $request
-        ->method(
-            'is'
-        )
-        ->with(
-            'post'
-        )
-        ->willReturn(
-            true
-        );
+        $controller = $this->createController($request, $exportModel, ['validateData', 'jsonResponse']);
+        $controller->method('validateData')->willReturn(true);
 
-        $request
-        ->method(
-            'getPost'
-        )
-        ->willReturn(
-            ['dummy' => 'data']
-        );
+        $expectedResponse = $this->createMock(ResponseInterface::class);
 
-        $exportModel = 
-        $this
-        ->createMock(
-            \App\Models\Backend\Components\ExportModel::class
-        );
+        $controller->expects($this->once())->method('jsonResponse')->with([
+            'result' => false,
+            'message' => lang('backend/components/export.messages.invalidEntity'),
+        ])->willReturn($expectedResponse);
 
-        $exportModel
-        ->method(
-            'generateValidationRules'
-        )
-        ->willReturn(
-            ['rule' => 'required']
-        );
-
-        $validator = 
-        $this
-        ->createMock(
-            \CodeIgniter\Validation\ValidationInterface::class
-        );
-
-        $validator
-        ->method(
-            'getErrors'
-        )
-        ->willReturn(
-            ['field' => 'error generate']
-        );
-
-        $controller = 
-        $this
-        ->getMockBuilder(
-            \App\Controllers\Backend\Components\ExportController::class
-        )
-        ->onlyMethods([
-            'validateData',
-            'jsonResponse'
-        ])
-        ->getMock();
-
-        $controller
-        ->method(
-            'validateData'
-        )
-        ->willReturn(
-            false
-        );
-
-        $expectedResponse = 
-        $this
-        ->createMock(
-            \CodeIgniter\HTTP\ResponseInterface::class
-        );
-
-        $controller
-        ->method(
-            'jsonResponse'
-        )
-        ->willReturnCallback(
-            function(
-                $data
-            ) use (
-                $expectedResponse
-            ) {
-                $this
-                ->assertFalse(
-                    $data
-                    ['result']
-                );
-
-                $this
-                ->assertStringContainsString(
-                    'error generate', 
-                    $data
-                    ['message']
-                );
-
-                return 
-                $expectedResponse;
-            }
-        );
-
-        $closure = 
-        function() use (
-            $request,
-            $exportModel,
-            $validator
-        ) {
-            $this
-            ->request = 
-            $request;
-
-            $this
-            ->exportModel = 
-            $exportModel;
-
-            $this
-            ->validator = 
-            $validator;
-        };
-
-        \Closure::bind(
-            $closure, 
-            $controller, 
-            $controller
-        )();
-
-        $result = 
-        $controller
-        ->generate();
-
-        $this
-        ->assertSame(
-            $expectedResponse, 
-            $result
-        );
+        $this->assertSame($expectedResponse, $controller->showModal());
     }
 
-    public function testGenerateReturnsResultDirectlyWhenFinishedOrError(): void
+    public function testShowDatabaseModalUsesDatabaseContext(): void
     {
-        $request = 
-        $this
-        ->createMock(
-            \CodeIgniter\HTTP\IncomingRequest::class
-        );
+        $request = $this->ajaxPostRequest(['entity' => 'users']);
 
-        $request
-        ->method(
-            'isAJAX'
-        )
-        ->willReturn(
-            true
-        );
+        $exportModel = $this->createMock(ExportModel::class);
+        $exportModel->expects($this->once())->method('getExportColumns')->with('users', ExportModel::CONTEXT_DATABASE)->willReturn(['id', 'uuid', 'name']);
+        $exportModel->expects($this->once())->method('getRequiredExportColumns')->with('users', ExportModel::CONTEXT_DATABASE)->willReturn(['uuid']);
 
-        $request
-        ->method(
-            'is'
-        )
-        ->with(
-            'post'
-        )
-        ->willReturn(
-            true
-        );
+        $controller = $this->createController($request, $exportModel, ['validateData', 'jsonResponse']);
+        $controller->method('validateData')->willReturn(true);
 
+        $expectedResponse = $this->createMock(ResponseInterface::class);
+        $controller->method('jsonResponse')->willReturn($expectedResponse);
+
+        $this->assertSame($expectedResponse, $controller->showDatabaseModal());
+    }
+
+    public function testGenerateReturnsValidationErrorsWhenInitialRequestValidationFails(): void
+    {
+        $request = $this->ajaxPostRequest(['entity' => '']);
+
+        $exportModel = $this->createMock(ExportModel::class);
+        $exportModel->method('generateValidationRules')->willReturn(['entity' => ['rules' => ['required']]]);
+
+        $validator = $this->createMock(ValidationInterface::class);
+        $validator->method('getErrors')->willReturn(['entity' => 'error generate']);
+
+        $controller = $this->createController($request, $exportModel, ['validateData', 'jsonResponse'], $validator);
+        $controller->method('validateData')->willReturn(false);
+
+        $expectedResponse = $this->createMock(ResponseInterface::class);
+
+        $controller->expects($this->once())->method('jsonResponse')->with($this->callback(function (array $data): bool {
+            $this->assertFalse($data['result']);
+            $this->assertStringContainsString('error generate', $data['message']);
+
+            return true;
+        }))->willReturn($expectedResponse);
+
+        $this->assertSame($expectedResponse, $controller->generate());
+    }
+
+    public function testGenerateInitialRequestUsesCrudContext(): void
+    {
         $postData = [
-            'lastId' => '',
-            'fileName' => 'test.csv',
-            'processedCount' => '0'
+            'entity' => 'users',
+            'selected_columns' => ['uuid', 'name'],
         ];
 
-        $request
-        ->method(
-            'getPost'
-        )
-        ->willReturnCallback(
-            function(
-                $key = null
-            ) use (
-                $postData
-            ) {
-                if (
-                    $key === 
-                    null
-                ):
-                    return 
-                    $postData;
-                endif;
+        $request = $this->ajaxPostRequest($postData);
 
-                return 
-                $postData
-                [$key] ?? 
-                null;
-            }
-        );
-
-        $exportModel = 
-        $this
-        ->createMock(
-            \App\Models\Backend\Components\ExportModel::class
-        );
-
-        $exportModel
-        ->method(
-            'generateValidationRules'
-        )
-        ->willReturn(
-            []
-        );
-
-        $exportResult = [
-            'result' => true,
-            'isFinished' => true,
-            'fileName' => 'test.csv'
-        ];
-
-        $exportModel
-        ->method(
-            'generate'
-        )
-        ->willReturn(
-            $exportResult
-        );
-
-        /* Inietta il mock nei Factories di CodeIgniter PRIMA di creare il controller */
-        \CodeIgniter\Config\Factories::injectMock(
-            'models', 
-            \App\Models\Backend\Components\ExportModel::class, 
-            $exportModel
-        );
-
-        $controller = 
-        $this
-        ->getMockBuilder(
-            \App\Controllers\Backend\Components\ExportController::class
-        )
-        ->onlyMethods([
-            'validateData',
-            'jsonResponse'
-        ])
-        ->getMock();
-
-        $controller
-        ->method(
-            'validateData'
-        )
-        ->willReturn(
-            true
-        );
-
-        $expectedResponse = 
-        $this
-        ->createMock(
-            \CodeIgniter\HTTP\ResponseInterface::class
-        );
-
-        $controller
-        ->method(
-            'jsonResponse'
-        )
-        ->willReturnCallback(
-            function(
-                $data
-            ) use (
-                $expectedResponse
-            ) {
-                $this
-                ->assertTrue(
-                    $data
-                    ['result']
-                );
-
-                $this
-                ->assertTrue(
-                    $data
-                    ['isFinished']
-                );
-
-                $this
-                ->assertEquals(
-                    'test.csv', 
-                    $data
-                    ['fileName']
-                );
-
-                return 
-                $expectedResponse;
-            }
-        );
-
-        /* Assegna solo la request tramite Closure, il model è già mockato dai Factories */
-        $closure = 
-        function() use (
-            $request
-        ) {
-            $this
-            ->request = 
-            $request;
-        };
-
-        \Closure::bind(
-            $closure, 
-            $controller, 
-            $controller
-        )();
-
-        $result = 
-        $controller
-        ->generate();
-
-        $this
-        ->assertSame(
-            $expectedResponse, 
-            $result
-        );
-    }
-
-    public function testGenerateReturnsProgressDataWhenNotFinished(): void
-    {
-        $request = 
-        $this
-        ->createMock(
-            \CodeIgniter\HTTP\IncomingRequest::class
-        );
-
-        $request
-        ->method(
-            'isAJAX'
-        )
-        ->willReturn(
-            true
-        );
-
-        $request
-        ->method(
-            'is'
-        )
-        ->with(
-            'post'
-        )
-        ->willReturn(
-            true
-        );
-
-        $postData = [
-            'lastId' => '100',
-            'fileName' => 'test.csv',
-            'processedCount' => '50'
-        ];
-
-        $request
-        ->method(
-            'getPost'
-        )
-        ->willReturnCallback(
-            function(
-                $key = null
-            ) use (
-                $postData
-            ) {
-                if (
-                    $key === 
-                    null
-                ):
-                    return 
-                    $postData;
-                endif;
-
-                return 
-                $postData
-                [$key] ?? 
-                null;
-            }
-        );
-
-        $exportModel = 
-        $this
-        ->createMock(
-            \App\Models\Backend\Components\ExportModel::class
-        );
-
-        $exportModel
-        ->method(
-            'generateValidationRules'
-        )
-        ->willReturn(
-            []
-        );
-
-        $exportResult = [
+        $exportModel = $this->createMock(ExportModel::class);
+        $exportModel->method('generateValidationRules')->willReturn([]);
+        $exportModel->expects($this->once())->method('generate')->with($postData, null, ExportModel::CONTEXT_CRUD)->willReturn([
             'result' => true,
             'isFinished' => false,
-            'lastId' => 200,
-            'fileName' => 'test.csv',
-            'chunkSize' => 50
+            'exportId' => self::EXPORT_ID,
+            'processedCount' => 5,
+        ]);
+
+        $controller = $this->createController($request, $exportModel, ['validateData', 'jsonResponse']);
+        $controller->method('validateData')->willReturn(true);
+
+        $expectedResponse = $this->createMock(ResponseInterface::class);
+
+        $controller->expects($this->once())->method('jsonResponse')->with([
+            'result' => true,
+            'isFinished' => false,
+            'exportId' => self::EXPORT_ID,
+            'processedCount' => 5,
+        ])->willReturn($expectedResponse);
+
+        $this->assertSame($expectedResponse, $controller->generate());
+    }
+
+    public function testGenerateContinuationUsesOnlyExportId(): void
+    {
+        $postData = [
+            'exportId' => self::EXPORT_ID,
+            'entity' => 'forged',
+            'processedCount' => '999',
         ];
 
-        $exportModel
-        ->method(
-            'generate'
-        )
-        ->willReturn(
-            $exportResult
+        $request = $this->ajaxPostRequest($postData);
+
+        $exportModel = $this->createMock(ExportModel::class);
+        $exportModel->expects($this->never())->method('generateValidationRules');
+        $exportModel->expects($this->once())->method('generate')->with([], self::EXPORT_ID, ExportModel::CONTEXT_CRUD)->willReturn([
+            'result' => true,
+            'isFinished' => true,
+            'exportId' => self::EXPORT_ID,
+            'processedCount' => 10,
+        ]);
+
+        $controller = $this->createController($request, $exportModel, ['validateData', 'jsonResponse']);
+        $controller->method('validateData')->willReturn(true);
+
+        $expectedResponse = $this->createMock(ResponseInterface::class);
+
+        $controller->expects($this->once())->method('jsonResponse')->with([
+            'result' => true,
+            'isFinished' => true,
+            'exportId' => self::EXPORT_ID,
+            'processedCount' => 10,
+        ])->willReturn($expectedResponse);
+
+        $this->assertSame($expectedResponse, $controller->generate());
+    }
+
+    public function testGenerateRejectsInvalidExportIdBeforeModelExecution(): void
+    {
+        $request = $this->ajaxPostRequest(['exportId' => 'invalid']);
+
+        $validator = $this->createMock(ValidationInterface::class);
+        $validator->method('getErrors')->willReturn(['exportId' => 'invalid export id']);
+
+        $exportModel = $this->createMock(ExportModel::class);
+        $exportModel->expects($this->never())->method('generate');
+
+        $controller = $this->createController($request, $exportModel, ['validateData', 'jsonResponse'], $validator);
+        $controller->method('validateData')->willReturn(false);
+
+        $expectedResponse = $this->createMock(ResponseInterface::class);
+
+        $controller->expects($this->once())->method('jsonResponse')->with($this->callback(function (array $data): bool {
+            $this->assertFalse($data['result']);
+            $this->assertStringContainsString('invalid export id', $data['message']);
+
+            return true;
+        }))->willReturn($expectedResponse);
+
+        $this->assertSame($expectedResponse, $controller->generate());
+    }
+
+    public function testGenerateDatabaseInitialRequestUsesDatabaseContext(): void
+    {
+        $postData = [
+            'entity' => 'users',
+            'selected_columns' => ['id', 'uuid'],
+        ];
+
+        $request = $this->ajaxPostRequest($postData);
+
+        $exportModel = $this->createMock(ExportModel::class);
+        $exportModel->method('generateValidationRules')->willReturn([]);
+        $exportModel->expects($this->once())->method('generate')->with($postData, null, ExportModel::CONTEXT_DATABASE)->willReturn([
+            'result' => false,
+            'message' => 'database-error',
+        ]);
+
+        $controller = $this->createController($request, $exportModel, ['validateData', 'jsonResponse']);
+        $controller->method('validateData')->willReturn(true);
+
+        $expectedResponse = $this->createMock(ResponseInterface::class);
+
+        $controller->expects($this->once())->method('jsonResponse')->with([
+            'result' => false,
+            'message' => 'database-error',
+        ])->willReturn($expectedResponse);
+
+        $this->assertSame($expectedResponse, $controller->generateDatabase());
+    }
+
+    public function testGenerateDatabaseContinuationUsesDatabaseContext(): void
+    {
+        $request = $this->ajaxPostRequest([
+            'exportId' => self::EXPORT_ID,
+        ]);
+
+        $exportModel = $this->createMock(ExportModel::class);
+        $exportModel->expects($this->once())->method('generate')->with([], self::EXPORT_ID, ExportModel::CONTEXT_DATABASE)->willReturn([
+            'result' => true,
+            'isFinished' => true,
+            'exportId' => self::EXPORT_ID,
+        ]);
+
+        $controller = $this->createController($request, $exportModel, ['validateData', 'jsonResponse']);
+        $controller->method('validateData')->willReturn(true);
+
+        $expectedResponse = $this->createMock(ResponseInterface::class);
+
+        $controller->expects($this->once())->method('jsonResponse')->with([
+            'result' => true,
+            'isFinished' => true,
+            'exportId' => self::EXPORT_ID,
+        ])->willReturn($expectedResponse);
+
+        $this->assertSame($expectedResponse, $controller->generateDatabase());
+    }
+
+    public function testRemoveRejectsNonAjaxRequest(): void
+    {
+        $request = $this->createMock(IncomingRequest::class);
+        $request->method('isAJAX')->willReturn(false);
+
+        $controller = $this->createController($request, $this->createMock(ExportModel::class), ['jsonResponse']);
+
+        $this->assertSame(400, $controller->remove()->getStatusCode());
+    }
+
+    public function testRemoveRejectsMissingExportId(): void
+    {
+        $request = $this->ajaxPostRequest([]);
+
+        $validator = $this->createMock(ValidationInterface::class);
+        $validator->method('getErrors')->willReturn([
+            'exportId' => 'The exportId field is required.',
+        ]);
+
+        $exportModel = $this->createMock(ExportModel::class);
+        $exportModel->expects($this->never())->method('deleteExport');
+
+        $controller = $this->createController($request, $exportModel, ['validateData', 'jsonResponse'], $validator);
+        $controller->method('validateData')->willReturn(false);
+
+        $expectedResponse = $this->createMock(ResponseInterface::class);
+
+        $controller->expects($this->once())->method('jsonResponse')->with($this->callback(function (array $data): bool {
+            $this->assertFalse($data['result']);
+            $this->assertStringContainsString('exportId', $data['message']);
+
+            return true;
+        }))->willReturn($expectedResponse);
+
+        $this->assertSame($expectedResponse, $controller->remove());
+    }
+
+    public function testRemoveDelegatesDeletionByExportId(): void
+    {
+        $request = $this->ajaxPostRequest([
+            'exportId' => self::EXPORT_ID,
+        ]);
+
+        $exportModel = $this->createMock(ExportModel::class);
+        $exportModel->expects($this->once())->method('deleteExport')->with(self::EXPORT_ID)->willReturn(true);
+
+        $controller = $this->createController($request, $exportModel, ['validateData', 'jsonResponse']);
+        $controller->method('validateData')->willReturn(true);
+
+        $expectedResponse = $this->createMock(ResponseInterface::class);
+
+        $controller->expects($this->once())->method('jsonResponse')->with([
+            'result' => true,
+        ])->willReturn($expectedResponse);
+
+        $this->assertSame($expectedResponse, $controller->remove());
+    }
+
+    public function testDownloadThrowsExceptionIfExportIdIsInvalid(): void
+    {
+        $controller = $this->createController(
+            $this->createMock(IncomingRequest::class),
+            $this->createMock(ExportModel::class),
+            []
         );
 
-        /* Inietta il mock nei Factories di CodeIgniter PRIMA di creare il controller */
-        \CodeIgniter\Config\Factories::injectMock(
-            'models', 
-            \App\Models\Backend\Components\ExportModel::class, 
-            $exportModel
+        $this->expectException(PageNotFoundException::class);
+
+        $controller->download('invalid');
+    }
+
+    public function testDownloadThrowsExceptionIfExportCannotBeResolved(): void
+    {
+        $exportModel = $this->createMock(ExportModel::class);
+        $exportModel->expects($this->once())->method('getDownloadFile')->with(self::EXPORT_ID)->willReturn(null);
+
+        $controller = $this->createController(
+            $this->createMock(IncomingRequest::class),
+            $exportModel,
+            []
         );
 
-        $controller = 
-        $this
-        ->getMockBuilder(
-            \App\Controllers\Backend\Components\ExportController::class
-        )
-        ->onlyMethods([
-            'validateData',
-            'jsonResponse'
-        ])
-        ->getMock();
+        $this->expectException(PageNotFoundException::class);
 
-        $controller
-        ->method(
-            'validateData'
-        )
-        ->willReturn(
-            true
-        );
+        $controller->download(self::EXPORT_ID);
+    }
 
-        $expectedResponse = 
-        $this
-        ->createMock(
-            \CodeIgniter\HTTP\ResponseInterface::class
-        );
+    public function testDownloadReturnsDownloadResponseWithManifestFileName(): void
+    {
+        $filePath = WRITEPATH . 'exports/staging/' . self::EXPORT_ID . '/data.csv';
+        $downloadName = 'export_users_08_10_2026_16_00_00.csv';
 
-        $controller
-        ->method(
-            'jsonResponse'
-        )
-        ->willReturnCallback(
-            function(
-                $data
-            ) use (
-                $expectedResponse
-            ) {
-                $this
-                ->assertTrue(
-                    $data
-                    ['result']
-                );
+        $exportModel = $this->createMock(ExportModel::class);
+        $exportModel->expects($this->once())->method('getDownloadFile')->with(self::EXPORT_ID)->willReturn([
+            'path' => $filePath,
+            'fileName' => $downloadName,
+        ]);
 
-                $this
-                ->assertFalse(
-                    $data
-                    ['isFinished']
-                );
+        $controller = $this->createController($this->createMock(IncomingRequest::class), $exportModel, []);
 
-                $this
-                ->assertEquals(
-                    200, 
-                    $data
-                    ['lastId']
-                );
+        $expectedResponse = $this->createMock(ResponseInterface::class);
 
-                $this
-                ->assertEquals(
-                    100, 
-                    $data
-                    ['processedCount']
-                );
+        $downloadResponse = $this->getMockBuilder(DownloadResponse::class)->disableOriginalConstructor()->onlyMethods(['setFileName'])->getMock();
+        $downloadResponse->expects($this->once())->method('setFileName')->with($downloadName)->willReturn($expectedResponse);
 
-                return 
-                $expectedResponse;
-            }
-        );
+        $response = $this->getMockBuilder(Response::class)->disableOriginalConstructor()->onlyMethods(['download'])->getMock();
+        $response->expects($this->once())->method('download')->with($filePath, null)->willReturn($downloadResponse);
 
-        /* Assegna solo la request tramite Closure */
-        $closure = 
-        function() use (
-            $request
-        ) {
-            $this
-            ->request = 
-            $request;
+        $this->injectResponse($controller, $response);
+
+        $this->assertSame($expectedResponse, $controller->download(self::EXPORT_ID));
+    }
+
+    private function ajaxPostRequest(array $data): IncomingRequest
+    {
+        $request = $this->createMock(IncomingRequest::class);
+
+        $request->method('isAJAX')->willReturn(true);
+        $request->method('is')->with('post')->willReturn(true);
+        $request->method('getPost')->willReturnCallback(static fn (?string $key = null) => $key === null ? $data : ($data[$key] ?? null));
+
+        return $request;
+    }
+
+    private function createController(
+        IncomingRequest $request,
+        ExportModel $exportModel,
+        array $methods,
+        ?ValidationInterface $validator = null
+    ): ExportController {
+        $builder = $this->getMockBuilder(ExportController::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods($methods);
+
+        $controller = $builder->getMock();
+        $response = $this->createMock(Response::class);
+
+        $inject = function (
+            ExportModel $model,
+            IncomingRequest $request,
+            Response $response,
+            ?ValidationInterface $validator
+        ): void {
+            $this->exportModel = $model;
+            $this->request = $request;
+            $this->response = $response;
+
+            if ($validator !== null):
+                $this->validator = $validator;
+            endif;
         };
 
-        \Closure::bind(
-            $closure, 
-            $controller, 
-            $controller
-        )();
+        $binder = \Closure::bind($inject, $controller, ExportController::class);
+        $binder($exportModel, $request, $response, $validator);
 
-        $result = 
-        $controller
-        ->generate();
-
-        $this
-        ->assertSame(
-            $expectedResponse, 
-            $result
-        );
+        return $controller;
     }
 
-    public function testRemoveDeletesFileAndReturnsTrue(): void
+    private function injectResponse(ExportController $controller, Response $response): void
     {
-        $request = 
-        $this
-        ->createMock(
-            \CodeIgniter\HTTP\IncomingRequest::class
-        );
-
-        $request
-        ->method(
-            'isAJAX'
-        )
-        ->willReturn(
-            true
-        );
-
-        $request
-        ->method(
-            'is'
-        )
-        ->with(
-            'post'
-        )
-        ->willReturn(
-            true
-        );
-
-        $fileName = 
-        'test_remove.csv';
-
-        $request
-        ->method(
-            'getPost'
-        )
-        ->with(
-            'fileName'
-        )
-        ->willReturn(
-            $fileName
-        );
-
-        $path = 
-        WRITEPATH . 
-        'exports/';
-
-        if (! is_dir(
-            $path
-        )):
-            mkdir(
-                $path, 
-                0775, 
-                true
-            );
-        endif;
-
-        $fullPath = 
-        $path . 
-        $fileName;
-
-        file_put_contents(
-            $fullPath, 
-            'dummy content'
-        );
-
-        $controller = 
-        $this
-        ->getMockBuilder(
-            \App\Controllers\Backend\Components\ExportController::class
-        )
-        ->onlyMethods([
-            'jsonResponse'
-        ])
-        ->getMock();
-
-        $expectedResponse = 
-        $this
-        ->createMock(
-            \CodeIgniter\HTTP\ResponseInterface::class
-        );
-
-        $controller
-        ->method(
-            'jsonResponse'
-        )
-        ->willReturnCallback(
-            function(
-                $data
-            ) use (
-                $expectedResponse
-            ) {
-                $this
-                ->assertTrue(
-                    $data
-                    ['result']
-                );
-
-                return 
-                $expectedResponse;
-            }
-        );
-
-        $closure = 
-        function() use (
-            $request
-        ) {
-            $this
-            ->request = 
-            $request;
+        $inject = function (Response $response): void {
+            $this->response = $response;
         };
 
-        \Closure::bind(
-            $closure, 
-            $controller, 
-            $controller
-        )();
-
-        $result = 
-        $controller
-        ->remove();
-
-        $this
-        ->assertSame(
-            $expectedResponse, 
-            $result
-        );
-
-        $this
-        ->assertFileDoesNotExist(
-            $fullPath
-        );
-    }
-
-    public function testDownloadThrowsExceptionIfFileNameIsEmpty(): void
-    {
-        $controller = 
-        new \App\Controllers\Backend\Components\ExportController();
-
-        $this
-        ->expectException(
-            \CodeIgniter\Exceptions\PageNotFoundException::class
-        );
-
-        $controller
-        ->download(
-            ''
-        );
-    }
-
-    public function testDownloadThrowsExceptionIfFileDoesNotExist(): void
-    {
-        $controller = 
-        new \App\Controllers\Backend\Components\ExportController();
-
-        $this
-        ->expectException(
-            \CodeIgniter\Exceptions\PageNotFoundException::class
-        );
-
-        $controller
-        ->download(
-            'non_existent_file.csv'
-        );
-    }
-
-    public function testDownloadReturnsDownloadResponseOnSuccess(): void
-    {
-        $fileName = 
-        'test_download.csv';
-        
-        $path = 
-        WRITEPATH . 
-        'exports/';
-
-        if (! is_dir(
-            $path
-        )):
-            mkdir(
-                $path, 
-                0775, 
-                true
-            );
-        endif;
-
-        $fullPath = 
-        $path . 
-        $fileName;
-
-        file_put_contents(
-            $fullPath, 
-            'dummy download'
-        );
-
-        $controller = 
-        new \App\Controllers\Backend\Components\ExportController();
-
-        $expectedResponse = 
-        $this
-        ->createMock(
-            \CodeIgniter\HTTP\ResponseInterface::class
-        );
-
-        $responseMock = 
-        $this
-        ->createMock(
-            \CodeIgniter\HTTP\ResponseInterface::class
-        );
-
-        $responseMock
-        ->method(
-            'download'
-        )
-        ->with(
-            $fullPath, 
-            null
-        )
-        ->willReturn(
-            $expectedResponse
-        );
-
-        $closure = 
-        function() use (
-            $responseMock
-        ) {
-            $this
-            ->response = 
-            $responseMock;
-        };
-
-        \Closure::bind(
-            $closure, 
-            $controller, 
-            $controller
-        )();
-
-        $result = 
-        $controller
-        ->download(
-            $fileName
-        );
-
-        $this
-        ->assertSame(
-            $expectedResponse, 
-            $result
-        );
-
-        /* Pulizia */
-        unlink(
-            $fullPath
-        );
+        $binder = \Closure::bind($inject, $controller, ExportController::class);
+        $binder($response);
     }
 }

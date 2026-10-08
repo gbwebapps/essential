@@ -55,5 +55,10 @@ return [
         'insufficientColumns' => 'Die CSV-Datei muss mindestens 2 Spalten enthalten.', 
         'missingPrimaryKey' => 'Die Spalte %s ist obligatorisch.', 
         'invalidColumns' => 'Die folgenden Spalten sind ungültig: %s', 
+        'emptyFile' => 'Die CSV-Datei ist leer oder enthält keine gültige Kopfzeile.',
+        'duplicatePrimaryKeys' => 'Die CSV-Datei enthält doppelte Primärschlüssel: %s.',
+        'recoveryRequired' => 'Der Import wurde in einem Zustand unterbrochen, der eine manuelle Prüfung erfordert. Staging-Daten und Backup aufbewahren. Import-ID: %s.',
+        'stagingDeleteError' => 'Die Staging-Daten des Imports konnten nicht entfernt werden.',
+        'additionalErrorsNotShown' => '... und %d weitere Fehler wurden aufgrund von Speicherbeschränkungen nicht angezeigt.',
     ],
 ];

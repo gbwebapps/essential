@@ -41,7 +41,8 @@ class LogsClass
 	 */
 	public function getJsIndex(): array
 	{
-		$locale = setting('Backend\General')->language;
+		$lang = setting('Backend\General')->language;
+		$locale = ($lang === 'en' ? 'default' : $lang);
 		
 	    return [
 	        ['id' => 'flatpickr-js', 'path' => 'assets/vendor/flatpickr/js/flatpickr.min.js', 'position' => 'before', 'target' => 'logs-js'], 

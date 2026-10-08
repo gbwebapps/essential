@@ -1,5 +1,5 @@
 /* Import delle costanti da backend.js */
-import { urlbase, action } from './backend.js';
+import { action } from './backend.js';
 
 /* Import della classe logica polivalente */
 import { ToolsManager } from './modules/Tools.js';
@@ -46,20 +46,12 @@ const actions = {
                 if (env === 'dbMaintenance') {
                     
                     if ( ! exportManager) {
-                        exportManager = new ExportCsvManager({
-                            linkId: '.export-entity',
-                            urlModal: urlbase + 'backend/export/database/showModal',
-                            urlExport: urlbase + 'backend/export/database/generate'
-                        });
+                        exportManager = new ExportCsvManager({ linkId: '.export-entity' });
                         exportManager.init();
                     }
                     
                     if ( ! importManager) {
-                        importManager = new ImportCsvManager({
-                            linkId: '.import-entity',
-                            urlModal: urlbase + 'backend/import/database/showModal',
-                            urlProcess: urlbase + 'backend/import/database/processCsv'
-                        });
+                        importManager = new ImportCsvManager({ linkId: '.import-entity' });
                         importManager.init();
                     }
                 }

@@ -41,9 +41,12 @@ class TokensClass
 	 */
 	public function getJsIndex(): array
 	{
+		$lang = setting('Backend\General')->language;
+		$locale = ($lang === 'en' ? 'default' : $lang);
+		
 	    return [
 	        ['id' => 'flatpickr-js', 'path' => 'assets/vendor/flatpickr/js/flatpickr.min.js', 'position' => 'before', 'target' => 'tokens-js'], 
-	        ['id' => 'it-js', 'path' => 'assets/vendor/flatpickr/js/it.js', 'position' => 'after', 'target' => 'flatpickr-js']
+	        ['id' => $locale . '-js', 'path' => 'assets/vendor/flatpickr/js/' . $locale . '.js', 'position' => 'after', 'target' => 'flatpickr-js']
 	    ];
 	}
 

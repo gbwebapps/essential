@@ -55,5 +55,10 @@ return [
         'insufficientColumns' => 'The CSV must contain at least 2 columns.', 
         'missingPrimaryKey' => 'Column %s is required.', 
         'invalidColumns' => 'The following columns are invalid: %s', 
+        'emptyFile' => 'The CSV file is empty or does not contain a valid header.',
+        'duplicatePrimaryKeys' => 'The CSV contains duplicate Primary Keys: %s.',
+        'recoveryRequired' => 'The import stopped in a state that requires manual verification. Keep the staging data and backup. Import ID: %s.',
+        'stagingDeleteError' => 'Unable to remove the import staging data.',
+        'additionalErrorsNotShown' => '... and %d additional errors are not shown due to memory limitations.',
     ],
 ];

@@ -1,5 +1,5 @@
 /* Import delle utility risalendo di un livello */
-import { urlbase, apiFetch, showAlert, smoothReplace } from '../backend.js';
+import { urlbase, apiFetch, showAlert, smoothReplace, handleValidationErrors } from '../backend.js';
 
 export class ImportCsvManager {
     constructor(config = {}, hooks = {}) {
@@ -10,16 +10,13 @@ export class ImportCsvManager {
         ImportCsvManager.instance = this;
 
         this.config = Object.assign({
+            controller: '',
             urlModal: urlbase + 'backend/import/showModal',
-            urlProcess: urlbase + 'backend/import/processCsv',
-            urlExecute: urlbase + 'backend/import/executeImport',
             modalContainerId: 'import-modal-container', 
             modalId: 'importModal', 
             linkId: '#import-entity', 
             removeId: '#btnCancelImport', 
             urlDelete: urlbase + 'backend/import/deleteFile',
-            maxNetworkRetries: 2,
-            retryDelayMs: 500,
         }, config);
 
         this.hooks = Object.assign({
@@ -34,9 +31,11 @@ export class ImportCsvManager {
 
         this.eventsBound = false;
         this.isSubmitting = false;
-        this.activeImportId = null;
-        this.recoveryRequired = false;
         
+        /* --- INIZIO MODIFICA CHUNKING: Contatori totali per l'intero processo --- */
+        this.totalInserted = 0;
+        this.totalUpdated = 0;
+        /* --- FINE MODIFICA CHUNKING --- */
     }
 
     init() {
@@ -63,6 +62,10 @@ export class ImportCsvManager {
         document.addEventListener('submit', async e => {
             if (e.target.id === 'importForm') {
                 e.preventDefault();
+                /* --- INIZIO MODIFICA CHUNKING: Reset contatori all'avvio di una nuova importazione --- */
+                this.totalInserted = 0;
+                this.totalUpdated = 0;
+                /* --- FINE MODIFICA CHUNKING --- */
                 await this.processImport(e.target);
             }
         });
@@ -82,8 +85,6 @@ export class ImportCsvManager {
     async showModal(entity) {
 
         if (this.isSubmitting) return;
-        this.activeImportId = null;
-        this.recoveryRequired = false;
         this.isSubmitting = true;
 
         if (typeof this.hooks.onModalBefore === 'function') {
@@ -158,33 +159,17 @@ export class ImportCsvManager {
 
     async deleteTempFile() {
 
-        const importIdEl = document.querySelector('input[name="importId"]');
-        const importId = importIdEl?.value || this.activeImportId;
+        /* Recupera l'elemento tramite il selettore dell'attributo name */
+        const tempFileEl = document.querySelector('input[name="tempFile"]');
+        if ( ! tempFileEl || ! tempFileEl.value) return;
 
-        if ( ! importId) {
-            const modalEl = document.getElementById(this.config.modalId);
-            if (modalEl) {
-                const modalInstance = bootstrap.Modal.getInstance(modalEl);
-                if (modalInstance) modalInstance.hide();
-            }
-            return;
-        }
-
-        /* In recovery lo staging e il backup sono artefatti diagnostici: chiudiamo la UI senza cancellarli. */
-        if (this.recoveryRequired) {
-            const modalEl = document.getElementById(this.config.modalId);
-            if (modalEl) {
-                const modalInstance = bootstrap.Modal.getInstance(modalEl);
-                if (modalInstance) modalInstance.hide();
-            }
-            return;
-        }
+        const tempFile = tempFileEl.value;
 
         if (this.isSubmitting) return;
         this.isSubmitting = true;
 
         if (typeof this.hooks.onDeleteBefore === 'function') {
-            const stop = this.hooks.onDeleteBefore(importId);
+            const stop = this.hooks.onDeleteBefore(tempFile);
             if (stop === false) {
                 this.isSubmitting = false;
                 return;
@@ -193,8 +178,9 @@ export class ImportCsvManager {
 
         try {
             const formData = new FormData();
-            formData.append('importId', importId);
+            formData.append('file', tempFile);
 
+            /* Assicurati di avere urlDelete definito nella tua configurazione (es. this.config.urlDelete) */
             const response = await apiFetch(this.config.urlDelete, {
                 method: 'POST',
                 body: formData
@@ -210,9 +196,6 @@ export class ImportCsvManager {
 
             /* Caso successo */
             if (data.result === true) {
-                this.activeImportId = null;
-                this.recoveryRequired = false;
-
                 if (typeof this.hooks.onDeleteAfter === 'function') {
                     this.hooks.onDeleteAfter(data);
                 }
@@ -228,51 +211,15 @@ export class ImportCsvManager {
         }
     }
 
-    async fetchWithRetry(url, options) {
-        let attempt = 0;
+    /* --- INIZIO MODIFICA CHUNKING: Aggiunto parametro offset alla firma della funzione --- */
+    async processImport(formElement, currentOffset = 0) {
+    /* --- FINE MODIFICA CHUNKING --- */
 
-        while (true) {
-            try {
-                return await apiFetch(url, options);
-            } catch (error) {
-                if (attempt >= this.config.maxNetworkRetries) throw error;
-
-                attempt++;
-                await new Promise(resolve => setTimeout(resolve, this.config.retryDelayMs * attempt));
-            }
-        }
-    }
-
-    restoreRetryForm() {
-        if ( ! this.activeImportId || document.getElementById('importForm')) return;
-
-        const modalBody = document.getElementById('import-content-area');
-        if ( ! modalBody) return;
-
-        const form = document.createElement('form');
-        form.id = 'importForm';
-        form.hidden = true;
-
-        const importIdInput = document.createElement('input');
-        importIdInput.type = 'hidden';
-        importIdInput.name = 'importId';
-        importIdInput.value = this.activeImportId;
-
-        const stepInput = document.createElement('input');
-        stepInput.type = 'hidden';
-        stepInput.name = 'step';
-        stepInput.value = 'confirm';
-
-        form.append(importIdInput, stepInput);
-        modalBody.appendChild(form);
-    }
-
-    async processImport(formElement, isContinuation = false) {
-
-        if (this.isSubmitting && ! isContinuation) return;
+        /* Blocchiamo il submit multiplo solo se siamo al primo giro (offset 0) */
+        if (this.isSubmitting && currentOffset === 0) return;
         this.isSubmitting = true;
 
-        if ( ! isContinuation && typeof this.hooks.onImportBefore === 'function') {
+        if (currentOffset === 0 && typeof this.hooks.onImportBefore === 'function') {
             const stop = this.hooks.onImportBefore(formElement);
             if (stop === false) {
                 this.isSubmitting = false;
@@ -281,25 +228,18 @@ export class ImportCsvManager {
         }
 
         try {
-            const formData = isContinuation && this.activeImportId
-                ? new FormData()
-                : new FormData(formElement);
-
-            if (isContinuation && this.activeImportId) {
-                formData.append('importId', this.activeImportId);
-                formData.append('step', 'confirm');
-            }
-
+            const formData = new FormData(formElement);
+            formData.append('offset', currentOffset);
+            
+            /* Invia al server il totale accumulato fino al giro precedente */
+            formData.append('accumulatedInserted', this.totalInserted || 0);
+            formData.append('accumulatedUpdated', this.totalUpdated || 0);
+            
             /* Determina l'URL in base allo step (upload file o conferma finale) */
             const isConfirmStep = formData.get('step') === 'confirm';
+            const processUrl = isConfirmStep ? urlbase + 'backend/import/executeImport' : urlbase + 'backend/import/processCsv'; 
 
-            if (isConfirmStep && ! this.activeImportId) {
-                this.activeImportId = formData.get('importId');
-            }
-
-            const processUrl = isConfirmStep ? this.config.urlExecute : this.config.urlProcess;
-
-            const response = await this.fetchWithRetry(processUrl, {
+            const response = await apiFetch(processUrl, {
                 method: 'POST',
                 body: formData
             });
@@ -307,15 +247,6 @@ export class ImportCsvManager {
             const data = await response.json();
 
             if (data.result === false) {
-                if (data.recoveryRequired === true) {
-                    this.recoveryRequired = true;
-                    this.activeImportId = data.importId || this.activeImportId;
-
-                    /* Nessun retry applicativo è sicuro in uno stato ambiguo/parzialmente committed. */
-                    const submitBtn = document.querySelector('#' + this.config.modalId + ' button[form="importForm"]');
-                    if (submitBtn) submitBtn.disabled = true;
-                }
-
                 /* 1. Caso errori massivi: inietta l'HTML pre-compilato nel contenitore del modale */
                 if (data.errorOutput) {
                     const modalAlertContainer = document.getElementById('import-alert-container');
@@ -344,14 +275,12 @@ export class ImportCsvManager {
 
                 /* Se era il primo step (upload), mostriamo l'anteprima */
                 if ( ! isConfirmStep && data.output) {
-                    this.activeImportId = data.importId || null;
-
                     const modalBody = document.getElementById('import-content-area');
                     if (modalBody) {
                         smoothReplace(modalBody, data.output);
                     }
 
-                    /* Nasconde la conferma quando il CSV è già allineato al database. */
+                    /* --- INIZIO MODIFICA: Nasconde il pulsante se non ci sono dati da elaborare --- */
                     const submitBtn = document.querySelector('#' + this.config.modalId + ' button[form="importForm"]');
                     if (submitBtn) {
                         if (data.hasProcessableData === false) {
@@ -360,17 +289,18 @@ export class ImportCsvManager {
                             submitBtn.style.display = ''; /* Ripristina la visualizzazione di default */
                         }
                     }
+                    /* --- FINE MODIFICA --- */
                     
                     this.isSubmitting = false; // Sblocca perché attende il click dell'utente per il secondo step
                 } 
                 
-                /* Esecuzione progressiva a chunk. */
+                /* --- INIZIO MODIFICA CHUNKING: Gestione ricorsione per lo step finale --- */
                 else if (isConfirmStep) {
 
                     const modalBody = document.getElementById('import-content-area');
                     
                     if (data.isFinished === false && data.progressOutput && modalBody) {
-                        if ( ! isContinuation) {
+                        if (currentOffset === 0) {
                             smoothReplace(modalBody, data.progressOutput);
                         } else {
                             const progressText = document.getElementById('import-progress-text');
@@ -380,16 +310,15 @@ export class ImportCsvManager {
                         }
                     }
 
+                    this.totalInserted += (data.inserted || 0);
+                    this.totalUpdated += (data.updated || 0);
 
-                    if (data.isFinished === false) {
-                        await this.processImport(formElement, true);
+                    if (data.isFinished === false && data.nextOffset) {
+                        await this.processImport(formElement, data.nextOffset);
                         return;
                     }
                     
                     if (data.message && typeof showAlert === 'function') showAlert('success', data.message);
-
-                    this.activeImportId = null;
-                    this.recoveryRequired = false;
                     
                     const modalEl = document.getElementById(this.config.modalId);
                     if (modalEl) {
@@ -403,19 +332,13 @@ export class ImportCsvManager {
                     
                     this.isSubmitting = false;
                 }
+                /* --- FINE MODIFICA CHUNKING --- */
             }
 
         } catch (error) {
             if (typeof this.hooks.onError === 'function') {
                 this.hooks.onError(error);
             }
-
-            this.restoreRetryForm();
-
-            if (typeof showAlert === 'function') {
-                showAlert('danger', error?.message || 'Errore di comunicazione con il server.');
-            }
-
             console.error("Errore di comunicazione con il server:", error);
             this.isSubmitting = false;
         }

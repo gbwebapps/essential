@@ -23,19 +23,11 @@ class LogsModel extends BackendModel
     protected ?string $module = 'admins_logs';
 
     /**
-     * Colonna di fallback usata per l'ordinamento della tabella se l'utente non ne seleziona una esplicitamente.
-     * 
-     * @var string 
-     */
-    protected ?string $defaultColumn = 'id';
-
-    /**
-     * Whitelist strutturale per le richieste di paginazione. 
-     * Definisce i parametri strettamente necessari (colonna, ordine, pagina, righe, filtri) accettati dal server.
+     * Whitelist dei parametri di paginazione accettati dal server (es. numero pagina, righe per pagina).
      * 
      * @var array 
      */
-    protected array $showAllAllowedFields = ['column', 'order', 'page', 'rows', 'searchFields'];
+    protected array $showAllAllowedFields = ['id', 'column', 'order', 'page', 'rows', 'searchFields', 'searchDates'];
 
     /**
      * Elenco esclusivo delle colonne su cui l'operatore è autorizzato a ordinare la griglia dati (ordinamento sicuro).

@@ -37,7 +37,7 @@ export class ListManager {
 
         this.state = {
             column: localStorage.getItem(`${this.config.controller}_column`) || 'id',
-            order: localStorage.getItem(`${this.config.controller}_order`) || 'asc',
+            order: localStorage.getItem(`${this.config.controller}_order`) || 'desc',
             page: localStorage.getItem(`${this.config.controller}_page`) || 1,
             rows: localStorage.getItem(`${this.config.controller}_rows`) || 5,
             trash_filter: localStorage.getItem(`${this.config.controller}_trash_filter`) || 'active',
@@ -317,7 +317,7 @@ export class ListManager {
 
     resetSortingAndPagination() {
         this.updateState('column', 'id');
-        this.updateState('order', 'asc');
+        this.updateState('order', 'desc');
         this.updateState('page', 1);
     }
 

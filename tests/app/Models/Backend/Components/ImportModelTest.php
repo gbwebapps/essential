@@ -2,4928 +2,1094 @@
 
 namespace App\Models\Backend\Components;
 
+use CodeIgniter\Database\BaseBuilder;
+use CodeIgniter\Database\BaseConnection;
+use CodeIgniter\Database\BaseResult;
+use CodeIgniter\HTTP\Files\UploadedFile;
 use CodeIgniter\Test\CIUnitTestCase;
+use Config\Services;
 
 class ImportModelTest extends CIUnitTestCase
 {
-	public function testGetTargetModelInstanceReturnsInstanceWhenClassExists()
+    private const SESSION_TOKEN = 'phpunit-import-session';
+
+    /** @var string[] */
+    private array $temporaryFiles = [];
+
+    /** @var string[] */
+    private array $stagingImportIds = [];
+
+    protected function setUp(): void
     {
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            new $modelClass();
-
-        $reflection
-            =
-            new \ReflectionMethod(
-                $modelClass,
-                'getTargetModelInstance'
-            );
-
-        $reflection
-            ->setAccessible(
-                true
-            );
-
-        /* Utilizziamo 'groups' per generare App\Models\Backend\GroupsModel che sappiamo esistere nel percorso corretto */
-        $entity
-            =
-            'groups';
-
-        $result
-            =
-            $reflection
-            ->invoke(
-                $model,
-                $entity
-            );
-
-        $this
-            ->assertNotNull(
-                $result
-            );
-
-        $expectedClass
-            =
-            \App\Models\Backend\GroupsModel::class;
-
-        $this
-            ->assertInstanceOf(
-                $expectedClass,
-                $result
-            );
+        parent::setUp();
+        session()->set('backendSession', self::SESSION_TOKEN);
     }
 
-    public function testGetTargetModelInstanceReturnsNullWhenClassDoesNotExist()
+    protected function tearDown(): void
     {
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            new $modelClass();
-
-        $reflection
-            =
-            new \ReflectionMethod(
-                $modelClass,
-                'getTargetModelInstance'
-            );
-
-        $reflection
-            ->setAccessible(
-                true
-            );
-
-        $entity
-            =
-            'ghost_entity_that_does_not_exist';
-
-        $result
-            =
-            $reflection
-            ->invoke(
-                $model,
-                $entity
-            );
-
-        $this
-            ->assertNull(
-                $result
-            );
-    }
-
-    public function testGetTableStructureReturnsEmptyArrayWhenTableMissing()
-    {
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            new $modelClass();
-
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        $dbMock
-            ->method(
-                'tableExists'
-            )
-            ->willReturn(
-                false
-            );
-
-        $injectDb
-            =
-            function (
-                $connection
-            ) {
-                $target
-                    =
-                    $this;
-
-                $target
-                    ->db
-                    =
-                    $connection;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,
-                $modelClass
-            );
-
-        $binder(
-            $dbMock
-        );
-
-        $table
-            =
-            'missing_table';
-
-        $result
-            =
-            $model
-            ->getTableStructure(
-                $table
-            );
-
-        $this
-            ->assertIsArray(
-                $result
-            );
-
-        $this
-            ->assertEmpty(
-                $result
-            );
-    }
-
-    public function testGetTableStructureReturnsFormattedStructureWithIndexesAndPrimaryKeys()
-    {
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            new $modelClass();
-
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        $dbMock
-            ->method(
-                'tableExists'
-            )
-            ->willReturn(
-                true
-            );
-
-        /* Simuliamo 3 campi: chiave primaria, campo indicizzato e campo normale */
-        $field1
-            =
-            new \stdClass();
-
-        $field1
-            ->name
-            =
-            'id';
-
-        $field1
-            ->type
-            =
-            'int';
-
-        $field1
-            ->max_length
-            =
-            11;
-
-        $field1
-            ->primary_key
-            =
-            1;
-
-        $field2
-            =
-            new \stdClass();
-
-        $field2
-            ->name
-            =
-            'email';
-
-        $field2
-            ->type
-            =
-            'varchar';
-
-        $field2
-            ->max_length
-            =
-            255;
-
-        $field2
-            ->primary_key
-            =
-            0;
-
-        $field3
-            =
-            new \stdClass();
-
-        $field3
-            ->name
-            =
-            'notes';
-
-        $field3
-            ->type
-            =
-            'text';
-
-        $field3
-            ->max_length
-            =
-            null;
-
-        $field3
-            ->primary_key
-            =
-            0;
-
-        $dbMock
-            ->method(
-                'getFieldData'
-            )
-            ->willReturn(
-                [
-                    $field1,
-                    $field2,
-                    $field3
-                ]
-            );
-
-        /* Simuliamo un indice applicato solo al campo 'email' */
-        $index1
-            =
-            new \stdClass();
-
-        $index1
-            ->name
-            =
-            'email_idx';
-
-        $index1
-            ->fields
-            =
-            [
-                'email'
-            ];
-
-        $dbMock
-            ->method(
-                'getIndexData'
-            )
-            ->willReturn(
-                [
-                    $index1
-                ]
-            );
-
-        $injectDb
-            =
-            function (
-                $connection
-            ) {
-                $target
-                    =
-                    $this;
-
-                $target
-                    ->db
-                    =
-                    $connection;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,
-                $modelClass
-            );
-
-        $binder(
-            $dbMock
-        );
-
-        $table
-            =
-            'real_table';
-
-        $result
-            =
-            $model
-            ->getTableStructure(
-                $table
-            );
-
-        $expected
-            =
-            [
-                [
-                    'name'
-                    =>
-                    'id',
-                    'type'
-                    =>
-                    'int',
-                    'max_length'
-                    =>
-                    11,
-                    'primary_key'
-                    =>
-                    1,
-                    'is_index'
-                    =>
-                    false
-                ],
-                [
-                    'name'
-                    =>
-                    'email',
-                    'type'
-                    =>
-                    'varchar',
-                    'max_length'
-                    =>
-                    255,
-                    'primary_key'
-                    =>
-                    0,
-                    'is_index'
-                    =>
-                    true
-                ],
-                [
-                    'name'
-                    =>
-                    'notes',
-                    'type'
-                    =>
-                    'text',
-                    'max_length'
-                    =>
-                    null,
-                    'primary_key'
-                    =>
-                    0,
-                    'is_index'
-                    =>
-                    false
-                ]
-            ];
-
-        $this
-            ->assertSame(
-                $expected,
-                $result
-            );
-    }
-
-    public function testParseAndValidateCsvReturnsErrorOnUnreadableFile()
-    {
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'getTableStructure'
-                ]
-            )
-            ->getMock();
-
-        $structure
-            =
-            [
-                [
-                    'name'
-                    =>
-                    'id',
-                    'primary_key'
-                    =>
-                    1
-                ]
-            ];
-
-        $model
-            ->method(
-                'getTableStructure'
-            )
-            ->willReturn(
-                $structure
-            );
-
-        $fileClass
-            =
-            \CodeIgniter\HTTP\Files\UploadedFile::class;
-
-        $fileMock
-            =
-            $this
-            ->getMockBuilder(
-                $fileClass
-            )
-            ->disableOriginalConstructor()
-            ->onlyMethods(
-                [
-                    'getTempName'
-                ]
-            )
-            ->getMock();
-
-        $fileMock
-            ->method(
-                'getTempName'
-            )
-            ->willReturn(
-                '/percorso/inesistente/file_fantasma.csv'
-            );
-
-        /* 
-         * Sospendiamo l'error handler di CI4 per impedire che il Warning 
-         * di fopen() venga scalato a ErrorException, permettendo così 
-         * al metodo di ricevere il "false" e testare il blocco condizionale.
-         */
-        set_error_handler(
-            function () {
-                return true;
-            }
-        );
-
-        $result
-            =
-            $model
-            ->parseAndValidateCsv(
-                $fileMock,
-                'users'
-            );
-
-        restore_error_handler();
-
-        $this
-            ->assertIsArray(
-                $result
-            );
-
-        $this
-            ->assertFalse(
-                $result['status']
-            );
-    }
-
-    public function testParseAndValidateCsvReturnsErrorOnInsufficientColumns()
-    {
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'getTableStructure'
-                ]
-            )
-            ->getMock();
-
-        $structure
-            =
-            [
-                [
-                    'name'
-                    =>
-                    'id',
-                    'primary_key'
-                    =>
-                    1
-                ]
-            ];
-
-        $model
-            ->method(
-                'getTableStructure'
-            )
-            ->willReturn(
-                $structure
-            );
-
-        $tempFile
-            =
-            tempnam(
-                sys_get_temp_dir(),
-                'csv_'
-            );
-
-        /* Creiamo un CSV con una sola colonna per forzare l'errore */
-        file_put_contents(
-            $tempFile,
-            "id\n1"
-        );
-
-        $fileClass
-            =
-            \CodeIgniter\HTTP\Files\UploadedFile::class;
-
-        $fileMock
-            =
-            $this
-            ->getMockBuilder(
-                $fileClass
-            )
-            ->disableOriginalConstructor()
-            ->onlyMethods(
-                [
-                    'getTempName'
-                ]
-            )
-            ->getMock();
-
-        $fileMock
-            ->method(
-                'getTempName'
-            )
-            ->willReturn(
-                $tempFile
-            );
-
-        $result
-            =
-            $model
-            ->parseAndValidateCsv(
-                $fileMock,
-                'users'
-            );
-
-        if (
-            file_exists(
-                $tempFile
-            )
-        ):
-            unlink(
-                $tempFile
-            );
-        endif;
-
-        $this
-            ->assertIsArray(
-                $result
-            );
-
-        $this
-            ->assertFalse(
-                $result['status']
-            );
-    }
-
-    public function testParseAndValidateCsvReturnsErrorOnMissingPrimaryKey()
-    {
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'getTableStructure'
-                ]
-            )
-            ->getMock();
-
-        $structure
-            =
-            [
-                [
-                    'name'
-                    =>
-                    'id',
-                    'primary_key'
-                    =>
-                    1
-                ],
-                [
-                    'name'
-                    =>
-                    'email',
-                    'primary_key'
-                    =>
-                    0
-                ]
-            ];
-
-        $model
-            ->method(
-                'getTableStructure'
-            )
-            ->willReturn(
-                $structure
-            );
-
-        $tempFile
-            =
-            tempnam(
-                sys_get_temp_dir(),
-                'csv_'
-            );
-
-        /* Manca l'header 'id' (chiave primaria) */
-        file_put_contents(
-            $tempFile,
-            "email,name\ntest@test.com,Mario"
-        );
-
-        $fileClass
-            =
-            \CodeIgniter\HTTP\Files\UploadedFile::class;
-
-        $fileMock
-            =
-            $this
-            ->getMockBuilder(
-                $fileClass
-            )
-            ->disableOriginalConstructor()
-            ->onlyMethods(
-                [
-                    'getTempName'
-                ]
-            )
-            ->getMock();
-
-        $fileMock
-            ->method(
-                'getTempName'
-            )
-            ->willReturn(
-                $tempFile
-            );
-
-        $result
-            =
-            $model
-            ->parseAndValidateCsv(
-                $fileMock,
-                'users'
-            );
-
-        if (
-            file_exists(
-                $tempFile
-            )
-        ):
-            unlink(
-                $tempFile
-            );
-        endif;
-
-        $this
-            ->assertIsArray(
-                $result
-            );
-
-        $this
-            ->assertFalse(
-                $result['status']
-            );
-    }
-
-    public function testParseAndValidateCsvReturnsErrorOnInvalidColumns()
-    {
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'getTableStructure'
-                ]
-            )
-            ->getMock();
-
-        $structure
-            =
-            [
-                [
-                    'name'
-                    =>
-                    'id',
-                    'primary_key'
-                    =>
-                    1
-                ],
-                [
-                    'name'
-                    =>
-                    'email',
-                    'primary_key'
-                    =>
-                    0
-                ]
-            ];
-
-        $model
-            ->method(
-                'getTableStructure'
-            )
-            ->willReturn(
-                $structure
-            );
-
-        $tempFile
-            =
-            tempnam(
-                sys_get_temp_dir(),
-                'csv_'
-            );
-
-        /* Inseriamo 'fake_column' che non è presente nello schema per innescare l'errore */
-        file_put_contents(
-            $tempFile,
-            "id,email,fake_column\n1,test@test.com,hacker"
-        );
-
-        $fileClass
-            =
-            \CodeIgniter\HTTP\Files\UploadedFile::class;
-
-        $fileMock
-            =
-            $this
-            ->getMockBuilder(
-                $fileClass
-            )
-            ->disableOriginalConstructor()
-            ->onlyMethods(
-                [
-                    'getTempName'
-                ]
-            )
-            ->getMock();
-
-        $fileMock
-            ->method(
-                'getTempName'
-            )
-            ->willReturn(
-                $tempFile
-            );
-
-        $result
-            =
-            $model
-            ->parseAndValidateCsv(
-                $fileMock,
-                'users'
-            );
-
-        if (
-            file_exists(
-                $tempFile
-            )
-        ):
-            unlink(
-                $tempFile
-            );
-        endif;
-
-        $this
-            ->assertIsArray(
-                $result
-            );
-
-        $this
-            ->assertFalse(
-                $result['status']
-            );
-    }
-
-    public function testParseAndValidateCsvReturnsErrorOnEmptyDataRows()
-    {
-        if (
-            ! defined(
-                'WRITEPATH'
-            )
-        ):
-            define(
-                'WRITEPATH',
-                sys_get_temp_dir() . '/'
-            );
-        endif;
-
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'getTableStructure',
-                    'getTargetModelInstance',
-                    'buildDynamicRules'
-                ]
-            )
-            ->getMock();
-
-        $structure
-            =
-            [
-                [
-                    'name'
-                    =>
-                    'id',
-                    'primary_key'
-                    =>
-                    1
-                ],
-                [
-                    'name'
-                    =>
-                    'email',
-                    'primary_key'
-                    =>
-                    0
-                ]
-            ];
-
-        $model
-            ->method(
-                'getTableStructure'
-            )
-            ->willReturn(
-                $structure
-            );
-
-        $tempFile
-            =
-            tempnam(
-                sys_get_temp_dir(),
-                'csv_'
-            );
-
-        /* Forziamo un CSV con la corretta struttura ma privo di righe dati */
-        file_put_contents(
-            $tempFile,
-            "id,email\n"
-        );
-
-        $fileClass
-            =
-            \CodeIgniter\HTTP\Files\UploadedFile::class;
-
-        $fileMock
-            =
-            $this
-            ->getMockBuilder(
-                $fileClass
-            )
-            ->disableOriginalConstructor()
-            ->onlyMethods(
-                [
-                    'getTempName'
-                ]
-            )
-            ->getMock();
-
-        $fileMock
-            ->method(
-                'getTempName'
-            )
-            ->willReturn(
-                $tempFile
-            );
-
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        $dbMock
-            ->method(
-                'tableExists'
-            )
-            ->willReturn(
-                false
-            );
-
-        $injectDb
-            =
-            function (
-                $connection
-            ) {
-                $target
-                    =
-                    $this;
-
-                $target
-                    ->db
-                    =
-                    $connection;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,
-                $modelClass
-            );
-
-        $binder(
-            $dbMock
-        );
-
-        $result
-            =
-            $model
-            ->parseAndValidateCsv(
-                $fileMock,
-                'users'
-            );
-
-        if (
-            file_exists(
-                $tempFile
-            )
-        ):
-            unlink(
-                $tempFile
-            );
-        endif;
-
-        $this
-            ->assertIsArray(
-                $result
-            );
-
-        $this
-            ->assertFalse(
-                $result['status']
-            );
-    }
-
-    public function testParseAndValidateCsvReturnsValidationErrors()
-    {
-        if (
-            ! defined(
-                'WRITEPATH'
-            )
-        ):
-            define(
-                'WRITEPATH',
-                sys_get_temp_dir() . '/'
-            );
-        endif;
-
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'getTableStructure',
-                    'buildDynamicRules'
-                ]
-            )
-            ->getMock();
-
-        $structure
-            =
-            [
-                [
-                    'name'
-                    =>
-                    'id',
-                    'primary_key'
-                    =>
-                    1
-                ],
-                [
-                    'name'
-                    =>
-                    'email',
-                    'primary_key'
-                    =>
-                    0
-                ]
-            ];
-
-        $model
-            ->method(
-                'getTableStructure'
-            )
-            ->willReturn(
-                $structure
-            );
-
-        $model
-            ->method(
-                'buildDynamicRules'
-            )
-            ->willReturn(
-                [
-                    'email'
-                    =>
-                    'required'
-                ]
-            );
-
-        $tempFile
-            =
-            tempnam(
-                sys_get_temp_dir(),
-                'csv_'
-            );
-
-        /* Riga con email vuota per scatenare la validazione */
-        file_put_contents(
-            $tempFile,
-            "id,email\n1,\n"
-        );
-
-        $fileClass
-            =
-            \CodeIgniter\HTTP\Files\UploadedFile::class;
-
-        $fileMock
-            =
-            $this
-            ->getMockBuilder(
-                $fileClass
-            )
-            ->disableOriginalConstructor()
-            ->onlyMethods(
-                [
-                    'getTempName'
-                ]
-            )
-            ->getMock();
-
-        $fileMock
-            ->method(
-                'getTempName'
-            )
-            ->willReturn(
-                $tempFile
-            );
-
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        $dbMock
-            ->method(
-                'tableExists'
-            )
-            ->willReturn(
-                false
-            );
-
-        $injectDb
-            =
-            function (
-                $connection
-            ) {
-                $target
-                    =
-                    $this;
-
-                $target
-                    ->db
-                    =
-                    $connection;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,
-                $modelClass
-            );
-
-        $binder(
-            $dbMock
-        );
-
-        /* Mock del servizio Validation */
-        $valClass
-            =
-            \CodeIgniter\Validation\ValidationInterface::class;
-
-        $valMock
-            =
-            $this
-            ->createMock(
-                $valClass
-            );
-
-        $valMock
-            ->method(
-                'run'
-            )
-            ->willReturn(
-                false
-            );
-
-        $valMock
-            ->method(
-                'getErrors'
-            )
-            ->willReturn(
-                [
-                    'email'
-                    =>
-                    'Email non valida.'
-                ]
-            );
-
-        \Config\Services::injectMock(
-            'validation',
-            $valMock
-        );
-
-        $result
-            =
-            $model
-            ->parseAndValidateCsv(
-                $fileMock,
-                'admins'
-            );
-
-        if (
-            file_exists(
-                $tempFile
-            )
-        ):
-            unlink(
-                $tempFile
-            );
-        endif;
-
-        $this
-            ->assertIsArray(
-                $result
-            );
-
-        $this
-            ->assertFalse(
-                $result['status']
-            );
-
-        $this
-            ->assertArrayHasKey(
-                'validationErrors',
-                $result
-            );
-    }
-
-    public function testParseAndValidateCsvSuccessWithInsertUpdateSkipActions()
-    {
-        if (
-            ! defined(
-                'WRITEPATH'
-            )
-        ):
-            define(
-                'WRITEPATH',
-                sys_get_temp_dir() . '/'
-            );
-        endif;
-
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'getTableStructure',
-                    'buildDynamicRules'
-                ]
-            )
-            ->getMock();
-
-        $structure
-            =
-            [
-                [
-                    'name'
-                    =>
-                    'id',
-                    'primary_key'
-                    =>
-                    1
-                ],
-                [
-                    'name'
-                    =>
-                    'email',
-                    'primary_key'
-                    =>
-                    0
-                ]
-            ];
-
-        $model
-            ->method(
-                'getTableStructure'
-            )
-            ->willReturn(
-                $structure
-            );
-
-        $model
-            ->method(
-                'buildDynamicRules'
-            )
-            ->willReturn(
-                []
-            );
-
-        $tempFile
-            =
-            tempnam(
-                sys_get_temp_dir(),
-                'csv_'
-            );
-
-        /*
-         * Creiamo 3 righe per innescare i 3 path logici del piano:
-         * 1: non esistente (Insert)
-         * 2: esistente ma modificata (Update)
-         * 3: esistente e identica (Skip)
-         */
-        $csvData
-            =
-            "id,email\n1,nuovo@test.com\n2,modificato@test.com\n3,identico@test.com\n";
-
-        file_put_contents(
-            $tempFile,
-            $csvData
-        );
-
-        $fileClass
-            =
-            \CodeIgniter\HTTP\Files\UploadedFile::class;
-
-        $fileMock
-            =
-            $this
-            ->getMockBuilder(
-                $fileClass
-            )
-            ->disableOriginalConstructor()
-            ->onlyMethods(
-                [
-                    'getTempName'
-                ]
-            )
-            ->getMock();
-
-        $fileMock
-            ->method(
-                'getTempName'
-            )
-            ->willReturn(
-                $tempFile
-            );
-
-        /* Mock DB Builder */
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        $builderClass
-            =
-            \CodeIgniter\Database\BaseBuilder::class;
-
-        $builderMock
-            =
-            $this
-            ->createMock(
-                $builderClass
-            );
-
-        $resClass
-            =
-            \CodeIgniter\Database\BaseResult::class;
-
-        $resMock
-            =
-            $this
-            ->createMock(
-                $resClass
-            );
-
-        /* Array di simulazione dati esistenti sul database */
-        $existingRecords
-            =
-            [
-                [
-                    'id'
-                    =>
-                    '2',
-                    'email'
-                    =>
-                    'vecchio@test.com'
-                ],
-                [
-                    'id'
-                    =>
-                    '3',
-                    'email'
-                    =>
-                    'identico@test.com'
-                ]
-            ];
-
-        $resMock
-            ->method(
-                'getResultArray'
-            )
-            ->willReturn(
-                $existingRecords
-            );
-
-        $builderMock
-            ->method(
-                'whereIn'
-            )
-            ->willReturnSelf();
-
-        $builderMock
-            ->method(
-                'get'
-            )
-            ->willReturn(
-                $resMock
-            );
-
-        $dbMock
-            ->method(
-                'tableExists'
-            )
-            ->willReturn(
-                true
-            );
-
-        $dbMock
-            ->method(
-                'table'
-            )
-            ->willReturn(
-                $builderMock
-            );
-
-        $injectDb
-            =
-            function (
-                $connection
-            ) {
-                $target
-                    =
-                    $this;
-
-                $target
-                    ->db
-                    =
-                    $connection;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,
-                $modelClass
-            );
-
-        $binder(
-            $dbMock
-        );
-
-        /* Assicuriamo che la validation passi */
-        $valClass
-            =
-            \CodeIgniter\Validation\ValidationInterface::class;
-
-        $valMock
-            =
-            $this
-            ->createMock(
-                $valClass
-            );
-
-        $valMock
-            ->method(
-                'run'
-            )
-            ->willReturn(
-                true
-            );
-
-        \Config\Services::injectMock(
-            'validation',
-            $valMock
-        );
-
-        $result
-            =
-            $model
-            ->parseAndValidateCsv(
-                $fileMock,
-                'admins'
-            );
-
-        if (
-            file_exists(
-                $tempFile
-            )
-        ):
-            unlink(
-                $tempFile
-            );
-        endif;
-
-        /* Pulizia del file di staging residuo */
-        if (
-            isset(
-                $result['tempFile']
-            )
-        ):
-            $stagingFile
-                =
-                WRITEPATH
-                .
-                'uploads/staging/'
-                .
-                $result['tempFile'];
-
-            if (
-                file_exists(
-                    $stagingFile
-                )
-            ):
-                unlink(
-                    $stagingFile
-                );
+        foreach ($this->temporaryFiles as $file):
+            if (is_file($file)):
+                @unlink($file);
             endif;
-        endif;
+        endforeach;
 
-        $this
-            ->assertIsArray(
-                $result
-            );
+        foreach ($this->stagingImportIds as $importId):
+            $this->removeDirectory(WRITEPATH . 'uploads/staging/' . $importId);
+            $this->removeDirectory(WRITEPATH . 'backups/imports/' . $importId);
+        endforeach;
 
-        $this
-            ->assertTrue(
-                $result['status']
-            );
-
-        /* Verifichiamo che il master plan abbia contato correttamente: 1 Insert, 1 Update, 1 Skip */
-        $this
-            ->assertSame(
-                1,
-                $result['plan']['insert']
-            );
-
-        $this
-            ->assertSame(
-                1,
-                $result['plan']['update']
-            );
-
-        $this
-            ->assertSame(
-                1,
-                $result['plan']['skip']
-            );
+        session()->remove('backendSession');
+        Services::resetSingle('validation');
+        parent::tearDown();
     }
 
-    public function testParseAndValidateCsvUnlinksStagingFileWhenNoInsertsOrUpdates()
+    public function testGetTargetModelInstanceReturnsInstanceWhenClassExists(): void
     {
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
+        $model = new ImportModel();
+        $result = $this->invokeMethod($model, 'getTargetModelInstance', ['groups']);
 
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'getTableStructure',
-                    'buildDynamicRules'
-                ]
-            )
-            ->getMock();
-
-        $structure
-            =
-            [
-                [
-                    'name'
-                    =>
-                    'id',
-                    'primary_key'
-                    =>
-                    1
-                ],
-                [
-                    'name'
-                    =>
-                    'email',
-                    'primary_key'
-                    =>
-                    0
-                ]
-            ];
-
-        $model
-            ->method(
-                'getTableStructure'
-            )
-            ->willReturn(
-                $structure
-            );
-
-        $tempFile
-            =
-            tempnam(
-                sys_get_temp_dir(),
-                'csv_'
-            );
-
-        /* Creiamo 1 riga identica al DB per generare solo 1 Skip (Insert=0, Update=0) */
-        file_put_contents(
-            $tempFile,
-            "id,email\n3,identico@test.com"
-        );
-
-        $fileClass
-            =
-            \CodeIgniter\HTTP\Files\UploadedFile::class;
-
-        $fileMock
-            =
-            $this
-            ->getMockBuilder(
-                $fileClass
-            )
-            ->disableOriginalConstructor()
-            ->onlyMethods(
-                [
-                    'getTempName'
-                ]
-            )
-            ->getMock();
-
-        $fileMock
-            ->method(
-                'getTempName'
-            )
-            ->willReturn(
-                $tempFile
-            );
-
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        $dbMock
-            ->method(
-                'tableExists'
-            )
-            ->willReturn(
-                true
-            );
-
-        $builderClass
-            =
-            \CodeIgniter\Database\BaseBuilder::class;
-
-        $builderMock
-            =
-            $this
-            ->createMock(
-                $builderClass
-            );
-
-        $resClass
-            =
-            \CodeIgniter\Database\BaseResult::class;
-
-        $resMock
-            =
-            $this
-            ->createMock(
-                $resClass
-            );
-
-        $existingRecords
-            =
-            [
-                [
-                    'id'
-                    =>
-                    '3',
-                    'email'
-                    =>
-                    'identico@test.com'
-                ]
-            ];
-
-        $resMock
-            ->method(
-                'getResultArray'
-            )
-            ->willReturn(
-                $existingRecords
-            );
-
-        $builderMock
-            ->method(
-                'whereIn'
-            )
-            ->willReturnSelf();
-
-        $builderMock
-            ->method(
-                'get'
-            )
-            ->willReturn(
-                $resMock
-            );
-
-        $dbMock
-            ->method(
-                'table'
-            )
-            ->willReturn(
-                $builderMock
-            );
-
-        $injectDb
-            =
-            function (
-                $connection
-            ) {
-                $target
-                    =
-                    $this;
-
-                $target
-                    ->db
-                    =
-                    $connection;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,
-                $modelClass
-            );
-
-        $binder(
-            $dbMock
-        );
-
-        $valClass
-            =
-            \CodeIgniter\Validation\ValidationInterface::class;
-
-        $valMock
-            =
-            $this
-            ->createMock(
-                $valClass
-            );
-
-        $valMock
-            ->method(
-                'run'
-            )
-            ->willReturn(
-                true
-            );
-
-        \Config\Services::injectMock(
-            'validation',
-            $valMock
-        );
-
-        $result
-            =
-            $model
-            ->parseAndValidateCsv(
-                $fileMock,
-                'admins'
-            );
-
-        if (
-            file_exists(
-                $tempFile
-            )
-        ):
-            unlink(
-                $tempFile
-            );
-        endif;
-
-        /* Siccome Insert=0 e Update=0, il file di staging DEVE essere stato rimosso */
-        $stagingPath
-            =
-            WRITEPATH
-            .
-            'uploads/staging/'
-            .
-            $result['tempFile'];
-
-        $this
-            ->assertFalse(
-                file_exists(
-                    $stagingPath
-                )
-            );
+        $this->assertInstanceOf(\App\Models\Backend\GroupsModel::class, $result);
     }
 
-    public function testParseAndValidateCsvCreatesStagingDirectory()
+    public function testGetTargetModelInstanceReturnsNullForInvalidEntity(): void
     {
-        if (
-            ! defined(
-                'WRITEPATH'
-            )
-        ):
-            define(
-                'WRITEPATH',
-                sys_get_temp_dir()
-                .
-                '/'
-            );
+        $model = new ImportModel();
+
+        $this->assertNull($this->invokeMethod($model, 'getTargetModelInstance', ['../admins']));
+    }
+
+    public function testGetTargetModelInstanceReturnsNullWhenClassDoesNotExist(): void
+    {
+        $model = new ImportModel();
+
+        $this->assertNull($this->invokeMethod($model, 'getTargetModelInstance', ['ghost_entity_that_does_not_exist']));
+    }
+
+    public function testGetTableStructureReturnsEmptyArrayWhenTableDoesNotExist(): void
+    {
+        $model = new ImportModel();
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->once())->method('tableExists')->with('missing_table')->willReturn(false);
+        $this->injectDatabase($model, $db);
+
+        $this->assertSame([], $model->getTableStructure('missing_table'));
+    }
+
+    public function testGetTableStructureReturnsCompletePortableMetadata(): void
+    {
+        $model = new ImportModel();
+        $db = $this->createMock(BaseConnection::class);
+        $id = (object) ['name' => 'id', 'type' => 'int', 'max_length' => 11, 'primary_key' => 1, 'nullable' => false, 'default' => null];
+        $email = (object) ['name' => 'email', 'type' => 'varchar', 'max_length' => 255, 'primary_key' => 0, 'nullable' => false, 'default' => null];
+        $notes = (object) ['name' => 'notes', 'type' => 'text', 'max_length' => null, 'primary_key' => 0, 'nullable' => true, 'default' => null];
+        $emailIndex = (object) ['name' => 'email_idx', 'fields' => ['email']];
+
+        $db->method('tableExists')->with('real_table')->willReturn(true);
+        $db->method('getFieldData')->with('real_table')->willReturn([$id, $email, $notes]);
+        $db->method('getIndexData')->with('real_table')->willReturn([$emailIndex]);
+        $db->method('getPlatform')->willReturn('SQLite3');
+        $this->injectDatabase($model, $db);
+
+        $this->assertSame([
+            ['name' => 'id', 'type' => 'int', 'max_length' => 11, 'primary_key' => 1, 'is_index' => false, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'generated' => false],
+            ['name' => 'email', 'type' => 'varchar', 'max_length' => 255, 'primary_key' => 0, 'is_index' => true, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'generated' => false],
+            ['name' => 'notes', 'type' => 'text', 'max_length' => null, 'primary_key' => 0, 'is_index' => false, 'nullable' => true, 'default' => null, 'auto_increment' => false, 'generated' => false],
+        ], $model->getTableStructure('real_table'));
+    }
+
+    public function testGetImportTableStructureRejectsUnknownMode(): void
+    {
+        $model = new ImportModel();
+
+        $this->assertSame([], $model->getImportTableStructure('admins', 'unknown'));
+    }
+
+    public function testGetImportTableStructureDatabaseModeReturnsWritablePhysicalSchema(): void
+    {
+        $model = $this->getMockBuilder(ImportModel::class)->onlyMethods(['getTableStructure'])->getMock();
+        $structure = $this->structureWithGeneratedColumn();
+        $model->method('getTableStructure')->with('any_table')->willReturn($structure);
+
+        $result = $model->getImportTableStructure('any_table', ImportModel::IMPORT_MODE_DATABASE);
+
+        $this->assertSame(['id', 'email'], array_column($result, 'name'));
+    }
+
+    public function testGetImportTableStructureRejectsCompositePrimaryKey(): void
+    {
+        $model = $this->getMockBuilder(ImportModel::class)->onlyMethods(['getTableStructure'])->getMock();
+        $structure = [
+            $this->field('id', 'int', 11, 1),
+            $this->field('tenant_id', 'int', 11, 1),
+            $this->field('email', 'varchar', 255, 0),
+        ];
+        $model->method('getTableStructure')->willReturn($structure);
+
+        $this->assertSame([], $model->getImportTableStructure('any_table', ImportModel::IMPORT_MODE_DATABASE));
+    }
+
+    public function testGetImportTableStructureCrudFailsClosedWithoutDomainProvider(): void
+    {
+        $model = $this->getMockBuilder(ImportModel::class)->onlyMethods(['getTableStructure'])->getMock();
+        $model->method('getTableStructure')->willReturn([$this->field('id', 'int', 11, 1), $this->field('email', 'varchar', 255, 0)]);
+
+        $this->assertSame([], $model->getImportTableStructure('ghost_entity_that_does_not_exist', ImportModel::IMPORT_MODE_CRUD));
+    }
+
+    public function testParseAndValidateCsvRejectsUnknownMode(): void
+    {
+        $model = new ImportModel();
+        $file = $this->uploadedFileFor("id,email\n1,test@example.com\n");
+
+        $result = $model->parseAndValidateCsv($file, 'admins', 'unknown');
+
+        $this->assertFalse($result['status']);
+        $this->assertSame(lang('backend/components/import.messages.invalidEntity'), $result['message']);
+    }
+
+    public function testParseAndValidateCsvReturnsNoStructureError(): void
+    {
+        $model = $this->getMockBuilder(ImportModel::class)->onlyMethods(['getImportTableStructure'])->getMock();
+        $model->method('getImportTableStructure')->willReturn([]);
+        $file = $this->uploadedFileFor("id,email\n1,test@example.com\n");
+
+        $result = $model->parseAndValidateCsv($file, 'admins', ImportModel::IMPORT_MODE_DATABASE);
+
+        $this->assertFalse($result['status']);
+        $this->assertSame(lang('backend/components/import.messages.noStructure'), $result['message']);
+    }
+
+    public function testParseAndValidateCsvReturnsFileReadErrorForUnreadableFile(): void
+    {
+        $model = $this->parseModel([$this->field('id', 'int', 11, 1), $this->field('email', 'varchar', 255, 0)]);
+        $file = $this->uploadedFileMock('Z:/path/that/does/not/exist.csv');
+
+        set_error_handler(static fn(): bool => true);
+        try {
+            $result = $model->parseAndValidateCsv($file, 'users', ImportModel::IMPORT_MODE_DATABASE);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertFalse($result['status']);
+        $this->assertSame(lang('backend/components/import.messages.fileReadError'), $result['message']);
+    }
+
+    public function testParseAndValidateCsvRejectsInsufficientColumns(): void
+    {
+        $model = $this->parseModel([$this->field('id', 'int', 11, 1), $this->field('email', 'varchar', 255, 0)]);
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id\n1\n"), 'users', ImportModel::IMPORT_MODE_DATABASE);
+
+        $this->assertFalse($result['status']);
+        $this->assertSame(lang('backend/components/import.messages.insufficientColumns'), $result['message']);
+    }
+
+    public function testParseAndValidateCsvRejectsDuplicateHeaders(): void
+    {
+        $model = $this->parseModel([$this->field('id', 'int', 11, 1), $this->field('email', 'varchar', 255, 0)]);
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email,email\n1,a@b.test,a@b.test\n"), 'users', ImportModel::IMPORT_MODE_DATABASE);
+
+        $this->assertFalse($result['status']);
+        $this->assertStringContainsString('email', $result['message']);
+    }
+
+    public function testParseAndValidateCsvRejectsMissingPrimaryKeyHeader(): void
+    {
+        $model = $this->parseModel([$this->field('id', 'int', 11, 1), $this->field('email', 'varchar', 255, 0)]);
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor("email,name\na@b.test,Mario\n"), 'users', ImportModel::IMPORT_MODE_DATABASE);
+
+        $this->assertFalse($result['status']);
+        $this->assertSame(sprintf(lang('backend/components/import.messages.missingPrimaryKey'), 'id'), $result['message']);
+    }
+
+    public function testParseAndValidateCsvRejectsUnknownColumns(): void
+    {
+        $model = $this->parseModel([$this->field('id', 'int', 11, 1), $this->field('email', 'varchar', 255, 0)]);
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email,fake\n1,a@b.test,x\n"), 'users', ImportModel::IMPORT_MODE_DATABASE);
+
+        $this->assertFalse($result['status']);
+        $this->assertStringContainsString('fake', $result['message']);
+    }
+
+    public function testParseAndValidateCsvRejectsDuplicatePrimaryKeys(): void
+    {
+        $structure = [$this->field('id', 'int', 11, 1), $this->field('email', 'varchar', 255, 0)];
+        $model = $this->parseModel($structure, true);
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email\n1,a@b.test\n1,c@d.test\n"), 'users', ImportModel::IMPORT_MODE_DATABASE);
+
+        $this->assertFalse($result['status']);
+        $this->assertStringContainsString('1', $result['message']);
+    }
+
+    public function testParseAndValidateCsvReturnsEmptyFileWhenThereAreNoDataRows(): void
+    {
+        $structure = [$this->field('id', 'int', 11, 1), $this->field('email', 'varchar', 255, 0)];
+        $model = $this->parseModel($structure, false);
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email\n\n"), 'users', ImportModel::IMPORT_MODE_DATABASE);
+
+        $this->assertFalse($result['status']);
+        $this->assertSame(lang('backend/components/import.messages.emptyFile'), $result['message']);
+    }
+
+    public function testParseAndValidateCsvReturnsValidationErrors(): void
+    {
+        $structure = [$this->field('id', 'int', 11, 1, false, null, true), $this->field('email', 'varchar', 255, 0, false)];
+        $model = $this->parseModel($structure, false, ['email' => 'required|valid_email']);
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email\n1,not-an-email\n"), 'users', ImportModel::IMPORT_MODE_DATABASE);
+
+        $this->assertFalse($result['status']);
+        $this->assertArrayHasKey('validationErrors', $result);
+        $this->assertNotEmpty($result['validationErrors']);
+    }
+
+    public function testParseAndValidateCsvCreatesStagingManifestForProcessableRows(): void
+    {
+        $structure = [$this->field('id', 'int', 11, 1, false, null, true), $this->field('email', 'varchar', 255, 0, false)];
+        $model = $this->parseModel($structure, false, []);
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email\n,first@example.com\n2,second@example.com\n"), 'users', ImportModel::IMPORT_MODE_DATABASE);
+
+        $this->assertTrue($result['status']);
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', (string) $result['importId']);
+        $this->assertSame(['insert' => 2, 'update' => 0, 'skip' => 0], $result['plan']);
+        $this->assertCount(2, $result['rows']);
+
+        $importId = (string) $result['importId'];
+        $this->stagingImportIds[] = $importId;
+        $directory = WRITEPATH . 'uploads/staging/' . $importId . DIRECTORY_SEPARATOR;
+        $this->assertFileExists($directory . 'data.csv');
+        $this->assertFileExists($directory . 'manifest.json');
+
+        $manifest = json_decode((string) file_get_contents($directory . 'manifest.json'), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame('users', $manifest['entity']);
+        $this->assertSame(ImportModel::IMPORT_MODE_DATABASE, $manifest['mode']);
+        $this->assertSame('staged', $manifest['status']);
+        $this->assertSame($result['plan'], $manifest['plan']);
+        $this->assertSame(hash('sha256', self::SESSION_TOKEN), $manifest['owner']);
+        $this->assertSame(['id', 'email', '__import_action', '__import_snapshot'], $manifest['headers']);
+    }
+
+    public function testParseAndValidateCsvReturnsNullImportIdWhenEveryRowIsSkipped(): void
+    {
+        $structure = [$this->field('id', 'int', 11, 1), $this->field('email', 'varchar', 255, 0)];
+        $builder = $this->createMock(BaseBuilder::class);
+        $resultSet = $this->createMock(BaseResult::class);
+        $resultSet->method('getResultArray')->willReturn([['id' => '1', 'email' => 'same@example.com']]);
+        $builder->method('whereIn')->willReturnSelf();
+        $builder->method('select')->willReturnSelf();
+        $builder->method('get')->willReturn($resultSet);
+        $model = $this->parseModel($structure, true, [], $builder);
+
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email\n1,same@example.com\n"), 'users', ImportModel::IMPORT_MODE_DATABASE);
+
+        $this->assertTrue($result['status']);
+        $this->assertNull($result['importId']);
+        $this->assertSame(['insert' => 0, 'update' => 0, 'skip' => 1], $result['plan']);
+    }
+
+    public function testParseAndValidateCsvTruncatesValidationErrorsAtConfiguredLimit(): void
+    {
+        $structure = [$this->field('id', 'int', 11, 1), $this->field('email', 'varchar', 255, 0)];
+        $model = $this->parseModel($structure, false, ['email' => 'valid_email']);
+        $csv = "id,email\n";
+        for ($i = 1; $i <= 501; $i++):
+            $csv .= $i . ",invalid-email-" . $i . "\n";
+        endfor;
+
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor($csv), 'users', ImportModel::IMPORT_MODE_DATABASE);
+
+        $this->assertFalse($result['status']);
+        $this->assertArrayHasKey('validationErrors', $result);
+        $this->assertCount(501, $result['validationErrors']);
+        $this->assertSame(
+            lang('backend/components/import.messages.additionalErrorsNotShown', [1]),
+            $result['validationErrors'][500]
+        );
+    }
+
+    public function testDeleteStagingImportRejectsInvalidImportId(): void
+    {
+        $model = new ImportModel();
+
+        $this->assertFalse($model->deleteStagingImport('../invalid'));
+    }
+
+    public function testDeleteStagingImportRemovesUntouchedStaging(): void
+    {
+        $structure = [$this->field('id', 'int', 11, 1, false, null, true), $this->field('email', 'varchar', 255, 0, false)];
+        $model = $this->parseModel($structure, true, []);
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email\n,first@example.com\n"), 'users', ImportModel::IMPORT_MODE_DATABASE);
+        $importId = (string) $result['importId'];
+        $this->stagingImportIds[] = $importId;
+
+        $this->assertTrue($model->deleteStagingImport($importId));
+        $this->assertDirectoryDoesNotExist(WRITEPATH . 'uploads/staging/' . $importId);
+    }
+
+    public function testBackupImportRejectsInvalidImportId(): void
+    {
+        $model = new ImportModel();
+
+        $this->assertFalse($model->backupImport('invalid'));
+    }
+
+    public function testBackupImportIsIdempotentWhenReadyBackupIsAlreadyValid(): void
+    {
+        $model = new ImportModel();
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $this->injectDatabase($model, $db);
+        $importId = $this->createStagingFixture('ready', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
+        $backup = $this->attachValidBackup($importId);
+        $backupPath = WRITEPATH . 'backups/imports/' . $importId . '/backup.sql';
+
+        $this->assertTrue($model->backupImport($importId));
+        $this->assertSame($backup['fileHash'], hash_file('sha256', $backupPath));
+        $this->assertSame($backup, $this->readManifest($importId)['backup']);
+    }
+
+    public function testBackupImportRejectsTamperedStagingBeforeBackupCreation(): void
+    {
+        $model = new ImportModel();
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $this->injectDatabase($model, $db);
+        $importId = $this->createStagingFixture('staged', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
+        $path = WRITEPATH . 'uploads/staging/' . $importId . '/data.csv';
+        $contents = (string) file_get_contents($path);
+        $tampered = str_replace('email', 'xmail', $contents);
+        $this->assertSame(strlen($contents), strlen($tampered));
+        file_put_contents($path, $tampered);
+
+        $this->assertFalse($model->backupImport($importId));
+        $this->assertDirectoryDoesNotExist(WRITEPATH . 'backups/imports/' . $importId);
+    }
+
+    public function testExecuteImportRejectsInvalidImportId(): void
+    {
+        $model = new ImportModel();
+        $result = $model->executeImport('invalid');
+
+        $this->assertFalse($result['status']);
+        $this->assertSame(lang('backend/components/import.messages.importationUndone'), $result['message']);
+    }
+
+    public function testExecuteImportIsIdempotentWhenManifestIsAlreadyCompleted(): void
+    {
+        $model = new ImportModel();
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $this->injectDatabase($model, $db);
+        $importId = $this->createStagingFixture('completed', ['insert' => 2, 'update' => 1, 'skip' => 0], ['processed' => 3, 'inserted' => 2, 'updated' => 1]);
+
+        $result = $model->executeImport($importId);
+
+        $this->assertTrue($result['status']);
+        $this->assertTrue($result['isFinished']);
+        $this->assertSame(0, $result['inserted']);
+        $this->assertSame(0, $result['updated']);
+        $this->assertSame(2, $result['totalInserted']);
+        $this->assertSame(1, $result['totalUpdated']);
+        $this->assertSame(3, $result['processed']);
+    }
+
+    public function testExecuteImportRequiresBackupBeforeFirstWrite(): void
+    {
+        $model = new ImportModel();
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $this->injectDatabase($model, $db);
+        $importId = $this->createStagingFixture('staged', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
+
+        $result = $model->executeImport($importId);
+
+        $this->assertFalse($result['status']);
+        $this->assertSame(lang('backend/components/import.messages.backupError'), $result['message']);
+    }
+
+    public function testExecuteImportFailsClosedWhenRecoveryFlagExists(): void
+    {
+        $model = new ImportModel();
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $this->injectDatabase($model, $db);
+        $importId = $this->createStagingFixture('ready', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
+        file_put_contents(WRITEPATH . 'uploads/staging/' . $importId . '/recovery.required', '{}');
+
+        $result = $model->executeImport($importId);
+
+        $this->assertFalse($result['status']);
+        $this->assertTrue($result['recoveryRequired']);
+        $this->assertSame(lang('backend/components/import.messages.importTransactionError'), $result['message']);
+    }
+
+    public function testResolveStagingContextRejectsDifferentSessionOwner(): void
+    {
+        $model = new ImportModel();
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $this->injectDatabase($model, $db);
+        $importId = $this->createStagingFixture('staged', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
+
+        session()->set('backendSession', 'different-session');
+        try {
+            $context = $this->invokeMethod($model, 'resolveStagingContext', [$importId, true]);
+        } finally {
+            session()->set('backendSession', self::SESSION_TOKEN);
+        }
+
+        $this->assertNull($context);
+    }
+
+    public function testResolveStagingContextRejectsExpiredManifestUnlessExplicitlyAllowed(): void
+    {
+        $model = new ImportModel();
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $this->injectDatabase($model, $db);
+        $importId = $this->createStagingFixture('staged', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
+        $manifest = $this->readManifest($importId);
+        $manifest['expiresAt'] = time() - 1;
+        $this->writeManifest($importId, $manifest);
+
+        $this->assertNull($this->invokeMethod($model, 'resolveStagingContext', [$importId, false, false]));
+        $this->assertIsArray($this->invokeMethod($model, 'resolveStagingContext', [$importId, false, true]));
+    }
+
+    public function testResolveStagingContextDetectsSameSizeStagingTamperingWhenChecksumIsRequired(): void
+    {
+        $model = new ImportModel();
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $this->injectDatabase($model, $db);
+        $importId = $this->createStagingFixture('staged', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
+        $path = WRITEPATH . 'uploads/staging/' . $importId . '/data.csv';
+        $contents = (string) file_get_contents($path);
+        $tampered = str_replace('email', 'xmail', $contents);
+        $this->assertSame(strlen($contents), strlen($tampered));
+        file_put_contents($path, $tampered);
+
+        $this->assertIsArray($this->invokeMethod($model, 'resolveStagingContext', [$importId, false]));
+        $this->assertNull($this->invokeMethod($model, 'resolveStagingContext', [$importId, true]));
+    }
+
+    public function testResolveStagingContextRejectsInconsistentProgressAccounting(): void
+    {
+        $model = new ImportModel();
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $this->injectDatabase($model, $db);
+        $importId = $this->createStagingFixture('processing', ['insert' => 2, 'update' => 0, 'skip' => 0], ['processed' => 1, 'inserted' => 1, 'updated' => 0]);
+        $manifest = $this->readManifest($importId);
+        $manifest['progress']['processed'] = 2;
+        $this->writeManifest($importId, $manifest);
+
+        $this->assertNull($this->invokeMethod($model, 'resolveStagingContext', [$importId, false]));
+    }
+
+    public function testCleanupExpiredStagingImportsRemovesExpiredSafeStaging(): void
+    {
+        $model = new ImportModel();
+        $importId = $this->createStagingFixture('staged', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
+        $manifest = $this->readManifest($importId);
+        $manifest['expiresAt'] = time() - 10;
+        $this->writeManifest($importId, $manifest);
+
+        $this->invokeMethod($model, 'cleanupExpiredStagingImports');
+
+        $this->assertDirectoryDoesNotExist(WRITEPATH . 'uploads/staging/' . $importId);
+    }
+
+    public function testCleanupExpiredStagingImportsPreservesFailedRecoveryState(): void
+    {
+        $model = new ImportModel();
+        $importId = $this->createStagingFixture('failed', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 1, 'inserted' => 1, 'updated' => 0]);
+        $manifest = $this->readManifest($importId);
+        $manifest['expiresAt'] = time() - 10;
+        $manifest['failure'] = ['at' => time() - 20, 'reason' => 'phpunit recovery', 'recoveryRequired' => true];
+        $this->writeManifest($importId, $manifest);
+
+        $this->invokeMethod($model, 'cleanupExpiredStagingImports');
+
+        $this->assertDirectoryExists(WRITEPATH . 'uploads/staging/' . $importId);
+    }
+
+    public function testCleanupExpiredImportBackupsRemovesOnlyOldOrphans(): void
+    {
+        $model = new ImportModel();
+        $orphanId = bin2hex(random_bytes(32));
+        $this->stagingImportIds[] = $orphanId;
+        $backupDirectory = WRITEPATH . 'backups/imports/' . $orphanId;
+        mkdir($backupDirectory, 0750, true);
+        $backupPath = $backupDirectory . '/backup.sql';
+        file_put_contents($backupPath, '-- orphan backup');
+        touch($backupPath, time() - 2592001);
+
+        $activeId = $this->createStagingFixture('staged', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
+        $activeBackupDirectory = WRITEPATH . 'backups/imports/' . $activeId;
+        mkdir($activeBackupDirectory, 0750, true);
+        $activeBackupPath = $activeBackupDirectory . '/backup.sql';
+        file_put_contents($activeBackupPath, '-- active backup');
+        touch($activeBackupPath, time() - 2592001);
+
+        $this->invokeMethod($model, 'cleanupExpiredImportBackups');
+
+        $this->assertDirectoryDoesNotExist($backupDirectory);
+        $this->assertFileExists($activeBackupPath);
+    }
+
+    public function testDeleteStagingImportRefusesProcessingImport(): void
+    {
+        $model = new ImportModel();
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $this->injectDatabase($model, $db);
+        $importId = $this->createStagingFixture('processing', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
+
+        $this->assertFalse($model->deleteStagingImport($importId));
+        $this->assertDirectoryExists(WRITEPATH . 'uploads/staging/' . $importId);
+    }
+
+    public function testDeleteStagingImportRefusesPartialFailedImport(): void
+    {
+        $model = new ImportModel();
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $this->injectDatabase($model, $db);
+        $importId = $this->createStagingFixture('failed', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 1, 'inserted' => 1, 'updated' => 0]);
+
+        $this->assertFalse($model->deleteStagingImport($importId));
+        $this->assertDirectoryExists(WRITEPATH . 'uploads/staging/' . $importId);
+    }
+
+    public function testIsImportBackupValidDetectsSameSizeChecksumTampering(): void
+    {
+        $model = new ImportModel();
+        $importId = $this->createStagingFixture('ready', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
+        $backup = $this->attachValidBackup($importId, '-- backup A');
+        $manifest = $this->readManifest($importId);
+        $backupPath = WRITEPATH . 'backups/imports/' . $importId . '/backup.sql';
+        file_put_contents($backupPath, '-- backup B');
+        $this->assertSame($backup['fileSize'], filesize($backupPath));
+
+        $this->assertTrue($this->invokeMethod($model, 'isImportBackupValid', [$importId, $manifest, false]));
+        $this->assertFalse($this->invokeMethod($model, 'isImportBackupValid', [$importId, $manifest, true]));
+    }
+
+    public function testExecuteImportRejectsTamperedStagingBeforeOpeningTransaction(): void
+    {
+        $model = new ImportModel();
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->expects($this->never())->method('transBegin');
+        $this->injectDatabase($model, $db);
+        $data = "id,email,__import_action,__import_snapshot\n,first@example.com,insert,\n";
+        $importId = $this->createStagingFixture('ready', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0], $data);
+        $this->attachValidBackup($importId);
+        $path = WRITEPATH . 'uploads/staging/' . $importId . '/data.csv';
+        $contents = (string) file_get_contents($path);
+        $tampered = str_replace('first@example.com', 'xirst@example.com', $contents);
+        $this->assertSame(strlen($contents), strlen($tampered));
+        file_put_contents($path, $tampered);
+
+        $result = $model->executeImport($importId);
+
+        $this->assertFalse($result['status']);
+        $this->assertSame(lang('backend/components/import.messages.fileNotFoundError'), $result['message']);
+    }
+
+    public function testExecuteImportRejectsAmbiguousPendingChunkAndCreatesRecoveryFlag(): void
+    {
+        $model = new ImportModel();
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $this->injectDatabase($model, $db);
+        $importId = $this->createStagingFixture('ready', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
+        $manifest = $this->readManifest($importId);
+        file_put_contents(WRITEPATH . 'uploads/staging/' . $importId . '/chunk.pending', json_encode([
+            'startedAt' => time(),
+            'cursor' => $manifest['progress']['cursor'],
+            'processed' => 0,
+            'inserted' => 0,
+            'updated' => 0,
+        ], JSON_THROW_ON_ERROR));
+
+        $result = $model->executeImport($importId);
+
+        $this->assertFalse($result['status']);
+        $this->assertTrue($result['recoveryRequired']);
+        $this->assertFileExists(WRITEPATH . 'uploads/staging/' . $importId . '/recovery.required');
+    }
+
+    public function testExecuteImportRemovesStalePendingChunkWhenManifestIsAhead(): void
+    {
+        $model = new ImportModel();
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $this->injectDatabase($model, $db);
+        $importId = $this->createStagingFixture('completed', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 1, 'inserted' => 1, 'updated' => 0]);
+        $manifest = $this->readManifest($importId);
+        $journalPath = WRITEPATH . 'uploads/staging/' . $importId . '/chunk.pending';
+        file_put_contents($journalPath, json_encode([
+            'startedAt' => time() - 1,
+            'cursor' => $manifest['progress']['cursor'],
+            'processed' => 0,
+            'inserted' => 0,
+            'updated' => 0,
+        ], JSON_THROW_ON_ERROR));
+
+        $result = $model->executeImport($importId);
+
+        $this->assertTrue($result['status']);
+        $this->assertTrue($result['isFinished']);
+        $this->assertFileDoesNotExist($journalPath);
+        $this->assertFileDoesNotExist(WRITEPATH . 'uploads/staging/' . $importId . '/recovery.required');
+    }
+
+    public function testExecuteImportMarksCorruptedReadyBackupAsFailedWithoutRecovery(): void
+    {
+        $model = new ImportModel();
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $this->injectDatabase($model, $db);
+        $importId = $this->createStagingFixture('ready', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
+        $backup = $this->attachValidBackup($importId, '-- backup A');
+        $backupPath = WRITEPATH . 'backups/imports/' . $importId . '/backup.sql';
+        file_put_contents($backupPath, '-- backup B');
+        $this->assertSame($backup['fileSize'], filesize($backupPath));
+
+        $result = $model->executeImport($importId);
+        $manifest = $this->readManifest($importId);
+
+        $this->assertFalse($result['status']);
+        $this->assertFalse($result['recoveryRequired']);
+        $this->assertSame(lang('backend/components/import.messages.backupError'), $result['message']);
+        $this->assertSame('failed', $manifest['status']);
+        $this->assertFalse($manifest['failure']['recoveryRequired']);
+    }
+
+    public function testExecuteImportMarksMissingBackupAfterCommittedProgressAsRecoveryRequired(): void
+    {
+        $model = new ImportModel();
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $this->injectDatabase($model, $db);
+        $importId = $this->createStagingFixture('processing', ['insert' => 2, 'update' => 0, 'skip' => 0], ['processed' => 1, 'inserted' => 1, 'updated' => 0]);
+
+        $result = $model->executeImport($importId);
+        $manifest = $this->readManifest($importId);
+
+        $this->assertFalse($result['status']);
+        $this->assertTrue($result['recoveryRequired']);
+        $this->assertSame('failed', $manifest['status']);
+        $this->assertTrue($manifest['failure']['recoveryRequired']);
+    }
+
+    public function testExecuteImportFailsClosedWhenTransactionCannotStart(): void
+    {
+        $structure = [$this->field('id', 'int', 11, 1, false, null, true), $this->field('email', 'varchar', 255, 0, false)];
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->expects($this->once())->method('transBegin')->willReturn(false);
+        $db->expects($this->never())->method('transCommit');
+        $db->expects($this->never())->method('transRollback');
+        $model = $this->executionModel($db, $structure);
+        $data = "id,email,__import_action,__import_snapshot\n,first@example.com,insert,\n";
+        $importId = $this->createStagingFixture('ready', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0], $data);
+        $this->attachValidBackup($importId);
+
+        $result = $model->executeImport($importId);
+        $manifest = $this->readManifest($importId);
+
+        $this->assertFalse($result['status']);
+        $this->assertSame(lang('backend/components/import.messages.importTransactionError'), $result['message']);
+        $this->assertSame('failed', $manifest['status']);
+    }
+
+    public function testExecuteImportDetectsConcurrentUpdateConflictAndRollsBack(): void
+    {
+        $structure = [$this->field('id', 'int', 11, 1, false), $this->field('email', 'varchar', 255, 0, false)];
+        $snapshotModel = new ImportModel();
+        $expectedSnapshot = $this->invokeMethod($snapshotModel, 'buildRowSnapshot', [['id' => '1', 'email' => 'before@example.com'], ['id', 'email'], ImportModel::IMPORT_MODE_DATABASE]);
+        $resultSet = $this->createMock(BaseResult::class);
+        $resultSet->method('getRowArray')->willReturn(['id' => '1', 'email' => 'changed-concurrently@example.com']);
+        $builder = $this->createMock(BaseBuilder::class);
+        $builder->method('where')->willReturnSelf();
+        $builder->method('select')->willReturnSelf();
+        $builder->method('get')->willReturn($resultSet);
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('table')->with('users')->willReturn($builder);
+        $db->method('transBegin')->willReturn(true);
+        $db->expects($this->once())->method('transRollback');
+        $db->expects($this->never())->method('transCommit');
+        $model = $this->executionModel($db, $structure);
+        $data = "id,email,__import_action,__import_snapshot\n1,after@example.com,update,{$expectedSnapshot}\n";
+        $importId = $this->createStagingFixture('ready', ['insert' => 0, 'update' => 1, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0], $data);
+        $this->attachValidBackup($importId);
+
+        $result = $model->executeImport($importId);
+        $manifest = $this->readManifest($importId);
+
+        $this->assertFalse($result['status']);
+        $this->assertFalse($result['recoveryRequired']);
+        $this->assertSame(lang('backend/components/import.messages.importationUndone'), $result['message']);
+        $this->assertSame('failed', $manifest['status']);
+    }
+
+    public function testExecuteImportDetectsPrimaryKeyCollisionBeforeInsertAndRollsBack(): void
+    {
+        $structure = [$this->field('id', 'int', 11, 1, false), $this->field('email', 'varchar', 255, 0, false)];
+        $builder = $this->createMock(BaseBuilder::class);
+        $builder->method('where')->willReturnSelf();
+        $builder->method('countAllResults')->willReturn(1);
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('table')->with('users')->willReturn($builder);
+        $db->method('transBegin')->willReturn(true);
+        $db->expects($this->once())->method('transRollback');
+        $db->expects($this->never())->method('transCommit');
+        $model = $this->executionModel($db, $structure);
+        $data = "id,email,__import_action,__import_snapshot\n1,new@example.com,insert,\n";
+        $importId = $this->createStagingFixture('ready', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0], $data);
+        $this->attachValidBackup($importId);
+
+        $result = $model->executeImport($importId);
+
+        $this->assertFalse($result['status']);
+        $this->assertFalse($result['recoveryRequired']);
+        $this->assertSame(lang('backend/components/import.messages.importationUndone'), $result['message']);
+    }
+
+    public function testExecuteImportRollsBackWhenTransactionStatusFails(): void
+    {
+        $structure = [$this->field('id', 'int', 11, 1, false, null, true), $this->field('email', 'varchar', 255, 0, false)];
+        $builder = $this->createMock(BaseBuilder::class);
+        $builder->method('insert')->willReturn(true);
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('table')->with('users')->willReturn($builder);
+        $db->method('transBegin')->willReturn(true);
+        $db->method('transStatus')->willReturn(false);
+        $db->expects($this->once())->method('transRollback');
+        $db->expects($this->never())->method('transCommit');
+        $model = $this->executionModel($db, $structure);
+        $data = "id,email,__import_action,__import_snapshot\n,first@example.com,insert,\n";
+        $importId = $this->createStagingFixture('ready', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0], $data);
+        $this->attachValidBackup($importId);
+
+        $result = $model->executeImport($importId);
+
+        $this->assertFalse($result['status']);
+        $this->assertFalse($result['recoveryRequired']);
+        $this->assertSame(lang('backend/components/import.messages.importTransactionError'), $result['message']);
+    }
+
+    public function testExecuteImportTreatsCommitFailureAsAmbiguousRecoveryState(): void
+    {
+        $structure = [$this->field('id', 'int', 11, 1, false, null, true), $this->field('email', 'varchar', 255, 0, false)];
+        $builder = $this->createMock(BaseBuilder::class);
+        $builder->method('insert')->willReturn(true);
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('table')->with('users')->willReturn($builder);
+        $db->method('transBegin')->willReturn(true);
+        $db->method('transStatus')->willReturn(true);
+        $db->expects($this->once())->method('transCommit')->willReturn(false);
+        $db->expects($this->never())->method('transRollback');
+        $model = $this->executionModel($db, $structure);
+        $data = "id,email,__import_action,__import_snapshot\n,first@example.com,insert,\n";
+        $importId = $this->createStagingFixture('ready', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0], $data);
+        $this->attachValidBackup($importId);
+
+        $result = $model->executeImport($importId);
+
+        $this->assertFalse($result['status']);
+        $this->assertTrue($result['recoveryRequired']);
+        $this->assertFileExists(WRITEPATH . 'uploads/staging/' . $importId . '/chunk.pending');
+        $this->assertFileExists(WRITEPATH . 'uploads/staging/' . $importId . '/recovery.required');
+    }
+
+    public function testExecuteImportCommitsExactlyOneChunkAndPersistsServerSideProgress(): void
+    {
+        $structure = [$this->field('id', 'int', 11, 1, false, null, true), $this->field('email', 'varchar', 255, 0, false)];
+        $builder = $this->createMock(BaseBuilder::class);
+        $builder->expects($this->exactly(5))->method('insert')->willReturn(true);
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('table')->with('users')->willReturn($builder);
+        $db->method('transBegin')->willReturn(true);
+        $db->method('transStatus')->willReturn(true);
+        $db->expects($this->once())->method('transCommit')->willReturn(true);
+        $model = $this->executionModel($db, $structure);
+        $data = "id,email,__import_action,__import_snapshot\n";
+        for ($i = 1; $i <= 6; $i++):
+            $data .= ",user{$i}@example.com,insert,\n";
+        endfor;
+        $importId = $this->createStagingFixture('ready', ['insert' => 6, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0], $data);
+        $this->attachValidBackup($importId);
+
+        $result = $model->executeImport($importId);
+        $manifest = $this->readManifest($importId);
+
+        $this->assertTrue($result['status']);
+        $this->assertFalse($result['isFinished']);
+        $this->assertSame(5, $result['inserted']);
+        $this->assertSame(5, $result['totalInserted']);
+        $this->assertSame(5, $result['processed']);
+        $this->assertSame('processing', $manifest['status']);
+        $this->assertSame(5, $manifest['progress']['processed']);
+        $this->assertSame(5, $manifest['progress']['inserted']);
+        $this->assertFileDoesNotExist(WRITEPATH . 'uploads/staging/' . $importId . '/chunk.pending');
+    }
+
+    public function testBuildDynamicRulesMapsInsertSchemaCorrectly(): void
+    {
+        $model = new ImportModel();
+        $structure = [
+            $this->field('id', 'int', 11, 1, false, null, true),
+            $this->field('email', 'varchar', 100, 0, false),
+            $this->field('note', 'text', null, 0, true),
+            $this->field('created_at', 'datetime', null, 0, false),
+        ];
+
+        $rules = $this->invokeMethod($model, 'buildDynamicRules', [$structure, 'insert', ImportModel::IMPORT_MODE_CRUD]);
+
+        $this->assertSame('permit_empty|integer', $rules['id']);
+        $this->assertSame('required|string|max_length[100]', $rules['email']);
+        $this->assertSame('permit_empty|string', $rules['note']);
+        $this->assertSame('permit_empty|valid_date[Y-m-d H:i:s]', $rules['created_at']);
+    }
+
+    public function testBuildDynamicRulesRequiresPrimaryKeyOnUpdate(): void
+    {
+        $model = new ImportModel();
+        $structure = [$this->field('uuid', 'varchar', 36, 1, false), $this->field('email', 'varchar', 255, 0, false)];
+
+        $rules = $this->invokeMethod($model, 'buildDynamicRules', [$structure, 'update', ImportModel::IMPORT_MODE_DATABASE]);
+
+        $this->assertSame('required|string|max_length[36]', $rules['uuid']);
+        $this->assertSame('required|string|max_length[255]', $rules['email']);
+    }
+
+    public function testBuildRowSnapshotIgnoresCrudLifecycleTimestamps(): void
+    {
+        $model = new ImportModel();
+        $rowA = ['id' => '1', 'email' => 'a@b.test', 'created_at' => '2026-01-01 00:00:00', 'updated_at' => '2026-01-01 00:00:00'];
+        $rowB = ['id' => '1', 'email' => 'a@b.test', 'created_at' => '2026-02-01 00:00:00', 'updated_at' => '2026-02-01 00:00:00'];
+        $headers = ['id', 'email', 'created_at', 'updated_at'];
+
+        $crudA = $this->invokeMethod($model, 'buildRowSnapshot', [$rowA, $headers, ImportModel::IMPORT_MODE_CRUD]);
+        $crudB = $this->invokeMethod($model, 'buildRowSnapshot', [$rowB, $headers, ImportModel::IMPORT_MODE_CRUD]);
+        $databaseA = $this->invokeMethod($model, 'buildRowSnapshot', [$rowA, $headers, ImportModel::IMPORT_MODE_DATABASE]);
+        $databaseB = $this->invokeMethod($model, 'buildRowSnapshot', [$rowB, $headers, ImportModel::IMPORT_MODE_DATABASE]);
+
+        $this->assertSame($crudA, $crudB);
+        $this->assertNotSame($databaseA, $databaseB);
+    }
+
+    public function testValidateStagingDefinitionAcceptsAuthorizedTechnicalHeaders(): void
+    {
+        $model = new ImportModel();
+        $headers = ['id', 'email', '__import_action', '__import_snapshot'];
+        $manifest = ['headers' => $headers];
+        $structure = [$this->field('id', 'int', 11, 1), $this->field('email', 'varchar', 255, 0)];
+
+        $this->assertTrue($this->invokeMethod($model, 'validateStagingDefinition', [$headers, $manifest, $structure, 'id']));
+    }
+
+    public function testValidateStagingDefinitionRejectsUnexpectedColumns(): void
+    {
+        $model = new ImportModel();
+        $headers = ['id', 'email', 'forged', '__import_action', '__import_snapshot'];
+        $manifest = ['headers' => $headers];
+        $structure = [$this->field('id', 'int', 11, 1), $this->field('email', 'varchar', 255, 0)];
+
+        $this->assertFalse($this->invokeMethod($model, 'validateStagingDefinition', [$headers, $manifest, $structure, 'id']));
+    }
+
+    public function testIsCsvRowEmptyDoesNotTreatZeroAsEmpty(): void
+    {
+        $model = new ImportModel();
+
+        $this->assertTrue($this->invokeMethod($model, 'isCsvRowEmpty', [['', '   ', null]]));
+        $this->assertFalse($this->invokeMethod($model, 'isCsvRowEmpty', [['0', '']]));
+    }
+
+    private function parseModel(array $structure, bool $tableExists = false, array $dynamicRules = [], ?BaseBuilder $builder = null): ImportModel
+    {
+        $model = $this->getMockBuilder(ImportModel::class)->onlyMethods(['getImportTableStructure', 'buildDynamicRules'])->getMock();
+        $model->method('getImportTableStructure')->willReturn($structure);
+        $model->method('buildDynamicRules')->willReturn($dynamicRules);
+
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('tableExists')->willReturn($tableExists);
+        if ($builder !== null):
+            $db->method('table')->willReturn($builder);
+        endif;
+        $this->injectDatabase($model, $db);
+
+        return $model;
+    }
+
+    private function uploadedFileFor(string $contents): UploadedFile
+    {
+        $path = tempnam(sys_get_temp_dir(), 'import_model_');
+        if ($path === false):
+            $this->fail('Unable to create temporary CSV file.');
         endif;
 
-        $stagingDir
-            =
-            WRITEPATH
-            .
-            'uploads/staging/';
+        file_put_contents($path, $contents);
+        $this->temporaryFiles[] = $path;
 
-        /* Distruggiamo la cartella di staging per forzare il mkdir() */
-        if (
-            is_dir(
-                $stagingDir
-            )
-        ):
-            $files
-                =
-                glob(
-                    $stagingDir
-                    .
-                    '*'
-                );
+        return $this->uploadedFileMock($path);
+    }
 
-            if (
-                $files
-                !==
-                false
-            ):
-                foreach (
-                    $files
-                    as
-                    $file
-                ):
-                    if (
-                        is_file(
-                            $file
-                        )
-                    ):
-                        unlink(
-                            $file
-                        );
-                    endif;
-                endforeach;
+    private function uploadedFileMock(string $path): UploadedFile
+    {
+        $file = $this->getMockBuilder(UploadedFile::class)->disableOriginalConstructor()->onlyMethods(['getTempName'])->getMock();
+        $file->method('getTempName')->willReturn($path);
+
+        return $file;
+    }
+
+    private function injectDatabase(ImportModel $model, BaseConnection $db): void
+    {
+        $inject = function(BaseConnection $connection): void {
+            $this->db = $connection;
+        };
+        $bound = \Closure::bind($inject, $model, ImportModel::class);
+        $bound($db);
+    }
+
+    private function invokeMethod(object $object, string $method, array $arguments = []): mixed
+    {
+        $reflection = new \ReflectionMethod($object, $method);
+        $reflection->setAccessible(true);
+
+        return $reflection->invokeArgs($object, $arguments);
+    }
+
+    private function field(string $name, string $type, ?int $maxLength, int $primaryKey, bool $nullable = true, mixed $default = null, bool $autoIncrement = false, bool $generated = false): array
+    {
+        return ['name' => $name, 'type' => $type, 'max_length' => $maxLength, 'primary_key' => $primaryKey, 'is_index' => false, 'nullable' => $nullable, 'default' => $default, 'auto_increment' => $autoIncrement, 'generated' => $generated];
+    }
+
+    private function structureWithGeneratedColumn(): array
+    {
+        return [
+            $this->field('id', 'int', 11, 1, false, null, true),
+            $this->field('email', 'varchar', 255, 0, false),
+            $this->field('computed_value', 'varchar', 255, 0, true, null, false, true),
+        ];
+    }
+
+    private function createStagingFixture(string $status, array $plan, array $progress, ?string $data = null): string
+    {
+        $importId = bin2hex(random_bytes(32));
+        $this->stagingImportIds[] = $importId;
+        $directory = WRITEPATH . 'uploads/staging/' . $importId . DIRECTORY_SEPARATOR;
+        if ( ! is_dir($directory)):
+            mkdir($directory, 0750, true);
+        endif;
+
+        $data ??= "id,email,__import_action,__import_snapshot\n";
+        file_put_contents($directory . 'data.csv', $data);
+        $newlinePosition = strpos($data, "\n");
+        $dataOffset = $newlinePosition === false ? strlen($data) : $newlinePosition + 1;
+        $progress['cursor'] = $progress['cursor'] ?? $dataOffset;
+        $now = time();
+        $manifest = [
+            'version' => 1,
+            'importId' => $importId,
+            'entity' => 'users',
+            'mode' => ImportModel::IMPORT_MODE_DATABASE,
+            'status' => $status,
+            'createdAt' => $now,
+            'updatedAt' => $now,
+            'expiresAt' => $now + 3600,
+            'owner' => hash('sha256', self::SESSION_TOKEN),
+            'file' => 'data.csv',
+            'fileSize' => filesize($directory . 'data.csv'),
+            'fileHash' => hash_file('sha256', $directory . 'data.csv'),
+            'headers' => ['id', 'email', '__import_action', '__import_snapshot'],
+            'plan' => $plan,
+            'backup' => null,
+            'failure' => null,
+            'progress' => ['cursor' => (int) $progress['cursor'], 'processed' => (int) $progress['processed'], 'inserted' => (int) $progress['inserted'], 'updated' => (int) $progress['updated']],
+        ];
+        $this->writeManifest($importId, $manifest);
+
+        return $importId;
+    }
+
+    private function executionModel(BaseConnection $db, array $structure): ImportModel
+    {
+        $model = $this->getMockBuilder(ImportModel::class)->onlyMethods(['getTableStructure', 'getImportTableStructure', 'buildDynamicRules'])->getMock();
+        $model->method('getTableStructure')->willReturn($structure);
+        $model->method('getImportTableStructure')->willReturn($structure);
+        $model->method('buildDynamicRules')->willReturn([]);
+        $this->injectDatabase($model, $db);
+
+        return $model;
+    }
+
+    private function readManifest(string $importId): array
+    {
+        $path = WRITEPATH . 'uploads/staging/' . $importId . '/manifest.json';
+        return json_decode((string) file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
+    }
+
+    private function writeManifest(string $importId, array $manifest): void
+    {
+        $path = WRITEPATH . 'uploads/staging/' . $importId . '/manifest.json';
+        file_put_contents($path, json_encode($manifest, JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
+    }
+
+    private function attachValidBackup(string $importId, string $contents = '-- phpunit backup'): array
+    {
+        $directory = WRITEPATH . 'backups/imports/' . $importId . DIRECTORY_SEPARATOR;
+        if ( ! is_dir($directory)):
+            mkdir($directory, 0750, true);
+        endif;
+        $path = $directory . 'backup.sql';
+        file_put_contents($path, $contents);
+        $backup = [
+            'file' => 'backup.sql',
+            'fileSize' => filesize($path),
+            'fileHash' => hash_file('sha256', $path),
+            'createdAt' => time(),
+            'rowCount' => 0,
+        ];
+        $manifest = $this->readManifest($importId);
+        $manifest['backup'] = $backup;
+        $this->writeManifest($importId, $manifest);
+
+        return $backup;
+    }
+
+    private function removeDirectory(string $directory): void
+    {
+        if ( ! is_dir($directory)):
+            return;
+        endif;
+
+        $items = scandir($directory);
+        if ($items === false):
+            return;
+        endif;
+
+        foreach ($items as $item):
+            if ($item === '.' || $item === '..'):
+                continue;
             endif;
-
-            rmdir(
-                $stagingDir
-            );
-        endif;
-
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'getTableStructure',
-                    'buildDynamicRules'
-                ]
-            )
-            ->getMock();
-
-        $structure
-            =
-            [
-                [
-                    'name'
-                    =>
-                    'id',
-                    'primary_key'
-                    =>
-                    1
-                ],
-                [
-                    'name'
-                    =>
-                    'email',
-                    'primary_key'
-                    =>
-                    0
-                ]
-            ];
-
-        $model
-            ->method(
-                'getTableStructure'
-            )
-            ->willReturn(
-                $structure
-            );
-
-        $tempFile
-            =
-            tempnam(
-                sys_get_temp_dir(),
-                'csv_'
-            );
-
-        /* CSV strutturalmente valido per superare i blocchi iniziali e arrivare al mkdir */
-        file_put_contents(
-            $tempFile,
-            "id,email\n1,test@test.com"
-        );
-
-        $fileClass
-            =
-            \CodeIgniter\HTTP\Files\UploadedFile::class;
-
-        $fileMock
-            =
-            $this
-            ->getMockBuilder(
-                $fileClass
-            )
-            ->disableOriginalConstructor()
-            ->onlyMethods(
-                [
-                    'getTempName'
-                ]
-            )
-            ->getMock();
-
-        $fileMock
-            ->method(
-                'getTempName'
-            )
-            ->willReturn(
-                $tempFile
-            );
-
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        $dbMock
-            ->method(
-                'tableExists'
-            )
-            ->willReturn(
-                false
-            );
-
-        $injectDb
-            =
-            function (
-                $connection
-            ) {
-                $target
-                    =
-                    $this;
-
-                $target
-                    ->db
-                    =
-                    $connection;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,
-                $modelClass
-            );
-
-        $binder(
-            $dbMock
-        );
-
-        $model
-            ->parseAndValidateCsv(
-                $fileMock,
-                'admins'
-            );
-
-        if (
-            file_exists(
-                $tempFile
-            )
-        ):
-            unlink(
-                $tempFile
-            );
-        endif;
-
-        /* Verifichiamo che la directory sia stata ricreata */
-        $this
-            ->assertTrue(
-                is_dir(
-                    $stagingDir
-                )
-            );
-    }
-
-    public function testParseAndValidateCsvSkipsEmptyRowsAndCatchesMismatchedColumns()
-    {
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'getTableStructure',
-                    'buildDynamicRules'
-                ]
-            )
-            ->getMock();
-
-        $structure
-            =
-            [
-                [
-                    'name'
-                    =>
-                    'id',
-                    'primary_key'
-                    =>
-                    1
-                ],
-                [
-                    'name'
-                    =>
-                    'email',
-                    'primary_key'
-                    =>
-                    0
-                ]
-            ];
-
-        $model
-            ->method(
-                'getTableStructure'
-            )
-            ->willReturn(
-                $structure
-            );
-
-        $tempFile
-            =
-            tempnam(
-                sys_get_temp_dir(),
-                'csv_'
-            );
-
-        /* Riga 1: Valida per incrementare insert. Riga 2: Vuota. Riga 3: Colonne sballate */
-        $csvData
-            =
-            "id,email\n1,valid@test.com\n,\n3,test@test.com,colonna_di_troppo";
-
-        file_put_contents(
-            $tempFile,
-            $csvData
-        );
-
-        $fileClass
-            =
-            \CodeIgniter\HTTP\Files\UploadedFile::class;
-
-        $fileMock
-            =
-            $this
-            ->getMockBuilder(
-                $fileClass
-            )
-            ->disableOriginalConstructor()
-            ->onlyMethods(
-                [
-                    'getTempName'
-                ]
-            )
-            ->getMock();
-
-        $fileMock
-            ->method(
-                'getTempName'
-            )
-            ->willReturn(
-                $tempFile
-            );
-
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        $dbMock
-            ->method(
-                'tableExists'
-            )
-            ->willReturn(
-                false
-            );
-
-        $injectDb
-            =
-            function (
-                $connection
-            ) {
-                $target
-                    =
-                    $this;
-
-                $target
-                    ->db
-                    =
-                    $connection;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,
-                $modelClass
-            );
-
-        $binder(
-            $dbMock
-        );
-
-        $result
-            =
-            $model
-            ->parseAndValidateCsv(
-                $fileMock,
-                'admins'
-            );
-
-        if (
-            file_exists(
-                $tempFile
-            )
-        ):
-            unlink(
-                $tempFile
-            );
-        endif;
-
-        $this
-            ->assertFalse(
-                $result['status']
-            );
-
-        $this
-            ->assertArrayHasKey(
-                'validationErrors',
-                $result
-            );
-
-        $errorList
-            =
-            $result['validationErrors'];
-
-        /* Simuliamo il formato esatto che il Model produce: Riga 4, 3 trovate, 2 dichiarate */
-        $expectedError
-            =
-            sprintf(
-                lang(
-                    'backend/components/import.messages.wrongColumnsNumber'
-                ),
-                4,
-                3,
-                2
-            );
-
-        $this
-            ->assertSame(
-                $expectedError,
-                $errorList[0]
-            );
-    }
-
-    public function testParseAndValidateCsvUsesFallbackRulesWhenTargetModelIsNull()
-    {
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'getTableStructure',
-                    'buildDynamicRules'
-                ]
-            )
-            ->getMock();
-
-        $structure
-            =
-            [
-                [
-                    'name'
-                    =>
-                    'id',
-                    'primary_key'
-                    =>
-                    1
-                ],
-                [
-                    'name'
-                    =>
-                    'email',
-                    'primary_key'
-                    =>
-                    0
-                ]
-            ];
-
-        $model
-            ->method(
-                'getTableStructure'
-            )
-            ->willReturn(
-                $structure
-            );
-
-        $fallbackRules
-            =
-            [
-                'id'
-                =>
-                'required'
-            ];
-
-        $model
-            ->method(
-                'buildDynamicRules'
-            )
-            ->willReturn(
-                $fallbackRules
-            );
-
-        $tempFile
-            =
-            tempnam(
-                sys_get_temp_dir(),
-                'csv_'
-            );
-
-        /* Inseriamo una riga valida per bypassare il controllo "file vuoto" */
-        file_put_contents(
-            $tempFile,
-            "id,email\n1,test@test.com"
-        );
-
-        $fileClass
-            =
-            \CodeIgniter\HTTP\Files\UploadedFile::class;
-
-        $fileMock
-            =
-            $this
-            ->getMockBuilder(
-                $fileClass
-            )
-            ->disableOriginalConstructor()
-            ->onlyMethods(
-                [
-                    'getTempName'
-                ]
-            )
-            ->getMock();
-
-        $fileMock
-            ->method(
-                'getTempName'
-            )
-            ->willReturn(
-                $tempFile
-            );
-
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        $dbMock
-            ->method(
-                'tableExists'
-            )
-            ->willReturn(
-                false
-            );
-
-        $injectDb
-            =
-            function (
-                $connection
-            ) {
-                $target
-                    =
-                    $this;
-
-                $target
-                    ->db
-                    =
-                    $connection;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,
-                $modelClass
-            );
-
-        $binder(
-            $dbMock
-        );
-
-        $valClass
-            =
-            \CodeIgniter\Validation\ValidationInterface::class;
-
-        $valMock
-            =
-            $this
-            ->createMock(
-                $valClass
-            );
-
-        $valMock
-            ->method(
-                'run'
-            )
-            ->willReturn(
-                true
-            );
-
-        \Config\Services::injectMock(
-            'validation',
-            $valMock
-        );
-
-        /* Passiamo un'entità per la quale non esiste il Model, attivando nativamente il fallback */
-        $result
-            =
-            $model
-            ->parseAndValidateCsv(
-                $fileMock,
-                'ghost_entity'
-            );
-
-        if (
-            file_exists(
-                $tempFile
-            )
-        ):
-            unlink(
-                $tempFile
-            );
-        endif;
-
-        /* Se restituisce true significa che il fallback è andato a buon fine e l'elaborazione è completata */
-        $this
-            ->assertTrue(
-                $result['status']
-            );
-    }
-
-    public function testParseAndValidateCsvTruncatesErrorsWhenExceedingMaxLimit()
-    {
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'getTableStructure',
-                    'buildDynamicRules'
-                ]
-            )
-            ->getMock();
-
-        $structure
-            =
-            [
-                [
-                    'name'
-                    =>
-                    'id',
-                    'primary_key'
-                    =>
-                    1
-                ],
-                [
-                    'name'
-                    =>
-                    'email',
-                    'primary_key'
-                    =>
-                    0
-                ]
-            ];
-
-        $model
-            ->method(
-                'getTableStructure'
-            )
-            ->willReturn(
-                $structure
-            );
-
-        $tempFile
-            =
-            tempnam(
-                sys_get_temp_dir(),
-                'csv_'
-            );
-
-        /* Riga 1: Valida. Righe successive: 505 errori di colonna per innescare l'array slice */
-        $csvData
-            =
-            "id,email\n1,valid@test.com\n";
-            
-        $i
-            =
-            0;
-            
-        while (
-            $i
-            <
-            505
-        ):
-            $csvData
-                .=
-                "2,test,extra_col\n";
-                
-            $i++;
-        endwhile;
-
-        file_put_contents(
-            $tempFile,
-            $csvData
-        );
-
-        $fileClass
-            =
-            \CodeIgniter\HTTP\Files\UploadedFile::class;
-
-        $fileMock
-            =
-            $this
-            ->getMockBuilder(
-                $fileClass
-            )
-            ->disableOriginalConstructor()
-            ->onlyMethods(
-                [
-                    'getTempName'
-                ]
-            )
-            ->getMock();
-
-        $fileMock
-            ->method(
-                'getTempName'
-            )
-            ->willReturn(
-                $tempFile
-            );
-
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        $dbMock
-            ->method(
-                'tableExists'
-            )
-            ->willReturn(
-                false
-            );
-
-        $injectDb
-            =
-            function (
-                $connection
-            ) {
-                $target
-                    =
-                    $this;
-
-                $target
-                    ->db
-                    =
-                    $connection;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,
-                $modelClass
-            );
-
-        $binder(
-            $dbMock
-        );
-
-        $result
-            =
-            $model
-            ->parseAndValidateCsv(
-                $fileMock,
-                'admins'
-            );
-
-        if (
-            file_exists(
-                $tempFile
-            )
-        ):
-            unlink(
-                $tempFile
-            );
-        endif;
-
-        $this
-            ->assertFalse(
-                $result['status']
-            );
-
-        $errorList
-            =
-            $result['validationErrors'];
-
-        /* Controlliamo che l'array sia stato troncato a 500 messaggi + 1 messaggio di overflow (totale 501) */
-        $this
-            ->assertCount(
-                501,
-                $errorList
-            );
-
-        $lastMessage
-            =
-            end(
-                $errorList
-            );
-
-        /* Verifichiamo che l'ultimo messaggio indichi l'avvenuto troncamento */
-        $this
-            ->assertStringContainsString(
-                'errori non mostrati per limiti di memoria',
-                $lastMessage
-            );
-    }
-
-    public function testExecuteImportReturnsErrorWhenFileNotFound()
-    {
-        if (
-            ! defined(
-                'WRITEPATH'
-            )
-        ):
-            define(
-                'WRITEPATH',
-                sys_get_temp_dir()
-                .
-                '/'
-            );
-        endif;
-
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'getTableStructure'
-                ]
-            )
-            ->getMock();
-
-        $entity
-            =
-            'admins';
-
-        $tempFile
-            =
-            'file_inesistente_123.csv';
-
-        $result
-            =
-            $model
-            ->executeImport(
-                $entity,
-                $tempFile
-            );
-
-        $this
-            ->assertIsArray(
-                $result
-            );
-
-        $this
-            ->assertFalse(
-                $result['status']
-            );
-
-        $this
-            ->assertSame(
-                lang(
-                    'backend/components/import.messages.fileNotFoundError'
-                ),
-                $result['message']
-            );
-    }
-
-    public function testExecuteImportReturnsErrorWhenPrimaryKeyNotDetermined()
-    {
-        if (
-            ! defined(
-                'WRITEPATH'
-            )
-        ):
-            define(
-                'WRITEPATH',
-                sys_get_temp_dir()
-                .
-                '/'
-            );
-        endif;
-
-        $stagingDir
-            =
-            WRITEPATH
-            .
-            'uploads/staging/';
-
-        if (
-            ! is_dir(
-                $stagingDir
-            )
-        ):
-            mkdir(
-                $stagingDir,
-                0755,
-                true
-            );
-        endif;
-
-        $tempFile
-            =
-            'test_nopk_'
-            .
-            time()
-            .
-            '.csv';
-
-        $filePath
-            =
-            $stagingDir
-            .
-            $tempFile;
-
-        file_put_contents(
-            $filePath,
-            "id,email\n1,test@test.com"
-        );
-
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'getTableStructure'
-                ]
-            )
-            ->getMock();
-
-        /* Schema volutamente privo di chiave primaria per innescare il blocco */
-        $structure
-            =
-            [
-                [
-                    'name'
-                    =>
-                    'id',
-                    'primary_key'
-                    =>
-                    0
-                ],
-                [
-                    'name'
-                    =>
-                    'email',
-                    'primary_key'
-                    =>
-                    0
-                ]
-            ];
-
-        $model
-            ->method(
-                'getTableStructure'
-            )
-            ->willReturn(
-                $structure
-            );
-
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        /* Ci aspettiamo l'avvio e il rollback della transazione */
-        $dbMock
-            ->expects(
-                $this
-                ->once()
-            )
-            ->method(
-                'transStart'
-            );
-
-        $dbMock
-            ->expects(
-                $this
-                ->once()
-            )
-            ->method(
-                'transRollback'
-            );
-
-        $injectDb
-            =
-            function (
-                $connection
-            ) {
-                $target
-                    =
-                    $this;
-
-                $target
-                    ->db
-                    =
-                    $connection;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,
-                $modelClass
-            );
-
-        $binder(
-            $dbMock
-        );
-
-        $entity
-            =
-            'admins';
-
-        $result
-            =
-            $model
-            ->executeImport(
-                $entity,
-                $tempFile
-            );
-
-        if (
-            file_exists(
-                $filePath
-            )
-        ):
-            unlink(
-                $filePath
-            );
-        endif;
-
-        $this
-            ->assertFalse(
-                $result['status']
-            );
-    }
-
-    public function testExecuteImportRollbacksOnMismatchedColumns()
-    {
-        if (
-            ! defined(
-                'WRITEPATH'
-            )
-        ):
-            define(
-                'WRITEPATH',
-                sys_get_temp_dir()
-                .
-                '/'
-            );
-        endif;
-
-        $stagingDir
-            =
-            WRITEPATH
-            .
-            'uploads/staging/';
-
-        if (
-            ! is_dir(
-                $stagingDir
-            )
-        ):
-            mkdir(
-                $stagingDir,
-                0755,
-                true
-            );
-        endif;
-
-        $tempFile
-            =
-            'test_mismatch_'
-            .
-            time()
-            .
-            '.csv';
-
-        $filePath
-            =
-            $stagingDir
-            .
-            $tempFile;
-
-        /* Intestazione 2 colonne, riga 3 colonne per innescare l'errore di integrità */
-        file_put_contents(
-            $filePath,
-            "id,email\n1,test@test.com,colonna_fantasma"
-        );
-
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'getTableStructure'
-                ]
-            )
-            ->getMock();
-
-        $structure
-            =
-            [
-                [
-                    'name'
-                    =>
-                    'id',
-                    'primary_key'
-                    =>
-                    1
-                ],
-                [
-                    'name'
-                    =>
-                    'email',
-                    'primary_key'
-                    =>
-                    0
-                ]
-            ];
-
-        $model
-            ->method(
-                'getTableStructure'
-            )
-            ->willReturn(
-                $structure
-            );
-
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        $dbMock
-            ->expects(
-                $this
-                ->once()
-            )
-            ->method(
-                'transStart'
-            );
-
-        $dbMock
-            ->expects(
-                $this
-                ->once()
-            )
-            ->method(
-                'transRollback'
-            );
-
-        $injectDb
-            =
-            function (
-                $connection
-            ) {
-                $target
-                    =
-                    $this;
-
-                $target
-                    ->db
-                    =
-                    $connection;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,
-                $modelClass
-            );
-
-        $binder(
-            $dbMock
-        );
-
-        $entity
-            =
-            'admins';
-
-        $result
-            =
-            $model
-            ->executeImport(
-                $entity,
-                $tempFile
-            );
-
-        if (
-            file_exists(
-                $filePath
-            )
-        ):
-            unlink(
-                $filePath
-            );
-        endif;
-
-        $this
-            ->assertFalse(
-                $result['status']
-            );
-
-        $this
-            ->assertSame(
-                lang(
-                    'backend/components/messages.importationUndone'
-                ),
-                $result['message']
-            );
-    }
-
-    public function testExecuteImportReturnsErrorOnTransactionFailure()
-    {
-        if (
-            ! defined(
-                'WRITEPATH'
-            )
-        ):
-            define(
-                'WRITEPATH',
-                sys_get_temp_dir()
-                .
-                '/'
-            );
-        endif;
-
-        $stagingDir
-            =
-            WRITEPATH
-            .
-            'uploads/staging/';
-
-        if (
-            ! is_dir(
-                $stagingDir
-            )
-        ):
-            mkdir(
-                $stagingDir,
-                0755,
-                true
-            );
-        endif;
-
-        $tempFile
-            =
-            'test_trans_'
-            .
-            time()
-            .
-            '.csv';
-
-        $filePath
-            =
-            $stagingDir
-            .
-            $tempFile;
-
-        file_put_contents(
-            $filePath,
-            "id,email\n1,test@test.com"
-        );
-
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'getTableStructure'
-                ]
-            )
-            ->getMock();
-
-        $structure
-            =
-            [
-                [
-                    'name'
-                    =>
-                    'id',
-                    'primary_key'
-                    =>
-                    1
-                ],
-                [
-                    'name'
-                    =>
-                    'email',
-                    'primary_key'
-                    =>
-                    0
-                ]
-            ];
-
-        $model
-            ->method(
-                'getTableStructure'
-            )
-            ->willReturn(
-                $structure
-            );
-
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        $builderClass
-            =
-            \CodeIgniter\Database\BaseBuilder::class;
-
-        $builderMock
-            =
-            $this
-            ->createMock(
-                $builderClass
-            );
-
-        $dbMock
-            ->method(
-                'table'
-            )
-            ->willReturn(
-                $builderMock
-            );
-
-        $dbMock
-            ->expects(
-                $this
-                ->once()
-            )
-            ->method(
-                'transStart'
-            );
-
-        $dbMock
-            ->expects(
-                $this
-                ->once()
-            )
-            ->method(
-                'transComplete'
-            );
-
-        /* Simuliamo il fallimento della transazione (es. violazione chiave univoca) */
-        $dbMock
-            ->expects(
-                $this
-                ->once()
-            )
-            ->method(
-                'transStatus'
-            )
-            ->willReturn(
-                false
-            );
-
-        $injectDb
-            =
-            function (
-                $connection
-            ) {
-                $target
-                    =
-                    $this;
-
-                $target
-                    ->db
-                    =
-                    $connection;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,
-                $modelClass
-            );
-
-        $binder(
-            $dbMock
-        );
-
-        $entity
-            =
-            'admins';
-
-        $result
-            =
-            $model
-            ->executeImport(
-                $entity,
-                $tempFile
-            );
-
-        if (
-            file_exists(
-                $filePath
-            )
-        ):
-            unlink(
-                $filePath
-            );
-        endif;
-
-        $this
-            ->assertFalse(
-                $result['status']
-            );
-    }
-
-    public function testExecuteImportProcessesRecordsAndReturnsSuccess()
-    {
-        if (
-            ! defined(
-                'WRITEPATH'
-            )
-        ):
-            define(
-                'WRITEPATH',
-                sys_get_temp_dir()
-                .
-                '/'
-            );
-        endif;
-
-        if (
-            ! function_exists(
-                __NAMESPACE__ . '\log_admin_activity'
-            )
-        ):
-            function log_admin_activity(
-                string $action,
-                string $entity,
-                string $message,
-                ?object $admin = null
-            ): void
-            {
-            }
-        endif;
-
-        $stagingDir
-            =
-            WRITEPATH
-            .
-            'uploads/staging/';
-
-        if (
-            ! is_dir(
-                $stagingDir
-            )
-        ):
-            mkdir(
-                $stagingDir,
-                0755,
-                true
-            );
-        endif;
-
-        $tempFile
-            =
-            'test_master_'
-            .
-            time()
-            .
-            '.csv';
-
-        $filePath
-            =
-            $stagingDir
-            .
-            $tempFile;
-
-        /*
-         * RIGA 1 (Insert): ID vuoto per generare UUID, usa created_at fittizio.
-         * RIGA 2 (Update): ID fisso, usa la stringa 'null' per ripulire il campo email.
-         */
-        $csvData
-            =
-            "id,email,created_at,updated_at,__import_action\n"
-            .
-            ",test@test.com,,,insert\n"
-            .
-            "2,null,2023-01-01,,update\n";
-
-        file_put_contents(
-            $filePath,
-            $csvData
-        );
-
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'getTableStructure',
-                    'generateUUID'
-                ]
-            )
-            ->getMock();
-
-        $structure
-            =
-            [
-                [
-                    'name'
-                    =>
-                    'id',
-                    'primary_key'
-                    =>
-                    1
-                ],
-                [
-                    'name'
-                    =>
-                    'email',
-                    'primary_key'
-                    =>
-                    0
-                ],
-                [
-                    'name'
-                    =>
-                    'created_at',
-                    'primary_key'
-                    =>
-                    0
-                ],
-                [
-                    'name'
-                    =>
-                    'updated_at',
-                    'primary_key'
-                    =>
-                    0
-                ]
-            ];
-
-        $model
-            ->method(
-                'getTableStructure'
-            )
-            ->willReturn(
-                $structure
-            );
-
-        /* Forziamo la generazione dell'UUID per la riga Insert senza ID */
-        $model
-            ->method(
-                'generateUUID'
-            )
-            ->willReturn(
-                'fake-uuid-1234'
-            );
-
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        $builderClass
-            =
-            \CodeIgniter\Database\BaseBuilder::class;
-
-        $builderMock
-            =
-            $this
-            ->createMock(
-                $builderClass
-            );
-
-        /* Ci aspettiamo 1 chiamata a update e 1 chiamata a insert */
-        $builderMock
-            ->expects(
-                $this
-                ->once()
-            )
-            ->method(
-                'update'
-            );
-
-        $builderMock
-            ->expects(
-                $this
-                ->once()
-            )
-            ->method(
-                'insert'
-            );
-
-        $builderMock
-            ->method(
-                'where'
-            )
-            ->willReturnSelf();
-
-        $dbMock
-            ->method(
-                'table'
-            )
-            ->willReturn(
-                $builderMock
-            );
-
-        $dbMock
-            ->method(
-                'transStatus'
-            )
-            ->willReturn(
-                true
-            );
-
-        $injectDb
-            =
-            function (
-                $connection
-            ) {
-                $target
-                    =
-                    $this;
-
-                $target
-                    ->db
-                    =
-                    $connection;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,
-                $modelClass
-            );
-
-        $binder(
-            $dbMock
-        );
-
-        $stdClass
-            =
-            \stdClass::class;
-
-        $authMock
-            =
-            $this
-            ->getMockBuilder(
-                $stdClass
-            )
-            ->addMethods(
-                [
-                    'currentAdmin'
-                ]
-            )
-            ->getMock();
-
-        $adminObj
-            =
-            new \stdClass();
-
-        /* Aggiungiamo l'UUID richiesto dall'helper */
-        $adminObj
-            ->uuid
-            =
-            '123e4567-e89b-12d3-a456-426614174000';
-
-        $adminObj
-            ->email
-            =
-            'aaa@aaa.com';
-
-        $authMock
-            ->method(
-                'currentAdmin'
-            )
-            ->willReturn(
-                $adminObj
-            );
-
-        \Config\Services::injectMock(
-            'authorization',
-            $authMock
-        );
-
-        $entity
-            =
-            'admins';
-
-        $result
-            =
-            $model
-            ->executeImport(
-                $entity,
-                $tempFile
-            );
-
-        /* Assicuriamoci che il file di staging sia stato rimosso dalla routine isFinished */
-        $this
-            ->assertFalse(
-                file_exists(
-                    $filePath
-                )
-            );
-
-        $this
-            ->assertTrue(
-                $result['status']
-            );
-
-        /* Verifichiamo i contatori del master plan */
-        $this
-            ->assertSame(
-                1,
-                $result['inserted']
-            );
-
-        $this
-            ->assertSame(
-                1,
-                $result['updated']
-            );
-            
-        $this
-            ->assertTrue(
-                $result['isFinished']
-            );
-    }
-
-    public function testExecuteImportReturnsErrorOnUnreadableFile()
-    {
-        if (
-            ! defined(
-                'WRITEPATH'
-            )
-        ):
-            define(
-                'WRITEPATH',
-                sys_get_temp_dir()
-                .
-                '/'
-            );
-        endif;
-
-        $stagingDir
-            =
-            WRITEPATH
-            .
-            'uploads/staging/';
-
-        if (
-            ! is_dir(
-                $stagingDir
-            )
-        ):
-            mkdir(
-                $stagingDir,
-                0755,
-                true
-            );
-        endif;
-
-        $tempFile
-            =
-            'unreadable_'
-            .
-            time()
-            .
-            '.csv';
-
-        $filePath
-            =
-            $stagingDir
-            .
-            $tempFile;
-
-        /* TRUCCO ENTERPRISE: Creiamo una directory con il nome del file. 
-           file_exists() passerà, ma fopen() fallirà restituendo false. */
-        mkdir(
-            $filePath,
-            0755
-        );
-
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            new $modelClass();
-
-        /* Silenziamo il warning di fopen per non far fallire PHPUnit */
-        set_error_handler(
-            function () {
-                return true;
-            }
-        );
-
-        $entity
-            =
-            'admins';
-
-        $result
-            =
-            $model
-            ->executeImport(
-                $entity,
-                $tempFile
-            );
-
-        restore_error_handler();
-
-        rmdir(
-            $filePath
-        );
-
-        $this
-            ->assertIsArray(
-                $result
-            );
-
-        $this
-            ->assertFalse(
-                $result['status']
-            );
-
-        $this
-            ->assertSame(
-                lang(
-                    'backend/components/import.messages.fileReadError'
-                ),
-                $result['message']
-            );
-    }
-
-    public function testExecuteImportHandlesPaginationAndEmptyRows()
-    {
-        if (
-            ! defined(
-                'WRITEPATH'
-            )
-        ):
-            define(
-                'WRITEPATH',
-                sys_get_temp_dir()
-                .
-                '/'
-            );
-        endif;
-
-        $stagingDir
-            =
-            WRITEPATH
-            .
-            'uploads/staging/';
-
-        if (
-            ! is_dir(
-                $stagingDir
-            )
-        ):
-            mkdir(
-                $stagingDir,
-                0755,
-                true
-            );
-        endif;
-
-        $tempFile
-            =
-            'test_pagination_'
-            .
-            time()
-            .
-            '.csv';
-
-        $filePath
-            =
-            $stagingDir
-            .
-            $tempFile;
-
-        /* 
-         * PROGETTAZIONE DEL FILE PER COPRIRE TUTTI I BLOCCHI ROSSI:
-         * Riga CSV 1: Intestazione.
-         * Riga CSV 2: Dati validi. Ma usando $offset = 1, verrà skippata (blocco rosso offset).
-         * Riga CSV 3: Riga completamente vuota, formattata solo da virgole (blocco rosso array_filter).
-         * Riga CSV 4 a 8: 5 record validi per raggiungere il $chunkSize (fissato a 5) e incrementare$processedInChunk.
-         * Riga CSV 9: Dati validi. Innescherà l'interruzione anticipata "break" perché 5 sono già stati processati (blocco rosso break).
-         */
-        $csvData
-            =
-            "id,email,__import_action\n"
-            .
-            "1,skip@test.com,insert\n"
-            .
-            ",,\n"
-            .
-            "3,test3@test.com,insert\n"
-            .
-            "4,test4@test.com,insert\n"
-            .
-            "5,test5@test.com,insert\n"
-            .
-            "6,test6@test.com,insert\n"
-            .
-            "7,test7@test.com,insert\n"
-            .
-            "8,break@test.com,insert\n";
-
-        file_put_contents(
-            $filePath,
-            $csvData
-        );
-
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'getTableStructure',
-                    'generateUUID'
-                ]
-            )
-            ->getMock();
-
-        $structure
-            =
-            [
-                [
-                    'name'
-                    =>
-                    'id',
-                    'primary_key'
-                    =>
-                    1
-                ],
-                [
-                    'name'
-                    =>
-                    'email',
-                    'primary_key'
-                    =>
-                    0
-                ]
-            ];
-
-        $model
-            ->method(
-                'getTableStructure'
-            )
-            ->willReturn(
-                $structure
-            );
-
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        $builderClass
-            =
-            \CodeIgniter\Database\BaseBuilder::class;
-
-        $builderMock
-            =
-            $this
-            ->createMock(
-                $builderClass
-            );
-
-        /* Ci aspettiamo ESATTAMENTE 5 insert, né uno in più né uno in meno */
-        $builderMock
-            ->expects(
-                $this
-                ->exactly(
-                    5
-                )
-            )
-            ->method(
-                'insert'
-            );
-
-        $dbMock
-            ->method(
-                'table'
-            )
-            ->willReturn(
-                $builderMock
-            );
-
-        $dbMock
-            ->method(
-                'transStatus'
-            )
-            ->willReturn(
-                true
-            );
-
-        $injectDb
-            =
-            function (
-                $connection
-            ) {
-                $target
-                    =
-                    $this;
-
-                $target
-                    ->db
-                    =
-                    $connection;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,
-                $modelClass
-            );
-
-        $binder(
-            $dbMock
-        );
-
-        $entity
-            =
-            'admins';
-
-        $offset
-            =
-            1;
-
-        $result
-            =
-            $model
-            ->executeImport(
-                $entity,
-                $tempFile,
-                $offset
-            );
-
-        if (
-            file_exists(
-                $filePath
-            )
-        ):
-            unlink(
-                $filePath
-            );
-        endif;
-
-        $this
-            ->assertTrue(
-                $result['status']
-            );
-
-        /* Essendo uscito per il break e non per fine file, isFinished deve essere false */
-        $this
-            ->assertFalse(
-                $result['isFinished']
-            );
-
-        $this
-            ->assertSame(
-                5,
-                $result['inserted']
-            );
-    }
-
-    public function testExecuteImportReturnsNoRecordsModified()
-    {
-        if (
-            ! defined(
-                'WRITEPATH'
-            )
-        ):
-            define(
-                'WRITEPATH',
-                sys_get_temp_dir()
-                .
-                '/'
-            );
-        endif;
-
-        if (
-            ! function_exists(
-                __NAMESPACE__ . '\log_admin_activity'
-            )
-        ):
-            function log_admin_activity(
-                string $action,
-                string $entity,
-                string $message,
-                ?object $admin = null
-            ): void
-            {
-            }
-        endif;
-
-        $stagingDir
-            =
-            WRITEPATH
-            .
-            'uploads/staging/';
-
-        if (
-            ! is_dir(
-                $stagingDir
-            )
-        ):
-            mkdir(
-                $stagingDir,
-                0755,
-                true
-            );
-        endif;
-
-        $tempFile
-            =
-            'test_norecords_'
-            .
-            time()
-            .
-            '.csv';
-
-        $filePath
-            =
-            $stagingDir
-            .
-            $tempFile;
-
-        /* Creiamo un file contenente esclusivamente l'intestazione, senza record */
-        file_put_contents(
-            $filePath,
-            "id,email,__import_action\n"
-        );
-
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'getTableStructure'
-                ]
-            )
-            ->getMock();
-
-        $structure
-            =
-            [
-                [
-                    'name'
-                    =>
-                    'id',
-                    'primary_key'
-                    =>
-                    1
-                ],
-                [
-                    'name'
-                    =>
-                    'email',
-                    'primary_key'
-                    =>
-                    0
-                ]
-            ];
-
-        $model
-            ->method(
-                'getTableStructure'
-            )
-            ->willReturn(
-                $structure
-            );
-
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        $dbMock
-            ->method(
-                'transStatus'
-            )
-            ->willReturn(
-                true
-            );
-
-        $injectDb
-            =
-            function (
-                $connection
-            ) {
-                $target
-                    =
-                    $this;
-
-                $target
-                    ->db
-                    =
-                    $connection;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,
-                $modelClass
-            );
-
-        $binder(
-            $dbMock
-        );
-
-        $stdClass
-            =
-            \stdClass::class;
-
-        $authMock
-            =
-            $this
-            ->getMockBuilder(
-                $stdClass
-            )
-            ->addMethods(
-                [
-                    'currentAdmin'
-                ]
-            )
-            ->getMock();
-
-        $adminObj
-            =
-            new \stdClass();
-
-        $adminObj
-            ->uuid
-            =
-            '123e4567-e89b-12d3-a456-426614174000';
-
-        $adminObj
-            ->email
-            =
-            'aaa@aaa.com';
-
-        $authMock
-            ->method(
-                'currentAdmin'
-            )
-            ->willReturn(
-                $adminObj
-            );
-
-        \Config\Services::injectMock(
-            'authorization',
-            $authMock
-        );
-
-        $entity
-            =
-            'admins';
-
-        $result
-            =
-            $model
-            ->executeImport(
-                $entity,
-                $tempFile
-            );
-
-        /* Il file doveva essere rimosso automaticamente dal blocco isFinished */
-        $this
-            ->assertFalse(
-                file_exists(
-                    $filePath
-                )
-            );
-
-        $this
-            ->assertTrue(
-                $result['status']
-            );
-
-        $this
-            ->assertTrue(
-                $result['isFinished']
-            );
-
-        $this
-            ->assertSame(
-                0,
-                $result['inserted']
-            );
-
-        $this
-            ->assertSame(
-                0,
-                $result['updated']
-            );
-
-        $this
-            ->assertSame(
-                lang(
-                    'backend/components/import.messages.importationNoRecordsModified'
-                ),
-                $result['message']
-            );
-    }
-
-    public function testBackupTableBeforeImportReturnsTrueWhenTableIsEmpty()
-    {
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->disableOriginalConstructor()
-            ->onlyMethods(
-                []
-            )
-            ->getMock();
-
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        $builderClass
-            =
-            \CodeIgniter\Database\BaseBuilder::class;
-
-        $builderMock
-            =
-            $this
-            ->createMock(
-                $builderClass
-            );
-
-        $builderMock
-            ->method(
-                'countAllResults'
-            )
-            ->with(
-                false
-            )
-            ->willReturn(
-                0
-            );
-
-        $dbMock
-            ->method(
-                'table'
-            )
-            ->willReturn(
-                $builderMock
-            );
-
-        $injectDb
-            =
-            function (
-                $connection
-            ) {
-                $target
-                    =
-                    $this;
-
-                $target
-                    ->db
-                    =
-                    $connection;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,$modelClass
-            );
-
-        $binder($dbMock
-        );
-
-        $result
-            =
-            $model
-            ->backupTableBeforeImport(
-                'admins'
-            );
-
-        $this
-            ->assertTrue(
-                $result
-            );
-    }
-
-    public function testBackupTableBeforeImportReturnsFalseOnFopenFailure()
-    {
-        if (
-            ! defined(
-                'WRITEPATH'
-            )
-        ):
-            define(
-                'WRITEPATH',
-                sys_get_temp_dir()
-                .
-                '/'
-            );
-        endif;
-
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->disableOriginalConstructor()
-            ->onlyMethods(
-                []
-            )
-            ->getMock();
-
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        $builderClass
-            =
-            \CodeIgniter\Database\BaseBuilder::class;
-
-        $builderMock
-            =
-            $this
-            ->createMock(
-                $builderClass
-            );
-
-        $builderMock
-            ->method(
-                'countAllResults'
-            )
-            ->with(
-                false
-            )
-            ->willReturn(
-                1
-            );
-
-        $dbMock
-            ->method(
-                'table'
-            )
-            ->willReturn(
-                $builderMock
-            );
-
-        $injectDb
-            =
-            function (
-                $connection
-            ) {
-                $target
-                    =
-                    $this;
-
-                $target
-                    ->db
-                    =
-                    $connection;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,$modelClass
-            );
-
-        $binder($dbMock
-        );
-
-        /* Trucco: inserendo una sottocartella inesistente nel nome entità, fopen() fallirà */
-        $entity
-            =
-            'folder_inesistente/admins';
-
-        set_error_handler(
-            function () {
-                return true;
-            }
-        );
-
-        $result
-            =
-            $model
-            ->backupTableBeforeImport(
-                $entity
-            );
-
-        restore_error_handler();
-
-        $this
-            ->assertFalse(
-                $result
-            );
-    }
-
-    public function testBackupTableBeforeImportCreatesBackupFile()
-    {
-        if (
-            ! defined(
-                'WRITEPATH'
-            )
-        ):
-            define(
-                'WRITEPATH',
-                sys_get_temp_dir()
-                .
-                '/'
-            );
-        endif;
-
-        $backupDir
-            =
-            WRITEPATH
-            .
-            'backups/imports/';
-
-        if (
-            is_dir(
-                $backupDir
-            )
-        ):
-            $files
-                =
-                glob(
-                    $backupDir
-                    .
-                    '*'
-                );
-
-            if (
-                $files
-                !==
-                false
-            ):
-                foreach (
-                    $files
-                    as
-                    $file
-                ):
-                    if (
-                        is_file(
-                            $file
-                        )
-                    ):
-                        unlink(
-                            $file
-                        );
-                    endif;
-                endforeach;
+            $path = $directory . DIRECTORY_SEPARATOR . $item;
+            if (is_dir($path)):
+                $this->removeDirectory($path);
+            else:
+                @unlink($path);
             endif;
+        endforeach;
 
-            rmdir(
-                $backupDir
-            );
-        endif;
-
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->disableOriginalConstructor()
-            ->onlyMethods(
-                []
-            )
-            ->getMock();
-
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        $builderClass
-            =
-            \CodeIgniter\Database\BaseBuilder::class;
-
-        $builderMock
-            =
-            $this
-            ->createMock(
-                $builderClass
-            );
-
-        $builderMock
-            ->method(
-                'countAllResults'
-            )
-            ->with(
-                false
-            )
-            ->willReturn(
-                2
-            );
-
-        $resClass
-            =
-            \CodeIgniter\Database\BaseResult::class;
-
-        $resMock
-            =
-            $this
-            ->createMock(
-                $resClass
-            );
-
-        $records
-            =
-            [
-                [
-                    'id'
-                    =>
-                    1,
-                    'name'
-                    =>
-                    'test1'
-                ],
-                [
-                    'id'
-                    =>
-                    2,
-                    'name'
-                    =>
-                    'test2'
-                ]
-            ];
-
-        $resMock
-            ->method(
-                'getResultArray'
-            )
-            ->willReturn(
-                $records
-            );
-
-        $builderMock
-            ->method(
-                'limit'
-            )
-            ->willReturnSelf();
-
-        $builderMock
-            ->method(
-                'get'
-            )
-            ->willReturn(
-                $resMock
-            );
-
-        $dbMock
-            ->method(
-                'table'
-            )
-            ->willReturn(
-                $builderMock
-            );
-
-        $dbMock
-            ->method(
-                'escape'
-            )
-            ->willReturnCallback(
-                function (
-                    $val
-                ) {
-                    return "'"
-                        .
-                        addslashes(
-                            (string) $val
-                        )
-                        .
-                        "'";
-                }
-            );
-
-        $injectDb
-            =
-            function (
-                $connection
-            ) {
-                $target
-                    =
-                    $this;
-
-                $target
-                    ->db
-                    =
-                    $connection;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,$modelClass
-            );
-
-        $binder($dbMock
-        );
-
-        $entity
-            =
-            'admins';
-
-        $result
-            =
-            $model
-            ->backupTableBeforeImport(
-                $entity
-            );
-
-        $this
-            ->assertTrue(
-                $result
-            );
-
-        $this
-            ->assertTrue(
-                is_dir(
-                    $backupDir
-                )
-            );
-
-        $files
-            =
-            glob(
-                $backupDir
-                .
-                $entity
-                .
-                '_backup_*.sql'
-            );
-
-        $this
-            ->assertNotEmpty(
-                $files
-            );
-
-        $backupFile
-            =
-            $files[0];
-
-        $content
-            =
-            file_get_contents(
-                $backupFile
-            );
-
-        $this
-            ->assertStringContainsString(
-                'TRUNCATE TABLE `admins`;',
-                $content
-            );
-
-        $this
-            ->assertStringContainsString(
-                "INSERT INTO `admins` (`id`, `name`) VALUES ('1', 'test1');",
-                $content
-            );
-
-        if (
-            file_exists(
-                $backupFile
-            )
-        ):
-            unlink(
-                $backupFile
-            );
-        endif;
+        @rmdir($directory);
     }
-
-    public function testBuildDynamicRulesMapsSchemaToValidationRules()
-    {
-        $modelClass
-            =
-            \App\Models\Backend\Components\ImportModel::class;
-
-        $model
-            =
-            new $modelClass();
-
-        $reflection
-            =
-            new \ReflectionMethod(
-                $modelClass,
-                'buildDynamicRules'
-            );
-
-        $reflection
-            ->setAccessible(
-                true
-            );
-
-        /* Simuliamo un intero schema coprendo il 100% delle varianti del metodo */
-        $structure
-            =
-            [
-                [
-                    'name'
-                    =>
-                    'field_int',
-                    'type'
-                    =>
-                    'int',
-                    'max_length'
-                    =>
-                    11
-                ],
-                [
-                    'name'
-                    =>
-                    'field_decimal',
-                    'type'
-                    =>
-                    'decimal',
-                    'max_length'
-                    =>
-                    10
-                ],
-                [
-                    'name'
-                    =>
-                    'field_varchar',
-                    'type'
-                    =>
-                    'varchar',
-                    'max_length'
-                    =>
-                    255
-                ],
-                [
-                    'name'
-                    =>
-                    'field_text',
-                    'type'
-                    =>
-                    'text',
-                    'max_length'
-                    =>
-                    65535
-                ],
-                [
-                    'name'
-                    =>
-                    'field_date',
-                    'type'
-                    =>
-                    'date',
-                    'max_length'
-                    =>
-                    10
-                ],
-                [
-                    'name'
-                    =>
-                    'field_datetime',
-                    'type'
-                    =>
-                    'datetime',
-                    'max_length'
-                    =>
-                    19
-                ],
-                [
-                    'name'
-                    =>
-                    'field_timestamp',
-                    'type'
-                    =>
-                    'timestamp',
-                    'max_length'
-                    =>
-                    19
-                ],
-                [
-                    'name'
-                    =>
-                    'field_unknown',
-                    'type'
-                    =>
-                    'enum',
-                    'max_length'
-                    =>
-                    5
-                ]
-            ];
-
-        /* Risultato atteso: mappatura precisa dei filtri CodeIgniter 4 */
-        $expected
-            =
-            [
-                'field_int'
-                =>
-                'permit_empty|integer|max_length[11]',
-                'field_decimal'
-                =>
-                'permit_empty|numeric|max_length[10]',
-                'field_varchar'
-                =>
-                'permit_empty|string|max_length[255]',
-                'field_text'
-                =>
-                'permit_empty|string',
-                'field_date'
-                =>
-                'permit_empty|valid_date[Y-m-d]',
-                'field_datetime'
-                =>
-                'permit_empty|valid_date[Y-m-d H:i:s]',
-                'field_timestamp'
-                =>
-                'permit_empty|valid_date[Y-m-d H:i:s]',
-                'field_unknown'
-                =>
-                'permit_empty|max_length[5]'
-            ];
-
-        $result
-            =
-            $reflection
-            ->invoke(
-                $model,
-                $structure
-            );
-
-        $this
-            ->assertSame(
-                $expected,
-                $result
-            );
-    }
-
 }

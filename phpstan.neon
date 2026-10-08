@@ -16,3 +16,7 @@ parameters:
     ignoreErrors:
         -
             identifier: codeigniter.modelArgumentInstanceof
+
+    excludePaths:
+        analyseAndScan:
+            - app/**/_*.php

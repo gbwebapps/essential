@@ -30,27 +30,62 @@ class ImportController extends BackendController
      *
      * @return ResponseInterface Risposta JSON contenente l'esito della validazione e l'HTML generato per la modale
      */
-    public function showModal(): ?ResponseInterface
+    public function showModal(): ResponseInterface
+    {
+        return $this->showModalByMode(ImportModel::IMPORT_MODE_CRUD);
+    }
+
+    /**
+     * Renderizza la modale per Tools > Database, esponendo lo schema fisico completo.
+     */
+    public function showDatabaseModal(): ResponseInterface
+    {
+        return $this->showModalByMode(ImportModel::IMPORT_MODE_DATABASE);
+    }
+
+    /**
+     * Implementazione condivisa della modale iniziale. Il mode è determinato dall'endpoint server-side.
+     */
+    private function showModalByMode(string $mode): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
             $posts = $this->request->getPost();
             $rules = ['entity' => 'required|alpha_dash'];
 
-            /* Validazione campi nascosti */
-            if ( ! $this->validateData($posts, $rules)) :
+            if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/components/import.messages.validateToastErrors'), $errorMessage)]);
+                return $this->jsonResponse([
+                    'result' => false,
+                    'message' => sprintf(lang('backend/components/import.messages.validateToastErrors'), $errorMessage)
+                ]);
             endif;
 
-            $data = ['structure' => $this->importModel->getTableStructure($posts['entity']), 'entity' => $posts['entity']]; 
-            $output = view('backend/components/import/showModalView', $data);
+            $entity = (string) $this->request->getPost('entity');
+            $structure = $this->importModel->getImportTableStructure($entity, $mode);
+
+            if ($structure === []):
+                return $this->jsonResponse([
+                    'result' => false,
+                    'message' => lang('backend/components/import.messages.noStructure')
+                ]);
+            endif;
+
+            $downloadUrl = $mode === ImportModel::IMPORT_MODE_DATABASE
+                ? base_url('backend/import/database/download/' . rawurlencode($entity))
+                : base_url('backend/import/download/' . rawurlencode($entity));
+
+            $output = view('backend/components/import/showModalView', [
+                'structure' => $structure,
+                'entity' => $entity,
+                'downloadUrl' => $downloadUrl,
+            ]);
 
             return $this->jsonResponse(['result' => true, 'output' => $output]);
 
         endif;
 
-        return null;
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -61,47 +96,84 @@ class ImportController extends BackendController
      */
     public function download(string $entity): ResponseInterface
     {
-        /* Validazione basilare per prevenire input malevoli */
-        if ( ! preg_match('/^[a-zA-Z_-]+$/', $entity)):
-            return redirect()->back()->with('message', lang('backend/components/import.messages.invalidEntity'))->with('class', 'light text-danger fw-bold');
+        return $this->downloadByMode($entity, ImportModel::IMPORT_MODE_CRUD);
+    }
+
+    /**
+     * Genera il template completo destinato a Tools > Database.
+     */
+    public function downloadDatabase(string $entity): ResponseInterface
+    {
+        return $this->downloadByMode($entity, ImportModel::IMPORT_MODE_DATABASE);
+    }
+
+    /**
+     * Genera il template CSV coerente con il contesto di importazione richiesto.
+     */
+    private function downloadByMode(string $entity, string $mode): ResponseInterface
+    {
+        if ( ! preg_match('/^[a-zA-Z0-9_-]+$/', $entity)):
+            return redirect()->back()
+                ->with('message', lang('backend/components/import.messages.invalidEntity'))
+                ->with('class', 'light text-danger fw-bold');
         endif;
 
-        /* Recupero la struttura dal model per avere solo i nomi delle colonne */
-        $structure = $this->importModel->getTableStructure($entity);
-        
-        if (empty($structure)):
-            return redirect()->back()->with('message', lang('backend/components/import.messages.noStructure'))->with('class', 'light text-danger fw-bold');
+        $structure = $this->importModel->getImportTableStructure($entity, $mode);
+
+        if ($structure === []):
+            return redirect()->back()
+                ->with('message', lang('backend/components/import.messages.noStructure'))
+                ->with('class', 'light text-danger fw-bold');
         endif;
 
-        /* Estraggo solo l'array dei nomi colonna */
         $headers = array_column($structure, 'name');
-
-        /* Apre un buffer in memoria per scrivere il CSV senza creare file su disco */
         $output = fopen('php://memory', 'w');
-        
-        /* Aggiunge il BOM UTF-8 per la compatibilità con Excel */
-        fputs($output, "\xEF\xBB\xBF");
-        
-        /* Scrive l'intestazione come unica riga del CSV (usando la virgola come separatore) */
-        fputcsv($output, $headers, ',');
-        
-        /* Riporta il puntatore all'inizio del buffer per poterlo leggere */
+
+        if ($output === false):
+            return service('response')->setStatusCode(500);
+        endif;
+
+        if (fwrite($output, "\xEF\xBB\xBF") === false || fputcsv($output, $headers, ',') === false):
+            fclose($output);
+            return service('response')->setStatusCode(500);
+        endif;
+
         rewind($output);
         $csvData = stream_get_contents($output);
         fclose($output);
 
-        /* Genera il download diretto del file */
+        if ($csvData === false):
+            return service('response')->setStatusCode(500);
+        endif;
+
         $filename = 'template_import_' . $entity . '.csv';
 
-        return $this->response->download($filename, $csvData)->setContentType('text/csv');
+        return service('response')->download($filename, $csvData)->setContentType('text/csv');
     }
 
     /**
-     * Riceve il file CSV caricato, esegue la validazione strutturale incrociata con il database e genera l'interfaccia con la tabella di anteprima e il piano delle modifiche.
-     *
-     * @return ResponseInterface Risposta JSON contenente l'esito della validazione e l'HTML dell'anteprima dati, oppure l'elenco degli errori bloccanti
+     * Processa un CSV proveniente da una sezione CRUD applicativa.
+     * Le regole strutturali SQL vengono integrate, quando disponibili, dalle regole import-specifiche del model di dominio.
      */
-    public function processCsv(): ?ResponseInterface
+    public function processCsv(): ResponseInterface
+    {
+        return $this->processCsvByMode(ImportModel::IMPORT_MODE_CRUD);
+    }
+
+    /**
+     * Processa un CSV proveniente da Tools > Database.
+     * In questa modalità vengono applicate esclusivamente le regole strutturali dedotte dal database.
+     */
+    public function processDatabaseCsv(): ResponseInterface
+    {
+        return $this->processCsvByMode(ImportModel::IMPORT_MODE_DATABASE);
+    }
+
+    /**
+     * Implementazione condivisa del parsing/preview. Il contesto di importazione viene scelto dal metodo server-side
+     * chiamante e viene poi persistito nel manifest; non viene accettato come parametro libero dal browser.
+     */
+    private function processCsvByMode(string $mode): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -111,8 +183,8 @@ class ImportController extends BackendController
                 'csvFile' => [
                     'rules'  => 'uploaded[csvFile]|ext_in[csvFile,csv,txt]|max_size[csvFile,2048]',
                     'errors' => [
-                        'uploaded' => lang('backend/components/import.errors.uploaded'),  
-                        'ext_in'   => lang('backend/components/import.errors.ext_in'),  
+                        'uploaded' => lang('backend/components/import.errors.uploaded'),
+                        'ext_in'   => lang('backend/components/import.errors.ext_in'),
                     ]
                 ]
             ];
@@ -122,63 +194,62 @@ class ImportController extends BackendController
                 return $this->jsonResponse(['result' => false, 'message' => $errorMessage]);
             endif;
 
-            $entity = $this->request->getPost('entity');
+            $entity = (string) $this->request->getPost('entity');
             $file = $this->request->getFile('csvFile');
 
-            /* Deleghiamo al Model il parsing e la validazione strutturale del CSV */
-            $previewData = $this->importModel->parseAndValidateCsv($file, $entity);
+            if ($file === null):
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/components/import.errors.uploaded')]);
+            endif;
 
-            /* Se la validazione fallisce (es. colonne mancanti o errate), blocchiamo tutto */
+            $previewData = $this->importModel->parseAndValidateCsv($file, $entity, $mode);
+
             if ($previewData['status'] === false):
 
-                /* 1. Caso array di errori strutturali: compila la vista HTML dell'alert */
                 if (isset($previewData['validationErrors'])):
                     $errorOutput = view('backend/components/import/errorsModalPartial', [
                         'validationErrors' => $previewData['validationErrors']
                     ]);
                     return $this->jsonResponse(['result' => false, 'errorOutput' => $errorOutput]);
                 endif;
-                
-                /* 2. Caso errore generico bloccante: restituisce il messaggio semplice */
+
                 return $this->jsonResponse(['result' => false, 'message' => $previewData['message']]);
             endif;
 
-            /* Prepara la vista con la tabella di anteprima dei dati */
             $output = view('backend/components/import/previewModalPartial', [
                 'entity' => $entity,
                 'headers' => $previewData['headers'],
-                'rows' => $previewData['rows'], 
-                'tempFile' => $previewData['tempFile'],
+                'rows' => $previewData['rows'],
+                'importId' => $previewData['importId'],
                 'plan' => $previewData['plan']
             ]);
 
-            /* Calcola se ci sono operazioni da eseguire (inserimenti o aggiornamenti) */
             $hasProcessableData = ($previewData['plan']['insert'] > 0 || $previewData['plan']['update'] > 0);
 
-            return $this->jsonResponse(['result' => true, 'output' => $output, 'hasProcessableData' => $hasProcessableData]);
+            return $this->jsonResponse([
+                'result' => true,
+                'output' => $output,
+                'importId' => $previewData['importId'],
+                'hasProcessableData' => $hasProcessableData
+            ]);
 
         endif;
 
-        return null;
+        return service('response')->setStatusCode(400);
     }
 
     /**
      * Esegue l'importazione progressiva (chunking) dei dati validati nel database, occupandosi di creare un backup della tabella interessata prima di iniziare.
      *
-     * @return ResponseInterface Risposta JSON con lo stato di avanzamento, il cursore (offset) per il blocco successivo e i messaggi di notifica
+     * @return ResponseInterface Risposta JSON con stato di avanzamento e contatori server-side dell'importazione
      */
-    public function executeImport(): ?ResponseInterface
+    public function executeImport(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
             $posts = $this->request->getPost();
             $rules = [
-                'entity' => 'required|alpha_dash',
-                'tempFile' => 'required|regex_match[/^[a-zA-Z0-9_\-\.]+$/]',
-                'step' => 'required|in_list[confirm]',
-                /* --- INIZIO MODIFICA CHUNKING: Validazione parametro offset --- */
-                'offset' => 'permit_empty|is_natural'
-                /* --- FINE MODIFICA CHUNKING --- */
+                'importId' => 'required|regex_match[/^[a-f0-9]{64}$/]',
+                'step' => 'required|in_list[confirm]'
             ];
 
             if ( ! $this->validateData($posts, $rules)):
@@ -186,55 +257,45 @@ class ImportController extends BackendController
                 return $this->jsonResponse(['result' => false, 'message' => $errorMessage]);
             endif;
 
-            $entity = $this->request->getPost('entity');
-            $tempFile = $this->request->getPost('tempFile');
-            
-            /* --- INIZIO MODIFICA CHUNKING: Inizializzazione offset --- */
-            $offset = (int) $this->request->getPost('offset'); // Se null/vuoto, diventa 0
-            /* --- FINE MODIFICA CHUNKING --- */
+            $importId = (string) $this->request->getPost('importId');
 
-            /* --- INIZIO MODIFICA CHUNKING: Backup SOLO al primo blocco --- */
-            /* Esecuzione del backup preventivo della tabella (solo al giro iniziale) */
-            if ($offset === 0):
-                if ($this->importModel->backupTableBeforeImport($entity) === false):
-                    return $this->jsonResponse(['result' => false, 'message' => lang('backend/components/import.messages.backupError')]);
-                endif;
+            /* Il metodo è idempotente: crea il backup solo al primo chunk e ne verifica l'integrità nei successivi. */
+            if ( ! $this->importModel->backupImport($importId)):
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/components/import.messages.backupError')]);
             endif;
-            /* --- FINE MODIFICA CHUNKING --- */
 
-            $importResult = $this->importModel->executeImport($entity, $tempFile, $offset);
+            $importResult = $this->importModel->executeImport($importId);
 
             if ($importResult['status'] === false):
-                return $this->jsonResponse(['result' => false, 'message' => $importResult['message']]);
-            endif;
+                $recoveryRequired = (bool) ($importResult['recoveryRequired'] ?? false);
+                $message = $recoveryRequired
+                    ? sprintf(lang('backend/components/import.messages.recoveryRequired'), $importId)
+                    : $importResult['message'];
 
-            /* Somma i totali inviati dal Javascript con il parziale di quest'ultimo blocco */
-            $totalInserted = (int)$this->request->getPost('accumulatedInserted') + $importResult['inserted'];
-            $totalUpdated  = (int)$this->request->getPost('accumulatedUpdated') + $importResult['updated'];
-
-            /* Genera il messaggio corretto solo al giro finale */
-            $finalMessage = '';
-            if ($importResult['isFinished']):
-                $finalMessage = ($totalInserted + $totalUpdated) === 0 
-                    ? lang('backend/components/import.messages.importationNoRecordsModified') 
-                    : sprintf(lang('backend/components/import.messages.importSuccess'), $totalInserted, $totalUpdated);
+                return $this->jsonResponse([
+                    'result' => false,
+                    'message' => $message,
+                    'recoveryRequired' => $recoveryRequired,
+                    'importId' => $recoveryRequired ? $importId : null,
+                ]);
             endif;
 
             return $this->jsonResponse([
-                'result' => true, 
-                'message' => $finalMessage,
-                'nextOffset' => $importResult['nextOffset'],
+                'result' => true,
+                'message' => $importResult['message'],
                 'isFinished' => $importResult['isFinished'],
-                /* Passiamo i parziali al JS per il prossimo giro */
                 'inserted' => $importResult['inserted'],
                 'updated' => $importResult['updated'],
-                'progressOutput' => view('backend/components/import/loadingModalPartial'), 
-                'progressMessage' => sprintf(lang('backend/components/import.messages.processedRows'), $importResult['nextOffset']),
+                'totalInserted' => $importResult['totalInserted'],
+                'totalUpdated' => $importResult['totalUpdated'],
+                'processed' => $importResult['processed'],
+                'progressOutput' => view('backend/components/import/loadingModalPartial'),
+                'progressMessage' => sprintf(lang('backend/components/import.messages.processedRows'), $importResult['processed']),
             ]);
 
         endif;
 
-        return null;
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -242,32 +303,28 @@ class ImportController extends BackendController
      *
      * @return ResponseInterface Risposta JSON di conferma dell'avvenuta eliminazione del file
      */
-    public function deleteFile(): ?ResponseInterface
+    public function deleteFile(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
             $posts = $this->request->getPost();
-            $rules = ['file' => 'required|regex_match[/^[a-zA-Z0-9_\-\.]+$/]'];
+            $rules = ['importId' => 'required|regex_match[/^[a-f0-9]{64}$/]'];
 
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 return $this->jsonResponse(['result' => false, 'message' => $errorMessage]);
             endif;
 
-            $file = $this->request->getPost('file');
-            
-            /* Aggiorniamo il percorso puntando alla nuova directory staging */
-            $filePath = WRITEPATH . 'uploads/staging/' . $file;
+            $importId = (string) $this->request->getPost('importId');
 
-            /* Elimina il file di staging se l'utente annulla o chiude la modale */
-            if (file_exists($filePath)):
-                unlink($filePath);
+            if ( ! $this->importModel->deleteStagingImport($importId)):
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/components/import.messages.stagingDeleteError')]);
             endif;
 
             return $this->jsonResponse(['result' => true]);
 
         endif;
 
-        return null;
+        return service('response')->setStatusCode(400);
     }
 }
