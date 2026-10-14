@@ -16,7 +16,7 @@ class SecurityTest extends CIUnitTestCase
         $this->assertSame('X-CSRF-TOKEN', $config->headerName);
         $this->assertSame('csrf_cookie_essential', $config->cookieName);
         $this->assertSame(7200, $config->expires);
-        $this->assertTrue($config->regenerate);
+        $this->assertFalse($config->regenerate);
         $this->assertSame(ENVIRONMENT === 'production', $config->redirect);
     }
 

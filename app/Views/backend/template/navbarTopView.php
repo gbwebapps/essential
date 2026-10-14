@@ -57,9 +57,18 @@
                                     $dataMessageAttr = isset($ele['message']) ? ' data-message="' . esc($ele['message']) . '"' : '';
                             ?>
                                 <li>
-                                    <a class="dropdown-item<?= $activeClass; ?>" href="<?= $href; ?>"<?= $dataIdAttr; ?><?= $dataMessageAttr; ?>>
-                                        <?= $ele['icon'] ?? ''; ?> <span class="ms-1"><?= $ele['label'] ?? ''; ?></span>
-                                    </a>
+                                    <?php if (($ele['method'] ?? 'get') === 'post'): ?>
+                                        <form action="<?= $href; ?>" method="post">
+                                            <?= csrf_field(); ?>
+                                            <button type="submit" class="dropdown-item<?= $activeClass; ?>"<?= $dataIdAttr; ?><?= $dataMessageAttr; ?>>
+                                                <?= $ele['icon'] ?? ''; ?> <span class="ms-1"><?= $ele['label'] ?? ''; ?></span>
+                                            </button>
+                                        </form>
+                                    <?php else: ?>
+                                        <a class="dropdown-item<?= $activeClass; ?>" href="<?= $href; ?>"<?= $dataIdAttr; ?><?= $dataMessageAttr; ?>>
+                                            <?= $ele['icon'] ?? ''; ?> <span class="ms-1"><?= $ele['label'] ?? ''; ?></span>
+                                        </a>
+                                    <?php endif; ?>
                                 </li>
 
                                 <!-- Aggiunge un separatore tra le voci, evitando di inserirlo dopo l'ultima -->

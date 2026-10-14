@@ -90,17 +90,25 @@ class RoutesTest extends CIUnitTestCase
             'backend/settings/saveSettings',
             'backend/settings/deleteSettings',
             'backend/tokens/hardDelete',
-            'backend/logs/hardDelete',
+            'backend/logs/disconnectSession',
             'backend/admins/hardDelete',
             'backend/admins/softDelete',
             'backend/admins/restoreDelete',
             'backend/admins/changeStatus',
+            'backend/auth/logout',
         ];
 
         foreach ($postOnlyRoutes as $route):
             $this->assertArrayHasKey($route, $postRoutes);
             $this->assertArrayNotHasKey($route, $getRoutes);
         endforeach;
+    }
+
+    public function testUnusedSettingsReaderIsNotExposed(): void
+    {
+        [$postRoutes] = $this->routeTable('POST');
+
+        $this->assertArrayNotHasKey('backend/settings/getSettings', $postRoutes);
     }
 
     public function testEveryControllerRouteReferencesAnExistingAction(): void

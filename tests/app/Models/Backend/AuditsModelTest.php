@@ -295,4 +295,48 @@ class AuditsModelTest extends CIUnitTestCase
             $dateRulesList
         );
     }
+
+    public function testListQueryKeepsGuestAuditsAndHistoricalUsername(): void
+    {
+        $model = new \App\Models\Backend\AuditsModel();
+
+        $extractor = function(): array {
+            return [
+                'query' => $this->getDataQuery,
+                'countQuery' => $this->getNumRowsQuery,
+                'orderColumns' => $this->allowedOrderColumns,
+            ];
+        };
+
+        $bind = \Closure::bind($extractor, $model, \App\Models\Backend\AuditsModel::class);
+        $configuration = $bind();
+
+        $this->assertStringContainsString('left join admins', $configuration['query']);
+        $this->assertStringContainsString('admins_audits.username', $configuration['query']);
+        $this->assertStringContainsString('coalesce(admins.superadmin, 0)', $configuration['query']);
+        $this->assertSame('select count(*) as count from admins_audits where 1 = 1', $configuration['countQuery']);
+        $this->assertContains('created_at', $configuration['orderColumns']);
+    }
+
+    public function testSearchRulesAcceptRealAuditValues(): void
+    {
+        $model = new \App\Models\Backend\AuditsModel();
+        $validation = \Config\Services::validation();
+        $validation->setRules($model->showAllSearchValidationRules());
+
+        $valid = $validation->run([
+            'searchFields' => [
+                'username' => 'admin@example.com',
+                'action' => 'RESET_PASSWORD_ADMIN',
+                'section' => 'upload preview',
+                'details' => 'Password reimpostata: operazione n. 2.',
+            ],
+            'searchDates' => [
+                'created_at-from' => '2026-10-01 00:00:00',
+                'created_at-to' => '2026-10-31 23:59:59',
+            ],
+        ]);
+
+        $this->assertTrue($valid, implode(', ', $validation->getErrors()));
+    }
 }

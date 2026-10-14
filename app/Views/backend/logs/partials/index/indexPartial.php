@@ -17,7 +17,7 @@
 
                             <!-- Numero dei record visualizzati in una pagina. Serve al Trick per evitare che all'eliminazione
                             dell'ultimo record in una pagina che non è la prima, la visualizzazione rimanga bloccata e non passi alla pagina successiva. -->
-                            <div id="lastItemPage" data-lastitempage="<?= $data['lastItemPage']; ?>"></div>
+                            <div class="lastItemPage" data-lastitempage="<?= $data['lastItemPage']; ?>"></div>
 
                             <table class="table table-condensed mb-0 text-nowrap">
                                 <thead>
@@ -116,7 +116,7 @@
 
                                         <tr class="border-end border-start table-row-60<?= $isSuperadmin ? ' table-bg-superadmin' : ''; ?>">
                                             <td class="align-middle fw-bold">
-                                                <button class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 text-secondary shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($log->id); ?>" aria-expanded="false" title="Mostra dettagli di sistema">
+                                                <button class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 text-secondary shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($log->id, 'attr'); ?>" aria-expanded="false" title="<?= esc(lang('backend/logs.labels.showSystemDetails'), 'attr'); ?>">
                                                     <i class="fa-solid fa-chevron-right"></i>
                                                 </button>
                                             </td>
@@ -145,11 +145,11 @@
 
                                                         <div class="d-flex flex-column gap-1">
 
-                                                            <!-- Pulsante Elimina Definitivamente (Hard Delete) -->
-                                                            <form class="hardDeleteRecord m-0 p-0" data-message="<?= sprintf(lang('backend/logs.messages.areYouSureHardDelete'), esc($log->firstname), esc($log->lastname)); ?>">
-                                                                <input type="hidden" name="tokenId" value="<?= esc($log->token_id_val); ?>">
+                                                            <!-- Pulsante di disconnessione della sessione -->
+                                                            <form class="disconnectSessionRecord m-0 p-0" data-controller="logs" data-message="<?= esc(sprintf(lang('backend/logs.messages.areYouSureDisconnectSession'), $log->firstname, $log->lastname), 'attr'); ?>">
+                                                                <input type="hidden" name="tokenId" value="<?= esc($log->token_id_val, 'attr'); ?>">
                                                                 <button type="submit" class="btn btn-link p-0 m-0 text-danger text-decoration-none action shadow-none">
-                                                                    <i class="fa-solid fa-xmark fa-fw"></i> <?= lang('backend/logs.actions.hardDelete'); ?>
+                                                                    <i class="fa-solid fa-xmark fa-fw"></i> <?= lang('backend/logs.actions.disconnectSession'); ?>
                                                                 </button>
                                                             </form>
 
@@ -168,19 +168,19 @@
                                                 <div class="collapse" id="meta-<?= esc($log->id); ?>">
                                                     <div class="p-2 border-bottom bg-light text-secondary small">
                                                         <?php 
-                                                            $userAgent->parse(esc($log->user_agent)); 
+                                                            $userAgent->parse($log->user_agent);
 
                                                             $agentText = lang('backend/logs.labels.createdAt') . ' <span class="text-primary fw-bold">' . convertDate(esc($log->created_at), 'conversational') . '</span>';
                                                             $agentText .= ' &bull; ' . lang('backend/logs.labels.typeToken') . ' <span class="text-primary fw-bold">' . esc($log->token_type) . '</span>';
-                                                            $agentText .= ' &bull; ' . lang('backend/logs.labels.operatingSystem') . ' <span class="text-primary fw-bold">' . $userAgent->getPlatform() . '</span>';
+                                                            $agentText .= ' &bull; ' . lang('backend/logs.labels.operatingSystem') . ' <span class="text-primary fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
                                                         ?>
                                                         <?php
                                                             if($userAgent->isBrowser()):
-                                                                $agentText .= ' &bull; ' . lang('backend/logs.labels.browser') . ' <span class="text-primary fw-bold">' . $userAgent->getBrowser() . '</span>';
+                                                                $agentText .= ' &bull; ' . lang('backend/logs.labels.browser') . ' <span class="text-primary fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
                                                             elseif($userAgent->isMobile()):
-                                                                $agentText .= ' &bull; ' . lang('backend/logs.labels.mobile') . ' <span class="text-primary fw-bold">' . $userAgent->getMobile() . '</span>';
+                                                                $agentText .= ' &bull; ' . lang('backend/logs.labels.mobile') . ' <span class="text-primary fw-bold">' . esc($userAgent->getMobile()) . '</span>';
                                                             elseif($userAgent->isRobot()):
-                                                                $agentText .= ' &bull; ' . lang('backend/logs.labels.robot') . ' Robot <span class="text-primary fw-bold">' . $userAgent->getRobot() . '</span>';
+                                                                $agentText .= ' &bull; ' . lang('backend/logs.labels.robot') . ' <span class="text-primary fw-bold">' . esc($userAgent->getRobot()) . '</span>';
                                                             endif;
                                                         ?>
                                                         <?= $agentText; ?>

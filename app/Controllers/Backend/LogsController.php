@@ -47,7 +47,7 @@ class LogsController extends BackendController
         $this->data['entity'] = 'logs';
 
         $this->logsModel = model(LogsModel::class);
-        $this->logsClass = new LogsClass($this->logsModel);
+        $this->logsClass = new LogsClass();
     }
 
     /**
@@ -114,11 +114,11 @@ class LogsController extends BackendController
     }
 
     /**
-     * Provvede alla rimozione definitiva di un singolo record di accesso (log session) identificato in modo esplicito dal suo token ID.
+     * Revoca una sessione attiva identificata tramite token, preservando il relativo log di accesso.
      *
-     * @return ResponseInterface|null Risposta JSON contenente l'esito dell'operazione di cancellazione.
+     * @return ResponseInterface Risposta JSON contenente l'esito dell'operazione di cancellazione.
      */
-    public function hardDelete(): ?ResponseInterface
+    public function disconnectSession(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -130,12 +130,12 @@ class LogsController extends BackendController
                 return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/logs.messages.validationToastErrors'), $errorMessage)]);
             endif;
 
-            $json = $this->logsModel->deleteToken((int) $posts['tokenId']);
+            $json = $this->logsModel->disconnectSession((int) $posts['tokenId']);
 
             return $this->jsonResponse($json);
 
         endif;
 
-        return null;
+        return service('response')->setStatusCode(400);
     }
 }

@@ -25,6 +25,10 @@ return [
 		'operatingSystem' => 'Sistema operativo', 
 		'browser' => 'Browser web', 
 		'ipAddress' => 'Indirizzo IP', 
+		'mobile' => 'Dispositivo mobile',
+		'robot' => 'Robot',
+		'filtersAndOptions' => 'Opzioni e filtri',
+		'showSystemDetails' => 'Mostra dettagli di sistema',
 		'dateFrom' => 'Data inizio', 
 		'dateTo' => 'Data fine',
 	],
@@ -37,6 +41,7 @@ return [
 		'dateTo' => 'Cerca per data fine...',
 	], 
 	'messages' => [
+		'validationToastErrors' => '%s',
 		'validationErrors' => 'Errori di validazione.', 
 		'noAuditsFound' => 'Non sono presenti attività.', 
 	]

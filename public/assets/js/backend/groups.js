@@ -181,7 +181,7 @@ document.addEventListener('click', function(e) {
     if (e.target.matches('.select-all')) {
         e.preventDefault();
         const controller = e.target.dataset.controller;
-        const checkboxes = document.querySelectorAll(`input[type="checkbox"].${controller}`);
+        const checkboxes = document.querySelectorAll(`input[type="checkbox"].${CSS.escape(controller)}`);
         const anyChecked = Array.from(checkboxes).some(el => el.checked);
         const newState = !anyChecked;
         checkboxes.forEach(el => el.checked = newState);

@@ -7,8 +7,8 @@
             <!-- Campo email -->
             <div class="mb-2">
                 <label for="email" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/auth.labels.email'); ?></label>
-                <input type="text" id="email" name="email" class="form-control" placeholder="<?= lang('backend/auth.placeholders.email'); ?>">
-                <div class="error_email text-danger fw-bold small pt-1">&nbsp;</div>
+                <input type="email" id="email" name="email" class="form-control" placeholder="<?= lang('backend/auth.placeholders.email'); ?>" autocomplete="email" aria-describedby="error-email">
+                <div id="error-email" class="error_email text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
             </div>
             <!-- End Campo email -->
 

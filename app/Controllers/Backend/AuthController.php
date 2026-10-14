@@ -50,7 +50,7 @@ class AuthController extends BackendController
      *
      * @return string HTML renderizzato della vista index
      */
-    public function index()
+    public function index(): string
     {
         $this->data['action'] = 'index';
         
@@ -93,14 +93,16 @@ class AuthController extends BackendController
 
             $json = $this->authModel->login($posts, $this->request);
 
-            /* Recupera l'URL salvato dal filtro, altrimenti usa la dashboard di default */
-            $redirectUrl = session()->get('intended_url') ?? base_url('backend/dashboard');
-            
-            /* Pulisce la variabile di sessione */
-            session()->remove('intended_url');
-            
-            /* Aggiunge la destinazione alla risposta per far eseguire il redirect al JS */
-            $json['redirect'] = $redirectUrl;
+            if (($json['result'] ?? false) === true):
+                /* Recupera l'URL salvato dal filtro, altrimenti usa la dashboard di default */
+                $json['redirect'] = session()->get('intended_url') ?? base_url('backend/dashboard');
+
+                /* Pulisce la variabile soltanto dopo il completamento del login */
+                session()->remove('intended_url');
+            elseif (($json['result'] ?? false) === '2fa_required'):
+                /* La destinazione è già stata trasferita nella sessione temporanea 2FA */
+                session()->remove('intended_url');
+            endif;
 
             return $this->jsonResponse($json);
 

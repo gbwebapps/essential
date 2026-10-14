@@ -89,8 +89,10 @@ return [
 		'areYouSureToDeleteBackups' => 'Êtes-vous sûr de vouloir supprimer la sauvegarde générée le <br><b>%s</b> ?', 
 		'areYouSureToDeleteLogs' => '<p>Êtes-vous sûr de vouloir supprimer les accès du <b>%s</b> au <b>%s</b> ?</p> <p><b>%d</b> accès seront supprimés.</p>',
 		'noAuditsDeleted' => 'Aucune activité supprimée dans la plage de dates sélectionnée.', 
+		'deleteAuditsError' => 'Les activités demandées n’ont pas pu être supprimées.',
 		'noAuditsFound' => 'Aucune activité trouvée dans la plage de dates sélectionnée.', 
 		'noLogsDeleted' => 'Aucun accès supprimé dans la plage de dates sélectionnée.', 
+		'deleteLogsError' => 'Les accès demandés n’ont pas pu être supprimés.',
 		'noLogsFound' => 'Aucun accès trouvé dans la plage de dates sélectionnée.', 
 		'deleteAuditsSuccess' => '%d activités supprimées avec succès <br>du %s au %s.', 
 		'deleteLogsSuccess' => '%d accès supprimés avec succès <br>du %s au %s.', 
@@ -108,5 +110,7 @@ return [
 		'noStructure' => 'Aucune donnée pour la structure de cette table.', 
 		'confirmCleanFolder' => 'Êtes-vous sûr de vouloir vider le dossier <b>%s</b> ? <br>Cette action est irréversible et pourrait causer des dysfonctionnements.', 
 		'folderCleanSuccess' => '%d fichiers ont été supprimés du dossier %s.', 
+		'folderCleanError' => '%d fichiers n’ont pas pu être supprimés du dossier %s.',
+		'folderCleanUnavailable' => 'Le dossier %s est indisponible ou illisible.',
 	], 
 ];

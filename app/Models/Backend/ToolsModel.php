@@ -14,6 +14,8 @@ use App\Interfaces\ImportValidationInterface;
  */
 class ToolsModel extends BackendModel 
 {
+	private const BACKUP_FILENAME_PATTERN = '/^backup_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.zip$/';
+
 	/**
 	 * Whitelist dei campi POST consentiti durante le operazioni di filtraggio o eliminazione degli Audit.
 	 * 
@@ -33,7 +35,7 @@ class ToolsModel extends BackendModel
 	 * 
 	 * @var array 
 	 */
-	protected array $cleanableFolders = ['backups/database', 'backups/imports', 'cache', 'debugbar', 'exports', 'logs', 'session', 'uploads/staging'];
+	protected array $cleanableFolders = ['cache', 'debugbar', 'exports', 'logs', 'uploads/staging'];
 
 	/**
 	 * Metodo di inizializzazione nativo di CodeIgniter.
@@ -182,7 +184,16 @@ class ToolsModel extends BackendModel
 		/* Query di eliminazione diretta */
 		$sql = 'delete from admins_audits where created_at between ? and ?';
 
-		$this->db->query($sql, [$dates['from'], $dates['to']]);
+		try {
+			$query = $this->db->query($sql, [$dates['from'], $dates['to']]);
+
+			if ($query === false):
+				return ['result' => false, 'message' => lang('backend/tools.messages.deleteAuditsError')];
+			endif;
+		} catch (\Throwable $e) {
+			log_message('error', 'Tools deleteAudits error: ' . $e->getMessage());
+			return ['result' => false, 'message' => lang('backend/tools.messages.deleteAuditsError')];
+		}
 
 		$deleted = $this->db->affectedRows();
 
@@ -294,7 +305,16 @@ class ToolsModel extends BackendModel
     	/* Query di eliminazione diretta */
     	$sql = 'delete from admins_logs where created_at between ? and ?';
 
-    	$this->db->query($sql, [$dates['from'], $dates['to']]);
+		try {
+			$query = $this->db->query($sql, [$dates['from'], $dates['to']]);
+
+			if ($query === false):
+				return ['result' => false, 'message' => lang('backend/tools.messages.deleteLogsError')];
+			endif;
+		} catch (\Throwable $e) {
+			log_message('error', 'Tools deleteLogs error: ' . $e->getMessage());
+			return ['result' => false, 'message' => lang('backend/tools.messages.deleteLogsError')];
+		}
 
     	$deleted = $this->db->affectedRows();
 
@@ -334,6 +354,10 @@ class ToolsModel extends BackendModel
 		$result = [];
 
 		foreach ($tables as $table) {
+			if (empty($table['Engine'])):
+				continue;
+			endif;
+
 			/* Calcolo della dimensione totale (Dati + Indici) convertita in MB */
 			$totalSizeBytes = $table['Data_length'] + $table['Index_length'];
 			$sizeMB = round($totalSizeBytes / 1048576, 2);
@@ -367,15 +391,29 @@ class ToolsModel extends BackendModel
 	public function runOptimization(string|array $target): array|bool
 	{
 		/* Normalizziamo l'input in un array per processare le query */
-		$tables = is_array($target) ? $target : [$target];
+		$tables = array_values(array_unique(is_array($target) ? $target : [$target]));
+		$availableTables = array_column($this->getTablesStatus(), 'name');
 
-		foreach ($tables as $table):
-			$escapedTable = $this->db->escapeIdentifiers($table);
-			
-			$this->db->query("ANALYZE TABLE {$escapedTable}");
-			$this->db->query("CHECK TABLE {$escapedTable}");
-			$this->db->query("OPTIMIZE TABLE {$escapedTable}");
-		endforeach;
+		if ($tables === [] || array_diff($tables, $availableTables) !== []):
+			return false;
+		endif;
+
+		try {
+			foreach ($tables as $table):
+				$escapedTable = $this->db->escapeIdentifiers($table);
+
+				foreach (['analyze', 'check', 'optimize'] as $operation):
+					$query = $this->db->query("{$operation} table {$escapedTable}");
+
+					if ( ! $this->maintenanceQuerySucceeded($query)):
+						return false;
+					endif;
+				endforeach;
+			endforeach;
+		} catch (\Throwable $e) {
+			log_message('error', 'Tools runOptimization error: ' . $e->getMessage());
+			return false;
+		}
 
 		/* Registrazione attività */
 		$currentAdmin = service('authorization')->currentAdmin();
@@ -389,6 +427,30 @@ class ToolsModel extends BackendModel
 
 		/* Se la richiesta era un array (tutte le tabelle), restituiamo l'intero database aggiornato */
 		return $this->getTablesStatus();
+	}
+
+	/**
+	 * Verifica l'esito restituito dai comandi MySQL di manutenzione.
+	 */
+	private function maintenanceQuerySucceeded(mixed $query): bool
+	{
+		if ($query === false):
+			return false;
+		endif;
+
+		if ( ! is_object($query) || ! method_exists($query, 'getResultArray')):
+			return true;
+		endif;
+
+		foreach ($query->getResultArray() as $row):
+			$messageType = strtolower((string) ($row['Msg_type'] ?? $row['msg_type'] ?? ''));
+
+			if ($messageType === 'error'):
+				return false;
+			endif;
+		endforeach;
+
+		return true;
 	}
 
 	/**
@@ -430,6 +492,10 @@ class ToolsModel extends BackendModel
             foreach ($files as $file):
 
                 $filename = basename($file);
+
+				if (preg_match(self::BACKUP_FILENAME_PATTERN, $filename) !== 1):
+					continue;
+				endif;
                 
                 /* 1. Ottiene la data in formato MySQL (dal nome file o dal file system) */
                 $mysqlDate = $this->extractDateFromFilename($filename);
@@ -498,109 +564,225 @@ class ToolsModel extends BackendModel
 	public function generateDatabaseBackups(): bool
 	{
 		$path = WRITEPATH . 'backups/database/';
-		
-		/* Crea la cartella se non dovesse esistere */
-		if ( ! is_dir($path)):
-			mkdir($path, 0775, true);
+
+		if ( ! is_dir($path) && ( ! mkdir($path, 0775, true) && ! is_dir($path))):
+			log_message('error', 'Tools backup error: impossibile creare la directory ' . $path);
+			return false;
 		endif;
 
 		$date = date('Y-m-d_H-i-s');
 		$sqlFilename = 'backup_' . $date . '.sql';
 		$zipFilename = 'backup_' . $date . '.zip';
-		
+
 		$sqlPath = $path . $sqlFilename;
 		$zipPath = $path . $zipFilename;
 
-		/* 1. Generazione file SQL in puro PHP (Universale) */
-		$fileHandler = fopen($sqlPath, 'w');
-		if ($fileHandler === false):
+		if (file_exists($sqlPath) || file_exists($zipPath)):
+			log_message('error', 'Tools backup error: esiste già un file con timestamp ' . $date);
 			return false;
 		endif;
 
-		/* Intestazione del file SQL */
-		fwrite($fileHandler, "/* Backup Database generato il " . date('Y-m-d H:i:s') . " */\n\n");
-		fwrite($fileHandler, "SET FOREIGN_KEY_CHECKS = 0;\n\n");
+		$fileHandler = null;
+		$snapshotStarted = false;
+		$backupCompleted = false;
 
-		/* Recupera tutte le tabelle */
-		$tables = $this->db->listTables();
+		try {
+			$fileHandler = fopen($sqlPath, 'xb');
 
-		foreach ($tables as $table):
-			/* Salva la struttura della tabella */
-			$query = $this->db->query("SHOW CREATE TABLE `{$table}`");
-			$row = $query->getRowArray();
-			
-			fwrite($fileHandler, "DROP TABLE IF EXISTS `{$table}`;\n");
-			fwrite($fileHandler, $row['Create Table'] . ";\n\n");
-
-			/* Salva i dati della tabella */
-			$query = $this->db->query("SELECT * FROM `{$table}`");
-			$results = $query->getResultArray();
-
-			if (count($results) > 0):
-				foreach ($results as $dataRow):
-					$values = [];
-					foreach ($dataRow as $val):
-						if (is_null($val)):
-							$values[] = 'NULL';
-						else:
-							/* escape() protegge la stringa e aggiunge automaticamente gli apici */
-							$values[] = $this->db->escape($val);
-						endif;
-					endforeach;
-					
-					$sqlInsert = "INSERT INTO `{$table}` VALUES(" . implode(', ', $values) . ");\n";
-					fwrite($fileHandler, $sqlInsert);
-				endforeach;
-				fwrite($fileHandler, "\n");
+			if ($fileHandler === false):
+				throw new \RuntimeException('Impossibile creare il file SQL temporaneo.');
 			endif;
-		endforeach;
 
-		/* Chiusura file SQL */
-		fwrite($fileHandler, "SET FOREIGN_KEY_CHECKS = 1;\n");
-		fclose($fileHandler);
+			if ($this->db->query('set transaction isolation level repeatable read') === false
+				|| $this->db->query('start transaction with consistent snapshot') === false):
+				throw new \RuntimeException('Impossibile avviare lo snapshot consistente del database.');
+			endif;
 
-		/* 2. Compressione del file in formato ZIP */
-		$zip = new \ZipArchive();
-		
-		if ($zip->open($zipPath, \ZipArchive::CREATE) === true):
-			$zip->addFile($sqlPath, $sqlFilename);
-			$zip->close();
-		else:
-			/* Pulizia in caso di errore di compressione */
-			unlink($sqlPath);
+			$snapshotStarted = true;
+
+			$this->writeBackupData($fileHandler, '/* Backup database generato il ' . date('Y-m-d H:i:s') . " */\n\n");
+			$this->writeBackupData($fileHandler, "set foreign_key_checks = 0;\n\n");
+
+			$tables = $this->db->listTables();
+			$views = [];
+
+			foreach ($tables as $table):
+				$escapedTable = $this->db->escapeIdentifiers($table);
+				$schemaQuery = $this->db->query("show create table {$escapedTable}");
+
+				if ($schemaQuery === false):
+					throw new \RuntimeException('Impossibile leggere la struttura di ' . $table . '.');
+				endif;
+
+				$schemaRow = $schemaQuery->getRowArray();
+				$createTable = $schemaRow['Create Table'] ?? null;
+				$createView = $schemaRow['Create View'] ?? null;
+
+				if (is_string($createView) && $createView !== ''):
+					$views[] = ['name' => $escapedTable, 'sql' => $createView];
+					continue;
+				endif;
+
+				if ( ! is_string($createTable) || $createTable === ''):
+					throw new \RuntimeException('Definizione SQL non disponibile per ' . $table . '.');
+				endif;
+
+				$fieldNames = $this->db->getFieldNames($table);
+
+				if ($fieldNames === []):
+					throw new \RuntimeException('Nessuna colonna disponibile per ' . $table . '.');
+				endif;
+
+				$escapedFields = array_map(fn($field) => $this->db->escapeIdentifiers($field), $fieldNames);
+				$fieldList = implode(', ', $escapedFields);
+
+				$this->writeBackupData($fileHandler, "drop table if exists {$escapedTable};\n");
+				$this->writeBackupData($fileHandler, $createTable . ";\n\n");
+
+				$dataQuery = $this->db->query("select {$fieldList} from {$escapedTable}");
+
+				if ($dataQuery === false):
+					throw new \RuntimeException('Impossibile leggere i dati di ' . $table . '.');
+				endif;
+
+				while (($dataRow = $dataQuery->getUnbufferedRow('array')) !== null):
+					$values = [];
+
+					foreach ($dataRow as $value):
+						$values[] = $value === null ? 'null' : $this->db->escape($value);
+					endforeach;
+
+					$this->writeBackupData(
+						$fileHandler,
+						"insert into {$escapedTable} ({$fieldList}) values (" . implode(', ', $values) . ");\n"
+					);
+				endwhile;
+
+				$dataQuery->freeResult();
+				$this->writeBackupData($fileHandler, "\n");
+			endforeach;
+
+			foreach ($views as $view):
+				$this->writeBackupData($fileHandler, "drop view if exists {$view['name']};\n");
+				$this->writeBackupData($fileHandler, $view['sql'] . ";\n\n");
+			endforeach;
+
+			$this->writeBackupData($fileHandler, "set foreign_key_checks = 1;\n");
+
+			if ($this->db->query('rollback') === false):
+				throw new \RuntimeException('Impossibile chiudere lo snapshot del database.');
+			endif;
+
+			$snapshotStarted = false;
+
+			if ( ! fclose($fileHandler)):
+				throw new \RuntimeException('Impossibile chiudere il file SQL temporaneo.');
+			endif;
+
+			$fileHandler = null;
+
+			$zip = new \ZipArchive();
+
+			if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true):
+				throw new \RuntimeException('Impossibile creare l’archivio ZIP.');
+			endif;
+
+			$fileAdded = $zip->addFile($sqlPath, $sqlFilename);
+			$zipClosed = $zip->close();
+
+			if ( ! $fileAdded || ! $zipClosed):
+				throw new \RuntimeException('Impossibile completare l’archivio ZIP.');
+			endif;
+
+			$verificationZip = new \ZipArchive();
+
+			if ($verificationZip->open($zipPath) !== true):
+				throw new \RuntimeException('L’archivio ZIP generato non è leggibile.');
+			endif;
+
+			$archiveContainsDump = $verificationZip->locateName($sqlFilename) !== false;
+			$verificationZip->close();
+			$zipSize = filesize($zipPath);
+
+			if ( ! $archiveContainsDump || $zipSize === false || $zipSize === 0):
+				throw new \RuntimeException('L’archivio ZIP generato non contiene il dump SQL.');
+			endif;
+
+			if ( ! unlink($sqlPath)):
+				throw new \RuntimeException('Impossibile eliminare il file SQL temporaneo.');
+			endif;
+
+			$backupCompleted = true;
+		} catch (\Throwable $e) {
+			log_message('error', 'Tools generateDatabaseBackups error: ' . $e->getMessage());
 			return false;
-		endif;
+		} finally {
+			if ($snapshotStarted):
+				try {
+					$this->db->query('rollback');
+				} catch (\Throwable $e) {
+					log_message('error', 'Tools backup rollback error: ' . $e->getMessage());
+				}
+			endif;
 
-		/* 3. Eliminazione del file SQL in chiaro */
-		if (file_exists($sqlPath)):
-			unlink($sqlPath);
-		endif;
+			if (is_resource($fileHandler)):
+				fclose($fileHandler);
+			endif;
 
-		/* 4. Rotazione Backup: manteniamo solo gli ultimi 10 file */
-		$files = glob($path . '*.zip');
-		
-		if (is_array($files) && count($files) > 10):
-			
-			/* Ordina i file dal più vecchio al più recente */
+			if (file_exists($sqlPath) && ! unlink($sqlPath)):
+				log_message('error', 'Tools backup cleanup error: impossibile eliminare ' . $sqlPath);
+			endif;
+
+			if ( ! $backupCompleted && file_exists($zipPath) && ! unlink($zipPath)):
+				log_message('error', 'Tools backup cleanup error: impossibile eliminare ' . $zipPath);
+			endif;
+		}
+
+		$files = array_values(array_filter(glob($path . '*.zip') ?: [], function($file) {
+			return preg_match(self::BACKUP_FILENAME_PATTERN, basename($file)) === 1;
+		}));
+
+		if (count($files) > 10):
 			usort($files, function($a, $b) {
 				return filemtime($a) <=> filemtime($b);
 			});
-			
+
 			$filesToDelete = count($files) - 10;
-			
+
 			for ($i = 0; $i < $filesToDelete; $i++):
-				if (file_exists($files[$i])):
-					unlink($files[$i]);
+				if (file_exists($files[$i]) && ! unlink($files[$i])):
+					log_message('error', 'Tools backup rotation error: impossibile eliminare ' . $files[$i]);
 				endif;
 			endfor;
-			
 		endif;
 
-		/* Registrazione attività */
-		$currentAdmin = service('authorization')->currentAdmin();
-		log_admin_activity('GENERATE_BACKUP', 'tools', sprintf(lang('backend/tools.audits.generateBackup'), $zipFilename), $currentAdmin);
+		try {
+			$currentAdmin = service('authorization')->currentAdmin();
+			log_admin_activity('GENERATE_BACKUP', 'tools', sprintf(lang('backend/tools.audits.generateBackup'), $zipFilename), $currentAdmin);
+		} catch (\Throwable $e) {
+			log_message('error', 'Tools backup audit error: ' . $e->getMessage());
+		}
 
 		return true;
+	}
+
+	/**
+	 * Scrive integralmente un blocco nel dump, intercettando scritture parziali o fallite.
+	 */
+	private function writeBackupData($handle, string $data): void
+	{
+		$length = strlen($data);
+		$written = 0;
+
+		while ($written < $length):
+			$result = fwrite($handle, substr($data, $written));
+
+			if ($result === false || $result === 0):
+				throw new \RuntimeException('Scrittura incompleta del dump SQL.');
+			endif;
+
+			$written += $result;
+		endwhile;
 	}
 
 	/**
@@ -615,6 +797,10 @@ class ToolsModel extends BackendModel
 	 */
 	public function deleteBackups(string $filename): bool
 	{
+		if (preg_match(self::BACKUP_FILENAME_PATTERN, $filename) !== 1):
+			return false;
+		endif;
+
 		/* basename protegge il percorso assicurando che sia solo il nome del file */
 		$path = WRITEPATH . 'backups/database/' . basename($filename);
 		
@@ -647,22 +833,11 @@ class ToolsModel extends BackendModel
 
 	    foreach ($this->cleanableFolders as $folder):
 	        $path = WRITEPATH . $folder;
-	        $count = 0;
-
-	        if (is_dir($path)):
-	            $files = scandir($path);
-	            foreach ($files as $file):
-	                if ($file !== '.' && $file !== '..' && strtolower($file) !== 'index.html'):
-	                    if (is_file($path . DIRECTORY_SEPARATOR . $file)):
-	                        $count++;
-	                    endif;
-	                endif;
-	            endforeach;
-	        endif;
+	        $files = $this->getCleanableFiles($path);
 
 	        $status[] = [
 	            'name'  => $folder,
-	            'count' => $count
+	            'count' => is_array($files) ? count($files) : 0
 	        ];
 	    endforeach;
 
@@ -688,28 +863,62 @@ class ToolsModel extends BackendModel
 
 	    $path = WRITEPATH . $folder;
 	    $deletedCount = 0;
+	    $failedCount = 0;
 
-	    if (is_dir($path)):
-	        $files = scandir($path);
-	        foreach ($files as $file):
-	            if ($file !== '.' && $file !== '..' && strtolower($file) !== 'index.html'):
-	                $filePath = $path . DIRECTORY_SEPARATOR . $file;
-	                
-	                /* Elimina solo se è un file (non tocca eventuali sottocartelle) */
-	                if (is_file($filePath)):
-	                    if (unlink($filePath)):
-	                        $deletedCount++;
-	                    endif;
-	                endif;
-	            endif;
-	        endforeach;
+	    $files = $this->getCleanableFiles($path);
+
+	    if ($files === false):
+	        return ['result' => false, 'message' => sprintf(lang('backend/tools.messages.folderCleanUnavailable'), $folder)];
 	    endif;
+
+	    foreach ($files as $filePath):
+	        if (unlink($filePath)):
+	            $deletedCount++;
+	        else:
+	            $failedCount++;
+	        endif;
+	    endforeach;
 
 	    /* Registrazione attività */
 	    $currentAdmin = service('authorization')->currentAdmin();
-	    log_admin_activity('CLEAN_' . strtoupper($folder), 'tools', sprintf(lang('backend/tools.audits.cleanFolder'), $folder, $deletedCount), $currentAdmin);
+	    log_admin_activity('CLEAN_' . strtoupper(str_replace('/', '_', $folder)), 'tools', sprintf(lang('backend/tools.audits.cleanFolder'), $folder, $deletedCount), $currentAdmin);
+
+	    if ($failedCount > 0):
+	        return ['result' => false, 'message' => sprintf(lang('backend/tools.messages.folderCleanError'), $failedCount, $folder)];
+	    endif;
 
 	    return ['result' => true, 'message' => sprintf(lang('backend/tools.messages.folderCleanSuccess'), $deletedCount, $folder)];
+	}
+
+	/**
+	 * Restituisce ricorsivamente i file eliminabili mantenendo intatto l'albero delle directory.
+	 */
+	private function getCleanableFiles(string $path): array|false
+	{
+		if ( ! is_dir($path) || ! is_readable($path)):
+			return false;
+		endif;
+
+		$files = [];
+		$protectedFiles = ['index.html', '.htaccess', '.gitignore'];
+
+		try {
+			$iterator = new \RecursiveIteratorIterator(
+				new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS),
+				\RecursiveIteratorIterator::LEAVES_ONLY
+			);
+
+			foreach ($iterator as $file):
+				if ($file->isFile() && ! in_array(strtolower($file->getFilename()), $protectedFiles, true)):
+					$files[] = $file->getPathname();
+				endif;
+			endforeach;
+		} catch (\UnexpectedValueException $e) {
+			log_message('error', 'Tools writable scan error: ' . $e->getMessage());
+			return false;
+		}
+
+		return $files;
 	}
 
 	/**

@@ -779,7 +779,7 @@ class LogsControllerTest extends CIUnitTestCase
         );
     }
 
-    public function testHardDeleteReturnsNullWhenNotAjaxOrPost(): void
+    public function testDisconnectSessionReturnsBadRequestWhenNotAjaxOrPost(): void
     {
         $request = 
         $this
@@ -823,15 +823,16 @@ class LogsControllerTest extends CIUnitTestCase
 
         $result =
         $controller
-        ->hardDelete();
+        ->disconnectSession();
 
         $this
-        ->assertNull(
-            $result
+        ->assertSame(
+            400,
+            $result->getStatusCode()
         );
     }
 
-    public function testHardDeleteReturnsValidationToastErrorsForInvalidPostData(): void
+    public function testDisconnectSessionReturnsValidationToastErrorsForInvalidPostData(): void
     {
         $request = 
         $this
@@ -956,7 +957,7 @@ class LogsControllerTest extends CIUnitTestCase
 
         $result = 
         $controller
-        ->hardDelete();
+        ->disconnectSession();
 
         $this
         ->assertSame(
@@ -965,7 +966,7 @@ class LogsControllerTest extends CIUnitTestCase
         );
     }
 
-    public function testHardDeleteReturnsModelResultOnSuccess(): void
+    public function testDisconnectSessionReturnsModelResultOnSuccess(): void
     {
         $request = 
         $this
@@ -1017,7 +1018,7 @@ class LogsControllerTest extends CIUnitTestCase
 
         $logsModel
         ->method(
-            'deleteToken'
+            'disconnectSession'
         )
         ->with(
             1
@@ -1085,12 +1086,26 @@ class LogsControllerTest extends CIUnitTestCase
 
         $result = 
         $controller
-        ->hardDelete();
+        ->disconnectSession();
 
         $this
         ->assertSame(
             $expectedResponse, 
             $result
         );
+    }
+
+    public function testIndexViewMatchesListManagerContract(): void
+    {
+        $view = file_get_contents(APPPATH . 'Views/backend/logs/indexView.php');
+
+        $this->assertIsString($view);
+        $this->assertStringContainsString('class="form-select changeNumRows"', $view);
+        $this->assertStringContainsString('class="collapse search-bar"', $view);
+
+        foreach (['username', 'logout_reason', 'login-from', 'login-to'] as $field):
+            $this->assertStringContainsString('data-search-field="' . $field . '"', $view);
+            $this->assertStringContainsString('data-search-error="' . $field . '"', $view);
+        endforeach;
     }
 }

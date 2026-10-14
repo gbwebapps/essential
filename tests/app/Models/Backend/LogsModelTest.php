@@ -56,7 +56,7 @@ class LogsModelTest extends \CodeIgniter\Test\CIUnitTestCase
                 [
                     'searchFields.username' => [
                         'label' => lang('backend/logs.labels.username'),
-                        'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\']+$/u]']
+                        'rules' => ['permit_empty', 'trim', 'max_length[100]', 'regex_match[/^[a-zA-Z0-9@._+\-]+$/]']
                     ],
                     'searchFields.logout_reason' => [
                         'label' => lang('backend/logs.labels.logoutReason'),
@@ -75,7 +75,7 @@ class LogsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             );
     }
 
-    public function testDeleteTokenNotFoundReturnsError()
+    public function testDisconnectSessionNotFoundReturnsError()
     {
         $modelClass
             =
@@ -95,6 +95,10 @@ class LogsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             ->createMock(
                 $dbClass
             );
+
+        $dbMock
+            ->method('transBegin')
+            ->willReturn(true);
 
         $resClass
             =
@@ -143,7 +147,7 @@ class LogsModelTest extends \CodeIgniter\Test\CIUnitTestCase
         $result
             =
             $model
-            ->deleteToken(
+            ->disconnectSession(
                 1
             );
 
@@ -154,7 +158,7 @@ class LogsModelTest extends \CodeIgniter\Test\CIUnitTestCase
 
         $expectedMsg
             =
-            lang('backend/logs.messages.deleteTokenError');
+            lang('backend/logs.messages.disconnectSessionError');
 
         $this
             ->assertSame(
@@ -163,7 +167,7 @@ class LogsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             );
     }
 
-    public function testDeleteTokenInTrashReturnsError()
+    public function testDisconnectSessionInTrashReturnsError()
     {
         $modelClass
             =
@@ -183,6 +187,10 @@ class LogsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             ->createMock(
                 $dbClass
             );
+
+        $dbMock
+            ->method('transBegin')
+            ->willReturn(true);
 
         $resClass
             =
@@ -242,7 +250,7 @@ class LogsModelTest extends \CodeIgniter\Test\CIUnitTestCase
         $result
             =
             $model
-            ->deleteToken(
+            ->disconnectSession(
                 2
             );
 
@@ -262,7 +270,7 @@ class LogsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             );
     }
 
-    public function testDeleteTokenSuperadminReturnsError()
+    public function testDisconnectSessionSuperadminReturnsError()
     {
         $modelClass
             =
@@ -282,6 +290,10 @@ class LogsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             ->createMock(
                 $dbClass
             );
+
+        $dbMock
+            ->method('transBegin')
+            ->willReturn(true);
 
         $resClass
             =
@@ -346,7 +358,7 @@ class LogsModelTest extends \CodeIgniter\Test\CIUnitTestCase
         $result
             =
             $model
-            ->deleteToken(
+            ->disconnectSession(
                 3
             );
 
@@ -366,7 +378,7 @@ class LogsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             );
     }
 
-    public function testDeleteTokenSuccessUpdatesLogAndDeletesToken()
+    public function testDisconnectSessionSuccessUpdatesLogAndDeletesToken()
     {
         if (
             ! function_exists(
@@ -396,6 +408,22 @@ class LogsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             ->createMock(
                 $dbClass
             );
+
+        $dbMock
+            ->method('transBegin')
+            ->willReturn(true);
+
+        $dbMock
+            ->method('affectedRows')
+            ->willReturn(1);
+
+        $dbMock
+            ->method('transStatus')
+            ->willReturn(true);
+
+        $dbMock
+            ->method('transCommit')
+            ->willReturn(true);
 
         $resClass
             =
@@ -504,7 +532,7 @@ class LogsModelTest extends \CodeIgniter\Test\CIUnitTestCase
 
         $authMock
             ->method('currentAdmin')
-            ->willReturn(1);
+            ->willReturn((object) ['uuid' => 'current-admin-uuid']);
 
         \Config\Services::injectMock(
             'authorization',
@@ -514,7 +542,7 @@ class LogsModelTest extends \CodeIgniter\Test\CIUnitTestCase
         $result
             =
             $model
-            ->deleteToken(
+            ->disconnectSession(
                 10
             );
 
@@ -525,11 +553,12 @@ class LogsModelTest extends \CodeIgniter\Test\CIUnitTestCase
 
         $this
             ->assertTrue(
-                $result['result']
+                $result['result'],
+                json_encode($result)
             );
     }
 
-    public function testDeleteTokenCatchBlockReturnsErrorOnException()
+    public function testDisconnectSessionCatchBlockReturnsErrorOnException()
     {
         $modelClass
             =
@@ -549,6 +578,10 @@ class LogsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             ->createMock(
                 $dbClass
             );
+
+        $dbMock
+            ->method('transBegin')
+            ->willReturn(true);
 
         $dbMock
             ->method(
@@ -589,7 +622,7 @@ class LogsModelTest extends \CodeIgniter\Test\CIUnitTestCase
         $result
             =
             $model
-            ->deleteToken(
+            ->disconnectSession(
                 1
             );
 
@@ -606,7 +639,7 @@ class LogsModelTest extends \CodeIgniter\Test\CIUnitTestCase
         $expectedMessage
             =
             lang(
-                'backend/logs.messages.deleteTokenError'
+                'backend/logs.messages.disconnectSessionError'
             );
 
         $this

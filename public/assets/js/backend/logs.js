@@ -12,6 +12,7 @@ const actions = {
         const logsManager = new ListManager({
             controller: 'logs',
             url: urlbase + 'backend/logs',
+            rootId: 'logs-list',
             containerId: 'index-logs-container',
             searchFields: ['username', 'logout_reason'],
             searchDates: ['login']
@@ -19,12 +20,12 @@ const actions = {
         logsManager.init();
 
         /* 2. Attiviamo Flatpickr sui wrapper (leggerà i valori appena inseriti dal manager) */
-        const { pickerFrom, pickerTo } = initRangeDatePicker('#wrapper-logs-login-from', '#wrapper-logs-login-to');
+        initRangeDatePicker('#wrapper-logs-login-from', '#wrapper-logs-login-to');
 
         const deleteManager = new DeleteManager({
             controller: 'logs',
             urls: {
-                hardDelete: urlbase + 'backend/logs/hardDelete'
+                disconnectSession: urlbase + 'backend/logs/disconnectSession'
             },
             listManager: logsManager
         });

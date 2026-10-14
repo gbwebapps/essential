@@ -11,6 +11,17 @@ namespace App\Validation\Backend;
 class AdminsRules
 {
     /**
+     * Verifica che il payload dei permessi mantenga la struttura prevista dal form.
+     *
+     * @param mixed $value Valore ricevuto dalla richiesta
+     * @return bool True esclusivamente per gli array
+     */
+    public function permissionArray(mixed $value): bool
+    {
+        return is_array($value);
+    }
+
+    /**
      * Regola di sicurezza anti-injection per la convalida dei campi testuali liberi (es. note o descrizioni).
      * 
      * Analizza la stringa in ingresso tramite espressione regolare e la respinge (restituendo false) 

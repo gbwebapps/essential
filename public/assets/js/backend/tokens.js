@@ -12,6 +12,7 @@ const actions = {
         const tokensManager = new ListManager({
             controller: 'tokens',
             url: urlbase + 'backend/tokens',
+            rootId: 'tokens-list',
             containerId: 'index-tokens-container',
             searchFields: ['email', 'token_type'],
             searchDates: ['token_create']
@@ -19,7 +20,7 @@ const actions = {
         tokensManager.init();
 
         /* 2. Attiviamo Flatpickr sui wrapper (leggerà i valori appena inseriti dal manager) */
-        const { pickerFrom, pickerTo } = initRangeDatePicker('#wrapper-tokens-token_create-from', '#wrapper-tokens-token_create-to');
+        initRangeDatePicker('#wrapper-tokens-token_create-from', '#wrapper-tokens-token_create-to');
 
         const deleteManager = new DeleteManager({
             controller: 'tokens',

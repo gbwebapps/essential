@@ -7,8 +7,8 @@
             <!-- Campo code -->
             <div class="mb-2">
                 <label for="code" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/auth.labels.code'); ?></label>
-                <input type="number" id="code" name="code" class="form-control" placeholder="<?= lang('backend/auth.placeholders.code'); ?>">
-                <div class="error_code text-danger fw-bold small pt-1">&nbsp;</div>
+                <input type="text" id="code" name="code" class="form-control" placeholder="<?= lang('backend/auth.placeholders.code'); ?>" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="one-time-code" aria-describedby="error-code">
+                <div id="error-code" class="error_code text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
             </div>
             <!-- End Campo code -->
 

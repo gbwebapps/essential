@@ -583,7 +583,7 @@ class ToolsControllerTest extends CIUnitTestCase
         );
     }
 
-    public function testOpenToolsNotAjaxReturnsNull()
+    public function testOpenToolsNotAjaxReturnsBadRequest()
     {
         $ctrlCls =
             \App\Controllers\Backend\ToolsController::class;
@@ -646,12 +646,10 @@ class ToolsControllerTest extends CIUnitTestCase
             $controller->openTools();
 
         /* Ora ci aspettiamo tranquillamente un null */
-        $this->assertNull(
-            $result
-        );
+        $this->assertSame(400, $result->getStatusCode());
     }
 
-    public function testValidateAuditsDateRequestNotAjaxReturnsNull()
+    public function testValidateAuditsDateRequestNotAjaxReturnsBadRequest()
     {
         $ctrlCls =
             \App\Controllers\Backend\ToolsController::class;
@@ -711,9 +709,7 @@ class ToolsControllerTest extends CIUnitTestCase
         $result =
             $controller->validateAuditsDateRequest();
 
-        $this->assertNull(
-            $result
-        );
+        $this->assertSame(400, $result->getStatusCode());
     }
 
     public function testValidateAuditsDateRequestValidationFails()
@@ -1465,7 +1461,7 @@ class ToolsControllerTest extends CIUnitTestCase
         );
     }
 
-    public function testDeleteAuditsNotAjaxReturnsNull()
+    public function testDeleteAuditsNotAjaxReturnsBadRequest()
     {
         $ctrlCls =
             \App\Controllers\Backend\ToolsController::class;
@@ -1525,9 +1521,7 @@ class ToolsControllerTest extends CIUnitTestCase
         $result =
             $controller->deleteAudits();
 
-        $this->assertNull(
-            $result
-        );
+        $this->assertSame(400, $result->getStatusCode());
     }
 
     public function testDeleteAuditsValidationFails()
@@ -1882,7 +1876,7 @@ class ToolsControllerTest extends CIUnitTestCase
         );
     }
 
-    public function testValidateLogsDateRequestNotAjaxReturnsNull()
+    public function testValidateLogsDateRequestNotAjaxReturnsBadRequest()
     {
         $ctrlCls =
             \App\Controllers\Backend\ToolsController::class;
@@ -1942,9 +1936,7 @@ class ToolsControllerTest extends CIUnitTestCase
         $result =
             $controller->validateLogsDateRequest();
 
-        $this->assertNull(
-            $result
-        );
+        $this->assertSame(400, $result->getStatusCode());
     }
 
     public function testValidateLogsDateRequestValidationFails()
@@ -2689,7 +2681,7 @@ class ToolsControllerTest extends CIUnitTestCase
         );
     }
 
-    public function testDeleteLogsNotAjaxReturnsNull()
+    public function testDeleteLogsNotAjaxReturnsBadRequest()
     {
         $ctrlCls =
             \App\Controllers\Backend\ToolsController::class;
@@ -2749,9 +2741,7 @@ class ToolsControllerTest extends CIUnitTestCase
         $result =
             $controller->deleteLogs();
 
-        $this->assertNull(
-            $result
-        );
+        $this->assertSame(400, $result->getStatusCode());
     }
 
     public function testDeleteLogsValidationFails()
@@ -3105,7 +3095,7 @@ class ToolsControllerTest extends CIUnitTestCase
         );
     }
 
-    public function testOptimizeTableNotAjaxReturnsNull()
+    public function testOptimizeTableNotAjaxReturnsBadRequest()
     {
         $ctrlCls =
             \App\Controllers\Backend\ToolsController::class;
@@ -3165,9 +3155,7 @@ class ToolsControllerTest extends CIUnitTestCase
         $result =
             $controller->optimizeTable();
 
-        $this->assertNull(
-            $result
-        );
+        $this->assertSame(400, $result->getStatusCode());
     }
 
     public function testOptimizeTableValidationFails()
@@ -3893,7 +3881,7 @@ class ToolsControllerTest extends CIUnitTestCase
         );
     }
 
-    public function testBackupsNotAjaxReturnsNull()
+    public function testBackupsNotAjaxReturnsBadRequest()
     {
         $ctrlCls =
             \App\Controllers\Backend\ToolsController::class;
@@ -3953,9 +3941,7 @@ class ToolsControllerTest extends CIUnitTestCase
         $result =
             $controller->backups();
 
-        $this->assertNull(
-            $result
-        );
+        $this->assertSame(400, $result->getStatusCode());
     }
 
     public function testBackupsValidationFails()
@@ -4502,13 +4488,13 @@ class ToolsControllerTest extends CIUnitTestCase
                 if (
                     $key === 'filename'
                 ) {
-                    return 'backup_file.zip';
+                    return 'backup_2026-10-12_10-00-00.zip';
                 }
 
                 $postArr =
                     [
                         'action'   => 'deleteBackups',
-                        'filename' => 'backup_file.zip'
+                        'filename' => 'backup_2026-10-12_10-00-00.zip'
                     ];
 
                 return $postArr;
@@ -4552,7 +4538,7 @@ class ToolsControllerTest extends CIUnitTestCase
             'deleteBackups'
         )
         ->with(
-            'backup_file.zip'
+            'backup_2026-10-12_10-00-00.zip'
         )
         ->willReturn(
             true
@@ -4687,13 +4673,13 @@ class ToolsControllerTest extends CIUnitTestCase
                 if (
                     $key === 'filename'
                 ) {
-                    return 'backup_file.zip';
+                    return 'backup_2026-10-12_10-00-00.zip';
                 }
 
                 $postArr =
                     [
                         'action'   => 'deleteBackups',
-                        'filename' => 'backup_file.zip'
+                        'filename' => 'backup_2026-10-12_10-00-00.zip'
                     ];
 
                 return $postArr;
@@ -4737,7 +4723,7 @@ class ToolsControllerTest extends CIUnitTestCase
             'deleteBackups'
         )
         ->with(
-            'backup_file.zip'
+            'backup_2026-10-12_10-00-00.zip'
         )
         ->willReturn(
             false
@@ -4860,7 +4846,7 @@ class ToolsControllerTest extends CIUnitTestCase
         );
 
         $fileName =
-            'test_down.zip';
+            'backup_2026-10-12_10-00-01.zip';
 
         $callback =
             function (
@@ -5047,7 +5033,7 @@ class ToolsControllerTest extends CIUnitTestCase
         );
 
         $fileName =
-            'not_exist.zip';
+            'backup_2026-10-12_10-00-02.zip';
 
         $callback =
             function (
@@ -5182,7 +5168,7 @@ class ToolsControllerTest extends CIUnitTestCase
             $builder->getMockForAbstractClass();
 
         $fileNameStr =
-            'not_exist_dl.zip';
+            'backup_2026-10-12_10-00-03.zip';
 
         $baseDir =
             WRITEPATH;
@@ -5284,7 +5270,7 @@ class ToolsControllerTest extends CIUnitTestCase
             $respBld->getMock();
 
         $fileNameStr =
-            'test_dl.zip';
+            'backup_2026-10-12_10-00-04.zip';
 
         $baseDir =
             WRITEPATH;
@@ -5356,7 +5342,7 @@ class ToolsControllerTest extends CIUnitTestCase
         );
     }
 
-    public function testCleanFolderNotAjaxReturnsNull()
+    public function testCleanFolderNotAjaxReturnsBadRequest()
     {
         $ctrlCls =
             \App\Controllers\Backend\ToolsController::class;
@@ -5416,9 +5402,7 @@ class ToolsControllerTest extends CIUnitTestCase
         $result =
             $controller->cleanFolder();
 
-        $this->assertNull(
-            $result
-        );
+        $this->assertSame(400, $result->getStatusCode());
     }
 
     public function testCleanFolderValidationFails()

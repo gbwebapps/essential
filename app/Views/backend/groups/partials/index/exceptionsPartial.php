@@ -7,7 +7,7 @@
                 
                 <div class="position-relative">
                     <div class="input-group">
-                        <input type="text" id="search-admin" class="form-control" placeholder="<?= lang('backend/groups.placeholders.admins'); ?>" autocomplete="off">
+                        <input type="text" id="search-admin" class="form-control" placeholder="<?= esc(lang('backend/groups.placeholders.admins'), 'attr'); ?>" autocomplete="off">
                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                     </div>
                     

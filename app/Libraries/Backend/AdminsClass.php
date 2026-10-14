@@ -2,8 +2,6 @@
 
 namespace App\Libraries\Backend;
 
-use App\Models\Backend\AdminsModel;
-
 /**
  * Classe di supporto (utility/presentazione) per la gestione dell'interfaccia della sezione Amministratori.
  * 
@@ -13,23 +11,6 @@ use App\Models\Backend\AdminsModel;
  */
 class AdminsClass 
 {
-	/**
-	 * Istanza del modello di riferimento, a disposizione per estrarre 
-	 * informazioni dal database utili alla generazione dinamica degli elementi dell'interfaccia.
-	 * @var AdminsModel 
-	 */
-	protected AdminsModel $adminsModel;
-
-	/**
-	 * Inizializza la libreria di supporto iniettando il modello associato alla sezione.
-	 *
-	 * @param AdminsModel $adminsModel Il modello preposto alla gestione dei dati degli amministratori
-	 */
-	public function __construct(AdminsModel $adminsModel) 
-	{
-		$this->adminsModel = $adminsModel;
-	}
-
 	/* ------------------------------------------------------------------------------------------------- */
 
 	/**

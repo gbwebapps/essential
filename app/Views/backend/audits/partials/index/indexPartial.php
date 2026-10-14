@@ -17,7 +17,7 @@
 
                             <!-- Numero dei record visualizzati in una pagina. Serve al Trick per evitare che all'eliminazione
                             dell'ultimo record in una pagina che non è la prima, la visualizzazione rimanga bloccata e non passi alla pagina successiva. -->
-                            <div id="lastItemPage" data-lastitempage="<?= $data['lastItemPage']; ?>"></div>
+                            <div class="lastItemPage" data-lastitempage="<?= $data['lastItemPage']; ?>"></div>
 
                             <table class="table table-condensed mb-0 text-nowrap">
                                 <thead>
@@ -73,7 +73,7 @@
                                             
                                             <!-- Cella chevron -->
                                             <td class="align-middle fw-bold">
-                                                <button class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 text-secondary shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($audit->id); ?>" aria-expanded="false" title="Mostra dettagli di sistema">
+                                                <button class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 text-secondary shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($audit->id); ?>" aria-expanded="false" title="<?= esc(lang('backend/audits.labels.showSystemDetails'), 'attr'); ?>">
                                                     <i class="fa-solid fa-chevron-right"></i>
                                                 </button>
                                             </td>
@@ -100,7 +100,7 @@
 
                                             <!-- Cella created At -->
                                             <td class="align-middle">
-                                                <span class="fw-bold"><?= convertDate(esc($audit->created_at), 'conversational'); ?></span>
+                                                <span class="fw-bold"><?= esc(convertDate($audit->created_at, 'conversational')); ?></span>
                                             </td>
                                         </tr>
 
@@ -119,20 +119,20 @@
                                                         <!-- Parte useragent -->
                                                         <?php 
                                                             /* Parsing della stringa User Agent tramite l'istanza passata dal Controller */
-                                                            $userAgent->parse(esc($audit->user_agent)); 
+                                                            $userAgent->parse($audit->user_agent);
 
                                                             /* Inizializzazione corretta della variabile in camelCase */
-                                                            $agentText = lang('backend/audits.labels.operatingSystem') . ' <span class="text-primary fw-bold">' . $userAgent->getPlatform() . '</span>';
+                                                            $agentText = lang('backend/audits.labels.operatingSystem') . ' <span class="text-primary fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
                                                         ?>
 
                                                         <?php
                                                             /* Valutazione con metodi nativi in camelCase di CodeIgniter 4 */
                                                             if($userAgent->isBrowser()):
-                                                                $agentText .= ' &bull; ' . lang('backend/audits.labels.browser') . ' <span class="text-primary fw-bold">' . $userAgent->getBrowser() . '</span>';
+                                                                $agentText .= ' &bull; ' . lang('backend/audits.labels.browser') . ' <span class="text-primary fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
                                                             elseif($userAgent->isMobile()):
-                                                                $agentText .= ' &bull; ' . lang('backend/audits.labels.mobile') . ' <span class="text-primary fw-bold">' . $userAgent->getMobile() . '</span>';
+                                                                $agentText .= ' &bull; ' . lang('backend/audits.labels.mobile') . ' <span class="text-primary fw-bold">' . esc($userAgent->getMobile()) . '</span>';
                                                             elseif($userAgent->isRobot()):
-                                                                $agentText .= ' &bull; ' . lang('backend/audits.labels.robot') . ' Robot <span class="text-primary fw-bold">' . $userAgent->getRobot() . '</span>';
+                                                                $agentText .= ' &bull; ' . lang('backend/audits.labels.robot') . ' <span class="text-primary fw-bold">' . esc($userAgent->getRobot()) . '</span>';
                                                             endif;
                                                         ?>
 

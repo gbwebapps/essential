@@ -85,7 +85,7 @@ class AuditsHelperTest extends CIUnitTestCase
         $this->assertFalse($result);
     }
 
-    public function testLogAdminActivityDoesNotHideModelExceptions(): void
+    public function testLogAdminActivityConvertsModelExceptionsToFalse(): void
     {
         $model = $this->createMock(AuditsModel::class);
 
@@ -100,9 +100,6 @@ class AuditsHelperTest extends CIUnitTestCase
             $model
         );
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Audit failure');
-
-        log_admin_activity('UPDATE', 'settings', 'Failure');
+        $this->assertFalse(log_admin_activity('UPDATE', 'settings', 'Failure'));
     }
 }

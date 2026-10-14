@@ -41,7 +41,7 @@ return [
 	],
 	'audits' => [
 	    'loginRefused'      => 'Intento de inicio de sesión con cuenta inexistente',
-	    'loginBlocked'      => 'Acceso denegado, cuenta bloqueada %s %s',
+	    'loginBlocked'      => 'Acceso denegado por límite de intentos',
 	    'loginFailed'       => 'Intento de inicio de sesión fallido %s %s',
 	    '2faRequired'       => 'Código de verificación 2FA requerido %s %s %s',
 	    'loginSuccess'      => 'Inicio de sesión exitoso %s %s',
@@ -61,12 +61,12 @@ return [
 		'setPasswordFailed' => 'Error al establecer la contraseña.',
 		'setPasswordError' => 'Error al establecer la contraseña.',
 		'checkAuthError' => 'Código de autenticación no válido o caducado.',
-		'tooManyAttempts' => 'Se han realizado demasiados intentos.',
+		'tooManyAttempts' => 'Se alcanzó el límite de intentos. Inténtalo de nuevo más tarde.',
 	    'currentSessionOn' => 'Sesión de %s %s aún en curso.',
 		'validationErrors' => 'Errores de validación.',
-		'resetPasswordSuccess' => 'Proceso de restablecimiento de contraseña configurado. Verifica el correo electrónico enviado para finalizar las operaciones.',
+		'resetPasswordSuccess' => 'Si la dirección pertenece a una cuenta activa, recibirás un correo con instrucciones para restablecer la contraseña.',
 		'resetPasswordSuccessNoEmail' => 'Proceso de restablecimiento de contraseña configurado, pero el correo no ha sido enviado. Contacta con el administrador.',
 		'expiredCode' => 'Código OTP caducado.',
 		'wrongCode' => 'Código OTP erróneo.',
-	]
+		'twoFactorEmailSendError' => 'No se ha podido enviar el código de verificación por correo electrónico. Inténtalo de nuevo en unos instantes.',	]
 ];

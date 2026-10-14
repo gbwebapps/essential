@@ -48,7 +48,11 @@ return [
         'totpSecretKey'      => 'Clave secreta (configuración manual)',
 		'enterOtpCode' => 'Introduce el código de 6 dígitos',
 		'rememberMe' => 'Recuérdame',
-		'currentDevice' => 'Sesión actual'
+		'currentDevice' => 'Sesión actual',
+		'mobile' => 'Dispositivo móvil',
+		'robot' => 'Robot',
+		'currentPassword' => 'Contraseña actual',
+		'currentPasswordEmailHelp' => 'Solo es necesaria al cambiar el correo electrónico.'
 	],
 	'placeholders' => [
 		'firstname' => 'Introduce el nombre...',
@@ -56,6 +60,7 @@ return [
 		'email' => 'Introduce el correo electrónico...',
 		'phone' => 'Introduce el teléfono...',
 		'note' => 'Introduce notas adicionales...',
+		'currentPassword' => 'Introduce la contraseña actual...',
 	],
 	'buttons' => [
 		'sendData' => 'Guardar datos',
@@ -64,10 +69,14 @@ return [
 		'resetPassword' => 'Proceder al restablecimiento de contraseña',
 		'verifyAndActivate' => 'Verificar y activar',
 		'undoClose' => 'Cerrar configuración y salir',
-		'delete' => 'Eliminar'
+		'delete' => 'Eliminar',
+		'showPassword' => 'Mostrar contraseña'
 	],
 	'errors' => [
 		'id' => 'ID no conforme.',
+		'safeText' => 'Caracteres no permitidos.',
+		'currentPasswordRequired' => 'Introduce tu contraseña actual.',
+		'currentPasswordInvalid' => 'La contraseña actual no es correcta.',
 	],
 	'audits' => [
 	    'updateData'     => 'Actualización de datos generales %s %s',
@@ -91,7 +100,7 @@ return [
 		'noTokensFound' => 'No hay tokens disponibles.',
 		'deleteTokenSuccess' => 'El token de %s %s se ha eliminado con éxito.',
 		'deleteTokenError' => 'La eliminación del token no se ha podido completar',
-		'expiringDate' => '<div class="pb-3">Has solicitado el restablecimiento de la contraseña.</div><div class="pb-3">Verifica tu correo electrónico y completa la operación.</div>Tienes hasta el %s</div>',
+		'expiringDate' => '<div class="pb-3">Has solicitado el restablecimiento de la contraseña.</div><div class="pb-3">Verifica tu correo electrónico y completa la operación.</div>Tienes hasta el %s',
 		'methodNotValid' => 'Método no válido o no soportado.',
 		'updateSecuritySettingsError' => 'Imposible actualizar la configuración de seguridad.',
 		'updateSecuritySettingsSuccess' => 'Configuración de seguridad actualizada con éxito.',
@@ -102,6 +111,8 @@ return [
 		'totpActivationNotPossible' => 'Imposible activar la autenticación TOTP.',
 		'totpConfigurationSuccess' => 'La aplicación de autenticación se ha configurado con éxito.',
 		'areYouSureChangeMethod' => '¿Estás seguro de que deseas cambiar el método del segundo factor de autenticación?',
-		'cannotDeleteCurrentToken' => 'No es posible eliminar la sesión actual.'
+		'cannotDeleteCurrentToken' => 'No es posible eliminar la sesión actual.',
+		'tooManyResetRequests' => 'Demasiadas solicitudes de restablecimiento. Inténtalo más tarde.',
+		'tooManyAttempts' => 'Demasiados intentos. Inténtalo más tarde.'
 	]
 ];

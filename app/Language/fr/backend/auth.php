@@ -41,7 +41,7 @@ return [
 	],
 	'audits' => [
 	    'loginRefused'      => 'Tentative de connexion avec un compte inexistant',
-	    'loginBlocked'      => 'Accès refusé, compte bloqué %s %s',
+	    'loginBlocked'      => 'Accès refusé en raison de la limite de tentatives',
 	    'loginFailed'       => 'Échec de la tentative de connexion %s %s',
 	    '2faRequired'       => 'Code de vérification 2FA requis %s %s %s',
 	    'loginSuccess'      => 'Connexion réussie %s %s',
@@ -61,12 +61,13 @@ return [
 		'setPasswordFailed' => 'Erreur lors de la définition du mot de passe.', 
 		'setPasswordError' => 'Erreurs lors de la définition du mot de passe.', 
 		'checkAuthError' => 'Code d\'authentification invalide ou expiré.', 
-		'tooManyAttempts' => 'Trop de tentatives ont été effectuées.', 
+		'tooManyAttempts' => 'Limite de tentatives atteinte. Réessayez plus tard.',
 	    'currentSessionOn' => 'Session de %s %s toujours en cours.', 
 		'validationErrors' => 'Erreurs de validation.', 
-		'resetPasswordSuccess' => 'Processus de réinitialisation du mot de passe configuré. Veuillez vérifier vos e-mails pour terminer l\'opération.', 
+		'resetPasswordSuccess' => 'Si l\'adresse appartient à un compte actif, vous recevrez un e-mail contenant les instructions de réinitialisation.',
 		'resetPasswordSuccessNoEmail' => 'Processus de réinitialisation du mot de passe configuré, mais l\'e-mail n\'a pas pu être envoyé. Veuillez contacter l\'administrateur.', 
 		'expiredCode' => 'Code OTP expiré.',
 		'wrongCode' => 'Code OTP incorrect.', 
+		'twoFactorEmailSendError' => 'Impossible d’envoyer le code de vérification par e-mail. Veuillez réessayer dans quelques instants.',
 	]
 ];

@@ -2,7 +2,7 @@
 
 <?= $this->section('content') ?>
 
-    <div class="tokens">
+    <div id="tokens-list" class="tokens crud-list">
 
         <div class="row">
             <div class="col-12">
@@ -15,7 +15,7 @@
 
                             <!-- Select per il numero delle righe da mostrare -->
                             <div class="col-12 col-md-1 mb-3 mb-md-0">
-                                <select id="changeNumRows" class="form-select">
+                                <select class="form-select changeNumRows">
                                     <option value="5">5</option>
                                     <option value="10">10</option>
                                     <option value="15">15</option>
@@ -27,7 +27,7 @@
                             <!-- Bottone Mobile per aprire l'Offcanvas -->
                             <div class="col-12 d-md-none mb-3">
                                 <button class="btn btn-secondary w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#actionsOffcanvas" aria-controls="actionsOffcanvas">
-                                    <i class="fa-solid fa-bars"></i> Opzioni e Filtri
+                                    <i class="fa-solid fa-bars"></i> <?= lang('backend/tokens.labels.filtersAndOptions'); ?>
                                 </button>
                             </div>
                             <!-- End Bottone Mobile -->
@@ -36,32 +36,32 @@
                             <div class="col-12 col-md-11 offcanvas-md offcanvas-bottom" tabindex="-1" id="actionsOffcanvas">
                                 <div class="offcanvas-header">
                                     <h5 class="offcanvas-title">
-                                        <i class="fa-solid fa-bars"></i> Opzioni e Filtri
+                                        <i class="fa-solid fa-bars"></i> <?= lang('backend/tokens.labels.filtersAndOptions'); ?>
                                     </h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#actionsOffcanvas" aria-label="Close"></button>
                                 </div>
                                 
                                 <div class="offcanvas-body pt-md-2">
                                     <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-md-end w-100 gap-0 gap-md-3">
-                                        
+
                                         <!-- Azioni e Filtri -->
-                                        <a href="#" id="link-search" data-bs-toggle="collapse" data-bs-target="#search-bar" class="cmd-link">
+                                        <a href="#" data-bs-toggle="collapse" data-bs-target="#tokens-search-bar" class="cmd-link link-search">
                                             <i class="fa-solid fa-magnifying-glass"></i> <?= lang('backend/tokens.links.filters'); ?>
                                         </a>
                                         
-                                        <a href="#" id="link-reset-search" class="cmd-link">
+                                        <a href="#" class="cmd-link link-reset-search">
                                             <i class="fa-solid fa-xmark"></i> <?= lang('backend/tokens.links.resetFilters'); ?>
                                         </a>
                                         
-                                        <a href="#" id="reset-sorting-link" class="cmd-link">
+                                        <a href="#" class="cmd-link reset-sorting-link">
                                             <i class="fa-solid fa-sort"></i> <?= lang('backend/tokens.links.resetSorting'); ?>
                                         </a>
                                         
-                                        <a href="#" id="refresh-list" class="cmd-link">
+                                        <a href="#" class="cmd-link refresh-list">
                                             <i class="fa-solid fa-arrows-rotate"></i> <?= lang('backend/tokens.links.reloadList'); ?>
                                         </a>
 
-                                        <a href="#" id="export-entity" class="cmd-link"  data-export-entity="admins_tokens">
+                                        <a href="#" id="export-entity" data-export-entity="admins_tokens" class="cmd-link">
                                             <i class="fa-solid fa-file-export"></i> <?= lang('backend/components/export.links.export'); ?>
                                         </a>
                                         <!-- End Azioni e Filtri -->
@@ -76,7 +76,7 @@
                     <!-- Fine testata lista -->
 
                     <!-- Inizio parte filtri -->
-                    <div id="search-bar" class="collapse">
+                    <div id="tokens-search-bar" class="collapse search-bar">
                         <div class="row card-body">
 
                             <!-- Ricerca avanzata per email -->
@@ -84,10 +84,10 @@
                                 <div class="mb-2 mb-md-0">
                                     <label for="tokens-email"><?= lang('backend/tokens.labels.username'); ?></label>
                                     <div class="input-group">
-                                        <input type="text" id="tokens-email" class="form-control" placeholder="<?= lang('backend/tokens.placeholders.searchUsername'); ?>" autocomplete="off">
+                                        <input type="text" id="tokens-email" class="form-control" placeholder="<?= esc(lang('backend/tokens.placeholders.searchUsername'), 'attr'); ?>" data-search-field="email" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
-                                    <div class="error_email text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="email" class="error_email text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End Ricerca avanzata per email -->
@@ -98,11 +98,11 @@
                                     <!-- Campo Data Da -->
                                     <label for="tokens-token_create-from"><?= lang('backend/tokens.labels.dateFrom'); ?></label>
                                     <div id="wrapper-tokens-token_create-from" class="input-group">
-                                        <input type="text" id="tokens-token_create-from" data-input class="form-control" placeholder="<?= lang('backend/tokens.placeholders.dateFrom'); ?>" autocomplete="off">
+                                        <input type="text" id="tokens-token_create-from" data-input class="form-control" placeholder="<?= esc(lang('backend/tokens.placeholders.dateFrom'), 'attr'); ?>" data-search-field="token_create-from" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <div class="error_token_create-from text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="token_create-from" class="error_token_create-from text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End ricerca avanzata per data da -->
@@ -113,11 +113,11 @@
                                     <!-- Campo Data A -->
                                     <label for="tokens-token_create-to"><?= lang('backend/tokens.labels.dateTo'); ?></label>
                                     <div id="wrapper-tokens-token_create-to" class="input-group">
-                                        <input type="text" id="tokens-token_create-to" data-input class="form-control" placeholder="<?= lang('backend/tokens.placeholders.dateTo'); ?>" autocomplete="off">
+                                        <input type="text" id="tokens-token_create-to" data-input class="form-control" placeholder="<?= esc(lang('backend/tokens.placeholders.dateTo'), 'attr'); ?>" data-search-field="token_create-to" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <div class="error_token_create-to text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="token_create-to" class="error_token_create-to text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End ricerca avanzata per data a -->
@@ -127,7 +127,7 @@
                                 <div class="mb-2 mb-md-0">
                                     <label for="tokens-token_type"><?= lang('backend/tokens.labels.tokenType'); ?></label>
                                     <div class="input-group">
-                                        <select id="tokens-token_type" class="form-select">
+                                        <select id="tokens-token_type" class="form-select" data-search-field="token_type">
                                             <!-- Option che funge da placeholder -->
                                             <option value="" disabled selected hidden><?= lang('backend/tokens.placeholders.searchType'); ?></option>
                                             <option value="activation"><?= lang('backend/tokens.labels.activation'); ?></option>
@@ -136,7 +136,7 @@
                                         </select>
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
-                                    <div class="error_token_type text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="token_type" class="error_token_type text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End Ricerca avanzata per azione -->

@@ -41,6 +41,7 @@ class TokensController extends BackendController
      * @param RequestInterface $request L'oggetto rappresentante la richiesta HTTP in ingresso
      * @param ResponseInterface $response L'oggetto deputato alla generazione della risposta HTTP
      * @param LoggerInterface $logger L'interfaccia per la registrazione degli eventi nel sistema di log
+     * @return void
      */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
@@ -50,7 +51,7 @@ class TokensController extends BackendController
         $this->data['entity'] = 'tokens';
 
         $this->tokensModel = model(TokensModel::class);
-        $this->tokensClass = new TokensClass($this->tokensModel);
+        $this->tokensClass = new TokensClass();
     }
 
     /**
@@ -82,10 +83,7 @@ class TokensController extends BackendController
                 return $this->jsonResponse(['errors' => $formattedErrors, 'message' => lang('backend/tokens.messages.validationErrors')]);
             endif;
 
-            /* Attiviamo il contesto token e lasciamo che getData() faccia tutto il lavoro pesante */
             $this->data['data'] = $this->tokensModel->getData($posts);
-
-            /* ... resto del controller invariato ... */
 
             $json = [];
 
@@ -122,9 +120,9 @@ class TokensController extends BackendController
      * Previa validazione formale dei dati in ingresso, forza la rimozione del record, revocando conseguentemente 
      * l'accesso al client o dispositivo remoto associato a tale sessione.
      *
-     * @return ResponseInterface|null Risposta JSON indicante l'esito dell'operazione di cancellazione e gli eventuali errori
+     * @return ResponseInterface Risposta JSON indicante l'esito dell'operazione di cancellazione e gli eventuali errori
      */
-    public function hardDelete(): ?ResponseInterface
+    public function hardDelete(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -143,6 +141,6 @@ class TokensController extends BackendController
 
         endif;
 
-        return null;
+        return service('response')->setStatusCode(400);
     }
 }

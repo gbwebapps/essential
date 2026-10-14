@@ -16,6 +16,7 @@ return [
 	], 
 	'labels' => [
 		'id' => 'ID', 
+		'uuid' => 'UUID',
 		'groupName' => '群组名称', 
 		'groupDescription' => '群组描述', 
 		'assignedToGroup' => '已分配到群组', 

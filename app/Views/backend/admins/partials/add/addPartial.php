@@ -21,7 +21,7 @@
                             <div class="col-12 col-lg-6">
                                 <div class="mb-2">
                                     <label for="firstname" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.firstname'); ?></label>
-                                    <input type="text" id="firstname" name="firstname" class="form-control" placeholder="<?= lang('backend/admins.placeholders.firstname'); ?>">
+                                    <input type="text" id="firstname" name="firstname" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.firstname'), 'attr'); ?>">
                                     <!-- Contenitore dinamico per l'errore di validazione -->
                                     <div class="error_firstname text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                                 </div>
@@ -29,7 +29,7 @@
                             <div class="col-12 col-lg-6">
                                 <div class="mb-2">
                                     <label for="lastname" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.lastname'); ?></label>
-                                    <input type="text" id="lastname" name="lastname" class="form-control" placeholder="<?= lang('backend/admins.placeholders.lastname'); ?>">
+                                    <input type="text" id="lastname" name="lastname" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.lastname'), 'attr'); ?>">
                                     <div class="error_lastname text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                                 </div>
                             </div>
@@ -41,14 +41,14 @@
                             <div class="col-12 col-lg-6">
                                 <div class="mb-2">
                                     <label for="email" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.email'); ?></label>
-                                    <input type="text" id="email" name="email" class="form-control" placeholder="<?= lang('backend/admins.placeholders.email'); ?>">
+                                    <input type="text" id="email" name="email" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.email'), 'attr'); ?>">
                                     <div class="error_email text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                                 </div>
                             </div>
                             <div class="col-12 col-lg-6">
                                 <div class="mb-2">
                                     <label for="phone" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.phone'); ?></label>
-                                    <input type="text" id="phone" name="phone" class="form-control" placeholder="<?= lang('backend/admins.placeholders.phone'); ?>">
+                                    <input type="text" id="phone" name="phone" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.phone'), 'attr'); ?>">
                                     <div class="error_phone text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                                 </div>
                             </div>
@@ -65,7 +65,7 @@
                                     <select name="group_id" class="form-select" id="group_id">
                                         <?php if (! empty($groups)): ?>
                                             <?php foreach ($groups as $group): ?>
-                                                <option value="<?= $group->id; ?>"><?= esc($group->name); ?></option>
+                                                <option value="<?= esc($group->id, 'attr'); ?>"><?= esc($group->name); ?></option>
                                             <?php endforeach; ?>
                                         <?php endif; ?>
                                     </select>
@@ -92,7 +92,7 @@
                             <div class="col-12">
                                 <div class="mb-2">
                                     <label for="note"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.note'); ?></label>
-                                    <textarea name="note" id="note" rows="7" class="form-control" placeholder="<?= lang('backend/admins.placeholders.note'); ?>"></textarea>
+                                    <textarea name="note" id="note" rows="7" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.note'), 'attr'); ?>"></textarea>
                                     <div class="error_note text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                                 </div>
                             </div>
@@ -106,7 +106,7 @@
 
                 <!-- Sezione: Upload e Preview Immagini Profilo -->
                 <div id="uploadPreview">
-                    <?= $this->include('backend/components/uploadPreviewImg/uploadPreviewImgView'); ?>
+                    <?= $this->include('backend/components/uploadPreview/uploadPreviewView'); ?>
                 </div>
                 <!-- End Sezione: Upload e Preview Immagini Profilo -->
 

@@ -15,7 +15,7 @@ return [
 		'id' => 'Ungültige ID.', 
 	], 
 	'actions' => [
-		'hardDelete' => 'Abmelden'
+		'disconnectSession' => 'Abmelden'
 	],
 	'labels' => [
 		'username' => 'Benutzername', 
@@ -35,7 +35,11 @@ return [
 		'banned' => 'Gesperrt', 
 		'undefined' => 'Undefiniert', 
 		'pending' => 'In Bearbeitung...', 
-		'duration' => 'Dauer'
+		'duration' => 'Dauer',
+		'mobile' => 'Mobilgerät',
+		'robot' => 'Robot',
+		'filtersAndOptions' => 'Optionen und Filter',
+		'showSystemDetails' => 'Systemdetails anzeigen'
 	],
 	'placeholders' => [
 		'searchUsername' => 'Nach Benutzernamen suchen...', 
@@ -44,15 +48,15 @@ return [
 		'searchLogoutReason' => 'Nach Abmeldegrund suchen...'
 	], 
 	'audits' => [
-	    'deleteToken' => 'Erzwungene Beendigung der aktuellen Sitzung',
+	    'disconnectSession' => 'Erzwungene Beendigung der aktuellen Sitzung',
 	],
 	'messages' => [
 		'noLogsFound' => 'Keine Protokolle gefunden.', 
-		'areYouSureHardDelete' => 'Sind Sie sicher, dass Sie <b>%s %s</b> abmelden möchten?', 
+		'areYouSureDisconnectSession' => 'Sind Sie sicher, dass Sie <b>%s %s</b> abmelden möchten?', 
 		'validationErrors' => 'Validierungsfehler.', 
 		'validationToastErrors' => '%s', 
-		'deleteTokenSuccess' => '%s %s wurde erfolgreich abgemeldet.', 
-		'deleteTokenError' => 'Abmeldung fehlgeschlagen.', 
+		'disconnectSessionSuccess' => '%s %s wurde erfolgreich abgemeldet.', 
+		'disconnectSessionError' => 'Abmeldung fehlgeschlagen.', 
 		'protectedAdmin' => 'Vor Änderungen geschützt.', 
 		'cannotModifyDeleted' => 'Ein gelöschter Administrator kann nicht bearbeitet werden.',
 	]

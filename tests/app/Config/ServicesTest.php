@@ -5,6 +5,7 @@ namespace Config;
 use App\Libraries\Backend\AuthorizationClass;
 use App\Libraries\CryptoService;
 use App\Libraries\RegExp;
+use CodeIgniter\Email\Email as EmailClient;
 use CodeIgniter\Test\CIUnitTestCase;
 use Tests\Support\Libraries\MocksSettings;
 
@@ -27,6 +28,44 @@ class ServicesTest extends CIUnitTestCase
         $this->assertInstanceOf(RegExp::class, $shared);
         $this->assertSame($shared, Services::regexp());
         $this->assertNotSame($shared, Services::regexp(false));
+    }
+
+    public function testEmailServiceUsesDatabaseSettingsAndLifecycle(): void
+    {
+        $this->mockSettings([
+            'Backend\\Email' => [
+                'protocol' => 'smtp',
+                'SMTPHost' => 'smtp.database.test',
+                'SMTPPort' => '465',
+                'SMTPUser' => 'database-user',
+                'SMTPPass' => 'database-password',
+                'SMTPCrypto' => '',
+            ],
+        ]);
+        Services::resetSingle('email');
+
+        $this->assertSame('smtp.database.test', setting('Backend\\Email')->SMTPHost);
+
+        $shared = Services::email();
+
+        $this->assertInstanceOf(EmailClient::class, $shared);
+        $this->assertSame('smtp.database.test', $shared->SMTPHost);
+        $this->assertSame(465, $shared->SMTPPort);
+        $this->assertSame('database-user', $shared->SMTPUser);
+        $this->assertSame('database-password', $shared->SMTPPass);
+        $this->assertSame($shared, Services::email());
+        $this->assertNotSame($shared, Services::email(null, false));
+    }
+
+    public function testEmailServiceHonorsExplicitConfiguration(): void
+    {
+        $email = Services::email([
+            'protocol' => 'mail',
+            'fromEmail' => 'explicit@essential.test',
+        ], false);
+
+        $this->assertSame('mail', $email->protocol);
+        $this->assertSame('explicit@essential.test', $email->fromEmail);
     }
 
     public function testAuthorizationServiceHonorsSharedAndFreshLifecycle(): void

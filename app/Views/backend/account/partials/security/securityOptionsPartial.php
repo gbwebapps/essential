@@ -6,6 +6,19 @@
         </div>
     </div>
 
+	<div class="row mb-3">
+		<div class="col-12 col-lg-4">
+			<label for="securityCurrentPassword" class="form-label"><?= lang('backend/account.labels.currentPassword'); ?></label>
+			<div class="input-group">
+				<button class="btn btn-secondary bg-white border toggle-password-visibility" type="button" aria-label="<?= esc(lang('backend/account.buttons.showPassword'), 'attr'); ?>" aria-pressed="false">
+					<i class="fa-solid fa-eye text-muted"></i>
+				</button>
+				<input type="password" id="securityCurrentPassword" class="form-control" autocomplete="current-password" data-required-message="<?= esc(lang('backend/account.errors.currentPasswordRequired'), 'attr'); ?>" placeholder="<?= esc(lang('backend/account.placeholders.currentPassword'), 'attr'); ?>">
+			</div>
+			<div class="error_currentPassword text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+		</div>
+	</div>
+
     <!-- Aggiunto gy-3 per gestire lo spazio verticale automatico solo quando vanno a capo -->
     <div class="row gy-3">
 

@@ -15,7 +15,7 @@ return [
 		'id' => 'ID 不符合规范。', 
 	], 
 	'actions' => [
-		'hardDelete' => '断开连接'
+		'disconnectSession' => '断开连接'
 	],
 	'labels' => [
 		'username' => '用户名', 
@@ -35,7 +35,11 @@ return [
 		'banned' => '已封禁', 
 		'undefined' => '未定义', 
 		'pending' => '进行中...', 
-		'duration' => '持续时间'
+		'duration' => '持续时间',
+		'mobile' => '移动设备',
+		'robot' => '机器人',
+		'filtersAndOptions' => '选项和筛选器',
+		'showSystemDetails' => '显示系统详细信息'
 	],
 	'placeholders' => [
 		'searchUsername' => '按用户名搜索...', 
@@ -44,15 +48,15 @@ return [
 		'searchLogoutReason' => '按退出原因搜索...'
 	], 
 	'audits' => [
-	    'deleteToken' => '强制终止当前会话',
+	    'disconnectSession' => '强制终止当前会话',
 	],
 	'messages' => [
 		'noLogsFound' => '未找到日志。', 
-		'areYouSureHardDelete' => '您确定要断开 <b>%s %s</b> 的连接吗？', 
+		'areYouSureDisconnectSession' => '您确定要断开 <b>%s %s</b> 的连接吗？', 
 		'validationErrors' => '验证错误。', 
 		'validationToastErrors' => '%s', 
-		'deleteTokenSuccess' => '%s %s 已成功断开连接。', 
-		'deleteTokenError' => '断开连接失败。', 
+		'disconnectSessionSuccess' => '%s %s 已成功断开连接。', 
+		'disconnectSessionError' => '断开连接失败。', 
 		'protectedAdmin' => '受保护，无法修改。', 
 		'cannotModifyDeleted' => '无法修改已删除的管理员。',
 	]

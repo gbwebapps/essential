@@ -10,16 +10,16 @@
             <!-- Campo password -->
             <div class="mb-2">
                 <label for="password" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/auth.labels.newPassword'); ?></label>
-                <input type="password" id="password" name="password" class="form-control" placeholder="<?= lang('backend/auth.placeholders.newPassword'); ?>">
-                <div class="error_password text-danger fw-bold small pt-1">&nbsp;</div>
+                <input type="password" id="password" name="password" class="form-control" placeholder="<?= lang('backend/auth.placeholders.newPassword'); ?>" autocomplete="new-password" aria-describedby="error-password">
+                <div id="error-password" class="error_password text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
             </div>
             <!-- End Campo password -->
 
             <!-- Campo conferma password -->
             <div class="mb-2">
                 <label for="password-confirm" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/auth.labels.confirmNewPassword'); ?></label>
-                <input type="password" id="password-confirm" name="confirmPassword" class="form-control" placeholder="<?= lang('backend/auth.placeholders.confirmNewPassword'); ?>">
-                <div class="error_confirmPassword text-danger fw-bold small pt-1">&nbsp;</div>
+                <input type="password" id="password-confirm" name="confirmPassword" class="form-control" placeholder="<?= lang('backend/auth.placeholders.confirmNewPassword'); ?>" autocomplete="new-password" aria-describedby="error-confirm-password">
+                <div id="error-confirm-password" class="error_confirmPassword text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
             </div>
             <!-- End Campo conferma password -->
 

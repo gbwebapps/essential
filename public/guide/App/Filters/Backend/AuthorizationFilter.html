@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="index, follow, all" />
+    <title>App\Filters\Backend\AuthorizationFilter | Essential API</title>
+
+            <link rel="stylesheet" type="text/css" href="../../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../../css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="../../../css/doctum.css">
+        <link rel="stylesheet" type="text/css" href="../../../fonts/doctum-font.css">
+        <script src="../../../js/jquery-3.5.1.slim.min.js"></script>
+        <script async defer src="../../../doctum.js"></script>
+        <script async defer src="../../../js/bootstrap.min.js"></script>
+        <script async defer src="../../../js/autocomplete.min.js"></script>
+        <meta name="MobileOptimized" content="width">
+        <meta name="HandheldFriendly" content="true">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+
+    </head>
+
+    <body id="class" data-name="class:App_Filters_Backend_AuthorizationFilter" data-root-path="../../../" data-search-index-url="../../../doctum-search.json">
+            <div id="content">
+        <div id="left-column">
+                <div id="control-panel">
+                <div class="search-bar hidden" id="search-progress-bar-container">
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" id="search-progress-bar"
+                    aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+            </div>
+        </div>
+        <form id="search-form" action="../../../search.html">
+            <span class="icon icon-search"></span>
+            <input name="search"
+                   id="doctum-search-auto-complete"
+                   class="typeahead form-control"
+                   type="search"
+                   placeholder="Search"
+                   spellcheck="false"
+                   autocorrect="off"
+                   autocomplete="off"
+                   autocapitalize="off">
+            <div class="auto-complete-results" id="auto-complete-results"></div>
+        </form>
+    </div>
+
+                <div id="api-tree"></div>
+
+        </div>
+        <div id="right-column">
+                <nav id="site-nav" class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-elements">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="../../../index.html">Essential API</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-elements">
+                <ul class="nav navbar-nav">
+                    <li><a href="../../../classes.html">Classes</a></li>
+                    <li><a href="../../../namespaces.html">Namespaces</a></li>
+                    <li><a href="../../../interfaces.html">Interfaces</a></li>
+                    <li><a href="../../../traits.html">Traits</a></li>
+                    <li><a href="../../../doc-index.html">Index</a></li>
+                    <li><a href="../../../search.html">Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+                        <div class="namespace-breadcrumbs">
+            <ol class="breadcrumb">
+                <li><span class="label label-default">class</span></li>
+                        <li><a href="../../../App.html">App</a></li><li class="backslash">\</li><li><a href="../../../App/Filters.html">Filters</a></li><li class="backslash">\</li><li><a href="../../../App/Filters/Backend.html">Backend</a></li><li class="backslash">\</li><li>AuthorizationFilter</li>
+            </ol>
+        </div>
+                <div id="page-content">
+    <div class="page-header">
+        <h1>AuthorizationFilter    
+            </h1>
+    </div>
+
+    
+    <p>        class
+    <strong>AuthorizationFilter</strong>        implements        <abbr title="CodeIgniter\Filters\FilterInterface">FilterInterface</abbr>
+</p>
+
+        
+        
+    
+        
+
+            <div class="description">
+            <p><p>Filtro di autorizzazione (middleware) per la protezione delle rotte del pannello di controllo.</p></p>            <p><p>Si occupa di verificare la presenza di una sessione amministrativa valida prima che la richiesta
+raggiunga il controller. In assenza di autenticazione, gestisce la pulizia dei cookie e delle sessioni,
+memorizza l'URL originario per consentire il reindirizzamento post-login e interrompe il flusso
+instradando l'utente verso la pagina di accesso.</p></p>        </div>
+            
+        
+    
+    
+            <h2>Methods</h2>
+
+            <div class="container-fluid underlined">
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <abbr title="CodeIgniter\HTTP\RedirectResponse">RedirectResponse</abbr>|<abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>|null
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_before">before</a>(<abbr title="CodeIgniter\HTTP\RequestInterface">RequestInterface</abbr> $request, array|null $arguments = null)
+        
+                                            <p><p>Intercetta e analizza la richiesta HTTP in ingresso per validare lo stato di autenticazione dell'utente.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>|null
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_after">after</a>(<abbr title="CodeIgniter\HTTP\RequestInterface">RequestInterface</abbr> $request, <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr> $response, array|null $arguments = null)
+        
+                                            <p><p>Intercetta la risposta HTTP in uscita dopo l'elaborazione da parte del controller.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+            </div>
+
+
+        <h2>Details</h2>
+
+            <div id="method-details">
+                    <div class="method-item">
+                    <h3 id="method_before">
+        <div class="location">at line 31</div>
+        <code>                    <abbr title="CodeIgniter\HTTP\RedirectResponse">RedirectResponse</abbr>|<abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>|null
+    <strong>before</strong>(<abbr title="CodeIgniter\HTTP\RequestInterface">RequestInterface</abbr> $request, array|null $arguments = null)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Intercetta e analizza la richiesta HTTP in ingresso per validare lo stato di autenticazione dell'utente.</p></p>                <p><p>Se l'amministratore non è connesso, il metodo esegue il logout per timeout (pulendo sia i cookie che il database),
+imposta i messaggi (flashdata) e differenzia l'interruzione del flusso: restituisce un payload JSON specifico
+in caso di chiamate asincrone (AJAX) oppure un redirect HTTP standard verso il form di login.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td><abbr title="CodeIgniter\HTTP\RequestInterface">RequestInterface</abbr></td>
+                <td>$request</td>
+                <td><p>L'oggetto rappresentante la richiesta HTTP in ingresso</p></td>
+            </tr>
+                    <tr>
+                <td>array|null</td>
+                <td>$arguments</td>
+                <td><p>Parametri opzionali configurati per il filtro (non utilizzati in questo contesto)</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><abbr title="CodeIgniter\HTTP\RedirectResponse">RedirectResponse</abbr>|<abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>|null</td>
+            <td><p>Restituisce null per autorizzare la richiesta, oppure una risposta (JSON o Redirect) per bloccarla</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_after">
+        <div class="location">at line 87</div>
+        <code>                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>|null
+    <strong>after</strong>(<abbr title="CodeIgniter\HTTP\RequestInterface">RequestInterface</abbr> $request, <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr> $response, array|null $arguments = null)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Intercetta la risposta HTTP in uscita dopo l'elaborazione da parte del controller.</p></p>                <p><p>Per questo specifico filtro di autorizzazione preliminare, non è richiesta alcuna manipolazione
+dei dati post-elaborazione, pertanto il metodo rimane intenzionalmente vuoto.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td><abbr title="CodeIgniter\HTTP\RequestInterface">RequestInterface</abbr></td>
+                <td>$request</td>
+                <td><p>L'oggetto rappresentante la richiesta HTTP elaborata</p></td>
+            </tr>
+                    <tr>
+                <td><abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr></td>
+                <td>$response</td>
+                <td><p>L'oggetto rappresentante la risposta HTTP generata dal controller</p></td>
+            </tr>
+                    <tr>
+                <td>array|null</td>
+                <td>$arguments</td>
+                <td><p>Parametri opzionali configurati per il filtro</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>|null</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+            </div>
+
+    
+</div><div id="footer">
+        Generated by <a href="https://github.com/code-lts/doctum">Doctum, a API Documentation generator and fork of Sami</a>.</div></div>
+    </div>
+    </body>
+
+</html>

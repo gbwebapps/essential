@@ -17,8 +17,9 @@ const actions = {
         const adminsManager = new ListManager({
             controller: 'admins',
             url: urlbase + 'backend/admins/showAll',
+            rootId: 'admins-list',
             containerId: 'showAll-admins-container',
-            searchFields: ['firstname', 'lastname', 'email', 'phone'], 
+            searchFields: ['firstname', 'lastname', 'email', 'phone'],
             searchDates: ['created_at', 'updated_at']
         });
         adminsManager.init();

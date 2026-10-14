@@ -48,14 +48,19 @@ return [
         'totpSecretKey'      => 'Chiave segreta (configurazione manuale)',
 		'enterOtpCode' => 'Inserisci il codice a 6 cifre',
 		'rememberMe' => 'Ricordami', 
-		'currentDevice' => 'Sessione corrente'
+		'currentDevice' => 'Sessione corrente',
+		'mobile' => 'Dispositivo mobile',
+		'robot' => 'Robot',
+		'currentPassword' => 'Password corrente',
+		'currentPasswordEmailHelp' => 'Richiesta solo se modifichi l\'indirizzo email.'
 	], 
 	'placeholders' => [
 		'firstname' => 'Inserisci nome...', 
 		'lastname' => 'Inserisci cognome...', 
 		'email' => 'Inserisci email...', 
 		'phone' => 'Inserisci telefono...', 
-		'note' => 'Inserisci note aggiuntive...', 
+		'note' => 'Inserisci note aggiuntive...',
+		'currentPassword' => 'Inserisci la password corrente...',
 	], 
 	'buttons' => [
 		'sendData' => 'Salva dati', 
@@ -64,10 +69,14 @@ return [
 		'resetPassword' => 'Procedi al reset della password',
 		'verifyAndActivate' => 'Verifica e attiva', 
 		'undoClose' => 'Chiudi configurazione ed esci', 
-		'delete' => 'Elimina'
+		'delete' => 'Elimina',
+		'showPassword' => 'Mostra password'
 	], 
 	'errors' => [
-		'id' => 'ID non conforme.', 
+		'id' => 'ID non conforme.',
+		'safeText' => 'Caratteri non ammessi.',
+		'currentPasswordRequired' => 'Inserisci la password corrente.',
+		'currentPasswordInvalid' => 'La password corrente non è corretta.',
 	], 
 	'audits' => [
 		'updateData' => 'Aggiornamento dati generali %s %s', 
@@ -91,7 +100,7 @@ return [
 		'noTokensFound' => 'Non sono presenti tokens.', 
 		'deleteTokenSuccess' => 'Il token di %s %s è stato eliminato con successo.', 
 		'deleteTokenError' => 'Eliminazione token non andata a buon fine', 
-		'expiringDate' => '<div class="pb-3">Hai richiesto il reset della password.</div><div class="pb-3">Verifica la tua email e completa l\'operazione.</div>Hai tempo fino al %s</div>',
+		'expiringDate' => '<div class="pb-3">Hai richiesto il reset della password.</div><div class="pb-3">Verifica la tua email e completa l\'operazione.</div>Hai tempo fino al %s',
 		'methodNotValid' => 'Metodo non valido o non supportato.', 
 		'updateSecuritySettingsError' => 'Impossibile aggiornare le impostazioni di sicurezza.', 
 		'updateSecuritySettingsSuccess' => 'Impostazioni di sicurezza aggiornate con successo.', 
@@ -102,6 +111,8 @@ return [
 		'totpActivationNotPossible' => 'Impossibile attivare l\'autenticazione TOTP.', 
 		'totpConfigurationSuccess' => 'L\'applicazione di autenticazione è stata configurata con successo.', 
 		'areYouSureChangeMethod' => 'Sei sicuro di voler cambiare il metodo del secondo fattore di autenticazione?', 
-		'cannotDeleteCurrentToken' => 'Non è possibile eliminare la sessione corrente.'
+		'cannotDeleteCurrentToken' => 'Non è possibile eliminare la sessione corrente.',
+		'tooManyResetRequests' => 'Troppe richieste di reset password. Riprova più tardi.',
+		'tooManyAttempts' => 'Troppi tentativi. Riprova più tardi.'
 	]
 ];

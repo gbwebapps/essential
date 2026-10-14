@@ -24,6 +24,7 @@ class MenuTest extends CIUnitTestCase
         $this->assertSame('backend/admins/showAll', $config->topRight[0]['route']);
         $this->assertSame('admins', $config->topRight[0]['controller']);
         $this->assertSame('backend/auth/logout', $config->topRight[6]['route']);
+        $this->assertSame('post', $config->topRight[6]['method']);
     }
 
     public function testConstructorBuildsBottomLeftMenu(): void
@@ -56,10 +57,19 @@ class MenuTest extends CIUnitTestCase
         $controllers = [];
 
         foreach ($items as $item):
-            $this->assertSame(['label', 'route', 'icon', 'controller'], array_keys($item));
+            $expectedKeys = ($item['route'] === 'backend/auth/logout')
+                ? ['label', 'route', 'icon', 'controller', 'method']
+                : ['label', 'route', 'icon', 'controller'];
+
+            $this->assertSame($expectedKeys, array_keys($item));
             $this->assertNotSame('', $item['label']);
             $this->assertNotSame('', $item['icon']);
-            $this->assertArrayHasKey($item['route'], $getRoutes, $item['route']);
+
+            $routesForMethod = ($item['method'] ?? 'get') === 'post'
+                ? $routes->getRoutes('POST')
+                : $getRoutes;
+
+            $this->assertArrayHasKey($item['route'], $routesForMethod, $item['route']);
 
             $configuredRoutes[] = $item['route'];
             $controllers[] = $item['controller'];

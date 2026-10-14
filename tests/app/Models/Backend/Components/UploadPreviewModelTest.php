@@ -25,15 +25,15 @@ class UploadPreviewModelTest extends CIUnitTestCase
             ->assertSame(
                 [
                     'entity' => [
-                        'label' => lang('backend/components/uploadPreviewImg.labels.entity'),
-                        'rules' => ['required', 'alpha']
+                        'label' => lang('backend/components/uploadPreview.labels.entity'),
+						'rules' => ['required', 'in_list[admins]']
                     ],
                     'uuid' => [
-                        'label' => lang('backend/components/uploadPreviewImg.labels.uuid'),
+                        'label' => lang('backend/components/uploadPreview.labels.uuid'),
                         'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]']
                     ],
                     'context' => [
-                        'label' => lang('backend/components/uploadPreviewImg.labels.context'),
+                        'label' => lang('backend/components/uploadPreview.labels.context'),
                         'rules' => ['required', 'in_list[edit,show]']
                     ]
                 ],
@@ -113,7 +113,7 @@ class UploadPreviewModelTest extends CIUnitTestCase
             ->assertSame(
                 [
                     'result' => false,
-                    'message' => lang('backend/components/uploadPreviewImg.messages.saveImagesError')
+                    'message' => lang('backend/components/uploadPreview.messages.saveImagesError')
                 ],
                 $result
             );
@@ -338,7 +338,7 @@ class UploadPreviewModelTest extends CIUnitTestCase
             ->assertSame(
                 [
                     'result' => true,
-                    'message' => lang('backend/components/uploadPreviewImg.messages.saveImagesSuccess')
+                    'message' => lang('backend/components/uploadPreview.messages.saveImagesSuccess')
                 ],
                 $result
             );

@@ -47,15 +47,13 @@
                         <div class="col-12 col-lg-3 text-center py-1">
                             <ul class="list-group list-group-flush border rounded-2">
                                 <li class="list-group-item" style="min-height: 75px;">
-                                    <label class="fw-bold text-dark d-block mb-1">
-                                        <form class="changePermission" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureChangePermission'), $actionVerb, $v, esc($admin->firstname), esc($admin->lastname)); ?>">
-                                            <input type="hidden" name="permission" value="<?= $k; ?>">
-                                            <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
-                                            <button type="submit" class="<?= $permClass; ?>">
-                                                <i class="fa-solid fa-circle-arrow-down"></i><?= $v; ?>
-                                            </button>
-                                        </form>
-                                    </label>
+                                    <form class="changePermission fw-bold text-dark d-block mb-1" data-message="<?= esc(sprintf(lang('backend/admins.messages.areYouSureChangePermission'), $actionVerb, $v, $admin->firstname, $admin->lastname), 'attr'); ?>">
+                                        <input type="hidden" name="permission" value="<?= esc($k, 'attr'); ?>">
+                                        <input type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>">
+                                        <button type="submit" class="<?= esc($permClass, 'attr'); ?>">
+                                            <i class="fa-solid fa-circle-arrow-down"></i><?= esc($v); ?>
+                                        </button>
+                                    </form>
                                     
                                     <?php if ($isGroupActive): ?>
                                         <span class="badge bg-success-subtle text-success border border-success-subtle fs-8"><?= lang('backend/admins.labels.assignedToGroup'); ?></span>
@@ -64,7 +62,7 @@
                                     <?php endif; ?>
                                 </li>
                                 <li class="list-group-item">
-                                    <span class="<?= $permClass; ?>" style="cursor: default;"><?= $permText; ?></span>
+                                    <span class="<?= esc($permClass, 'attr'); ?>" style="cursor: default;"><?= esc($permText); ?></span>
                                 </li>
                             </ul>
                         </div>

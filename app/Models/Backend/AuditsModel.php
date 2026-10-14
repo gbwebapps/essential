@@ -3,7 +3,6 @@
 namespace App\Models\Backend;
 
 use App\Models\Backend\BackendModel;
-use App\Interfaces\ImportValidationInterface;
 
 /*
  * Modello dedicato alla gestione dell'Audit Log (lo storico delle attività di sistema).
@@ -34,7 +33,7 @@ class AuditsModel extends BackendModel
      * 
      * @var array 
      */
-    protected array $allowedOrderColumns = ['username', 'action', 'section', 'details']; 
+    protected array $allowedOrderColumns = ['id', 'username', 'action', 'section', 'details', 'created_at'];
 
     /**
      * Whitelist dei campi di database abilitati per la ricerca tramite testo libero.
@@ -52,14 +51,14 @@ class AuditsModel extends BackendModel
 
     /**
      * Query SQL principale per caricare la tabella dei dati. 
-     * Esegue una JOIN con la tabella `admins` per recuperare i dettagli anagrafici e i permessi 
-     * di chi ha eseguito l'azione, mostrando così un quadro completo dell'evento.
+     * Esegue una LEFT JOIN con la tabella `admins` per recuperare il flag superadmin senza escludere
+     * gli audit guest o quelli riferiti ad amministratori successivamente eliminati.
      * 
      * @var string 
      */
-    protected ?string $getDataQuery = "select admins_audits.id, admin_uuid, username, action, section, details, ip_address, user_agent, admins_audits.created_at, superadmin 
+    protected ?string $getDataQuery = "select admins_audits.id as id, admins_audits.admin_uuid, admins_audits.username, admins_audits.action, admins_audits.section, admins_audits.details, admins_audits.ip_address, admins_audits.user_agent, admins_audits.created_at as created_at, coalesce(admins.superadmin, 0) as superadmin
                                        from admins_audits 
-                                       join admins 
+                                       left join admins
                                        on admins.uuid = admins_audits.admin_uuid 
                                        where 1 = 1";
 
@@ -119,20 +118,20 @@ class AuditsModel extends BackendModel
     {
         return [
             'searchFields.username' => [
-                'label' => lang('backend/admins.labels.username'), 
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\']+$/u]'], 
+                'label' => lang('backend/audits.labels.username'),
+                'rules' => ['permit_empty', 'trim', 'max_length[100]'],
             ],
             'searchFields.action' => [
-                'label' => lang('backend/admins.labels.action'), 
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\']+$/u]'], 
+                'label' => lang('backend/audits.labels.action'),
+                'rules' => ['permit_empty', 'trim', 'max_length[50]'],
             ],
             'searchFields.section' => [
-                'label' => lang('backend/admins.labels.section'), 
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\']+$/u]'], 
+                'label' => lang('backend/audits.labels.section'),
+                'rules' => ['permit_empty', 'trim', 'max_length[100]'],
             ],
             'searchFields.details' => [
-                'label' => lang('backend/admins.labels.details'), 
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\']+$/u]'], 
+                'label' => lang('backend/audits.labels.details'),
+                'rules' => ['permit_empty', 'trim', 'max_length[500]'],
             ],
             'searchDates.created_at-from' => [
                 'label' => lang('backend/audits.labels.dateFrom'),

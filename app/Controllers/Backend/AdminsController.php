@@ -19,11 +19,6 @@ use App\Models\Backend\Components\GalleryOneModel;
  */
 class AdminsController extends BackendController 
 {
-	private function invalidRequest(): ResponseInterface
-	{
-		return $this->jsonResponse(['result' => false, 'message' => lang('backend/global.errors.err403')], 400);
-	}
-
 	private function targetAccessError(array $record): ?ResponseInterface
 	{
 		if ($record['result'] === false):
@@ -77,7 +72,7 @@ class AdminsController extends BackendController
         $this->data['entity'] = 'admins';
 
         $this->adminsModel = model(AdminsModel::class);
-        $this->adminsClass = new AdminsClass($this->adminsModel);
+        $this->adminsClass = new AdminsClass();
 
         $this->galleryOneModel = model(GalleryOneModel::class);
     }
@@ -371,7 +366,7 @@ class AdminsController extends BackendController
 
 		endif;
 
-		return $this->invalidRequest();
+		return service('response')->setStatusCode(400);
     }
 
     /**
@@ -448,7 +443,7 @@ class AdminsController extends BackendController
 
 		endif;
 
-		return $this->invalidRequest();
+		return service('response')->setStatusCode(400);
 	}
 
     /**
@@ -475,7 +470,7 @@ class AdminsController extends BackendController
 
 		endif;
 
-		return $this->invalidRequest();
+		return service('response')->setStatusCode(400);
 	}
 
     /**
@@ -502,7 +497,7 @@ class AdminsController extends BackendController
 
         endif;
 
-		return $this->invalidRequest();
+		return service('response')->setStatusCode(400);
     }
 
     /**
@@ -529,7 +524,7 @@ class AdminsController extends BackendController
 
 		endif;
 
-		return $this->invalidRequest();
+		return service('response')->setStatusCode(400);
 	}
 
     /**
@@ -571,7 +566,7 @@ class AdminsController extends BackendController
 
 		endif;
 
-		return $this->invalidRequest();
+		return service('response')->setStatusCode(400);
 	}
 
     /**
@@ -614,7 +609,7 @@ class AdminsController extends BackendController
 
 		endif;
 
-		return $this->invalidRequest();
+		return service('response')->setStatusCode(400);
 	}
 
     /**
@@ -672,7 +667,7 @@ class AdminsController extends BackendController
 
 		endif;
 
-		return $this->invalidRequest();
+		return service('response')->setStatusCode(400);
     }
 
     /**
@@ -718,7 +713,7 @@ class AdminsController extends BackendController
 
 		endif;
 
-		return $this->invalidRequest();
+		return service('response')->setStatusCode(400);
     }
 
     /**
@@ -781,7 +776,7 @@ class AdminsController extends BackendController
 
 		endif;
 
-		return $this->invalidRequest();
+		return service('response')->setStatusCode(400);
     }
 
     /**
@@ -830,7 +825,7 @@ class AdminsController extends BackendController
 
 		endif;
 
-		return $this->invalidRequest();
+		return service('response')->setStatusCode(400);
     }
 
     /**
@@ -872,6 +867,6 @@ class AdminsController extends BackendController
 
 		endif;
 
-		return $this->invalidRequest();
+		return service('response')->setStatusCode(400);
 	}
 }

@@ -22,13 +22,16 @@ class AppOtpServiceTest extends CIUnitTestCase
             'Backend\Auth' => [
                 'twoFactorDigits' => 6,
                 'twoFactorIssuer' => 'Essential',
-                'twoFactorWindow' => 1
+                'twoFactorWindow' => 1,
+				'twoFactorOtpExpiry' => 30,
+				'sessionCryptoKey' => str_repeat('k', 32)
             ]
         ]);
     }
 
     protected function tearDown(): void
     {
+		Services::resetSingle('crypto');
         $this->resetSettingsMocks();
 
         parent::tearDown();
@@ -80,6 +83,11 @@ class AppOtpServiceTest extends CIUnitTestCase
             ->twoFactorWindow
             =
             1;
+
+        $authConfig
+            ->twoFactorOtpExpiry
+            =
+            30;
 
         if (
             class_exists(
@@ -165,6 +173,11 @@ class AppOtpServiceTest extends CIUnitTestCase
             =
             1;
 
+        $authConfig
+            ->twoFactorOtpExpiry
+            =
+            30;
+
         if (
             class_exists(
                 '\CodeIgniter\Config\Factories'
@@ -242,6 +255,11 @@ class AppOtpServiceTest extends CIUnitTestCase
             =
             1;
 
+        $authConfig
+            ->twoFactorOtpExpiry
+            =
+            30;
+
         if (
             class_exists(
                 '\CodeIgniter\Config\Factories'
@@ -312,4 +330,22 @@ class AppOtpServiceTest extends CIUnitTestCase
                 $result
             );
     }
+
+	public function testProtectAndRevealSecretRoundTrip(): void
+	{
+		$service = new \App\Libraries\AppOtpService();
+		$secret = 'JBSWY3DPEHPK3PXP';
+		$protected = $service->protectSecret($secret);
+
+		$this->assertStringStartsWith('enc:v1:', $protected);
+		$this->assertNotSame($secret, $protected);
+		$this->assertSame($secret, $service->revealSecret($protected));
+	}
+
+	public function testRevealSecretSupportsLegacyPlaintext(): void
+	{
+		$service = new \App\Libraries\AppOtpService();
+
+		$this->assertSame('LEGACYSECRET', $service->revealSecret('LEGACYSECRET'));
+	}
 }

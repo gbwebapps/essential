@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for D:\Laragon\www\essential\app\Models</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../_css/bootstrap.min.css?v=10.1.16" rel="stylesheet" type="text/css">
+  <link href="../_css/nv.d3.min.css?v=10.1.16" rel="stylesheet" type="text/css">
+  <link href="../_css/style.css?v=10.1.16" rel="stylesheet" type="text/css">
+  <link href="../_css/custom.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+  <header>
+   <div class="container-fluid">
+    <div class="row">
+     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+       <ol class="breadcrumb">
+         <li class="breadcrumb-item"><a href="../index.html">D:\Laragon\www\essential\app</a></li>
+         <li class="breadcrumb-item"><a href="index.html">Models</a></li>
+         <li class="breadcrumb-item active">(Dashboard)</li>
+
+       </ol>
+      </nav>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Backend/AccountModel.php.html#15">App\Models\Backend\AccountModel</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#16">App\Models\Backend\AdminsModel</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuditsModel.php.html#16">App\Models\Backend\AuditsModel</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#16">App\Models\Backend\AuthModel</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/_ExportModel.php.html#15">App\Models\Backend\Components\ExportModel</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/GalleryOneModel.php.html#16">App\Models\Backend\Components\GalleryOneModel</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/_ImportModel.php.html#16">App\Models\Backend\Components\ImportModel</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/UploadPreviewModel.php.html#15">App\Models\Backend\Components\UploadPreviewModel</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/DashboardModel.php.html#15">App\Models\Backend\DashboardModel</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#15">App\Models\Backend\GroupsModel</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/LogsModel.php.html#16">App\Models\Backend\LogsModel</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/MessagesModel.php.html#7">App\Models\Backend\MessagesModel</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/SettingsModel.php.html#15">App\Models\Backend\SettingsModel</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/TokensModel.php.html#15">App\Models\Backend\TokensModel</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#15">App\Models\Backend\ToolsModel</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/UsersModel.php.html#7">App\Models\Backend\UsersModel</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Frontend/FrontendModel.php.html#7">App\Models\Frontend\FrontendModel</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Frontend/HomeModel.php.html#7">App\Models\Frontend\HomeModel</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/BackendModel.php.html#15">App\Models\Backend\BackendModel</a></td><td class="text-right">46%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Backend/_AdminsModel.php.html#16">App\Models\Backend\AdminsModel</a></td><td class="text-right">13110</td></tr>
+       <tr><td><a href="Backend/Components/_ImportModel.php.html#16">App\Models\Backend\Components\ImportModel</a></td><td class="text-right">9506</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#15">App\Models\Backend\ToolsModel</a></td><td class="text-right">6006</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#16">App\Models\Backend\AuthModel</a></td><td class="text-right">5852</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#15">App\Models\Backend\GroupsModel</a></td><td class="text-right">3660</td></tr>
+       <tr><td><a href="Backend/Components/_ExportModel.php.html#15">App\Models\Backend\Components\ExportModel</a></td><td class="text-right">2070</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#15">App\Models\Backend\AccountModel</a></td><td class="text-right">1980</td></tr>
+       <tr><td><a href="Backend/SettingsModel.php.html#15">App\Models\Backend\SettingsModel</a></td><td class="text-right">1482</td></tr>
+       <tr><td><a href="Backend/BackendModel.php.html#15">App\Models\Backend\BackendModel</a></td><td class="text-right">720</td></tr>
+       <tr><td><a href="Backend/TokensModel.php.html#15">App\Models\Backend\TokensModel</a></td><td class="text-right">182</td></tr>
+       <tr><td><a href="Backend/LogsModel.php.html#16">App\Models\Backend\LogsModel</a></td><td class="text-right">110</td></tr>
+       <tr><td><a href="Backend/Components/GalleryOneModel.php.html#16">App\Models\Backend\Components\GalleryOneModel</a></td><td class="text-right">90</td></tr>
+       <tr><td><a href="Backend/AuditsModel.php.html#16">App\Models\Backend\AuditsModel</a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="Backend/Components/UploadPreviewModel.php.html#15">App\Models\Backend\Components\UploadPreviewModel</a></td><td class="text-right">56</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Backend/AccountModel.php.html#53"><abbr title="App\Models\Backend\AccountModel::initModel">initModel</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#68"><abbr title="App\Models\Backend\AccountModel::editValidationRules">editValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#105"><abbr title="App\Models\Backend\AccountModel::deleteTokenValidationRules">deleteTokenValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#128"><abbr title="App\Models\Backend\AccountModel::getGroupPermissions">getGroupPermissions</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#152"><abbr title="App\Models\Backend\AccountModel::getAdminExceptions">getAdminExceptions</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#176"><abbr title="App\Models\Backend\AccountModel::getTokens">getTokens</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#196"><abbr title="App\Models\Backend\AccountModel::edit">edit</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#252"><abbr title="App\Models\Backend\AccountModel::getCurrentTokenId">getCurrentTokenId</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#284"><abbr title="App\Models\Backend\AccountModel::deleteToken">deleteToken</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#342"><abbr title="App\Models\Backend\AccountModel::resetPassword">resetPassword</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#423"><abbr title="App\Models\Backend\AccountModel::getExpiringDate">getExpiringDate</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#448"><abbr title="App\Models\Backend\AccountModel::getActiveMethod">getActiveMethod</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#472"><abbr title="App\Models\Backend\AccountModel::setBasicMethod">setBasicMethod</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#511"><abbr title="App\Models\Backend\AccountModel::saveTemporarySecret">saveTemporarySecret</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#535"><abbr title="App\Models\Backend\AccountModel::getTemporarySecret">getTemporarySecret</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#558"><abbr title="App\Models\Backend\AccountModel::activateTotpMethod">activateTotpMethod</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#187"><abbr title="App\Models\Backend\AdminsModel::initModel">initModel</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#197"><abbr title="App\Models\Backend\AdminsModel::showAllValidationRules">showAllValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#226"><abbr title="App\Models\Backend\AdminsModel::showAllSearchValidationRules">showAllSearchValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#272"><abbr title="App\Models\Backend\AdminsModel::addValidationRules">addValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#323"><abbr title="App\Models\Backend\AdminsModel::editValidationRules">editValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#391"><abbr title="App\Models\Backend\AdminsModel::changeGroupValidationRules">changeGroupValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#410"><abbr title="App\Models\Backend\AdminsModel::delValidationRules">delValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#429"><abbr title="App\Models\Backend\AdminsModel::resetPasswordValidationRules">resetPasswordValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#451"><abbr title="App\Models\Backend\AdminsModel::changeStatusValidationRules">changeStatusValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#480"><abbr title="App\Models\Backend\AdminsModel::getTokensValidationRules">getTokensValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#502"><abbr title="App\Models\Backend\AdminsModel::generalDataValidationRules">generalDataValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#532"><abbr title="App\Models\Backend\AdminsModel::metaDataValidationRules">metaDataValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#555"><abbr title="App\Models\Backend\AdminsModel::getPermissionsValidationRules">getPermissionsValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#586"><abbr title="App\Models\Backend\AdminsModel::deleteTokenValidationRules">deleteTokenValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#617"><abbr title="App\Models\Backend\AdminsModel::changePermissionValidationRules">changePermissionValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#657"><abbr title="App\Models\Backend\AdminsModel::getPermissions">getPermissions</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#670"><abbr title="App\Models\Backend\AdminsModel::getTokens">getTokens</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#683"><abbr title="App\Models\Backend\AdminsModel::getAttempts">getAttempts</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#696"><abbr title="App\Models\Backend\AdminsModel::getTwoFaAttempts">getTwoFaAttempts</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#709"><abbr title="App\Models\Backend\AdminsModel::getTwoFaCodes">getTwoFaCodes</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#722"><abbr title="App\Models\Backend\AdminsModel::getTwoFa">getTwoFa</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#734"><abbr title="App\Models\Backend\AdminsModel::getGroups">getGroups</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#746"><abbr title="App\Models\Backend\AdminsModel::getGroupPermissions">getGroupPermissions</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#767"><abbr title="App\Models\Backend\AdminsModel::getAdminExceptions">getAdminExceptions</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#797"><abbr title="App\Models\Backend\AdminsModel::add">add</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#907"><abbr title="App\Models\Backend\AdminsModel::edit">edit</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#1030"><abbr title="App\Models\Backend\AdminsModel::hasAdminChanged">hasAdminChanged</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#1090"><abbr title="App\Models\Backend\AdminsModel::hardDelete">hardDelete</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#1169"><abbr title="App\Models\Backend\AdminsModel::softDelete">softDelete</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#1246"><abbr title="App\Models\Backend\AdminsModel::restoreDelete">restoreDelete</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#1335"><abbr title="App\Models\Backend\AdminsModel::resetPassword">resetPassword</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#1436"><abbr title="App\Models\Backend\AdminsModel::changeStatus">changeStatus</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#1528"><abbr title="App\Models\Backend\AdminsModel::changePermission">changePermission</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#1627"><abbr title="App\Models\Backend\AdminsModel::deleteToken">deleteToken</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#1703"><abbr title="App\Models\Backend\AdminsModel::deletePermissions">deletePermissions</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuditsModel.php.html#78"><abbr title="App\Models\Backend\AuditsModel::initModel">initModel</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuditsModel.php.html#91"><abbr title="App\Models\Backend\AuditsModel::showAllValidationRules">showAllValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuditsModel.php.html#118"><abbr title="App\Models\Backend\AuditsModel::showAllSearchValidationRules">showAllSearchValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuditsModel.php.html#162"><abbr title="App\Models\Backend\AuditsModel::logActivity">logActivity</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#69"><abbr title="App\Models\Backend\AuthModel::initModel">initModel</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#84"><abbr title="App\Models\Backend\AuthModel::validateLoginRules">validateLoginRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#108"><abbr title="App\Models\Backend\AuthModel::validateResetPasswordRules">validateResetPasswordRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#127"><abbr title="App\Models\Backend\AuthModel::validateSetPasswordRules">validateSetPasswordRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#159"><abbr title="App\Models\Backend\AuthModel::validateVerifyRules">validateVerifyRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#186"><abbr title="App\Models\Backend\AuthModel::login">login</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#341"><abbr title="App\Models\Backend\AuthModel::innerLogin">innerLogin</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#453"><abbr title="App\Models\Backend\AuthModel::resetPassword">resetPassword</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#537"><abbr title="App\Models\Backend\AuthModel::setPassword">setPassword</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#604"><abbr title="App\Models\Backend\AuthModel::checkAuthToken">checkAuthToken</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#647"><abbr title="App\Models\Backend\AuthModel::verify">verify</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#782"><abbr title="App\Models\Backend\AuthModel::logoutBySession">logoutBySession</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#841"><abbr title="App\Models\Backend\AuthModel::logoutByCookie">logoutByCookie</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/BackendModel.php.html#352"><abbr title="App\Models\Backend\BackendModel::getByUUID">getByUUID</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/BackendModel.php.html#383"><abbr title="App\Models\Backend\BackendModel::hasDataChanged">hasDataChanged</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/BackendModel.php.html#428"><abbr title="App\Models\Backend\BackendModel::insertImages">insertImages</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/BackendModel.php.html#478"><abbr title="App\Models\Backend\BackendModel::rrmdir">rrmdir</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/BackendModel.php.html#507"><abbr title="App\Models\Backend\BackendModel::generateUUID">generateUUID</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/BackendModel.php.html#551"><abbr title="App\Models\Backend\BackendModel::getUploadService">getUploadService</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/_ExportModel.php.html#25"><abbr title="App\Models\Backend\Components\ExportModel::getSensitiveColumns">getSensitiveColumns</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/_ExportModel.php.html#39"><abbr title="App\Models\Backend\Components\ExportModel::generateValidationRules">generateValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/_ExportModel.php.html#75"><abbr title="App\Models\Backend\Components\ExportModel::getExportColumns">getExportColumns</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/_ExportModel.php.html#106"><abbr title="App\Models\Backend\Components\ExportModel::getPrimaryKey">getPrimaryKey</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/_ExportModel.php.html#143"><abbr title="App\Models\Backend\Components\ExportModel::generate">generate</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/GalleryOneModel.php.html#45"><abbr title="App\Models\Backend\Components\GalleryOneModel::getImagesValidateFields">getImagesValidateFields</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/GalleryOneModel.php.html#72"><abbr title="App\Models\Backend\Components\GalleryOneModel::deleteImageValidateFields">deleteImageValidateFields</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/GalleryOneModel.php.html#106"><abbr title="App\Models\Backend\Components\GalleryOneModel::coverValidateFields">coverValidateFields</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/GalleryOneModel.php.html#142"><abbr title="App\Models\Backend\Components\GalleryOneModel::getImages">getImages</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/GalleryOneModel.php.html#161"><abbr title="App\Models\Backend\Components\GalleryOneModel::deleteImage">deleteImage</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/GalleryOneModel.php.html#187"><abbr title="App\Models\Backend\Components\GalleryOneModel::setCover">setCover</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/GalleryOneModel.php.html#230"><abbr title="App\Models\Backend\Components\GalleryOneModel::removeCover">removeCover</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/_ImportModel.php.html#29"><abbr title="App\Models\Backend\Components\ImportModel::getTargetModelInstance">getTargetModelInstance</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/_ImportModel.php.html#51"><abbr title="App\Models\Backend\Components\ImportModel::getTableStructure">getTableStructure</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/_ImportModel.php.html#102"><abbr title="App\Models\Backend\Components\ImportModel::parseAndValidateCsv">parseAndValidateCsv</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/_ImportModel.php.html#350"><abbr title="App\Models\Backend\Components\ImportModel::executeImport">executeImport</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/_ImportModel.php.html#549"><abbr title="App\Models\Backend\Components\ImportModel::backupTableBeforeImport">backupTableBeforeImport</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/_ImportModel.php.html#612"><abbr title="App\Models\Backend\Components\ImportModel::buildDynamicRules">buildDynamicRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/UploadPreviewModel.php.html#35"><abbr title="App\Models\Backend\Components\UploadPreviewModel::uploadPreviewHiddenRules">uploadPreviewHiddenRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/UploadPreviewModel.php.html#65"><abbr title="App\Models\Backend\Components\UploadPreviewModel::uploadPreviewImagesRules">uploadPreviewImagesRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/Components/UploadPreviewModel.php.html#87"><abbr title="App\Models\Backend\Components\UploadPreviewModel::saveImages">saveImages</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/DashboardModel.php.html#25"><abbr title="App\Models\Backend\DashboardModel::initModel">initModel</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#89"><abbr title="App\Models\Backend\GroupsModel::initModel">initModel</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#103"><abbr title="App\Models\Backend\GroupsModel::addValidationRules">addValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#144"><abbr title="App\Models\Backend\GroupsModel::getGroupByIdValidationRules">getGroupByIdValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#164"><abbr title="App\Models\Backend\GroupsModel::editValidationRules">editValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#208"><abbr title="App\Models\Backend\GroupsModel::delValidationRules">delValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#227"><abbr title="App\Models\Backend\GroupsModel::saveExceptionsValidationRules">saveExceptionsValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#267"><abbr title="App\Models\Backend\GroupsModel::dropdownAdminsRules">dropdownAdminsRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#285"><abbr title="App\Models\Backend\GroupsModel::adminPermissionsValidationRules">adminPermissionsValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#307"><abbr title="App\Models\Backend\GroupsModel::getGroups">getGroups</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#332"><abbr title="App\Models\Backend\GroupsModel::getGroup">getGroup</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#358"><abbr title="App\Models\Backend\GroupsModel::getGroupById">getGroupById</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#388"><abbr title="App\Models\Backend\GroupsModel::add">add</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#457"><abbr title="App\Models\Backend\GroupsModel::edit">edit</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#536"><abbr title="App\Models\Backend\GroupsModel::del">del</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#587"><abbr title="App\Models\Backend\GroupsModel::hasGroupChanged">hasGroupChanged</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#622"><abbr title="App\Models\Backend\GroupsModel::getDropdownAdmins">getDropdownAdmins</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#660"><abbr title="App\Models\Backend\GroupsModel::getAdminByUuid">getAdminByUuid</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#690"><abbr title="App\Models\Backend\GroupsModel::getGroupPermissionsArray">getGroupPermissionsArray</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#706"><abbr title="App\Models\Backend\GroupsModel::getAdminExceptionsArray">getAdminExceptionsArray</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#732"><abbr title="App\Models\Backend\GroupsModel::saveExceptions">saveExceptions</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#843"><abbr title="App\Models\Backend\GroupsModel::hasAdminsAttached">hasAdminsAttached</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/LogsModel.php.html#86"><abbr title="App\Models\Backend\LogsModel::initModel">initModel</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/LogsModel.php.html#100"><abbr title="App\Models\Backend\LogsModel::showAllValidationRules">showAllValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/LogsModel.php.html#127"><abbr title="App\Models\Backend\LogsModel::showAllSearchValidationRules">showAllSearchValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/LogsModel.php.html#160"><abbr title="App\Models\Backend\LogsModel::deleteToken">deleteToken</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/MessagesModel.php.html#9"><abbr title="App\Models\Backend\MessagesModel::initModel">initModel</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/SettingsModel.php.html#113"><abbr title="App\Models\Backend\SettingsModel::initModel">initModel</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/SettingsModel.php.html#127"><abbr title="App\Models\Backend\SettingsModel::authSettingsValidateRules">authSettingsValidateRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/SettingsModel.php.html#198"><abbr title="App\Models\Backend\SettingsModel::uploadSettingsValidateRules">uploadSettingsValidateRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/SettingsModel.php.html#257"><abbr title="App\Models\Backend\SettingsModel::emailSettingsValidateRules">emailSettingsValidateRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/SettingsModel.php.html#328"><abbr title="App\Models\Backend\SettingsModel::generalSettingsValidateRules">generalSettingsValidateRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/SettingsModel.php.html#358"><abbr title="App\Models\Backend\SettingsModel::getSettings">getSettings</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/SettingsModel.php.html#409"><abbr title="App\Models\Backend\SettingsModel::hasDatabaseSettings">hasDatabaseSettings</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/SettingsModel.php.html#431"><abbr title="App\Models\Backend\SettingsModel::saveSettings">saveSettings</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/SettingsModel.php.html#494"><abbr title="App\Models\Backend\SettingsModel::getChangedKeys">getChangedKeys</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/SettingsModel.php.html#536"><abbr title="App\Models\Backend\SettingsModel::deleteSettings">deleteSettings</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/SettingsModel.php.html#569"><abbr title="App\Models\Backend\SettingsModel::hasSettingsChanged">hasSettingsChanged</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/TokensModel.php.html#96"><abbr title="App\Models\Backend\TokensModel::initModel">initModel</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/TokensModel.php.html#109"><abbr title="App\Models\Backend\TokensModel::showAllValidationRules">showAllValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/TokensModel.php.html#135"><abbr title="App\Models\Backend\TokensModel::showAllSearchValidationRules">showAllSearchValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/TokensModel.php.html#165"><abbr title="App\Models\Backend\TokensModel::delValidationRules">delValidationRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/TokensModel.php.html#201"><abbr title="App\Models\Backend\TokensModel::hardDelete">hardDelete</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#43"><abbr title="App\Models\Backend\ToolsModel::initModel">initModel</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#56"><abbr title="App\Models\Backend\ToolsModel::validateManageAuditsRules">validateManageAuditsRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#77"><abbr title="App\Models\Backend\ToolsModel::validateManageLogsRules">validateManageLogsRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#99"><abbr title="App\Models\Backend\ToolsModel::getAuditsStats">getAuditsStats</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#124"><abbr title="App\Models\Backend\ToolsModel::buildAuditDates">buildAuditDates</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#149"><abbr title="App\Models\Backend\ToolsModel::countAuditsToDelete">countAuditsToDelete</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#174"><abbr title="App\Models\Backend\ToolsModel::deleteAudits">deleteAudits</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#212"><abbr title="App\Models\Backend\ToolsModel::getLogsStats">getLogsStats</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#237"><abbr title="App\Models\Backend\ToolsModel::buildLogDates">buildLogDates</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#262"><abbr title="App\Models\Backend\ToolsModel::countLogsToDelete">countLogsToDelete</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#286"><abbr title="App\Models\Backend\ToolsModel::deleteLogs">deleteLogs</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#326"><abbr title="App\Models\Backend\ToolsModel::getTablesStatus">getTablesStatus</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#367"><abbr title="App\Models\Backend\ToolsModel::runOptimization">runOptimization</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#402"><abbr title="App\Models\Backend\ToolsModel::getDatabase">getDatabase</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#420"><abbr title="App\Models\Backend\ToolsModel::getBackups">getBackups</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#472"><abbr title="App\Models\Backend\ToolsModel::extractDateFromFilename">extractDateFromFilename</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#498"><abbr title="App\Models\Backend\ToolsModel::generateDatabaseBackups">generateDatabaseBackups</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#616"><abbr title="App\Models\Backend\ToolsModel::deleteBackups">deleteBackups</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#644"><abbr title="App\Models\Backend\ToolsModel::getWritableFoldersStatus">getWritableFoldersStatus</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#682"><abbr title="App\Models\Backend\ToolsModel::cleanWritableFolder">cleanWritableFolder</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#724"><abbr title="App\Models\Backend\ToolsModel::getSystemInfo">getSystemInfo</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/UsersModel.php.html#9"><abbr title="App\Models\Backend\UsersModel::initModel">initModel</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Frontend/FrontendModel.php.html#9"><abbr title="App\Models\Frontend\FrontendModel::initModel">initModel</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Frontend/HomeModel.php.html#9"><abbr title="App\Models\Frontend\HomeModel::initModel">initModel</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/BackendModel.php.html#320"><abbr title="App\Models\Backend\BackendModel::buildTrashFilter">buildTrashFilter</abbr></a></td><td class="text-right">62%</td></tr>
+       <tr><td><a href="Backend/BackendModel.php.html#530"><abbr title="App\Models\Backend\BackendModel::checkAllowedFields">checkAllowedFields</abbr></a></td><td class="text-right">75%</td></tr>
+       <tr><td><a href="Backend/BackendModel.php.html#284"><abbr title="App\Models\Backend\BackendModel::buildDateFilters">buildDateFilters</abbr></a></td><td class="text-right">81%</td></tr>
+       <tr><td><a href="Backend/BackendModel.php.html#159"><abbr title="App\Models\Backend\BackendModel::getData">getData</abbr></a></td><td class="text-right">89%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Backend/Components/_ImportModel.php.html#102"><abbr title="App\Models\Backend\Components\ImportModel::parseAndValidateCsv">parseAndValidateCsv</abbr></a></td><td class="text-right">2070</td></tr>
+       <tr><td><a href="Backend/Components/_ExportModel.php.html#143"><abbr title="App\Models\Backend\Components\ExportModel::generate">generate</abbr></a></td><td class="text-right">1122</td></tr>
+       <tr><td><a href="Backend/Components/_ImportModel.php.html#350"><abbr title="App\Models\Backend\Components\ImportModel::executeImport">executeImport</abbr></a></td><td class="text-right">702</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#186"><abbr title="App\Models\Backend\AuthModel::login">login</abbr></a></td><td class="text-right">380</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#647"><abbr title="App\Models\Backend\AuthModel::verify">verify</abbr></a></td><td class="text-right">306</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#907"><abbr title="App\Models\Backend\AdminsModel::edit">edit</abbr></a></td><td class="text-right">210</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#732"><abbr title="App\Models\Backend\GroupsModel::saveExceptions">saveExceptions</abbr></a></td><td class="text-right">210</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#498"><abbr title="App\Models\Backend\ToolsModel::generateDatabaseBackups">generateDatabaseBackups</abbr></a></td><td class="text-right">210</td></tr>
+       <tr><td><a href="Backend/Components/_ImportModel.php.html#612"><abbr title="App\Models\Backend\Components\ImportModel::buildDynamicRules">buildDynamicRules</abbr></a></td><td class="text-right">156</td></tr>
+       <tr><td><a href="Backend/BackendModel.php.html#383"><abbr title="App\Models\Backend\BackendModel::hasDataChanged">hasDataChanged</abbr></a></td><td class="text-right">132</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#1627"><abbr title="App\Models\Backend\AdminsModel::deleteToken">deleteToken</abbr></a></td><td class="text-right">110</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#1528"><abbr title="App\Models\Backend\AdminsModel::changePermission">changePermission</abbr></a></td><td class="text-right">90</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#782"><abbr title="App\Models\Backend\AuthModel::logoutBySession">logoutBySession</abbr></a></td><td class="text-right">90</td></tr>
+       <tr><td><a href="Backend/TokensModel.php.html#201"><abbr title="App\Models\Backend\TokensModel::hardDelete">hardDelete</abbr></a></td><td class="text-right">90</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#682"><abbr title="App\Models\Backend\ToolsModel::cleanWritableFolder">cleanWritableFolder</abbr></a></td><td class="text-right">90</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#284"><abbr title="App\Models\Backend\AccountModel::deleteToken">deleteToken</abbr></a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#797"><abbr title="App\Models\Backend\AdminsModel::add">add</abbr></a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#1030"><abbr title="App\Models\Backend\AdminsModel::hasAdminChanged">hasAdminChanged</abbr></a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#1436"><abbr title="App\Models\Backend\AdminsModel::changeStatus">changeStatus</abbr></a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#841"><abbr title="App\Models\Backend\AuthModel::logoutByCookie">logoutByCookie</abbr></a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#457"><abbr title="App\Models\Backend\GroupsModel::edit">edit</abbr></a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="Backend/SettingsModel.php.html#431"><abbr title="App\Models\Backend\SettingsModel::saveSettings">saveSettings</abbr></a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#644"><abbr title="App\Models\Backend\ToolsModel::getWritableFoldersStatus">getWritableFoldersStatus</abbr></a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#1090"><abbr title="App\Models\Backend\AdminsModel::hardDelete">hardDelete</abbr></a></td><td class="text-right">56</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#1246"><abbr title="App\Models\Backend\AdminsModel::restoreDelete">restoreDelete</abbr></a></td><td class="text-right">56</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#1335"><abbr title="App\Models\Backend\AdminsModel::resetPassword">resetPassword</abbr></a></td><td class="text-right">56</td></tr>
+       <tr><td><a href="Backend/BackendModel.php.html#428"><abbr title="App\Models\Backend\BackendModel::insertImages">insertImages</abbr></a></td><td class="text-right">56</td></tr>
+       <tr><td><a href="Backend/LogsModel.php.html#160"><abbr title="App\Models\Backend\LogsModel::deleteToken">deleteToken</abbr></a></td><td class="text-right">56</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#196"><abbr title="App\Models\Backend\AccountModel::edit">edit</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#1169"><abbr title="App\Models\Backend\AdminsModel::softDelete">softDelete</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="Backend/Components/_ExportModel.php.html#75"><abbr title="App\Models\Backend\Components\ExportModel::getExportColumns">getExportColumns</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="Backend/Components/_ImportModel.php.html#51"><abbr title="App\Models\Backend\Components\ImportModel::getTableStructure">getTableStructure</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="Backend/Components/_ImportModel.php.html#549"><abbr title="App\Models\Backend\Components\ImportModel::backupTableBeforeImport">backupTableBeforeImport</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#388"><abbr title="App\Models\Backend\GroupsModel::add">add</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="Backend/SettingsModel.php.html#257"><abbr title="App\Models\Backend\SettingsModel::emailSettingsValidateRules">emailSettingsValidateRules</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="Backend/AuditsModel.php.html#162"><abbr title="App\Models\Backend\AuditsModel::logActivity">logActivity</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#453"><abbr title="App\Models\Backend\AuthModel::resetPassword">resetPassword</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#537"><abbr title="App\Models\Backend\AuthModel::setPassword">setPassword</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Backend/Components/UploadPreviewModel.php.html#87"><abbr title="App\Models\Backend\Components\UploadPreviewModel::saveImages">saveImages</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Backend/SettingsModel.php.html#358"><abbr title="App\Models\Backend\SettingsModel::getSettings">getSettings</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Backend/SettingsModel.php.html#494"><abbr title="App\Models\Backend\SettingsModel::getChangedKeys">getChangedKeys</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Backend/SettingsModel.php.html#569"><abbr title="App\Models\Backend\SettingsModel::hasSettingsChanged">hasSettingsChanged</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#367"><abbr title="App\Models\Backend\ToolsModel::runOptimization">runOptimization</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#342"><abbr title="App\Models\Backend\AccountModel::resetPassword">resetPassword</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#341"><abbr title="App\Models\Backend\AuthModel::innerLogin">innerLogin</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Backend/AuthModel.php.html#604"><abbr title="App\Models\Backend\AuthModel::checkAuthToken">checkAuthToken</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Backend/BackendModel.php.html#478"><abbr title="App\Models\Backend\BackendModel::rrmdir">rrmdir</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Backend/Components/_ExportModel.php.html#106"><abbr title="App\Models\Backend\Components\ExportModel::getPrimaryKey">getPrimaryKey</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#326"><abbr title="App\Models\Backend\ToolsModel::getTablesStatus">getTablesStatus</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#420"><abbr title="App\Models\Backend\ToolsModel::getBackups">getBackups</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#616"><abbr title="App\Models\Backend\ToolsModel::deleteBackups">deleteBackups</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Backend/BackendModel.php.html#159"><abbr title="App\Models\Backend\BackendModel::getData">getData</abbr></a></td><td class="text-right">16</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#152"><abbr title="App\Models\Backend\AccountModel::getAdminExceptions">getAdminExceptions</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#252"><abbr title="App\Models\Backend\AccountModel::getCurrentTokenId">getCurrentTokenId</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#423"><abbr title="App\Models\Backend\AccountModel::getExpiringDate">getExpiringDate</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#472"><abbr title="App\Models\Backend\AccountModel::setBasicMethod">setBasicMethod</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#767"><abbr title="App\Models\Backend\AdminsModel::getAdminExceptions">getAdminExceptions</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Backend/BackendModel.php.html#352"><abbr title="App\Models\Backend\BackendModel::getByUUID">getByUUID</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Backend/Components/GalleryOneModel.php.html#187"><abbr title="App\Models\Backend\Components\GalleryOneModel::setCover">setCover</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#358"><abbr title="App\Models\Backend\GroupsModel::getGroupById">getGroupById</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#536"><abbr title="App\Models\Backend\GroupsModel::del">del</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#587"><abbr title="App\Models\Backend\GroupsModel::hasGroupChanged">hasGroupChanged</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Backend/SettingsModel.php.html#536"><abbr title="App\Models\Backend\SettingsModel::deleteSettings">deleteSettings</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#99"><abbr title="App\Models\Backend\ToolsModel::getAuditsStats">getAuditsStats</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#174"><abbr title="App\Models\Backend\ToolsModel::deleteAudits">deleteAudits</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#212"><abbr title="App\Models\Backend\ToolsModel::getLogsStats">getLogsStats</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#286"><abbr title="App\Models\Backend\ToolsModel::deleteLogs">deleteLogs</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#724"><abbr title="App\Models\Backend\ToolsModel::getSystemInfo">getSystemInfo</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Backend/BackendModel.php.html#284"><abbr title="App\Models\Backend\BackendModel::buildDateFilters">buildDateFilters</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#128"><abbr title="App\Models\Backend\AccountModel::getGroupPermissions">getGroupPermissions</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#448"><abbr title="App\Models\Backend\AccountModel::getActiveMethod">getActiveMethod</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#511"><abbr title="App\Models\Backend\AccountModel::saveTemporarySecret">saveTemporarySecret</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#535"><abbr title="App\Models\Backend\AccountModel::getTemporarySecret">getTemporarySecret</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/AccountModel.php.html#558"><abbr title="App\Models\Backend\AccountModel::activateTotpMethod">activateTotpMethod</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#323"><abbr title="App\Models\Backend\AdminsModel::editValidationRules">editValidationRules</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#617"><abbr title="App\Models\Backend\AdminsModel::changePermissionValidationRules">changePermissionValidationRules</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/_AdminsModel.php.html#746"><abbr title="App\Models\Backend\AdminsModel::getGroupPermissions">getGroupPermissions</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/Components/_ImportModel.php.html#29"><abbr title="App\Models\Backend\Components\ImportModel::getTargetModelInstance">getTargetModelInstance</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#103"><abbr title="App\Models\Backend\GroupsModel::addValidationRules">addValidationRules</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#164"><abbr title="App\Models\Backend\GroupsModel::editValidationRules">editValidationRules</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#227"><abbr title="App\Models\Backend\GroupsModel::saveExceptionsValidationRules">saveExceptionsValidationRules</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#307"><abbr title="App\Models\Backend\GroupsModel::getGroups">getGroups</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#332"><abbr title="App\Models\Backend\GroupsModel::getGroup">getGroup</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#622"><abbr title="App\Models\Backend\GroupsModel::getDropdownAdmins">getDropdownAdmins</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#660"><abbr title="App\Models\Backend\GroupsModel::getAdminByUuid">getAdminByUuid</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/GroupsModel.php.html#706"><abbr title="App\Models\Backend\GroupsModel::getAdminExceptionsArray">getAdminExceptionsArray</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/SettingsModel.php.html#409"><abbr title="App\Models\Backend\SettingsModel::hasDatabaseSettings">hasDatabaseSettings</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#124"><abbr title="App\Models\Backend\ToolsModel::buildAuditDates">buildAuditDates</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#149"><abbr title="App\Models\Backend\ToolsModel::countAuditsToDelete">countAuditsToDelete</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#237"><abbr title="App\Models\Backend\ToolsModel::buildLogDates">buildLogDates</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#262"><abbr title="App\Models\Backend\ToolsModel::countLogsToDelete">countLogsToDelete</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/ToolsModel.php.html#472"><abbr title="App\Models\Backend\ToolsModel::extractDateFromFilename">extractDateFromFilename</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/BackendModel.php.html#320"><abbr title="App\Models\Backend\BackendModel::buildTrashFilter">buildTrashFilter</abbr></a></td><td class="text-right">4</td></tr>
+       <tr><td><a href="Backend/BackendModel.php.html#530"><abbr title="App\Models\Backend\BackendModel::checkAllowedFields">checkAllowedFields</abbr></a></td><td class="text-right">3</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 10.1.16</a> using <a href="https://www.php.net/" target="_top">PHP 8.3.16</a> and <a href="https://phpunit.de/">PHPUnit 10.5.66</a> at Thu Oct 8 21:23:33 CEST 2026.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="../_js/jquery.min.js?v=10.1.16" type="text/javascript"></script>
+  <script src="../_js/d3.min.js?v=10.1.16" type="text/javascript"></script>
+  <script src="../_js/nv.d3.min.js?v=10.1.16" type="text/javascript"></script>
+  <script type="text/javascript">
+$(document).ready(function() {
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#classCoverageDistribution svg')
+      .datum(getCoverageDistributionData([18,0,0,0,0,1,0,0,0,0,0,1], "Class Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#methodCoverageDistribution svg')
+      .datum(getCoverageDistributionData([162,0,0,0,0,0,0,1,1,2,0,5], "Method Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getCoverageDistributionData(data, label) {
+    var labels = [
+      '0%',
+      '0-10%',
+      '10-20%',
+      '20-30%',
+      '30-40%',
+      '40-50%',
+      '50-60%',
+      '60-70%',
+      '70-80%',
+      '80-90%',
+      '90-100%',
+      '100%'
+    ];
+    var values = [];
+    $.each(labels, function(key) {
+      values.push({x: labels[key], y: data[key]});
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Cyclomatic Complexity');
+
+    d3.select('#classComplexity svg')
+      .datum(getComplexityData([[0,44,"<a href=\"Backend\/AccountModel.php.html#15\">App\\Models\\Backend\\AccountModel<\/a>"],[0,114,"<a href=\"Backend\/_AdminsModel.php.html#16\">App\\Models\\Backend\\AdminsModel<\/a>"],[0,8,"<a href=\"Backend\/AuditsModel.php.html#16\">App\\Models\\Backend\\AuditsModel<\/a>"],[0,76,"<a href=\"Backend\/AuthModel.php.html#16\">App\\Models\\Backend\\AuthModel<\/a>"],[46.82539682539682,66,"<a href=\"Backend\/BackendModel.php.html#15\">App\\Models\\Backend\\BackendModel<\/a>"],[0,45,"<a href=\"Backend\/Components\/_ExportModel.php.html#15\">App\\Models\\Backend\\Components\\ExportModel<\/a>"],[0,9,"<a href=\"Backend\/Components\/GalleryOneModel.php.html#16\">App\\Models\\Backend\\Components\\GalleryOneModel<\/a>"],[0,97,"<a href=\"Backend\/Components\/_ImportModel.php.html#16\">App\\Models\\Backend\\Components\\ImportModel<\/a>"],[0,7,"<a href=\"Backend\/Components\/UploadPreviewModel.php.html#15\">App\\Models\\Backend\\Components\\UploadPreviewModel<\/a>"],[0,1,"<a href=\"Backend\/DashboardModel.php.html#15\">App\\Models\\Backend\\DashboardModel<\/a>"],[0,60,"<a href=\"Backend\/GroupsModel.php.html#15\">App\\Models\\Backend\\GroupsModel<\/a>"],[0,10,"<a href=\"Backend\/LogsModel.php.html#16\">App\\Models\\Backend\\LogsModel<\/a>"],[0,1,"<a href=\"Backend\/MessagesModel.php.html#7\">App\\Models\\Backend\\MessagesModel<\/a>"],[0,38,"<a href=\"Backend\/SettingsModel.php.html#15\">App\\Models\\Backend\\SettingsModel<\/a>"],[0,13,"<a href=\"Backend\/TokensModel.php.html#15\">App\\Models\\Backend\\TokensModel<\/a>"],[0,77,"<a href=\"Backend\/ToolsModel.php.html#15\">App\\Models\\Backend\\ToolsModel<\/a>"],[0,1,"<a href=\"Backend\/UsersModel.php.html#7\">App\\Models\\Backend\\UsersModel<\/a>"],[100,2,"<a href=\"BaseModel.php.html#16\">App\\Models\\BaseModel<\/a>"],[0,1,"<a href=\"Frontend\/FrontendModel.php.html#7\">App\\Models\\Frontend\\FrontendModel<\/a>"],[0,1,"<a href=\"Frontend\/HomeModel.php.html#7\">App\\Models\\Frontend\\HomeModel<\/a>"]], 'Class Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Method Complexity');
+
+    d3.select('#methodComplexity svg')
+      .datum(getComplexityData([[0,1,"<a href=\"Backend\/AccountModel.php.html#53\">App\\Models\\Backend\\AccountModel::initModel<\/a>"],[0,1,"<a href=\"Backend\/AccountModel.php.html#68\">App\\Models\\Backend\\AccountModel::editValidationRules<\/a>"],[0,1,"<a href=\"Backend\/AccountModel.php.html#105\">App\\Models\\Backend\\AccountModel::deleteTokenValidationRules<\/a>"],[0,2,"<a href=\"Backend\/AccountModel.php.html#128\">App\\Models\\Backend\\AccountModel::getGroupPermissions<\/a>"],[0,3,"<a href=\"Backend\/AccountModel.php.html#152\">App\\Models\\Backend\\AccountModel::getAdminExceptions<\/a>"],[0,1,"<a href=\"Backend\/AccountModel.php.html#176\">App\\Models\\Backend\\AccountModel::getTokens<\/a>"],[0,6,"<a href=\"Backend\/AccountModel.php.html#196\">App\\Models\\Backend\\AccountModel::edit<\/a>"],[0,3,"<a href=\"Backend\/AccountModel.php.html#252\">App\\Models\\Backend\\AccountModel::getCurrentTokenId<\/a>"],[0,8,"<a href=\"Backend\/AccountModel.php.html#284\">App\\Models\\Backend\\AccountModel::deleteToken<\/a>"],[0,4,"<a href=\"Backend\/AccountModel.php.html#342\">App\\Models\\Backend\\AccountModel::resetPassword<\/a>"],[0,3,"<a href=\"Backend\/AccountModel.php.html#423\">App\\Models\\Backend\\AccountModel::getExpiringDate<\/a>"],[0,2,"<a href=\"Backend\/AccountModel.php.html#448\">App\\Models\\Backend\\AccountModel::getActiveMethod<\/a>"],[0,3,"<a href=\"Backend\/AccountModel.php.html#472\">App\\Models\\Backend\\AccountModel::setBasicMethod<\/a>"],[0,2,"<a href=\"Backend\/AccountModel.php.html#511\">App\\Models\\Backend\\AccountModel::saveTemporarySecret<\/a>"],[0,2,"<a href=\"Backend\/AccountModel.php.html#535\">App\\Models\\Backend\\AccountModel::getTemporarySecret<\/a>"],[0,2,"<a href=\"Backend\/AccountModel.php.html#558\">App\\Models\\Backend\\AccountModel::activateTotpMethod<\/a>"],[0,1,"<a href=\"Backend\/_AdminsModel.php.html#187\">App\\Models\\Backend\\AdminsModel::initModel<\/a>"],[0,1,"<a href=\"Backend\/_AdminsModel.php.html#197\">App\\Models\\Backend\\AdminsModel::showAllValidationRules<\/a>"],[0,1,"<a href=\"Backend\/_AdminsModel.php.html#226\">App\\Models\\Backend\\AdminsModel::showAllSearchValidationRules<\/a>"],[0,1,"<a href=\"Backend\/_AdminsModel.php.html#272\">App\\Models\\Backend\\AdminsModel::addValidationRules<\/a>"],[0,2,"<a href=\"Backend\/_AdminsModel.php.html#323\">App\\Models\\Backend\\AdminsModel::editValidationRules<\/a>"],[0,1,"<a href=\"Backend\/_AdminsModel.php.html#391\">App\\Models\\Backend\\AdminsModel::changeGroupValidationRules<\/a>"],[0,1,"<a href=\"Backend\/_AdminsModel.php.html#410\">App\\Models\\Backend\\AdminsModel::delValidationRules<\/a>"],[0,1,"<a href=\"Backend\/_AdminsModel.php.html#429\">App\\Models\\Backend\\AdminsModel::resetPasswordValidationRules<\/a>"],[0,1,"<a href=\"Backend\/_AdminsModel.php.html#451\">App\\Models\\Backend\\AdminsModel::changeStatusValidationRules<\/a>"],[0,1,"<a href=\"Backend\/_AdminsModel.php.html#480\">App\\Models\\Backend\\AdminsModel::getTokensValidationRules<\/a>"],[0,1,"<a href=\"Backend\/_AdminsModel.php.html#502\">App\\Models\\Backend\\AdminsModel::generalDataValidationRules<\/a>"],[0,1,"<a href=\"Backend\/_AdminsModel.php.html#532\">App\\Models\\Backend\\AdminsModel::metaDataValidationRules<\/a>"],[0,1,"<a href=\"Backend\/_AdminsModel.php.html#555\">App\\Models\\Backend\\AdminsModel::getPermissionsValidationRules<\/a>"],[0,1,"<a href=\"Backend\/_AdminsModel.php.html#586\">App\\Models\\Backend\\AdminsModel::deleteTokenValidationRules<\/a>"],[0,2,"<a href=\"Backend\/_AdminsModel.php.html#617\">App\\Models\\Backend\\AdminsModel::changePermissionValidationRules<\/a>"],[0,1,"<a href=\"Backend\/_AdminsModel.php.html#657\">App\\Models\\Backend\\AdminsModel::getPermissions<\/a>"],[0,1,"<a href=\"Backend\/_AdminsModel.php.html#670\">App\\Models\\Backend\\AdminsModel::getTokens<\/a>"],[0,1,"<a href=\"Backend\/_AdminsModel.php.html#683\">App\\Models\\Backend\\AdminsModel::getAttempts<\/a>"],[0,1,"<a href=\"Backend\/_AdminsModel.php.html#696\">App\\Models\\Backend\\AdminsModel::getTwoFaAttempts<\/a>"],[0,1,"<a href=\"Backend\/_AdminsModel.php.html#709\">App\\Models\\Backend\\AdminsModel::getTwoFaCodes<\/a>"],[0,1,"<a href=\"Backend\/_AdminsModel.php.html#722\">App\\Models\\Backend\\AdminsModel::getTwoFa<\/a>"],[0,1,"<a href=\"Backend\/_AdminsModel.php.html#734\">App\\Models\\Backend\\AdminsModel::getGroups<\/a>"],[0,2,"<a href=\"Backend\/_AdminsModel.php.html#746\">App\\Models\\Backend\\AdminsModel::getGroupPermissions<\/a>"],[0,3,"<a href=\"Backend\/_AdminsModel.php.html#767\">App\\Models\\Backend\\AdminsModel::getAdminExceptions<\/a>"],[0,8,"<a href=\"Backend\/_AdminsModel.php.html#797\">App\\Models\\Backend\\AdminsModel::add<\/a>"],[0,14,"<a href=\"Backend\/_AdminsModel.php.html#907\">App\\Models\\Backend\\AdminsModel::edit<\/a>"],[0,8,"<a href=\"Backend\/_AdminsModel.php.html#1030\">App\\Models\\Backend\\AdminsModel::hasAdminChanged<\/a>"],[0,7,"<a href=\"Backend\/_AdminsModel.php.html#1090\">App\\Models\\Backend\\AdminsModel::hardDelete<\/a>"],[0,6,"<a href=\"Backend\/_AdminsModel.php.html#1169\">App\\Models\\Backend\\AdminsModel::softDelete<\/a>"],[0,7,"<a href=\"Backend\/_AdminsModel.php.html#1246\">App\\Models\\Backend\\AdminsModel::restoreDelete<\/a>"],[0,7,"<a href=\"Backend\/_AdminsModel.php.html#1335\">App\\Models\\Backend\\AdminsModel::resetPassword<\/a>"],[0,8,"<a href=\"Backend\/_AdminsModel.php.html#1436\">App\\Models\\Backend\\AdminsModel::changeStatus<\/a>"],[0,9,"<a href=\"Backend\/_AdminsModel.php.html#1528\">App\\Models\\Backend\\AdminsModel::changePermission<\/a>"],[0,10,"<a href=\"Backend\/_AdminsModel.php.html#1627\">App\\Models\\Backend\\AdminsModel::deleteToken<\/a>"],[0,1,"<a href=\"Backend\/_AdminsModel.php.html#1703\">App\\Models\\Backend\\AdminsModel::deletePermissions<\/a>"],[0,1,"<a href=\"Backend\/AuditsModel.php.html#78\">App\\Models\\Backend\\AuditsModel::initModel<\/a>"],[0,1,"<a href=\"Backend\/AuditsModel.php.html#91\">App\\Models\\Backend\\AuditsModel::showAllValidationRules<\/a>"],[0,1,"<a href=\"Backend\/AuditsModel.php.html#118\">App\\Models\\Backend\\AuditsModel::showAllSearchValidationRules<\/a>"],[0,5,"<a href=\"Backend\/AuditsModel.php.html#162\">App\\Models\\Backend\\AuditsModel::logActivity<\/a>"],[0,1,"<a href=\"Backend\/AuthModel.php.html#69\">App\\Models\\Backend\\AuthModel::initModel<\/a>"],[0,1,"<a href=\"Backend\/AuthModel.php.html#84\">App\\Models\\Backend\\AuthModel::validateLoginRules<\/a>"],[0,1,"<a href=\"Backend\/AuthModel.php.html#108\">App\\Models\\Backend\\AuthModel::validateResetPasswordRules<\/a>"],[0,1,"<a href=\"Backend\/AuthModel.php.html#127\">App\\Models\\Backend\\AuthModel::validateSetPasswordRules<\/a>"],[0,1,"<a href=\"Backend\/AuthModel.php.html#159\">App\\Models\\Backend\\AuthModel::validateVerifyRules<\/a>"],[0,19,"<a href=\"Backend\/AuthModel.php.html#186\">App\\Models\\Backend\\AuthModel::login<\/a>"],[0,4,"<a href=\"Backend\/AuthModel.php.html#341\">App\\Models\\Backend\\AuthModel::innerLogin<\/a>"],[0,5,"<a href=\"Backend\/AuthModel.php.html#453\">App\\Models\\Backend\\AuthModel::resetPassword<\/a>"],[0,5,"<a href=\"Backend\/AuthModel.php.html#537\">App\\Models\\Backend\\AuthModel::setPassword<\/a>"],[0,4,"<a href=\"Backend\/AuthModel.php.html#604\">App\\Models\\Backend\\AuthModel::checkAuthToken<\/a>"],[0,17,"<a href=\"Backend\/AuthModel.php.html#647\">App\\Models\\Backend\\AuthModel::verify<\/a>"],[0,9,"<a href=\"Backend\/AuthModel.php.html#782\">App\\Models\\Backend\\AuthModel::logoutBySession<\/a>"],[0,8,"<a href=\"Backend\/AuthModel.php.html#841\">App\\Models\\Backend\\AuthModel::logoutByCookie<\/a>"],[100,1,"<a href=\"Backend\/BackendModel.php.html#140\">App\\Models\\Backend\\BackendModel::initModel<\/a>"],[89.28571428571429,16,"<a href=\"Backend\/BackendModel.php.html#159\">App\\Models\\Backend\\BackendModel::getData<\/a>"],[100,6,"<a href=\"Backend\/BackendModel.php.html#228\">App\\Models\\Backend\\BackendModel::getNumRows<\/a>"],[100,3,"<a href=\"Backend\/BackendModel.php.html#259\">App\\Models\\Backend\\BackendModel::buildFilters<\/a>"],[81.81818181818183,6,"<a href=\"Backend\/BackendModel.php.html#284\">App\\Models\\Backend\\BackendModel::buildDateFilters<\/a>"],[62.5,4,"<a href=\"Backend\/BackendModel.php.html#320\">App\\Models\\Backend\\BackendModel::buildTrashFilter<\/a>"],[0,3,"<a href=\"Backend\/BackendModel.php.html#352\">App\\Models\\Backend\\BackendModel::getByUUID<\/a>"],[0,11,"<a href=\"Backend\/BackendModel.php.html#383\">App\\Models\\Backend\\BackendModel::hasDataChanged<\/a>"],[0,7,"<a href=\"Backend\/BackendModel.php.html#428\">App\\Models\\Backend\\BackendModel::insertImages<\/a>"],[0,4,"<a href=\"Backend\/BackendModel.php.html#478\">App\\Models\\Backend\\BackendModel::rrmdir<\/a>"],[0,1,"<a href=\"Backend\/BackendModel.php.html#507\">App\\Models\\Backend\\BackendModel::generateUUID<\/a>"],[75,3,"<a href=\"Backend\/BackendModel.php.html#530\">App\\Models\\Backend\\BackendModel::checkAllowedFields<\/a>"],[0,1,"<a href=\"Backend\/BackendModel.php.html#551\">App\\Models\\Backend\\BackendModel::getUploadService<\/a>"],[0,1,"<a href=\"Backend\/Components\/_ExportModel.php.html#25\">App\\Models\\Backend\\Components\\ExportModel::getSensitiveColumns<\/a>"],[0,1,"<a href=\"Backend\/Components\/_ExportModel.php.html#39\">App\\Models\\Backend\\Components\\ExportModel::generateValidationRules<\/a>"],[0,6,"<a href=\"Backend\/Components\/_ExportModel.php.html#75\">App\\Models\\Backend\\Components\\ExportModel::getExportColumns<\/a>"],[0,4,"<a href=\"Backend\/Components\/_ExportModel.php.html#106\">App\\Models\\Backend\\Components\\ExportModel::getPrimaryKey<\/a>"],[0,33,"<a href=\"Backend\/Components\/_ExportModel.php.html#143\">App\\Models\\Backend\\Components\\ExportModel::generate<\/a>"],[0,1,"<a href=\"Backend\/Components\/GalleryOneModel.php.html#45\">App\\Models\\Backend\\Components\\GalleryOneModel::getImagesValidateFields<\/a>"],[0,1,"<a href=\"Backend\/Components\/GalleryOneModel.php.html#72\">App\\Models\\Backend\\Components\\GalleryOneModel::deleteImageValidateFields<\/a>"],[0,1,"<a href=\"Backend\/Components\/GalleryOneModel.php.html#106\">App\\Models\\Backend\\Components\\GalleryOneModel::coverValidateFields<\/a>"],[0,1,"<a href=\"Backend\/Components\/GalleryOneModel.php.html#142\">App\\Models\\Backend\\Components\\GalleryOneModel::getImages<\/a>"],[0,1,"<a href=\"Backend\/Components\/GalleryOneModel.php.html#161\">App\\Models\\Backend\\Components\\GalleryOneModel::deleteImage<\/a>"],[0,3,"<a href=\"Backend\/Components\/GalleryOneModel.php.html#187\">App\\Models\\Backend\\Components\\GalleryOneModel::setCover<\/a>"],[0,1,"<a href=\"Backend\/Components\/GalleryOneModel.php.html#230\">App\\Models\\Backend\\Components\\GalleryOneModel::removeCover<\/a>"],[0,2,"<a href=\"Backend\/Components\/_ImportModel.php.html#29\">App\\Models\\Backend\\Components\\ImportModel::getTargetModelInstance<\/a>"],[0,6,"<a href=\"Backend\/Components\/_ImportModel.php.html#51\">App\\Models\\Backend\\Components\\ImportModel::getTableStructure<\/a>"],[0,45,"<a href=\"Backend\/Components\/_ImportModel.php.html#102\">App\\Models\\Backend\\Components\\ImportModel::parseAndValidateCsv<\/a>"],[0,26,"<a href=\"Backend\/Components\/_ImportModel.php.html#350\">App\\Models\\Backend\\Components\\ImportModel::executeImport<\/a>"],[0,6,"<a href=\"Backend\/Components\/_ImportModel.php.html#549\">App\\Models\\Backend\\Components\\ImportModel::backupTableBeforeImport<\/a>"],[0,12,"<a href=\"Backend\/Components\/_ImportModel.php.html#612\">App\\Models\\Backend\\Components\\ImportModel::buildDynamicRules<\/a>"],[0,1,"<a href=\"Backend\/Components\/UploadPreviewModel.php.html#35\">App\\Models\\Backend\\Components\\UploadPreviewModel::uploadPreviewHiddenRules<\/a>"],[0,1,"<a href=\"Backend\/Components\/UploadPreviewModel.php.html#65\">App\\Models\\Backend\\Components\\UploadPreviewModel::uploadPreviewImagesRules<\/a>"],[0,5,"<a href=\"Backend\/Components\/UploadPreviewModel.php.html#87\">App\\Models\\Backend\\Components\\UploadPreviewModel::saveImages<\/a>"],[0,1,"<a href=\"Backend\/DashboardModel.php.html#25\">App\\Models\\Backend\\DashboardModel::initModel<\/a>"],[0,1,"<a href=\"Backend\/GroupsModel.php.html#89\">App\\Models\\Backend\\GroupsModel::initModel<\/a>"],[0,2,"<a href=\"Backend\/GroupsModel.php.html#103\">App\\Models\\Backend\\GroupsModel::addValidationRules<\/a>"],[0,1,"<a href=\"Backend\/GroupsModel.php.html#144\">App\\Models\\Backend\\GroupsModel::getGroupByIdValidationRules<\/a>"],[0,2,"<a href=\"Backend\/GroupsModel.php.html#164\">App\\Models\\Backend\\GroupsModel::editValidationRules<\/a>"],[0,1,"<a href=\"Backend\/GroupsModel.php.html#208\">App\\Models\\Backend\\GroupsModel::delValidationRules<\/a>"],[0,2,"<a href=\"Backend\/GroupsModel.php.html#227\">App\\Models\\Backend\\GroupsModel::saveExceptionsValidationRules<\/a>"],[0,1,"<a href=\"Backend\/GroupsModel.php.html#267\">App\\Models\\Backend\\GroupsModel::dropdownAdminsRules<\/a>"],[0,1,"<a href=\"Backend\/GroupsModel.php.html#285\">App\\Models\\Backend\\GroupsModel::adminPermissionsValidationRules<\/a>"],[0,2,"<a href=\"Backend\/GroupsModel.php.html#307\">App\\Models\\Backend\\GroupsModel::getGroups<\/a>"],[0,2,"<a href=\"Backend\/GroupsModel.php.html#332\">App\\Models\\Backend\\GroupsModel::getGroup<\/a>"],[0,3,"<a href=\"Backend\/GroupsModel.php.html#358\">App\\Models\\Backend\\GroupsModel::getGroupById<\/a>"],[0,6,"<a href=\"Backend\/GroupsModel.php.html#388\">App\\Models\\Backend\\GroupsModel::add<\/a>"],[0,8,"<a href=\"Backend\/GroupsModel.php.html#457\">App\\Models\\Backend\\GroupsModel::edit<\/a>"],[0,3,"<a href=\"Backend\/GroupsModel.php.html#536\">App\\Models\\Backend\\GroupsModel::del<\/a>"],[0,3,"<a href=\"Backend\/GroupsModel.php.html#587\">App\\Models\\Backend\\GroupsModel::hasGroupChanged<\/a>"],[0,2,"<a href=\"Backend\/GroupsModel.php.html#622\">App\\Models\\Backend\\GroupsModel::getDropdownAdmins<\/a>"],[0,2,"<a href=\"Backend\/GroupsModel.php.html#660\">App\\Models\\Backend\\GroupsModel::getAdminByUuid<\/a>"],[0,1,"<a href=\"Backend\/GroupsModel.php.html#690\">App\\Models\\Backend\\GroupsModel::getGroupPermissionsArray<\/a>"],[0,2,"<a href=\"Backend\/GroupsModel.php.html#706\">App\\Models\\Backend\\GroupsModel::getAdminExceptionsArray<\/a>"],[0,14,"<a href=\"Backend\/GroupsModel.php.html#732\">App\\Models\\Backend\\GroupsModel::saveExceptions<\/a>"],[0,1,"<a href=\"Backend\/GroupsModel.php.html#843\">App\\Models\\Backend\\GroupsModel::hasAdminsAttached<\/a>"],[0,1,"<a href=\"Backend\/LogsModel.php.html#86\">App\\Models\\Backend\\LogsModel::initModel<\/a>"],[0,1,"<a href=\"Backend\/LogsModel.php.html#100\">App\\Models\\Backend\\LogsModel::showAllValidationRules<\/a>"],[0,1,"<a href=\"Backend\/LogsModel.php.html#127\">App\\Models\\Backend\\LogsModel::showAllSearchValidationRules<\/a>"],[0,7,"<a href=\"Backend\/LogsModel.php.html#160\">App\\Models\\Backend\\LogsModel::deleteToken<\/a>"],[0,1,"<a href=\"Backend\/MessagesModel.php.html#9\">App\\Models\\Backend\\MessagesModel::initModel<\/a>"],[0,1,"<a href=\"Backend\/SettingsModel.php.html#113\">App\\Models\\Backend\\SettingsModel::initModel<\/a>"],[0,1,"<a href=\"Backend\/SettingsModel.php.html#127\">App\\Models\\Backend\\SettingsModel::authSettingsValidateRules<\/a>"],[0,1,"<a href=\"Backend\/SettingsModel.php.html#198\">App\\Models\\Backend\\SettingsModel::uploadSettingsValidateRules<\/a>"],[0,6,"<a href=\"Backend\/SettingsModel.php.html#257\">App\\Models\\Backend\\SettingsModel::emailSettingsValidateRules<\/a>"],[0,1,"<a href=\"Backend\/SettingsModel.php.html#328\">App\\Models\\Backend\\SettingsModel::generalSettingsValidateRules<\/a>"],[0,5,"<a href=\"Backend\/SettingsModel.php.html#358\">App\\Models\\Backend\\SettingsModel::getSettings<\/a>"],[0,2,"<a href=\"Backend\/SettingsModel.php.html#409\">App\\Models\\Backend\\SettingsModel::hasDatabaseSettings<\/a>"],[0,8,"<a href=\"Backend\/SettingsModel.php.html#431\">App\\Models\\Backend\\SettingsModel::saveSettings<\/a>"],[0,5,"<a href=\"Backend\/SettingsModel.php.html#494\">App\\Models\\Backend\\SettingsModel::getChangedKeys<\/a>"],[0,3,"<a href=\"Backend\/SettingsModel.php.html#536\">App\\Models\\Backend\\SettingsModel::deleteSettings<\/a>"],[0,5,"<a href=\"Backend\/SettingsModel.php.html#569\">App\\Models\\Backend\\SettingsModel::hasSettingsChanged<\/a>"],[0,1,"<a href=\"Backend\/TokensModel.php.html#96\">App\\Models\\Backend\\TokensModel::initModel<\/a>"],[0,1,"<a href=\"Backend\/TokensModel.php.html#109\">App\\Models\\Backend\\TokensModel::showAllValidationRules<\/a>"],[0,1,"<a href=\"Backend\/TokensModel.php.html#135\">App\\Models\\Backend\\TokensModel::showAllSearchValidationRules<\/a>"],[0,1,"<a href=\"Backend\/TokensModel.php.html#165\">App\\Models\\Backend\\TokensModel::delValidationRules<\/a>"],[0,9,"<a href=\"Backend\/TokensModel.php.html#201\">App\\Models\\Backend\\TokensModel::hardDelete<\/a>"],[0,1,"<a href=\"Backend\/ToolsModel.php.html#43\">App\\Models\\Backend\\ToolsModel::initModel<\/a>"],[0,1,"<a href=\"Backend\/ToolsModel.php.html#56\">App\\Models\\Backend\\ToolsModel::validateManageAuditsRules<\/a>"],[0,1,"<a href=\"Backend\/ToolsModel.php.html#77\">App\\Models\\Backend\\ToolsModel::validateManageLogsRules<\/a>"],[0,3,"<a href=\"Backend\/ToolsModel.php.html#99\">App\\Models\\Backend\\ToolsModel::getAuditsStats<\/a>"],[0,2,"<a href=\"Backend\/ToolsModel.php.html#124\">App\\Models\\Backend\\ToolsModel::buildAuditDates<\/a>"],[0,2,"<a href=\"Backend\/ToolsModel.php.html#149\">App\\Models\\Backend\\ToolsModel::countAuditsToDelete<\/a>"],[0,3,"<a href=\"Backend\/ToolsModel.php.html#174\">App\\Models\\Backend\\ToolsModel::deleteAudits<\/a>"],[0,3,"<a href=\"Backend\/ToolsModel.php.html#212\">App\\Models\\Backend\\ToolsModel::getLogsStats<\/a>"],[0,2,"<a href=\"Backend\/ToolsModel.php.html#237\">App\\Models\\Backend\\ToolsModel::buildLogDates<\/a>"],[0,2,"<a href=\"Backend\/ToolsModel.php.html#262\">App\\Models\\Backend\\ToolsModel::countLogsToDelete<\/a>"],[0,3,"<a href=\"Backend\/ToolsModel.php.html#286\">App\\Models\\Backend\\ToolsModel::deleteLogs<\/a>"],[0,4,"<a href=\"Backend\/ToolsModel.php.html#326\">App\\Models\\Backend\\ToolsModel::getTablesStatus<\/a>"],[0,5,"<a href=\"Backend\/ToolsModel.php.html#367\">App\\Models\\Backend\\ToolsModel::runOptimization<\/a>"],[0,1,"<a href=\"Backend\/ToolsModel.php.html#402\">App\\Models\\Backend\\ToolsModel::getDatabase<\/a>"],[0,4,"<a href=\"Backend\/ToolsModel.php.html#420\">App\\Models\\Backend\\ToolsModel::getBackups<\/a>"],[0,2,"<a href=\"Backend\/ToolsModel.php.html#472\">App\\Models\\Backend\\ToolsModel::extractDateFromFilename<\/a>"],[0,14,"<a href=\"Backend\/ToolsModel.php.html#498\">App\\Models\\Backend\\ToolsModel::generateDatabaseBackups<\/a>"],[0,4,"<a href=\"Backend\/ToolsModel.php.html#616\">App\\Models\\Backend\\ToolsModel::deleteBackups<\/a>"],[0,8,"<a href=\"Backend\/ToolsModel.php.html#644\">App\\Models\\Backend\\ToolsModel::getWritableFoldersStatus<\/a>"],[0,9,"<a href=\"Backend\/ToolsModel.php.html#682\">App\\Models\\Backend\\ToolsModel::cleanWritableFolder<\/a>"],[0,3,"<a href=\"Backend\/ToolsModel.php.html#724\">App\\Models\\Backend\\ToolsModel::getSystemInfo<\/a>"],[0,1,"<a href=\"Backend\/UsersModel.php.html#9\">App\\Models\\Backend\\UsersModel::initModel<\/a>"],[100,1,"<a href=\"BaseModel.php.html#34\">App\\Models\\BaseModel::__construct<\/a>"],[100,1,"<a href=\"BaseModel.php.html#49\">App\\Models\\BaseModel::initModel<\/a>"],[0,1,"<a href=\"Frontend\/FrontendModel.php.html#9\">App\\Models\\Frontend\\FrontendModel::initModel<\/a>"],[0,1,"<a href=\"Frontend\/HomeModel.php.html#9\">App\\Models\\Frontend\\HomeModel::initModel<\/a>"]], 'Method Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getComplexityData(data, label) {
+    var values = [];
+    $.each(data, function(key) {
+      var value = Math.round(data[key][0]*100) / 100;
+      values.push({
+        x: value,
+        y: data[key][1],
+        class: data[key][2],
+        size: 0.05,
+        shape: 'diamond'
+      });
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+});
+  </script>
+ </body>
+</html>

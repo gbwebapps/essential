@@ -2,4554 +2,1297 @@
 
 namespace App\Models\Backend;
 
+use CodeIgniter\Config\Factories;
+use CodeIgniter\Database\BaseConnection;
+use CodeIgniter\Database\BaseResult;
+use CodeIgniter\HTTP\IncomingRequest;
+use CodeIgniter\HTTP\UserAgent;
 use CodeIgniter\Test\CIUnitTestCase;
+use Config\Services;
+use Tests\Support\Libraries\MocksSettings;
 
-/* Funzione isolata per evitare che i test scrivano audit reali. */
-if ( ! function_exists(__NAMESPACE__ . '\log_admin_activity')):
-    function log_admin_activity(
-        string $action,
-        string $section,
-        string $details,
-        ?object $currentAdmin = null
-    ): bool {
+if (! function_exists(__NAMESPACE__ . '\log_admin_activity')) {
+    function log_admin_activity(string $action, string $section, string $details, ?object $currentAdmin = null): bool
+    {
         return true;
     }
-endif;
+}
 
-class AuthModelTest extends CIUnitTestCase
+final class AuthModelTest extends CIUnitTestCase
 {
-    public function testLoginFailsOnTooManyAttempts(): void
+    use MocksSettings;
+
+    private const EMAIL = 'admin@example.test';
+    private const UUID = 'admin-uuid-1';
+    private const PASSWORD = 'CorrectPassword123!';
+    private const IP = '127.0.0.1';
+
+    /** @var array<string, mixed> */
+    private array $defaultConfig;
+
+    protected function setUp(): void
     {
-        /* 1. MOCK CONFIGURAZIONE */
-        $mockConfig = 
-            (object)[
-                'attempts'         => true,
-                'twoFactor'        => false,
-                'attemptsInterval' => 900,
-                'attemptsLimit'    => 5
-            ];
+        parent::setUp();
 
-        /* 2. MOCK QUERY DB E TRANSAZIONI */
-        $mockRow = 
-            (object)[
-                'uuid'          => '123-abc',
-                'firstname'     => 'Mario',
-                'lastname'      => 'Rossi',
-                'email'         => 'mario@test.com',
-                'times'         => 5,
-                'password_hash' => 'hash',
-                'last_ts'       => '2026-09-25 10:00:00'
-            ];
+        Factories::reset();
+        Services::reset();
+        helper(['settings', 'cookie']);
 
-        $mockQuery = 
-            $this->getMockBuilder(\stdClass::class)
-                 ->addMethods(['getRow'])
-                 ->getMock();
-                 
-        $mockQuery
-            ->method('getRow')
-            ->willReturn(
-                $mockRow
-            );
+        $this->defaultConfig = [
+            'attempts' => true,
+            'attemptsInterval' => 900,
+            'attemptsLimit' => 5,
+            'attemptsIpMultiplier' => 20,
+            'activationTime' => 3600,
+            'hashKey' => 'phpunit-auth-hash-key',
+            'passwordRegex' => '/.*/',
+            'rememberMeTime' => 2592000,
+            'resetAttempts' => true,
+            'resetAttemptsInterval' => 900,
+            'resetAttemptsLimit' => 5,
+            'resetPasswordInterval' => 900,
+            'resetPasswordLimit' => 5,
+            'sessionTime' => 3600,
+            'twoFactor' => false,
+            'twoFactorAttempts' => true,
+            'twoFactorAttemptsInterval' => 300,
+            'twoFactorDigits' => 6,
+            'twoFactorEmailExpiry' => 300,
+            'twoFactorLimit' => 5,
+            'twoFactorTime' => 300,
+            'twoFactorWindow' => 1,
+        ];
 
-        $mockDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class)
-                 ->disableOriginalConstructor()
-                 ->getMock();
+        $this->mockSettings(['Backend\\Auth' => $this->defaultConfig]);
 
-        $mockDb
-            ->method('query')
-            ->willReturn(
-                $mockQuery
-            );
-            
-        /* FIX TYPERROR: Impedisce il crash di PHP restituendo bool ai metodi transazionali */
-        $mockDb
-            ->method('transBegin')
-            ->willReturn(true);
-            
-        $mockDb
-            ->method('transCommit')
-            ->willReturn(true);
-            
-        $mockDb
-            ->method('transStatus')
-            ->willReturn(true);
+        $crypto = $this->getMockBuilder(\App\Libraries\CryptoService::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['encrypt', 'decrypt'])
+            ->getMock();
+        $crypto->method('encrypt')->willReturn('encrypted-token');
+        $crypto->method('decrypt')->willReturnCallback(static fn (string $value): string => $value);
+        Services::injectMock('crypto', $crypto);
 
-        /* 3. MOCK REQUEST */
-        $mockRequest = 
-            $this->getMockBuilder(\CodeIgniter\HTTP\IncomingRequest::class)
-                 ->disableOriginalConstructor()
-                 ->getMock();
-                 
-        $mockRequest
-            ->method('getIPAddress')
-            ->willReturn('127.0.0.1');
-
-        /* 4. MOCK MODEL */
-        $model = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class)
-                 ->disableOriginalConstructor()
-                 ->onlyMethods(['checkAllowedFields'])
-                 ->getMock();
-
-        $model
-            ->method('checkAllowedFields')
-            ->willReturnArgument(0);
-
-        /* INIEZIONE DB E CONFIG VIA CLOSURE (INFALLIBILE SUI MOCK) */
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 5. DATI POST */
-        $posts = 
-            [
-                'email'    => 'mario@test.com',
-                'password' => 'password'
-            ];
-
-        /* 6. ESECUZIONE */
-        $result = 
-            $model->login(
-                $posts, 
-                $mockRequest
-            );
-
-        /* 7. ASSERZIONI */
-        $this->assertFalse(
-            $result['result']
-        );
-        
-        $this->assertEquals(
-            lang('backend/auth.messages.tooMAnyAttempts'), 
-            $result['message']
-        );
+        session()->remove(['backendSession', 'login_log_id', 'auth_2fa_pending']);
     }
 
-    public function testLoginRequiresTwoFactorAuthentication(): void
+    protected function tearDown(): void
     {
-        /* 0. FIX HELPER GLOBALE E MOCK EMAIL (Previene invii reali e crash) */
-        if (
-            ! function_exists('setting')
-        ):
-            /* Proprietà richieste dai servizi OTP email e TOTP. */
-            eval("function setting(\$key = null) { return (object)['twoFactorDigits' => 6, 'twoFactorEmailExpiry' => 300, 'twoFactorWindow' => 1]; }");
-        endif;
-        
-        $mockEmail = 
-            $this->getMockBuilder(\CodeIgniter\Email\Email::class)
-                 ->disableOriginalConstructor()
-                 ->getMock();
-                 
-        $mockEmail
-            ->method('send')
-            ->willReturn(true);
-            
-        \CodeIgniter\Config\Services::injectMock(
-            'email', 
-            $mockEmail
-        );
+        session()->remove(['backendSession', 'login_log_id', 'auth_2fa_pending']);
+        $this->resetSettingsMocks();
+        Factories::reset();
+        Services::reset();
 
-        /* 1. MOCK CONFIGURAZIONE */
-        $mockConfig = 
-            (object)[
-                'attempts'         => true,
-                'twoFactor'        => true,
-                'attemptsInterval' => 900,
-                'attemptsLimit'    => 5
-            ];
-
-        /* 2. MOCK QUERY DB */
-        $realHash = 
-            password_hash('passwordCorretta', PASSWORD_DEFAULT);
-            
-        $mockAdmin = 
-            (object)[
-                'uuid'          => '123-abc',
-                'firstname'     => 'Mario',
-                'lastname'      => 'Rossi',
-                'email'         => 'mario@test.com',
-                'times'         => 0,
-                'password_hash' => $realHash
-            ];
-            
-        $mock2fa = 
-            (object)[
-                'method' => 'email'
-            ];
-
-        $mockQuery = 
-            $this->getMockBuilder(\stdClass::class)
-                 ->addMethods(['getRow'])
-                 ->getMock();
-                 
-        $mockQuery
-            ->method('getRow')
-            ->willReturnOnConsecutiveCalls(
-                $mockAdmin, 
-                $mock2fa
-            );
-
-        $mockDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class)
-                 ->disableOriginalConstructor()
-                 ->getMock();
-
-        $mockDb
-            ->method('query')
-            ->willReturn(
-                $mockQuery
-            );
-            
-        $mockDb
-            ->method('transBegin')
-            ->willReturn(true);
-            
-        $mockDb
-            ->method('transCommit')
-            ->willReturn(true);
-            
-        $mockDb
-            ->method('transStatus')
-            ->willReturn(true);
-
-        /* 3. MOCK REQUEST */
-        $mockRequest = 
-            $this->getMockBuilder(\CodeIgniter\HTTP\IncomingRequest::class)
-                 ->disableOriginalConstructor()
-                 ->getMock();
-                 
-        $mockRequest
-            ->method('getIPAddress')
-            ->willReturn('127.0.0.1');
-
-        /* 4. MOCK MODEL E INIEZIONE */
-        $model = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class)
-                 ->disableOriginalConstructor()
-                 ->onlyMethods(['checkAllowedFields'])
-                 ->getMock();
-
-        $model
-            ->method('checkAllowedFields')
-            ->willReturnArgument(0);
-
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 5. DATI POST */
-        $posts = 
-            [
-                'email'    => 'mario@test.com',
-                'password' => 'passwordCorretta'
-            ];
-
-        /* 6. ESECUZIONE */
-        $result = 
-            $model->login(
-                $posts, 
-                $mockRequest
-            );
-
-        /* 7. ASSERZIONI */
-        $this->assertEquals(
-            '2fa_required', 
-            $result['result']
-        );
-        
-        $this->assertEquals(
-            'email', 
-            $result['method']
-        );
-        
-        \CodeIgniter\Config\Services::reset();
+        parent::tearDown();
     }
 
-    public function testLoginSuccessWithSessionToken(): void
+    private function createStatefulSessionMock(array $initialState = []): \CodeIgniter\Session\Session
     {
-        /* 1. MOCK CONFIGURAZIONE */
-        $mockConfig = 
-            (object)[
-                'attempts'         => false,
-                'twoFactor'        => false,
-                'sessionTime'      => 3600,
-                'hashKey'          => 'secret123'
-            ];
+        $state = $initialState;
 
-        /* 2. MOCK QUERY DB */
-        $realHash = 
-            password_hash('passwordCorretta', PASSWORD_DEFAULT);
-            
-        $mockAdmin = 
-            (object)[
-                'uuid'          => '123-abc',
-                'firstname'     => 'Mario',
-                'lastname'      => 'Rossi',
-                'email'         => 'mario@test.com',
-                'times'         => 0,
-                'password_hash' => $realHash
-            ];
+        $session = $this->getMockBuilder(\CodeIgniter\Session\Session::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['get', 'set', 'has', 'remove', 'regenerate', 'setFlashdata'])
+            ->getMock();
 
-        $mockQuery = 
-            $this->getMockBuilder(\stdClass::class)
-                 ->addMethods(['getRow'])
-                 ->getMock();
-                 
-        $mockQuery
-            ->method('getRow')
-            ->willReturn(
-                $mockAdmin
-            );
+        $session->method('get')->willReturnCallback(static function (?string $key = null) use (&$state) {
+            return $key === null ? $state : ($state[$key] ?? null);
+        });
 
-        $mockDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class)
-                 ->disableOriginalConstructor()
-                 ->getMock();
+        $session->method('has')->willReturnCallback(static fn (string $key): bool => array_key_exists($key, $state));
 
-        $mockDb
-            ->method('query')
-            ->willReturn(
-                $mockQuery
-            );
-            
-        $mockDb
-            ->method('transBegin')
-            ->willReturn(true);
-            
-        $mockDb
-            ->method('transCommit')
-            ->willReturn(true);
-            
-        $mockDb
-            ->method('transStatus')
-            ->willReturn(true);
-            
-        /* Aggiungiamo il mock per insertID richiesto da innerLogin */
-        $mockDb
-            ->method('insertID')
-            ->willReturn(
-                1
-            );
+        $session->method('set')->willReturnCallback(static function ($key, $value = null) use (&$state): void {
+            if (is_array($key)):
+                foreach ($key as $name => $item):
+                    $state[$name] = $item;
+                endforeach;
+                return;
+            endif;
 
-        /* 3. MOCK REQUEST E USER AGENT */
-        $mockUserAgent = 
-            $this->getMockBuilder(\CodeIgniter\HTTP\UserAgent::class)
-                 ->disableOriginalConstructor()
-                 ->getMock();
-                 
-        $mockUserAgent
-            ->method('getAgentString')
-            ->willReturn('Mozilla/Test');
+            $state[$key] = $value;
+        });
 
-        $mockRequest = 
-            $this->getMockBuilder(\CodeIgniter\HTTP\IncomingRequest::class)
-                 ->disableOriginalConstructor()
-                 ->getMock();
-                 
-        $mockRequest
-            ->method('getIPAddress')
-            ->willReturn('127.0.0.1');
-            
-        /* Forniamo lo UserAgent fittizio quando innerLogin lo richiede */
-        $mockRequest
-            ->method('getUserAgent')
-            ->willReturn(
-                $mockUserAgent
-            );
+        $session->method('remove')->willReturnCallback(static function ($key) use (&$state): void {
+            foreach ((array) $key as $name):
+                unset($state[$name]);
+            endforeach;
+        });
 
-        /* 4. MOCK MODEL E INIEZIONE */
-        $model = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class)
-                 ->disableOriginalConstructor()
-                 ->onlyMethods(['checkAllowedFields'])
-                 ->getMock();
+        $session->method('regenerate')->willReturnCallback(static function (bool $destroy = false): void {
+        });
 
-        $model
-            ->method('checkAllowedFields')
-            ->willReturnArgument(0);
+        $session->method('setFlashdata')->willReturnCallback(static function ($data, $value = null): void {
+        });
 
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
+        Services::injectMock('session', $session);
 
-        /* 5. DATI POST */
-        $posts = 
-            [
-                'email'    => 'mario@test.com',
-                'password' => 'passwordCorretta'
-            ];
-
-        /* 6. ESECUZIONE */
-        $result = 
-            $model->login(
-                $posts, 
-                $mockRequest
-            );
-
-        /* 7. ASSERZIONI */
-        $this->assertTrue(
-            $result['result']
-        );
+        return $session;
     }
 
-    public function testLoginSuccessWithRememberMeCookie(): void
+    public function testValidateLoginRulesExposeEmailAndPasswordSecurityRules(): void
     {
-        /* 0. CARICAMENTO HELPER E MOCK SERVIZIO CRYPTO */
-        helper('cookie');
+        $model = $this->createModel($this->createMock(BaseConnection::class));
 
-        $mockCrypto = 
-            $this->getMockBuilder(\stdClass::class)
-                 ->addMethods(['encrypt'])
-                 ->getMock();
-                 
-        $mockCrypto
-            ->method('encrypt')
-            ->willReturn('encrypted_token_string');
-            
-        \CodeIgniter\Config\Services::injectMock(
-            'crypto', 
-            $mockCrypto
-        );
+        $rules = $model->validateLoginRules();
 
-        /* 1. MOCK CONFIGURAZIONE */
-        $mockConfig = 
-            (object)[
-                'attempts'         => false,
-                'twoFactor'        => false,
-                'rememberMeTime'   => 2592000,
-                'hashKey'          => 'secret123'
-            ];
-
-        /* 2. MOCK QUERY DB E TRANSAZIONI */
-        $realHash = 
-            password_hash('passwordCorretta', PASSWORD_DEFAULT);
-            
-        $mockAdmin = 
-            (object)[
-                'uuid'          => '123-abc',
-                'firstname'     => 'Mario',
-                'lastname'      => 'Rossi',
-                'email'         => 'mario@test.com',
-                'times'         => 0,
-                'password_hash' => $realHash
-            ];
-
-        $mockQuery = 
-            $this->getMockBuilder(\stdClass::class)
-                 ->addMethods(['getRow'])
-                 ->getMock();
-                 
-        $mockQuery
-            ->method('getRow')
-            ->willReturn(
-                $mockAdmin
-            );
-
-        $mockDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class)
-                 ->disableOriginalConstructor()
-                 ->getMock();
-
-        $mockDb
-            ->method('query')
-            ->willReturn(
-                $mockQuery
-            );
-            
-        $mockDb
-            ->method('transBegin')
-            ->willReturn(true);
-            
-        $mockDb
-            ->method('transCommit')
-            ->willReturn(true);
-            
-        $mockDb
-            ->method('transStatus')
-            ->willReturn(true);
-            
-        $mockDb
-            ->method('insertID')
-            ->willReturn(
-                1
-            );
-
-        /* 3. MOCK REQUEST E USER AGENT */
-        $mockUserAgent = 
-            $this->getMockBuilder(\CodeIgniter\HTTP\UserAgent::class)
-                 ->disableOriginalConstructor()
-                 ->getMock();
-                 
-        $mockUserAgent
-            ->method('getAgentString')
-            ->willReturn('Mozilla/Test');
-
-        $mockRequest = 
-            $this->getMockBuilder(\CodeIgniter\HTTP\IncomingRequest::class)
-                 ->disableOriginalConstructor()
-                 ->getMock();
-                 
-        $mockRequest
-            ->method('getIPAddress')
-            ->willReturn('127.0.0.1');
-            
-        $mockRequest
-            ->method('getUserAgent')
-            ->willReturn(
-                $mockUserAgent
-            );
-
-        /* 4. MOCK MODEL E INIEZIONE */
-        $model = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class)
-                 ->disableOriginalConstructor()
-                 ->onlyMethods(['checkAllowedFields'])
-                 ->getMock();
-
-        $model
-            ->method('checkAllowedFields')
-            ->willReturnArgument(0);
-
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 5. DATI POST (CON FLAG REMEMBER ME ATTIVO) */
-        $posts = 
-            [
-                'email'      => 'mario@test.com',
-                'password'   => 'passwordCorretta',
-                'rememberMe' => true
-            ];
-
-        /* 6. ESECUZIONE */
-        $result = 
-            $model->login(
-                $posts, 
-                $mockRequest
-            );
-
-        /* 7. ASSERZIONI E PULIZIA MOCK */
-        $this->assertTrue(
-            $result['result']
-        );
-        
-        \CodeIgniter\Config\Services::reset();
+        $this->assertSame(['email', 'password'], array_keys($rules));
+        $this->assertContains('valid_email', $rules['email']['rules']);
+        $this->assertContains('max_length[255]', $rules['password']['rules']);
+        $this->assertNotContains('regex_match[/.*/]', $rules['password']['rules']);
     }
 
-    public function testResetPasswordFailsWhenAdminNotFound(): void
+    public function testValidateResetPasswordRulesRequireValidEmail(): void
     {
-        /* 1. MOCK QUERY DB (Restituisce null, simulando admin non trovato) */
-        $builderQuery = 
-            $this->getMockBuilder(\stdClass::class);
-            
-        $builderQuery->addMethods(['getRow']);
-        
-        $mockQuery = 
-            $builderQuery->getMock();
-            
-        $mockQuery->method('getRow')->willReturn(null);
+        $model = $this->createModel($this->createMock(BaseConnection::class));
 
-        /* 2. MOCK CONNESSIONE DB */
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        $mockDb->method('query')->willReturn(
-            $mockQuery
-        );
+        $rules = $model->validateResetPasswordRules();
 
-        /* 3. MOCK REQUEST */
-        $builderReq = 
-            $this->getMockBuilder(\CodeIgniter\HTTP\IncomingRequest::class);
-            
-        $builderReq->disableOriginalConstructor();
-        
-        $mockRequest = 
-            $builderReq->getMock();
-
-        /* 4. MOCK MODEL */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods(['checkAllowedFields']);
-        
-        $model = 
-            $builderModel->getMock();
-            
-        $model->method('checkAllowedFields')->willReturnArgument(0);
-
-        /* 5. INIEZIONE DIPENDENZE VIA CLOSURE */
-        $injector = 
-            function() use (
-                $mockDb
-            ) {
-                $this->db = 
-                    $mockDb;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 6. ESECUZIONE */
-        $posts = 
-            ['email' => 'inesistente@test.com'];
-            
-        $result = 
-            $model->resetPassword(
-                $posts, 
-                $mockRequest
-            );
-
-        /* 7. ASSERZIONI */
-        $expectedResult = 
-            false;
-            
-        $actualResult = 
-            $result['result'];
-            
-        $this->assertEquals(
-            $expectedResult, 
-            $actualResult
-        );
+        $this->assertSame(['email'], array_keys($rules));
+        $this->assertSame(['required', 'valid_email', 'trim'], $rules['email']['rules']);
     }
 
-    public function testResetPasswordSuccessWithEmailSent(): void
+    public function testValidateSetPasswordRulesRequirePasswordConfirmationAndToken(): void
     {
-        /* 1. MOCK SERVIZIO EMAIL (Intercetta EmailService) */
-        $builderEmail = 
-            $this->getMockBuilder(\CodeIgniter\Email\Email::class);
-            
-        $builderEmail->disableOriginalConstructor();
-        
-        $mockEmail = 
-            $builderEmail->getMock();
-            
-        $mockEmail->method('send')->willReturn(true);
-        
-        \CodeIgniter\Config\Services::injectMock(
-            'email', 
-            $mockEmail
-        );
+        $model = $this->createModel($this->createMock(BaseConnection::class));
 
-        /* 2. MOCK CONFIGURAZIONE */
-        $configArr = 
-            [
-                'hashKey'        => 'secret123',
-                'activationTime' => 3600
-            ];
-            
-        $mockConfig = 
-            (object) $configArr;
+        $rules = $model->validateSetPasswordRules();
 
-        /* 3. MOCK DB E QUERY */
-        $adminArr = 
-            [
-                'uuid'      => '123-abc',
-                'firstname' => 'Mario',
-                'lastname'  => 'Rossi',
-                'email'     => 'mario@test.com'
-            ];
-            
-        $mockAdmin = 
-            (object) $adminArr;
-            
-        $builderQuery = 
-            $this->getMockBuilder(\stdClass::class);
-            
-        $builderQuery->addMethods(['getRow']);
-        
-        $mockQuery = 
-            $builderQuery->getMock();
-            
-        $mockQuery->method('getRow')->willReturn(
-            $mockAdmin
-        );
-
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        $mockDb->method('query')->willReturn(
-            $mockQuery
-        );
-        
-        $mockDb->method('transBegin')->willReturn(true);
-        
-        $mockDb->method('transCommit')->willReturn(true);
-        
-        $mockDb->method('transStatus')->willReturn(true);
-
-        /* 4. MOCK REQUEST E USER AGENT */
-        $builderUA = 
-            $this->getMockBuilder(\CodeIgniter\HTTP\UserAgent::class);
-            
-        $builderUA->disableOriginalConstructor();
-        
-        $mockUA = 
-            $builderUA->getMock();
-            
-        $mockUA->method('getAgentString')->willReturn('TestAgent');
-
-        $builderReq = 
-            $this->getMockBuilder(\CodeIgniter\HTTP\IncomingRequest::class);
-            
-        $builderReq->disableOriginalConstructor();
-        
-        $mockRequest = 
-            $builderReq->getMock();
-            
-        $mockRequest->method('getUserAgent')->willReturn(
-            $mockUA
-        );
-        
-        $mockRequest->method('getIPAddress')->willReturn('127.0.0.1');
-
-        /* 5. MOCK MODEL E INIEZIONE (Db, Config e Module) */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods(['checkAllowedFields']);
-        
-        $model = 
-            $builderModel->getMock();
-            
-        $model->method('checkAllowedFields')->willReturnArgument(0);
-
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-                    
-                $this->module = 
-                    'auth';
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 6. ESECUZIONE */
-        $posts = 
-            ['email' => 'mario@test.com'];
-            
-        $result = 
-            $model->resetPassword(
-                $posts, 
-                $mockRequest
-            );
-
-        /* 7. ASSERZIONI E PULIZIA MOCK */
-        $expectedResult = 
-            true;
-            
-        $actualResult = 
-            $result['result'];
-            
-        $this->assertEquals(
-            $expectedResult, 
-            $actualResult
-        );
-        
-        \CodeIgniter\Config\Services::reset();
+        $this->assertSame(['password', 'confirmPassword', 'token'], array_keys($rules));
+        $this->assertContains('regex_match[/.*/]', $rules['password']['rules']);
+        $this->assertContains('matches[password]', $rules['confirmPassword']['rules']);
+        $this->assertSame('required|checkTokenRule', $rules['token']['rules']);
     }
 
-    public function testResetPasswordFailsOnTransactionError(): void
+    public function testValidateVerifyRulesRequireExactlySixDigitsIncludingLeadingZeroes(): void
     {
-        /* 1. MOCK CONFIGURAZIONE */
-        $configArr = 
-            [
-                'hashKey'        => 'secret123',
-                'activationTime' => 3600
-            ];
-            
-        $mockConfig = 
-            (object) $configArr;
+        $model = $this->createModel($this->createMock(BaseConnection::class));
 
-        /* 2. MOCK DB E TRANSAZIONE FALLITA */
-        $adminArr = 
-            [
-                'uuid'      => '123-abc',
-                'firstname' => 'Mario',
-                'lastname'  => 'Rossi',
-                'email'     => 'mario@test.com'
-            ];
-            
-        $mockAdmin = 
-            (object) $adminArr;
-            
-        $builderQuery = 
-            $this->getMockBuilder(\stdClass::class);
-            
-        $builderQuery->addMethods(['getRow']);
-        
-        $mockQuery = 
-            $builderQuery->getMock();
-            
-        $mockQuery->method('getRow')->willReturn(
-            $mockAdmin
-        );
+        $rules = $model->validateVerifyRules();
 
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        $mockDb->method('query')->willReturn(
-            $mockQuery
-        );
-        
-        $mockDb->method('transBegin')->willReturn(true);
-        
-        /* Simuliamo il fallimento della transazione */
-        $mockDb->method('transStatus')->willReturn(false);
-        
-        /* Verifichiamo che il metodo transRollback venga effettivamente chiamato */
-        $once = 
-            $this->once();
-            
-        $expects = 
-            $mockDb->expects(
-                $once
-            );
-            
-        $expects->method('transRollback');
+        $this->assertSame(['required', 'regex_match[/^[0-9]{6}$/]'], $rules['code']['rules']);
 
-        /* 3. MOCK REQUEST E USER AGENT */
-        $builderUA = 
-            $this->getMockBuilder(\CodeIgniter\HTTP\UserAgent::class);
-            
-        $builderUA->disableOriginalConstructor();
-        
-        $mockUA = 
-            $builderUA->getMock();
-            
-        $mockUA->method('getAgentString')->willReturn('TestAgent');
+        $validation = Services::validation();
+        $validation->setRules($rules);
+        $this->assertTrue($validation->run(['code' => '012345']));
 
-        $builderReq = 
-            $this->getMockBuilder(\CodeIgniter\HTTP\IncomingRequest::class);
-            
-        $builderReq->disableOriginalConstructor();
-        
-        $mockRequest = 
-            $builderReq->getMock();
-            
-        $mockRequest->method('getUserAgent')->willReturn(
-            $mockUA
-        );
-        
-        $mockRequest->method('getIPAddress')->willReturn('127.0.0.1');
+        $validation->reset()->setRules($rules);
+        $this->assertFalse($validation->run(['code' => '12345']));
 
-        /* 4. MOCK MODEL E INIEZIONE */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods(['checkAllowedFields']);
-        
-        $model = 
-            $builderModel->getMock();
-            
-        $model->method('checkAllowedFields')->willReturnArgument(0);
-
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 5. ESECUZIONE */
-        $posts = 
-            ['email' => 'mario@test.com'];
-            
-        $result = 
-            $model->resetPassword(
-                $posts, 
-                $mockRequest
-            );
-            
-        /* 6. ASSERZIONI */
-        $expectedResult = 
-            false;
-            
-        $actualResult = 
-            $result['result'];
-            
-        $this->assertEquals(
-            $expectedResult, 
-            $actualResult
-        );
+        $validation->reset()->setRules($rules);
+        $this->assertFalse($validation->run(['code' => '12345a']));
     }
 
-    public function testResetPasswordFailsWhenEmailNotSent(): void
+    public function testLoginRecordsUnknownEmailWithoutRevealingAccountExistence(): void
     {
-        /* 1. MOCK SERVIZIO EMAIL (Restituisce false simulando un errore SMTP) */
-        $builderEmail = 
-            $this->getMockBuilder(\CodeIgniter\Email\Email::class);
-            
-        $builderEmail->disableOriginalConstructor();
-        
-        $mockEmail = 
-            $builderEmail->getMock();
-            
-        $mockEmail->method('send')->willReturn(false);
-        
-        \CodeIgniter\Config\Services::injectMock(
-            'email', 
-            $mockEmail
-        );
-
-        /* 2. MOCK CONFIGURAZIONE */
-        $configArr = 
-            [
-                'hashKey'        => 'secret123',
-                'activationTime' => 3600
-            ];
-            
-        $mockConfig = 
-            (object) $configArr;
-
-        /* 3. MOCK DB E QUERY */
-        $adminArr = 
-            [
-                'uuid'      => '123-abc',
-                'firstname' => 'Mario',
-                'lastname'  => 'Rossi',
-                'email'     => 'mario@test.com'
-            ];
-            
-        $mockAdmin = 
-            (object) $adminArr;
-            
-        $builderQuery = 
-            $this->getMockBuilder(\stdClass::class);
-            
-        $builderQuery->addMethods(['getRow']);
-        
-        $mockQuery = 
-            $builderQuery->getMock();
-            
-        $mockQuery->method('getRow')->willReturn(
-            $mockAdmin
-        );
-
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        $mockDb->method('query')->willReturn(
-            $mockQuery
-        );
-        
-        $mockDb->method('transBegin')->willReturn(true);
-        
-        $mockDb->method('transCommit')->willReturn(true);
-        
-        $mockDb->method('transStatus')->willReturn(true);
-
-        /* 4. MOCK REQUEST E USER AGENT */
-        $builderUA = 
-            $this->getMockBuilder(\CodeIgniter\HTTP\UserAgent::class);
-            
-        $builderUA->disableOriginalConstructor();
-        
-        $mockUA = 
-            $builderUA->getMock();
-            
-        $mockUA->method('getAgentString')->willReturn('TestAgent');
-
-        $builderReq = 
-            $this->getMockBuilder(\CodeIgniter\HTTP\IncomingRequest::class);
-            
-        $builderReq->disableOriginalConstructor();
-        
-        $mockRequest = 
-            $builderReq->getMock();
-            
-        $mockRequest->method('getUserAgent')->willReturn(
-            $mockUA
-        );
-        
-        $mockRequest->method('getIPAddress')->willReturn('127.0.0.1');
-
-        /* 5. MOCK MODEL E INIEZIONE (Db, Config e Module) */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods(['checkAllowedFields']);
-        
-        $model = 
-            $builderModel->getMock();
-            
-        $model->method('checkAllowedFields')->willReturnArgument(0);
-
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-                    
-                $this->module = 
-                    'auth';
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 6. ESECUZIONE */
-        $posts = 
-            ['email' => 'mario@test.com'];
-            
-        $result = 
-            $model->resetPassword(
-                $posts, 
-                $mockRequest
-            );
-
-        /* 7. ASSERZIONI E PULIZIA MOCK */
-        $expectedResult = 
-            false;
-            
-        $actualResult = 
-            $result['result'];
-            
-        $this->assertEquals(
-            $expectedResult, 
-            $actualResult
-        );
-        
-        \CodeIgniter\Config\Services::reset();
-    }
-
-    public function testResetPasswordCatchesExceptionAndRollbacks(): void
-    {
-        /* 1. MOCK CONFIGURAZIONE */
-        $configArr = 
-            [
-                'hashKey'        => 'secret123',
-                'activationTime' => 3600
-            ];
-            
-        $mockConfig = 
-            (object) $configArr;
-
-        /* 2. MOCK DB E ECCEZIONE FORZATA */
-        $adminArr = 
-            [
-                'uuid'      => '123-abc',
-                'firstname' => 'Mario',
-                'lastname'  => 'Rossi',
-                'email'     => 'mario@test.com'
-            ];
-            
-        $mockAdmin = 
-            (object) $adminArr;
-            
-        $builderQuery = 
-            $this->getMockBuilder(\stdClass::class);
-            
-        $builderQuery->addMethods(['getRow']);
-        
-        $mockQuery = 
-            $builderQuery->getMock();
-            
-        $mockQuery->method('getRow')->willReturn(
-            $mockAdmin
-        );
-
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        /* La prima query per trovare l'utente va a buon fine */
-        $mockDb->method('query')->willReturn(
-            $mockQuery
-        );
-        
-        /* Forziamo un'eccezione su transBegin per far scattare il blocco catch */
-        $exception = 
-            new \Exception('Test DB Connection Lost');
-            
-        $mockDb->method('transBegin')->willThrowException(
-            $exception
-        );
-        
-        /* Verifichiamo che il metodo transRollback venga richiamato per sicurezza */
-        $once = 
-            $this->once();
-            
-        $expects = 
-            $mockDb->expects(
-                $once
-            );
-            
-        $expects->method('transRollback');
-
-        /* 3. MOCK REQUEST */
-        $builderReq = 
-            $this->getMockBuilder(\CodeIgniter\HTTP\IncomingRequest::class);
-            
-        $builderReq->disableOriginalConstructor();
-        
-        $mockRequest = 
-            $builderReq->getMock();
-
-        /* 4. MOCK MODEL E INIEZIONE */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods(['checkAllowedFields']);
-        
-        $model = 
-            $builderModel->getMock();
-            
-        $model->method('checkAllowedFields')->willReturnArgument(0);
-
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 5. ESECUZIONE */
-        $posts = 
-            ['email' => 'mario@test.com'];
-            
-        $result = 
-            $model->resetPassword(
-                $posts, 
-                $mockRequest
-            );
-            
-        /* 6. ASSERZIONI */
-        $expectedResult = 
-            false;
-            
-        $actualResult = 
-            $result['result'];
-            
-        $this->assertEquals(
-            $expectedResult, 
-            $actualResult
-        );
-    }
-
-    public function testSetPasswordFailsWhenAdminNotFound(): void
-    {
-        /* 1. MOCK CONFIGURAZIONE */
-        $configArr = 
-            ['hashKey' => 'secret123'];
-            
-        $mockConfig = 
-            (object) $configArr;
-
-        /* 2. MOCK DB */
-        $builderQuery = 
-            $this->getMockBuilder(\stdClass::class);
-            
-        $builderQuery->addMethods(['getRow']);
-        
-        $mockQuery = 
-            $builderQuery->getMock();
-            
-        $mockQuery->method('getRow')->willReturn(null);
-
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        $mockDb->method('query')->willReturn(
-            $mockQuery
-        );
-
-        /* 3. MOCK MODEL */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods(['checkAllowedFields']);
-        
-        $model = 
-            $builderModel->getMock();
-            
-        $model->method('checkAllowedFields')->willReturnArgument(0);
-
-        /* 4. INIEZIONE */
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 5. ESECUZIONE */
-        $posts = 
-            [
-                'token'    => 'dummy_token',
-                'password' => 'NewPass123!'
-            ];
-            
-        $result = 
-            $model->setPassword(
-                $posts
-            );
-
-        /* 6. ASSERZIONE */
-        $expected = 
-            false;
-            
-        $actual = 
-            $result['result'];
-            
-        $this->assertEquals(
-            $expected, 
-            $actual
-        );
-    }
-
-    public function testSetPasswordSuccess(): void
-    {
-        /* 1. MOCK CONFIGURAZIONE */
-        $configArr = 
-            ['hashKey' => 'secret123'];
-            
-        $mockConfig = 
-            (object) $configArr;
-
-        /* 2. MOCK DB */
-        $adminArr = 
-            [
-                'uuid'      => '123-abc',
-                'firstname' => 'Mario',
-                'lastname'  => 'Rossi'
-            ];
-            
-        $mockAdmin = 
-            (object) $adminArr;
-            
-        $builderQuery = 
-            $this->getMockBuilder(\stdClass::class);
-            
-        $builderQuery->addMethods(['getRow']);
-        
-        $mockQuery = 
-            $builderQuery->getMock();
-            
-        $mockQuery->method('getRow')->willReturn(
-            $mockAdmin
-        );
-
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        $mockDb->method('query')->willReturn(
-            $mockQuery
-        );
-        
-        $mockDb->method('transBegin')->willReturn(true);
-        
-        $mockDb->method('transCommit')->willReturn(true);
-        
-        $mockDb->method('transStatus')->willReturn(true);
-
-        /* 3. MOCK MODEL */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods(['checkAllowedFields']);
-        
-        $model = 
-            $builderModel->getMock();
-            
-        $model->method('checkAllowedFields')->willReturnArgument(0);
-
-        /* 4. INIEZIONE */
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 5. ESECUZIONE */
-        $posts = 
-            [
-                'token'    => 'dummy_token',
-                'password' => 'NewPass123!'
-            ];
-            
-        $result = 
-            $model->setPassword(
-                $posts
-            );
-
-        /* 6. ASSERZIONE */
-        $expected = 
-            true;
-            
-        $actual = 
-            $result['result'];
-            
-        $this->assertEquals(
-            $expected, 
-            $actual
-        );
-    }
-
-    public function testSetPasswordFailsOnTransactionError(): void
-    {
-        /* 1. MOCK CONFIGURAZIONE */
-        $configArr = 
-            ['hashKey' => 'secret123'];
-            
-        $mockConfig = 
-            (object) $configArr;
-
-        /* 2. MOCK DB */
-        $adminArr = 
-            [
-                'uuid'      => '123-abc',
-                'firstname' => 'Mario',
-                'lastname'  => 'Rossi'
-            ];
-            
-        $mockAdmin = 
-            (object) $adminArr;
-            
-        $builderQuery = 
-            $this->getMockBuilder(\stdClass::class);
-            
-        $builderQuery->addMethods(['getRow']);
-        
-        $mockQuery = 
-            $builderQuery->getMock();
-            
-        $mockQuery->method('getRow')->willReturn(
-            $mockAdmin
-        );
-
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        $mockDb->method('query')->willReturn(
-            $mockQuery
-        );
-        
-        $mockDb->method('transBegin')->willReturn(true);
-        
-        $mockDb->method('transStatus')->willReturn(false);
-        
-        $once = 
-            $this->once();
-            
-        $expects = 
-            $mockDb->expects(
-                $once
-            );
-            
-        $expects->method('transRollback');
-
-        /* 3. MOCK MODEL */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods(['checkAllowedFields']);
-        
-        $model = 
-            $builderModel->getMock();
-            
-        $model->method('checkAllowedFields')->willReturnArgument(0);
-
-        /* 4. INIEZIONE */
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 5. ESECUZIONE */
-        $posts = 
-            [
-                'token'    => 'dummy_token',
-                'password' => 'NewPass123!'
-            ];
-            
-        $result = 
-            $model->setPassword(
-                $posts
-            );
-
-        /* 6. ASSERZIONE */
-        $expected = 
-            false;
-            
-        $actual = 
-            $result['result'];
-            
-        $this->assertEquals(
-            $expected, 
-            $actual
-        );
-    }
-
-    public function testSetPasswordCatchesExceptionAndRollbacks(): void
-    {
-        /* 1. MOCK CONFIGURAZIONE */
-        $configArr = 
-            ['hashKey' => 'secret123'];
-            
-        $mockConfig = 
-            (object) $configArr;
-
-        /* 2. MOCK DB CON ECCEZIONE FORZATA */
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        $exception = 
-            new \Exception('Test DB Error');
-            
-        $mockDb->method('query')->willThrowException(
-            $exception
-        );
-        
-        $once = 
-            $this->once();
-            
-        $expects = 
-            $mockDb->expects(
-                $once
-            );
-            
-        $expects->method('transRollback');
-
-        /* 3. MOCK MODEL */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods(['checkAllowedFields']);
-        
-        $model = 
-            $builderModel->getMock();
-            
-        $model->method('checkAllowedFields')->willReturnArgument(0);
-
-        /* 4. INIEZIONE */
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 5. ESECUZIONE */
-        $posts = 
-            [
-                'token'    => 'dummy_token',
-                'password' => 'NewPass123!'
-            ];
-            
-        $result = 
-            $model->setPassword(
-                $posts
-            );
-
-        /* 6. ASSERZIONE */
-        $expected = 
-            false;
-            
-        $actual = 
-            $result['result'];
-            
-        $this->assertEquals(
-            $expected, 
-            $actual
-        );
-    }
-
-    public function testCheckAuthTokenFailsWhenTokenNotFound(): void
-    {
-        /* 1. MOCK CONFIGURAZIONE */
-        $configArr = 
-            ['hashKey' => 'secret123'];
-            
-        $mockConfig = 
-            (object) $configArr;
-
-        /* 2. MOCK DB */
-        $builderQuery = 
-            $this->getMockBuilder(\stdClass::class);
-            
-        $builderQuery->addMethods(['getRow']);
-        
-        $mockQuery = 
-            $builderQuery->getMock();
-            
-        $mockQuery->method('getRow')->willReturn(null);
-
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        $mockDb->method('query')->willReturn(
-            $mockQuery
-        );
-
-        /* 3. MOCK MODEL CORRETTO (Mockiamo solo checkAllowedFields) */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods(['checkAllowedFields']);
-        
-        $model = 
-            $builderModel->getMock();
-
-        /* 4. INIEZIONE */
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 5. ESECUZIONE */
-        $token = 
-            'dummy_token';
-            
-        $result = 
-            $model->checkAuthToken(
-                $token
-            );
-
-        /* 6. ASSERZIONE */
-        $expected = 
-            false;
-            
-        $this->assertEquals(
-            $expected, 
-            $result
-        );
-    }
-
-    public function testCheckAuthTokenFailsWhenTokenExpired(): void
-    {
-        /* 1. MOCK CONFIGURAZIONE */
-        $configArr = 
-            ['hashKey' => 'secret123'];
-            
-        $mockConfig = 
-            (object) $configArr;
-
-        /* 2. MOCK DB CON DATA SCADUTA */
-        $pastDate = 
-            date('Y-m-d H:i:s', strtotime('-1 day'));
-            
-        $adminArr = 
-            ['token_expire' => $pastDate];
-            
-        $mockAdmin = 
-            (object) $adminArr;
-            
-        $builderQuery = 
-            $this->getMockBuilder(\stdClass::class);
-            
-        $builderQuery->addMethods(['getRow']);
-        
-        $mockQuery = 
-            $builderQuery->getMock();
-            
-        $mockQuery->method('getRow')->willReturn(
-            $mockAdmin
-        );
-
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        $mockDb->method('query')->willReturn(
-            $mockQuery
-        );
-
-        /* 3. MOCK MODEL CORRETTO */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods(['checkAllowedFields']);
-        
-        $model = 
-            $builderModel->getMock();
-
-        /* 4. INIEZIONE */
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 5. ESECUZIONE */
-        $token = 
-            'dummy_token';
-            
-        $result = 
-            $model->checkAuthToken(
-                $token
-            );
-
-        /* 6. ASSERZIONE */
-        $expected = 
-            false;
-            
-        $this->assertEquals(
-            $expected, 
-            $result
-        );
-    }
-
-    public function testCheckAuthTokenSuccessWhenValid(): void
-    {
-        /* 1. MOCK CONFIGURAZIONE */
-        $configArr = 
-            ['hashKey' => 'secret123'];
-            
-        $mockConfig = 
-            (object) $configArr;
-
-        /* 2. MOCK DB CON DATA FUTURA E CLASSE STANDARD */
-        $futureDate = 
-            date('Y-m-d H:i:s', strtotime('+1 day'));
-            
-        $adminArr = 
-            ['token_expire' => $futureDate];
-            
-        $mockAdmin = 
-            (object) $adminArr;
-            
-        $builderQuery = 
-            $this->getMockBuilder(\stdClass::class);
-            
-        $builderQuery->addMethods(['getRow']);
-        
-        $mockQuery = 
-            $builderQuery->getMock();
-            
-        $mockQuery->method('getRow')->willReturn(
-            $mockAdmin
-        );
-
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        $mockDb->method('query')->willReturn(
-            $mockQuery
-        );
-
-        /* 3. MOCK MODEL CORRETTO */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods(['checkAllowedFields']);
-        
-        $model = 
-            $builderModel->getMock();
-
-        /* 4. INIEZIONE */
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 5. ESECUZIONE */
-        $token = 
-            'dummy_token';
-            
-        $result = 
-            $model->checkAuthToken(
-                $token
-            );
-
-        /* 6. ASSERZIONE */
-        $expected = 
-            true;
-            
-        $this->assertEquals(
-            $expected, 
-            $result
-        );
-    }
-
-    public function testCheckAuthTokenCatchesException(): void
-    {
-        /* 1. MOCK CONFIGURAZIONE */
-        $configArr = 
-            ['hashKey' => 'secret123'];
-            
-        $mockConfig = 
-            (object) $configArr;
-
-        /* 2. MOCK DB CON ECCEZIONE FORZATA */
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        $exception = 
-            new \Exception('DB query failed');
-            
-        $mockDb->method('query')->willThrowException(
-            $exception
-        );
-
-        /* 3. MOCK MODEL CORRETTO */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods(['checkAllowedFields']);
-        
-        $model = 
-            $builderModel->getMock();
-
-        /* 4. INIEZIONE */
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 5. ESECUZIONE */
-        $token = 
-            'dummy_token';
-            
-        $result = 
-            $model->checkAuthToken(
-                $token
-            );
-
-        /* 6. ASSERZIONE */
-        $expected = 
-            false;
-            
-        $this->assertEquals(
-            $expected, 
-            $result
-        );
-    }
-
-    public function testVerifyFailsOnEmptySession(): void
-    {
-        /* 1. MOCK SESSION */
-        $builderSession = 
-            $this->getMockBuilder(\CodeIgniter\Session\Session::class);
-            
-        $builderSession->disableOriginalConstructor();
-        
-        $mockSession = 
-            $builderSession->getMock();
-            
-        $mockSession->method('get')->willReturn(null);
-        
-        \CodeIgniter\Config\Services::injectMock(
-            'session', 
-            $mockSession
-        );
-
-        /* 2. MOCK REQUEST */
-        $builderReq = 
-            $this->getMockBuilder(\CodeIgniter\HTTP\IncomingRequest::class);
-            
-        $builderReq->disableOriginalConstructor();
-        
-        $mockRequest = 
-            $builderReq->getMock();
-            
-        $mockRequest->method('getIPAddress')->willReturn('127.0.0.1');
-
-        /* 3. MOCK DB E CONFIG (Necessari per il blocco catch di sicurezza) */
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        $configArr = 
-            [];
-            
-        $mockConfig = 
-            (object) $configArr;
-
-        /* 4. MOCK MODEL E INIEZIONE */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods(['checkAllowedFields']);
-        
-        $model = 
-            $builderModel->getMock();
-            
-        $model->method('checkAllowedFields')->willReturnArgument(0);
-
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 5. ESECUZIONE */
-        $posts = 
-            ['code' => '123456'];
-            
-        $result = 
-            $model->verify(
-                $posts, 
-                $mockRequest
-            );
-
-        /* 6. ASSERZIONE */
-        $expected = 
-            false;
-            
-        $actual = 
-            $result['result'];
-            
-        $this->assertEquals(
-            $expected, 
-            $actual
-        );
-
-        \CodeIgniter\Config\Services::reset();
-    }
-
-    public function testVerifyFailsOnAdminNotFound(): void
-    {
-        /* 1. MOCK SESSION */
-        $builderSession = 
-            $this->getMockBuilder(\CodeIgniter\Session\Session::class);
-            
-        $builderSession->disableOriginalConstructor();
-        
-        $mockSession = 
-            $builderSession->getMock();
-            
-        $sessData = 
-            [
-                'admin_uuid' => '123-abc',
-                'method'     => 'totp',
-                'rememberMe' => false
-            ];
-            
-        $mockSession->method('get')->willReturn(
-            $sessData
-        );
-        
-        \CodeIgniter\Config\Services::injectMock(
-            'session', 
-            $mockSession
-        );
-
-        /* 2. MOCK REQUEST */
-        $builderReq = 
-            $this->getMockBuilder(\CodeIgniter\HTTP\IncomingRequest::class);
-            
-        $builderReq->disableOriginalConstructor();
-        
-        $mockRequest = 
-            $builderReq->getMock();
-            
-        $mockRequest->method('getIPAddress')->willReturn('127.0.0.1');
-
-        /* 3. MOCK DB CON ESITO NULLO SULL'ADMIN */
-        $builderQuery = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseResult::class);
-            
-        $builderQuery->disableOriginalConstructor();
-        
-        $mockQuery = 
-            $builderQuery->getMock();
-            
-        $mockQuery->method('getRow')->willReturn(null);
-
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        $mockDb->method('query')->willReturn(
-            $mockQuery
-        );
-
-        /* 4. MOCK CONFIG E MODEL */
-        $configArr = 
-            [];
-            
-        $mockConfig = 
-            (object) $configArr;
-
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods(['checkAllowedFields']);
-        
-        $model = 
-            $builderModel->getMock();
-            
-        $model->method('checkAllowedFields')->willReturnArgument(0);
-
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 5. ESECUZIONE */
-        $posts = 
-            ['code' => '123456'];
-            
-        $result = 
-            $model->verify(
-                $posts, 
-                $mockRequest
-            );
-
-        /* 6. ASSERZIONE */
-        $expected = 
-            false;
-            
-        $actual = 
-            $result['result'];
-            
-        $this->assertEquals(
-            $expected, 
-            $actual
-        );
-
-        \CodeIgniter\Config\Services::reset();
-    }
-
-    public function testVerifyFailsOnThrottlingLimit(): void
-    {
-        /* 1. MOCK SESSION E REQUEST */
-        $builderSession = 
-            $this->getMockBuilder(\CodeIgniter\Session\Session::class);
-            
-        $builderSession->disableOriginalConstructor();
-        
-        $mockSession = 
-            $builderSession->getMock();
-            
-        $sessData = 
-            [
-                'admin_uuid' => '123-abc',
-                'method'     => 'email',
-                'rememberMe' => false
-            ];
-            
-        $mockSession->method('get')->willReturn(
-            $sessData
-        );
-        
-        \CodeIgniter\Config\Services::injectMock(
-            'session', 
-            $mockSession
-        );
-
-        $builderReq = 
-            $this->getMockBuilder(\CodeIgniter\HTTP\IncomingRequest::class);
-            
-        $builderReq->disableOriginalConstructor();
-        
-        $mockRequest = 
-            $builderReq->getMock();
-            
-        $mockRequest->method('getIPAddress')->willReturn('127.0.0.1');
-
-        /* 2. CONFIGURAZIONE LIMITI BRUTE-FORCE */
-        $configArr = 
-            [
-                'twoFactorTime'  => 900,
-                'twoFactorLimit' => 3
-            ];
-            
-        $mockConfig = 
-            (object) $configArr;
-
-        /* 3. MOCK DB CON SEQUENZA DI RISPOSTE */
-        $adminArr = 
-            ['firstname' => 'Mario', 'lastname' => 'Rossi'];
-            
-        $mockAdmin = 
-            (object) $adminArr;
-
-        $countArr = 
-            ['cnt' => 5]; /* Supera il limite di 3 */
-            
-        $mockCount = 
-            (object) $countArr;
-
-        $tsArr = 
-            ['last_ts' => '2026-01-01 10:00:00'];
-            
-        $mockTs = 
-            (object) $tsArr;
-
-        $builderQuery = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseResult::class);
-            
-        $builderQuery->disableOriginalConstructor();
-        
-        $mockQuery = 
-            $builderQuery->getMock();
-
-        /* Intercettiamo le query in ordine: admin, conteggio fallimenti, timestamp */
-        $mockQuery->method('getRow')->willReturnOnConsecutiveCalls(
-            $mockAdmin, 
-            $mockCount, 
-            $mockTs
-        );
-
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        $mockDb->method('query')->willReturn(
-            $mockQuery
-        );
-        
-        $mockDb->method('transBegin')->willReturn(true);
-        
-        $mockDb->method('transCommit')->willReturn(true);
-
-        /* 4. MOCK MODEL E INIEZIONE */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods(['checkAllowedFields']);
-        
-        $model = 
-            $builderModel->getMock();
-            
-        $model->method('checkAllowedFields')->willReturnArgument(0);
-
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 5. ESECUZIONE */
-        $posts = 
-            ['code' => '123456'];
-            
-        $result = 
-            $model->verify(
-                $posts, 
-                $mockRequest
-            );
-
-        /* 6. ASSERZIONE */
-        $expected = 
-            false;
-            
-        $actual = 
-            $result['result'];
-            
-        $this->assertEquals(
-            $expected, 
-            $actual
-        );
-
-        \CodeIgniter\Config\Services::reset();
-    }
-
-    public function testVerifyFailsOnWrongEmailCode(): void
-    {
-        /* 1. MOCK SESSION E REQUEST */
-        $builderSession = 
-            $this->getMockBuilder(\CodeIgniter\Session\Session::class);
-            
-        $builderSession->disableOriginalConstructor();
-        
-        $mockSession = 
-            $builderSession->getMock();
-            
-        $sessData = 
-            [
-                'admin_uuid' => '123-abc',
-                'method'     => 'email',
-                'rememberMe' => false
-            ];
-            
-        $mockSession->method('get')->willReturn(
-            $sessData
-        );
-        
-        \CodeIgniter\Config\Services::injectMock(
-            'session', 
-            $mockSession
-        );
-
-        $builderReq = 
-            $this->getMockBuilder(\CodeIgniter\HTTP\IncomingRequest::class);
-            
-        $builderReq->disableOriginalConstructor();
-        
-        $mockRequest = 
-            $builderReq->getMock();
-            
-        $mockRequest->method('getIPAddress')->willReturn('127.0.0.1');
-
-        /* 2. MOCK CONFIG */
-        $configArr = 
-            [
-                'twoFactorTime'  => 900,
-                'twoFactorLimit' => 3
-            ];
-            
-        $mockConfig = 
-            (object) $configArr;
-
-        /* 3. MOCK DB CON CODICE ERRATO */
-        $adminArr = 
-            ['firstname' => 'Mario', 'lastname' => 'Rossi'];
-            
-        $mockAdmin = 
-            (object) $adminArr;
-
-        $countArr = 
-            ['cnt' => 0];
-            
-        $mockCount = 
-            (object) $countArr;
-
-        $mockCode = 
-            null; /* Simuliamo codice inesistente */
-
-        $builderQuery = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseResult::class);
-            
-        $builderQuery->disableOriginalConstructor();
-        
-        $mockQuery = 
-            $builderQuery->getMock();
-
-        $mockQuery->method('getRow')->willReturnOnConsecutiveCalls(
-            $mockAdmin, 
-            $mockCount, 
-            $mockCode
-        );
-
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        $mockDb->method('query')->willReturn(
-            $mockQuery
-        );
-        
-        $mockDb->method('transBegin')->willReturn(true);
-        
-        $mockDb->method('transCommit')->willReturn(true);
-
-        /* 4. MOCK MODEL */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods(['checkAllowedFields']);
-        
-        $model = 
-            $builderModel->getMock();
-            
-        $model->method('checkAllowedFields')->willReturnArgument(0);
-
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 5. ESECUZIONE */
-        $posts = 
-            ['code' => '999999'];
-            
-        $result = 
-            $model->verify(
-                $posts, 
-                $mockRequest
-            );
-
-        /* 6. ASSERZIONE */
-        $expected = 
-            false;
-            
-        $actual = 
-            $result['result'];
-            
-        $this->assertEquals(
-            $expected, 
-            $actual
-        );
-
-        \CodeIgniter\Config\Services::reset();
-    }
-
-    public function testVerifyFailsOnExpiredEmailCode(): void
-    {
-        /* 1. MOCK SESSION E REQUEST */
-        $builderSession = 
-            $this->getMockBuilder(\CodeIgniter\Session\Session::class);
-            
-        $builderSession->disableOriginalConstructor();
-        
-        $mockSession = 
-            $builderSession->getMock();
-            
-        $sessData = 
-            [
-                'admin_uuid' => '123-abc',
-                'method'     => 'email',
-                'rememberMe' => false
-            ];
-            
-        $mockSession->method('get')->willReturn(
-            $sessData
-        );
-        
-        \CodeIgniter\Config\Services::injectMock(
-            'session', 
-            $mockSession
-        );
-
-        $builderReq = 
-            $this->getMockBuilder(\CodeIgniter\HTTP\IncomingRequest::class);
-            
-        $builderReq->disableOriginalConstructor();
-        
-        $mockRequest = 
-            $builderReq->getMock();
-            
-        $mockRequest->method('getIPAddress')->willReturn('127.0.0.1');
-
-        /* 2. MOCK CONFIG */
-        $configArr = 
-            [
-                'twoFactorTime'  => 900,
-                'twoFactorLimit' => 3
-            ];
-            
-        $mockConfig = 
-            (object) $configArr;
-
-        /* 3. MOCK DB CON CODICE SCADUTO */
-        $adminArr = 
-            ['firstname' => 'Mario', 'lastname' => 'Rossi'];
-            
-        $mockAdmin = 
-            (object) $adminArr;
-
-        $countArr = 
-            ['cnt' => 0];
-            
-        $mockCount = 
-            (object) $countArr;
-
-        $pastDate = 
-            date('Y-m-d H:i:s', strtotime('-1 hour'));
-            
-        $codeArr = 
-            ['expires_at' => $pastDate];
-            
-        $mockCode = 
-            (object) $codeArr;
-
-        $builderQuery = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseResult::class);
-            
-        $builderQuery->disableOriginalConstructor();
-        
-        $mockQuery = 
-            $builderQuery->getMock();
-
-        $mockQuery->method('getRow')->willReturnOnConsecutiveCalls(
-            $mockAdmin, 
-            $mockCount, 
-            $mockCode
-        );
-
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        $mockDb->method('query')->willReturn(
-            $mockQuery
-        );
-        
-        $mockDb->method('transBegin')->willReturn(true);
-        
-        $mockDb->method('transCommit')->willReturn(true);
-
-        /* 4. MOCK MODEL */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods(['checkAllowedFields']);
-        
-        $model = 
-            $builderModel->getMock();
-            
-        $model->method('checkAllowedFields')->willReturnArgument(0);
-
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 5. ESECUZIONE */
-        $posts = 
-            ['code' => '123456'];
-            
-        $result = 
-            $model->verify(
-                $posts, 
-                $mockRequest
-            );
-
-        /* 6. ASSERZIONE */
-        $expected = 
-            false;
-            
-        $actual = 
-            $result['result'];
-            
-        $this->assertEquals(
-            $expected, 
-            $actual
-        );
-
-        \CodeIgniter\Config\Services::reset();
-    }
-
-    public function testVerifySuccessEmailCode(): void
-    {
-        /* 1. MOCK SESSION, REQUEST E USER AGENT */
-        $builderSession = 
-            $this->getMockBuilder(\CodeIgniter\Session\Session::class);
-            
-        $builderSession->disableOriginalConstructor();
-        
-        $mockSession = 
-            $builderSession->getMock();
-            
-        $sessData = 
-            [
-                'admin_uuid' => '123-abc',
-                'method'     => 'email',
-                'rememberMe' => false
-            ];
-            
-        $mockSession->method('get')->willReturn(
-            $sessData
-        );
-        
-        \CodeIgniter\Config\Services::injectMock(
-            'session', 
-            $mockSession
-        );
-
-        /* Mock dello User Agent (richiesto da innerLogin) */
-        $builderUA = 
-            $this->getMockBuilder(\CodeIgniter\HTTP\UserAgent::class);
-            
-        $builderUA->disableOriginalConstructor();
-        
-        $mockUA = 
-            $builderUA->getMock();
-            
-        $mockUA->method('getAgentString')->willReturn('TestAgent');
-
-        $builderReq = 
-            $this->getMockBuilder(\CodeIgniter\HTTP\IncomingRequest::class);
-            
-        $builderReq->disableOriginalConstructor();
-        
-        $mockRequest = 
-            $builderReq->getMock();
-            
-        $mockRequest->method('getIPAddress')->willReturn('127.0.0.1');
-        
-        $mockRequest->method('getUserAgent')->willReturn(
-            $mockUA
-        );
-
-        /* 2. MOCK CONFIG (Inclusi i parametri richiesti da innerLogin) */
-        $configArr = 
-            [
-                'twoFactorTime'  => 900,
-                'twoFactorLimit' => 3,
-                'hashKey'        => 'secret123',
-                'sessionTime'    => 7200
-            ];
-            
-        $mockConfig = 
-            (object) $configArr;
-
-        /* 3. MOCK DB CON CODICE VALIDO */
-        $adminArr = 
-            [
-                'uuid'      => '123-abc',
-                'firstname' => 'Mario',
-                'lastname'  => 'Rossi',
-                'email'     => 'mario@test.com'
-            ];
-            
-        $mockAdmin = 
-            (object) $adminArr;
-
-        $countArr = 
-            ['cnt' => 0];
-            
-        $mockCount = 
-            (object) $countArr;
-
-        $futureDate = 
-            date('Y-m-d H:i:s', strtotime('+1 hour'));
-            
-        $codeArr = 
-            ['expires_at' => $futureDate];
-            
-        $mockCode = 
-            (object) $codeArr;
-
-        $builderQuery = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseResult::class);
-            
-        $builderQuery->disableOriginalConstructor();
-        
-        $mockQuery = 
-            $builderQuery->getMock();
-
-        /* getRow() gestirà in sequenza: utente, conteggio tentativi, verifica codice */
-        $mockQuery->method('getRow')->willReturnOnConsecutiveCalls(
-            $mockAdmin, 
-            $mockCount, 
-            $mockCode
-        );
-
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        $mockDb->method('query')->willReturn(
-            $mockQuery
-        );
-        
-        $mockDb->method('transBegin')->willReturn(true);
-        
-        $mockDb->method('transCommit')->willReturn(true);
-        
-        $mockDb->method('transStatus')->willReturn(true);
-
-        /* 4. MOCK MODEL (Senza mockare innerLogin, lasciamo che esegua!) */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods(['checkAllowedFields']);
-        
-        $model = 
-            $builderModel->getMock();
-            
-        $model->method('checkAllowedFields')->willReturnArgument(0);
-
-        $injector = 
-            function() use (
-                $mockDb, 
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 5. ESECUZIONE */
-        $posts = 
-            ['code' => '123456'];
-            
-        $result = 
-            $model->verify(
-                $posts, 
-                $mockRequest
-            );
-
-        /* 6. ASSERZIONE */
-        $expected = 
-            true;
-            
-        $actual = 
-            $result['result'];
-            
-        $this->assertEquals(
-            $expected, 
-            $actual
-        );
-
-        \CodeIgniter\Config\Services::reset();
-    }
-
-    public function testLogoutBySessionDoesNothingWhenNoSession(): void
-    {
-        /* 1. MOCK SESSION (Simula sessione inesistente) */
-        $builderSession = 
-            $this->getMockBuilder(\CodeIgniter\Session\Session::class);
-            
-        $builderSession->disableOriginalConstructor();
-        
-        $mockSession = 
-            $builderSession->getMock();
-            
-        $mockSession
-            ->expects(
-                $this->once()
-            )
-            ->method('has')
-            ->with('backendSession')
-            ->willReturn(false);
-
-        $mockSession
-            ->expects(
-                $this->never()
-            )
-            ->method('remove');
-
-        $mockSession
-            ->expects(
-                $this->never()
-            )
-            ->method('regenerate');
-        
-        \CodeIgniter\Config\Services::injectMock(
-            'session', 
-            $mockSession
-        );
-
-        /* 2. MOCK MODEL */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods([]);
-        
-        $model = 
-            $builderModel->getMock();
-
-        /* 3. ESECUZIONE */
-        $model->logoutBySession();
-
-        /* 4. PULIZIA */
-        \CodeIgniter\Config\Services::reset();
-    }
-
-    public function testLogoutBySessionDeletesTokenWhenNoLogId(): void
-    {
-        /* 1. MOCK SESSION (Ha il token, ma manca il login_log_id) */
-        $builderSession = 
-            $this->getMockBuilder(\CodeIgniter\Session\Session::class);
-            
-        $builderSession->disableOriginalConstructor();
-        
-        $mockSession = 
-            $builderSession->getMock();
-            
-        $mockSession->method('has')->willReturnMap([
-            ['backendSession', true],
-            ['login_log_id', false]
-        ]);
-        
-        $fakeSessionVal = 
-            'fake_session_string';
-            
-        $mockSession->method('get')->willReturn(
-            $fakeSessionVal
-        );
-        
-        $mockSession
-            ->expects(
-                $this->once()
-            )
-            ->method('remove')
-            ->with('backendSession')
-            ->willReturn(true);
-        
-        $mockSession
-            ->expects(
-                $this->once()
-            )
-            ->method('regenerate')
-            ->with(true)
-            ->willReturn(true);
-        
-        \CodeIgniter\Config\Services::injectMock(
-            'session', 
-            $mockSession
-        );
-
-        /* 2. MOCK DB CON SUCCESSO (Solo query di delete) */
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        $mockDb
-            ->expects(
-                $this->once()
-            )
-            ->method('query')
-            ->with(
-                'delete from admins_tokens where token_hash = ? and token_type = ?',
-                $this->callback(
-                    static fn(array $params): bool => count($params) === 2 && $params[1] === 'session'
-                )
-            )
-            ->willReturn(true);
-
-        /* 3. MOCK MODEL E INIEZIONE */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods([]);
-        
-        $model = 
-            $builderModel->getMock();
-            
-        $mockConfig = 
-            (object) ['hashKey' => 'secret_key'];
-
-        $injector = 
-            function() use (
-                $mockDb,
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 4. ESECUZIONE */
-        $model->logoutBySession();
-
-        /* 5. PULIZIA */
-        \CodeIgniter\Config\Services::reset();
-    }
-
-    public function testLogoutBySessionUpdatesLogAndDeletesTokenOnSuccess(): void
-    {
-        /* 1. MOCK SESSION (Tutto presente) */
-        $builderSession = 
-            $this->getMockBuilder(\CodeIgniter\Session\Session::class);
-            
-        $builderSession->disableOriginalConstructor();
-        
-        $mockSession = 
-            $builderSession->getMock();
-            
-        $mockSession->method('has')->willReturn(true);
-        
-        $fakeSessionVal = 
-            'fake_session_string';
-            
-        $mockSession->method('get')->willReturnMap([
-            ['backendSession', $fakeSessionVal],
-            ['login_log_id', 99]
-        ]);
-        
-        $removedSessionKeys = [];
-
-        $mockSession
-            ->expects(
-                $this->exactly(2)
-            )
-            ->method('remove')
-            ->willReturnCallback(
-                static function(string $key) use (&$removedSessionKeys): bool {
-                    $removedSessionKeys[] = $key;
-                    return true;
-                }
-            );
-        
-        $mockSession
-            ->expects(
-                $this->once()
-            )
-            ->method('regenerate')
-            ->with(true)
-            ->willReturn(true);
-        
-        \CodeIgniter\Config\Services::injectMock(
-            'session', 
-            $mockSession
-        );
-
-        /* 2. MOCK DB (Simula le select del log e del token) */
-        $builderQuery = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseResult::class);
-            
-        $builderQuery->disableOriginalConstructor();
-        
-        $mockQuery = 
-            $builderQuery->getMock();
-            
-        $fakeLogRow = 
-            (object) ['logout_reason' => null];
-            
-        $fakeTokenRow = 
-            (object) ['last_activity' => '2026-09-27 18:00:00'];
-            
-        $mockQuery->method('getRow')->willReturnOnConsecutiveCalls(
-            $fakeLogRow,
-            $fakeTokenRow
-        );
-
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
         $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->exactly(4))->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
 
-        $mockDb
-            ->expects(
-                $this->exactly(4)
-            )
-            ->method('query')
-            ->willReturnCallback(
-                static function(string $sql, array $params) use (&$queries, $mockQuery) {
-                    $queries[] = [$sql, $params];
-                    return $mockQuery;
-                }
-            );
+            if (str_contains($sql, 'as identifier_attempts')):
+                return $this->dbResult((object) ['identifier_attempts' => 0, 'ip_attempts' => 0]);
+            endif;
 
-        /* 3. MOCK MODEL E INIEZIONE */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods([]);
-        
-        $model = 
-            $builderModel->getMock();
-            
-        $mockConfig = 
-            (object) ['hashKey' => 'secret_key'];
+            if (str_contains($sql, 'select uuid, firstname, lastname, email, password_hash from admins')):
+                return $this->dbResult(null);
+            endif;
 
-        $injector = 
-            function() use (
-                $mockDb,
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
+            return true;
+        });
+        $db->expects($this->once())->method('transBegin')->willReturn(true);
+        $db->expects($this->once())->method('transCommit')->willReturn(true);
 
-        /* 4. ESECUZIONE (Passiamo timeout per coprire la condizione specifica) */
-        $reason = 
-            'timeout';
-            
-        $model->logoutBySession(
-            $reason
-        );
+        $result = $this->createModel($db)->login(['email' => self::EMAIL, 'password' => self::PASSWORD], $this->request());
 
-        /* 5. ASSERZIONI */
-        $this->assertSame(
-            [
-                'select logout_reason from admins_logs where id = ?',
-                'select last_activity from admins_tokens where token_hash = ? and token_type = ?',
-                'update admins_logs set logout = ?, logout_reason = ? where id = ?',
-                'delete from admins_tokens where token_hash = ? and token_type = ?'
-            ],
-            array_column($queries, 0)
-        );
-
-        $this->assertSame(['login_log_id', 'backendSession'], $removedSessionKeys);
-        $this->assertSame('timeout', $queries[2][1][1]);
-        $this->assertSame(99, $queries[2][1][2]);
-        $this->assertSame('session', $queries[3][1][1]);
-        
-        /* 6. PULIZIA */
-        \CodeIgniter\Config\Services::reset();
+        $this->assertSame(['result' => false, 'message' => lang('backend/auth.messages.loginFailed')], $result);
+        $attempt = $this->findQuery($queries, 'insert into admins_attempts');
+        $this->assertNull($attempt[1][0]);
+        $this->assertSame(hash_hmac('sha256', self::EMAIL, $this->defaultConfig['hashKey']), $attempt[1][1]);
+        $this->assertSame(self::IP, $attempt[1][2]);
     }
 
-    public function testLogoutBySessionCatchesException(): void
+    public function testLoginThrottlingRenewsIdentifierWindowAndRejectsAccess(): void
     {
-        /* 1. MOCK SESSION CHE LANCIA ECCEZIONE FORZATA */
-        $builderSession = 
-            $this->getMockBuilder(\CodeIgniter\Session\Session::class);
-            
-        $builderSession->disableOriginalConstructor();
-        
-        $mockSession = 
-            $builderSession->getMock();
-            
-        $exception = 
-            new \Exception('Session Crash Simulation');
-            
-        $mockSession
-            ->expects(
-                $this->once()
-            )
-            ->method('has')
-            ->with('backendSession')
-            ->willThrowException(
-                $exception
-            );
-        
-        \CodeIgniter\Config\Services::injectMock(
-            'session', 
-            $mockSession
-        );
-
-        /* 2. MOCK MODEL */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods([]);
-        
-        $model = 
-            $builderModel->getMock();
-
-        /* 3. ESECUZIONE */
-        $model->logoutBySession();
-
-        /* 4. PULIZIA */
-        \CodeIgniter\Config\Services::reset();
-    }
-
-    public function testLogoutByCookieDeletesTokenWhenNoLogId(): void
-    {
-        /* 1. MOCK SESSION (Simuliamo l'assenza del login_log_id) */
-        $builderSession = 
-            $this->getMockBuilder(\CodeIgniter\Session\Session::class);
-            
-        $builderSession->disableOriginalConstructor();
-        
-        $mockSession = 
-            $builderSession->getMock();
-            
-        $mockSession
-            ->expects(
-                $this->once()
-            )
-            ->method('has')
-            ->with('login_log_id')
-            ->willReturn(false);
-        
-        \CodeIgniter\Config\Services::injectMock(
-            'session', 
-            $mockSession
-        );
-
-        /* 2. MOCK DB CON SUCCESSO (Verrà eseguita solo la query di delete) */
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        $mockDb
-            ->expects(
-                $this->once()
-            )
-            ->method('query')
-            ->with(
-                'delete from admins_tokens where token_hash = ? and token_type = ?',
-                $this->callback(
-                    static fn(array $params): bool => count($params) === 2 && $params[1] === 'cookie'
-                )
-            )
-            ->willReturn(true);
-
-        /* 3. MOCK MODEL E INIEZIONE */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods([]);
-        
-        $model = 
-            $builderModel->getMock();
-            
-        $mockConfig = 
-            (object) ['hashKey' => 'secret_key'];
-
-        $injector = 
-            function() use (
-                $mockDb,
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
-
-        /* 4. ESECUZIONE */
-        $cookieValue = 
-            'fake_cookie_string';
-            
-        $model->logoutByCookie(
-            $cookieValue
-        );
-
-        /* 5. PULIZIA */
-        \CodeIgniter\Config\Services::reset();
-    }
-
-    public function testLogoutByCookieUpdatesLogAndDeletesToken(): void
-    {
-        /* 1. MOCK SESSION (Simuliamo la presenza del login_log_id) */
-        $builderSession = 
-            $this->getMockBuilder(\CodeIgniter\Session\Session::class);
-            
-        $builderSession->disableOriginalConstructor();
-        
-        $mockSession = 
-            $builderSession->getMock();
-            
-        $mockSession->method('has')->willReturn(true);
-        
-        $fakeLogId = 
-            99;
-            
-        $mockSession->method('get')->willReturn(
-            $fakeLogId
-        );
-        
-        $mockSession
-            ->expects(
-                $this->once()
-            )
-            ->method('remove')
-            ->with('login_log_id')
-            ->willReturn(true);
-        
-        \CodeIgniter\Config\Services::injectMock(
-            'session', 
-            $mockSession
-        );
-
-        /* 2. MOCK DB (Simula le select e le update) */
-        $builderQuery = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseResult::class);
-            
-        $builderQuery->disableOriginalConstructor();
-        
-        $mockQuery = 
-            $builderQuery->getMock();
-            
-        $fakeLogRow = 
-            (object) ['logout_reason' => null];
-            
-        $fakeTokenRow = 
-            (object) ['last_activity' => '2026-09-27 18:00:00'];
-            
-        $mockQuery->method('getRow')->willReturnOnConsecutiveCalls(
-            $fakeLogRow,
-            $fakeTokenRow
-        );
-
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
         $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->exactly(3))->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
 
-        $mockDb
-            ->expects(
-                $this->exactly(4)
-            )
-            ->method('query')
-            ->willReturnCallback(
-                static function(string $sql, array $params) use (&$queries, $mockQuery) {
-                    $queries[] = [$sql, $params];
-                    return $mockQuery;
-                }
-            );
+            if (str_contains($sql, 'as identifier_attempts')):
+                return $this->dbResult((object) ['identifier_attempts' => 5, 'ip_attempts' => 1]);
+            endif;
 
-        /* 3. MOCK MODEL E INIEZIONE */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods([]);
-        
-        $model = 
-            $builderModel->getMock();
-            
-        $mockConfig = 
-            (object) ['hashKey' => 'secret_key'];
+            return true;
+        });
+        $db->expects($this->once())->method('transBegin')->willReturn(true);
+        $db->expects($this->once())->method('transCommit')->willReturn(true);
 
-        $injector = 
-            function() use (
-                $mockDb,
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
+        $result = $this->createModel($db)->login(['email' => self::EMAIL, 'password' => self::PASSWORD], $this->request());
 
-        /* 4. ESECUZIONE */
-        $cookieValue = 
-            'fake_cookie_string';
-            
-        $reason = 
-            'timeout';
-            
-        $model->logoutByCookie(
-            $cookieValue, 
-            $reason
-        );
-
-        /* 5. ASSERZIONI */
-        $this->assertSame(
-            [
-                'select logout_reason from admins_logs where id = ?',
-                'select last_activity from admins_tokens where token_hash = ? and token_type = ?',
-                'update admins_logs set logout = ?, logout_reason = ? where id = ?',
-                'delete from admins_tokens where token_hash = ? and token_type = ?'
-            ],
-            array_column($queries, 0)
-        );
-
-        $this->assertSame('timeout', $queries[2][1][1]);
-        $this->assertSame(99, $queries[2][1][2]);
-        $this->assertSame('cookie', $queries[3][1][1]);
-        
-        /* 6. PULIZIA */
-        \CodeIgniter\Config\Services::reset();
+        $this->assertSame(['result' => false, 'message' => lang('backend/auth.messages.tooManyAttempts')], $result);
+        $this->assertTrue($this->queriesContain($queries, 'update admins_attempts set timestamp = ? where timestamp > ? and email_hash = ?'));
     }
 
-    public function testLogoutByCookieCatchesException(): void
+    public function testLoginThrottlingAlsoBlocksIpWideCredentialSpraying(): void
     {
-        /* 1. MOCK SESSION */
-        $builderSession = 
-            $this->getMockBuilder(\CodeIgniter\Session\Session::class);
-            
-        $builderSession->disableOriginalConstructor();
-        
-        $mockSession = 
-            $builderSession->getMock();
-            
-        $mockSession->method('has')->willReturn(false);
-        
-        \CodeIgniter\Config\Services::injectMock(
-            'session', 
-            $mockSession
-        );
+        $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->exactly(3))->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
 
-        /* 2. MOCK DB CHE LANCIA ECCEZIONE FORZATA */
-        $builderDb = 
-            $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class);
-            
-        $builderDb->disableOriginalConstructor();
-        
-        $mockDb = 
-            $builderDb->getMock();
-            
-        $exception = 
-            new \Exception('Simulated DB Crash');
-            
-        $mockDb
-            ->expects(
-                $this->once()
-            )
-            ->method('query')
-            ->willThrowException(
-                $exception
-            );
+            if (str_contains($sql, 'as identifier_attempts')):
+                return $this->dbResult((object) ['identifier_attempts' => 1, 'ip_attempts' => 100]);
+            endif;
 
-        /* 3. MOCK MODEL E INIEZIONE */
-        $builderModel = 
-            $this->getMockBuilder(\App\Models\Backend\AuthModel::class);
-            
-        $builderModel->disableOriginalConstructor();
-        
-        $builderModel->onlyMethods([]);
-        
-        $model = 
-            $builderModel->getMock();
-            
-        $mockConfig = 
-            (object) ['hashKey' => 'secret_key'];
+            return true;
+        });
+        $db->expects($this->once())->method('transBegin')->willReturn(true);
+        $db->expects($this->once())->method('transCommit')->willReturn(true);
 
-        $injector = 
-            function() use (
-                $mockDb,
-                $mockConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-                    
-                $this->config = 
-                    $mockConfig;
-            };
-            
-        $boundInjector = 
-            \Closure::bind(
-                $injector, 
-                $model, 
-                \App\Models\Backend\AuthModel::class
-            );
-            
-        $boundInjector();
+        $result = $this->createModel($db)->login(['email' => self::EMAIL, 'password' => self::PASSWORD], $this->request());
 
-        /* 4. ESECUZIONE E ASSERZIONE */
-        $cookieValue = 
-            'fake_cookie_string';
-            
-        $model->logoutByCookie(
-            $cookieValue
-        );
-
-        /* 5. PULIZIA */
-        \CodeIgniter\Config\Services::reset();
+        $this->assertSame(['result' => false, 'message' => lang('backend/auth.messages.tooManyAttempts')], $result);
+        $this->assertFalse($this->queriesContain($queries, 'select uuid, firstname, lastname, email, password_hash from admins'));
+        $this->assertTrue($this->queriesContain($queries, 'update admins_attempts set timestamp = ? where timestamp > ? and ip_address = ?'));
     }
 
-    public function testInitModelIsCalledAndSetsConfig(): void
+    public function testLoginThrottlingRenewsBothWindowsWhenBothLimitsAreReached(): void
     {
-        $model = 
-            new \App\Models\Backend\AuthModel();
+        $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->exactly(3))->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
 
-        $invoker = 
-            function () {
-                $this->initModel();
-                
-                return $this->config;
-            };
+            if (str_contains($sql, 'as identifier_attempts')):
+                return $this->dbResult((object) ['identifier_attempts' => 5, 'ip_attempts' => 100]);
+            endif;
 
-        $bind = 
-            \Closure::bind(
-                $invoker,
-                $model,
-                \App\Models\Backend\AuthModel::class
-            );
+            return true;
+        });
+        $db->expects($this->once())->method('transBegin')->willReturn(true);
+        $db->expects($this->once())->method('transCommit')->willReturn(true);
 
-        $config = 
-            $bind();
+        $result = $this->createModel($db)->login(['email' => self::EMAIL, 'password' => self::PASSWORD], $this->request());
 
-        $this->assertNotNull(
-            $config
-        );
+        $this->assertSame(['result' => false, 'message' => lang('backend/auth.messages.tooManyAttempts')], $result);
+        $this->assertTrue($this->queriesContain($queries, 'update admins_attempts set timestamp = ? where timestamp > ? and (email_hash = ? or ip_address = ?)'));
     }
 
-    public function testValidateLoginRulesReturnsCorrectArray(): void
+    public function testLoginWrongPasswordRecordsAttemptInsideTransaction(): void
     {
-        $model = 
-            new \App\Models\Backend\AuthModel();
+        $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
 
-        $fakeConfig = 
-            (object)['passwordRegex' => '/.*/'];
+            if (str_contains($sql, 'as identifier_attempts')):
+                return $this->dbResult((object) ['identifier_attempts' => 0, 'ip_attempts' => 0]);
+            endif;
 
-        $injector = 
-            function () use (
-                $fakeConfig
-            ) {
-                $this->config = 
-                    $fakeConfig;
-            };
+            if (str_contains($sql, 'select uuid, firstname, lastname, email, password_hash from admins')):
+                return $this->dbResult($this->admin(['password_hash' => password_hash('different', PASSWORD_DEFAULT)]));
+            endif;
 
-        $bind = 
-            \Closure::bind(
-                $injector,
-                $model,
-                \App\Models\Backend\AuthModel::class
-            );
+            return true;
+        });
+        $db->expects($this->once())->method('transBegin')->willReturn(true);
+        $db->expects($this->once())->method('transCommit')->willReturn(true);
 
-        $bind();
+        $result = $this->createModel($db)->login(['email' => self::EMAIL, 'password' => self::PASSWORD], $this->request());
 
-        $rules = 
-            $model->validateLoginRules();
-
-        $this->assertIsArray(
-            $rules
-        );
-
-        $this->assertArrayHasKey(
-            'email',
-            $rules
-        );
-
-        $this->assertArrayHasKey(
-            'password',
-            $rules
-        );
+        $this->assertFalse($result['result']);
+        $this->assertTrue($this->queriesContain($queries, 'delete from admins_attempts where timestamp <= ?'));
+        $this->assertTrue($this->queriesContain($queries, 'insert into admins_attempts'));
+        $attempt = $this->findQuery($queries, 'insert into admins_attempts');
+        $this->assertSame(self::UUID, $attempt[1][0]);
+        $this->assertSame(hash_hmac('sha256', self::EMAIL, $this->defaultConfig['hashKey']), $attempt[1][1]);
+        $this->assertSame(self::IP, $attempt[1][2]);
     }
 
-    public function testValidateResetPasswordRulesReturnsCorrectArray(): void
+    public function testLoginWrongPasswordDoesNotWriteAttemptWhenAttemptsAreDisabled(): void
     {
-        $model = 
-            new \App\Models\Backend\AuthModel();
+        $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
 
-        $rules = 
-            $model->validateResetPasswordRules();
+            if (str_contains($sql, 'select uuid, firstname, lastname, email, password_hash from admins')):
+                return $this->dbResult($this->admin(['password_hash' => password_hash('different', PASSWORD_DEFAULT)]));
+            endif;
 
-        $this->assertIsArray(
-            $rules
-        );
+            return true;
+        });
+        $db->expects($this->never())->method('transBegin');
+        $db->expects($this->never())->method('transCommit');
 
-        $this->assertArrayHasKey(
-            'email',
-            $rules
-        );
+        $result = $this->createModel($db, ['attempts' => false])->login(['email' => self::EMAIL, 'password' => self::PASSWORD], $this->request());
 
-        $emailConfig = 
-            $rules['email'];
-
-        $emailRulesList = 
-            $emailConfig['rules'];
-
-        $this->assertContains(
-            'valid_email',
-            $emailRulesList
-        );
+        $this->assertFalse($result['result']);
+        $this->assertFalse($this->queriesContain($queries, 'insert into admins_attempts'));
     }
 
-    public function testValidateSetPasswordRulesReturnsCorrectArray(): void
+    public function testLoginWithTotpTwoFactorStoresOnlyPendingServerSessionAndDoesNotCreateLoginToken(): void
     {
-        $model = 
-            new \App\Models\Backend\AuthModel();
+        $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
 
-        $fakeConfig = 
-            (object)['passwordRegex' => '/.*/'];
+            if (str_contains($sql, 'as identifier_attempts')):
+                return $this->dbResult((object) ['identifier_attempts' => 0, 'ip_attempts' => 0]);
+            endif;
 
-        $injector = 
-            function () use (
-                $fakeConfig
-            ) {
-                $this->config = 
-                    $fakeConfig;
-            };
+            if (str_contains($sql, 'select uuid, firstname, lastname, email, password_hash from admins')):
+                return $this->dbResult($this->admin());
+            endif;
 
-        $bind = 
-            \Closure::bind(
-                $injector,
-                $model,
-                \App\Models\Backend\AuthModel::class
-            );
+            if (str_contains($sql, 'select method from admins_2fa')):
+                return $this->dbResult((object) ['method' => 'totp']);
+            endif;
 
-        $bind();
+            return true;
+        });
+        $db->expects($this->never())->method('transBegin');
 
-        $rules = 
-            $model->validateSetPasswordRules();
+        $result = $this->createModel($db, ['twoFactor' => true])->login(['email' => self::EMAIL, 'password' => self::PASSWORD, 'rememberMe' => true], $this->request());
 
-        $this->assertIsArray(
-            $rules
-        );
-
-        $this->assertArrayHasKey(
-            'password',
-            $rules
-        );
-
-        $this->assertArrayHasKey(
-            'confirmPassword',
-            $rules
-        );
-
-        $this->assertArrayHasKey(
-            'token',
-            $rules
-        );
+        $this->assertSame(['result' => '2fa_required', 'method' => 'totp'], $result);
+        $pending = session()->get('auth_2fa_pending');
+        $this->assertSame(self::UUID, $pending['admin_uuid']);
+        $this->assertTrue($pending['rememberMe']);
+        $this->assertSame('totp', $pending['method']);
+        $this->assertIsInt($pending['created_at']);
+        $this->assertSame(base_url('backend/dashboard'), $pending['redirect']);
+        $this->assertNull(session()->get('backendSession'));
+        $this->assertTrue($this->queriesContain($queries, 'delete from admins_attempts'));
+        $this->assertTrue($this->queriesContain($queries, 'delete from admins_2fa_codes'));
+        $this->assertFalse($this->queriesContain($queries, 'insert into admins_tokens'));
     }
 
-    public function testValidateVerifyRulesReturnsCorrectArray(): void
+    public function testLoginSuccessfulSessionCreatesTokenAndLogAndClearsAttempts(): void
     {
-        $model = 
-            new \App\Models\Backend\AuthModel();
-
-        $rules = 
-            $model->validateVerifyRules();
-
-        $this->assertIsArray(
-            $rules
-        );
-
-        $this->assertArrayHasKey(
-            'code',
-            $rules
-        );
-
-        $codeConfig = 
-            $rules['code'];
-
-        $codeRulesList = 
-            $codeConfig['rules'];
-
-        $this->assertContains(
-            'exact_length[6]',
-            $codeRulesList
-        );
-    }
-
-    public function testLoginFailsIfAdminNotFound(): void
-    {
-        $model = 
-            new \App\Models\Backend\AuthModel();
-
-        $mockDb = 
-            $this->createMock(\CodeIgniter\Database\BaseConnection::class);
-
-        $mockResultAdmin = 
-            $this->createMock(\CodeIgniter\Database\BaseResult::class);
-
-        $mockResultAdmin->method('getRow')
-                        ->willReturn(null);
-
-        $mockDb->method('query')
-               ->willReturn(
-                   $mockResultAdmin
-               );
-
-        $fakeConfig = 
-            (object)[
-                'attempts' => 1,
-                'twoFactor' => 0,
-                'attemptsInterval' => 900
-            ];
-
-        $injector = 
-            function () use (
-                $mockDb,
-                $fakeConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-
-                $this->config = 
-                    $fakeConfig;
-
-                $this->loginAllowedFields = 
-                    ['email', 'password', 'rememberMe'];
-            };
-
-        $bind = 
-            \Closure::bind(
-                $injector,
-                $model,
-                \App\Models\Backend\AuthModel::class
-            );
-
-        $bind();
-
-        $posts = 
-            [
-                'email' => 'test@test.com', 
-                'password' => 'secret'
-            ];
-
-        $request = 
-            $this->createMock(\CodeIgniter\HTTP\IncomingRequest::class);
-
-        $request->method('getIPAddress')
-                ->willReturn('127.0.0.1');
-
-        $result = 
-            $model->login(
-                $posts,
-                $request
-            );
-
-        $isResultFalse = 
-            $result['result'];
-
-        $this->assertFalse(
-            $isResultFalse
-        );
-    }
-
-    public function testLoginFailsIfPasswordWrongAndInsertsAttempt(): void
-    {
-        $model = 
-            new \App\Models\Backend\AuthModel();
-
-        $mockDb = 
-            $this->createMock(\CodeIgniter\Database\BaseConnection::class);
-
-        $mockResultAdmin = 
-            $this->createMock(\CodeIgniter\Database\BaseResult::class);
-
-        $fakeHash = 
-            password_hash('wrong', PASSWORD_DEFAULT);
-
-        $mockRow = 
-            (object)[
-                'uuid' => '1234', 
-                'firstname' => 'Test', 
-                'lastname' => 'User', 
-                'password_hash' => $fakeHash
-            ];
-
-        $mockResultAdmin->method('getRow')
-                        ->willReturn($mockRow);
-
-        $mockDb->method('query')
-               ->willReturn(
-                   $mockResultAdmin
-               );
-
-        $mockDb->method('transBegin')
-               ->willReturn(true);
-
-        $mockDb->method('transCommit')
-               ->willReturn(true);
-
-        $fakeConfig = 
-            (object)[
-                'attempts' => 1,
-                'twoFactor' => 0,
-                'attemptsInterval' => 900
-            ];
-
-        $injector = 
-            function () use (
-                $mockDb,
-                $fakeConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-
-                $this->config = 
-                    $fakeConfig;
-
-                $this->loginAllowedFields = 
-                    ['email', 'password', 'rememberMe'];
-            };
-
-        $bind = 
-            \Closure::bind(
-                $injector,
-                $model,
-                \App\Models\Backend\AuthModel::class
-            );
-
-        $bind();
-
-        $posts = 
-            [
-                'email' => 'test@test.com', 
-                'password' => 'right'
-            ];
-
-        $request = 
-            $this->createMock(\CodeIgniter\HTTP\IncomingRequest::class);
-
-        $request->method('getIPAddress')
-                ->willReturn('127.0.0.1');
-
-        $result = 
-            $model->login(
-                $posts,
-                $request
-            );
-
-        $isResultFalse = 
-            $result['result'];
-
-        $this->assertFalse(
-            $isResultFalse
-        );
-    }
-
-    public function testLoginSucceedsAndDeletesAttempts(): void
-    {
-        $model = 
-            new \App\Models\Backend\AuthModel();
-
-        $mockDb = 
-            $this->createMock(\CodeIgniter\Database\BaseConnection::class);
-
-        $mockResultAdmin = 
-            $this->createMock(\CodeIgniter\Database\BaseResult::class);
-
-        $fakeHash = 
-            password_hash('correct', PASSWORD_DEFAULT);
-
-        $mockRow = 
-            (object)[
-                'uuid' => '1234', 
-                'firstname' => 'Test', 
-                'lastname' => 'User', 
-                'email' => 'test@test.com',
-                'password_hash' => $fakeHash,
-                'times' => 0,
-                'status' => 1,
-                'deleted_at' => null
-            ];
-
-        $mockResultAdmin->method('getRow')
-                        ->willReturn($mockRow);
+        $this->createStatefulSessionMock();
 
         $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
 
-        $mockDb->method('query')
-               ->willReturnCallback(
-                   static function(string $sql, array $params = []) use (&$queries, $mockResultAdmin) {
-                       $queries[] = [$sql, $params];
-                       return $mockResultAdmin;
-                   }
-               );
+            if (str_contains($sql, 'as identifier_attempts')):
+                return $this->dbResult((object) ['identifier_attempts' => 0, 'ip_attempts' => 0]);
+            endif;
 
-        $mockDb->method('insertID')
-               ->willReturnOnConsecutiveCalls(10, 20);
+            if (str_contains($sql, 'select uuid, firstname, lastname, email, password_hash from admins')):
+                return $this->dbResult($this->admin());
+            endif;
 
-        $mockDb->method('transBegin')
-               ->willReturn(true);
+            return true;
+        });
+        $db->method('transBegin')->willReturn(true);
+        $db->method('transStatus')->willReturn(true);
+        $db->method('insertID')->willReturnOnConsecutiveCalls(10, 20);
+        $db->expects($this->exactly(2))->method('transCommit')->willReturn(true);
 
-        $mockDb->method('transCommit')
-               ->willReturn(true);
-
-        $fakeConfig = 
-            (object)[
-                'attempts' => 1,
-                'twoFactor' => 0,
-                'attemptsInterval' => 900,
-                'attemptsLimit' => 5,
-                'sessionTime' => 3600,
-                'hashKey' => 'test_hash_key'
-            ];
-
-        $injector = 
-            function () use (
-                $mockDb,
-                $fakeConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-
-                $this->config = 
-                    $fakeConfig;
-
-                $this->loginAllowedFields = 
-                    ['email', 'password', 'rememberMe'];
-            };
-
-        $bind = 
-            \Closure::bind(
-                $injector,
-                $model,
-                \App\Models\Backend\AuthModel::class
-            );
-
-        $bind();
-
-        $posts = 
-            [
-                'email' => 'test@test.com', 
-                'password' => 'correct'
-            ];
-
-        $request = 
-            $this->createMock(\CodeIgniter\HTTP\IncomingRequest::class);
-
-        $request->method('getIPAddress')
-                ->willReturn('127.0.0.1');
-
-        $userAgent =
-            $this->createMock(\CodeIgniter\HTTP\UserAgent::class);
-
-        $userAgent->method('getAgentString')
-                  ->willReturn('PHPUnit');
-
-        $request->method('getUserAgent')
-                ->willReturn($userAgent);
-
-        $result = 
-            $model->login(
-                $posts,
-                $request
-            );
+        $result = $this->createModel($db)->login(['email' => self::EMAIL, 'password' => self::PASSWORD], $this->request());
 
         $this->assertSame(['result' => true], $result);
-        $this->assertNotEmpty(session()->get('backendSession'));
+        $this->assertIsString(session()->get('backendSession'));
+        $this->assertNotSame('', session()->get('backendSession'));
         $this->assertSame(20, session()->get('login_log_id'));
-        $this->assertContains(
-            'delete from admins_attempts where admin_uuid = ?',
-            array_column($queries, 0)
-        );
+        $this->assertTrue($this->queriesContain($queries, 'delete from admins_attempts'));
+        $this->assertTrue($this->queriesContain($queries, 'update admins_logs as l join admins_tokens as t'));
+        $this->assertTrue($this->queriesContain($queries, 'delete from admins_tokens where admin_uuid = ? and token_type = ?'));
+        $this->assertTrue($this->queriesContain($queries, 'insert into admins_tokens'));
+        $this->assertTrue($this->queriesContain($queries, 'insert into admins_logs'));
     }
 
-    public function testVerifyCatchesExceptionAndRollbacks(): void
+    public function testLoginRememberMeCreatesCookieTokenWithoutServerSessionToken(): void
     {
-        $model = 
-            new \App\Models\Backend\AuthModel();
-
-        $mockDb = 
-            $this->createMock(\CodeIgniter\Database\BaseConnection::class);
-
-        $exception = 
-            new \Exception('Forced crash to test catch block');
-
-        /* La primissima query dell'admin scatenerà questo errore */
-        $mockDb->method('query')
-               ->willThrowException(
-                   $exception
-               );
-
-        /* Asserzione: ci aspettiamo che il rollback venga richiamato esattamente 1 volta */
-        $mockDb->expects(
-                   $this->once()
-               )
-               ->method('transRollback');
-
-        /* Tutte le configurazioni lette prima della query per evitare crash silenti */
-        $fakeConfig = 
-            (object)[
-                'twoFactorTime' => 300,
-                'twoFactorLimit' => 5
-            ];
-
-        $injector = 
-            function () use (
-                $mockDb,
-                $fakeConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-
-                $this->config = 
-                    $fakeConfig;
-
-                $this->verifyAllowedFields = 
-                    ['code'];
-            };
-
-        $bind = 
-            \Closure::bind(
-                $injector,
-                $model,
-                \App\Models\Backend\AuthModel::class
-            );
-
-        $bind();
-
-        /* Iniezione della sessione corretta attesa dal tuo if di sicurezza */
-        session()->set(
-            'auth_2fa_pending', 
-            [
-                'admin_uuid' => '1234',
-                'method' => 'totp',
-                'rememberMe' => false
-            ]
-        );
-
-        $posts = 
-            ['code' => '123456'];
-
-        $request = 
-            $this->createMock(\CodeIgniter\HTTP\IncomingRequest::class);
-
-        $request->method('getIPAddress')
-                ->willReturn('127.0.0.1');
-
-        $result = 
-            $model->verify(
-                $posts,
-                $request
-            );
-
-        $isResultFalse = 
-            $result['result'];
-
-        $this->assertFalse(
-            $isResultFalse
-        );
-    }
-
-    public function testVerifyReturnsSessionExpiredWhenPendingSessionIsMissing(): void
-    {
-        $model = 
-            new \App\Models\Backend\AuthModel();
-
-        $mockDb = 
-            $this->createMock(\CodeIgniter\Database\BaseConnection::class);
-
-        $mockResult = 
-            $this->createMock(\CodeIgniter\Database\BaseResult::class);
-
-        $mockRow = 
-            (object)[
-                'method' => 'totp',
-                'secret' => 'JBSWY3DPEHPK3PXP'
-            ];
-
-        $mockResult->method('getRow')
-                   ->willReturn(
-                       $mockRow
-                   );
-
-        $mockDb->method('query')
-               ->willReturn(
-                   $mockResult
-               );
-
-        $injector = 
-            function () use (
-                $mockDb
-            ) {
-                $this->db = 
-                    $mockDb;
-            };
-
-        $bind = 
-            \Closure::bind(
-                $injector,
-                $model,
-                \App\Models\Backend\AuthModel::class
-            );
-
-        $bind();
-
-        $session = 
-            \Config\Services::session();
-
-        $session->set(
-            'method', 
-            'totp'
-        );
-
-        $session->set(
-            '2fa_method', 
-            'totp'
-        );
-
-        $posts = 
-            ['code' => '123456'];
-
-        $request = 
-            $this->createMock(\CodeIgniter\HTTP\IncomingRequest::class);
-
-        $request->method('getIPAddress')
-                ->willReturn('127.0.0.1');
-
-        $result = 
-            $model->verify(
-                $posts,
-                $request
-            );
-
-        $this->assertSame(
-            [
-                'result' => false,
-                'message' => lang('backend/auth.messages.sessionExpired')
-            ],
-            $result
-        );
-    }
-
-    public function testVerifyTotpRejectsInvalidCodeAndRecordsAttempt(): void
-    {
-        $model = 
-            new \App\Models\Backend\AuthModel();
-
-        $mockDb = 
-            $this->createMock(\CodeIgniter\Database\BaseConnection::class);
-
-        $mockDb->method('transBegin')
-               ->willReturn(true);
-
-        $mockDb->method('transCommit')
-               ->willReturn(true);
-
-        /* Callback intelligente: risponde in base alla query che il model sta eseguendo */
+        $this->createStatefulSessionMock();
+        
         $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
 
-        $queryHandler = 
-            function (
-                $sql
-            ) use (&$queries) {
-                $queries[] = $sql;
+            if (str_contains($sql, 'as identifier_attempts')):
+                return $this->dbResult((object) ['identifier_attempts' => 0, 'ip_attempts' => 0]);
+            endif;
 
-                $mockResult = 
-                    $this->createMock(\CodeIgniter\Database\BaseResult::class);
+            if (str_contains($sql, 'select uuid, firstname, lastname, email, password_hash from admins')):
+                return $this->dbResult($this->admin());
+            endif;
 
-                $sqlLower = 
-                    strtolower($sql);
+            return true;
+        });
+        $db->method('transBegin')->willReturn(true);
+        $db->method('transStatus')->willReturn(true);
+        $db->method('insertID')->willReturnOnConsecutiveCalls(11, 21);
+        $db->expects($this->exactly(2))->method('transCommit')->willReturn(true);
 
-                $isAdmin = 
-                    strpos($sqlLower, 'select * from admins');
+        $crypto = $this->getMockBuilder(\stdClass::class)->addMethods(['encrypt'])->getMock();
+        $crypto->expects($this->once())->method('encrypt')->with($this->isType('string'))->willReturn('encrypted-remember-token');
+        Services::injectMock('crypto', $crypto);
 
-                if ($isAdmin !== false):
-                    $mockRow = 
-                        (object)[
-                            'uuid' => '1234',
-                            'firstname' => 'Test',
-                            'lastname' => 'User'
-                        ];
-                    $mockResult->method('getRow')
-                               ->willReturn($mockRow);
-                    return $mockResult;
-                endif;
+        $result = $this->createModel($db)->login(['email' => self::EMAIL, 'password' => self::PASSWORD, 'rememberMe' => true], $this->request());
 
-                $isAttempts = 
-                    strpos($sqlLower, 'count(id)');
+        $this->assertSame(['result' => true], $result);
+        $this->assertNull(session()->get('backendSession'));
+        $this->assertSame(21, session()->get('login_log_id'));
 
-                if ($isAttempts !== false):
-                    $mockRow = 
-                        (object)[
-                            'cnt' => 0
-                        ];
-                    $mockResult->method('getRow')
-                               ->willReturn($mockRow);
-                    return $mockResult;
-                endif;
-
-                $isTotp = 
-                    strpos($sqlLower, 'secret from admins_2fa');
-
-                if ($isTotp !== false):
-                    $mockRow = 
-                        (object)[
-                            'secret' => 'JBSWY3DPEHPK3PXP'
-                        ];
-                    $mockResult->method('getRow')
-                               ->willReturn($mockRow);
-                    return $mockResult;
-                endif;
-
-                $mockResult->method('getRow')
-                           ->willReturn(null);
-
-                return $mockResult;
-            };
-
-        $mockDb->method('query')
-               ->willReturnCallback(
-                   $queryHandler
-               );
-
-        $fakeConfig = 
-            (object)[
-                'twoFactorTime' => 300,
-                'twoFactorLimit' => 5
-            ];
-
-        $injector = 
-            function () use (
-                $mockDb,
-                $fakeConfig
-            ) {
-                $this->db = 
-                    $mockDb;
-
-                $this->config = 
-                    $fakeConfig;
-
-                $this->verifyAllowedFields = 
-                    ['code'];
-            };
-
-        $bind = 
-            \Closure::bind(
-                $injector,
-                $model,
-                \App\Models\Backend\AuthModel::class
-            );
-
-        $bind();
-
-        /* Forziamo il blocco TOTP tramite sessione */
-        session()->set(
-            'auth_2fa_pending', 
-            [
-                'admin_uuid' => '1234',
-                'method' => 'totp',
-                'rememberMe' => false
-            ]
-        );
-
-        $posts = 
-            ['code' => '123456'];
-
-        $request = 
-            $this->createMock(\CodeIgniter\HTTP\IncomingRequest::class);
-
-        $request->method('getIPAddress')
-                ->willReturn('127.0.0.1');
-
-        $result = 
-            $model->verify(
-                $posts,
-                $request
-            );
-
-        $this->assertSame(
-            [
-                'result' => false,
-                'message' => lang('backend/auth.messages.wrongCode')
-            ],
-            $result
-        );
-        $this->assertContains(
-            'insert into admins_2fa_attempts (admin_uuid, method, ip_address, timestamp) values (?, ?, ?, ?)',
-            $queries
-        );
+        $tokenInsert = $this->findQuery($queries, 'insert into admins_tokens');
+        $this->assertSame('cookie', $tokenInsert[1][5]);
+        $this->assertFalse($this->queriesContain($queries, 'delete from admins_tokens where admin_uuid = ? and token_type = ?'));
     }
 
-    public function testVerifyEmailCodeCompletesLogin(): void
+    public function testLoginFailsClosedWithoutRollbackBeforeTransaction(): void
     {
-        $model = 
-            new \App\Models\Backend\AuthModel();
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('query')->willThrowException(new \RuntimeException('database failure'));
+        $db->expects($this->never())->method('transRollback');
 
-        $mockDb = 
-            $this->createMock(\CodeIgniter\Database\BaseConnection::class);
+        $result = $this->createModel($db)->login(['email' => self::EMAIL, 'password' => self::PASSWORD], $this->request());
 
-        $mockDb->method('transBegin')
-               ->willReturn(true);
+        $this->assertSame(['result' => false, 'message' => lang('backend/auth.messages.loginFailed')], $result);
+    }
 
-        $mockDb->method('transCommit')
-               ->willReturn(true);
+    public function testResetPasswordDoesNotRevealUnknownAdmin(): void
+    {
+        $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->exactly(4))->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
 
-        $mockDb->method('insertID')
-               ->willReturnOnConsecutiveCalls(10, 20);
+            if (str_contains($sql, 'as identifier_attempts')):
+                return $this->dbResult((object) ['identifier_attempts' => 0, 'ip_attempts' => 0]);
+            endif;
 
-        /* Usiamo lo stesso cervello, ma con la risposta specifica per le Email */
-        $queryHandler = 
-            function (
-                $sql
-            ) {
-                $mockResult = 
-                    $this->createMock(\CodeIgniter\Database\BaseResult::class);
+            if (str_contains($sql, 'select uuid, firstname, lastname, email from admins')):
+                return $this->dbResult(null);
+            endif;
 
-                $sqlLower = 
-                    strtolower($sql);
+            return true;
+        });
+        $db->expects($this->once())->method('transBegin')->willReturn(true);
+        $db->expects($this->once())->method('transCommit')->willReturn(true);
 
-                $isAdmin = 
-                    strpos($sqlLower, 'select * from admins');
+        $result = $this->createModel($db)->resetPassword(['email' => self::EMAIL], $this->request());
 
-                if ($isAdmin !== false):
-                    $mockRow = 
-                        (object)[
-                            'uuid' => '1234',
-                            'firstname' => 'Test',
-                            'lastname' => 'User',
-                            'email' => 'test@test.com'
-                        ];
-                    $mockResult->method('getRow')
-                               ->willReturn($mockRow);
-                    return $mockResult;
-                endif;
+        $this->assertSame(['result' => true, 'message' => lang('backend/auth.messages.resetPasswordSuccess')], $result);
+        $attempt = $this->findQuery($queries, 'insert into admins_reset_attempts');
+        $this->assertSame(hash_hmac('sha256', self::EMAIL, $this->defaultConfig['hashKey']), $attempt[1][0]);
+        $this->assertSame(self::IP, $attempt[1][1]);
+    }
 
-                $isAttempts = 
-                    strpos($sqlLower, 'count(id)');
+    public function testResetPasswordBypassesAttemptsTableWhenControlIsDisabled(): void
+    {
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->once())->method('query')->with(
+            $this->callback(static fn (string $sql): bool => str_contains($sql, 'select uuid, firstname, lastname, email from admins')),
+            [self::EMAIL]
+        )->willReturn($this->dbResult(null));
 
-                if ($isAttempts !== false):
-                    $mockRow = 
-                        (object)[
-                            'cnt' => 0
-                        ];
-                    $mockResult->method('getRow')
-                               ->willReturn($mockRow);
-                    return $mockResult;
-                endif;
+        $result = $this->createModel($db, ['resetAttempts' => false])
+            ->resetPassword(['email' => self::EMAIL], $this->request());
 
-                $isEmail = 
-                    strpos($sqlLower, 'expires_at from admins_2fa_codes');
+        $this->assertSame(['result' => true, 'message' => lang('backend/auth.messages.resetPasswordSuccess')], $result);
+    }
 
-                if ($isEmail !== false):
-                    /* Creiamo una data di scadenza nel futuro per validare il controllo temporale */
-                    $future = 
-                        date('Y-m-d H:i:s', time() + 3600);
+    public function testResetPasswordBlocksRequestWhenAttemptsControlFails(): void
+    {
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->once())->method('query')->willThrowException(new \RuntimeException('Attempts table unavailable'));
 
-                    $mockRow = 
-                        (object)[
-                            'expires_at' => $future
-                        ];
-                    $mockResult->method('getRow')
-                               ->willReturn($mockRow);
-                    return $mockResult;
-                endif;
+        $result = $this->createModel($db)->resetPassword(['email' => self::EMAIL], $this->request());
 
-                $mockResult->method('getRow')
-                           ->willReturn(null);
+        $this->assertSame(['result' => false, 'message' => lang('backend/auth.messages.resetPasswordFailed')], $result);
+    }
 
-                return $mockResult;
-            };
+    public function testResetPasswordRateLimitReturnsGenericResponseWithoutAdminLookup(): void
+    {
+        $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->exactly(3))->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
 
-        $mockDb->method('query')
-               ->willReturnCallback(
-                   $queryHandler
-               );
+            if (str_contains($sql, 'as identifier_attempts')):
+                return $this->dbResult((object) ['identifier_attempts' => 5, 'ip_attempts' => 1]);
+            endif;
 
-        $fakeConfig = 
-            (object)[
-                'twoFactorTime' => 300,
-                'twoFactorLimit' => 5,
-                'sessionTime' => 3600,
-                'hashKey' => 'test_hash_key'
-            ];
+            return true;
+        });
+        $db->expects($this->once())->method('transBegin')->willReturn(true);
+        $db->expects($this->once())->method('transCommit')->willReturn(true);
 
-        $injector = 
-            function () use (
-                $mockDb,
-                $fakeConfig
-            ) {
-                $this->db = 
-                    $mockDb;
+        $result = $this->createModel($db)->resetPassword(['email' => self::EMAIL], $this->request());
 
-                $this->config = 
-                    $fakeConfig;
+        $this->assertFalse($this->queriesContain($queries, 'select uuid, firstname, lastname, email from admins'));
+        $this->assertFalse($this->queriesContain($queries, 'insert into admins_reset_attempts'));
+        $this->assertTrue($this->queriesContain($queries, 'update admins_reset_attempts set timestamp'));
+        $this->assertSame(['result' => false, 'message' => lang('backend/auth.messages.tooManyAttempts')], $result);
+    }
 
-                $this->verifyAllowedFields = 
-                    ['code'];
-            };
+    public function testResetPasswordRateLimitAlsoBlocksExcessiveIpRequests(): void
+    {
+        $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->exactly(3))->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
 
-        $bind = 
-            \Closure::bind(
-                $injector,
-                $model,
-                \App\Models\Backend\AuthModel::class
-            );
+            if (str_contains($sql, 'as identifier_attempts')):
+                return $this->dbResult((object) ['identifier_attempts' => 1, 'ip_attempts' => 100]);
+            endif;
 
-        $bind();
+            return true;
+        });
+        $db->expects($this->once())->method('transBegin')->willReturn(true);
+        $db->expects($this->once())->method('transCommit')->willReturn(true);
 
-        /* Forziamo il blocco EMAIL tramite sessione */
-        session()->set(
-            'auth_2fa_pending', 
-            [
-                'admin_uuid' => '1234',
+        $result = $this->createModel($db)->resetPassword(['email' => self::EMAIL], $this->request());
+
+        $this->assertFalse($this->queriesContain($queries, 'select uuid, firstname, lastname, email from admins'));
+        $this->assertTrue($this->queriesContain($queries, 'update admins_reset_attempts set timestamp = ? where timestamp > ? and ip_address = ?'));
+        $this->assertSame(['result' => false, 'message' => lang('backend/auth.messages.tooManyAttempts')], $result);
+    }
+
+    public function testResetPasswordSuccessPersistsActivationTokenAndSendsEmail(): void
+    {
+        $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
+
+            if (str_contains($sql, 'select uuid, firstname, lastname, email from admins')):
+                return $this->dbResult($this->admin());
+            endif;
+
+            return true;
+        });
+        $db->expects($this->once())->method('transBegin')->willReturn(true);
+        $db->expects($this->once())->method('transStatus')->willReturn(true);
+        $db->expects($this->once())->method('transCommit')->willReturn(true);
+
+        $email = $this->getMockBuilder(\CodeIgniter\Email\Email::class)->disableOriginalConstructor()->onlyMethods(['setTo', 'setSubject', 'setMessage', 'send'])->getMock();
+        $email->method('setTo')->willReturnSelf();
+        $email->method('setSubject')->willReturnSelf();
+        $email->method('setMessage')->willReturnSelf();
+        $email->expects($this->once())->method('send')->willReturn(true);
+        Services::injectMock('email', $email);
+
+        $result = $this->createModel($db, ['resetAttempts' => false])->resetPassword(['email' => self::EMAIL], $this->request());
+
+        $this->assertTrue($result['result']);
+        $this->assertTrue($this->queriesContain($queries, 'update admins set resetted_at'));
+        $this->assertTrue($this->queriesContain($queries, 'delete from admins_tokens'));
+        $insert = $this->findQuery($queries, 'insert into admins_tokens');
+        $this->assertSame(self::UUID, $insert[1][0]);
+        $this->assertSame('activation', $insert[1][5]);
+    }
+
+    public function testResetPasswordReportsEmailFailureAfterSuccessfulDatabaseCommit(): void
+    {
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('query')->willReturnCallback(function (string $sql) {
+            if (str_contains($sql, 'select uuid, firstname, lastname, email from admins')):
+                return $this->dbResult($this->admin());
+            endif;
+
+            return true;
+        });
+        $db->method('transBegin')->willReturn(true);
+        $db->method('transStatus')->willReturn(true);
+        $db->expects($this->exactly(2))->method('transCommit')->willReturn(true);
+
+        $email = $this->getMockBuilder(\CodeIgniter\Email\Email::class)->disableOriginalConstructor()->onlyMethods(['setTo', 'setSubject', 'setMessage', 'send', 'printDebugger'])->getMock();
+        $email->method('setTo')->willReturnSelf();
+        $email->method('setSubject')->willReturnSelf();
+        $email->method('setMessage')->willReturnSelf();
+        $email->expects($this->once())->method('send')->willReturn(false);
+        $email->method('printDebugger')->willReturn('smtp failure');
+        Services::injectMock('email', $email);
+
+        $result = $this->createModel($db, ['resetAttempts' => false])->resetPassword(['email' => self::EMAIL], $this->request());
+
+        $this->assertSame([
+            'result' => true,
+            'message' => lang('backend/auth.messages.resetPasswordSuccess'),
+        ], $result);
+    }
+
+    public function testResetPasswordRollsBackWhenTransactionStatusFails(): void
+    {
+        $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
+
+            if (str_contains($sql, 'select uuid, firstname, lastname, email from admins')):
+                return $this->dbResult($this->admin());
+            endif;
+
+            return true;
+        });
+        $db->expects($this->once())->method('transBegin')->willReturn(true);
+        $db->expects($this->once())->method('transStatus')->willReturn(false);
+        $db->expects($this->once())->method('transRollback')->willReturn(true);
+        $db->expects($this->never())->method('transCommit');
+
+        $result = $this->createModel($db, ['resetAttempts' => false])->resetPassword(['email' => self::EMAIL], $this->request());
+
+        $this->assertSame(['result' => false, 'message' => lang('backend/auth.messages.resetPasswordFailed')], $result);
+        $this->assertTrue($this->queriesContain($queries, 'update admins set resetted_at'));
+        $this->assertTrue($this->queriesContain($queries, 'delete from admins_tokens'));
+        $this->assertTrue($this->queriesContain($queries, 'insert into admins_tokens'));
+    }
+
+    public function testResetPasswordCatchesDatabaseExceptionAndRollsBack(): void
+    {
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('query')->willReturnCallback(function (string $sql) {
+            if (str_contains($sql, 'select uuid, firstname, lastname, email from admins')):
+                return $this->dbResult($this->admin());
+            endif;
+
+            throw new \RuntimeException('write failure');
+        });
+        $db->expects($this->once())->method('transBegin')->willReturn(true);
+        $db->expects($this->once())->method('transRollback')->willReturn(true);
+
+        $result = $this->createModel($db, ['resetAttempts' => false])->resetPassword(['email' => self::EMAIL], $this->request());
+
+        $this->assertSame(['result' => false, 'message' => lang('backend/auth.messages.resetPasswordFailed')], $result);
+    }
+
+    public function testSetPasswordRejectsUnknownActivationToken(): void
+    {
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->once())->method('query')->willReturn($this->dbResult(null));
+        $db->expects($this->once())->method('transBegin')->willReturn(true);
+        $db->expects($this->once())->method('transRollback')->willReturn(true);
+
+        $result = $this->createModel($db)->setPassword(['token' => 'activation-token', 'password' => self::PASSWORD]);
+
+        $this->assertSame(['result' => false, 'message' => lang('backend/auth.messages.setPasswordFailed')], $result);
+    }
+
+    public function testSetPasswordUpdatesPasswordAndConsumesActivationToken(): void
+    {
+        $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
+
+            if (str_contains($sql, 'from admins as u')):
+                return $this->dbResult($this->admin());
+            endif;
+
+            return true;
+        });
+        $db->expects($this->once())->method('transBegin')->willReturn(true);
+        $db->expects($this->once())->method('transStatus')->willReturn(true);
+        $db->expects($this->once())->method('transCommit')->willReturn(true);
+        $db->expects($this->never())->method('transRollback');
+
+        $result = $this->createModel($db)->setPassword(['token' => 'activation-token', 'password' => self::PASSWORD]);
+
+        $this->assertTrue($result['result']);
+        $update = $this->findQuery($queries, 'update admins set password_hash');
+        $this->assertTrue(password_verify(self::PASSWORD, $update[1][0]));
+        $this->assertNull($update[1][1]);
+        $this->assertSame(self::UUID, $update[1][2]);
+        $this->assertTrue($this->queriesContain($queries, 'update admins_logs as l join admins_tokens as t'));
+        $this->assertTrue($this->queriesContain($queries, 'delete from admins_tokens'));
+    }
+
+    public function testSetPasswordRollsBackAndDoesNotCommitWhenTransactionFails(): void
+    {
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('query')->willReturnCallback(function (string $sql) {
+            if (str_contains($sql, 'from admins as u')):
+                return $this->dbResult($this->admin());
+            endif;
+
+            return true;
+        });
+        $db->expects($this->once())->method('transBegin')->willReturn(true);
+        $db->expects($this->once())->method('transStatus')->willReturn(false);
+        $db->expects($this->once())->method('transRollback')->willReturn(true);
+        $db->expects($this->never())->method('transCommit');
+
+        $result = $this->createModel($db)->setPassword(['token' => 'activation-token', 'password' => self::PASSWORD]);
+
+        $this->assertSame(['result' => false, 'message' => lang('backend/auth.messages.setPasswordError')], $result);
+    }
+
+    public function testCheckAuthTokenReturnsFalseWhenTokenDoesNotExist(): void
+    {
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->once())->method('query')->willReturn($this->dbResult(null));
+
+        $this->assertFalse($this->createModel($db)->checkAuthToken('activation-token'));
+    }
+
+    public function testCheckAuthTokenReturnsFalseWhenTokenIsExpired(): void
+    {
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->once())->method('query')->willReturn($this->dbResult((object) ['token_expire' => date('Y-m-d H:i:s', time() - 60)]));
+
+        $this->assertFalse($this->createModel($db)->checkAuthToken('activation-token'));
+    }
+
+    public function testCheckAuthTokenReturnsTrueOnlyForFutureExpiry(): void
+    {
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->once())->method('query')->willReturn($this->dbResult((object) ['token_expire' => date('Y-m-d H:i:s', time() + 3600)]));
+
+        $this->assertTrue($this->createModel($db)->checkAuthToken('activation-token'));
+    }
+
+    public function testCheckAuthTokenFailsClosedOnDatabaseException(): void
+    {
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->once())->method('query')->willThrowException(new \RuntimeException('read failure'));
+
+        $this->assertFalse($this->createModel($db)->checkAuthToken('activation-token'));
+    }
+
+    public function testVerifyFailsBeforeDatabaseAccessWhenPendingSessionIsMissing(): void
+    {
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->never())->method('query');
+
+        $result = $this->createModel($db)->verify(['code' => '123456'], $this->request());
+
+        $this->assertSame(['result' => false, 'message' => lang('backend/auth.messages.sessionExpired')], $result);
+    }
+
+    public function testVerifyRejectsExpiredPendingSessionAndDeletesEmailCode(): void
+    {
+        $this->createStatefulSessionMock([
+            'auth_2fa_pending' => [
+                'admin_uuid' => self::UUID,
                 'method' => 'email',
-                'rememberMe' => false
-            ]
-        );
+                'rememberMe' => false,
+                'created_at' => time() - 301,
+            ],
+        ]);
 
-        $posts = 
-            ['code' => '123456'];
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->once())->method('query')->with(
+            'delete from admins_2fa_codes where admin_uuid = ?',
+            [self::UUID]
+        )->willReturn(true);
 
-        $request = 
-            $this->createMock(\CodeIgniter\HTTP\IncomingRequest::class);
+        $result = $this->createModel($db)->verify(['code' => '123456'], $this->request());
 
-        $request->method('getIPAddress')
-                ->willReturn('127.0.0.1');
-
-        $userAgent =
-            $this->createMock(\CodeIgniter\HTTP\UserAgent::class);
-
-        $userAgent->method('getAgentString')
-                  ->willReturn('PHPUnit');
-
-        $request->method('getUserAgent')
-                ->willReturn($userAgent);
-
-        $result = 
-            $model->verify(
-                $posts,
-                $request
-            );
-
-        $this->assertSame(['result' => true], $result);
+        $this->assertSame(['result' => false, 'message' => lang('backend/auth.messages.sessionExpired')], $result);
         $this->assertNull(session()->get('auth_2fa_pending'));
-        $this->assertNotEmpty(session()->get('backendSession'));
-        $this->assertSame(20, session()->get('login_log_id'));
+    }
+
+    public function testVerifyRejectsMissingOrDisabledAdmin(): void
+    {
+        $this->setPendingTwoFactor('email');
+
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->once())->method('query')->with(
+            $this->callback(static fn (string $sql): bool => str_contains($sql, 'status = 1') && str_contains($sql, 'suspended_at is null') && str_contains($sql, 'deleted_at is null')),
+            [self::UUID]
+        )->willReturn($this->dbResult(null));
+
+        $result = $this->createModel($db)->verify(['code' => '123456'], $this->request());
+
+        $this->assertSame(['result' => false, 'message' => lang('backend/auth.messages.verifyFailed')], $result);
+    }
+
+    public function testVerifyThrottlingExtendsLatestAttemptAndRejectsCode(): void
+    {
+        $this->setPendingTwoFactor('email');
+
+        $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
+
+            if (str_contains($sql, 'select * from admins where uuid')):
+                return $this->dbResult($this->admin());
+            endif;
+
+            if (str_contains($sql, 'as identifier_attempts')):
+                return $this->dbResult((object) ['identifier_attempts' => 5, 'ip_attempts' => 1]);
+            endif;
+
+            return true;
+        });
+        $db->expects($this->once())->method('transBegin')->willReturn(true);
+        $db->expects($this->once())->method('transCommit')->willReturn(true);
+
+        $result = $this->createModel($db)->verify(['code' => '123456'], $this->request());
+
+        $this->assertSame(['result' => false, 'message' => lang('backend/auth.messages.tooManyAttempts')], $result);
+        $this->assertTrue($this->queriesContain($queries, 'update admins_2fa_attempts set timestamp = ? where timestamp > ? and admin_uuid = ? and method = ?'));
+    }
+
+    public function testVerifyThrottlingAlsoBlocksIpWideOtpSpraying(): void
+    {
+        $this->setPendingTwoFactor('email');
+
+        $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
+
+            if (str_contains($sql, 'select * from admins where uuid')):
+                return $this->dbResult($this->admin());
+            endif;
+
+            if (str_contains($sql, 'as identifier_attempts')):
+                return $this->dbResult((object) ['identifier_attempts' => 1, 'ip_attempts' => 100]);
+            endif;
+
+            return true;
+        });
+        $db->expects($this->once())->method('transBegin')->willReturn(true);
+        $db->expects($this->once())->method('transCommit')->willReturn(true);
+
+        $result = $this->createModel($db)->verify(['code' => '123456'], $this->request());
+
+        $this->assertSame(['result' => false, 'message' => lang('backend/auth.messages.tooManyAttempts')], $result);
+        $this->assertFalse($this->queriesContain($queries, 'select expires_at from admins_2fa_codes'));
+        $this->assertTrue($this->queriesContain($queries, 'update admins_2fa_attempts set timestamp = ? where timestamp > ? and ip_address = ?'));
+    }
+
+    public function testVerifyWrongEmailCodeRecordsSecurityAttempt(): void
+    {
+        $this->setPendingTwoFactor('email');
+
+        $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
+
+            if (str_contains($sql, 'select * from admins where uuid')):
+                return $this->dbResult($this->admin());
+            endif;
+
+            if (str_contains($sql, 'as identifier_attempts')):
+                return $this->dbResult((object) ['identifier_attempts' => 0, 'ip_attempts' => 0]);
+            endif;
+
+            if (str_contains($sql, 'select expires_at from admins_2fa_codes')):
+                return $this->dbResult(null);
+            endif;
+
+            return true;
+        });
+        $db->expects($this->once())->method('transBegin')->willReturn(true);
+        $db->expects($this->once())->method('transCommit')->willReturn(true);
+
+        $result = $this->createModel($db)->verify(['code' => '123456'], $this->request());
+
+        $this->assertSame(['result' => false, 'message' => lang('backend/auth.messages.wrongCode')], $result);
+        $this->assertTrue($this->queriesContain($queries, 'delete from admins_2fa_attempts where timestamp <= ?'));
+        $this->assertTrue($this->queriesContain($queries, 'insert into admins_2fa_attempts'));
+    }
+
+    public function testVerifyDoesNotUseAttemptsTableWhenControlIsDisabled(): void
+    {
+        $this->setPendingTwoFactor('email');
+
+        $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
+
+            if (str_contains($sql, 'select * from admins where uuid')):
+                return $this->dbResult($this->admin());
+            endif;
+
+            if (str_contains($sql, 'select expires_at from admins_2fa_codes')):
+                return $this->dbResult(null);
+            endif;
+
+            return true;
+        });
+        $db->expects($this->never())->method('transBegin');
+        $db->expects($this->never())->method('transCommit');
+
+        $result = $this->createModel($db, ['twoFactorAttempts' => false])->verify(['code' => '123456'], $this->request());
+
+        $this->assertSame(['result' => false, 'message' => lang('backend/auth.messages.wrongCode')], $result);
+        $this->assertFalse($this->queriesContain($queries, 'admins_2fa_attempts'));
+    }
+
+    public function testVerifyExpiredEmailCodeIsRejectedAndCountsAsAttempt(): void
+    {
+        $this->setPendingTwoFactor('email');
+
+        $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
+
+            if (str_contains($sql, 'select * from admins where uuid')):
+                return $this->dbResult($this->admin());
+            endif;
+
+            if (str_contains($sql, 'as identifier_attempts')):
+                return $this->dbResult((object) ['identifier_attempts' => 0, 'ip_attempts' => 0]);
+            endif;
+
+            if (str_contains($sql, 'select expires_at from admins_2fa_codes')):
+                return $this->dbResult((object) ['expires_at' => date('Y-m-d H:i:s', time() - 60)]);
+            endif;
+
+            return true;
+        });
+        $db->expects($this->once())->method('transBegin')->willReturn(true);
+        $db->expects($this->once())->method('transCommit')->willReturn(true);
+
+        $result = $this->createModel($db)->verify(['code' => '123456'], $this->request());
+
+        $this->assertSame(['result' => false, 'message' => lang('backend/auth.messages.expiredCode')], $result);
+        $this->assertTrue($this->queriesContain($queries, 'insert into admins_2fa_attempts'));
+    }
+
+    public function testVerifyValidEmailCodeCleansTemporaryStateAndCompletesSessionLogin(): void
+    {
+        $this->setPendingTwoFactor('email');
+
+        $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
+
+            if (str_contains($sql, 'select * from admins where uuid')):
+                return $this->dbResult($this->admin());
+            endif;
+
+            if (str_contains($sql, 'as identifier_attempts')):
+                return $this->dbResult((object) ['identifier_attempts' => 0, 'ip_attempts' => 0]);
+            endif;
+
+            if (str_contains($sql, 'select expires_at from admins_2fa_codes')):
+                return $this->dbResult((object) ['expires_at' => date('Y-m-d H:i:s', time() + 300)]);
+            endif;
+
+            return true;
+        });
+        $db->method('transBegin')->willReturn(true);
+        $db->method('transStatus')->willReturn(true);
+        $db->method('insertID')->willReturnOnConsecutiveCalls(30, 40);
+        $db->expects($this->exactly(2))->method('transCommit')->willReturn(true);
+
+        $result = $this->createModel($db)->verify(['code' => '123456'], $this->request());
+
+        $this->assertSame(['result' => true, 'redirect' => base_url('backend/dashboard')], $result);
+        $this->assertNull(session()->get('auth_2fa_pending'));
+        $this->assertIsString(session()->get('backendSession'));
+        $this->assertSame(40, session()->get('login_log_id'));
+        $this->assertTrue($this->queriesContain($queries, 'delete from admins_2fa_attempts'));
+        $this->assertTrue($this->queriesContain($queries, 'delete from admins_2fa_codes'));
+    }
+
+    public function testVerifyFailsClosedWithoutRollbackBeforeTransaction(): void
+    {
+        $this->setPendingTwoFactor('email');
+
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->once())->method('query')->willThrowException(new \RuntimeException('2fa failure'));
+        $db->expects($this->never())->method('transRollback');
+
+        $result = $this->createModel($db)->verify(['code' => '123456'], $this->request());
+
+        $this->assertSame(['result' => false, 'message' => lang('backend/auth.messages.verifyError')], $result);
+    }
+
+    public function testLogoutBySessionDoesNothingWithoutAuthenticatedSession(): void
+    {
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->never())->method('query');
+
+        $this->createModel($db)->logoutBySession();
+
+        $this->assertNull(session()->get('backendSession'));
+    }
+
+    public function testLogoutBySessionDeletesTokenAndClearsLocalSessionWithoutLogId(): void
+    {
+        session()->set('backendSession', 'raw-session-token');
+
+        $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $lastActivity = '2026-10-08 10:11:12';
+        $db->expects($this->exactly(3))->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries, $lastActivity) {
+            $queries[] = [$sql, $params];
+
+            if (str_contains($sql, 'select id, last_activity')):
+                return $this->dbResult((object) ['id' => 55, 'last_activity' => $lastActivity]);
+            endif;
+
+            return true;
+        });
+
+        $this->createModel($db)->logoutBySession();
+
+        $this->assertNull(session()->get('backendSession'));
+        $update = $this->findQuery($queries, 'update admins_logs set logout');
+        $this->assertSame('manual', $update[1][1]);
+        $this->assertSame(55, $update[1][2]);
+        $this->assertTrue($this->queriesContain($queries, 'delete from admins_tokens'));
+        $delete = $this->findQuery($queries, 'delete from admins_tokens');
+        $this->assertSame('session', $delete[1][1]);
+    }
+
+    public function testLogoutBySessionClosesOpenLogAndUsesTokenActivityForTimeout(): void
+    {
+        session()->set('backendSession', 'raw-session-token');
+        session()->set('login_log_id', 99);
+
+        $queries = [];
+        $lastActivity = '2026-10-08 10:11:12';
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->exactly(3))->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries, $lastActivity) {
+            $queries[] = [$sql, $params];
+
+            if (str_contains($sql, 'select id, last_activity')):
+                return $this->dbResult((object) ['id' => 55, 'last_activity' => $lastActivity]);
+            endif;
+
+            return true;
+        });
+
+        $this->createModel($db)->logoutBySession('timeout');
+
+        $update = $this->findQuery($queries, 'update admins_logs set logout');
+        $this->assertSame([$lastActivity, 'timeout', 99], $update[1]);
+        $this->assertNull(session()->get('backendSession'));
+        $this->assertNull(session()->get('login_log_id'));
+    }
+
+    public function testLogoutBySessionUpdatesOnlyAnOpenLog(): void
+    {
+        session()->set('backendSession', 'raw-session-token');
+        session()->set('login_log_id', 99);
+
+        $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->exactly(3))->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries) {
+            $queries[] = [$sql, $params];
+
+            if (str_contains($sql, 'select id, last_activity')):
+                return $this->dbResult((object) ['id' => 55, 'last_activity' => null]);
+            endif;
+
+            return true;
+        });
+
+        $this->createModel($db)->logoutBySession();
+
+        $update = $this->findQuery($queries, 'update admins_logs set logout');
+        $this->assertStringContainsString('where id = ? and logout is null', $update[0]);
+        $this->assertTrue($this->queriesContain($queries, 'delete from admins_tokens'));
+    }
+
+    public function testLogoutByCookieAlwaysDeletesCookieToken(): void
+    {
+        $crypto = $this->getMockBuilder(\App\Libraries\CryptoService::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['decrypt'])
+            ->getMock();
+        $crypto->expects($this->once())->method('decrypt')->with('encrypted-cookie-token')->willReturn('raw-cookie-token');
+        Services::injectMock('crypto', $crypto);
+
+        $queries = [];
+        $db = $this->createMock(BaseConnection::class);
+        $lastActivity = '2026-10-08 09:08:07';
+        $db->expects($this->exactly(3))->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries, $lastActivity) {
+            $queries[] = [$sql, $params];
+
+            if (str_contains($sql, 'select id, last_activity')):
+                return $this->dbResult((object) ['id' => 77, 'last_activity' => $lastActivity]);
+            endif;
+
+            return true;
+        });
+
+        $this->createModel($db)->logoutByCookie('encrypted-cookie-token');
+
+        $update = $this->findQuery($queries, 'update admins_logs set logout');
+        $this->assertSame('manual', $update[1][1]);
+        $this->assertSame(77, $update[1][2]);
+        $delete = $this->findQuery($queries, 'delete from admins_tokens');
+        $this->assertSame(hash_hmac('sha256', 'raw-cookie-token', $this->defaultConfig['hashKey']), $delete[1][0]);
+        $this->assertSame('cookie', $delete[1][1]);
+    }
+
+    public function testLogoutByCookieClosesOpenLogAndUsesTokenActivityForTimeout(): void
+    {
+        session()->set('login_log_id', 101);
+
+        $queries = [];
+        $lastActivity = '2026-10-08 09:08:07';
+        $db = $this->createMock(BaseConnection::class);
+        $db->expects($this->exactly(3))->method('query')->willReturnCallback(function (string $sql, array $params = []) use (&$queries, $lastActivity) {
+            $queries[] = [$sql, $params];
+
+            if (str_contains($sql, 'select id, last_activity')):
+                return $this->dbResult((object) ['id' => 77, 'last_activity' => $lastActivity]);
+            endif;
+
+            return true;
+        });
+
+        $this->createModel($db)->logoutByCookie('raw-cookie-token', 'timeout');
+
+        $update = $this->findQuery($queries, 'update admins_logs set logout');
+        $this->assertSame([$lastActivity, 'timeout', 101], $update[1]);
+        $this->assertNull(session()->get('login_log_id'));
+    }
+
+    public function testLogoutMethodsFailClosedWhenDatabaseThrows(): void
+    {
+        session()->set('backendSession', 'raw-session-token');
+
+        $db = $this->createMock(BaseConnection::class);
+        $db->method('query')->willThrowException(new \RuntimeException('logout failure'));
+
+        $model = $this->createModel($db);
+        $model->logoutBySession();
+        $model->logoutByCookie('raw-cookie-token');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * Crea un'istanza unit-test dell'AuthModel senza eseguire il costruttore del BaseModel.
+     *
+     * Il model mantiene integralmente i metodi di produzione; vengono sostituite soltanto le
+     * dipendenze esterne (database e configurazione) per impedire accessi al DB di sviluppo.
+     *
+     * @param BaseConnection $db Connessione database mockata.
+     * @param array<string, mixed> $overrides Override della configurazione Auth.
+     * @return AuthModel Istanza pronta per il test.
+     */
+    private function createModel(BaseConnection $db, array $overrides = []): AuthModel
+    {
+        $model = $this->getMockBuilder(AuthModel::class)->disableOriginalConstructor()->onlyMethods([])->getMock();
+        $config = (object) array_replace($this->defaultConfig, $overrides);
+
+        $inject = function (BaseConnection $connection, object $config): void {
+            $this->db = $connection;
+            $this->config = $config;
+        };
+
+        $binder = \Closure::bind($inject, $model, AuthModel::class);
+        $binder($db, $config);
+
+        return $model;
+    }
+
+    /**
+     * Crea una request deterministica con IP e User-Agent controllati.
+     *
+     * @return IncomingRequest Request mockata.
+     */
+    private function request(): IncomingRequest
+    {
+        $agent = $this->createMock(UserAgent::class);
+        $agent->method('getAgentString')->willReturn('PHPUnit AuthModel');
+
+        $request = $this->createMock(IncomingRequest::class);
+        $request->method('getIPAddress')->willReturn(self::IP);
+        $request->method('getUserAgent')->willReturn($agent);
+
+        return $request;
+    }
+
+    /**
+     * Crea un risultato DB con una singola riga.
+     *
+     * @param object|null $row Riga restituita da getRow().
+     * @return BaseResult Result mockato.
+     */
+    private function dbResult(?object $row): BaseResult
+    {
+        $result = $this->createMock(BaseResult::class);
+        $result->method('getRow')->willReturn($row);
+
+        return $result;
+    }
+
+    /**
+     * Restituisce un admin valido sovrascrivibile per scenari specifici.
+     *
+     * @param array<string, mixed> $overrides Proprietà da sovrascrivere.
+     * @return object Admin fixture.
+     */
+    private function admin(array $overrides = []): object
+    {
+        return (object) array_replace([
+            'uuid' => self::UUID,
+            'firstname' => 'Test',
+            'lastname' => 'Admin',
+            'email' => self::EMAIL,
+            'password_hash' => password_hash(self::PASSWORD, PASSWORD_DEFAULT),
+            'times' => 0,
+            'status' => 1,
+            'deleted_at' => null,
+        ], $overrides);
+    }
+
+    /**
+     * Configura lo stato temporaneo server-side richiesto dal secondo fattore.
+     *
+     * @param string $method Metodo 2FA.
+     * @param bool $rememberMe Stato remember-me da preservare.
+     * @return void
+     */
+    private function setPendingTwoFactor(string $method, bool $rememberMe = false): void
+    {
+        $this->createStatefulSessionMock([
+            'auth_2fa_pending' => [
+                'admin_uuid' => self::UUID,
+                'method' => $method,
+                'rememberMe' => $rememberMe,
+                'created_at' => time(),
+                'redirect' => base_url('backend/dashboard'),
+            ],
+        ]);
+    }
+
+    /**
+     * Verifica se una query SQL è stata emessa durante lo scenario.
+     *
+     * @param array<int, array{0:string,1:array}> $queries Query catturate.
+     * @param string $needle Frammento SQL cercato.
+     * @return bool True quando almeno una query contiene il frammento.
+     */
+    private function queriesContain(array $queries, string $needle): bool
+    {
+        foreach ($queries as [$sql]):
+            if (str_contains($sql, $needle)):
+                return true;
+            endif;
+        endforeach;
+
+        return false;
+    }
+
+    /**
+     * Recupera la prima query che contiene il frammento richiesto.
+     *
+     * @param array<int, array{0:string,1:array}> $queries Query catturate.
+     * @param string $needle Frammento SQL cercato.
+     * @return array{0:string,1:array}
+     */
+    private function findQuery(array $queries, string $needle): array
+    {
+        foreach ($queries as $query):
+            if (str_contains($query[0], $needle)):
+                return $query;
+            endif;
+        endforeach;
+
+        $this->fail('Query non trovata: ' . $needle);
     }
 }

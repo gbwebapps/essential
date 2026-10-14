@@ -2,6 +2,7 @@
 
 namespace App\Models\Backend\Components;
 
+use App\Libraries\ImageFileSystemService;
 use App\Models\Backend\BackendModel;
 
 /**
@@ -32,19 +33,19 @@ class UploadPreviewModel extends BackendModel
 	 *
 	 * @return array Regole native di CodeIgniter per i campi nascosti
 	 */
-	public function uploadPreviewHiddenRules()
+	public function uploadPreviewHiddenRules(): array
 	{
 		return [
 			'entity' => [
-			    'label' => lang('backend/components/uploadPreviewImg.labels.entity'),
-			    'rules' => ['required', 'alpha'],
+			    'label' => lang('backend/components/uploadPreview.labels.entity'),
+			    'rules' => ['required', 'in_list[admins]'],
 			],
 			'uuid' => [
-			    'label' => lang('backend/components/uploadPreviewImg.labels.uuid'),
+			    'label' => lang('backend/components/uploadPreview.labels.uuid'),
 			    'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
 			],
 			'context' => [
-			    'label' => lang('backend/components/uploadPreviewImg.labels.context'),
+			    'label' => lang('backend/components/uploadPreview.labels.context'),
 			    'rules' => ['required', 'in_list[edit,show]'],
 			],
 		];
@@ -62,7 +63,7 @@ class UploadPreviewModel extends BackendModel
 	 *
 	 * @return array Regole di validazione per l'array di file
 	 */
-	public function uploadPreviewImagesRules()
+	public function uploadPreviewImagesRules(): array
 	{
 		return [
 			'images' => [
@@ -87,6 +88,7 @@ class UploadPreviewModel extends BackendModel
 	public function saveImages(array $posts): array
 	{
 		$posts = $this->checkAllowedFields($posts, $this->uploadPreviewAllowedFields);
+		$filenames = [];
 
 		try {
 
@@ -95,30 +97,38 @@ class UploadPreviewModel extends BackendModel
 		        $uploadService = $this->getUploadService();
 		        $filenames = $uploadService->doUpload($posts['images'], $posts['entity'], $posts['uuid']);
 
-		        if ($filenames):
-
-		            /* Eseguiamo la query secca. Se fallisce, restituisce false o lancia un'eccezione */
-		            $inserted = $this->insertImages($filenames, $posts['uuid'], $posts['entity'], $posts['context']);
-		            
-		            if ($inserted === false):
-		                log_message('error', lang('backend/components/uploadPreviewImg.messages.addError'));
-		                return ['result' => false, 'message' => lang('backend/components/uploadPreviewImg.messages.saveImagesError')];
-		            endif;
+		        if ($filenames === false):
+		            return ['result' => false, 'message' => lang('backend/components/uploadPreview.messages.saveImagesError')];
 		        endif;
+
+				/* Se la persistenza fallisce, elimina i file appena creati per evitare orfani. */
+				if ( ! $this->insertImages($filenames, $posts['uuid'], $posts['entity'], $posts['context'])):
+					foreach ($filenames as $filename):
+						ImageFileSystemService::removeSingleImage($posts['entity'], $posts['uuid'], $filename);
+					endforeach;
+
+					log_message('error', lang('backend/components/uploadPreview.messages.addError'));
+					return ['result' => false, 'message' => lang('backend/components/uploadPreview.messages.saveImagesError')];
+				endif;
 
 		        log_admin_activity('SAVE_IMAGES', 'upload preview', 'Salvataggio immagini.');
 
-		        return ['result' => true, 'message' => lang('backend/components/uploadPreviewImg.messages.saveImagesSuccess')];
+		        return ['result' => true, 'message' => lang('backend/components/uploadPreview.messages.saveImagesSuccess')];
 
 		    endif;
 
-			return ['result' => false, 'message' => lang('backend/components/uploadPreviewImg.messages.saveImagesError')];
+			return ['result' => false, 'message' => lang('backend/components/uploadPreview.messages.saveImagesError')];
 
 		} catch(\Throwable $e) {
+			if (is_array($filenames)):
+				foreach ($filenames as $filename):
+					ImageFileSystemService::removeSingleImage($posts['entity'], $posts['uuid'], $filename);
+				endforeach;
+			endif;
 
 		    /* Qualsiasi errore strutturale finisce qui dentro in sicurezza */
-		    log_message('error', lang('backend/components/uploadPreviewImg.messages.saveImagesError') . ' - ' . $e);
-		    return ['result' => false, 'message' => lang('backend/components/uploadPreviewImg.messages.saveImagesError')];
+		    log_message('error', lang('backend/components/uploadPreview.messages.saveImagesError') . ' - ' . $e);
+		    return ['result' => false, 'message' => lang('backend/components/uploadPreview.messages.saveImagesError')];
 		}
 	}
 }

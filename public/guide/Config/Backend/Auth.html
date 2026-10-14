@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="index, follow, all" />
+    <title>Config\Backend\Auth | Essential API</title>
+
+            <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/doctum.css">
+        <link rel="stylesheet" type="text/css" href="../../fonts/doctum-font.css">
+        <script src="../../js/jquery-3.5.1.slim.min.js"></script>
+        <script async defer src="../../doctum.js"></script>
+        <script async defer src="../../js/bootstrap.min.js"></script>
+        <script async defer src="../../js/autocomplete.min.js"></script>
+        <meta name="MobileOptimized" content="width">
+        <meta name="HandheldFriendly" content="true">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+
+    </head>
+
+    <body id="class" data-name="class:Config_Backend_Auth" data-root-path="../../" data-search-index-url="../../doctum-search.json">
+            <div id="content">
+        <div id="left-column">
+                <div id="control-panel">
+                <div class="search-bar hidden" id="search-progress-bar-container">
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" id="search-progress-bar"
+                    aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+            </div>
+        </div>
+        <form id="search-form" action="../../search.html">
+            <span class="icon icon-search"></span>
+            <input name="search"
+                   id="doctum-search-auto-complete"
+                   class="typeahead form-control"
+                   type="search"
+                   placeholder="Search"
+                   spellcheck="false"
+                   autocorrect="off"
+                   autocomplete="off"
+                   autocapitalize="off">
+            <div class="auto-complete-results" id="auto-complete-results"></div>
+        </form>
+    </div>
+
+                <div id="api-tree"></div>
+
+        </div>
+        <div id="right-column">
+                <nav id="site-nav" class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-elements">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="../../index.html">Essential API</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-elements">
+                <ul class="nav navbar-nav">
+                    <li><a href="../../classes.html">Classes</a></li>
+                    <li><a href="../../namespaces.html">Namespaces</a></li>
+                    <li><a href="../../interfaces.html">Interfaces</a></li>
+                    <li><a href="../../traits.html">Traits</a></li>
+                    <li><a href="../../doc-index.html">Index</a></li>
+                    <li><a href="../../search.html">Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+                        <div class="namespace-breadcrumbs">
+            <ol class="breadcrumb">
+                <li><span class="label label-default">class</span></li>
+                        <li><a href="../../Config.html">Config</a></li><li class="backslash">\</li><li><a href="../../Config/Backend.html">Backend</a></li><li class="backslash">\</li><li>Auth</li>
+            </ol>
+        </div>
+                <div id="page-content">
+    <div class="page-header">
+        <h1>Auth    
+            </h1>
+    </div>
+
+    
+    <p>        class
+    <strong>Auth</strong>        extends <abbr title="CodeIgniter\Config\BaseConfig">BaseConfig</abbr>
+</p>
+
+        
+        
+    
+        
+
+            <div class="description">
+            <p><p>Gestisce la configurazione dei parametri di autenticazione, sicurezza, crittografia e gestione delle sessioni del backend.</p></p>                    </div>
+            
+        
+    
+            <h2>Properties</h2>
+
+            <table class="table table-condensed">
+                    <tr>
+                <td class="type" id="property_hashKey">
+                                                                                string
+                                                                                
+                                    </td>
+                <td>$hashKey</td>
+                <td class="last"><p>Chiave di cifratura utilizzata per le funzioni di hash</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_sessionCryptoKey">
+                                                                                string
+                                                                                
+                                    </td>
+                <td>$sessionCryptoKey</td>
+                <td class="last"><p>Chiave crittografica dedicata alla sicurezza delle sessioni</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_attempts">
+                                                                                bool
+                                                                                
+                                    </td>
+                <td>$attempts</td>
+                <td class="last"><p>Indica se il controllo dei tentativi di accesso falliti è attivo</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_attemptsInterval">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$attemptsInterval</td>
+                <td class="last"><p>Intervallo di tempo in secondi per il blocco dei tentativi di accesso</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_attemptsLimit">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$attemptsLimit</td>
+                <td class="last"><p>Numero massimo consentito di tentativi di accesso prima del blocco</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_attemptsIpMultiplier">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$attemptsIpMultiplier</td>
+                <td class="last"><p>Moltiplicatore interno applicato al limite per identificatore per ricavare il limite IP</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_twoFactor">
+                                                                                bool
+                                                                                
+                                    </td>
+                <td>$twoFactor</td>
+                <td class="last"><p>Indica se l'autenticazione a due fattori (2FA) è abilitata globalmente</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_twoFactorAttempts">
+                                                                                bool
+                                                                                
+                                    </td>
+                <td>$twoFactorAttempts</td>
+                <td class="last"><p>Indica se il controllo dei tentativi OTP falliti è attivo</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_twoFactorLimit">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$twoFactorLimit</td>
+                <td class="last"><p>Limite massimo di tentativi errati consentiti per la verifica del codice 2FA</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_twoFactorTime">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$twoFactorTime</td>
+                <td class="last"><p>Durata massima in secondi della sessione temporanea di verifica 2FA</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_twoFactorAttemptsInterval">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$twoFactorAttemptsInterval</td>
+                <td class="last"><p>Finestra temporale in secondi per il controllo dei tentativi OTP falliti</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_twoFactorIssuer">
+                                                                                string
+                                                                                
+                                    </td>
+                <td>$twoFactorIssuer</td>
+                <td class="last"><p>Nome dell'emittente associato alla generazione dei codici OTP</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_twoFactorDigits">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$twoFactorDigits</td>
+                <td class="last"><p>Numero di cifre che compongono il codice di verifica 2FA</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_twoFactorWindow">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$twoFactorWindow</td>
+                <td class="last"><p>Tolleranza temporale in finestre temporali per la verifica 2FA</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_twoFactorEmailExpiry">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$twoFactorEmailExpiry</td>
+                <td class="last"><p>Tempo di scadenza in secondi per il codice 2FA inviato via email</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_twoFactorOtpExpiry">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$twoFactorOtpExpiry</td>
+                <td class="last"><p>Tempo di scadenza in secondi per il codice 2FA inviato via app</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_twoFactorEmailFrom">
+                                                                                string
+                                                                                
+                                    </td>
+                <td>$twoFactorEmailFrom</td>
+                <td class="last"><p>Indirizzo email predefinito utilizzato per l'invio dei codici 2FA</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_twoFactorMethods">
+                                                                                array
+                                                                                
+                                    </td>
+                <td>$twoFactorMethods</td>
+                <td class="last"><p>Elenco dei metodi di autenticazione a due fattori supportati</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_rememberMeTime">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$rememberMeTime</td>
+                <td class="last"><p>Durata in secondi della sessione di ricordo dell'accesso (Remember Me)</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_sessionTime">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$sessionTime</td>
+                <td class="last"><p>Durata massima in secondi di inattività prima della scadenza della sessione</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_activationTime">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$activationTime</td>
+                <td class="last"><p>Tempo di validità in secondi per il link o codice di attivazione dell'account</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_resetAttempts">
+                                                                                bool
+                                                                                
+                                    </td>
+                <td>$resetAttempts</td>
+                <td class="last"><p>Indica se il controllo dei tentativi di reset password pubblico è attivo</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_resetAttemptsLimit">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$resetAttemptsLimit</td>
+                <td class="last"><p>Numero massimo di richieste di reset password pubblico consentite per email</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_resetAttemptsInterval">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$resetAttemptsInterval</td>
+                <td class="last"><p>Finestra temporale in secondi per i tentativi di reset password pubblico</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_resetPasswordLimit">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$resetPasswordLimit</td>
+                <td class="last"><p>Numero massimo di richieste di reset password dall'account autenticato</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_resetPasswordInterval">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$resetPasswordInterval</td>
+                <td class="last"><p>Finestra temporale in secondi per il reset password dall'account autenticato</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_passwordRegex">
+                                                                                string
+                                                                                
+                                    </td>
+                <td>$passwordRegex</td>
+                <td class="last"><p>Espressione regolare per la validazione della robustezza delle password</p></td>
+                <td></td>
+            </tr>
+            </table>
+
+    
+            <h2>Methods</h2>
+
+            <div class="container-fluid underlined">
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8">
+                    <a href="#method___construct">__construct</a>()
+        
+                                            <p><p>Inizializza la configurazione di autenticazione recuperando e convertendo la chiave di cifratura dall'ambiente.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+            </div>
+
+
+        <h2>Details</h2>
+
+            <div id="method-details">
+                    <div class="method-item">
+                    <h3 id="method___construct">
+        <div class="location">at line 29</div>
+        <code>                    
+    <strong>__construct</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Inizializza la configurazione di autenticazione recuperando e convertendo la chiave di cifratura dall'ambiente.</p></p>                        
+        </div>
+        <div class="tags">
+            
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+            </div>
+
+    
+</div><div id="footer">
+        Generated by <a href="https://github.com/code-lts/doctum">Doctum, a API Documentation generator and fork of Sami</a>.</div></div>
+    </div>
+    </body>
+
+</html>

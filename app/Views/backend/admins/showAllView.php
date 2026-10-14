@@ -2,7 +2,7 @@
 
 <?= $this->section('content') ?>
 
-    <div class="admins">
+    <div id="admins-list" class="admins crud-list">
 
         <div class="row">
             <div class="col-12">
@@ -15,7 +15,7 @@
 
                             <!-- Select per il numero delle righe da mostrare -->
                             <div class="col-12 col-md-1 mb-3 mb-md-0">
-                                <select id="changeNumRows" class="form-select">
+                                <select class="form-select changeNumRows">
                                     <option value="5">5</option>
                                     <option value="10">10</option>
                                     <option value="15">15</option>
@@ -26,19 +26,19 @@
 
                             <!-- Bottone Mobile per aprire l'Offcanvas -->
                             <div class="col-12 d-md-none mb-3">
-                                <button class="btn btn-secondary w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#actionsOffcanvas" aria-controls="actionsOffcanvas">
+                                <button class="btn btn-secondary w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#admins-actionsOffcanvas" aria-controls="actionsOffcanvas">
                                     <i class="fa-solid fa-bars"></i> <?= lang('backend/admins.labels.filtersAndOptions'); ?>
                                 </button>
                             </div>
                             <!-- End Bottone Mobile -->
 
                             <!-- Contenitore Offcanvas -->
-                            <div class="col-12 col-md-11 offcanvas-md offcanvas-bottom" tabindex="-1" id="actionsOffcanvas">
+                            <div class="col-12 col-md-11 offcanvas-md offcanvas-bottom" tabindex="-1" id="admins-actionsOffcanvas">
                                 <div class="offcanvas-header">
                                     <h5 class="offcanvas-title">
                                         <i class="fa-solid fa-bars"></i> <?= lang('backend/admins.labels.filtersAndOptions'); ?>
                                     </h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#actionsOffcanvas" aria-label="Close"></button>
+                                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#admins-actionsOffcanvas" aria-label="Close"></button>
                                 </div>
                                 
                                 <div class="offcanvas-body pt-md-2">
@@ -59,19 +59,19 @@
                                         <!-- End Selezione stato record -->
 
                                         <!-- Azioni e Filtri -->
-                                        <a href="#" id="link-search" data-bs-toggle="collapse" data-bs-target="#search-bar" class="cmd-link">
+                                        <a href="#" data-bs-toggle="collapse" data-bs-target="#admins-search-bar" class="cmd-link link-search">
                                             <i class="fa-solid fa-magnifying-glass"></i> <?= lang('backend/admins.links.filters'); ?>
                                         </a>
                                         
-                                        <a href="#" id="link-reset-search" class="cmd-link">
+                                        <a href="#" class="cmd-link link-reset-search">
                                             <i class="fa-solid fa-xmark"></i> <?= lang('backend/admins.links.resetFilters'); ?>
                                         </a>
                                         
-                                        <a href="#" id="reset-sorting-link" class="cmd-link">
+                                        <a href="#" class="cmd-link reset-sorting-link">
                                             <i class="fa-solid fa-sort"></i> <?= lang('backend/admins.links.resetSorting'); ?>
                                         </a>
                                         
-                                        <a href="#" id="refresh-list" class="cmd-link">
+                                        <a href="#" class="cmd-link refresh-list">
                                             <i class="fa-solid fa-arrows-rotate"></i> <?= lang('backend/admins.links.reloadList'); ?>
                                         </a>
                                         
@@ -79,10 +79,9 @@
                                             <i class="fa-solid fa-file-export"></i> <?= lang('backend/components/export.links.export'); ?>
                                         </a>
 
-										<a href="#" id="import-entity" data-import-entity="admins" class="cmd-link">
-											<i class="fa-solid fa-file-import"></i> <?= lang('backend/components/import.links.import'); ?>
-										</a>
-
+                                        <a href="#" id="import-entity" data-import-entity="admins" class="cmd-link">
+                                            <i class="fa-solid fa-file-import"></i> <?= lang('backend/components/import.links.import'); ?>
+                                        </a>
                                         <!-- End Azioni e Filtri -->
 
                                     </div>
@@ -95,7 +94,7 @@
                     <!-- Fine testata lista -->
 
                     <!-- Inizio parte filtri -->
-                    <div id="search-bar" class="collapse">
+                    <div id="admins-search-bar" class="collapse search-bar">
                         <div class="row card-body pb-0">
 
                             <!-- Ricerca avanzata per nome -->
@@ -103,10 +102,10 @@
                                 <div class="mb-2 mb-md-0">
                                     <label for="admins-firstname"><?= lang('backend/admins.labels.firstname'); ?></label>
                                     <div class="input-group">
-                                        <input type="text" id="admins-firstname" class="form-control" placeholder="<?= lang('backend/admins.placeholders.searchFirstname'); ?>" autocomplete="off">
+                                        <input type="text" id="admins-firstname" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.searchFirstname'), 'attr'); ?>" data-search-field="firstname" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
-                                    <div class="error_firstname text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="firstname" class="error_firstname text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End Ricerca avanzata per nome -->
@@ -116,10 +115,10 @@
                                 <div class="mb-2 mb-md-0">
                                     <label for="admins-lastname"><?= lang('backend/admins.labels.lastname'); ?></label>
                                     <div class="input-group">
-                                        <input type="text" id="admins-lastname" class="form-control" placeholder="<?= lang('backend/admins.placeholders.searchLastname'); ?>" autocomplete="off">
+                                        <input type="text" id="admins-lastname" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.searchLastname'), 'attr'); ?>" data-search-field="lastname" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
-                                    <div class="error_lastname text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="lastname" class="error_lastname text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End Ricerca avanzata per cognome -->
@@ -129,10 +128,10 @@
                                 <div class="mb-2 mb-md-0">
                                     <label for="admins-email"><?= lang('backend/admins.labels.email'); ?></label>
                                     <div class="input-group">
-                                        <input type="text" id="admins-email" class="form-control" placeholder="<?= lang('backend/admins.placeholders.searchEmail'); ?>" autocomplete="off">
+                                        <input type="text" id="admins-email" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.searchEmail'), 'attr'); ?>" data-search-field="email" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
-                                    <div class="error_email text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="email" class="error_email text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End Ricerca avanzata per email -->
@@ -142,10 +141,10 @@
                                 <div class="mb-2 mb-md-0">
                                     <label for="admins-phone"><?= lang('backend/admins.labels.phone'); ?></label>
                                     <div class="input-group">
-                                        <input type="text" id="admins-phone" class="form-control" placeholder="<?= lang('backend/admins.placeholders.searchPhone'); ?>" autocomplete="off">
+                                        <input type="text" id="admins-phone" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.searchPhone'), 'attr'); ?>" data-search-field="phone" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
-                                    <div class="error_phone text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="phone" class="error_phone text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End Ricerca avanzata per phone -->
@@ -160,11 +159,11 @@
                                     <!-- Campo Data Da -->
                                     <label for="admins-created_at-from"><?= lang('backend/admins.labels.dateFrom'); ?></label>
                                     <div id="wrapper-admins-created_at-from" class="input-group">
-                                        <input type="text" id="admins-created_at-from" data-input class="form-control" placeholder="<?= lang('backend/admins.placeholders.dateFrom'); ?>" autocomplete="off">
+                                        <input type="text" id="admins-created_at-from" data-input class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.dateFrom'), 'attr'); ?>" data-search-field="created_at-from" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <div class="error_created_at-from text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="created_at-from" class="error_created_at-from text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End ricerca avanzata per data da -->
@@ -175,11 +174,11 @@
                                     <!-- Campo Data A -->
                                     <label for="admins-created_at-to"><?= lang('backend/admins.labels.dateTo'); ?></label>
                                     <div id="wrapper-admins-created_at-to" class="input-group">
-                                        <input type="text" id="admins-created_at-to" data-input class="form-control" placeholder="<?= lang('backend/admins.placeholders.dateTo'); ?>" autocomplete="off">
+                                        <input type="text" id="admins-created_at-to" data-input class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.dateTo'), 'attr'); ?>" data-search-field="created_at-to" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <div class="error_created_at-to text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="created_at-to" class="error_created_at-to text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End ricerca avanzata per data a -->
@@ -190,11 +189,11 @@
                                     <!-- Campo Data Da -->
                                     <label for="admins-updated_at-from"><?= lang('backend/admins.labels.dateFrom'); ?></label>
                                     <div id="wrapper-admins-updated_at-from" class="input-group">
-                                        <input type="text" id="admins-updated_at-from" data-input class="form-control" placeholder="<?= lang('backend/admins.placeholders.dateFrom'); ?>" autocomplete="off">
+                                        <input type="text" id="admins-updated_at-from" data-input class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.dateFrom'), 'attr'); ?>" data-search-field="updated_at-from" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <div class="error_updated_at-from text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="updated_at-from" class="error_updated_at-from text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End ricerca avanzata per data da -->
@@ -205,11 +204,11 @@
                                     <!-- Campo Data A -->
                                     <label for="admins-updated_at-to"><?= lang('backend/admins.labels.dateTo'); ?></label>
                                     <div id="wrapper-admins-updated_at-to" class="input-group">
-                                        <input type="text" id="admins-updated_at-to" data-input class="form-control" placeholder="<?= lang('backend/admins.placeholders.dateTo'); ?>" autocomplete="off">
+                                        <input type="text" id="admins-updated_at-to" data-input class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.dateTo'), 'attr'); ?>" data-search-field="updated_at-to" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <div class="error_updated_at-to text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="updated_at-to" class="error_updated_at-to text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End ricerca avanzata per data a -->

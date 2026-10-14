@@ -2,18 +2,18 @@
     <div class="ps-2 py-1 bg-light fw-bold small mb-2 border text-center rounded-2">
         <?= sprintf(lang('backend/groups.labels.groupNameBar'), esc($name)); ?>
     </div>
-    <form id="edit-admin-exceptions-form" data-uuid="<?= $uuid; ?>">
+    <form id="edit-admin-exceptions-form" data-uuid="<?= esc($uuid, 'attr'); ?>">
 
-        <input type="hidden" name="uuid" value="<?= $uuid; ?>">
+        <input type="hidden" name="uuid" value="<?= esc($uuid, 'attr'); ?>">
 
         <?php foreach($permissions as $key => $permission): ?>
 
             <div class="row mb-2 g-0 bg-light pt-2 ps-2 pe-2 border rounded-2">
                 <div class="col-6 text-start">
-                    <h5><?= $permission['icon']; ?> <?= ucfirst($permission['title']); ?></h5>
+                    <h5><?= $permission['icon']; ?> <?= esc(ucfirst($permission['title'])); ?></h5>
                 </div>
                 <div class="col-6 text-end">
-                    <a href="#" class="select-all" data-controller="<?= $permission['controller']; ?>">
+                    <a href="#" class="select-all" data-controller="<?= esc($permission['controller'], 'attr'); ?>">
                         <i class="fa-solid fa-square-check"></i>
                         <?= lang('backend/global.links.selectAll'); ?>
                     </a>
@@ -22,7 +22,7 @@
 
             <?php $marginClass = ($key === array_key_last($permissions)) ? '' : 'mb-3'; ?>
 
-            <div class="row <?= $marginClass; ?>">
+            <div class="row <?= esc($marginClass, 'attr'); ?>">
 
                 <div class="col-12">
                     <div class="row">
@@ -44,8 +44,8 @@
                             <div class="col-12 col-lg-3 text-center py-1">
                                 <ul class="list-group list-group-flush border rounded-2">
                                     <li class="list-group-item" style="min-height: 75px;">
-                                        <label for="exc_<?= $k; ?>" class="fw-bold text-dark d-block mb-1">
-                                            <i class="fa-solid fa-circle-arrow-down"></i><?= $v; ?>
+                                        <label for="exc_<?= esc($k, 'attr'); ?>" class="fw-bold text-dark d-block mb-1">
+                                            <i class="fa-solid fa-circle-arrow-down"></i><?= esc($v); ?>
                                         </label>
                                         
                                         <?php if ($isGroupActive): ?>
@@ -56,7 +56,7 @@
                                     </li>
                                     <li class="list-group-item">
                                         <div class="form-check form-switch d-inline-block">
-                                            <input type="checkbox" class="form-check-input btn-trigger-admin-perm-switch <?= $permission['controller']; ?>" name="permissions[]" value="<?= $k; ?>" id="exc_<?= $k; ?>" <?= $isChecked; ?>>
+                                            <input type="checkbox" class="form-check-input btn-trigger-admin-perm-switch <?= esc($permission['controller'], 'attr'); ?>" name="permissions[]" value="<?= esc($k, 'attr'); ?>" id="exc_<?= esc($k, 'attr'); ?>" <?= $isChecked; ?>>
                                         </div>
                                     </li>
                                 </ul>
@@ -70,12 +70,12 @@
 
         <?php endforeach; ?>
 
-        <div class="error_exceptions text-danger text-center small fw-bold pb-2">&nbsp;</div>
+        <div class="error_permissions text-danger text-center small fw-bold pb-2">&nbsp;</div>
 
         <div class="row">
             <div class="col-12">
                 <div class="d-flex flex-column flex-md-row justify-content-center gap-2">
-                    <button type="button" class="btn btn-warning text-dark btn-sm btn-refresh-admin-perms" data-uuid="<?= $uuid; ?>" data-message="<?= lang('backend/groups.messages.areYouSureToReload'); ?>">
+                    <button type="button" class="btn btn-warning text-dark btn-sm btn-refresh-admin-perms" data-uuid="<?= esc($uuid, 'attr'); ?>" data-message="<?= esc(lang('backend/groups.messages.areYouSureToReload'), 'attr'); ?>">
                         <i class="fa-solid fa-refresh me-1"></i> <?= lang('backend/groups.buttons.resetData'); ?>
                     </button>
                     <button type="submit" class="btn btn-success btn-sm">

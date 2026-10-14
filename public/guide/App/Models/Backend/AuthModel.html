@@ -1,0 +1,2245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="index, follow, all" />
+    <title>App\Models\Backend\AuthModel | Essential API</title>
+
+            <link rel="stylesheet" type="text/css" href="../../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../../css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="../../../css/doctum.css">
+        <link rel="stylesheet" type="text/css" href="../../../fonts/doctum-font.css">
+        <script src="../../../js/jquery-3.5.1.slim.min.js"></script>
+        <script async defer src="../../../doctum.js"></script>
+        <script async defer src="../../../js/bootstrap.min.js"></script>
+        <script async defer src="../../../js/autocomplete.min.js"></script>
+        <meta name="MobileOptimized" content="width">
+        <meta name="HandheldFriendly" content="true">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+
+    </head>
+
+    <body id="class" data-name="class:App_Models_Backend_AuthModel" data-root-path="../../../" data-search-index-url="../../../doctum-search.json">
+            <div id="content">
+        <div id="left-column">
+                <div id="control-panel">
+                <div class="search-bar hidden" id="search-progress-bar-container">
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" id="search-progress-bar"
+                    aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+            </div>
+        </div>
+        <form id="search-form" action="../../../search.html">
+            <span class="icon icon-search"></span>
+            <input name="search"
+                   id="doctum-search-auto-complete"
+                   class="typeahead form-control"
+                   type="search"
+                   placeholder="Search"
+                   spellcheck="false"
+                   autocorrect="off"
+                   autocomplete="off"
+                   autocapitalize="off">
+            <div class="auto-complete-results" id="auto-complete-results"></div>
+        </form>
+    </div>
+
+                <div id="api-tree"></div>
+
+        </div>
+        <div id="right-column">
+                <nav id="site-nav" class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-elements">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="../../../index.html">Essential API</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-elements">
+                <ul class="nav navbar-nav">
+                    <li><a href="../../../classes.html">Classes</a></li>
+                    <li><a href="../../../namespaces.html">Namespaces</a></li>
+                    <li><a href="../../../interfaces.html">Interfaces</a></li>
+                    <li><a href="../../../traits.html">Traits</a></li>
+                    <li><a href="../../../doc-index.html">Index</a></li>
+                    <li><a href="../../../search.html">Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+                        <div class="namespace-breadcrumbs">
+            <ol class="breadcrumb">
+                <li><span class="label label-default">class</span></li>
+                        <li><a href="../../../App.html">App</a></li><li class="backslash">\</li><li><a href="../../../App/Models.html">Models</a></li><li class="backslash">\</li><li><a href="../../../App/Models/Backend.html">Backend</a></li><li class="backslash">\</li><li>AuthModel</li>
+            </ol>
+        </div>
+                <div id="page-content">
+    <div class="page-header">
+        <h1>AuthModel    
+            </h1>
+    </div>
+
+    
+    <p>        class
+    <strong>AuthModel</strong>        extends <a href="../../../App/Models/Backend/BackendModel.html"><abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a>
+</p>
+
+        
+        
+    
+        
+
+            <div class="description">
+            <p><p>Modello principale dedicato all'Autenticazione e alla Sicurezza degli accessi (Auth).</p></p>            <p><p>Estende il BackendModel e incapsula tutta la complessa business logic legata all'ingresso
+nel sistema. Gestisce il flusso di Login a più step (incluso il controllo 2FA), il sistema
+anti brute-force (throttling dei tentativi falliti), il recupero delle credenziali,
+la generazione di token crittografici (sessioni o cookie "Remember Me") e la tracciatura
+rigorosa di ogni accesso o disconnessione nell'Audit Log.</p></p>        </div>
+            
+        
+            <h2>Constants</h2>    <table class="table table-condensed">
+                    <tr>
+                <td>
+                                                            private
+                                                                                DUMMY_PASSWORD_HASH
+                                    </td>
+                <td class="last">
+                    <p><em><p>Hash password valido usato per uniformare il costo di verifica degli account inesistenti.</p></em></p>
+                    <p></p>
+                </td>
+            </tr>
+            </table>
+
+    
+            <h2>Properties</h2>
+
+            <table class="table table-condensed">
+                    <tr>
+                <td class="type" id="property_db">
+                                        protected                                        <abbr title="CodeIgniter\Database\BaseConnection">BaseConnection</abbr>
+                                                                                
+                                    </td>
+                <td>$db</td>
+                <td class="last"><p>Istanza condivisa della connessione primaria al database.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/BaseModel.html#property_db">
+<abbr title="App\Models\BaseModel">BaseModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_module">
+                                                                                string|null
+                                                                                
+                                    </td>
+                <td>$module</td>
+                <td class="last"><p>Nome identificativo del modulo corrente, utilizzato per instradare i log o risolvere i template email.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_hasSoftDelete">
+                                        protected                                        bool
+                                                                                
+                                    </td>
+                <td>$hasSoftDelete</td>
+                <td class="last"><p>Definisce se l'entità corrente supporta la cancellazione logica (Soft Delete).</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_hasSoftDelete">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_getDataQuery">
+                                        protected                                        string|null
+                                                                                
+                                    </td>
+                <td>$getDataQuery</td>
+                <td class="last"><p>Costrutto SQL nativo preparato per l'estrazione paginata dei record (metodo getData).</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_getDataQuery">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_getUUIDQuery">
+                                        protected                                        string|null
+                                                                                
+                                    </td>
+                <td>$getUUIDQuery</td>
+                <td class="last"><p>Costrutto SQL nativo preparato per la singola estrazione tramite identificatore (metodo getByUUID).</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_getUUIDQuery">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_getNumRowsQuery">
+                                        protected                                        string|null
+                                                                                
+                                    </td>
+                <td>$getNumRowsQuery</td>
+                <td class="last"><p>Costrutto SQL nativo (COUNT) indispensabile per il calcolo matematico della paginazione (metodo getNumRows).</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_getNumRowsQuery">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_defaultColumn">
+                                        protected                                        string|null
+                                                                                
+                                    </td>
+                <td>$defaultColumn</td>
+                <td class="last"><p>La colonna di default a cui ricorrere per l'ordinamento (ORDER BY) in assenza di direttive del client.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_defaultColumn">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_defaultOrder">
+                                        protected                                        string|null
+                                                                                
+                                    </td>
+                <td>$defaultOrder</td>
+                <td class="last"><p>L'ordinamento di default a cui ricorrere per l'ordinamento in assenza di direttive del client.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_defaultOrder">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_toCompare">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$toCompare</td>
+                <td class="last"><p>Elenco dei campi tabella soggetti al controllo euristico di mutazione dati (metodo hasDataChanged).</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_toCompare">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_showAllAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$showAllAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti durante la richiesta di visualizzazione dell'elenco record (es. DataTables).</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_showAllAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_showAllSearchAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$showAllSearchAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi su cui è abilitata l'esecuzione della ricerca testuale (barra di ricerca globale).</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_showAllSearchAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_showAllSearchAllowedDates">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$showAllSearchAllowedDates</td>
+                <td class="last"><p>Whitelist specifica per i campi data ammessi come filtri temporali nell'elenco record.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_showAllSearchAllowedDates">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_addAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$addAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti durante la creazione (INSERT) di un nuovo record.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_addAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_editAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$editAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti durante la modifica (UPDATE) di un record esistente.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_editAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_delAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$delAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti durante la richiesta di eliminazione (Soft Delete o fisica) di un record.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_delAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_changeStatusAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$changeStatusAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi ammessi per l'operazione di cambio stato rapido (es. toggle attivazione/disattivazione).</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_changeStatusAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_allowedOrderColumns">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$allowedOrderColumns</td>
+                <td class="last"><p>Whitelist delle colonne del database su cui è consentito applicare l'ordinamento (ORDER BY) nelle viste ad elenco.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_allowedOrderColumns">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_config">
+                                                            private                    object
+                                                                                
+                                    </td>
+                <td>$config</td>
+                <td class="last"><p>Contenitore per i parametri di configurazione globali del modulo Auth
+(es. limiti di tentativi, durata sessioni, espressioni regolari per le password).</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_loginAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$loginAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi HTTP POST consentiti in fase di Login.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_resetPasswordAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$resetPasswordAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti per la richiesta di reset della password (solo email).</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_setPasswordAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$setPasswordAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti durante l'impostazione fisica di una nuova password
+(tramite link di ripristino o attivazione).</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_verifyAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$verifyAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti durante la verifica OTP per il Secondo Fattore di Autenticazione (2FA).</p></td>
+                <td></td>
+            </tr>
+            </table>
+
+    
+            <h2>Methods</h2>
+
+            <div class="container-fluid underlined">
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8">
+                    <a href="#method___construct">__construct</a>()
+        
+                                            <p><p>Costruttore principale del modello.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/BaseModel.html#method___construct">
+<abbr title="App\Models\BaseModel">BaseModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_initModel">initModel</a>()
+        
+                                            <p><p>Hook di inizializzazione nativo di CodeIgniter 4.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getData">getData</a>(array $posts)
+        
+                                            <p><p>Motore principale per l'estrazione paginata, ordinata e filtrata dei dataset (DataTables e Liste).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_getData">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    int
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getNumRows">getNumRows</a>(array $paramsFilter)
+        
+                                            <p><p>Calcola in modo chirurgico il numero totale dei record che soddisfano la query corrente.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_getNumRows">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_buildFilters">buildFilters</a>(array $searchFields, array $params)
+        
+                                            <p><p>Costruisce in modo dinamico i costrutti logici SQL (LIKE) per la ricerca testuale (Full Search).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_buildFilters">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_buildDateFilters">buildDateFilters</a>(array $searchDates, array $params)
+        
+                                            <p><p>Genera i costrutti logici operazionali (&gt;= e &lt;=) per il partizionamento e filtraggio temporale.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_buildDateFilters">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_buildTrashFilter">buildTrashFilter</a>(string $filter, string $table, bool $hasSoftDelete = true)
+        
+                                            <p><p>Implementa la logica a scudo (Shield) per l'isolamento dei record sottoposti a cancellazione logica.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_buildTrashFilter">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getByUUID">getByUUID</a>(string $uuid)
+        
+                                            <p><p>Recupera un singolo record dal database avvalendosi dell'Identificatore Univoco Universale (UUID).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_getByUUID">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_hasDataChanged">hasDataChanged</a>(array $posts, object $original)
+        
+                                            <p><p>Esegue una validazione euristica delle differenze per l'ottimizzazione degli UPDATE transazionali.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_hasDataChanged">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_insertImages">insertImages</a>(array $filenames, string $uuid, string $entity, string $action = &#039;add&#039;)
+        
+                                            <p><p>Orchestratore logico per l'inserimento massivo (Bulk Insert) delle dipendenze fotografiche (Images).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_insertImages">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_rrmdir">rrmdir</a>(string $dir)
+        
+                                            <p><p>Algoritmo File System distruttivo per la rimozione ricorsiva di cartelle ad albero (RRMDIR).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_rrmdir">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_generateUUID">generateUUID</a>()
+        
+                                            <p><p>Fabbrica crittograficamente sicura per la generazione di Identificatori Univoci Universali (UUID versione 4).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_generateUUID">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_checkAllowedFields">checkAllowedFields</a>(array $posts, array $allowedFields)
+        
+                                            <p><p>Scudo Architetturale Anti Mass-Assignment per la disinfezione dell'input HTTP POST.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_checkAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <a href="../../../App/Libraries/Backend/UploadClass.html"><abbr title="App\Libraries\Backend\UploadClass">UploadClass</abbr></a>
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getUploadService">getUploadService</a>()
+        
+                                            <p><p>Restituisce l'istanza del servizio di upload.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_getUploadService">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_validateLoginRules">validateLoginRules</a>()
+        
+                                            <p><p>Regole di validazione per il form di Login.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_validateResetPasswordRules">validateResetPasswordRules</a>()
+        
+                                            <p><p>Regole di validazione per la richiesta di Reset della Password (Form "Password Dimenticata").</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_validateSetPasswordRules">validateSetPasswordRules</a>()
+        
+                                            <p><p>Regole di validazione per l'impostazione di una nuova password.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_validateVerifyRules">validateVerifyRules</a>()
+        
+                                            <p><p>Regole di validazione per la verifica del codice OTP (2FA).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_login">login</a>(array $posts, <abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr> $request)
+        
+                                            <p><p>Orchestratore principale del flusso di Autenticazione (Login).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_innerLogin">innerLogin</a>(object $admin, bool $rememberMe, <abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr> $request)
+        
+                                            <p><p>Conclude positivamente l'autenticazione generando i token e i cookie necessari.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_resetPassword">resetPassword</a>(array $posts, <abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr> $request)
+        
+                                            <p><p>Gestisce la richiesta di ripristino per "Password dimenticata".</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getAttemptIdentifierHash">getAttemptIdentifierHash</a>(string $identifier)
+        
+                                            <p><p>Calcola l'HMAC stabile dell'identificatore senza memorizzare l'email in chiaro.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getAttemptsStatus">getAttemptsStatus</a>(string $scope, array $identifier, string $ipAddress, int $limit, int $interval)
+        
+                                            <p><p>Restituisce lo stato della finestra tentativi per identificatore e indirizzo IP.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_registerAttempt">registerAttempt</a>(string $scope, array $identifier, string $ipAddress)
+        
+                                            <p><p>Registra un tentativo nella tabella associata all'ambito richiesto.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_renewAttemptsWindow">renewAttemptsWindow</a>(string $scope, array $identifier, string $ipAddress, array $status)
+        
+                                            <p><p>Rinnova l'intera finestra del gruppo che ha causato il blocco.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_clearAttempts">clearAttempts</a>(string $scope, array $identifier)
+        
+                                            <p><p>Elimina i tentativi dopo il completamento positivo di Login o Verify.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getAttemptsTable">getAttemptsTable</a>(string $scope)
+        
+                                            <p><p>Risolve esclusivamente le tabelle autorizzate per evitare identificatori SQL dinamici arbitrari.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_setPassword">setPassword</a>(array $posts)
+        
+                                            <p><p>Salva la nuova password dopo la convalida del token di reset/attivazione.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_checkAuthToken">checkAuthToken</a>(string $token)
+        
+                                            <p><p>Verifica l'autenticità e la validità temporale di un token di reset/attivazione.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_verify">verify</a>(array $posts, <abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr> $request)
+        
+                                            <p><p>Convalida l'inserimento del codice OTP (Autenticazione a Due Fattori).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_logoutBySession">logoutBySession</a>(string $reason = &#039;manual&#039;)
+        
+                                            <p><p>Esegue il Logout (Disconnessione) per gli utenti autenticati via Sessione standard.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_logoutByCookie">logoutByCookie</a>(string $cookieValue, string $reason = &#039;manual&#039;)
+        
+                                            <p><p>Esegue il Logout (Disconnessione) per gli utenti autenticati via Cookie "Ricordami".</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_closeLoginLog">closeLoginLog</a>(string $tokenHash, string $tokenType, string $reason)
+        
+                                            <p><p>Chiude il log di accesso associato a un token senza sovrascrivere log già conclusi.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+            </div>
+
+
+        <h2>Details</h2>
+
+            <div id="method-details">
+                    <div class="method-item">
+                    <h3 id="method___construct">
+        <div class="location">in <a href="../../../App/Models/BaseModel.html#method___construct">
+<abbr title="App\Models\BaseModel">BaseModel</abbr></a> at line 34</div>
+        <code>                    
+    <strong>__construct</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Costruttore principale del modello.</p></p>                <p><p>Al momento dell'istanziazione di qualsiasi classe figlia, innesca automaticamente
+il metodo di inizializzazione interno per predisporre le risorse di base (come il DB).</p></p>        
+        </div>
+        <div class="tags">
+            
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_initModel">
+        <div class="location">at line 72</div>
+        <code>            protected        void
+    <strong>initModel</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Hook di inizializzazione nativo di CodeIgniter 4.</p></p>                <p><p>Richiama il setup genitore e inietta immediatamente in memoria le configurazioni
+del modulo Auth, rendendole disponibili a tutti i metodi della classe per evitare query ripetitive.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getData">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_getData">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 159</div>
+        <code>                    array
+    <strong>getData</strong>(array $posts)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Motore principale per l'estrazione paginata, ordinata e filtrata dei dataset (DataTables e Liste).</p></p>                <p><p>Svolge il lavoro pesante incapsulando: sanitizzazione del payload tramite Whitelist, validazione
+rigorosa delle colonne di ordinamento e calcolo degli offset matematici (LIMIT/OFFSET).
+Compila dinamicamente la stringa SQL finale iniettando costrutti protetti per il filtro Cestino,
+i parametri di ricerca testuale (LIKE) e i range di date. Interroga infine getNumRows() passando
+i filtri esatti per garantire la perfetta coerenza totale/risultati.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Il payload POST strutturato proveniente dall'interfaccia client</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Struttura standardizzata comprendente l'esito (result), il blocco record, i dati di paginazione e l'offset ultimo</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getNumRows">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_getNumRows">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 228</div>
+        <code>            protected        int
+    <strong>getNumRows</strong>(array $paramsFilter)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Calcola in modo chirurgico il numero totale dei record che soddisfano la query corrente.</p></p>                <p><p>Metodo ancillare, rigorosamente accoppiato a getData(). Elabora l'identico set di parametri e filtri
+($paramsFilter) sfruttando query preparate, garantendo al motore di paginazione frontend
+di conoscere l'esatto volume di dati indipendentemente dai limiti della singola "pagina" SQL.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$paramsFilter</td>
+                <td><p>Array contenente i flag e i valori validati (trash_filter, searchFields, searchDates)</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td><p>Il conteggio intero dei record validi estratti dal database</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_buildFilters">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_buildFilters">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 259</div>
+        <code>            protected        string
+    <strong>buildFilters</strong>(array $searchFields, array $params)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Costruisce in modo dinamico i costrutti logici SQL (LIKE) per la ricerca testuale (Full Search).</p></p>                <p><p>Processa l'array di ricerca confrontando ogni chiave con la whitelist dedicata ($showAllSearchAllowedFields).
+Se il campo è autorizzato, concatena la stringa SQL e appende il valore mascherato (%) per riferimento
+nell'array dei parametri ($params), delegando la protezione contro l'Injection al driver PDO.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$searchFields</td>
+                <td><p>Valori di ricerca estratti dal payload del client</p></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$params</td>
+                <td><p>Riferimento all'array PDO per il data binding</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>Porzione di query SQL formattata (es. " AND table.column LIKE ?")</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_buildDateFilters">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_buildDateFilters">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 284</div>
+        <code>            protected        string
+    <strong>buildDateFilters</strong>(array $searchDates, array $params)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Genera i costrutti logici operazionali (&gt;= e &lt;=) per il partizionamento e filtraggio temporale.</p></p>                <p><p>Basandosi sulla whitelist delle colonne Data ammesse ($showAllSearchAllowedDates), intercetta
+convenzionalmente i suffissi di input '-from' e '-to'. Gestisce range temporali parziali o totali,
+accodando i valori referenziati all'array di bind per preservare l'integrità strutturale dell'interrogazione.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$searchDates</td>
+                <td><p>Valori temporali (date/datetime) estratti dal payload del client</p></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$params</td>
+                <td><p>Riferimento all'array PDO per il data binding</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>Porzione di query SQL formattata (es. " AND table.date_col &gt;= ? AND table.date_col &lt;= ?")</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_buildTrashFilter">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_buildTrashFilter">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 320</div>
+        <code>            protected        string
+    <strong>buildTrashFilter</strong>(string $filter, string $table, bool $hasSoftDelete = true)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Implementa la logica a scudo (Shield) per l'isolamento dei record sottoposti a cancellazione logica.</p></p>                <p><p>La funzione analizza lo stato richiesto, rimuove proattivamente i caratteri anomali dal nome tabella via Regex
+per impedire injection sulla stringa. Include un blocco di salvaguardia: se il modulo non possiede
+un cestino logico ($hasSoftDelete = false) restituisce una stringa vuota, prevenendo eccezioni SQL per colonne inesistenti.
+Il comportamento di fallback obbligatorio (active) sigilla l'esposizione dei record cancellati.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$filter</td>
+                <td><p>Lo stato di visibilità richiesto (active, trashed, all)</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$table</td>
+                <td><p>Il nome stringa della tabella di riferimento (sanitizzato internamente)</p></td>
+            </tr>
+                    <tr>
+                <td>bool</td>
+                <td>$hasSoftDelete</td>
+                <td><p>Flag strutturale sulla persistenza logica (default true)</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>Clausola condizionale SQL mirata (es. " AND table.deleted_at IS NULL") o vuota</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getByUUID">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_getByUUID">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 352</div>
+        <code>                    array
+    <strong>getByUUID</strong>(string $uuid)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Recupera un singolo record dal database avvalendosi dell'Identificatore Univoco Universale (UUID).</p></p>                <p><p>Sfrutta la query nativa fornita dal modulo figlio (getUUIDQuery), avvolgendo l'interrogazione in
+un blocco Try/Catch per catturare silenziando disallineamenti gravi a database. Restituisce una struttura
+di array fissa e immutabile, garantendo al BackendController un pattern di risposta standard per l'elaborazione.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$uuid</td>
+                <td><p>La stringa alfanumerica di 36 caratteri (Identificatore)</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Array associativo contenente un booleano (result) e l'oggetto dati (row) in caso di query fortunata</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_hasDataChanged">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_hasDataChanged">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 383</div>
+        <code>            protected        bool
+    <strong>hasDataChanged</strong>(array $posts, object $original)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Esegue una validazione euristica delle differenze per l'ottimizzazione degli UPDATE transazionali.</p></p>                <p><p>Effettua un'analisi comparativa tra il payload POST in ingresso e l'oggetto originario prelevato dal DB.
+Castando temporaneamente entrambi i poli di confronto a stringa, neutralizza le divergenze puramente sintattiche
+tra NULL e stringhe vuote. Effettua uno scanning secondario sulle chiavi di tipo 'images' per rilevare
+l'esistenza di operazioni multimediali in pendenza, ritornando true al primo differenziale rilevato per limitare il dispendio CPU.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dataset sanificato sottomesso via HTTP POST</p></td>
+            </tr>
+                    <tr>
+                <td>object</td>
+                <td>$original</td>
+                <td><p>L'oggetto rappresentativo dell'istanza fisica residente nel database</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td><p>True se è emersa un'effettiva mutazione logica (testo o file immessi), false viceversa</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_insertImages">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_insertImages">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 429</div>
+        <code>            protected        bool
+    <strong>insertImages</strong>(array $filenames, string $uuid, string $entity, string $action = &#039;add&#039;)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Orchestratore logico per l'inserimento massivo (Bulk Insert) delle dipendenze fotografiche (Images).</p></p>                <p><p>Metodo ad elevata efficienza che aggrega tuple in una singola query preparata, minimizzando le latenze I/O con il database.
+Analizza il contesto operativo ('add' o 'edit') allocando in modo automatico l'attributo 'is_cover' (copertina)
+alla prima immagine dell'array iterato, qualora un query lookup preventivo certifichi l'assenza di copertine attuali.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$filenames</td>
+                <td><p>Array monolitico contenente le stringhe alfanumeriche dei file già consolidati su disco</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$uuid</td>
+                <td><p>L'identificatore univoco del record padrone (proprietario della galleria)</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$entity</td>
+                <td><p>Lo slug/nome dell'entità proprietaria associata (es. 'admins')</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$action</td>
+                <td><p>Parametro comportamentale ('add' per prima allocazione, 'edit' per accodamento)</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td><p>True se tutte le immagini sono state registrate, false altrimenti</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_rrmdir">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_rrmdir">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 485</div>
+        <code>            protected        void
+    <strong>rrmdir</strong>(string $dir)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Algoritmo File System distruttivo per la rimozione ricorsiva di cartelle ad albero (RRMDIR).</p></p>                <p><p>Implementazione a basso livello progettata per disintegrare un'intera directory e le sue foglie
+(es. al momento dell'eliminazione fisica di un utente o entità). Scandisce gli inode e si richiama ricorsivamente.
+Fa uso intensivo del soppressore d'errore <code>@</code> di PHP per ammortizzare eccezioni fatali derivanti
+da file in stato "Locked" (OS I/O block) o transitorie indisponibilità di permessi CHMOD.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$dir</td>
+                <td><p>Percorso assoluto root della directory bersaglio sul server</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_generateUUID">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_generateUUID">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 514</div>
+        <code>            protected        string
+    <strong>generateUUID</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Fabbrica crittograficamente sicura per la generazione di Identificatori Univoci Universali (UUID versione 4).</p></p>                <p><p>Ricorre all'API CSPRNG nativa di PHP (random_bytes) per produrre un pool entropico a 16 byte.
+Modifica bit a bit i metadati (AND/OR logici) per conformare la sequenza al rigoroso standard RFC 4122 (versione 4, variante).
+Converte infine il buffer binario in esadecimale stringa con trattini (hyphen).</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>Stringa formattata (es. 'b5e5a210-9e63-4a1c-99a3-5c8e3d304ec8')</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_checkAllowedFields">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_checkAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 537</div>
+        <code>            protected        array
+    <strong>checkAllowedFields</strong>(array $posts, array $allowedFields)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Scudo Architetturale Anti Mass-Assignment per la disinfezione dell'input HTTP POST.</p></p>                <p><p>Filtra e decostruisce l'array dei parametri in ingresso basandosi severamente su una Whitelist fornita come matrice.
+Utilizzando in_array in modalità strict, sgancia ed esegue l'unset su qualsiasi chiave POST arbitraria o malevola
+introdotta per forzare alterazioni su colonne sensibili del database (es. iniezione del campo superadmin o permessi).</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Array grezzo o parzialmente manipolato prelevato dalla request HTTP</p></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$allowedFields</td>
+                <td><p>Array monolitico (Whitelist) dei nodi (chiavi) consentite per il ciclo vitale attuale</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>L'array bonificato e compattato, pronto per i layer Data Access o Validazione</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getUploadService">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_getUploadService">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 558</div>
+        <code>            protected        <a href="../../../App/Libraries/Backend/UploadClass.html"><abbr title="App\Libraries\Backend\UploadClass">UploadClass</abbr></a>
+    <strong>getUploadService</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Restituisce l'istanza del servizio di upload.</p></p>                <p><p>Metodo wrapper utilizzato per incapsulare l'istanziazione diretta
+della libreria, facilitando l'iniezione delle dipendenze (Mocking)
+durante l'esecuzione dei test unitari tramite il pattern Extract Method.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><a href="../../../App/Libraries/Backend/UploadClass.html"><abbr title="App\Libraries\Backend\UploadClass">UploadClass</abbr></a></td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_validateLoginRules">
+        <div class="location">at line 87</div>
+        <code>                    array
+    <strong>validateLoginRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per il form di Login.</p></p>                <p><p>Verifica che l'email sia in un formato valido e che la password sia presente entro la lunghezza massima.
+La validità effettiva della credenziale viene determinata dal confronto con l'hash memorizzato.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole native di CodeIgniter</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_validateResetPasswordRules">
+        <div class="location">at line 108</div>
+        <code>                    array
+    <strong>validateResetPasswordRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per la richiesta di Reset della Password (Form "Password Dimenticata").</p></p>                <p><p>Controlla esclusivamente la correttezza formale dell'indirizzo email prima di interrogare il database.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole native di CodeIgniter</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_validateSetPasswordRules">
+        <div class="location">at line 127</div>
+        <code>                    array
+    <strong>validateSetPasswordRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per l'impostazione di una nuova password.</p></p>                <p><p>Verifica che la nuova password rispetti la Regex di sicurezza, che il campo di conferma combaci
+perfettamente (<code>matches[password]</code>) e applica una regola personalizzata (<code>checkTokenRule</code>)
+per validare l'autenticità del token nascosto inviato dal form.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole strutturate</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_validateVerifyRules">
+        <div class="location">at line 159</div>
+        <code>                    array
+    <strong>validateVerifyRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per la verifica del codice OTP (2FA).</p></p>                <p><p>Assicura che il codice immesso sia composto esattamente da 6 cifre,
+preservando anche gli eventuali zeri iniziali.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole per il campo code</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_login">
+        <div class="location">at line 185</div>
+        <code>                    array
+    <strong>login</strong>(array $posts, <abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr> $request)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Orchestratore principale del flusso di Autenticazione (Login).</p></p>                <p><p>Metodo denso e protetto:</p>
+<ol>
+<li>Filtra i dati in ingresso e legge le configurazioni (es. limiti tentativi, 2FA).</li>
+<li>Applica il throttling uniforme per email anonimizzata e indirizzo IP, anche per account inesistenti.</li>
+<li>Estrae l'utente verificando subito gli scudi (deve essere attivo, non cestinato, non sospeso).</li>
+<li>Valida l'hash della password con costo uniforme. Se fallisce, registra il tentativo errato a DB in transazione.</li>
+<li>Se la password è corretta ma il 2FA è attivo, parcheggia i dati sicuri in una sessione temporanea server-side,
+invia l'eventuale OTP via email e avvisa il controller di richiedere il secondo fattore (<code>result =&gt; '2fa_required'</code>).</li>
+<li>Se il 2FA non è richiesto, azzera i tentativi falliti e demanda la creazione della sessione a <code>innerLogin()</code>.</li>
+</ol></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Credenziali pulite sottomesse dal form</p></td>
+            </tr>
+                    <tr>
+                <td><abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr></td>
+                <td>$request</td>
+                <td><p>Richiesta per estrarre Indirizzo IP</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Risposta strutturata con esito e messaggi per il router o il client</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_innerLogin">
+        <div class="location">at line 379</div>
+        <code>                private    array
+    <strong>innerLogin</strong>(object $admin, bool $rememberMe, <abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr> $request)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Conclude positivamente l'autenticazione generando i token e i cookie necessari.</p></p>                <p><p>Valuta se l'utente ha richiesto la funzione "Ricordami" per decidere la scadenza (cookie lungo o sessione breve).
+Genera un nuovo token crittografico univoco, lo salva nella tabella <code>admins_tokens</code>,
+e inserisce un record di ingresso (Login) nella tabella <code>admins_logs</code> per l'auditing.
+Successivamente rigenera l'ID di sessione PHP (protezione da Session Fixation) e imposta
+il cookie cifrato o la sessione standard, restituendo al frontend un messaggio flash di benvenuto.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>object</td>
+                <td>$admin</td>
+                <td><p>I dati validati dell'amministratore</p></td>
+            </tr>
+                    <tr>
+                <td>bool</td>
+                <td>$rememberMe</td>
+                <td><p>Flag che indica se il client ha spuntato "Ricordami"</p></td>
+            </tr>
+                    <tr>
+                <td><abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr></td>
+                <td>$request</td>
+                <td><p>Richiesta per tracciare User Agent e IP</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Esito positivo</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_resetPassword">
+        <div class="location">at line 512</div>
+        <code>                    array
+    <strong>resetPassword</strong>(array $posts, <abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr> $request)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Gestisce la richiesta di ripristino per "Password dimenticata".</p></p>                <p><p>Cerca l'utente tramite email, assicurandosi che non sia cestinato. Se trovato,
+inizia una transazione per generare un token di attivazione univoco, ne calcola la scadenza,
+lo salva a DB eliminando eventuali vecchi token pendenti e invia l'email transazionale
+contenente il link di recupero.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dati POST contenenti l'email</p></td>
+            </tr>
+                    <tr>
+                <td><abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr></td>
+                <td>$request</td>
+                <td><p>Richiesta HTTP per logging dati connessione</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Esito dell'operazione e relativo messaggio utente</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getAttemptIdentifierHash">
+        <div class="location">at line 657</div>
+        <code>                private    string
+    <strong>getAttemptIdentifierHash</strong>(string $identifier)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Calcola l'HMAC stabile dell'identificatore senza memorizzare l'email in chiaro.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$identifier</td>
+                <td><p>Identificatore già normalizzato.</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>Hash esadecimale SHA-256.</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getAttemptsStatus">
+        <div class="location">at line 675</div>
+        <code>                private    array
+    <strong>getAttemptsStatus</strong>(string $scope, array $identifier, string $ipAddress, int $limit, int $interval)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Restituisce lo stato della finestra tentativi per identificatore e indirizzo IP.</p></p>                <p><p>Prima del conteggio elimina in modo uniforme i record scaduti. Il limite IP è
+intenzionalmente più alto e deriva dal moltiplicatore interno non esposto nei Settings.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$scope</td>
+                <td><p>Ambito supportato: login, verify oppure reset.</p></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$identifier</td>
+                <td><p>Identificatore specifico dell'ambito.</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$ipAddress</td>
+                <td><p>Indirizzo IP della richiesta.</p></td>
+            </tr>
+                    <tr>
+                <td>int</td>
+                <td>$limit</td>
+                <td><p>Limite configurato per l'identificatore.</p></td>
+            </tr>
+                    <tr>
+                <td>int</td>
+                <td>$interval</td>
+                <td><p>Finestra temporale configurata in secondi.</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_registerAttempt">
+        <div class="location">at line 742</div>
+        <code>                private    void
+    <strong>registerAttempt</strong>(string $scope, array $identifier, string $ipAddress)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Registra un tentativo nella tabella associata all'ambito richiesto.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$scope</td>
+                <td><p>Ambito supportato: login, verify oppure reset.</p></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$identifier</td>
+                <td><p>Dati identificativi specifici dell'ambito.</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$ipAddress</td>
+                <td><p>Indirizzo IP della richiesta.</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_renewAttemptsWindow">
+        <div class="location">at line 778</div>
+        <code>                private    void
+    <strong>renewAttemptsWindow</strong>(string $scope, array $identifier, string $ipAddress, array $status)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Rinnova l'intera finestra del gruppo che ha causato il blocco.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$scope</td>
+                <td><p>Ambito supportato: login, verify oppure reset.</p></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$identifier</td>
+                <td><p>Identificatore specifico dell'ambito.</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$ipAddress</td>
+                <td><p>Indirizzo IP della richiesta.</p></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$status</td>
+                <td><p>Stato del limite corrente.</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_clearAttempts">
+        <div class="location">at line 825</div>
+        <code>                private    void
+    <strong>clearAttempts</strong>(string $scope, array $identifier)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Elimina i tentativi dopo il completamento positivo di Login o Verify.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$scope</td>
+                <td><p>Ambito supportato: login oppure verify.</p></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$identifier</td>
+                <td><p>Identificatore specifico dell'ambito.</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getAttemptsTable">
+        <div class="location">at line 853</div>
+        <code>                private    string
+    <strong>getAttemptsTable</strong>(string $scope)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Risolve esclusivamente le tabelle autorizzate per evitare identificatori SQL dinamici arbitrari.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$scope</td>
+                <td><p>Ambito supportato.</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>Nome della tabella tentativi.</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_setPassword">
+        <div class="location">at line 880</div>
+        <code>                    array
+    <strong>setPassword</strong>(array $posts)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Salva la nuova password dopo la convalida del token di reset/attivazione.</p></p>                <p><p>Recupera l'utente a partire dall'hash del token fornito. Esegue in transazione
+la rigenerazione dell'hash della password (<code>password_hash</code>), azzera la data di reset,
+chiude i log aperti e revoca tutti i token attivi dell'amministratore.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dati POST contenenti la nuova password e il token</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Esito del salvataggio</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_checkAuthToken">
+        <div class="location">at line 964</div>
+        <code>                    bool
+    <strong>checkAuthToken</strong>(string $token)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Verifica l'autenticità e la validità temporale di un token di reset/attivazione.</p></p>                <p><p>Metodo di utilità usato frequentemente per proteggere le rotte (es. form di reset password).
+Controlla che il token esista nel database e che il timestamp attuale non abbia
+superato la data di scadenza prestabilita (<code>token_expire</code>).</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$token</td>
+                <td><p>La stringa raw del token da verificare</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td><p>True se il token è valido e non scaduto, false altrimenti</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_verify">
+        <div class="location">at line 1010</div>
+        <code>                    array
+    <strong>verify</strong>(array $posts, <abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr> $request)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Convalida l'inserimento del codice OTP (Autenticazione a Due Fattori).</p></p>                <p><p>Estrae in sicurezza i dati pre-autorizzati dalla sessione temporanea <code>auth_2fa_pending</code>.
+Applica il Throttling specifico per il 2FA: se si sbaglia il codice troppe volte, rinnova il blocco e respinge.
+Verifica il codice immesso valutando sia la corrispondenza (Tramite App Authenticator o DB per OTP Email)
+sia la scadenza temporale. In caso di errore, incrementa i fallimenti in transazione.
+In caso di successo, svuota le tabelle temporanee, distrugge la sessione di parcheggio e
+finalizza l'ingresso invocando <code>innerLogin()</code>.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Il payload contenente il codice (OTP)</p></td>
+            </tr>
+                    <tr>
+                <td><abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr></td>
+                <td>$request</td>
+                <td><p>Richiesta HTTP per l'estrazione dell'IP</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Esito dell'operazione (successo o messaggio d'errore specifico se scaduto o errato)</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_logoutBySession">
+        <div class="location">at line 1189</div>
+        <code>                    void
+    <strong>logoutBySession</strong>(string $reason = &#039;manual&#039;)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Esegue il Logout (Disconnessione) per gli utenti autenticati via Sessione standard.</p></p>                <p><p>Recupera il token dalla sessione locale, identifica il log aperto nella tabella <code>admins_logs</code>
+(tramite <code>login_log_id</code> salvato durante il login) e lo chiude formalmente inserendo
+l'ora di uscita (<code>last_activity</code>) e la causale (es. 'manual' o 'timeout').
+Infine distrugge il record del token dal database e resetta completamente la sessione PHP locale.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$reason</td>
+                <td><p>Motivo della disconnessione (default: 'manual')</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_logoutByCookie">
+        <div class="location">at line 1224</div>
+        <code>                    void
+    <strong>logoutByCookie</strong>(string $cookieValue, string $reason = &#039;manual&#039;)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Esegue il Logout (Disconnessione) per gli utenti autenticati via Cookie "Ricordami".</p></p>                <p><p>Funzionamento analogo a <code>logoutBySession</code>, ma estrae l'hash partendo dal valore crittografato
+del cookie inviato dal browser. Chiude il log aperto registrando il timestamp di logout
+ed elimina definitivamente il token di tipo 'cookie' dal database, invalidando gli accessi futuri.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$cookieValue</td>
+                <td><p>Il valore crittografato del cookie 'backendRememberMe'</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$reason</td>
+                <td><p>Motivo della disconnessione (default: 'manual')</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_closeLoginLog">
+        <div class="location">at line 1258</div>
+        <code>                private    void
+    <strong>closeLoginLog</strong>(string $tokenHash, string $tokenType, string $reason)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Chiude il log di accesso associato a un token senza sovrascrivere log già conclusi.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$tokenHash</td>
+                <td><p>Hash del token di autenticazione.</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$tokenType</td>
+                <td><p>Tipo del token: session oppure cookie.</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$reason</td>
+                <td><p>Motivo della disconnessione.</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+            </div>
+
+    
+</div><div id="footer">
+        Generated by <a href="https://github.com/code-lts/doctum">Doctum, a API Documentation generator and fork of Sami</a>.</div></div>
+    </div>
+    </body>
+
+</html>

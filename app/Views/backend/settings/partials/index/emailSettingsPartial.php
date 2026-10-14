@@ -106,8 +106,23 @@
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="email_SMTPPass" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.SMTPPass'); ?></label>
-                        <input type="text" id="email_SMTPPass" name="SMTPPass" class="form-control shadow-none" value="<?= esc($emailSettings['SMTPPass']); ?>" placeholder="<?= lang('backend/settings.placeholders.SMTPPass'); ?>">
+                        <label for="email_SMTPPass" class="form-label mb-1">
+                            <i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.SMTPPass'); ?>
+                        </label>
+                        <div class="input-group">
+                            <input type="password"
+                                   id="email_SMTPPass"
+                                   name="SMTPPass"
+                                   class="form-control shadow-none"
+                                   value="<?= esc($emailSettings['SMTPPass']); ?>"
+                                   placeholder="<?= lang('backend/settings.placeholders.SMTPPass'); ?>">
+                            <button class="btn btn-secondary bg-white border toggle-password-visibility"
+                                    type="button"
+                                    aria-label="Mostra password"
+                                    aria-pressed="false">
+                                <i class="fa-solid fa-eye text-muted"></i>
+                            </button>
+                        </div>
                         <div class="error_SMTPPass text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
 

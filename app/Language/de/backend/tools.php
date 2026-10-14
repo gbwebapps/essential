@@ -89,8 +89,10 @@ return [
 		'areYouSureToDeleteBackups' => 'Sind Sie sicher, dass Sie das am <br><b>%s</b> erstellte Backup löschen möchten?', 
 		'areYouSureToDeleteLogs' => '<p>Sind Sie sicher, dass Sie die Zugriffe vom <b>%s</b> bis zum <b>%s</b> löschen möchten?</p> <p>Es werden <b>%d</b> Zugriffe gelöscht.</p>',
 		'noAuditsDeleted' => 'Keine Aktivitäten im ausgewählten Zeitraum gelöscht.', 
+		'deleteAuditsError' => 'Die angeforderten Aktivitäten konnten nicht gelöscht werden.',
 		'noAuditsFound' => 'Keine Aktivitäten im ausgewählten Zeitraum gefunden.', 
 		'noLogsDeleted' => 'Keine Zugriffe im ausgewählten Zeitraum gelöscht.', 
+		'deleteLogsError' => 'Die angeforderten Zugriffe konnten nicht gelöscht werden.',
 		'noLogsFound' => 'Keine Zugriffe im ausgewählten Zeitraum gefunden.', 
 		'deleteAuditsSuccess' => '%d Aktivitäten erfolgreich gelöscht <br>vom %s bis %s.', 
 		'deleteLogsSuccess' => '%d Zugriffe erfolgreich gelöscht <br>vom %s bis %s.', 
@@ -108,5 +110,7 @@ return [
 		'noStructure' => 'Keine Daten für die Struktur dieser Tabelle vorhanden.', 
 		'confirmCleanFolder' => 'Sind Sie sicher, dass Sie den Ordner <b>%s</b> leeren möchten? <br>Diese Aktion ist unumkehrbar und kann zu Fehlfunktionen führen.', 
 		'folderCleanSuccess' => 'Es wurden %d Dateien aus dem Ordner %s gelöscht.', 
+		'folderCleanError' => '%d Dateien konnten nicht aus dem Ordner %s gelöscht werden.',
+		'folderCleanUnavailable' => 'Der Ordner %s ist nicht verfügbar oder nicht lesbar.',
 	], 
 ];

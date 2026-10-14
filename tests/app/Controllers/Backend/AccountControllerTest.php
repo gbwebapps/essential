@@ -65,8 +65,6 @@ class AccountControllerTest extends CIUnitTestCase
                         $this->data,
                     'accountModel' => 
                         $this->accountModel,
-                    'accountClass' => 
-                        $this->accountClass,
                     'galleryModel' => 
                         $this->galleryOneModel
                 ];
@@ -88,9 +86,6 @@ class AccountControllerTest extends CIUnitTestCase
 
         $accModel = 
             $props['accountModel'];
-
-        $accClass = 
-            $props['accountClass'];
 
         $gallModel = 
             $props['galleryModel'];
@@ -131,10 +126,6 @@ class AccountControllerTest extends CIUnitTestCase
             $gallModel
         );
 
-        $this->assertInstanceOf(
-            \App\Libraries\Backend\AccountClass::class,
-            $accClass
-        );
     }
 
     public function testEditRendersViewOnGetRequest(): void
@@ -1662,6 +1653,9 @@ class AccountControllerTest extends CIUnitTestCase
         
         $mockRequest->method('is')->willReturn(true);
 
+		$mockRequest->method('getPost')->willReturn(['currentPassword' => 'ValidPassword1!']);
+		$mockRequest->method('getIPAddress')->willReturn('127.0.0.1');
+
         /* 2. MOCK MODEL E ADMIN */
         $builderModel = 
             $this->getMockBuilder(\App\Models\Backend\AccountModel::class);
@@ -1670,11 +1664,16 @@ class AccountControllerTest extends CIUnitTestCase
         
         $mockModel = 
             $builderModel->getMock();
+
+		$mockModel->method('currentPasswordValidationRules')->willReturn([
+			'currentPassword' => ['rules' => ['required']],
+		]);
+		$mockModel->expects($this->once())->method('verifyCurrentPassword')->willReturn(true);
             
         $modelFail = 
             ['result' => false, 'message' => 'Reset failed'];
             
-        $mockModel->method('resetPassword')->willReturn(
+        $mockModel->expects($this->once())->method('resetPassword')->willReturn(
             $modelFail
         );
         
@@ -1781,6 +1780,9 @@ class AccountControllerTest extends CIUnitTestCase
         
         $mockRequest->method('is')->willReturn(true);
 
+		$mockRequest->method('getPost')->willReturn(['currentPassword' => 'ValidPassword1!']);
+		$mockRequest->method('getIPAddress')->willReturn('127.0.0.2');
+
         /* 3. MOCK MODEL E ADMIN */
         $builderModel = 
             $this->getMockBuilder(\App\Models\Backend\AccountModel::class);
@@ -1789,11 +1791,16 @@ class AccountControllerTest extends CIUnitTestCase
         
         $mockModel = 
             $builderModel->getMock();
+
+		$mockModel->method('currentPasswordValidationRules')->willReturn([
+			'currentPassword' => ['rules' => ['required']],
+		]);
+		$mockModel->expects($this->once())->method('verifyCurrentPassword')->willReturn(true);
             
         $modelSuccess = 
             ['result' => true, 'message' => 'Reset success'];
             
-        $mockModel->method('resetPassword')->willReturn(
+        $mockModel->expects($this->once())->method('resetPassword')->willReturn(
             $modelSuccess
         );
         
@@ -2021,7 +2028,9 @@ class AccountControllerTest extends CIUnitTestCase
         
         $mockRequest->method('is')->willReturn(true);
         
-        $mockRequest->method('getPost')->willReturn('email');
+		$mockRequest->method('getPost')->willReturnCallback(
+			static fn (?string $key = null): string => $key === 'currentPassword' ? 'ValidPassword1!' : 'email'
+		);
 
         /* 3. MOCK MODEL (Simuliamo fallimento aggiornamento) */
         $builderModel = 
@@ -2031,6 +2040,8 @@ class AccountControllerTest extends CIUnitTestCase
         
         $mockModel = 
             $builderModel->getMock();
+
+		$mockModel->method('verifyCurrentPassword')->willReturn(true);
             
         $mockModel->expects($this->once())
                   ->method('setBasicMethod')
@@ -2124,7 +2135,9 @@ class AccountControllerTest extends CIUnitTestCase
         
         $mockRequest->method('is')->willReturn(true);
         
-        $mockRequest->method('getPost')->willReturn('email');
+		$mockRequest->method('getPost')->willReturnCallback(
+			static fn (?string $key = null): string => $key === 'currentPassword' ? 'ValidPassword1!' : 'email'
+		);
 
         /* 3. MOCK MODEL (Simuliamo successo aggiornamento) */
         $builderModel = 
@@ -2134,6 +2147,8 @@ class AccountControllerTest extends CIUnitTestCase
         
         $mockModel = 
             $builderModel->getMock();
+
+		$mockModel->method('verifyCurrentPassword')->willReturn(true);
             
         $mockModel->expects($this->once())
                   ->method('setBasicMethod')
@@ -2269,6 +2284,8 @@ class AccountControllerTest extends CIUnitTestCase
         
         $mockRequest->method('is')->willReturn(true);
 
+		$mockRequest->method('getPost')->willReturn('ValidPassword1!');
+
         /* 2. MOCK MODEL E ADMIN (Email necessaria per AppOtpService) */
         $builderModel = 
             $this->getMockBuilder(\App\Models\Backend\AccountModel::class);
@@ -2277,8 +2294,13 @@ class AccountControllerTest extends CIUnitTestCase
         
         $mockModel = 
             $builderModel->getMock();
+
+		$mockModel->method('currentPasswordValidationRules')->willReturn([
+			'currentPassword' => ['rules' => ['required']],
+		]);
+		$mockModel->expects($this->once())->method('verifyCurrentPassword')->willReturn(true);
             
-        $mockModel->method('saveTemporarySecret')->willReturn(false);
+        $mockModel->expects($this->once())->method('saveTemporarySecret')->willReturn(false);
         
         $adminObj = 
             (object) ['uuid' => '123-abc', 'email' => 'admin@test.com'];
@@ -2373,6 +2395,8 @@ class AccountControllerTest extends CIUnitTestCase
         
         $mockRequest->method('is')->willReturn(true);
 
+		$mockRequest->method('getPost')->willReturn('ValidPassword1!');
+
         /* 3. MOCK MODEL E ADMIN (L'email sarà iniettata nell'uri di Endroid) */
         $builderModel = 
             $this->getMockBuilder(\App\Models\Backend\AccountModel::class);
@@ -2381,8 +2405,13 @@ class AccountControllerTest extends CIUnitTestCase
         
         $mockModel = 
             $builderModel->getMock();
+
+		$mockModel->method('currentPasswordValidationRules')->willReturn([
+			'currentPassword' => ['rules' => ['required']],
+		]);
+		$mockModel->expects($this->once())->method('verifyCurrentPassword')->willReturn(true);
             
-        $mockModel->method('saveTemporarySecret')->willReturn(true);
+        $mockModel->expects($this->once())->method('saveTemporarySecret')->willReturn(true);
         
         $adminObj = 
             (object) ['uuid' => '123-abc', 'email' => 'admin@test.com'];
@@ -3051,6 +3080,116 @@ class AccountControllerTest extends CIUnitTestCase
         );
     }
 
+    public function testVerifyCurrentPasswordAcceptsValidPassword(): void
+    {
+        $throttler = $this->createMock(\CodeIgniter\Throttle\ThrottlerInterface::class);
+        $throttler->expects($this->once())
+            ->method('check')
+            ->with(
+                $this->stringStartsWith('account-current-password-'),
+                3,
+                600,
+                0
+            )
+            ->willReturn(true);
+
+        $test = $this->createVerifyCurrentPasswordController(
+            'PasswordCorretta!',
+            true,
+            true,
+            1,
+            $throttler
+        );
+
+        $result = $test['controller']->verifyCurrentPassword();
+
+        $this->assertSame($test['response'], $result);
+        $this->assertSame(['result' => true], $test['output']->data);
+        $this->assertSame(200, $test['output']->statusCode);
+    }
+
+    public function testVerifyCurrentPasswordRejectsWrongPasswordAndConsumesAttempt(): void
+    {
+        $costs = [];
+        $throttler = $this->createMock(\CodeIgniter\Throttle\ThrottlerInterface::class);
+        $throttler->expects($this->exactly(2))
+            ->method('check')
+            ->willReturnCallback(static function (string $key, int $capacity, int $seconds, int $cost) use (&$costs): bool {
+                $costs[] = $cost;
+                return true;
+            });
+
+        $test = $this->createVerifyCurrentPasswordController(
+            'PasswordErrata!',
+            true,
+            false,
+            1,
+            $throttler
+        );
+
+        $result = $test['controller']->verifyCurrentPassword();
+
+        $this->assertSame($test['response'], $result);
+        $this->assertSame([0, 1], $costs);
+        $this->assertSame(false, $test['output']->data['result']);
+        $this->assertSame(
+            lang('backend/account.errors.currentPasswordInvalid'),
+            $test['output']->data['errors']['currentPassword']
+        );
+        $this->assertSame(200, $test['output']->statusCode);
+    }
+
+    public function testVerifyCurrentPasswordReturns429WhenRateLimitIsReached(): void
+    {
+        $throttler = $this->createMock(\CodeIgniter\Throttle\ThrottlerInterface::class);
+        $throttler->expects($this->once())
+            ->method('check')
+            ->with(
+                $this->stringStartsWith('account-current-password-'),
+                3,
+                600,
+                0
+            )
+            ->willReturn(false);
+
+        $test = $this->createVerifyCurrentPasswordController(
+            'PasswordCorretta!',
+            true,
+            true,
+            0,
+            $throttler
+        );
+
+        $result = $test['controller']->verifyCurrentPassword();
+
+        $this->assertSame($test['response'], $result);
+        $this->assertSame(false, $test['output']->data['result']);
+        $this->assertSame(lang('backend/account.messages.tooManyAttempts'), $test['output']->data['message']);
+        $this->assertSame(429, $test['output']->statusCode);
+    }
+
+    public function testVerifyCurrentPasswordRejectsEmptyPasswordBeforeRateLimit(): void
+    {
+        $throttler = $this->createMock(\CodeIgniter\Throttle\ThrottlerInterface::class);
+        $throttler->expects($this->never())->method('check');
+
+        $test = $this->createVerifyCurrentPasswordController(
+            '',
+            false,
+            false,
+            0,
+            $throttler,
+            ['currentPassword' => 'Password obbligatoria']
+        );
+
+        $result = $test['controller']->verifyCurrentPassword();
+
+        $this->assertSame($test['response'], $result);
+        $this->assertSame(false, $test['output']->data['result']);
+        $this->assertSame('Password obbligatoria', $test['output']->data['message']);
+        $this->assertSame(200, $test['output']->statusCode);
+    }
+
     public function testGeneralRendersView(): void
     {
         /* 1. MOCK CONTROLLER */
@@ -3137,5 +3276,101 @@ class AccountControllerTest extends CIUnitTestCase
             $expected, 
             $result
         );
+    }
+
+    /**
+     * Prepara il controller isolato per verificare il precontrollo della password corrente.
+     *
+     * @param string $password Password inviata dalla richiesta
+     * @param bool $validationResult Esito della validazione formale
+     * @param bool $passwordResult Esito della verifica della password nel modello
+     * @param int $expectedVerifyCalls Numero atteso di verifiche sul modello
+     * @param \CodeIgniter\Throttle\ThrottlerInterface $throttler Throttler simulato
+     * @param array $validationErrors Errori di validazione simulati
+     * @return array Controller e dipendenze osservabili del test
+     */
+    private function createVerifyCurrentPasswordController(
+        string $password,
+        bool $validationResult,
+        bool $passwordResult,
+        int $expectedVerifyCalls,
+        \CodeIgniter\Throttle\ThrottlerInterface $throttler,
+        array $validationErrors = []
+    ): array {
+        $request = $this->getMockBuilder(\CodeIgniter\HTTP\IncomingRequest::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $request->method('isAJAX')->willReturn(true);
+        $request->method('is')->with('post')->willReturn(true);
+        $request->method('getPost')->with('currentPassword')->willReturn($password);
+        $request->method('getIPAddress')->willReturn('127.0.0.1');
+
+        $accountModel = $this->getMockBuilder(\App\Models\Backend\AccountModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $accountModel->method('currentPasswordValidationRules')->willReturn([
+            'currentPassword' => ['rules' => ['required']],
+        ]);
+        $accountModel->expects($this->exactly($expectedVerifyCalls))
+            ->method('verifyCurrentPassword')
+            ->with('admin-test', $password)
+            ->willReturn($passwordResult);
+
+        $validator = $this->getMockBuilder(\CodeIgniter\Validation\Validation::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $validator->method('getErrors')->willReturn($validationErrors);
+
+        $settingsModel = $this->getMockBuilder(\App\Models\Backend\SettingsModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $settingsModel->method('getSettings')->with('Backend\\Auth')->willReturn([
+            'attemptsLimit' => 3,
+            'attemptsInterval' => 600,
+        ]);
+        \CodeIgniter\Config\Factories::injectMock(
+            'models',
+            \App\Models\Backend\SettingsModel::class,
+            $settingsModel
+        );
+        Services::injectMock('throttler', $throttler);
+
+        $response = $this->createMock(\CodeIgniter\HTTP\ResponseInterface::class);
+        $output = (object) [
+            'data' => null,
+            'statusCode' => null,
+        ];
+
+        $controller = $this->getMockBuilder(\App\Controllers\Backend\AccountController::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['validateData', 'jsonResponse'])
+            ->getMock();
+        $controller->method('validateData')->willReturn($validationResult);
+        $controller->method('jsonResponse')
+            ->willReturnCallback(static function (array $data, int $statusCode = 200) use ($output, $response) {
+                $output->data = $data;
+                $output->statusCode = $statusCode;
+                return $response;
+            });
+
+        $injector = function () use ($request, $accountModel, $validator) {
+            $this->request = $request;
+            $this->accountModel = $accountModel;
+            $this->validator = $validator;
+            $this->currentAdmin = (object) ['uuid' => 'admin-test'];
+        };
+
+        $boundInjector = \Closure::bind(
+            $injector,
+            $controller,
+            \App\Controllers\Backend\AccountController::class
+        );
+        $boundInjector();
+
+        return [
+            'controller' => $controller,
+            'response' => $response,
+            'output' => $output,
+        ];
     }
 }

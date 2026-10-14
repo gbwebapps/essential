@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for D:\Laragon\www\essential\app\Libraries</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../_css/bootstrap.min.css?v=10.1.16" rel="stylesheet" type="text/css">
+  <link href="../_css/nv.d3.min.css?v=10.1.16" rel="stylesheet" type="text/css">
+  <link href="../_css/style.css?v=10.1.16" rel="stylesheet" type="text/css">
+  <link href="../_css/custom.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+  <header>
+   <div class="container-fluid">
+    <div class="row">
+     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+       <ol class="breadcrumb">
+         <li class="breadcrumb-item"><a href="../index.html">D:\Laragon\www\essential\app</a></li>
+         <li class="breadcrumb-item"><a href="index.html">Libraries</a></li>
+         <li class="breadcrumb-item active">(Dashboard)</li>
+
+       </ol>
+      </nav>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="AppOtpService.php.html#14">App\Libraries\AppOtpService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AccountClass.php.html#15">App\Libraries\Backend\AccountClass</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AdminsClass.php.html#14">App\Libraries\Backend\AdminsClass</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuditsClass.php.html#14">App\Libraries\Backend\AuditsClass</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthClass.php.html#14">App\Libraries\Backend\AuthClass</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthorizationClass.php.html#14">App\Libraries\Backend\AuthorizationClass</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/BackendClass.php.html#13">App\Libraries\Backend\BackendClass</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/DashboardClass.php.html#14">App\Libraries\Backend\DashboardClass</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/EmailService.php.html#12">App\Libraries\Backend\EmailService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsClass.php.html#14">App\Libraries\Backend\GroupsClass</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/LogsClass.php.html#14">App\Libraries\Backend\LogsClass</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/MessagesClass.php.html#15">App\Libraries\Backend\MessagesClass</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/SettingsClass.php.html#14">App\Libraries\Backend\SettingsClass</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/TokensClass.php.html#14">App\Libraries\Backend\TokensClass</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsClass.php.html#14">App\Libraries\Backend\ToolsClass</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/UploadClass.php.html#15">App\Libraries\Backend\UploadClass</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/UsersClass.php.html#15">App\Libraries\Backend\UsersClass</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CryptoService.php.html#12">App\Libraries\CryptoService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EmailOtpService.php.html#12">App\Libraries\EmailOtpService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Frontend/FrontendClass.php.html#7">App\Libraries\Frontend\FrontendClass</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Frontend/HomeClass.php.html#5">App\Libraries\Frontend\HomeClass</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ImageFileSystemService.php.html#12">App\Libraries\ImageFileSystemService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RegExp.php.html#12">App\Libraries\RegExp</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Token.php.html#13">App\Libraries\Token</a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Backend/UploadClass.php.html#15">App\Libraries\Backend\UploadClass</a></td><td class="text-right">1722</td></tr>
+       <tr><td><a href="Backend/AuthorizationClass.php.html#14">App\Libraries\Backend\AuthorizationClass</a></td><td class="text-right">992</td></tr>
+       <tr><td><a href="ImageFileSystemService.php.html#12">App\Libraries\ImageFileSystemService</a></td><td class="text-right">272</td></tr>
+       <tr><td><a href="Backend/AdminsClass.php.html#14">App\Libraries\Backend\AdminsClass</a></td><td class="text-right">132</td></tr>
+       <tr><td><a href="Backend/BackendClass.php.html#13">App\Libraries\Backend\BackendClass</a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="EmailOtpService.php.html#12">App\Libraries\EmailOtpService</a></td><td class="text-right">56</td></tr>
+       <tr><td><a href="CryptoService.php.html#12">App\Libraries\CryptoService</a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="Backend/AuditsClass.php.html#14">App\Libraries\Backend\AuditsClass</a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Backend/LogsClass.php.html#14">App\Libraries\Backend\LogsClass</a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Backend/TokensClass.php.html#14">App\Libraries\Backend\TokensClass</a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Backend/ToolsClass.php.html#14">App\Libraries\Backend\ToolsClass</a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Token.php.html#13">App\Libraries\Token</a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Backend/EmailService.php.html#12">App\Libraries\Backend\EmailService</a></td><td class="text-right">6</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="AppOtpService.php.html#21"><abbr title="App\Libraries\AppOtpService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AppOtpService.php.html#34"><abbr title="App\Libraries\AppOtpService::generateSecret">generateSecret</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AppOtpService.php.html#50"><abbr title="App\Libraries\AppOtpService::getProvisioningUri">getProvisioningUri</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AppOtpService.php.html#74"><abbr title="App\Libraries\AppOtpService::verify">verify</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AccountClass.php.html#29"><abbr title="App\Libraries\Backend\AccountClass::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AdminsClass.php.html#28"><abbr title="App\Libraries\Backend\AdminsClass::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AdminsClass.php.html#43"><abbr title="App\Libraries\Backend\AdminsClass::getLinksBarShowAll">getLinksBarShowAll</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AdminsClass.php.html#60"><abbr title="App\Libraries\Backend\AdminsClass::getLinksBarAdd">getLinksBarAdd</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AdminsClass.php.html#79"><abbr title="App\Libraries\Backend\AdminsClass::getLinksBarEdit">getLinksBarEdit</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AdminsClass.php.html#102"><abbr title="App\Libraries\Backend\AdminsClass::getLinksBarShow">getLinksBarShow</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AdminsClass.php.html#126"><abbr title="App\Libraries\Backend\AdminsClass::getJsShowAll">getJsShowAll</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AdminsClass.php.html#145"><abbr title="App\Libraries\Backend\AdminsClass::getJsShow">getJsShow</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AdminsClass.php.html#162"><abbr title="App\Libraries\Backend\AdminsClass::getCssShowAll">getCssShowAll</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuditsClass.php.html#28"><abbr title="App\Libraries\Backend\AuditsClass::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuditsClass.php.html#44"><abbr title="App\Libraries\Backend\AuditsClass::getJsIndex">getJsIndex</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuditsClass.php.html#65"><abbr title="App\Libraries\Backend\AuditsClass::getCssIndex">getCssIndex</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthClass.php.html#28"><abbr title="App\Libraries\Backend\AuthClass::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthorizationClass.php.html#38"><abbr title="App\Libraries\Backend\AuthorizationClass::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthorizationClass.php.html#54"><abbr title="App\Libraries\Backend\AuthorizationClass::currentAdmin">currentAdmin</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthorizationClass.php.html#89"><abbr title="App\Libraries\Backend\AuthorizationClass::getAdminFromSession">getAdminFromSession</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthorizationClass.php.html#144"><abbr title="App\Libraries\Backend\AuthorizationClass::getAdminFromCookie">getAdminFromCookie</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthorizationClass.php.html#203"><abbr title="App\Libraries\Backend\AuthorizationClass::getAdmin">getAdmin</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/AuthorizationClass.php.html#290"><abbr title="App\Libraries\Backend\AuthorizationClass::refresh">refresh</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/BackendClass.php.html#28"><abbr title="App\Libraries\Backend\BackendClass::getOrderedAssets">getOrderedAssets</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/BackendClass.php.html#75"><abbr title="App\Libraries\Backend\BackendClass::findAssetIndex">findAssetIndex</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/DashboardClass.php.html#28"><abbr title="App\Libraries\Backend\DashboardClass::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/EmailService.php.html#29"><abbr title="App\Libraries\Backend\EmailService::sendActivationEmail">sendActivationEmail</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/GroupsClass.php.html#28"><abbr title="App\Libraries\Backend\GroupsClass::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/LogsClass.php.html#28"><abbr title="App\Libraries\Backend\LogsClass::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/LogsClass.php.html#42"><abbr title="App\Libraries\Backend\LogsClass::getJsIndex">getJsIndex</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/LogsClass.php.html#61"><abbr title="App\Libraries\Backend\LogsClass::getCssIndex">getCssIndex</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/MessagesClass.php.html#29"><abbr title="App\Libraries\Backend\MessagesClass::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/MessagesClass.php.html#98"><abbr title="App\Libraries\Backend\MessagesClass::getLinksBarIndex">getLinksBarIndex</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/MessagesClass.php.html#114"><abbr title="App\Libraries\Backend\MessagesClass::getLinksBarShowAll">getLinksBarShowAll</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/MessagesClass.php.html#130"><abbr title="App\Libraries\Backend\MessagesClass::getLinksBarShow">getLinksBarShow</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/SettingsClass.php.html#28"><abbr title="App\Libraries\Backend\SettingsClass::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/SettingsClass.php.html#42"><abbr title="App\Libraries\Backend\SettingsClass::getJsIndex">getJsIndex</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/SettingsClass.php.html#57"><abbr title="App\Libraries\Backend\SettingsClass::getCssIndex">getCssIndex</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/SettingsClass.php.html#72"><abbr title="App\Libraries\Backend\SettingsClass::getTimezones">getTimezones</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/SettingsClass.php.html#85"><abbr title="App\Libraries\Backend\SettingsClass::getLanguages">getLanguages</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/SettingsClass.php.html#106"><abbr title="App\Libraries\Backend\SettingsClass::getDateFormats">getDateFormats</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/TokensClass.php.html#28"><abbr title="App\Libraries\Backend\TokensClass::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/TokensClass.php.html#42"><abbr title="App\Libraries\Backend\TokensClass::getJsIndex">getJsIndex</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/TokensClass.php.html#61"><abbr title="App\Libraries\Backend\TokensClass::getCssIndex">getCssIndex</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsClass.php.html#28"><abbr title="App\Libraries\Backend\ToolsClass::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsClass.php.html#42"><abbr title="App\Libraries\Backend\ToolsClass::getJsIndex">getJsIndex</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/ToolsClass.php.html#61"><abbr title="App\Libraries\Backend\ToolsClass::getCssIndex">getCssIndex</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/UploadClass.php.html#27"><abbr title="App\Libraries\Backend\UploadClass::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/UploadClass.php.html#46"><abbr title="App\Libraries\Backend\UploadClass::doUpload">doUpload</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/UploadClass.php.html#142"><abbr title="App\Libraries\Backend\UploadClass::cropImage">cropImage</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/UsersClass.php.html#29"><abbr title="App\Libraries\Backend\UsersClass::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/UsersClass.php.html#98"><abbr title="App\Libraries\Backend\UsersClass::getLinksBarIndex">getLinksBarIndex</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/UsersClass.php.html#114"><abbr title="App\Libraries\Backend\UsersClass::getLinksBarShowAll">getLinksBarShowAll</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Backend/UsersClass.php.html#130"><abbr title="App\Libraries\Backend\UsersClass::getLinksBarShow">getLinksBarShow</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CryptoService.php.html#31"><abbr title="App\Libraries\CryptoService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CryptoService.php.html#46"><abbr title="App\Libraries\CryptoService::encrypt">encrypt</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CryptoService.php.html#78"><abbr title="App\Libraries\CryptoService::decrypt">decrypt</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EmailOtpService.php.html#24"><abbr title="App\Libraries\EmailOtpService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EmailOtpService.php.html#39"><abbr title="App\Libraries\EmailOtpService::send">send</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EmailOtpService.php.html#104"><abbr title="App\Libraries\EmailOtpService::verify">verify</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Frontend/FrontendClass.php.html#9"><abbr title="App\Libraries\Frontend\FrontendClass::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Frontend/HomeClass.php.html#7"><abbr title="App\Libraries\Frontend\HomeClass::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ImageFileSystemService.php.html#25"><abbr title="App\Libraries\ImageFileSystemService::removeAllImages">removeAllImages</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ImageFileSystemService.php.html#49"><abbr title="App\Libraries\ImageFileSystemService::removeSingleImage">removeSingleImage</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ImageFileSystemService.php.html#72"><abbr title="App\Libraries\ImageFileSystemService::rrmdir">rrmdir</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RegExp.php.html#24"><abbr title="App\Libraries\RegExp::validateUUID">validateUUID</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RegExp.php.html#40"><abbr title="App\Libraries\RegExp::validatePassword">validatePassword</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Token.php.html#31"><abbr title="App\Libraries\Token::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Token.php.html#49"><abbr title="App\Libraries\Token::getValue">getValue</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Token.php.html#65"><abbr title="App\Libraries\Token::getHash">getHash</abbr></a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Backend/UploadClass.php.html#142"><abbr title="App\Libraries\Backend\UploadClass::cropImage">cropImage</abbr></a></td><td class="text-right">650</td></tr>
+       <tr><td><a href="Backend/UploadClass.php.html#46"><abbr title="App\Libraries\Backend\UploadClass::doUpload">doUpload</abbr></a></td><td class="text-right">240</td></tr>
+       <tr><td><a href="ImageFileSystemService.php.html#72"><abbr title="App\Libraries\ImageFileSystemService::rrmdir">rrmdir</abbr></a></td><td class="text-right">132</td></tr>
+       <tr><td><a href="Backend/AuthorizationClass.php.html#203"><abbr title="App\Libraries\Backend\AuthorizationClass::getAdmin">getAdmin</abbr></a></td><td class="text-right">90</td></tr>
+       <tr><td><a href="Backend/AuthorizationClass.php.html#89"><abbr title="App\Libraries\Backend\AuthorizationClass::getAdminFromSession">getAdminFromSession</abbr></a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="Backend/AuthorizationClass.php.html#144"><abbr title="App\Libraries\Backend\AuthorizationClass::getAdminFromCookie">getAdminFromCookie</abbr></a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="Backend/BackendClass.php.html#28"><abbr title="App\Libraries\Backend\BackendClass::getOrderedAssets">getOrderedAssets</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Backend/AuthorizationClass.php.html#54"><abbr title="App\Libraries\Backend\AuthorizationClass::currentAdmin">currentAdmin</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="CryptoService.php.html#78"><abbr title="App\Libraries\CryptoService::decrypt">decrypt</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="EmailOtpService.php.html#39"><abbr title="App\Libraries\EmailOtpService::send">send</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Backend/BackendClass.php.html#75"><abbr title="App\Libraries\Backend\BackendClass::findAssetIndex">findAssetIndex</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="ImageFileSystemService.php.html#49"><abbr title="App\Libraries\ImageFileSystemService::removeSingleImage">removeSingleImage</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Backend/AdminsClass.php.html#79"><abbr title="App\Libraries\Backend\AdminsClass::getLinksBarEdit">getLinksBarEdit</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/AdminsClass.php.html#102"><abbr title="App\Libraries\Backend\AdminsClass::getLinksBarShow">getLinksBarShow</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/AdminsClass.php.html#126"><abbr title="App\Libraries\Backend\AdminsClass::getJsShowAll">getJsShowAll</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/AuditsClass.php.html#44"><abbr title="App\Libraries\Backend\AuditsClass::getJsIndex">getJsIndex</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/EmailService.php.html#29"><abbr title="App\Libraries\Backend\EmailService::sendActivationEmail">sendActivationEmail</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/LogsClass.php.html#42"><abbr title="App\Libraries\Backend\LogsClass::getJsIndex">getJsIndex</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/TokensClass.php.html#42"><abbr title="App\Libraries\Backend\TokensClass::getJsIndex">getJsIndex</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Backend/ToolsClass.php.html#42"><abbr title="App\Libraries\Backend\ToolsClass::getJsIndex">getJsIndex</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EmailOtpService.php.html#104"><abbr title="App\Libraries\EmailOtpService::verify">verify</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="ImageFileSystemService.php.html#25"><abbr title="App\Libraries\ImageFileSystemService::removeAllImages">removeAllImages</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Token.php.html#31"><abbr title="App\Libraries\Token::__construct">__construct</abbr></a></td><td class="text-right">6</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 10.1.16</a> using <a href="https://www.php.net/" target="_top">PHP 8.3.16</a> and <a href="https://phpunit.de/">PHPUnit 10.5.66</a> at Thu Oct 8 21:23:33 CEST 2026.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="../_js/jquery.min.js?v=10.1.16" type="text/javascript"></script>
+  <script src="../_js/d3.min.js?v=10.1.16" type="text/javascript"></script>
+  <script src="../_js/nv.d3.min.js?v=10.1.16" type="text/javascript"></script>
+  <script type="text/javascript">
+$(document).ready(function() {
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#classCoverageDistribution svg')
+      .datum(getCoverageDistributionData([24,0,0,0,0,0,0,0,0,0,0,0], "Class Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#methodCoverageDistribution svg')
+      .datum(getCoverageDistributionData([70,0,0,0,0,0,0,0,0,0,0,0], "Method Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getCoverageDistributionData(data, label) {
+    var labels = [
+      '0%',
+      '0-10%',
+      '10-20%',
+      '20-30%',
+      '30-40%',
+      '40-50%',
+      '50-60%',
+      '60-70%',
+      '70-80%',
+      '80-90%',
+      '90-100%',
+      '100%'
+    ];
+    var values = [];
+    $.each(labels, function(key) {
+      values.push({x: labels[key], y: data[key]});
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Cyclomatic Complexity');
+
+    d3.select('#classComplexity svg')
+      .datum(getComplexityData([[0,4,"<a href=\"AppOtpService.php.html#14\">App\\Libraries\\AppOtpService<\/a>"],[0,1,"<a href=\"Backend\/AccountClass.php.html#15\">App\\Libraries\\Backend\\AccountClass<\/a>"],[0,11,"<a href=\"Backend\/AdminsClass.php.html#14\">App\\Libraries\\Backend\\AdminsClass<\/a>"],[0,4,"<a href=\"Backend\/AuditsClass.php.html#14\">App\\Libraries\\Backend\\AuditsClass<\/a>"],[0,1,"<a href=\"Backend\/AuthClass.php.html#14\">App\\Libraries\\Backend\\AuthClass<\/a>"],[0,31,"<a href=\"Backend\/AuthorizationClass.php.html#14\">App\\Libraries\\Backend\\AuthorizationClass<\/a>"],[0,8,"<a href=\"Backend\/BackendClass.php.html#13\">App\\Libraries\\Backend\\BackendClass<\/a>"],[0,1,"<a href=\"Backend\/DashboardClass.php.html#14\">App\\Libraries\\Backend\\DashboardClass<\/a>"],[0,2,"<a href=\"Backend\/EmailService.php.html#12\">App\\Libraries\\Backend\\EmailService<\/a>"],[0,1,"<a href=\"Backend\/GroupsClass.php.html#14\">App\\Libraries\\Backend\\GroupsClass<\/a>"],[0,4,"<a href=\"Backend\/LogsClass.php.html#14\">App\\Libraries\\Backend\\LogsClass<\/a>"],[0,4,"<a href=\"Backend\/MessagesClass.php.html#15\">App\\Libraries\\Backend\\MessagesClass<\/a>"],[0,6,"<a href=\"Backend\/SettingsClass.php.html#14\">App\\Libraries\\Backend\\SettingsClass<\/a>"],[0,4,"<a href=\"Backend\/TokensClass.php.html#14\">App\\Libraries\\Backend\\TokensClass<\/a>"],[0,4,"<a href=\"Backend\/ToolsClass.php.html#14\">App\\Libraries\\Backend\\ToolsClass<\/a>"],[0,41,"<a href=\"Backend\/UploadClass.php.html#15\">App\\Libraries\\Backend\\UploadClass<\/a>"],[0,4,"<a href=\"Backend\/UsersClass.php.html#15\">App\\Libraries\\Backend\\UsersClass<\/a>"],[0,6,"<a href=\"CryptoService.php.html#12\">App\\Libraries\\CryptoService<\/a>"],[0,7,"<a href=\"EmailOtpService.php.html#12\">App\\Libraries\\EmailOtpService<\/a>"],[0,1,"<a href=\"Frontend\/FrontendClass.php.html#7\">App\\Libraries\\Frontend\\FrontendClass<\/a>"],[0,1,"<a href=\"Frontend\/HomeClass.php.html#5\">App\\Libraries\\Frontend\\HomeClass<\/a>"],[0,16,"<a href=\"ImageFileSystemService.php.html#12\">App\\Libraries\\ImageFileSystemService<\/a>"],[0,2,"<a href=\"RegExp.php.html#12\">App\\Libraries\\RegExp<\/a>"],[0,4,"<a href=\"Token.php.html#13\">App\\Libraries\\Token<\/a>"]], 'Class Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Method Complexity');
+
+    d3.select('#methodComplexity svg')
+      .datum(getComplexityData([[0,1,"<a href=\"AppOtpService.php.html#21\">App\\Libraries\\AppOtpService::__construct<\/a>"],[0,1,"<a href=\"AppOtpService.php.html#34\">App\\Libraries\\AppOtpService::generateSecret<\/a>"],[0,1,"<a href=\"AppOtpService.php.html#50\">App\\Libraries\\AppOtpService::getProvisioningUri<\/a>"],[0,1,"<a href=\"AppOtpService.php.html#74\">App\\Libraries\\AppOtpService::verify<\/a>"],[0,1,"<a href=\"Backend\/AccountClass.php.html#29\">App\\Libraries\\Backend\\AccountClass::__construct<\/a>"],[0,1,"<a href=\"Backend\/AdminsClass.php.html#28\">App\\Libraries\\Backend\\AdminsClass::__construct<\/a>"],[0,1,"<a href=\"Backend\/AdminsClass.php.html#43\">App\\Libraries\\Backend\\AdminsClass::getLinksBarShowAll<\/a>"],[0,1,"<a href=\"Backend\/AdminsClass.php.html#60\">App\\Libraries\\Backend\\AdminsClass::getLinksBarAdd<\/a>"],[0,2,"<a href=\"Backend\/AdminsClass.php.html#79\">App\\Libraries\\Backend\\AdminsClass::getLinksBarEdit<\/a>"],[0,2,"<a href=\"Backend\/AdminsClass.php.html#102\">App\\Libraries\\Backend\\AdminsClass::getLinksBarShow<\/a>"],[0,2,"<a href=\"Backend\/AdminsClass.php.html#126\">App\\Libraries\\Backend\\AdminsClass::getJsShowAll<\/a>"],[0,1,"<a href=\"Backend\/AdminsClass.php.html#145\">App\\Libraries\\Backend\\AdminsClass::getJsShow<\/a>"],[0,1,"<a href=\"Backend\/AdminsClass.php.html#162\">App\\Libraries\\Backend\\AdminsClass::getCssShowAll<\/a>"],[0,1,"<a href=\"Backend\/AuditsClass.php.html#28\">App\\Libraries\\Backend\\AuditsClass::__construct<\/a>"],[0,2,"<a href=\"Backend\/AuditsClass.php.html#44\">App\\Libraries\\Backend\\AuditsClass::getJsIndex<\/a>"],[0,1,"<a href=\"Backend\/AuditsClass.php.html#65\">App\\Libraries\\Backend\\AuditsClass::getCssIndex<\/a>"],[0,1,"<a href=\"Backend\/AuthClass.php.html#28\">App\\Libraries\\Backend\\AuthClass::__construct<\/a>"],[0,1,"<a href=\"Backend\/AuthorizationClass.php.html#38\">App\\Libraries\\Backend\\AuthorizationClass::__construct<\/a>"],[0,4,"<a href=\"Backend\/AuthorizationClass.php.html#54\">App\\Libraries\\Backend\\AuthorizationClass::currentAdmin<\/a>"],[0,8,"<a href=\"Backend\/AuthorizationClass.php.html#89\">App\\Libraries\\Backend\\AuthorizationClass::getAdminFromSession<\/a>"],[0,8,"<a href=\"Backend\/AuthorizationClass.php.html#144\">App\\Libraries\\Backend\\AuthorizationClass::getAdminFromCookie<\/a>"],[0,9,"<a href=\"Backend\/AuthorizationClass.php.html#203\">App\\Libraries\\Backend\\AuthorizationClass::getAdmin<\/a>"],[0,1,"<a href=\"Backend\/AuthorizationClass.php.html#290\">App\\Libraries\\Backend\\AuthorizationClass::refresh<\/a>"],[0,5,"<a href=\"Backend\/BackendClass.php.html#28\">App\\Libraries\\Backend\\BackendClass::getOrderedAssets<\/a>"],[0,3,"<a href=\"Backend\/BackendClass.php.html#75\">App\\Libraries\\Backend\\BackendClass::findAssetIndex<\/a>"],[0,1,"<a href=\"Backend\/DashboardClass.php.html#28\">App\\Libraries\\Backend\\DashboardClass::__construct<\/a>"],[0,2,"<a href=\"Backend\/EmailService.php.html#29\">App\\Libraries\\Backend\\EmailService::sendActivationEmail<\/a>"],[0,1,"<a href=\"Backend\/GroupsClass.php.html#28\">App\\Libraries\\Backend\\GroupsClass::__construct<\/a>"],[0,1,"<a href=\"Backend\/LogsClass.php.html#28\">App\\Libraries\\Backend\\LogsClass::__construct<\/a>"],[0,2,"<a href=\"Backend\/LogsClass.php.html#42\">App\\Libraries\\Backend\\LogsClass::getJsIndex<\/a>"],[0,1,"<a href=\"Backend\/LogsClass.php.html#61\">App\\Libraries\\Backend\\LogsClass::getCssIndex<\/a>"],[0,1,"<a href=\"Backend\/MessagesClass.php.html#29\">App\\Libraries\\Backend\\MessagesClass::__construct<\/a>"],[0,1,"<a href=\"Backend\/MessagesClass.php.html#98\">App\\Libraries\\Backend\\MessagesClass::getLinksBarIndex<\/a>"],[0,1,"<a href=\"Backend\/MessagesClass.php.html#114\">App\\Libraries\\Backend\\MessagesClass::getLinksBarShowAll<\/a>"],[0,1,"<a href=\"Backend\/MessagesClass.php.html#130\">App\\Libraries\\Backend\\MessagesClass::getLinksBarShow<\/a>"],[0,1,"<a href=\"Backend\/SettingsClass.php.html#28\">App\\Libraries\\Backend\\SettingsClass::__construct<\/a>"],[0,1,"<a href=\"Backend\/SettingsClass.php.html#42\">App\\Libraries\\Backend\\SettingsClass::getJsIndex<\/a>"],[0,1,"<a href=\"Backend\/SettingsClass.php.html#57\">App\\Libraries\\Backend\\SettingsClass::getCssIndex<\/a>"],[0,1,"<a href=\"Backend\/SettingsClass.php.html#72\">App\\Libraries\\Backend\\SettingsClass::getTimezones<\/a>"],[0,1,"<a href=\"Backend\/SettingsClass.php.html#85\">App\\Libraries\\Backend\\SettingsClass::getLanguages<\/a>"],[0,1,"<a href=\"Backend\/SettingsClass.php.html#106\">App\\Libraries\\Backend\\SettingsClass::getDateFormats<\/a>"],[0,1,"<a href=\"Backend\/TokensClass.php.html#28\">App\\Libraries\\Backend\\TokensClass::__construct<\/a>"],[0,2,"<a href=\"Backend\/TokensClass.php.html#42\">App\\Libraries\\Backend\\TokensClass::getJsIndex<\/a>"],[0,1,"<a href=\"Backend\/TokensClass.php.html#61\">App\\Libraries\\Backend\\TokensClass::getCssIndex<\/a>"],[0,1,"<a href=\"Backend\/ToolsClass.php.html#28\">App\\Libraries\\Backend\\ToolsClass::__construct<\/a>"],[0,2,"<a href=\"Backend\/ToolsClass.php.html#42\">App\\Libraries\\Backend\\ToolsClass::getJsIndex<\/a>"],[0,1,"<a href=\"Backend\/ToolsClass.php.html#61\">App\\Libraries\\Backend\\ToolsClass::getCssIndex<\/a>"],[0,1,"<a href=\"Backend\/UploadClass.php.html#27\">App\\Libraries\\Backend\\UploadClass::__construct<\/a>"],[0,15,"<a href=\"Backend\/UploadClass.php.html#46\">App\\Libraries\\Backend\\UploadClass::doUpload<\/a>"],[0,25,"<a href=\"Backend\/UploadClass.php.html#142\">App\\Libraries\\Backend\\UploadClass::cropImage<\/a>"],[0,1,"<a href=\"Backend\/UsersClass.php.html#29\">App\\Libraries\\Backend\\UsersClass::__construct<\/a>"],[0,1,"<a href=\"Backend\/UsersClass.php.html#98\">App\\Libraries\\Backend\\UsersClass::getLinksBarIndex<\/a>"],[0,1,"<a href=\"Backend\/UsersClass.php.html#114\">App\\Libraries\\Backend\\UsersClass::getLinksBarShowAll<\/a>"],[0,1,"<a href=\"Backend\/UsersClass.php.html#130\">App\\Libraries\\Backend\\UsersClass::getLinksBarShow<\/a>"],[0,1,"<a href=\"CryptoService.php.html#31\">App\\Libraries\\CryptoService::__construct<\/a>"],[0,1,"<a href=\"CryptoService.php.html#46\">App\\Libraries\\CryptoService::encrypt<\/a>"],[0,4,"<a href=\"CryptoService.php.html#78\">App\\Libraries\\CryptoService::decrypt<\/a>"],[0,1,"<a href=\"EmailOtpService.php.html#24\">App\\Libraries\\EmailOtpService::__construct<\/a>"],[0,4,"<a href=\"EmailOtpService.php.html#39\">App\\Libraries\\EmailOtpService::send<\/a>"],[0,2,"<a href=\"EmailOtpService.php.html#104\">App\\Libraries\\EmailOtpService::verify<\/a>"],[0,1,"<a href=\"Frontend\/FrontendClass.php.html#9\">App\\Libraries\\Frontend\\FrontendClass::__construct<\/a>"],[0,1,"<a href=\"Frontend\/HomeClass.php.html#7\">App\\Libraries\\Frontend\\HomeClass::__construct<\/a>"],[0,2,"<a href=\"ImageFileSystemService.php.html#25\">App\\Libraries\\ImageFileSystemService::removeAllImages<\/a>"],[0,3,"<a href=\"ImageFileSystemService.php.html#49\">App\\Libraries\\ImageFileSystemService::removeSingleImage<\/a>"],[0,11,"<a href=\"ImageFileSystemService.php.html#72\">App\\Libraries\\ImageFileSystemService::rrmdir<\/a>"],[0,1,"<a href=\"RegExp.php.html#24\">App\\Libraries\\RegExp::validateUUID<\/a>"],[0,1,"<a href=\"RegExp.php.html#40\">App\\Libraries\\RegExp::validatePassword<\/a>"],[0,2,"<a href=\"Token.php.html#31\">App\\Libraries\\Token::__construct<\/a>"],[0,1,"<a href=\"Token.php.html#49\">App\\Libraries\\Token::getValue<\/a>"],[0,1,"<a href=\"Token.php.html#65\">App\\Libraries\\Token::getHash<\/a>"]], 'Method Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getComplexityData(data, label) {
+    var values = [];
+    $.each(data, function(key) {
+      var value = Math.round(data[key][0]*100) / 100;
+      values.push({
+        x: value,
+        y: data[key][1],
+        class: data[key][2],
+        size: 0.05,
+        shape: 'diamond'
+      });
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+});
+  </script>
+ </body>
+</html>

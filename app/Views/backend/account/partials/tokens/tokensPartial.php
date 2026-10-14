@@ -24,18 +24,18 @@
                     $tokenType = $typeMap[$token->token_type] ?? lang('backend/admins.labels.unknown');
 
                     /* Parsing della stringa User Agent tramite l'istanza passata dal Controller */
-                    $userAgent->parse(esc($token->user_agent)); 
+					$userAgent->parse((string) $token->user_agent);
                     
                     /* Inizializzazione corretta della variabile in camelCase */
-                    $agentText = lang('backend/account.labels.operatingSystem') . ' <span class="text-primary">' . $userAgent->getPlatform() . '</span>';
+					$agentText = lang('backend/account.labels.operatingSystem') . ' <span class="text-primary">' . esc($userAgent->getPlatform()) . '</span>';
                     
                     /* Valutazione con metodi nativi in camelCase di CodeIgniter 4 */
                     if($userAgent->isBrowser()):
-                        $agentText .= ' &bull; ' . lang('backend/account.labels.browser') . ' <span class="text-primary">' . $userAgent->getBrowser() . '</span>';
+						$agentText .= ' &bull; ' . lang('backend/account.labels.browser') . ' <span class="text-primary">' . esc($userAgent->getBrowser()) . '</span>';
                     elseif($userAgent->isMobile()):
-                        $agentText .= ' &bull; ' . lang('backend/account.labels.mobile') . ' <span class="text-primary">' . $userAgent->getMobile() . '</span>';
+						$agentText .= ' &bull; ' . lang('backend/account.labels.mobile') . ' <span class="text-primary">' . esc($userAgent->getMobile()) . '</span>';
                     elseif($userAgent->isRobot()):
-                        $agentText .= ' &bull; ' . lang('backend/account.labels.robot') . ' Robot <span class="text-primary">' . $userAgent->getRobot() . '</span>';
+						$agentText .= ' &bull; ' . lang('backend/account.labels.robot') . ' <span class="text-primary">' . esc($userAgent->getRobot()) . '</span>';
                     endif;
                 ?>
 
@@ -48,11 +48,11 @@
                             <div class="row">
                                 <div class="col-12 col-md-4 mb-3 mb-md-0 text-start">
                                     <small class="text-muted fw-bold d-block mb-1"><i class="fa-solid fa-circle-arrow-down me-1"></i><?= lang('backend/account.labels.createdToken'); ?></small>
-                                    <span class="fw-bold"><?= convertDate(esc($token->token_create), 'conversational'); ?></span>
+									<span class="fw-bold"><?= esc(convertDate($token->token_create, 'conversational')); ?></span>
                                 </div>
                                 <div class="col-12 col-md-4 mb-3 mb-md-0 text-start">
                                     <small class="text-muted fw-bold d-block mb-1"><i class="fa-solid fa-circle-arrow-down me-1"></i><?= lang('backend/account.labels.expiredToken'); ?></small>
-                                    <span class="<?= $class; ?>"><?= convertDate($dateExpire->format('Y-m-d H:i:s'), 'conversational'); ?></span>
+									<span class="<?= $class; ?>"><?= esc(convertDate($dateExpire->format('Y-m-d H:i:s'), 'conversational')); ?></span>
                                 </div>
                                 <div class="col-12 col-md-4 mb-3 mb-md-0 text-start">
                                     <small class="text-muted fw-bold d-block mb-1"><i class="fa-solid fa-circle-arrow-down me-1"></i><?= lang('backend/account.labels.typeToken'); ?></small>

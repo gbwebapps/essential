@@ -13,6 +13,13 @@ use OTPHP\TOTP;
  */
 class AppOtpService
 {
+	/**
+	 * Prefisso di versione usato per distinguere i segreti cifrati dai record legacy in chiaro.
+	 *
+	 * @var string
+	 */
+	private const ENCRYPTED_PREFIX = 'enc:v1:';
+
     /**
      * Costruttore del servizio.
      * Inizializza le dipendenze basilari, caricando in memoria l'helper necessario 
@@ -36,6 +43,32 @@ class AppOtpService
         return TOTP::create()->getSecret();
     }
 
+	/**
+	 * Cifra un segreto TOTP prima della persistenza o del salvataggio temporaneo in sessione.
+	 *
+	 * @param string $secret Segreto TOTP in chiaro
+	 * @return string Segreto cifrato e corredato dal prefisso di versione
+	 */
+	public function protectSecret(string $secret): string
+	{
+		return self::ENCRYPTED_PREFIX . service('crypto')->encrypt($secret);
+	}
+
+	/**
+	 * Decifra un segreto TOTP protetto, mantenendo compatibilità con i record legacy in chiaro.
+	 *
+	 * @param string $storedSecret Segreto proveniente dal database o dalla sessione
+	 * @return string|null Segreto in chiaro oppure null se il payload cifrato non è valido
+	 */
+	public function revealSecret(string $storedSecret): ?string
+	{
+		if ( ! str_starts_with($storedSecret, self::ENCRYPTED_PREFIX)):
+			return $storedSecret !== '' ? $storedSecret : null;
+		endif;
+
+		return service('crypto')->decrypt(substr($storedSecret, strlen(self::ENCRYPTED_PREFIX)));
+	}
+
     /**
      * Compila e restituisce l'URI di provisioning standard richiesto per l'accoppiamento del dispositivo.
      * 
@@ -52,7 +85,7 @@ class AppOtpService
         $config = setting('Backend\Auth');
 
         /* Crea l'istanza TOTP impostando la durata standard (30s), l'algoritmo e il numero di cifre */
-        $totp = TOTP::create($secret, 30, 'sha1', (int) $config->twoFactorDigits);
+        $totp = TOTP::create($secret, (int) $config->twoFactorOtpExpiry, 'sha1', (int) $config->twoFactorDigits);
         $totp->setLabel($label);
         $totp->setIssuer($config->twoFactorIssuer);
 
@@ -76,7 +109,7 @@ class AppOtpService
         $config = setting('Backend\Auth');
         
         /* CORREZIONE: Inizializzo l'oggetto con le stesse identiche configurazioni del QR Code */
-        $totp = TOTP::create($secret, 30, 'sha1', (int) $config->twoFactorDigits);
+        $totp = TOTP::create($secret, (int) $config->twoFactorOtpExpiry, 'sha1', (int) $config->twoFactorDigits);
         
         /* Consente una tolleranza di X periodi prima/dopo per compensare disallineamenti di orario dello smartphone */
         $window = (int) $config->twoFactorWindow;

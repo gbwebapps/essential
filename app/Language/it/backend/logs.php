@@ -15,7 +15,7 @@ return [
 		'id' => 'ID non conforme.', 
 	], 
 	'actions' => [
-		'hardDelete' => 'Disconnetti'
+		'disconnectSession' => 'Disconnetti'
 	],
 	'labels' => [
 		'username' => 'Nome utente', 
@@ -35,7 +35,11 @@ return [
 		'banned' => 'Bannato', 
 		'undefined' => 'Indefinito', 
 		'pending' => 'In corso...', 
-		'duration' => 'Durata'
+		'duration' => 'Durata',
+		'mobile' => 'Dispositivo mobile',
+		'robot' => 'Robot',
+		'filtersAndOptions' => 'Opzioni e filtri',
+		'showSystemDetails' => 'Mostra dettagli di sistema'
 	],
 	'placeholders' => [
 		'searchUsername' => 'Cerca per nome utente...', 
@@ -44,15 +48,15 @@ return [
 		'searchLogoutReason' => 'Cerca per motivo di disconnessione...'
 	], 
 	'audits' => [
-		'deleteToken' => 'Interruzione forzata sessione in corso', 
+		'disconnectSession' => 'Interruzione forzata sessione in corso', 
 	], 
 	'messages' => [
 		'noLogsFound' => 'Nessun log trovato.', 
-		'areYouSureHardDelete' => 'Sei sicuro di voler disconnettere <b>%s %s?</b>', 
+		'areYouSureDisconnectSession' => 'Sei sicuro di voler disconnettere <b>%s %s?</b>', 
 		'validationErrors' => 'Errori di validazione.', 
 		'validationToastErrors' => '%s', 
-		'deleteTokenSuccess' => '%s %s è stato disconnesso con successo.', 
-		'deleteTokenError' => 'Disconnessione fallita.', 
+		'disconnectSessionSuccess' => '%s %s è stato disconnesso con successo.', 
+		'disconnectSessionError' => 'Disconnessione fallita.', 
 		'protectedAdmin' => 'Protetto da modifiche.', 
 		'cannotModifyDeleted' => 'Non è possibile modificare un admin eliminato.',
 	]

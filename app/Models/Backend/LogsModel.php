@@ -3,7 +3,6 @@
 namespace App\Models\Backend;
 
 use App\Models\Backend\BackendModel;
-use App\Interfaces\ImportValidationInterface;
 
 /*
  * Modello dedicato alla consultazione dei log di accesso e alla gestione delle sessioni (Logs).
@@ -34,7 +33,7 @@ class LogsModel extends BackendModel
      * 
      * @var array 
      */
-    protected array $allowedOrderColumns = ['username', 'login', 'logout', 'logout_reason']; 
+    protected array $allowedOrderColumns = ['id', 'username', 'login', 'logout', 'logout_reason'];
 
     /**
      * Whitelist dei campi di database su cui è consentito applicare la ricerca testuale libera (filtri LIKE).
@@ -51,7 +50,7 @@ class LogsModel extends BackendModel
     protected array $showAllSearchAllowedDates = ['login'];
 
     /**
-     * Query SQL principale per l'estrazione paginata dei log. 
+     * Query SQL per il conteggio dei log filtrati.
      * Utilizza le JOIN per arricchire la riga di log con i dettagli della sessione (token) e l'anagrafica dell'amministratore.
      * 
      * @var string 
@@ -67,29 +66,19 @@ class LogsModel extends BackendModel
     /**
      * Query SQL principale per l'estrazione paginata dei log. 
      * 
-     * @var string x
+     * @var string
      */
     protected ?string $getNumRowsQuery = "select count(*) as count from admins_logs where 1 = 1";
 
     /**
-     *      * Utilizza le JOIN per arricchire la riga di log con i dettagli della sessione (token) e l'anagrafica dell'amministratore.
-     *      
-     * @var string x
+     * Query SQL per il recupero puntuale di un log.
+     *
+     * @var string
      */
     protected ?string $getUUIDQuery = "select * from admins_logs where id = ?";
 
-    /**
-     * Metodo di inizializzazione nativo di CodeIgniter.
-     * 
-     * Richiama l'impostazione della classe genitore per preparare le dipendenze di base (es. l'helper per tracciare le attività).
-     */
-    protected function initModel(): void 
-    {
-        parent::initModel();
-    }
-
     /*
-     * Regole di validazione per il motore di paginazione e ordinamento (DataTables).
+     * Regole di validazione per il motore di paginazione e ordinamento.
      * 
      * Assicura che la richiesta inviata dal browser contenga valori validi per calcolare 
      * la pagina e l'offset: richiede numeri interi positivi per righe e pagine, 
@@ -118,7 +107,7 @@ class LogsModel extends BackendModel
     /*
      * Regole di validazione per i campi di ricerca testuale e temporale.
      * 
-     * Controlla che il testo inserito dall'operatore sia sicuro (es. consentendo solo lettere per lo username) 
+     * Controlla che il testo inserito dall'operatore sia sicuro, consentendo ricerche parziali sullo username,
      * e vincola il motivo del logout (logout_reason) a una lista chiusa di valori noti. 
      * Verifica inoltre che le date inserite per il filtro temporale rispettino il formato corretto.
      *
@@ -129,7 +118,7 @@ class LogsModel extends BackendModel
         return [
             'searchFields.username' => [
                 'label' => lang('backend/logs.labels.username'), 
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\']+$/u]'], 
+                'rules' => ['permit_empty', 'trim', 'max_length[100]', 'regex_match[/^[a-zA-Z0-9@._+\-]+$/]'],
             ],
             'searchFields.logout_reason' => [
                 'label' => lang('backend/logs.labels.logoutReason'), 
@@ -157,56 +146,84 @@ class LogsModel extends BackendModel
      * @param int $tokenId L'ID numerico del token di sessione o cookie da distruggere
      * @return array Risposta strutturata con esito (result) e messaggio di feedback per l'operatore
      */
-    public function deleteToken(int $tokenId): array
+    public function disconnectSession(int $tokenId): array
     {
+        $transactionStarted = false;
+
         try {
+            if ( ! $this->db->transBegin()):
+                throw new \RuntimeException('disconnectSession: impossibile avviare la transazione.');
+            endif;
+
+            $transactionStarted = true;
+
             /* 1. Recupero il token tramite il suo ID */
             $tokenSql = "select at.id, at.admin_uuid, at.last_activity, at.token_type, a.firstname, a.lastname, a.superadmin, a.deleted_at 
                          from admins_tokens as at 
                          join admins as a 
                          on at.admin_uuid = a.uuid 
-                         where at.id = ?";
+                         where at.id = ?
+                         for update";
             $tokenRow = $this->db->query($tokenSql, [$tokenId])->getRow();
 
-            if ($tokenRow):
-
-                /* Scudo Enterprise: blocco immediato se il record si trova nel cestino */
-                if ($tokenRow->deleted_at !== null):
-                    return ['result' => false, 'message' => lang('backend/logs.messages.cannotModifyDeleted')]; /* Ricorda di creare la stringa lingua */
-                endif;
-
-                /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il superadmin */
-                if ((int) $tokenRow->superadmin === 1):
-                    return ['result'  => false, 'message' => lang('backend/logs.messages.protectedAdmin')];
-                endif;
-                
-                /* 2. Aggiorno il log registrando la forzatura (banned) */
-                if (in_array($tokenRow->token_type, ['cookie', 'session'])):
-                    $logoutTime = ! empty($tokenRow->last_activity) ? $tokenRow->last_activity : date('Y-m-d H:i:s');
-                    
-                    $logUpdateSql = "update admins_logs set logout = ?, logout_reason = 'banned' where token_id = ?";
-                    $this->db->query($logUpdateSql, [$logoutTime, $tokenRow->id]);
-                endif;
-
-                /* 3. Elimino fisicamente il token */
-                $sqlDelete = "delete from admins_tokens where id = ?";
-                $this->db->query($sqlDelete, [$tokenRow->id]);
-
-                /* 4. Log dell'azione per l'audit di sistema (opzionale ma consigliato) */
-                $currentAdmin = service('authorization')->currentAdmin();
-                log_admin_activity('DELETE_TOKEN', 'logs', lang('backend/logs.audits.deleteToken'), $currentAdmin);
-
-                return ['result' => true, 'message' => sprintf(lang('backend/logs.messages.deleteTokenSuccess'), esc($tokenRow->firstname), esc($tokenRow->lastname))];
-                
+            if ( ! $tokenRow):
+                $this->db->transRollback();
+                $transactionStarted = false;
+                return ['result' => false, 'message' => lang('backend/logs.messages.disconnectSessionError')];
             endif;
 
-            return ['result' => false, 'message' => lang('backend/logs.messages.deleteTokenError')];
+            /* Scudo Enterprise: blocco immediato se il record si trova nel cestino */
+            if ($tokenRow->deleted_at !== null):
+                $this->db->transRollback();
+                $transactionStarted = false;
+                return ['result' => false, 'message' => lang('backend/logs.messages.cannotModifyDeleted')];
+            endif;
+
+            /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il superadmin */
+            if ((int) $tokenRow->superadmin === 1):
+                $this->db->transRollback();
+                $transactionStarted = false;
+                return ['result'  => false, 'message' => lang('backend/logs.messages.protectedAdmin')];
+            endif;
+
+            /* 2. Aggiorno il log registrando la forzatura (banned) */
+            if (in_array($tokenRow->token_type, ['cookie', 'session'], true)):
+                $logoutTime = ! empty($tokenRow->last_activity) ? $tokenRow->last_activity : date('Y-m-d H:i:s');
+                
+                $logUpdateSql = "update admins_logs set logout = ?, logout_reason = 'banned' where token_id = ? and logout is null";
+                $this->db->query($logUpdateSql, [$logoutTime, $tokenRow->id]);
+            endif;
+
+            /* 3. Elimino fisicamente il token */
+            $sqlDelete = "delete from admins_tokens where id = ?";
+            $this->db->query($sqlDelete, [$tokenRow->id]);
+
+            if ($this->db->affectedRows() !== 1 || $this->db->transStatus() === false):
+                $this->db->transRollback();
+                $transactionStarted = false;
+                return ['result' => false, 'message' => lang('backend/logs.messages.disconnectSessionError')];
+            endif;
+
+            if ( ! $this->db->transCommit()):
+                throw new \RuntimeException('disconnectSession: commit della transazione non riuscito.');
+            endif;
+
+            $transactionStarted = false;
+
+            /* 4. Log dell'azione per l'audit di sistema */
+            $currentAdmin = service('authorization')->currentAdmin();
+            log_admin_activity('DISCONNECT_SESSION', 'logs', lang('backend/logs.audits.disconnectSession'), $currentAdmin);
+
+            return ['result' => true, 'message' => sprintf(lang('backend/logs.messages.disconnectSessionSuccess'), esc($tokenRow->firstname), esc($tokenRow->lastname))];
 
         } catch (\Throwable $e) {
+            if ($transactionStarted):
+                $this->db->transRollback();
+            endif;
             
             /* Tracciamento dell'errore tecnico */
             log_message('error', 'Errore ban sessione - ' . $e);
-            return ['result' => false, 'message' => lang('backend/logs.messages.deleteTokenError')];
+            return ['result' => false, 'message' => lang('backend/logs.messages.disconnectSessionError')];
             
         }
     }

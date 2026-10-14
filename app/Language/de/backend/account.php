@@ -48,14 +48,19 @@ return [
         'totpSecretKey'      => 'Geheimschlüssel (manuelle Konfiguration)',
 		'enterOtpCode' => 'Geben Sie den 6-stelligen Code ein',
 		'rememberMe' => 'Angemeldet bleiben', 
-		'currentDevice' => 'Aktuelle Sitzung'
+		'currentDevice' => 'Aktuelle Sitzung',
+		'mobile' => 'Mobilgerät',
+		'robot' => 'Robot',
+		'currentPassword' => 'Aktuelles Passwort',
+		'currentPasswordEmailHelp' => 'Nur bei Änderung der E-Mail-Adresse erforderlich.'
 	], 
 	'placeholders' => [
 		'firstname' => 'Vorname eingeben...', 
 		'lastname' => 'Nachname eingeben...', 
 		'email' => 'E-Mail eingeben...', 
 		'phone' => 'Telefonnummer eingeben...', 
-		'note' => 'Zusätzliche Notizen eingeben...', 
+		'note' => 'Zusätzliche Notizen eingeben...',
+		'currentPassword' => 'Aktuelles Passwort eingeben...',
 	], 
 	'buttons' => [
 		'sendData' => 'Daten speichern', 
@@ -64,10 +69,14 @@ return [
 		'resetPassword' => 'Mit dem Passwort-Reset fortfahren',
 		'verifyAndActivate' => 'Überprüfen und aktivieren', 
 		'undoClose' => 'Konfiguration schließen und beenden', 
-		'delete' => 'Löschen'
+		'delete' => 'Löschen',
+		'showPassword' => 'Passwort anzeigen'
 	], 
 	'errors' => [
-		'id' => 'Ungültige ID.', 
+		'id' => 'Ungültige ID.',
+		'safeText' => 'Nicht zulässige Zeichen.',
+		'currentPasswordRequired' => 'Geben Sie Ihr aktuelles Passwort ein.',
+		'currentPasswordInvalid' => 'Das aktuelle Passwort ist falsch.',
 	], 
 	'audits' => [
 	    'updateData'     => 'Allgemeine Datenaktualisierung %s %s',
@@ -91,7 +100,7 @@ return [
 		'noTokensFound' => 'Keine Tokens vorhanden.', 
 		'deleteTokenSuccess' => 'Das Token von %s %s wurde erfolgreich gelöscht.', 
 		'deleteTokenError' => 'Löschen des Tokens fehlgeschlagen.', 
-		'expiringDate' => '<div class="pb-3">Sie haben das Zurücksetzen des Passworts angefordert.</div><div class="pb-3">Bitte überprüfen Sie Ihre E-Mail und schließen Sie den Vorgang ab.</div>Sie haben Zeit bis %s</div>',
+		'expiringDate' => '<div class="pb-3">Sie haben das Zurücksetzen des Passworts angefordert.</div><div class="pb-3">Bitte überprüfen Sie Ihre E-Mail und schließen Sie den Vorgang ab.</div>Sie haben Zeit bis %s',
 		'methodNotValid' => 'Ungültige oder nicht unterstützte Methode.', 
 		'updateSecuritySettingsError' => 'Sicherheitseinstellungen konnten nicht aktualisiert werden.', 
 		'updateSecuritySettingsSuccess' => 'Sicherheitseinstellungen erfolgreich aktualisiert.', 
@@ -102,6 +111,8 @@ return [
 		'totpActivationNotPossible' => 'TOTP-Authentifizierung konnte nicht aktiviert werden.', 
 		'totpConfigurationSuccess' => 'Die Authentifizierungs-App wurde erfolgreich konfiguriert.', 
 		'areYouSureChangeMethod' => 'Sind Sie sicher, dass Sie die Methode für den zweiten Authentifizierungsfaktor ändern möchten?', 
-		'cannotDeleteCurrentToken' => 'Die aktuelle Sitzung kann nicht gelöscht werden.'
+		'cannotDeleteCurrentToken' => 'Die aktuelle Sitzung kann nicht gelöscht werden.',
+		'tooManyResetRequests' => 'Zu viele Anfragen zum Zurücksetzen des Passworts. Versuchen Sie es später erneut.',
+		'tooManyAttempts' => 'Zu viele Versuche. Versuchen Sie es später erneut.'
 	]
 ];

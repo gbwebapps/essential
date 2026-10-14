@@ -3,14 +3,13 @@
 namespace App\Models\Backend;
 
 use App\Models\Backend\BackendModel;
-use App\Interfaces\ImportValidationInterface;
 
 /**
  * Modello dedicato alla gestione e al monitoraggio dei token di sicurezza.
  * 
  * Estende il BackendModel per sfruttare le funzioni di paginazione, ricerca e filtraggio. 
  * Si occupa di mostrare l'elenco dei token attivi o passati (sessioni di login, cookie "ricordami", 
- * token per il reset della password) e permette di revocarli forzatamente, disconnettendo gli utenti.
+ * token di attivazione) e permette di revocarli forzatamente, disconnettendo gli utenti.
  */
 class TokensModel extends BackendModel 
 {
@@ -33,7 +32,7 @@ class TokensModel extends BackendModel
      * 
      * @var array 
      */
-    protected array $allowedOrderColumns = ['email', 'token_create', 'token_expire', 'token_type']; 
+    protected array $allowedOrderColumns = ['id', 'email', 'token_create', 'token_expire', 'token_type', 'created_at'];
 
     /**
      * Whitelist dei campi HTTP POST consentiti per l'operazione di cancellazione del token.
@@ -79,26 +78,6 @@ class TokensModel extends BackendModel
                                             where 1 = 1";
 
     /**
-     * Query per recuperare i dettagli di un singolo token (e del suo proprietario) tramite il suo ID.
-     * 
-     * @var string 
-     */
-    protected ?string $getUUIDQuery = "select admins_tokens.id, admins.uuid, admins.firstname, admins.lastname, admins.deleted_at, admins.superadmin 
-                                        from admins_tokens 
-                                        join admins 
-                                        on admins.uuid = admins_tokens.admin_uuid 
-                                        where admins_tokens.id = ?";
-
-    /**
-     * Metodo di inizializzazione base di CodeIgniter. 
-     * Assicura che le impostazioni del modello genitore vengano caricate correttamente.
-     */
-    protected function initModel(): void 
-    {
-        parent::initModel();
-    }
-
-    /**
      * Fornisce le regole di validazione per la paginazione e l'ordinamento della tabella.
      * 
      * Controlla che la richiesta indichi correttamente quale colonna ordinare, la direzione (asc/desc), 
@@ -137,11 +116,11 @@ class TokensModel extends BackendModel
         return [
             'searchFields.email' => [
                 'label' => lang('backend/tokens.labels.username'), 
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\']+$/u]'], 
+                'rules' => ['permit_empty', 'trim', 'max_length[100]', 'regex_match[/^[a-zA-Z0-9@._+\-]+$/]'],
             ],
             'searchFields.token_type' => [
-                'label' => lang('backend/tokens.labels.token_type'), 
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\']+$/u]'], 
+                'label' => lang('backend/tokens.labels.tokenType'),
+                'rules' => ['permit_empty', 'in_list[activation,session,cookie]'],
             ],
             'searchDates.token_create-from' => [
                 'label' => lang('backend/tokens.labels.dateFrom'),
@@ -155,9 +134,34 @@ class TokensModel extends BackendModel
     }
 
     /**
+     * Costruisce i filtri testuali usando le colonne fisiche corrette delle tabelle coinvolte.
+     *
+     * @param array $searchFields Valori di ricerca validati provenienti dalla lista Tokens
+     * @param array &$params Parametri associati alla query preparata
+     * @return string Clausole SQL da aggiungere alla query principale e alla query di conteggio
+     */
+    protected function buildFilters(array $searchFields, array &$params): string
+    {
+        $whereClause = '';
+        $columns = [
+            'email' => 'admins.email',
+            'token_type' => 'admins_tokens.token_type'
+        ];
+
+        foreach ($searchFields as $key => $value):
+            if (isset($columns[$key])):
+                $whereClause .= ' and ' . $columns[$key] . ' like ?';
+                $params[] = '%' . $value . '%';
+            endif;
+        endforeach;
+
+        return $whereClause;
+    }
+
+    /**
      * Fornisce le regole di validazione per l'eliminazione di un token.
      * 
-     * Assicura che la richiesta contenga un UUID nel formato corretto (stringa standard UUIDv4) 
+     * Assicura che la richiesta contenga un UUID nel formato corretto (versioni standard da 1 a 5)
      * e che l'ID del token sia un numero intero valido, prevenendo alterazioni malevole dei parametri.
      *
      * @return array Regole di validazione per i campi id e uuid
@@ -202,54 +206,78 @@ class TokensModel extends BackendModel
     {
         /* Match dei posts con i campi consentiti */
         $posts = $this->checkAllowedFields($posts, $this->delAllowedFields);
+        $transactionStarted = false;
 
         try 
         {
-            /* Recupero i dati dell'utente prima dell'eliminazione */
-            $data = $this->getByUUID($posts['id']);
+            if ( ! $this->db->transBegin()):
+                throw new \RuntimeException('hardDelete: impossibile avviare la transazione.');
+            endif;
 
-            if($data['result'] === false):
-                return ['result' => false, 'message' => $data['message']];
+            $transactionStarted = true;
+
+            /* Recupero e blocco il token verificando contemporaneamente ID e proprietario */
+            $tokenSql = "select at.id, at.admin_uuid, at.last_activity, at.token_type, a.uuid, a.firstname, a.lastname, a.deleted_at, a.superadmin
+                         from admins_tokens as at
+                         join admins as a
+                         on a.uuid = at.admin_uuid
+                         where at.id = ? and at.admin_uuid = ?
+                         for update";
+            $tokenRow = $this->db->query($tokenSql, [$posts['id'], $posts['uuid']])->getRow();
+
+            if ( ! $tokenRow):
+                $this->db->transRollback();
+                $transactionStarted = false;
+                return ['result' => false, 'message' => lang('backend/tokens.messages.deleteTokenError')];
             endif;
 
             /* Scudo Enterprise: blocco immediato se il record si trova nel cestino */
-            if ($data['row']->deleted_at !== null):
-                return ['result' => false, 'message' => lang('backend/tokens.messages.cannotModifyDeleted')]; /* Ricorda di creare la stringa lingua */
+            if ($tokenRow->deleted_at !== null):
+                $this->db->transRollback();
+                $transactionStarted = false;
+                return ['result' => false, 'message' => lang('backend/tokens.messages.cannotModifyDeleted')];
             endif;
 
             /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il superadmin */
-            if ((int) $data['row']->superadmin === 1):
+            if ((int) $tokenRow->superadmin === 1):
+                $this->db->transRollback();
+                $transactionStarted = false;
                 return ['result'  => false, 'message' => lang('backend/tokens.messages.protectedAdmin')];
             endif;
 
-            /* 1. Recupero il token per leggere last_activity */
-            $tokenSql = "select id, last_activity, token_type from admins_tokens where admin_uuid = ? and id = ?";
-            $tokenRow = $this->db->query($tokenSql, [$posts['uuid'], $posts['id']])->getRow();
-
-            if ($tokenRow):
-                /* 2. Aggiorno il log registrando la forzatura (banned) */
-                if (in_array($tokenRow->token_type, ['cookie', 'session'])):
-                    $logoutTime = ! empty($tokenRow->last_activity) ? $tokenRow->last_activity : date('Y-m-d H:i:s');
-                    $logUpdateSql = "update admins_logs set logout = ?, logout_reason = 'banned' where token_id = ?";
-                    $this->db->query($logUpdateSql, [$logoutTime, $tokenRow->id]);
-                endif;
+            /* Aggiorno il log aperto registrando la forzatura */
+            if (in_array($tokenRow->token_type, ['cookie', 'session'], true)):
+                $logoutTime = ! empty($tokenRow->last_activity) ? $tokenRow->last_activity : date('Y-m-d H:i:s');
+                $logUpdateSql = "update admins_logs set logout = ?, logout_reason = 'banned' where token_id = ? and logout is null";
+                $this->db->query($logUpdateSql, [$logoutTime, $tokenRow->id]);
             endif;
 
-            /* 3. Elimino fisicamente il token */
+            /* Elimino fisicamente il token */
             $sql = "delete from admins_tokens where admin_uuid = ? and id = ?";
-            $this->db->query($sql, [$posts['uuid'], $posts['id']]);
+            $this->db->query($sql, [$tokenRow->admin_uuid, $tokenRow->id]);
 
-            if($this->db->affectedRows() > 0):
-
-                $currentAdmin = service('authorization')->currentAdmin();
-                log_admin_activity('DELETE_TOKEN', 'tokens', sprintf(lang('backend/tokens.audits.deleteToken'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
-
-                return ['result' => true, 'message' => sprintf(lang('backend/tokens.messages.deleteTokenSuccess'), esc($data['row']->firstname), esc($data['row']->lastname)), 'admin' => $data['row']];
+            if ($this->db->affectedRows() !== 1 || $this->db->transStatus() === false):
+                $this->db->transRollback();
+                $transactionStarted = false;
+                return ['result' => false, 'message' => lang('backend/tokens.messages.deleteTokenError')];
             endif;
 
-            return ['result' => false, 'message' => lang('backend/tokens.messages.deleteTokenError')];
+            if ( ! $this->db->transCommit()):
+                throw new \RuntimeException('hardDelete: commit della transazione non riuscito.');
+            endif;
+
+            $transactionStarted = false;
+
+            $currentAdmin = service('authorization')->currentAdmin();
+            log_admin_activity('DELETE_TOKEN', 'tokens', sprintf(lang('backend/tokens.audits.deleteToken'), esc($tokenRow->firstname), esc($tokenRow->lastname)), $currentAdmin);
+
+            return ['result' => true, 'message' => sprintf(lang('backend/tokens.messages.deleteTokenSuccess'), esc($tokenRow->firstname), esc($tokenRow->lastname)), 'admin' => $tokenRow];
 
         } catch(\Throwable $e) {
+
+            if ($transactionStarted):
+                $this->db->transRollback();
+            endif;
 
             log_message('error', lang('backend/tokens.messages.deleteTokenError') . ' - ' . $e);
             return ['result' => false, 'message' => lang('backend/tokens.messages.deleteTokenError')];

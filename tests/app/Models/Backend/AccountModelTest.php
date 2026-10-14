@@ -1226,6 +1226,9 @@ class AccountModelTest extends CIUnitTestCase
         );
         
         $mockDb->method('affectedRows')->willReturn(1);
+		$mockDb->method('transBegin')->willReturn(true);
+		$mockDb->method('transStatus')->willReturn(true);
+		$mockDb->method('transCommit')->willReturn(true);
 
         /* 2. MOCK MODEL */
         $builderModel = 
@@ -2449,7 +2452,8 @@ class AccountModelTest extends CIUnitTestCase
         
         $mockDb->method('query')->willReturn(true);
         
-        $mockDb->method('transCommit')->willReturn(true);
+		$mockDb->method('transCommit')->willReturn(true);
+		$mockDb->method('transStatus')->willReturn(true);
 
         /* 2. MOCK MODEL E INIEZIONE */
         $builderModel = 
@@ -2524,7 +2528,8 @@ class AccountModelTest extends CIUnitTestCase
         
         $mockDb->method('query')->willReturn(true);
         
-        $mockDb->method('transCommit')->willReturn(true);
+		$mockDb->method('transCommit')->willReturn(true);
+		$mockDb->method('transStatus')->willReturn(true);
 
         /* 2. MOCK MODEL E INIEZIONE */
         $builderModel = 
@@ -2711,7 +2716,7 @@ class AccountModelTest extends CIUnitTestCase
         );
     }
 
-    public function testSaveTemporarySecretReturnsFalseOnException(): void
+	public function testSaveTemporarySecretStoresProtectedSessionState(): void
     {
         /* 1. MOCK DB CHE LANCIA ECCEZIONE FORZATA */
         $builderDb = 
@@ -2770,17 +2775,22 @@ class AccountModelTest extends CIUnitTestCase
                 $secret
             );
             
-        $expected = 
-            false;
+		$expected =
+			true;
             
         $this->assertEquals(
             $expected, 
             $result
         );
+
+		$pending = session()->get('account_totp_setup');
+		$this->assertSame($adminUuid, $pending['admin_uuid']);
+		$this->assertStringStartsWith('enc:v1:', $pending['secret']);
     }
 
     public function testGetTemporarySecretReturnsNullWhenNoRowFound(): void
     {
+		session()->remove('account_totp_setup');
         /* 1. MOCK DB CON RISULTATO VUOTO */
         $builderQuery = 
             $this->getMockBuilder(\CodeIgniter\Database\BaseResult::class);
@@ -2848,6 +2858,11 @@ class AccountModelTest extends CIUnitTestCase
 
     public function testGetTemporarySecretReturnsSecretString(): void
     {
+		session()->set('account_totp_setup', [
+			'admin_uuid' => '123-abc',
+			'secret' => 'ABCDEF123456',
+			'created_at' => time(),
+		]);
         /* 1. MOCK DB CON ESITO POSITIVO */
         $builderQuery = 
             $this->getMockBuilder(\CodeIgniter\Database\BaseResult::class);
@@ -2946,6 +2961,7 @@ class AccountModelTest extends CIUnitTestCase
         $mockDb->method('query')->willReturn(true);
         
         $mockDb->method('transCommit')->willReturn(true);
+		$mockDb->method('transStatus')->willReturn(true);
 
         /* 2. MOCK MODEL E INIEZIONE */
         $builderModel = 
@@ -2982,9 +2998,12 @@ class AccountModelTest extends CIUnitTestCase
         $currentAdmin = 
             (object) ['uuid' => '123-abc', 'firstname' => 'Mario', 'lastname' => 'Rossi'];
 
+		$secret = 'JBSWY3DPEHPK3PXP';
+
         $result = 
             $model->activateTotpMethod(
-                $adminUuid, 
+				$adminUuid,
+				$secret,
                 $currentAdmin
             );
 
@@ -3054,9 +3073,12 @@ class AccountModelTest extends CIUnitTestCase
         $currentAdmin = 
             (object) ['uuid' => '123-abc'];
 
+		$secret = 'JBSWY3DPEHPK3PXP';
+
         $result = 
             $model->activateTotpMethod(
-                $adminUuid, 
+				$adminUuid,
+				$secret,
                 $currentAdmin
             );
 

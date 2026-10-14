@@ -54,7 +54,7 @@ class DashboardController extends BackendController
      *
      * @return string HTML renderizzato della schermata di riepilogo.
      */
-    public function index()
+    public function index(): string
     {
         $this->data['action'] = 'index';
         

@@ -31,7 +31,12 @@ return [
 		'createdAt' => 'Added on ', 
 		'session' => 'Session', 
 		'activation' => 'Activation', 
-		'cookie' => 'Remember Me'
+		'cookie' => 'Remember Me',
+		'mobile' => 'Mobile device',
+		'robot' => 'Robot',
+		'unknown' => 'Unknown',
+		'filtersAndOptions' => 'Options and filters',
+		'showSystemDetails' => 'Show system details'
 	],
 	'errors' => [
 		'uuid' => 'Invalid UUID.', 
@@ -44,7 +49,7 @@ return [
 		'actions' => 'Actions'
 	], 
 	'placeholders' => [
-		'searchUsername' => 'Search by username...', 
+		'searchUsername' => 'Search by email...',
 		'searchType' => 'Search by type...', 
 		'dateFrom' => 'Search by start date...', 
 		'dateTo' => 'Search by start date...',

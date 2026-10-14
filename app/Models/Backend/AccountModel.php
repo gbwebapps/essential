@@ -44,17 +44,6 @@ class AccountModel extends BackendModel
 	 */
     protected array $toCompare = ['firstname', 'lastname', 'email', 'phone', 'note'];
 
-    /**
-     * Hook nativo di CodeIgniter 4 per l'inizializzazione del modello.
-     * 
-     * Richiama il costruttore del parent (BackendModel) per garantire il corretto setup 
-     * delle dipendenze di base (connessione DB, helper).
-     */
-	protected function initModel(): void 
-	{
-		parent::initModel();
-	}
-
 	/**
 	 * Genera il set di regole di validazione nativo di CodeIgniter per l'aggiornamento dell'anagrafica.
 	 * 
@@ -88,10 +77,28 @@ class AccountModel extends BackendModel
 	            'label' => lang('backend/account.labels.note'),
 	            'rules' => ['permit_empty', 'trim', 'max_length[500]', 'safeText'],
 	            'errors' => [
-	                'safeText' => 'Caratteri non ammessi.'
+	                'safeText' => lang('backend/account.errors.safeText')
 	            ]
 	        ],
 	    ];
+	}
+
+	/**
+	 * Genera le regole di validazione per la conferma della password corrente.
+	 *
+	 * @return array Regole di validazione per il campo currentPassword
+	 */
+	public function currentPasswordValidationRules(): array
+	{
+		return [
+			'currentPassword' => [
+				'label' => lang('backend/account.labels.currentPassword'),
+				'rules' => ['required', 'max_length[255]'],
+				'errors' => [
+					'required' => lang('backend/account.errors.currentPasswordRequired'),
+				],
+			],
+		];
 	}
 
 	/**
@@ -168,7 +175,7 @@ class AccountModel extends BackendModel
 	}
 
 	/**
-	 * Recupera l'intero registro dei token di accesso (sessioni web, cookie remember-me, reset password) associati all'utente.
+	 * Recupera l'intero registro dei token di accesso (sessioni web, cookie remember-me e attivazione password) associati all'utente.
 	 *
 	 * @param string $uuid L'identificatore univoco dell'amministratore
 	 * @return array Elenco dei record estratti dalla tabella admins_tokens
@@ -195,6 +202,8 @@ class AccountModel extends BackendModel
 	 */
 	public function edit(array $posts, \stdClass $currentAdmin): array 
 	{
+		$transactionStarted = false;
+
 	    try {
 
 	        $posts = $this->checkAllowedFields($posts, $this->editAllowedFields);
@@ -210,18 +219,24 @@ class AccountModel extends BackendModel
 	        $note = isset($posts['note']) ? trim($posts['note']) : '';
 	        $noteValue = ($note === '') ? null : $note;
 
-	        $this->db->transBegin();
+	        if ( ! $this->db->transBegin()):
+	            throw new \RuntimeException('Impossibile avviare la transazione di aggiornamento account.');
+	        endif;
+
+	        $transactionStarted = true;
 
 	        $sql = 'update admins set firstname = ?, lastname = ?, email = ?, phone = ?, note = ?, updated_at = ? where uuid = ?';
 	        $this->db->query($sql, [$posts['firstname'], $posts['lastname'], $posts['email'], $posts['phone'], $noteValue, $updated_at, $currentAdmin->uuid]);
 
 	        if ($this->db->transStatus() === false):
-	            $this->db->transRollback();
-	            log_message('error', lang('backend/account.messages.editError'));
-	            return ['result' => false, 'message' => lang('backend/account.messages.editError')];
+	            throw new \RuntimeException('Errore durante l\'aggiornamento dell\'account.');
 	        endif;
 
-	        $this->db->transCommit();
+	        if ( ! $this->db->transCommit()):
+	            throw new \RuntimeException('Commit dell\'aggiornamento account non riuscito.');
+	        endif;
+
+	        $transactionStarted = false;
 
 	        /* Ricarichiamo l'istanza dell'admin aggiornata per passarla al controller */
 	        $currentAdmin = service('authorization')->refresh()->currentAdmin();
@@ -234,10 +249,30 @@ class AccountModel extends BackendModel
 	        ];
 
 	    } catch(\Throwable $e) {
-	        $this->db->transRollback();
+	        if ($transactionStarted):
+	            $this->db->transRollback();
+	        endif;
+
 	        log_message('error', lang('backend/account.messages.editError') . ' - ' . $e->getMessage() . ' | File: ' . $e->getFile() . ' | Riga: ' . $e->getLine());
 	        return ['result' => false, 'message' => lang('backend/account.messages.editError')];
 	    }
+	}
+
+	/**
+	 * Verifica che la password fornita corrisponda a quella dell'amministratore autenticato.
+	 *
+	 * @param string $adminUuid Identificatore univoco dell'amministratore
+	 * @param string $currentPassword Password corrente in chiaro ricevuta dal form
+	 * @return bool True se la password è corretta, false altrimenti
+	 */
+	public function verifyCurrentPassword(string $adminUuid, string $currentPassword): bool
+	{
+		$sql = "select password_hash from admins where uuid = ? and status = 1 and suspended_at is null and deleted_at is null limit 1";
+		$row = $this->db->query($sql, [$adminUuid])->getRow();
+
+		return $row !== null
+			&& ! empty($row->password_hash)
+			&& password_verify($currentPassword, (string) $row->password_hash);
 	}
 
 	/**
@@ -292,33 +327,58 @@ class AccountModel extends BackendModel
             return ['result' => false, 'message' => lang('backend/account.messages.cannotDeleteCurrentToken')];
         endif;
 
+        $transactionStarted = false;
+
         try {
 
+			if ( ! $this->db->transBegin()):
+				throw new \RuntimeException('Impossibile avviare la transazione di revoca token.');
+			endif;
+
+			$transactionStarted = true;
+
             /* 1. Recupero il token per leggere last_activity */
-            $tokenSql = "select id, last_activity, token_type from admins_tokens where admin_uuid = ? and id = ?";
+			$tokenSql = "select id, last_activity, token_type from admins_tokens where admin_uuid = ? and id = ? for update";
             $tokenRow = $this->db->query($tokenSql, [$currentAdmin->uuid, $posts['id']])->getRow();
 
-            if ($tokenRow):
-                /* 2. Aggiorno il log se è una sessione o cookie */
-                if (in_array($tokenRow->token_type, ['cookie', 'session'])):
-                    $logoutTime = ! empty($tokenRow->last_activity) ? $tokenRow->last_activity : date('Y-m-d H:i:s');
-                    $logUpdateSql = "update admins_logs set logout = ?, logout_reason = 'deleted' where token_id = ?";
-                    $this->db->query($logUpdateSql, [$logoutTime, $tokenRow->id]);
-                endif;
+			if ( ! $tokenRow):
+				throw new \RuntimeException('Token non trovato o non appartenente all\'account corrente.');
             endif;
+
+			if ($currentTokenId !== null && (int) $tokenRow->id === $currentTokenId):
+				$this->db->transRollback();
+				$transactionStarted = false;
+				return ['result' => false, 'message' => lang('backend/account.messages.cannotDeleteCurrentToken')];
+			endif;
+
+			/* 2. Aggiorno il log se è una sessione o cookie */
+			if (in_array($tokenRow->token_type, ['cookie', 'session'], true)):
+				$logoutTime = ! empty($tokenRow->last_activity) ? $tokenRow->last_activity : date('Y-m-d H:i:s');
+				$logUpdateSql = "update admins_logs set logout = ?, logout_reason = 'deleted' where token_id = ? and logout is null";
+				$this->db->query($logUpdateSql, [$logoutTime, $tokenRow->id]);
+			endif;
 
             /* 3. Elimino fisicamente il token */
             $sql = "delete from admins_tokens where admin_uuid = ? and id = ?";
             $this->db->query($sql, [$currentAdmin->uuid, $posts['id']]);
 
-            if($this->db->affectedRows() > 0):
-                log_admin_activity('DELETE_TOKEN', 'account', sprintf(lang('backend/account.audits.deleteToken'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)), $currentAdmin);
-                return ['result' => true, 'message' => sprintf(lang('backend/account.messages.deleteTokenSuccess'), esc($currentAdmin->firstname), esc($currentAdmin->lastname))];
+			if ($this->db->affectedRows() !== 1 || $this->db->transStatus() === false):
+				throw new \RuntimeException('Revoca token non riuscita.');
             endif;
 
-            return ['result' => false, 'message' => lang('backend/account.messages.deleteTokenError')];
+			if ( ! $this->db->transCommit()):
+				throw new \RuntimeException('Commit della revoca token non riuscito.');
+			endif;
+
+			$transactionStarted = false;
+
+			log_admin_activity('DELETE_TOKEN', 'account', sprintf(lang('backend/account.audits.deleteToken'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)), $currentAdmin);
+			return ['result' => true, 'message' => sprintf(lang('backend/account.messages.deleteTokenSuccess'), esc($currentAdmin->firstname), esc($currentAdmin->lastname))];
 
         } catch(\Throwable $e) {
+			if ($transactionStarted):
+				$this->db->transRollback();
+			endif;
 
             log_message('error', lang('backend/account.messages.deleteTokenError') . ' - ' . $e);
             return ['result' => false, 'message' => lang('backend/account.messages.deleteTokenError')];
@@ -327,7 +387,7 @@ class AccountModel extends BackendModel
     }
 
     /**
-     * Esegue la procedura transazionale per la generazione di una richiesta di ripristino/attivazione password.
+	 * Avvia la procedura transazionale per la richiesta di impostazione di una nuova password.
      * 
      * Disabilita ogni eventuale token di attivazione precedente e genera un nuovo token crittograficamente sicuro, 
      * calcolandone l'hash e la scadenza in base ai parametri globali. Salva il record nel database aggiornando 
@@ -341,6 +401,8 @@ class AccountModel extends BackendModel
      */
 	public function resetPassword(\stdClass $currentAdmin, \CodeIgniter\HTTP\IncomingRequest $request): array
 	{
+		$transactionStarted = false;
+
 	    try 
 	    {
 	        $userAgent = $request->getUserAgent()->getAgentString();
@@ -348,12 +410,16 @@ class AccountModel extends BackendModel
 
 	        /* Generazione token di attivazione */
 	        $token = new \App\Libraries\Token();
-	        $tokenHash = $token->getHash(setting('Backend\Auth')->hashKey);
+	        $tokenHash = $token->getHash(config(\Config\Backend\Auth::class)->hashKey);
 
 	        /* 2. Calcolo corretto della scadenza lavorando sui secondi (timestamp) */
 	        $expireTime = date('Y-m-d H:i:s', time() + setting('Backend\Auth')->activationTime);
 
-	        $this->db->transBegin();
+	        if ( ! $this->db->transBegin()):
+	            throw new \RuntimeException('Impossibile avviare la transazione di reset password.');
+	        endif;
+
+	        $transactionStarted = true;
 
 	        /* Scrittura Data di Reset nella tabella admins */
 	        $sql = "update admins set resetted_at = ? where uuid = ?";
@@ -369,19 +435,22 @@ class AccountModel extends BackendModel
 
 	        if ($this->db->transStatus() === false):
 
-	            $this->db->transRollback();
-	            log_message('error', lang('backend/account.messages.resetPasswordError'));
-
-	            return ['result' => false, 'message' => lang('backend/account.messages.resetPasswordError')];
+	            throw new \RuntimeException('Errore durante la registrazione del reset password.');
 	        endif;
 
-	        $this->db->transCommit();
+	        if ( ! $this->db->transCommit()):
+	            throw new \RuntimeException('Commit del reset password non riuscito.');
+	        endif;
+
+	        $transactionStarted = false;
 
 	        log_admin_activity('RESET_PASSWORD', 'account', sprintf(lang('backend/account.audits.resetPassword'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)), $currentAdmin);
 
 	    } catch (\Throwable $e) {
 
-	        $this->db->transRollback();
+	        if ($transactionStarted):
+	            $this->db->transRollback();
+	        endif;
 
 	        log_message('error', lang('backend/account.messages.resetPasswordError') . ' - ' . $e);
 	        return ['result' => false, 'message' => lang('backend/account.messages.resetPasswordError')];
@@ -469,10 +538,16 @@ class AccountModel extends BackendModel
 	 * @param string $method Il metodo richiesto ('none' per disabilitare, 'email' per abilitare OTP via e-mail)
 	 * @return bool True se la transazione e l'aggiornamento vanno a buon fine, false in caso di eccezione
 	 */
-	public function setBasicMethod(\stdClass $currentAdmin, string $method,): bool
+	public function setBasicMethod(\stdClass $currentAdmin, string $method): bool
     {
+		$transactionStarted = false;
+
         try {
-            $this->db->transBegin();
+			if ( ! $this->db->transBegin()):
+				throw new \RuntimeException('Impossibile avviare la transazione 2FA.');
+			endif;
+
+			$transactionStarted = true;
 
             /* Disattivo tutti i metodi esistenti per l'utente */
             $sqlDisable = "update admins_2fa set enabled = 0 where admin_uuid = ?";
@@ -484,25 +559,33 @@ class AccountModel extends BackendModel
                 $this->db->query($sqlUpsert, [$currentAdmin->uuid]);
             endif;
 
-            $this->db->transCommit();
+			if ($this->db->transStatus() === false):
+				throw new \RuntimeException('Aggiornamento del metodo 2FA non riuscito.');
+			endif;
+
+			if ( ! $this->db->transCommit()):
+				throw new \RuntimeException('Commit del metodo 2FA non riuscito.');
+			endif;
+
+			$transactionStarted = false;
+			$this->clearTemporarySecret();
 
             log_admin_activity('ACTIVATE_' . strtoupper($method), 'account', sprintf(lang('backend/account.audits.activateMethod'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)), $currentAdmin);
 
             return true;
 
         } catch (\Throwable $e) {
-            $this->db->transRollback();
+			if ($transactionStarted):
+				$this->db->transRollback();
+			endif;
+
             log_message('error', 'Errore nel salvataggio del metodo 2FA base: ' . $e->getMessage());
             return false;
         }
     }
 
     /**
-     * Salva temporaneamente il segreto crittografico TOTP generato (es. via Google Authenticator).
-     * 
-     * Esegue un comando di Upsert per inserire o aggiornare la chiave segreta (secret) nella tabella 
-     * admins_2fa, forzando rigorosamente il campo 'enabled' a 0. Il metodo TOTP diventerà operativo 
-     * solo dopo che l'utente avrà dimostrato di possedere l'app superando una prima validazione.
+     * Salva in sessione, cifrato e con scadenza, il segreto TOTP ancora da confermare.
      *
      * @param string $adminUuid L'identificatore univoco dell'amministratore
      * @param string $secret La chiave segreta alfanumerica di base32
@@ -512,9 +595,14 @@ class AccountModel extends BackendModel
     {
         try {
 
-            $sql = "insert into admins_2fa (admin_uuid, method, secret, enabled) values (?, 'totp', ?, 0) on duplicate key update secret = ?, enabled = 0";
-            
-            $this->db->query($sql, [$adminUuid, $secret, $secret]);
+			$protectedSecret = (new \App\Libraries\AppOtpService())->protectSecret($secret);
+
+			session()->set('account_totp_setup', [
+				'admin_uuid' => $adminUuid,
+				'secret' => $protectedSecret,
+				'created_at' => time(),
+			]);
+
             return true;
 
         } catch (\Throwable $e) {
@@ -524,59 +612,94 @@ class AccountModel extends BackendModel
     }
 
     /**
-     * Recupera la chiave segreta TOTP (temporanea e non ancora validata) associata all'utente.
-     * 
-     * Utilizzato durante il processo di onboarding del 2FA tramite App: estrae il segreto salvato 
-     * in precedenza (con enabled = 0) per permetterne il confronto con l'OTP digitato dall'utente.
+     * Recupera e decifra il segreto TOTP temporaneo dalla sessione corrente.
      *
      * @param string $adminUuid L'identificatore univoco dell'amministratore
      * @return string|null La chiave segreta se presente, null in caso contrario
      */
     public function getTemporarySecret(string $adminUuid): ?string
     {
-        $sql = "select secret from admins_2fa where admin_uuid = ? and method = 'totp' and enabled = 0 limit 1";
-        $row = $this->db->query($sql, [$adminUuid])->getRow();
+		$pending = session()->get('account_totp_setup');
+		$settings = setting('Backend\Auth');
+		$expiresIn = (int) ($settings->twoFactorTime ?? config(\Config\Backend\Auth::class)->twoFactorTime);
 
-        if ( ! $row) :
-            return null;
-        endif;
+		if ( ! is_array($pending)
+			|| ! isset($pending['admin_uuid'], $pending['secret'], $pending['created_at'])
+			|| ! hash_equals($adminUuid, (string) $pending['admin_uuid'])
+			|| (time() - (int) $pending['created_at']) > $expiresIn):
+			$this->clearTemporarySecret();
+			return null;
+		endif;
 
-        return (string) $row->secret;
+		$secret = (new \App\Libraries\AppOtpService())->revealSecret((string) $pending['secret']);
+
+		if ($secret === null):
+			$this->clearTemporarySecret();
+		endif;
+
+		return $secret;
     }
+
+	/**
+	 * Elimina dalla sessione l'eventuale configurazione TOTP ancora in sospeso.
+	 *
+	 * @return void
+	 */
+	public function clearTemporarySecret(): void
+	{
+		session()->remove('account_totp_setup');
+	}
 
     /**
      * Convalida e attiva definitivamente il metodo TOTP (Time-based One-Time Password) per l'utente.
      * 
-     * Questa transazione rappresenta la fase conclusiva dell'onboarding 2FA: disattiva esplicitamente 
-     * l'eventuale metodo via E-mail preesistente e converte in stato attivo (enabled = 1) il record 
-     * TOTP precedentemente inserito in modalità temporanea. L'evento viene protocollato nell'audit log.
+     * Questa transazione disattiva gli altri metodi e salva il nuovo segreto TOTP cifrato
+     * soltanto dopo che il primo codice è stato validato.
      *
      * @param string $adminUuid L'identificatore univoco dell'amministratore
+	 * @param string $secret La chiave TOTP in chiaro già validata
      * @param \stdClass $currentAdmin L'oggetto identità utilizzato per la compilazione del log di audit
      * @return bool True se la transazione e l'attivazione hanno successo, false in caso di errore
      */
-    public function activateTotpMethod(string $adminUuid, \stdClass $currentAdmin): bool
+	public function activateTotpMethod(string $adminUuid, string $secret, \stdClass $currentAdmin): bool
     {
+		$transactionStarted = false;
+
         try {
-        	
-            $this->db->transBegin();
+			if ( ! $this->db->transBegin()):
+				throw new \RuntimeException('Impossibile avviare la transazione TOTP.');
+			endif;
 
-            /* Disattivo l'eventuale metodo email attivo */
-            $sqlDisableEmail = "update admins_2fa set enabled = 0 where admin_uuid = ? and method = 'email'";
-            $this->db->query($sqlDisableEmail, [$adminUuid]);
+			$transactionStarted = true;
 
-            /* Attivo definitivamente il metodo TOTP esistente */
-            $sqlActivateTotp = "update admins_2fa set enabled = 1 where admin_uuid = ? and method = 'totp'";
-            $this->db->query($sqlActivateTotp, [$adminUuid]);
+			/* Disattivo tutti i metodi prima di attivare esclusivamente TOTP */
+			$sqlDisable = "update admins_2fa set enabled = 0 where admin_uuid = ?";
+			$this->db->query($sqlDisable, [$adminUuid]);
 
-            $this->db->transCommit();
+			$protectedSecret = (new \App\Libraries\AppOtpService())->protectSecret($secret);
+			$sqlActivateTotp = "insert into admins_2fa (admin_uuid, method, secret, enabled) values (?, 'totp', ?, 1) on duplicate key update secret = values(secret), enabled = 1";
+			$this->db->query($sqlActivateTotp, [$adminUuid, $protectedSecret]);
+
+			if ($this->db->transStatus() === false):
+				throw new \RuntimeException('Attivazione TOTP non riuscita.');
+			endif;
+
+			if ( ! $this->db->transCommit()):
+				throw new \RuntimeException('Commit dell\'attivazione TOTP non riuscito.');
+			endif;
+
+			$transactionStarted = false;
+			$this->clearTemporarySecret();
 
             log_admin_activity('ACTIVATE_TOTP', 'account', sprintf(lang('backend/account.audits.activateTotp'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)), $currentAdmin);
 
             return true;
 
         } catch (\Throwable $e) {
-            $this->db->transRollback();
+			if ($transactionStarted):
+				$this->db->transRollback();
+			endif;
+
             log_message('error', 'Errore durante l\'attivazione definitiva del TOTP: ' . $e->getMessage());
             return false;
         }

@@ -184,6 +184,41 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
     }
 
     /**
+     * Registra l'audit senza alterare l'esito di una transazione già consolidata.
+     *
+     * @param string $action Codice dell'azione eseguita
+     * @param string $details Dettaglio descrittivo dell'operazione
+     */
+    protected function logActivitySafely(string $action, string $details): void
+    {
+        try
+        {
+            $currentAdmin = service('authorization')->currentAdmin();
+
+            if (log_admin_activity($action, 'admins', $details, $currentAdmin) === false):
+                log_message('error', 'Registrazione audit Admins non riuscita: ' . $action);
+            endif;
+        }
+        catch (\Throwable $e)
+        {
+            log_message('error', 'Errore registrazione audit Admins: ' . $e);
+        }
+    }
+
+    /**
+     * Rimuove i file creati durante un upload che non ha raggiunto il commit.
+     *
+     * @param array $filenames Nomi dei file caricati nella transazione corrente
+     * @param string $uuid Identificativo del proprietario delle immagini
+     */
+    protected function cleanupUploadedImages(array $filenames, string $uuid): void
+    {
+        foreach ($filenames as $filename):
+            \App\Libraries\ImageFileSystemService::removeSingleImage('admins', $uuid, $filename);
+        endforeach;
+    }
+
+    /**
      * Regole di validazione per la griglia dati (paginazione, ordinamento e filtro cestino).
      *
      * @return array Regole native per i parametri strutturali
@@ -290,7 +325,7 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
                 'label' => lang('backend/admins.labels.note'),
                 'rules' => ['permit_empty', 'trim', 'max_length[500]', 'safeText'],
                 'errors' => [
-                    'safeText' => 'Caratteri non ammessi.'
+                    'safeText' => lang('backend/admins.errors.safeText')
                 ]
             ],
             'group_id' => [
@@ -355,7 +390,7 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
                 'label' => lang('backend/admins.labels.note'),
                 'rules' => ['permit_empty', 'trim', 'max_length[500]', 'safeText'],
                 'errors' => [
-                    'safeText' => 'Caratteri non ammessi.'
+                    'safeText' => lang('backend/admins.errors.safeText')
                 ]
             ],
             'group_id' => [
@@ -363,11 +398,18 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
                 'rules' => ['required', 'is_natural_no_zero', 'is_not_unique[admins_groups.id]'],
             ],
             /* Validazione di ogni singolo elemento contenuto nell'array delle eccezioni */
+            'permissions' => [
+                'label' => lang('backend/admins.labels.permissions'),
+                'rules' => ['permit_empty', 'permissionArray'],
+                'errors' => [
+                    'permissionArray' => lang('backend/admins.messages.wrongPermissionsFormat')
+                ]
+            ],
             'permissions.*' => [
                 'label' => lang('backend/admins.labels.permissions'),
                 'rules' => ['permit_empty', 'in_list[' . $inListString . ']'],
                 'errors' => [
-                    'in_list' => lang('Backend/admins.errors.permission')
+                    'in_list' => lang('backend/admins.errors.permission')
                 ]
             ],
             'images' => [
@@ -438,7 +480,7 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
                 'label' => lang('backend/admins.labels.note'),
                 'rules' => ['permit_empty', 'trim', 'max_length[500]', 'safeText'],
                 'errors' => [
-                    'safeText' => 'Caratteri non ammessi.'
+                    'safeText' => lang('backend/admins.errors.safeText')
                 ]
             ],
             'group_id' => [
@@ -489,7 +531,7 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
                 'label' => lang('backend/admins.labels.note'),
                 'rules' => ['permit_empty', 'trim', 'max_length[500]', 'safeText'],
                 'errors' => [
-                    'safeText' => 'Caratteri non ammessi.'
+                    'safeText' => lang('backend/admins.errors.safeText')
                 ]
             ],
             'group_id' => [
@@ -555,8 +597,8 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
                 'label' => lang('backend/admins.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'], 
                 'errors' => [
-                    'required' => lang('Backend/admins.errors.uuid'), 
-                    'regex_match' => lang('Backend/admins.errors.uuid')
+                    'required' => lang('backend/admins.errors.uuid'),
+                    'regex_match' => lang('backend/admins.errors.uuid')
                 ]
             ],
         ];
@@ -574,8 +616,8 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
                 'label' => lang('backend/admins.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
                 'errors' => [
-                    'required' => lang('Backend/admins.errors.uuid'), 
-                    'regex_match' => lang('Backend/admins.errors.uuid')
+                    'required' => lang('backend/admins.errors.uuid'),
+                    'regex_match' => lang('backend/admins.errors.uuid')
                 ]
             ],
         ];
@@ -596,15 +638,15 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
                 'label' => lang('backend/admins.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'], 
                 'errors' => [
-                    'required' => lang('Backend/admins.errors.uuid'), 
-                    'regex_match' => lang('Backend/admins.errors.uuid')
+                    'required' => lang('backend/admins.errors.uuid'),
+                    'regex_match' => lang('backend/admins.errors.uuid')
                 ]
             ],
             'context' => [
                 'label' => lang('backend/admins.labels.context'),
                 'rules' => ['permit_empty', 'in_list[show]'],
                 'errors' => [
-                    'in_list' => lang('Backend/admins.errors.context'), 
+                    'in_list' => lang('backend/admins.errors.context'),
                 ]
             ],
         ];
@@ -625,8 +667,8 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
                 'label' => lang('backend/admins.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
                 'errors' => [
-                    'required' => lang('Backend/admins.errors.uuid'), 
-                    'regex_match' => lang('Backend/admins.errors.uuid') 
+                    'required' => lang('backend/admins.errors.uuid'),
+                    'regex_match' => lang('backend/admins.errors.uuid')
                 ]
             ],
         ]; 
@@ -647,16 +689,16 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
                 'label' => lang('backend/admins.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'], 
                 'errors' => [
-                    'required' => lang('Backend/admins.errors.uuid'), 
-                    'regex_match' => lang('Backend/admins.errors.uuid') 
+                    'required' => lang('backend/admins.errors.uuid'),
+                    'regex_match' => lang('backend/admins.errors.uuid')
                 ]
             ],
             'context' => [
                 'label' => lang('backend/admins.labels.context'),
                 'rules' => ['required', 'in_list[show,edit]'],
                 'errors' => [
-                    'required' => lang('Backend/admins.errors.context'), 
-                    'in_list' => lang('Backend/admins.errors.context') 
+                    'required' => lang('backend/admins.errors.context'),
+                    'in_list' => lang('backend/admins.errors.context')
                 ]
             ],
         ];
@@ -677,8 +719,8 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
                 'label' => lang('backend/admins.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
                 'errors' => [
-                    'required' => lang('Backend/admins.errors.uuid'), 
-                    'regex_match' => lang('Backend/admins.errors.uuid') 
+                    'required' => lang('backend/admins.errors.uuid'),
+                    'regex_match' => lang('backend/admins.errors.uuid')
                 ]
             ],
         ];
@@ -700,16 +742,16 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
                 'label' => lang('backend/admins.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'], 
                 'errors' => [
-                    'required' => lang('Backend/admins.errors.uuid'), 
-                    'regex_match' => lang('Backend/admins.errors.uuid') 
+                    'required' => lang('backend/admins.errors.uuid'),
+                    'regex_match' => lang('backend/admins.errors.uuid')
                 ]
             ],
             'context' => [
                 'label' => lang('backend/admins.labels.context'),
                 'rules' => ['required', 'in_list[show,edit]'], 
                 'errors' => [
-                    'required' => lang('Backend/admins.errors.context'), 
-                    'in_list' => lang('Backend/admins.errors.context') 
+                    'required' => lang('backend/admins.errors.context'),
+                    'in_list' => lang('backend/admins.errors.context')
                 ]
             ],
         ];
@@ -731,16 +773,16 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
                 'label' => lang('backend/admins.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
                 'errors' => [
-                    'required' => lang('Backend/admins.errors.uuid'), 
-                    'regex_match' => lang('Backend/admins.errors.uuid') 
+                    'required' => lang('backend/admins.errors.uuid'),
+                    'regex_match' => lang('backend/admins.errors.uuid')
                 ]
             ],
             'id' => [
                 'label' => lang('backend/admins.labels.id'),
                 'rules' => ['required', 'is_natural_no_zero'],
                 'errors' => [
-                    'required' => lang('Backend/admins.errors.id'), 
-                    'is_natural_no_zero' => lang('Backend/admins.errors.id') 
+                    'required' => lang('backend/admins.errors.id'),
+                    'is_natural_no_zero' => lang('backend/admins.errors.id')
                 ]
             ],
         ];
@@ -774,16 +816,16 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
                 'label' => lang('backend/admins.labels.uuid'),
                 'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'], 
                 'errors' => [
-                    'required' => lang('Backend/admins.errors.uuid'), 
-                    'regex_match' => lang('Backend/admins.errors.uuid') 
+                    'required' => lang('backend/admins.errors.uuid'),
+                    'regex_match' => lang('backend/admins.errors.uuid')
                 ]
             ],
             'permission' => [
                 'label' => lang('backend/admins.labels.permissions'),
                 'rules' => ['required', 'in_list[' . $inListString . ']'], 
                 'errors' => [
-                    'required' => lang('Backend/admins.errors.permission'), 
-                    'in_list' => lang('Backend/admins.errors.permission') 
+                    'required' => lang('backend/admins.errors.permission'),
+                    'in_list' => lang('backend/admins.errors.permission')
                 ]
             ]
         ];
@@ -811,7 +853,7 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
     public function getTokens(string $uuid): array
     {
         /* Estrazione log dei tokens di sessione o reset */
-        $sql = "select * from admins_tokens where admin_uuid = ?";
+        $sql = "select id, token_create, token_expire, token_type, user_agent, ip_address from admins_tokens where admin_uuid = ? order by token_create desc, id desc";
         return $this->db->query($sql, [$uuid])->getResult();
     }
 
@@ -874,7 +916,7 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
      */
     public function getGroups(): array
     {
-        $sql = "select * from admins_groups";
+        $sql = "select * from admins_groups order by name asc, id asc";
         return $this->db->query($sql)->getResult();
     }
 
@@ -937,6 +979,8 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
      */
     public function add(array $posts, \CodeIgniter\HTTP\IncomingRequest $request): array
     {
+        $uuid = '';
+
         try 
         {
             /* Filtro campi post ammessi */
@@ -977,36 +1021,43 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
                 $uploadService = $this->getUploadService();
                     
                 $filenames = $uploadService->doUpload($posts['images'], 'admins', $uuid);
-                
-                if ($filenames):$this->insertImages($filenames, $uuid, 'admins', 'add');
-
+                if ($filenames === false || count($filenames) !== count($posts['images'])):
+                    throw new \RuntimeException('Upload immagini Admins non completato.');
                 endif;
+
+                $this->insertImages($filenames, $uuid, 'admins', 'add');
             endif;
 
             /* 3. Verifico eventuali errori SQL prima di fare il commit */
             if ($this->db->transStatus() === false):
                 $this->db->transRollback();
+                \App\Libraries\ImageFileSystemService::removeAllImages('admins', $uuid);
 
                 log_message('error', lang('backend/admins.messages.addError'));
                 return ['result' => false, 'message' => lang('backend/admins.messages.addError')];
             endif;
 
-            /* Se le query sono andate a buon fine, salvo definitivamente */
-            $this->db->transCommit();
-
             /* Recupero dati utente appena inseriti */
             $data = $this->getByUUID($uuid);
 
             if($data['result'] === false):
+                $this->db->transRollback();
+                \App\Libraries\ImageFileSystemService::removeAllImages('admins', $uuid);
                 return ['result' => false, 'message' => $data['message']];
             endif;
 
-            $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('ADD_ADMIN', 'admins', sprintf(lang('backend/admins.audits.addAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+            /* Se le query sono andate a buon fine, salvo definitivamente */
+            $this->db->transCommit();
+
+            $this->logActivitySafely('ADD_ADMIN', sprintf(lang('backend/admins.audits.addAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)));
 
         } catch (\Throwable $e) {
             
             $this->db->transRollback();
+
+            if ($uuid !== ''):
+                \App\Libraries\ImageFileSystemService::removeAllImages('admins', $uuid);
+            endif;
 
 			log_message('error', lang('backend/admins.messages.addError') . ' - ' . $e);
             return ['result' => false, 'message' => lang('backend/admins.messages.addError')];
@@ -1047,10 +1098,19 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
      */
     public function edit(array $posts): array
     {
+        $uploadedFilenames = [];
+        $uploadUuid = '';
+
         try 
         {
             /* Match dei posts con i campi consentiti (ricordati di inserire group_id ed eliminare permissions in $editAllowedFields) */
             $posts = $this->checkAllowedFields($posts, $this->editAllowedFields);
+
+            if (isset($posts['permissions']) && ! is_array($posts['permissions'])):
+                return ['result' => false, 'message' => lang('backend/admins.messages.wrongPermissionsFormat')];
+            endif;
+
+            $uploadUuid = $posts['uuid'];
 
             /* Recupero i dati dell'utente prima dell'aggiornamento */
             $data = $this->getByUUID($posts['uuid']);
@@ -1117,14 +1177,18 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
                 $uploadService = $this->getUploadService();
 
                 $filenames = $uploadService->doUpload($posts['images'], 'admins', $posts['uuid']);
-                
-                if ($filenames):
-                    $this->insertImages($filenames, $posts['uuid'], 'admins', 'edit');
+                $uploadedFilenames = $filenames ?: [];
+
+                if ($filenames === false || count($filenames) !== count($posts['images'])):
+                    throw new \RuntimeException('Upload immagini Admins non completato.');
                 endif;
+
+                $this->insertImages($filenames, $posts['uuid'], 'admins', 'edit');
             endif;
 
             if ($this->db->transStatus() === false):
                 $this->db->transRollback();
+                $this->cleanupUploadedImages($uploadedFilenames, $uploadUuid);
                 log_message('error', lang('backend/admins.messages.editError'));
                 return ['result' => false, 'message' => lang('backend/admins.messages.editError')];
             endif;
@@ -1141,8 +1205,7 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
             $data['row']->note       = $posts['note'];
             $data['row']->updated_at = $updated_at;
 
-            $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('EDIT_ADMIN', 'admins', sprintf(lang('backend/admins.audits.editAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+            $this->logActivitySafely('EDIT_ADMIN', sprintf(lang('backend/admins.audits.editAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)));
 
             return [
                 'result'  => true, 
@@ -1152,6 +1215,7 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
 
         } catch (\Throwable $e) {
             $this->db->transRollback();
+            $this->cleanupUploadedImages($uploadedFilenames, $uploadUuid);
             log_message('error', lang('backend/admins.messages.editError') . ' - ' . $e->getMessage() . ' | File: ' . $e->getFile() . ' | Riga: ' . $e->getLine());
             return ['result' => false, 'message' => lang('backend/admins.messages.editError')];
         }
@@ -1271,8 +1335,7 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
 
             $this->db->transCommit();
 
-            $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('HARD_DELETE_ADMINS', 'admins', sprintf(lang('backend/admins.audits.hardDeleteAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+            $this->logActivitySafely('HARD_DELETE_ADMINS', sprintf(lang('backend/admins.audits.hardDeleteAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)));
 
 			if ( ! \App\Libraries\ImageFileSystemService::removeAllImages('admins', $posts['uuid'])):
 				log_message('error', lang('backend/admins.messages.hardDeleteImagesError'));
@@ -1340,6 +1403,10 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
             $sql = "update admins set email = CONCAT(email, ?), deleted_at = NOW() where uuid = ?";
             $this->db->query($sql, [$deletedMarker, $posts['uuid']]);
 
+            /* Chiusura coerente dello storico delle sessioni prima della revoca dei token */
+            $logoutAt = date('Y-m-d H:i:s');
+            $this->db->query("update admins_logs set logout = ?, logout_reason = 'deleted' where admin_uuid = ? and logout is null", [$logoutAt, $posts['uuid']]);
+
             /* Revoca immediata degli accessi attivi (disconnessione forzata) */
             $this->db->query("delete from admins_tokens where admin_uuid = ?", [$posts['uuid']]);
             $this->db->query("delete from admins_2fa_codes where admin_uuid = ?", [$posts['uuid']]);
@@ -1355,8 +1422,7 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
             $this->db->transCommit();
 
             /* Registrazione attività */
-            $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('SOFT_DELETE_ADMINS', 'admins', sprintf(lang('backend/admins.audits.softDeleteAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+            $this->logActivitySafely('SOFT_DELETE_ADMINS', sprintf(lang('backend/admins.audits.softDeleteAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)));
 
             /* Nota: usa una stringa di lingua dedicata come softDelSuccess se l'hai creata */
             return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.softDeleteSuccess'), esc($data['row']->firstname), esc($data['row']->lastname))];
@@ -1446,8 +1512,7 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
             $this->db->transCommit();
 
             /* Registrazione attività */
-            $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('RESTORE_DELETE_ADMINS', 'admins', sprintf(lang('backend/admins.audits.restoreDeleteAdmin'), esc($row->firstname), esc($row->lastname)), $currentAdmin);
+            $this->logActivitySafely('RESTORE_DELETE_ADMINS', sprintf(lang('backend/admins.audits.restoreDeleteAdmin'), esc($row->firstname), esc($row->lastname)));
 
             return ['result' => true, 'message' => $message];
 
@@ -1531,8 +1596,7 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
 
             $this->db->transCommit();
 
-            $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('RESET_PASSWORD_ADMIN', 'admins', sprintf(lang('backend/admins.audits.resetPasswordAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+            $this->logActivitySafely('RESET_PASSWORD_ADMIN', sprintf(lang('backend/admins.audits.resetPasswordAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)));
 
         } catch (\Throwable $e) {
 
@@ -1639,8 +1703,7 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
 
             $this->db->transCommit();
 
-            $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('CHANGE_STATUS_ADMIN', 'admins', sprintf(lang('backend/admins.audits.changeStatusAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+            $this->logActivitySafely('CHANGE_STATUS_ADMIN', sprintf(lang('backend/admins.audits.changeStatusAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)));
 
             return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.changeStatusSuccess'), esc($data['row']->firstname), esc($data['row']->lastname)), 'admin' => $data['row']];
 
@@ -1737,8 +1800,7 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
 
             $this->db->transCommit();
 
-            $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('CHANGE_PERMISSION_ADMIN', 'admins', sprintf(lang('backend/admins.audits.changePermissionAdmin'), esc($admin->firstname), esc($admin->lastname)), $currentAdmin);
+            $this->logActivitySafely('CHANGE_PERMISSION_ADMIN', sprintf(lang('backend/admins.audits.changePermissionAdmin'), esc($admin->firstname), esc($admin->lastname)));
 
             $admin->updated_at = $updatedAt;
 
@@ -1814,8 +1876,7 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
 			if($this->db->affectedRows() > 0 && $this->db->transStatus() !== false):
 				$this->db->transCommit();
 
-                $currentAdmin = service('authorization')->currentAdmin();
-                log_admin_activity('DELETE_TOKEN_ADMIN', 'admins', sprintf(lang('backend/admins.audits.deleteTokenAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+                $this->logActivitySafely('DELETE_TOKEN_ADMIN', sprintf(lang('backend/admins.audits.deleteTokenAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)));
 
                 return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.deleteTokenSuccess'), esc($data['row']->firstname), esc($data['row']->lastname)), 'admin' => $data['row']];
 			endif;

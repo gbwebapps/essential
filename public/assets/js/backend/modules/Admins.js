@@ -2,14 +2,14 @@
 import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace } from '../backend.js';
 
 export class ResetPasswordManager {
-    constructor(hooks = {}) {
 
+    constructor(hooks = {}) {
         if (ResetPasswordManager.instance) {
             return ResetPasswordManager.instance;
         }
+
         ResetPasswordManager.instance = this;
 
-        /* Parametri di configurazione della sezione dedicati e hardcoded */
         this.formSelector = '.resetAdmin';
         this.url = `${urlbase}backend/admins/resetPassword`;
 
@@ -19,50 +19,73 @@ export class ResetPasswordManager {
             onResetError: null
         }, hooks);
 
-        /* Variabili di stato per la sicurezza */
         this.eventsBound = false;
         this.isSubmitting = false;
-    }
-    
-    init() {
+        this.destroyed = false;
 
-        /* Impedisce cloni dei listener */
-        if (this.eventsBound) return;
+        this.eventsController = new AbortController();
+    }
+
+    init() {
+        if (this.destroyed) return;
+
+        this.bindEvents();
+    }
+
+    bindEvents() {
+        if (this.eventsBound || this.destroyed) return;
+
         this.eventsBound = true;
 
-        /* Event Delegation basato sul formSelector hardcoded */
-        document.addEventListener('submit', async (e) => {
-            const formEl = e.target.closest(this.formSelector);
-            if ( ! formEl) return;
+        document.addEventListener('submit', async e => {
+            const formEl = e.target;
+
+            if (!(formEl instanceof HTMLFormElement)) return;
+            if (!formEl.matches(this.formSelector)) return;
 
             e.preventDefault();
 
-            const message = formEl.dataset.message;
-            if (message) {
-                const ok = await askConfirm(message);
-                if ( ! ok) return;
-            }
+            if (this.isSubmitting || this.destroyed) return;
 
-            const formData = new FormData(formEl);
-            await this.resetPassword(formData, formEl);
+            this.isSubmitting = true;
+
+            try {
+                const message = formEl.dataset.message;
+
+                if (message) {
+                    const ok = await askConfirm(message);
+
+                    if (!ok || this.destroyed) return;
+                }
+
+                await this.resetPassword(new FormData(formEl), formEl, true);
+
+            } catch (error) {
+                await this.handleError(error);
+            } finally {
+                this.isSubmitting = false;
+            }
+        }, {
+            signal: this.eventsController.signal
         });
     }
-    
-    async resetPassword(formData, formEl) {
-        
-        /* Se c'è già una richiesta in corso, blocca */
-        if (this.isSubmitting) return;
-        this.isSubmitting = true;
 
-        if (typeof this.hooks.onResetBefore === 'function') {
-            const stop = this.hooks.onResetBefore(formData);
-            if (stop === false) {
-                this.isSubmitting = false;
-                return;
-            }
+    async resetPassword(formData, formEl, alreadySubmitting = false) {
+        if (this.destroyed || (this.isSubmitting && !alreadySubmitting)) return;
+
+        if (!alreadySubmitting) {
+            this.isSubmitting = true;
         }
 
         try {
+            if (typeof this.hooks.onResetBefore === 'function') {
+                const stop = await this.hooks.onResetBefore(formData);
+
+                if (stop === false) return;
+            }
+
+            if (this.destroyed) return;
+
             const response = await apiFetch(this.url, {
                 method: 'POST',
                 body: formData
@@ -70,18 +93,22 @@ export class ResetPasswordManager {
 
             const data = await response.json();
 
-            /* Fallimento logico (es. email non trovata) */
+            if (this.destroyed) return;
+
             if (data.result === false) {
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
                 return;
             }
 
-            /* Successo */
             if (data.result === true) {
-
                 if (typeof this.hooks.onResetAfter === 'function') {
-                    this.hooks.onResetAfter(data);
+                    await this.hooks.onResetAfter(data);
                 }
+
+                if (this.destroyed) return;
 
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('success', data.message);
@@ -89,29 +116,51 @@ export class ResetPasswordManager {
             }
 
         } catch (error) {
-
-            /* Qui finiscono solo gli errori di rete o i crash del server */
-            if (typeof this.hooks.onResetError === 'function') {
-                this.hooks.onResetError(error);
-            }
-            console.error("Errore ResetPasswordManager:", error);
+            await this.handleError(error);
         } finally {
+            if (!alreadySubmitting) {
+                this.isSubmitting = false;
+            }
+        }
+    }
 
-            /* Rilascia sempre il blocco */
-            this.isSubmitting = false;
+    async handleError(error) {
+        if (typeof this.hooks.onResetError === 'function') {
+            try {
+                await this.hooks.onResetError(error);
+            } catch (hookError) {
+                console.error(
+                    'Errore hook ResetPasswordManager:',
+                    hookError
+                );
+            }
+        }
+
+        console.error('Errore ResetPasswordManager:', error);
+    }
+
+    destroy() {
+        if (this.destroyed) return;
+
+        this.destroyed = true;
+        this.eventsController.abort();
+        this.eventsBound = false;
+
+        if (ResetPasswordManager.instance === this) {
+            ResetPasswordManager.instance = null;
         }
     }
 }
 
 export class ChangeGroupManager {
-    constructor(hooks = {}) {
 
+    constructor(hooks = {}) {
         if (ChangeGroupManager.instance) {
             return ChangeGroupManager.instance;
         }
+
         ChangeGroupManager.instance = this;
 
-        /* Parametro di configurazione della sezione dedicato e hardcoded */
         this.url = urlbase + 'backend/admins/changeGroup';
 
         this.hooks = Object.assign({
@@ -122,69 +171,97 @@ export class ChangeGroupManager {
 
         this.eventsBound = false;
         this.isSubmitting = false;
+        this.destroyed = false;
+
+        this.eventsController = new AbortController();
     }
 
     init() {
+        if (this.destroyed) return;
+
         this.bindEvents();
     }
 
     bindEvents() {
-        if (this.eventsBound) return;
+        if (this.eventsBound || this.destroyed) return;
+
         this.eventsBound = true;
 
         /* Memorizzo il valore iniziale al caricamento della pagina, se presente */
         const initialGroup = document.getElementById('group_id');
         let previousGroupId = initialGroup ? initialGroup.value : '';
 
-        /* Agganciamo il listener al document: sopravvive a qualsiasi rimpiazzo HTML */
+        /* Event delegation per le viste dinamiche */
         document.addEventListener('change', async e => {
-            const selectEl = e.target.closest('#group_id');
-            if ( ! selectEl) return; /* Se non è la nostra select, ignora l'evento */
+            const selectEl = e.target;
 
-            /* Intercettiamo la conferma dell'utente prima di aggiornare lo stato */
-            const message = selectEl.dataset.message;
-            const ok = await askConfirm(message);
+            if (!(selectEl instanceof HTMLSelectElement)) return;
+            if (!selectEl.matches('#group_id')) return;
 
-            if ( ! ok) {
+            if (this.isSubmitting || this.destroyed) return;
 
-                /* Se l'utente annulla, ripristino visivamente il gruppo precedente sulla select e blocco il flusso */
+            this.isSubmitting = true;
+
+            try {
+                const message = selectEl.dataset.message;
+                const ok = await askConfirm(message);
+
+                if (this.destroyed) return;
+
+                if (!ok) {
+                    selectEl.value = previousGroupId;
+                    return;
+                }
+
+                const groupId = selectEl.value;
+                const uuidEl = document.getElementById('uuid');
+                const uuid = uuidEl ? uuidEl.value : '';
+
+                if (!groupId || !uuid) return;
+
+                const formData = new FormData();
+                formData.append('group_id', groupId);
+                formData.append('uuid', uuid);
+
+                const changed = await this.changeGroup(formData, true);
+
+                if (this.destroyed) return;
+
+                if (changed === true) {
+                    previousGroupId = groupId;
+                } else {
+                    selectEl.value = previousGroupId;
+                }
+
+            } catch (error) {
                 selectEl.value = previousGroupId;
-                return;
+                await this.handleError(error);
+            } finally {
+                this.isSubmitting = false;
             }
-
-            const groupId = selectEl.value;
-            const uuidEl = document.getElementById('uuid');
-            const uuid = uuidEl ? uuidEl.value : '';
-
-            if (!groupId || !uuid) return;
-
-			const formData = new FormData();
-			formData.append('group_id', groupId);
-			formData.append('uuid', uuid);
-
-			const changed = await this.changeGroup(formData);
-
-			if (changed === true) {
-				previousGroupId = groupId;
-			} else {
-				selectEl.value = previousGroupId;
-			}
+        }, {
+            signal: this.eventsController.signal
         });
     }
 
-    async changeGroup(formData) {
-		if (this.isSubmitting) return false;
-        this.isSubmitting = true;
+    async changeGroup(formData, alreadySubmitting = false) {
+        if (this.destroyed || (this.isSubmitting && !alreadySubmitting)) {
+            return false;
+        }
 
-        if (typeof this.hooks.onGroupBefore === 'function') {
-            const stop = this.hooks.onGroupBefore(formData);
-            if (stop === false) {
-                this.isSubmitting = false;
-				return false;
-            }
+        if (!alreadySubmitting) {
+            this.isSubmitting = true;
         }
 
         try {
+            if (typeof this.hooks.onGroupBefore === 'function') {
+                const stop = await this.hooks.onGroupBefore(formData);
+
+                if (stop === false) return false;
+            }
+
+            if (this.destroyed) return false;
+
             const response = await apiFetch(this.url, {
                 method: 'POST',
                 body: formData
@@ -192,50 +269,81 @@ export class ChangeGroupManager {
 
             const data = await response.json();
 
-			if (data.result === false) {
-				if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
-				return false;
+            if (this.destroyed) return false;
+
+            if (data.result === false) {
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
+                return false;
             }
 
             if (data.result === true) {
-
-                /* Aggiorno chirurgicamente solo il contenitore dei permessi parziali */
+                /* Aggiorno solo il contenitore dei permessi parziali */
                 const permissionsEl = document.getElementById('permissions');
+
                 if (permissionsEl && data.output) {
                     smoothReplace(permissionsEl, data.output);
                 }
 
-				if (typeof this.hooks.onGroupAfter === 'function') {
-					this.hooks.onGroupAfter(data);
-				}
+                if (typeof this.hooks.onGroupAfter === 'function') {
+                    await this.hooks.onGroupAfter(data);
+                }
 
-				return true;
-			}
+                return true;
+            }
 
-			return false;
+            return false;
 
         } catch (error) {
-            if (typeof this.hooks.onGroupError === 'function') {
-                this.hooks.onGroupError(error);
-			}
-			console.error("Errore ChangeGroup:", error);
-			return false;
+            await this.handleError(error);
+            return false;
         } finally {
-            this.isSubmitting = false;
+            if (!alreadySubmitting) {
+                this.isSubmitting = false;
+            }
+        }
+    }
+
+    async handleError(error) {
+        if (typeof this.hooks.onGroupError === 'function') {
+            try {
+                await this.hooks.onGroupError(error);
+            } catch (hookError) {
+                console.error(
+                    'Errore hook ChangeGroupManager:',
+                    hookError
+                );
+            }
+        }
+
+        console.error('Errore ChangeGroupManager:', error);
+    }
+
+    destroy() {
+        if (this.destroyed) return;
+
+        this.destroyed = true;
+        this.eventsController.abort();
+        this.eventsBound = false;
+
+        if (ChangeGroupManager.instance === this) {
+            ChangeGroupManager.instance = null;
         }
     }
 }
 
 export class GetPermissionsManager {
-    constructor(hooks = {}) {
 
+    constructor(hooks = {}) {
         if (GetPermissionsManager.instance) {
             return GetPermissionsManager.instance;
         }
+
         GetPermissionsManager.instance = this;
 
-        /* Parametri di configurazione della sezione dedicati e hardcoded */
-        this.url = urlbase + 'backend/admins/getPermissions'; 
+        this.url = urlbase + 'backend/admins/getPermissions';
         this.formSelector = '#getPermissions';
 
         this.hooks = Object.assign({
@@ -244,46 +352,54 @@ export class GetPermissionsManager {
             onPermissionsError: null
         }, hooks);
 
-        /* Variabili di stato per la sicurezza */
         this.eventsBound = false;
         this.isSubmitting = false;
+        this.destroyed = false;
+
+        this.eventsController = new AbortController();
     }
 
     init() {
+        if (this.destroyed) return;
+
         this.bindEvents();
     }
 
     bindEvents() {
+        if (this.eventsBound || this.destroyed) return;
 
-        /* Impedisce cloni dei listener */
-        if (this.eventsBound) return;
         this.eventsBound = true;
 
         document.addEventListener('submit', async e => {
-            if ( ! e.target.matches(this.formSelector)) return;
+            const formEl = e.target;
+
+            if (!(formEl instanceof HTMLFormElement)) return;
+            if (!formEl.matches(this.formSelector)) return;
 
             e.preventDefault();
-            const formData = new FormData(e.target);
 
-            await this.getPermissions(formData);
+            if (this.isSubmitting || this.destroyed) return;
+
+            await this.getPermissions(new FormData(formEl));
+        }, {
+            signal: this.eventsController.signal
         });
     }
 
     async getPermissions(formData) {
-        
-        /* Se c'è già una richiesta in corso, blocca */
-        if (this.isSubmitting) return;
+        if (this.destroyed || this.isSubmitting) return;
+
         this.isSubmitting = true;
 
-        if (typeof this.hooks.onPermissionsBefore === 'function') {
-            const stop = this.hooks.onPermissionsBefore(formData);
-            if (stop === false) {
-                this.isSubmitting = false;
-                return;
-            }
-        }
-
         try {
+            if (typeof this.hooks.onPermissionsBefore === 'function') {
+                const stop = await this.hooks.onPermissionsBefore(formData);
+
+                if (stop === false) return;
+            }
+
+            if (this.destroyed) return;
+
             const response = await apiFetch(this.url, {
                 method: 'POST',
                 body: formData
@@ -291,47 +407,68 @@ export class GetPermissionsManager {
 
             const data = await response.json();
 
-            /* Gestione fallimento logico generico */
+            if (this.destroyed) return;
+
             if (data.result === false) {
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
                 return;
             }
 
-            /* Caso successo */
             if (data.result === true) {
-                
                 const permissionsEl = document.getElementById('permissions');
+
                 if (permissionsEl && data.output) {
                     smoothReplace(permissionsEl, data.output);
                 }
 
                 if (typeof this.hooks.onPermissionsAfter === 'function') {
-                    this.hooks.onPermissionsAfter(data);
+                    await this.hooks.onPermissionsAfter(data);
                 }
             }
 
         } catch (error) {
             if (typeof this.hooks.onPermissionsError === 'function') {
-                this.hooks.onPermissionsError(error);
+                try {
+                    await this.hooks.onPermissionsError(error);
+                } catch (hookError) {
+                    console.error(
+                        'Errore hook GetPermissionsManager:',
+                        hookError
+                    );
+                }
             }
-            console.error("Errore PermissionsManager:", error);
-        } finally {
 
-            /* Rilascia sempre il blocco */
+            console.error('Errore GetPermissionsManager:', error);
+        } finally {
             this.isSubmitting = false;
+        }
+    }
+
+    destroy() {
+        if (this.destroyed) return;
+
+        this.destroyed = true;
+        this.eventsController.abort();
+        this.eventsBound = false;
+
+        if (GetPermissionsManager.instance === this) {
+            GetPermissionsManager.instance = null;
         }
     }
 }
 
 export class ChangePermissionManager {
-    constructor(hooks = {}) {
 
+    constructor(hooks = {}) {
         if (ChangePermissionManager.instance) {
             return ChangePermissionManager.instance;
         }
+
         ChangePermissionManager.instance = this;
 
-        /* Parametro di configurazione della sezione dedicato e hardcoded */
         this.url = urlbase + 'backend/admins/changePermission';
 
         this.hooks = Object.assign({
@@ -340,58 +477,70 @@ export class ChangePermissionManager {
             onPermissionError: null
         }, hooks);
 
-        /* Variabili di stato per la sicurezza */
         this.eventsBound = false;
         this.isSubmitting = false;
+        this.destroyed = false;
+
+        this.eventsController = new AbortController();
     }
 
     init() {
+        if (this.destroyed) return;
+
         this.bindEvents();
     }
 
     bindEvents() {
+        if (this.eventsBound || this.destroyed) return;
 
-        /* Impedisce cloni dei listener */
-        if (this.eventsBound) return;
         this.eventsBound = true;
 
-        /* Gestione dell'invio dei dati (cattura il click sul button type="submit") */
         document.addEventListener('submit', async e => {
-            const formEl = e.target.closest('.changePermission');
-            if ( ! formEl) return;
+            const formEl = e.target;
+
+            if (!(formEl instanceof HTMLFormElement)) return;
+            if (!formEl.matches('.changePermission')) return;
 
             e.preventDefault();
 
-            const message = formEl.dataset.message;
-            const ok = await askConfirm(message);
+            if (this.isSubmitting || this.destroyed) return;
 
-            if ( ! ok) {
+            this.isSubmitting = true;
 
-                /* Se l'utente annulla la conferma, interrompiamo semplicemente il flusso */
-                return;
+            try {
+                const message = formEl.dataset.message;
+                const ok = await askConfirm(message);
+
+                if (!ok || this.destroyed) return;
+
+                await this.changePermission(new FormData(formEl), true);
+
+            } catch (error) {
+                await this.handleError(error);
+            } finally {
+                this.isSubmitting = false;
             }
-
-            /* Recuperiamo i dati dal form e li passiamo alla funzione */
-            const formData = new FormData(formEl);
-            await this.changePermission(formData);
+        }, {
+            signal: this.eventsController.signal
         });
     }
 
-    async changePermission(formData) {
+    async changePermission(formData, alreadySubmitting = false) {
+        if (this.destroyed || (this.isSubmitting && !alreadySubmitting)) return;
 
-        /* Se c'è già una richiesta in corso, blocca */
-        if (this.isSubmitting) return;
-        this.isSubmitting = true;
-
-        if (typeof this.hooks.onPermissionBefore === 'function') {
-            const stop = this.hooks.onPermissionBefore(formData);
-            if (stop === false) {
-                this.isSubmitting = false;
-                return;
-            }
+        if (!alreadySubmitting) {
+            this.isSubmitting = true;
         }
 
         try {
+            if (typeof this.hooks.onPermissionBefore === 'function') {
+                const stop = await this.hooks.onPermissionBefore(formData);
+
+                if (stop === false) return;
+            }
+
+            if (this.destroyed) return;
+
             const response = await apiFetch(this.url, {
                 method: 'POST',
                 body: formData
@@ -399,28 +548,34 @@ export class ChangePermissionManager {
 
             const data = await response.json();
 
-            /* Gestione fallimento logico generico */
+            if (this.destroyed) return;
+
             if (data.result === false) {
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
                 return;
             }
 
-            /* Caso successo */
             if (data.result === true) {
-
                 const PermissionsEl = document.getElementById('permissions');
+
                 if (PermissionsEl && data.permissionsView) {
                     smoothReplace(PermissionsEl, data.permissionsView);
                 }
 
                 const MetaDataEl = document.getElementById('metaData');
+
                 if (MetaDataEl && data.metaView) {
                     smoothReplace(MetaDataEl, data.metaView);
                 }
 
                 if (typeof this.hooks.onPermissionAfter === 'function') {
-                    this.hooks.onPermissionAfter(data);
+                    await this.hooks.onPermissionAfter(data);
                 }
+
+                if (this.destroyed) return;
 
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('success', data.message);
@@ -428,28 +583,52 @@ export class ChangePermissionManager {
             }
 
         } catch (error) {
-            if (typeof this.hooks.onPermissionError === 'function') {
-                this.hooks.onPermissionError(error);
-            }
-            console.error("Errore ChangePermission:", error);
+            await this.handleError(error);
         } finally {
+            if (!alreadySubmitting) {
+                this.isSubmitting = false;
+            }
+        }
+    }
 
-            /* Rilascia sempre il blocco */
-            this.isSubmitting = false;
+    async handleError(error) {
+        if (typeof this.hooks.onPermissionError === 'function') {
+            try {
+                await this.hooks.onPermissionError(error);
+            } catch (hookError) {
+                console.error(
+                    'Errore hook ChangePermissionManager:',
+                    hookError
+                );
+            }
+        }
+
+        console.error('Errore ChangePermissionManager:', error);
+    }
+
+    destroy() {
+        if (this.destroyed) return;
+
+        this.destroyed = true;
+        this.eventsController.abort();
+        this.eventsBound = false;
+
+        if (ChangePermissionManager.instance === this) {
+            ChangePermissionManager.instance = null;
         }
     }
 }
 
 export class GetTokensManager {
-    constructor(hooks = {}) {
 
+    constructor(hooks = {}) {
         if (GetTokensManager.instance) {
             return GetTokensManager.instance;
         }
+
         GetTokensManager.instance = this;
 
-        /* Parametri di configurazione della sezione dedicati e hardcoded */
-        this.url = urlbase + 'backend/admins/getTokens'; 
+        this.url = urlbase + 'backend/admins/getTokens';
         this.formSelector = '#getTokens';
 
         this.hooks = Object.assign({
@@ -458,46 +637,54 @@ export class GetTokensManager {
             onTokensError: null
         }, hooks);
 
-        /* Variabili di stato per la sicurezza */
         this.eventsBound = false;
         this.isSubmitting = false;
+        this.destroyed = false;
+
+        this.eventsController = new AbortController();
     }
 
     init() {
+        if (this.destroyed) return;
+
         this.bindEvents();
     }
 
     bindEvents() {
+        if (this.eventsBound || this.destroyed) return;
 
-        /* Impedisce cloni dei listener */
-        if (this.eventsBound) return;
         this.eventsBound = true;
 
         document.addEventListener('submit', async e => {
-            if ( ! e.target.matches(this.formSelector)) return;
+            const formEl = e.target;
+
+            if (!(formEl instanceof HTMLFormElement)) return;
+            if (!formEl.matches(this.formSelector)) return;
 
             e.preventDefault();
-            const formData = new FormData(e.target);
 
-            await this.getTokens(formData);
+            if (this.isSubmitting || this.destroyed) return;
+
+            await this.getTokens(new FormData(formEl));
+        }, {
+            signal: this.eventsController.signal
         });
     }
 
     async getTokens(formData) {
-        
-        /* Se c'è già una richiesta in corso, blocca */
-        if (this.isSubmitting) return;
+        if (this.destroyed || this.isSubmitting) return;
+
         this.isSubmitting = true;
 
-        if (typeof this.hooks.onTokensBefore === 'function') {
-            const stop = this.hooks.onTokensBefore(formData);
-            if (stop === false) {
-                this.isSubmitting = false;
-                return;
-            }
-        }
-
         try {
+            if (typeof this.hooks.onTokensBefore === 'function') {
+                const stop = await this.hooks.onTokensBefore(formData);
+
+                if (stop === false) return;
+            }
+
+            if (this.destroyed) return;
+
             const response = await apiFetch(this.url, {
                 method: 'POST',
                 body: formData
@@ -505,47 +692,68 @@ export class GetTokensManager {
 
             const data = await response.json();
 
-            /* Gestione fallimento logico generico */
+            if (this.destroyed) return;
+
             if (data.result === false) {
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
                 return;
             }
 
-            /* Caso successo */
             if (data.result === true) {
-
                 const tokensEl = document.getElementById('tokens');
+
                 if (tokensEl && data.output) {
                     smoothReplace(tokensEl, data.output);
                 }
 
                 if (typeof this.hooks.onTokensAfter === 'function') {
-                    this.hooks.onTokensAfter(data);
+                    await this.hooks.onTokensAfter(data);
                 }
             }
 
         } catch (error) {
             if (typeof this.hooks.onTokensError === 'function') {
-                this.hooks.onTokensError(error);
+                try {
+                    await this.hooks.onTokensError(error);
+                } catch (hookError) {
+                    console.error(
+                        'Errore hook GetTokensManager:',
+                        hookError
+                    );
+                }
             }
-            console.error("Errore TokensManager:", error);
-        } finally {
 
-            /* Rilascia sempre il blocco */
+            console.error('Errore GetTokensManager:', error);
+        } finally {
             this.isSubmitting = false;
+        }
+    }
+
+    destroy() {
+        if (this.destroyed) return;
+
+        this.destroyed = true;
+        this.eventsController.abort();
+        this.eventsBound = false;
+
+        if (GetTokensManager.instance === this) {
+            GetTokensManager.instance = null;
         }
     }
 }
 
 export class DeleteTokenManager {
-    constructor(hooks = {}) { 
 
+    constructor(hooks = {}) {
         if (DeleteTokenManager.instance) {
             return DeleteTokenManager.instance;
         }
+
         DeleteTokenManager.instance = this;
 
-        /* Parametro di configurazione della sezione dedicato e hardcoded */
         this.url = urlbase + 'backend/admins/deleteToken';
 
         this.hooks = Object.assign({
@@ -554,58 +762,70 @@ export class DeleteTokenManager {
             onDeleteTokenError: null
         }, hooks);
 
-        /* Variabili di stato per la sicurezza */
         this.eventsBound = false;
         this.isSubmitting = false;
+        this.destroyed = false;
+
+        this.eventsController = new AbortController();
     }
 
     init() {
+        if (this.destroyed) return;
+
         this.bindEvents();
     }
 
     bindEvents() {
+        if (this.eventsBound || this.destroyed) return;
 
-        /* Impedisce cloni dei listener */
-        if (this.eventsBound) return;
         this.eventsBound = true;
 
-        /* Gestione dell'invio dei dati (cattura il click sul button type="submit") */
         document.addEventListener('submit', async e => {
-            const formEl = e.target.closest('.deleteToken');
-            if ( ! formEl) return;
+            const formEl = e.target;
+
+            if (!(formEl instanceof HTMLFormElement)) return;
+            if (!formEl.matches('.deleteToken')) return;
 
             e.preventDefault();
 
-            const message = formEl.dataset.message;
-            const ok = await askConfirm(message);
+            if (this.isSubmitting || this.destroyed) return;
 
-            if ( ! ok) {
+            this.isSubmitting = true;
 
-                /* Se l'utente annulla la conferma, interrompiamo semplicemente il flusso */
-                return;
+            try {
+                const message = formEl.dataset.message;
+                const ok = await askConfirm(message);
+
+                if (!ok || this.destroyed) return;
+
+                await this.deleteToken(new FormData(formEl), true);
+
+            } catch (error) {
+                await this.handleError(error);
+            } finally {
+                this.isSubmitting = false;
             }
-
-            /* Recuperiamo i dati dal form e li passiamo alla funzione */
-            const formData = new FormData(formEl);
-            await this.deleteToken(formData);
+        }, {
+            signal: this.eventsController.signal
         });
     }
 
-    async deleteToken(formData) {
+    async deleteToken(formData, alreadySubmitting = false) {
+        if (this.destroyed || (this.isSubmitting && !alreadySubmitting)) return;
 
-        /* Se c'è già una richiesta in corso, blocca */
-        if (this.isSubmitting) return;
-        this.isSubmitting = true;
-
-        if (typeof this.hooks.onDeleteTokenBefore === 'function') {
-            const stop = this.hooks.onDeleteTokenBefore(formData);
-            if (stop === false) {
-                this.isSubmitting = false;
-                return;
-            }
+        if (!alreadySubmitting) {
+            this.isSubmitting = true;
         }
 
         try {
+            if (typeof this.hooks.onDeleteTokenBefore === 'function') {
+                const stop = await this.hooks.onDeleteTokenBefore(formData);
+
+                if (stop === false) return;
+            }
+
+            if (this.destroyed) return;
+
             const response = await apiFetch(this.url, {
                 method: 'POST',
                 body: formData
@@ -613,23 +833,28 @@ export class DeleteTokenManager {
 
             const data = await response.json();
 
-            /* Gestione fallimento logico generico */
+            if (this.destroyed) return;
+
             if (data.result === false) {
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
                 return;
             }
 
-            /* Caso successo */
             if (data.result === true) {
-                
-                const deleteToken = document.getElementById('tokens');
-                if (deleteToken && data.tokensView) {
-                    smoothReplace(deleteToken, data.tokensView);
+                const tokensEl = document.getElementById('tokens');
+
+                if (tokensEl && data.tokensView) {
+                    smoothReplace(tokensEl, data.tokensView);
                 }
 
                 if (typeof this.hooks.onDeleteTokenAfter === 'function') {
-                    this.hooks.onDeleteTokenAfter(data);
+                    await this.hooks.onDeleteTokenAfter(data);
                 }
+
+                if (this.destroyed) return;
 
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('success', data.message);
@@ -637,14 +862,38 @@ export class DeleteTokenManager {
             }
 
         } catch (error) {
-            if (typeof this.hooks.onDeleteTokenError === 'function') {
-                this.hooks.onDeleteTokenError(error);
-            }
-            console.error("Errore DeleteToken:", error);
+            await this.handleError(error);
         } finally {
+            if (!alreadySubmitting) {
+                this.isSubmitting = false;
+            }
+        }
+    }
 
-            /* Rilascia sempre il blocco */
-            this.isSubmitting = false;
+    async handleError(error) {
+        if (typeof this.hooks.onDeleteTokenError === 'function') {
+            try {
+                await this.hooks.onDeleteTokenError(error);
+            } catch (hookError) {
+                console.error(
+                    'Errore hook DeleteTokenManager:',
+                    hookError
+                );
+            }
+        }
+
+        console.error('Errore DeleteTokenManager:', error);
+    }
+
+    destroy() {
+        if (this.destroyed) return;
+
+        this.destroyed = true;
+        this.eventsController.abort();
+        this.eventsBound = false;
+
+        if (DeleteTokenManager.instance === this) {
+            DeleteTokenManager.instance = null;
         }
     }
 }

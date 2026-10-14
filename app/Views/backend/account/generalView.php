@@ -13,7 +13,7 @@
             <div class="card mt-3 mt-lg-0">
                 <div class="card-header">
                     <h2 class="card-title text-center text-lg-start mb-0">
-                        <?= $sections['edit']['icon']; ?>
+						<?= $sections['general']['icon']; ?>
                         <?= lang('backend/account.titles.general'); ?>
                     </h2>
                 </div>

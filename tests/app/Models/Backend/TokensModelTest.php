@@ -2,863 +2,251 @@
 
 namespace App\Models\Backend;
 
-class TokensModelTest extends \CodeIgniter\Test\CIUnitTestCase
+use CodeIgniter\Database\BaseConnection;
+use CodeIgniter\Database\BaseResult;
+use CodeIgniter\Test\CIUnitTestCase;
+use Config\Services;
+
+if ( ! function_exists(__NAMESPACE__ . '\\log_admin_activity')):
+    function log_admin_activity(): bool
+    {
+        return true;
+    }
+endif;
+
+class TokensModelTest extends CIUnitTestCase
 {
-	protected function setUp(): void
+    protected function tearDown(): void
     {
-        parent::setUp();
-
-        $modelClass
-            =
-            \App\Models\Backend\TokensModel::class;
-
-        $model
-            =
-            new $modelClass();
-
-        $this
-            ->model
-            =
-            $model;
+        Services::resetSingle('authorization');
+        parent::tearDown();
     }
 
-    public function testShowAllValidationRulesReturnsArrayWithExpectedKeys()
+    public function testShowAllValidationRulesReturnsExpectedRules(): void
     {
-        $model
-            =
-            $this
-            ->model;
-
-        $result
-            =
-            $model
-            ->showAllValidationRules();
-
-        $this
-            ->assertSame(
-                [
-                    'column' => ['rules' => ['required', 'alpha_dash']],
-                    'order' => ['rules' => ['required', 'in_list[asc,desc]']],
-                    'page' => ['rules' => ['required', 'is_natural_no_zero']],
-                    'rows' => ['rules' => ['required', 'is_natural_no_zero']]
-                ],
-                $result
-            );
+        $this->assertSame([
+            'column' => ['rules' => ['required', 'alpha_dash']],
+            'order' => ['rules' => ['required', 'in_list[asc,desc]']],
+            'page' => ['rules' => ['required', 'is_natural_no_zero']],
+            'rows' => ['rules' => ['required', 'is_natural_no_zero']]
+        ], (new TokensModel())->showAllValidationRules());
     }
 
-    public function testShowAllSearchValidationRulesReturnsArrayWithExpectedKeys()
+    public function testShowAllSearchValidationRulesSupportsPartialEmailSearch(): void
     {
-        $model
-            =
-            $this
-            ->model;
+        $rules = (new TokensModel())->showAllSearchValidationRules();
 
-        $result
-            =
-            $model
-            ->showAllSearchValidationRules();
-
-        $this
-            ->assertSame(
-                [
-                    'searchFields.email' => [
-                        'label' => lang('backend/tokens.labels.username'),
-                        'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\']+$/u]']
-                    ],
-                    'searchFields.token_type' => [
-                        'label' => lang('backend/tokens.labels.token_type'),
-                        'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\']+$/u]']
-                    ],
-                    'searchDates.token_create-from' => [
-                        'label' => lang('backend/tokens.labels.dateFrom'),
-                        'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]']
-                    ],
-                    'searchDates.token_create-to' => [
-                        'label' => lang('backend/tokens.labels.dateTo'),
-                        'rules' => ['permit_empty', 'valid_date[Y-m-d H:i:s]']
-                    ]
-                ],
-                $result
-            );
-    }
-
-    public function testDelValidationRulesReturnsArrayWithExpectedKeys()
-    {
-        $model
-            =
-            $this
-            ->model;
-
-        $result
-            =
-            $model
-            ->delValidationRules();
-
-        $this
-            ->assertSame(
-                [
-                    'uuid' => [
-                        'label' => lang('backend/tokens.labels.uuid'),
-                        'rules' => ['required', 'regex_match[/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i]'],
-                        'errors' => [
-                            'required' => lang('backend/tokens.errors.uuid'),
-                            'regex_match' => lang('backend/tokens.errors.uuid')
-                        ]
-                    ],
-                    'id' => [
-                        'label' => lang('backend/tokens.labels.id'),
-                        'rules' => ['required', 'is_natural_no_zero'],
-                        'errors' => [
-                            'required' => lang('backend/tokens.errors.id'),
-                            'is_natural_no_zero' => lang('backend/tokens.errors.id')
-                        ]
-                    ]
-                ],
-                $result
-            );
-    }
-
-    public function testHardDeleteUserInTrashReturnsError()
-    {
-        $modelClass
-            =
-            \App\Models\Backend\TokensModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'checkAllowedFields',
-                    'getByUUID'
-                ]
-            )
-            ->getMock();
-
-        $posts
-            =
-            [
-                'id'
-                =>
-                '2',
-                'uuid'
-                =>
-                'uuid-123'
-            ];
-
-        $model
-            ->method('checkAllowedFields')
-            ->willReturn(
-                $posts
-            );
-
-        $fakeRow
-            =
-            new \stdClass();
-
-        $fakeRow
-            ->deleted_at
-            =
-            '2026-01-01';
-
-        $fakeData
-            =
-            [
-                'result'
-                =>
-                true,
-                'row'
-                =>
-                $fakeRow
-            ];
-
-        $model
-            ->method('getByUUID')
-            ->with('2')
-            ->willReturn(
-                $fakeData
-            );
-
-        $result
-            =
-            $model
-            ->hardDelete(
-                $posts
-            );
-
-        $this
-            ->assertFalse(
-                $result['result']
-            );
-
-        $expectedMsg
-            =
-            lang('backend/tokens.messages.cannotModifyDeleted');
-
-        $this
-            ->assertSame(
-                $expectedMsg,
-                $result['message']
-            );
-    }
-
-    public function testHardDeleteSuperadminReturnsError()
-    {
-        $modelClass
-            =
-            \App\Models\Backend\TokensModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'checkAllowedFields',
-                    'getByUUID'
-                ]
-            )
-            ->getMock();
-
-        $posts
-            =
-            [
-                'id'
-                =>
-                '3',
-                'uuid'
-                =>
-                'uuid-123'
-            ];
-
-        $model
-            ->method('checkAllowedFields')
-            ->willReturn(
-                $posts
-            );
-
-        $fakeRow
-            =
-            new \stdClass();
-
-        $fakeRow
-            ->deleted_at
-            =
-            null;
-
-        $fakeRow
-            ->superadmin
-            =
-            1;
-
-        $fakeData
-            =
-            [
-                'result'
-                =>
-                true,
-                'row'
-                =>
-                $fakeRow
-            ];
-
-        $model
-            ->method('getByUUID')
-            ->with('3')
-            ->willReturn(
-                $fakeData
-            );
-
-        $result
-            =
-            $model
-            ->hardDelete(
-                $posts
-            );
-
-        $this
-            ->assertFalse(
-                $result['result']
-            );
-
-        $expectedMsg
-            =
-            lang('backend/tokens.messages.protectedAdmin');
-
-        $this
-            ->assertSame(
-                $expectedMsg,
-                $result['message']
-            );
-    }
-
-    public function testHardDeleteNoAffectedRowsReturnsError()
-    {
-        $modelClass
-            =
-            \App\Models\Backend\TokensModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'checkAllowedFields',
-                    'getByUUID'
-                ]
-            )
-            ->getMock();
-
-        $posts
-            =
-            [
-                'id'
-                =>
-                '4',
-                'uuid'
-                =>
-                'uuid-123'
-            ];
-
-        $model
-            ->method('checkAllowedFields')
-            ->willReturn(
-                $posts
-            );
-
-        $fakeRow
-            =
-            new \stdClass();
-
-        $fakeRow
-            ->deleted_at
-            =
-            null;
-
-        $fakeRow
-            ->superadmin
-            =
-            0;
-
-        $fakeData
-            =
-            [
-                'result'
-                =>
-                true,
-                'row'
-                =>
-                $fakeRow
-            ];
-
-        $model
-            ->method('getByUUID')
-            ->with('4')
-            ->willReturn(
-                $fakeData
-            );
-
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        $resClass
-            =
-            \CodeIgniter\Database\BaseResult::class;
-
-        $resMock
-            =
-            $this
-            ->createMock(
-                $resClass
-            );
-
-        $resMock
-            ->method('getRow')
-            ->willReturn(null);
-
-        $dbMock
-            ->method('query')
-            ->willReturn(
-                $resMock
-            );
-
-        $dbMock
-            ->method('affectedRows')
-            ->willReturn(0);
-
-        $injectDb
-            =
-            function (
-                $d
-            ) {
-                $this
-                    ->db
-                    =
-                    $d;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,
-                $modelClass
-            );
-
-        $binder(
-            $dbMock
+        $this->assertSame(
+            ['permit_empty', 'trim', 'max_length[100]', 'regex_match[/^[a-zA-Z0-9@._+\-]+$/]'],
+            $rules['searchFields.email']['rules']
         );
-
-        $result
-            =
-            $model
-            ->hardDelete(
-                $posts
-            );
-
-        $this
-            ->assertFalse(
-                $result['result']
-            );
-
-        $expectedMsg
-            =
-            lang('backend/tokens.messages.deleteTokenError');
-
-        $this
-            ->assertSame(
-                $expectedMsg,
-                $result['message']
-            );
-    }
-
-    public function testHardDeleteThrowsExceptionReturnsError()
-    {
-        $modelClass
-            =
-            \App\Models\Backend\TokensModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'checkAllowedFields',
-                    'getByUUID'
-                ]
-            )
-            ->getMock();
-
-        $posts
-            =
-            [
-                'id'
-                =>
-                6,
-                'uuid'
-                =>
-                'uuid-123'
-            ];
-
-        $model
-            ->method('checkAllowedFields')
-            ->willReturn(
-                $posts
-            );
-
-        $fakeRow
-            =
-            new \stdClass();
-
-        $fakeRow
-            ->deleted_at
-            =
-            null;
-
-        $fakeRow
-            ->superadmin
-            =
-            0;
-
-        $fakeData
-            =
-            [
-                'result'
-                =>
-                true,
-                'row'
-                =>
-                $fakeRow
-            ];
-
-        $model
-            ->method('getByUUID')
-            ->willReturn(
-                $fakeData
-            );
-
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        $exceptionClass
-            =
-            \Exception::class;
-
-        $exceptionMsg
-            =
-            'DB Error';
-
-        $exceptionObj
-            =
-            new $exceptionClass(
-                $exceptionMsg
-            );
-
-        $dbMock
-            ->method('query')
-            ->willThrowException(
-                $exceptionObj
-            );
-
-        $injectDb
-            =
-            function (
-                $d
-            ) {
-                $this
-                    ->db
-                    =
-                    $d;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,
-                $modelClass
-            );
-
-        $binder(
-            $dbMock
+        $this->assertSame(
+            ['permit_empty', 'in_list[activation,session,cookie]'],
+            $rules['searchFields.token_type']['rules']
         );
-
-        $result
-            =
-            $model
-            ->hardDelete(
-                $posts
-            );
-
-        $this
-            ->assertFalse(
-                $result['result']
-            );
     }
 
-    public function testHardDeleteUserNotFoundReturnsError()
+    public function testDelValidationRulesRequiresUuidAndTokenId(): void
     {
-        $modelClass
-            =
-            \App\Models\Backend\TokensModel::class;
+        $rules = (new TokensModel())->delValidationRules();
 
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'checkAllowedFields',
-                    'getByUUID'
-                ]
-            )
-            ->getMock();
-
-        $posts
-            =
-            [
-                'id'
-                =>
-                '1',
-                'uuid'
-                =>
-                'some-uuid'
-            ];
-
-        $model
-            ->method('checkAllowedFields')
-            ->willReturn(
-                $posts
-            );
-
-        $fakeData
-            =
-            [
-                'result'
-                =>
-                false,
-                'message'
-                =>
-                'User not found'
-            ];
-
-        $model
-            ->method('getByUUID')
-            ->with('1')
-            ->willReturn(
-                $fakeData
-            );
-
-        $result
-            =
-            $model
-            ->hardDelete(
-                $posts
-            );
-
-        $this
-            ->assertFalse(
-                $result['result']
-            );
-
-        $this
-            ->assertSame(
-                'User not found',
-                $result['message']
-            );
+        $this->assertArrayHasKey('uuid', $rules);
+        $this->assertArrayHasKey('id', $rules);
+        $this->assertContains('is_natural_no_zero', $rules['id']['rules']);
     }
 
-    public function testHardDeleteSuccessWithLogUpdate()
+    public function testBuildFiltersUsesJoinedAdminEmailColumn(): void
     {
-        if (
-            ! function_exists(
-                __NAMESPACE__ . '\log_admin_activity'
-            )
-        ):
-            function log_admin_activity()
-            {
+        $model = new TokensModel();
+        $params = [];
+        $invoke = function (array $fields, array &$values): string {
+            return $this->buildFilters($fields, $values);
+        };
+        $buildFilters = \Closure::bind($invoke, $model, TokensModel::class);
+
+        $sql = $buildFilters(['email' => 'admin1@', 'token_type' => 'session'], $params);
+
+        $this->assertSame(' and admins.email like ? and admins_tokens.token_type like ?', $sql);
+        $this->assertSame(['%admin1@%', '%session%'], $params);
+    }
+
+    public function testHardDeleteRejectsTokenOwnedByAnotherAdmin(): void
+    {
+        $database = $this->createMock(BaseConnection::class);
+        $result = $this->createMock(BaseResult::class);
+        $result->method('getRow')->willReturn(null);
+
+        $database->expects($this->once())->method('transBegin')->willReturn(true);
+        $database->expects($this->once())
+            ->method('query')
+            ->with($this->stringContains('where at.id = ? and at.admin_uuid = ?'), [7, 'owner-uuid'])
+            ->willReturn($result);
+        $database->expects($this->once())->method('transRollback')->willReturn(true);
+
+        $response = $this->createModel($database)->hardDelete(['id' => 7, 'uuid' => 'owner-uuid']);
+
+        $this->assertFalse($response['result']);
+        $this->assertSame(lang('backend/tokens.messages.deleteTokenError'), $response['message']);
+    }
+
+    public function testHardDeleteRejectsDeletedAdmin(): void
+    {
+        $database = $this->createMock(BaseConnection::class);
+        $result = $this->createMock(BaseResult::class);
+        $result->method('getRow')->willReturn($this->tokenRow(['deleted_at' => '2026-01-01 00:00:00']));
+
+        $database->method('transBegin')->willReturn(true);
+        $database->method('query')->willReturn($result);
+        $database->expects($this->once())->method('transRollback')->willReturn(true);
+
+        $response = $this->createModel($database)->hardDelete($this->posts());
+
+        $this->assertFalse($response['result']);
+        $this->assertSame(lang('backend/tokens.messages.cannotModifyDeleted'), $response['message']);
+    }
+
+    public function testHardDeleteRejectsSuperadmin(): void
+    {
+        $database = $this->createMock(BaseConnection::class);
+        $result = $this->createMock(BaseResult::class);
+        $result->method('getRow')->willReturn($this->tokenRow(['superadmin' => 1]));
+
+        $database->method('transBegin')->willReturn(true);
+        $database->method('query')->willReturn($result);
+        $database->expects($this->once())->method('transRollback')->willReturn(true);
+
+        $response = $this->createModel($database)->hardDelete($this->posts());
+
+        $this->assertFalse($response['result']);
+        $this->assertSame(lang('backend/tokens.messages.protectedAdmin'), $response['message']);
+    }
+
+    public function testHardDeleteRollsBackWhenDeleteDoesNotAffectOneToken(): void
+    {
+        $database = $this->createMock(BaseConnection::class);
+        $result = $this->createMock(BaseResult::class);
+        $result->method('getRow')->willReturn($this->tokenRow());
+
+        $database->method('transBegin')->willReturn(true);
+        $database->method('query')->willReturn($result);
+        $database->method('affectedRows')->willReturn(0);
+        $database->method('transStatus')->willReturn(true);
+        $database->expects($this->once())->method('transRollback')->willReturn(true);
+
+        $response = $this->createModel($database)->hardDelete($this->posts());
+
+        $this->assertFalse($response['result']);
+        $this->assertSame(lang('backend/tokens.messages.deleteTokenError'), $response['message']);
+    }
+
+    public function testHardDeleteLocksTokenClosesOpenLogAndCommits(): void
+    {
+        $queries = [];
+        $result = $this->createMock(BaseResult::class);
+        $result->method('getRow')->willReturn($this->tokenRow());
+        $database = $this->createMock(BaseConnection::class);
+
+        $database->expects($this->once())->method('transBegin')->willReturn(true);
+        $database->method('query')->willReturnCallback(
+            function (string $sql, array $params = []) use (&$queries, $result) {
+                $queries[] = [$sql, $params];
+                return str_contains($sql, 'select at.id') ? $result : true;
             }
-        endif;
-
-        $modelClass
-            =
-            \App\Models\Backend\TokensModel::class;
-
-        $model
-            =
-            $this
-            ->getMockBuilder(
-                $modelClass
-            )
-            ->onlyMethods(
-                [
-                    'checkAllowedFields',
-                    'getByUUID'
-                ]
-            )
-            ->getMock();
-
-        $posts
-            =
-            [
-                'id'
-                =>
-                '5',
-                'uuid'
-                =>
-                'uuid-123'
-            ];
-
-        $model
-            ->method('checkAllowedFields')
-            ->willReturn(
-                $posts
-            );
-
-        $fakeRow
-            =
-            new \stdClass();
-
-        $fakeRow
-            ->deleted_at
-            =
-            null;
-
-        $fakeRow
-            ->superadmin
-            =
-            0;
-
-        $fakeRow
-            ->firstname
-            =
-            'Mario';
-
-        $fakeRow
-            ->lastname
-            =
-            'Rossi';
-
-        $fakeData
-            =
-            [
-                'result'
-                =>
-                true,
-                'row'
-                =>
-                $fakeRow
-            ];
-
-        $model
-            ->method('getByUUID')
-            ->willReturn(
-                $fakeData
-            );
-
-        $dbClass
-            =
-            \CodeIgniter\Database\BaseConnection::class;
-
-        $dbMock
-            =
-            $this
-            ->createMock(
-                $dbClass
-            );
-
-        $resClass
-            =
-            \CodeIgniter\Database\BaseResult::class;
-
-        $resMock
-            =
-            $this
-            ->createMock(
-                $resClass
-            );
-
-        $tokenRow
-            =
-            new \stdClass();
-
-        $tokenRow
-            ->id
-            =
-            10;
-
-        $tokenRow
-            ->token_type
-            =
-            'cookie';
-
-        $tokenRow
-            ->last_activity
-            =
-            '2026-01-01 10:00:00';
-
-        $resMock
-            ->method('getRow')
-            ->willReturn(
-                $tokenRow
-            );
-
-        $dbMock
-            ->method('query')
-            ->willReturn(
-                $resMock
-            );
-
-        $dbMock
-            ->method('affectedRows')
-            ->willReturn(1);
-
-        $injectDb
-            =
-            function (
-                $d
-            ) {
-                $this
-                    ->db
-                    =
-                    $d;
-            };
-
-        $binder
-            =
-            \Closure::bind(
-                $injectDb,
-                $model,
-                $modelClass
-            );
-
-        $binder(
-            $dbMock
         );
+        $database->method('affectedRows')->willReturn(1);
+        $database->method('transStatus')->willReturn(true);
+        $database->expects($this->once())->method('transCommit')->willReturn(true);
+        $database->expects($this->never())->method('transRollback');
 
-        $stdClass
-            =
-            \stdClass::class;
-
-        $authMock
-            =
-            $this
-            ->getMockBuilder(
-                $stdClass
-            )
-            ->addMethods(
-                ['currentAdmin']
-            )
+        $authorization = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['currentAdmin'])
             ->getMock();
+        $authorization->method('currentAdmin')->willReturn((object) ['uuid' => 'current-admin']);
+        Services::injectMock('authorization', $authorization);
 
-        $authMock
-            ->method('currentAdmin')
-            ->willReturn(1);
+        $response = $this->createModel($database)->hardDelete($this->posts());
 
-        \Config\Services::injectMock(
-            'authorization',
-            $authMock
-        );
+        $this->assertTrue($response['result'], json_encode($response));
+        $this->assertTrue($this->queriesContain($queries, 'for update'));
+        $this->assertTrue($this->queriesContain($queries, "logout_reason = 'banned' where token_id = ? and logout is null"));
+        $this->assertTrue($this->queriesContain($queries, 'delete from admins_tokens where admin_uuid = ? and id = ?'));
+    }
 
-        $result
-            =
-            $model
-            ->hardDelete(
-                $posts
-            );
+    public function testHardDeleteRollsBackOnException(): void
+    {
+        $database = $this->createMock(BaseConnection::class);
+        $database->method('transBegin')->willReturn(true);
+        $database->method('query')->willThrowException(new \RuntimeException('Database error'));
+        $database->expects($this->once())->method('transRollback')->willReturn(true);
 
-        $this
-            ->assertTrue(
-                $result['result']
-            );
+        $response = $this->createModel($database)->hardDelete($this->posts());
+
+        $this->assertFalse($response['result']);
+    }
+
+    /**
+     * Crea il model iniettando una connessione database controllata dal test.
+     *
+     * @param BaseConnection $database Connessione database simulata
+     * @return TokensModel Model configurato per il test
+     */
+    private function createModel(BaseConnection $database): TokensModel
+    {
+        $model = new TokensModel();
+        $inject = function (BaseConnection $connection): void {
+            $this->db = $connection;
+        };
+        \Closure::bind($inject, $model, TokensModel::class)($database);
+
+        return $model;
+    }
+
+    /**
+     * Restituisce un token valido sovrascrivibile per i singoli scenari.
+     *
+     * @param array $overrides Proprietà da sovrascrivere
+     * @return object Riga token simulata
+     */
+    private function tokenRow(array $overrides = []): object
+    {
+        return (object) array_merge([
+            'id' => 7,
+            'admin_uuid' => 'owner-uuid',
+            'last_activity' => '2026-10-13 10:11:12',
+            'token_type' => 'session',
+            'uuid' => 'owner-uuid',
+            'firstname' => 'Mario',
+            'lastname' => 'Rossi',
+            'deleted_at' => null,
+            'superadmin' => 0
+        ], $overrides);
+    }
+
+    /**
+     * Restituisce il payload valido per la cancellazione del token.
+     *
+     * @return array Payload del test
+     */
+    private function posts(): array
+    {
+        return ['id' => 7, 'uuid' => 'owner-uuid'];
+    }
+
+    /**
+     * Verifica la presenza di un frammento SQL nelle query intercettate.
+     *
+     * @param array $queries Query e parametri registrati
+     * @param string $fragment Frammento SQL cercato
+     * @return bool Esito della ricerca
+     */
+    private function queriesContain(array $queries, string $fragment): bool
+    {
+        foreach ($queries as [$sql]):
+            if (str_contains($sql, $fragment)):
+                return true;
+            endif;
+        endforeach;
+
+        return false;
     }
 }

@@ -31,7 +31,12 @@ return [
 		'createdAt' => '添加时间 ', 
 		'session' => '会话', 
 		'activation' => '激活', 
-		'cookie' => '记住我'
+		'cookie' => '记住我',
+		'mobile' => '移动设备',
+		'robot' => '机器人',
+		'unknown' => '未知',
+		'filtersAndOptions' => '选项和筛选',
+		'showSystemDetails' => '显示系统详细信息'
 	],
 	'errors' => [
 		'uuid' => 'UUID 不符合规范。', 
@@ -44,7 +49,7 @@ return [
 		'actions' => '操作'
 	], 
 	'placeholders' => [
-		'searchUsername' => '按用户名搜索...', 
+		'searchUsername' => '按电子邮件搜索...',
 		'searchType' => '按类型搜索...', 
 		'dateFrom' => '按开始日期搜索...', 
 		'dateTo' => '按结束日期搜索...',

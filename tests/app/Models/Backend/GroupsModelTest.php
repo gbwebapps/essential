@@ -15,6 +15,13 @@ class GroupsModelTest extends \CodeIgniter\Test\CIUnitTestCase
         $this->model = $model;
     }
 
+    protected function tearDown(): void
+    {
+        \Config\Services::resetSingle('authorization');
+
+        parent::tearDown();
+    }
+
     public function testAddValidationRulesReturnsExpectedArray()
     {
 	    $model
@@ -49,6 +56,10 @@ class GroupsModelTest extends \CodeIgniter\Test\CIUnitTestCase
 	            'permissions.*',
 	            $result
 	        );
+
+        $this->assertContains('max_length[50]', $result['name']['rules']);
+        $this->assertContains('is_unique[admins_groups.name]', $result['name']['rules']);
+        $this->assertContains('max_length[255]', $result['description']['rules']);
 	}
 
     public function testGetGroupByIdValidationRulesReturnsExpectedArray()
@@ -125,6 +136,9 @@ class GroupsModelTest extends \CodeIgniter\Test\CIUnitTestCase
 	            'permissions.*',
 	            $result
 	        );
+
+        $this->assertContains('max_length[50]', $result['name']['rules']);
+        $this->assertContains('max_length[255]', $result['description']['rules']);
 	}
 
     public function testDelValidationRulesReturnsExpectedArray()
@@ -203,6 +217,9 @@ class GroupsModelTest extends \CodeIgniter\Test\CIUnitTestCase
 	            'query',
 	            $result
 	        );
+
+        $this->assertContains('min_length[3]', $result['query']['rules']);
+        $this->assertContains('max_length[100]', $result['query']['rules']);
 	}
 
     public function testAdminPermissionsValidationRulesReturnsExpectedArray()

@@ -12,7 +12,7 @@
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span><?= lang('backend/tools.labels.ciVersion'); ?></span>
-                        <strong><?= $sysInfo['framework']['ci_version']; ?></strong>
+                        <strong><?= esc($sysInfo['framework']['ci_version']); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span><?= lang('backend/tools.labels.environment'); ?></span>
@@ -20,7 +20,7 @@
                             /* Badge verde per produzione, giallo per sviluppo */
                             $envClass = ($sysInfo['framework']['environment'] === 'production') ? 'bg-success' : 'bg-warning text-dark'; 
                         ?>
-                        <span class="badge <?= $envClass; ?>"><?= ucfirst($sysInfo['framework']['environment']); ?></span>
+                        <span class="badge <?= esc($envClass, 'attr'); ?>"><?= esc(ucfirst($sysInfo['framework']['environment'])); ?></span>
                     </li>
                 </ul>
             </div>
@@ -33,11 +33,11 @@
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span><?= lang('backend/tools.labels.timezone'); ?></span>
-                        <strong><?= $sysInfo['local']['timezone']; ?></strong>
+                        <strong><?= esc($sysInfo['local']['timezone']); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span><?= lang('backend/tools.labels.language'); ?></span>
-                        <strong><?= $sysInfo['local']['locale']; ?></strong>
+                        <strong><?= esc($sysInfo['local']['locale']); ?></strong>
                     </li>
                 </ul>
             </div>
@@ -50,11 +50,11 @@
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span><?= lang('backend/tools.labels.os'); ?></span>
-                        <strong><?= $sysInfo['server']['os']; ?></strong>
+                        <strong><?= esc($sysInfo['server']['os']); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span><?= lang('backend/tools.labels.webServer'); ?></span>
-                        <strong><?= $sysInfo['server']['software']; ?></strong>
+                        <strong><?= esc($sysInfo['server']['software']); ?></strong>
                     </li>
                 </ul>
             </div>
@@ -67,8 +67,8 @@
                 <div class="card-body">
                     <div class="d-flex flex-wrap gap-3">
                         <?php foreach($sysInfo['extensions'] as $ext => $loaded): ?>
-                            <div class="badge border <?= $loaded ? 'border-success text-success' : 'border-danger text-danger'; ?> bg-transparent p-2">
-                                <i class="fa-solid <?= $loaded ? 'fa-check' : 'fa-xmark'; ?> me-1"></i> <?= strtoupper($ext); ?>
+                            <div class="badge border <?= esc($loaded ? 'border-success text-success' : 'border-danger text-danger', 'attr'); ?> bg-transparent p-2">
+                                <i class="fa-solid <?= esc($loaded ? 'fa-check' : 'fa-xmark', 'attr'); ?> me-1"></i> <?= esc(strtoupper($ext)); ?>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -88,35 +88,35 @@
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span><?= lang('backend/tools.labels.phpVersion'); ?></span>
-                        <strong><?= $sysInfo['php']['version']; ?> (<?= $sysInfo['php']['architecture']; ?>)</strong>
+                        <strong><?= esc($sysInfo['php']['version']); ?> (<?= esc($sysInfo['php']['architecture']); ?>)</strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span><?= lang('backend/tools.labels.sapi'); ?></span>
-                        <strong><?= $sysInfo['php']['sapi']; ?></strong>
+                        <strong><?= esc($sysInfo['php']['sapi']); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span><?= lang('backend/tools.labels.memoryLimit'); ?></span>
-                        <strong><?= $sysInfo['php']['memory_limit']; ?></strong>
+                        <strong><?= esc($sysInfo['php']['memory_limit']); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span><?= lang('backend/tools.labels.maxExecutionTime'); ?></span>
-                        <strong><?= $sysInfo['php']['max_execution_time']; ?> <?= lang('backend/tools.labels.seconds'); ?></strong>
+                        <strong><?= esc($sysInfo['php']['max_execution_time']); ?> <?= esc(lang('backend/tools.labels.seconds')); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span><?= lang('backend/tools.labels.uploadMax'); ?></span>
-                        <strong><?= $sysInfo['php']['upload_max_filesize']; ?></strong>
+                        <strong><?= esc($sysInfo['php']['upload_max_filesize']); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span><?= lang('backend/tools.labels.postMax'); ?></span>
-                        <strong><?= $sysInfo['php']['post_max_size']; ?></strong>
+                        <strong><?= esc($sysInfo['php']['post_max_size']); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span><?= lang('backend/tools.labels.maxFileUploads'); ?></span>
-                        <strong><?= $sysInfo['php']['max_file_uploads']; ?></strong>
+                        <strong><?= esc($sysInfo['php']['max_file_uploads']); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span><?= lang('backend/tools.labels.maxInputVars'); ?></span>
-                        <strong><?= $sysInfo['php']['max_input_vars']; ?></strong>
+                        <strong><?= esc($sysInfo['php']['max_input_vars']); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span><?= lang('backend/tools.labels.displayErrors'); ?></span>
@@ -124,7 +124,7 @@
                             /* Rosso se abilitato in produzione, verde se disabilitato */
                             $errClass = ($sysInfo['php']['display_errors'] === 'On') ? 'text-danger' : 'text-success'; 
                         ?>
-                        <strong class="<?= $errClass; ?>"><?= $sysInfo['php']['display_errors']; ?></strong>
+                        <strong class="<?= esc($errClass, 'attr'); ?>"><?= esc($sysInfo['php']['display_errors']); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span><?= lang('backend/tools.labels.opcache'); ?></span>
@@ -132,7 +132,7 @@
                             /* Verde se abilitato, giallo se disabilitato */
                             $opClass = ($sysInfo['php']['opcache'] === 'On') ? 'text-success' : 'text-warning'; 
                         ?>
-                        <strong class="<?= $opClass; ?>"><?= $sysInfo['php']['opcache']; ?></strong>
+                        <strong class="<?= esc($opClass, 'attr'); ?>"><?= esc($sysInfo['php']['opcache']); ?></strong>
                     </li>
                 </ul>
             </div>

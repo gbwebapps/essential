@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="index, follow, all" />
+    <title>App\Libraries\AppOtpService | Essential API</title>
+
+            <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/doctum.css">
+        <link rel="stylesheet" type="text/css" href="../../fonts/doctum-font.css">
+        <script src="../../js/jquery-3.5.1.slim.min.js"></script>
+        <script async defer src="../../doctum.js"></script>
+        <script async defer src="../../js/bootstrap.min.js"></script>
+        <script async defer src="../../js/autocomplete.min.js"></script>
+        <meta name="MobileOptimized" content="width">
+        <meta name="HandheldFriendly" content="true">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+
+    </head>
+
+    <body id="class" data-name="class:App_Libraries_AppOtpService" data-root-path="../../" data-search-index-url="../../doctum-search.json">
+            <div id="content">
+        <div id="left-column">
+                <div id="control-panel">
+                <div class="search-bar hidden" id="search-progress-bar-container">
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" id="search-progress-bar"
+                    aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+            </div>
+        </div>
+        <form id="search-form" action="../../search.html">
+            <span class="icon icon-search"></span>
+            <input name="search"
+                   id="doctum-search-auto-complete"
+                   class="typeahead form-control"
+                   type="search"
+                   placeholder="Search"
+                   spellcheck="false"
+                   autocorrect="off"
+                   autocomplete="off"
+                   autocapitalize="off">
+            <div class="auto-complete-results" id="auto-complete-results"></div>
+        </form>
+    </div>
+
+                <div id="api-tree"></div>
+
+        </div>
+        <div id="right-column">
+                <nav id="site-nav" class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-elements">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="../../index.html">Essential API</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-elements">
+                <ul class="nav navbar-nav">
+                    <li><a href="../../classes.html">Classes</a></li>
+                    <li><a href="../../namespaces.html">Namespaces</a></li>
+                    <li><a href="../../interfaces.html">Interfaces</a></li>
+                    <li><a href="../../traits.html">Traits</a></li>
+                    <li><a href="../../doc-index.html">Index</a></li>
+                    <li><a href="../../search.html">Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+                        <div class="namespace-breadcrumbs">
+            <ol class="breadcrumb">
+                <li><span class="label label-default">class</span></li>
+                        <li><a href="../../App.html">App</a></li><li class="backslash">\</li><li><a href="../../App/Libraries.html">Libraries</a></li><li class="backslash">\</li><li>AppOtpService</li>
+            </ol>
+        </div>
+                <div id="page-content">
+    <div class="page-header">
+        <h1>AppOtpService    
+            </h1>
+    </div>
+
+    
+    <p>        class
+    <strong>AppOtpService</strong>
+</p>
+
+        
+        
+    
+        
+
+            <div class="description">
+            <p><p>Servizio dedicato alla gestione dell'autenticazione a due fattori (2FA) basata su protocollo TOTP (Time-based One-Time Password).</p></p>            <p><p>Interfaccia la libreria crittografica sottostante per generare chiavi segrete, fornire gli URI
+di configurazione per le applicazioni client (es. Google Authenticator, Authy) e validare
+matematicamente i codici temporanei immessi dagli utenti.</p></p>        </div>
+            
+        
+            <h2>Constants</h2>    <table class="table table-condensed">
+                    <tr>
+                <td>
+                                                            private
+                                                                                ENCRYPTED_PREFIX
+                                    </td>
+                <td class="last">
+                    <p><em><p>Prefisso di versione usato per distinguere i segreti cifrati dai record legacy in chiaro.</p></em></p>
+                    <p></p>
+                </td>
+            </tr>
+            </table>
+
+    
+    
+            <h2>Methods</h2>
+
+            <div class="container-fluid underlined">
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8">
+                    <a href="#method___construct">__construct</a>()
+        
+                                            <p><p>Costruttore del servizio.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_generateSecret">generateSecret</a>()
+        
+                                            <p><p>Genera crittograficamente un nuovo codice segreto condiviso univoco (in formato base32).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_protectSecret">protectSecret</a>(string $secret)
+        
+                                            <p><p>Cifra un segreto TOTP prima della persistenza o del salvataggio temporaneo in sessione.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string|null
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_revealSecret">revealSecret</a>(string $storedSecret)
+        
+                                            <p><p>Decifra un segreto TOTP protetto, mantenendo compatibilità con i record legacy in chiaro.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getProvisioningUri">getProvisioningUri</a>(string $secret, string $label)
+        
+                                            <p><p>Compila e restituisce l'URI di provisioning standard richiesto per l'accoppiamento del dispositivo.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_verify">verify</a>(string $secret, string $code)
+        
+                                            <p><p>Esegue la validazione algoritmica del codice temporaneo (OTP) fornito dall'amministratore.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+            </div>
+
+
+        <h2>Details</h2>
+
+            <div id="method-details">
+                    <div class="method-item">
+                    <h3 id="method___construct">
+        <div class="location">at line 28</div>
+        <code>                    
+    <strong>__construct</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Costruttore del servizio.</p></p>                <p><p>Inizializza le dipendenze basilari, caricando in memoria l'helper necessario
+al recupero dinamico delle configurazioni del modulo di autenticazione.</p></p>        
+        </div>
+        <div class="tags">
+            
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_generateSecret">
+        <div class="location">at line 41</div>
+        <code>                    string
+    <strong>generateSecret</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Genera crittograficamente un nuovo codice segreto condiviso univoco (in formato base32).</p></p>                <p><p>Questo segreto rappresenta la chiave master per l'algoritmo TOTP e deve essere associato
+in modo permanente e sicuro al profilo dell'amministratore all'interno del database.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>La stringa alfanumerica rappresentante il nuovo segreto generato</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_protectSecret">
+        <div class="location">at line 52</div>
+        <code>                    string
+    <strong>protectSecret</strong>(string $secret)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Cifra un segreto TOTP prima della persistenza o del salvataggio temporaneo in sessione.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$secret</td>
+                <td><p>Segreto TOTP in chiaro</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>Segreto cifrato e corredato dal prefisso di versione</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_revealSecret">
+        <div class="location">at line 63</div>
+        <code>                    string|null
+    <strong>revealSecret</strong>(string $storedSecret)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Decifra un segreto TOTP protetto, mantenendo compatibilità con i record legacy in chiaro.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$storedSecret</td>
+                <td><p>Segreto proveniente dal database o dalla sessione</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string|null</td>
+            <td><p>Segreto in chiaro oppure null se il payload cifrato non è valido</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getProvisioningUri">
+        <div class="location">at line 83</div>
+        <code>                    string
+    <strong>getProvisioningUri</strong>(string $secret, string $label)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Compila e restituisce l'URI di provisioning standard richiesto per l'accoppiamento del dispositivo.</p></p>                <p><p>Legge le impostazioni globali del sistema (numero di cifre, nome dell'emittente) e struttura
+un URI formattato secondo le specifiche otpauth://. Questo URI viene tipicamente trasformato
+in un codice QR per facilitare la configurazione dell'app sullo smartphone dell'utente.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$secret</td>
+                <td><p>La chiave segreta univoca associata all'amministratore</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$label</td>
+                <td><p>L'etichetta identificativa da mostrare nell'applicazione client (es. l'indirizzo email)</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>L'URI formattato e pronto per la generazione del codice QR</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_verify">
+        <div class="location">at line 107</div>
+        <code>                    bool
+    <strong>verify</strong>(string $secret, string $code)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Esegue la validazione algoritmica del codice temporaneo (OTP) fornito dall'amministratore.</p></p>                <p><p>Ricostruisce il validatore TOTP applicando i medesimi parametri utilizzati durante la generazione
+dell'URI (periodo, algoritmo, lunghezza). Integra inoltre una finestra temporale di tolleranza (window)
+definita nelle configurazioni, fondamentale per compensare lievi desincronizzazioni fisiologiche
+tra l'orologio del server e quello dello smartphone del client.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$secret</td>
+                <td><p>La chiave segreta univoca memorizzata nel profilo dell'amministratore</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$code</td>
+                <td><p>Il codice numerico inserito dall'utente per tentare l'accesso</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td><p>Esito della verifica crittografica: true se il codice è valido e tempestivo, false altrimenti</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+            </div>
+
+    
+</div><div id="footer">
+        Generated by <a href="https://github.com/code-lts/doctum">Doctum, a API Documentation generator and fork of Sami</a>.</div></div>
+    </div>
+    </body>
+
+</html>

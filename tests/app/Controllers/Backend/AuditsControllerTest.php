@@ -643,4 +643,18 @@ class AuditsControllerTest extends CIUnitTestCase
             $audClass
         );
     }
-} 
+
+    public function testIndexViewMatchesListManagerContract(): void
+    {
+        $view = file_get_contents(APPPATH . 'Views/backend/audits/indexView.php');
+
+        $this->assertIsString($view);
+        $this->assertStringContainsString('class="form-select changeNumRows"', $view);
+        $this->assertStringContainsString('class="collapse search-bar"', $view);
+
+        foreach (['username', 'action', 'section', 'details', 'created_at-from', 'created_at-to'] as $field):
+            $this->assertStringContainsString('data-search-field="' . $field . '"', $view);
+            $this->assertStringContainsString('data-search-error="' . $field . '"', $view);
+        endforeach;
+    }
+}

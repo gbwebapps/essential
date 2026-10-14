@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="index, follow, all" />
+    <title>App\Libraries\Backend\UploadClass | Essential API</title>
+
+            <link rel="stylesheet" type="text/css" href="../../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../../css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="../../../css/doctum.css">
+        <link rel="stylesheet" type="text/css" href="../../../fonts/doctum-font.css">
+        <script src="../../../js/jquery-3.5.1.slim.min.js"></script>
+        <script async defer src="../../../doctum.js"></script>
+        <script async defer src="../../../js/bootstrap.min.js"></script>
+        <script async defer src="../../../js/autocomplete.min.js"></script>
+        <meta name="MobileOptimized" content="width">
+        <meta name="HandheldFriendly" content="true">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+
+    </head>
+
+    <body id="class" data-name="class:App_Libraries_Backend_UploadClass" data-root-path="../../../" data-search-index-url="../../../doctum-search.json">
+            <div id="content">
+        <div id="left-column">
+                <div id="control-panel">
+                <div class="search-bar hidden" id="search-progress-bar-container">
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" id="search-progress-bar"
+                    aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+            </div>
+        </div>
+        <form id="search-form" action="../../../search.html">
+            <span class="icon icon-search"></span>
+            <input name="search"
+                   id="doctum-search-auto-complete"
+                   class="typeahead form-control"
+                   type="search"
+                   placeholder="Search"
+                   spellcheck="false"
+                   autocorrect="off"
+                   autocomplete="off"
+                   autocapitalize="off">
+            <div class="auto-complete-results" id="auto-complete-results"></div>
+        </form>
+    </div>
+
+                <div id="api-tree"></div>
+
+        </div>
+        <div id="right-column">
+                <nav id="site-nav" class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-elements">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="../../../index.html">Essential API</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-elements">
+                <ul class="nav navbar-nav">
+                    <li><a href="../../../classes.html">Classes</a></li>
+                    <li><a href="../../../namespaces.html">Namespaces</a></li>
+                    <li><a href="../../../interfaces.html">Interfaces</a></li>
+                    <li><a href="../../../traits.html">Traits</a></li>
+                    <li><a href="../../../doc-index.html">Index</a></li>
+                    <li><a href="../../../search.html">Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+                        <div class="namespace-breadcrumbs">
+            <ol class="breadcrumb">
+                <li><span class="label label-default">class</span></li>
+                        <li><a href="../../../App.html">App</a></li><li class="backslash">\</li><li><a href="../../../App/Libraries.html">Libraries</a></li><li class="backslash">\</li><li><a href="../../../App/Libraries/Backend.html">Backend</a></li><li class="backslash">\</li><li>UploadClass</li>
+            </ol>
+        </div>
+                <div id="page-content">
+    <div class="page-header">
+        <h1>UploadClass    
+            </h1>
+    </div>
+
+    
+    <p>        class
+    <strong>UploadClass</strong>
+</p>
+
+        
+        
+    
+        
+
+            <div class="description">
+            <p><p>Servizio dedicato alla gestione avanzata dei caricamenti (upload) e all'elaborazione delle immagini.</p></p>            <p><p>Centralizza la logica di salvataggio fisico dei file multimediali, occupandosi della
+validazione base, della sanitizzazione della nomenclatura, della creazione dinamica delle
+alberature di directory e della generazione automatica delle miniature (thumbnail) tramite ritaglio intelligente.</p></p>        </div>
+            
+        
+    
+            <h2>Properties</h2>
+
+            <table class="table table-condensed">
+                    <tr>
+                <td class="type" id="property_config">
+                                                            private                    object
+                                                                                
+                                    </td>
+                <td>$config</td>
+                <td class="last"><p>Contenitore delle direttive di configurazione per i caricamenti (es. dimensioni di ritaglio, policy di sovrascrittura).</p></td>
+                <td></td>
+            </tr>
+            </table>
+
+    
+            <h2>Methods</h2>
+
+            <div class="container-fluid underlined">
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8">
+                    <a href="#method___construct">__construct</a>()
+        
+                                            <p><p>Inizializza il servizio caricando dinamicamente le configurazioni specifiche del modulo di upload
+tramite l'helper globale del pannello di amministrazione.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array|false
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_doUpload">doUpload</a>(array $files, string $entity, string $uuid)
+        
+                                            <p><p>Elabora un array di file caricati, posizionandoli e ridimensionandoli nelle rispettive directory.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_cropImage">cropImage</a>(string $srcPath, string $destPath, int $targetX, int $targetY)
+        
+                                            <p><p>Esegue il ridimensionamento e il ritaglio esatto dal centro (center crop) di un'immagine.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+            </div>
+
+
+        <h2>Details</h2>
+
+            <div id="method-details">
+                    <div class="method-item">
+                    <h3 id="method___construct">
+        <div class="location">at line 27</div>
+        <code>                    
+    <strong>__construct</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Inizializza il servizio caricando dinamicamente le configurazioni specifiche del modulo di upload
+tramite l'helper globale del pannello di amministrazione.</p></p>                        
+        </div>
+        <div class="tags">
+            
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_doUpload">
+        <div class="location">at line 46</div>
+        <code>                    array|false
+    <strong>doUpload</strong>(array $files, string $entity, string $uuid)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Elabora un array di file caricati, posizionandoli e ridimensionandoli nelle rispettive directory.</p></p>                <p><p>Genera automaticamente la struttura di cartelle (large, medium, small) basata sull'entità e sull'UUID
+specificati. Applica le policy di nomenclatura (nome casuale o sanitizzato) e di sovrascrittura.
+L'immagine originale viene depositata nella cartella 'large', dopodiché vengono generate le versioni
+ritagliate per le cartelle 'medium' e 'small'.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$files</td>
+                <td><p>Array di istanze UploadedFile provenienti dalla richiesta HTTP</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$entity</td>
+                <td><p>Il nome dell'entità o del modulo di riferimento (es. 'gallery', 'users')</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$uuid</td>
+                <td><p>L'identificatore univoco del record associato</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array|false</td>
+            <td><p>Restituisce un array con i nomi finali dei file caricati con successo, o false in caso di fallimento totale</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_cropImage">
+        <div class="location">at line 146</div>
+        <code>            protected        bool
+    <strong>cropImage</strong>(string $srcPath, string $destPath, int $targetX, int $targetY)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Esegue il ridimensionamento e il ritaglio esatto dal centro (center crop) di un'immagine.</p></p>                <p><p>Il metodo sfrutta le librerie GD native per calcolare le proporzioni tra l'immagine sorgente e il target.
+Scarta l'eccedenza visiva (verticale o orizzontale) partendo rigorosamente dal centro, in modo da riempire
+perfettamente le dimensioni richieste senza distorcere l'immagine. Supporta e preserva i canali alfa
+(trasparenza) per i formati compatibili (PNG, GIF, WEBP, AVIF).</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$srcPath</td>
+                <td><p>Il percorso fisico assoluto dell'immagine sorgente (originale)</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$destPath</td>
+                <td><p>Il percorso fisico assoluto dove salvare l'immagine elaborata</p></td>
+            </tr>
+                    <tr>
+                <td>int</td>
+                <td>$targetX</td>
+                <td><p>La larghezza esatta in pixel richiesta per il ritaglio</p></td>
+            </tr>
+                    <tr>
+                <td>int</td>
+                <td>$targetY</td>
+                <td><p>L'altezza esatta in pixel richiesta per il ritaglio</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td><p>Esito dell'operazione grafico/fisica: true se il ritaglio e il salvataggio hanno avuto successo, false altrimenti</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+            </div>
+
+    
+</div><div id="footer">
+        Generated by <a href="https://github.com/code-lts/doctum">Doctum, a API Documentation generator and fork of Sami</a>.</div></div>
+    </div>
+    </body>
+
+</html>

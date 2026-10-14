@@ -424,9 +424,14 @@ abstract class BackendModel extends BaseModel
 	 * @param string $uuid L'identificatore univoco del record padrone (proprietario della galleria)
 	 * @param string $entity Lo slug/nome dell'entità proprietaria associata (es. 'admins')
 	 * @param string $action Parametro comportamentale ('add' per prima allocazione, 'edit' per accodamento)
+	 * @return bool True se tutte le immagini sono state registrate, false altrimenti
 	 */
-	protected function insertImages(array $filenames, string $uuid, string $entity, string $action = 'add')
+	protected function insertImages(array $filenames, string $uuid, string $entity, string $action = 'add'): bool
 	{
+		if ($filenames === []):
+			return false;
+		endif;
+
 	    $dataImage = [];
 	    $flag = false;
 
@@ -462,7 +467,9 @@ abstract class BackendModel extends BaseModel
 	    endforeach;
 
 	    $sql = "insert into images (entity, entity_uuid, filename, is_cover, created_at) values " . implode(", ", $placeholders);
-	    $this->db->query($sql, $bind);
+	    $result = $this->db->query($sql, $bind);
+
+	    return $result !== false && $this->db->affectedRows() === count($dataImage);
 	}
 
 	/**

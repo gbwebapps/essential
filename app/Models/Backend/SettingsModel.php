@@ -35,13 +35,18 @@ class SettingsModel extends BackendModel
         'attemptsLimit',
         'attemptsInterval',
         'twoFactor',
+        'twoFactorAttempts',
         'twoFactorLimit',
         'twoFactorTime',
+        'twoFactorAttemptsInterval',
         'twoFactorIssuer',
         'twoFactorDigits',
         'twoFactorWindow',
         'twoFactorEmailExpiry',
         'twoFactorEmailFrom',
+        'resetAttempts',
+        'resetAttemptsLimit',
+        'resetAttemptsInterval',
         'sessionTime',
         'rememberMeTime',
         'activationTime',
@@ -143,6 +148,10 @@ class SettingsModel extends BackendModel
                 'label' => lang('backend/settings.labels.twoFactor'),
                 'rules' => ['required', 'in_list[0,1]'],
             ],
+            'twoFactorAttempts' => [
+                'label' => lang('backend/settings.labels.twoFactorAttempts'),
+                'rules' => ['required', 'in_list[0,1]'],
+            ],
             'twoFactorLimit' => [
                 'label' => lang('backend/settings.labels.twoFactorLimit'),
                 'rules' => ['required', 'is_natural_no_zero', 'less_than_equal_to[10]'],
@@ -150,6 +159,10 @@ class SettingsModel extends BackendModel
             'twoFactorTime' => [
                 'label' => lang('backend/settings.labels.twoFactorTime'),
                 'rules' => ['required', 'is_natural_no_zero', 'greater_than_equal_to[10]'],
+            ],
+            'twoFactorAttemptsInterval' => [
+                'label' => lang('backend/settings.labels.twoFactorAttemptsInterval'),
+                'rules' => ['required', 'is_natural_no_zero', 'greater_than_equal_to[10]', 'less_than_equal_to[86400]'],
             ],
             'twoFactorIssuer' => [
                 'label' => lang('backend/settings.labels.twoFactorIssuer'),
@@ -170,6 +183,18 @@ class SettingsModel extends BackendModel
             'twoFactorEmailFrom' => [
                 'label' => lang('backend/settings.labels.twoFactorEmailFrom'),
                 'rules' => ['required', 'valid_email', 'max_length[255]'],
+            ],
+            'resetAttempts' => [
+                'label' => lang('backend/settings.labels.resetAttempts'),
+                'rules' => ['required', 'in_list[0,1]'],
+            ],
+            'resetAttemptsLimit' => [
+                'label' => lang('backend/settings.labels.resetAttemptsLimit'),
+                'rules' => ['required', 'is_natural_no_zero', 'less_than_equal_to[20]'],
+            ],
+            'resetAttemptsInterval' => [
+                'label' => lang('backend/settings.labels.resetAttemptsInterval'),
+                'rules' => ['required', 'is_natural_no_zero', 'greater_than_equal_to[60]', 'less_than_equal_to[86400]'],
             ],
             'sessionTime' => [
                 'label' => lang('backend/settings.labels.sessionTime'),
@@ -338,7 +363,7 @@ class SettingsModel extends BackendModel
             ],
             'dateFormat' => [
                 'label' => lang('backend/settings.labels.dateFormat'),
-                'rules' => ['required', 'in_list[d MMMM yyyy HH:mm:ss,dd/MM/yyyy HH:mm,MM/dd/yyyy h:mm a,yyyy-MM-dd HH:mm:ss]'],
+                'rules' => ['required', 'in_list[d MMMM yyyy HH:mm:ss,dd/MM/yyyy HH:mm,MMMM d yyyy h:mm:ss a,MM/dd/yyyy h:mm a,yyyy-MM-dd HH:mm:ss]'],
             ],
         ];
     }
@@ -469,9 +494,20 @@ class SettingsModel extends BackendModel
 
         $sql = "insert into `settings` (`class`, `key`, `value`) 
                 values " . implode(', ', $valuesQueries) . " 
-                on duplicate key update `value` = values(`value`), `updated_at` = CURRENT_TIMESTAMP";
+                on duplicate key update `value` = values(`value`), `updated_at` = current_timestamp";
 
-        $this->db->query($sql, $params);
+        try {
+            $saved = $this->db->query($sql, $params);
+        }
+        catch (\Throwable $e) {
+            log_message('error', 'Errore salvataggio settings ' . $namespace . ': ' . $e->getMessage());
+            return ['result' => false, 'message' => lang('backend/settings.messages.saveError')];
+        }
+
+        if ($saved === false):
+            log_message('error', 'Errore salvataggio settings ' . $namespace . '.');
+            return ['result' => false, 'message' => lang('backend/settings.messages.saveError')];
+        endif;
 
         $currentAdmin = service('authorization')->currentAdmin();
         log_admin_activity('SAVE_SETTINGS', 'settings', lang('backend/settings.audits.saveSettings'), $currentAdmin);
@@ -531,12 +567,28 @@ class SettingsModel extends BackendModel
      * scrive un evento nell'Audit log per mantenere traccia dell'operazione.
      *
      * @param string $namespace Il nome della sezione da ripulire
-     * @return bool True se l'eliminazione è avvenuta con successo, False se non c'era nulla da eliminare
+     * @return bool|null True in caso di successo, False in caso di errore, Null se non esistono dati da eliminare
      */
-    public function deleteSettings(string $namespace): bool
+    public function deleteSettings(string $namespace): ?bool
     {
         /** Verifica preliminare se ci sono effettivamente dati da cancellare */
         if ( ! $this->hasDatabaseSettings($namespace)):
+            return null;
+        endif;
+
+        /** Esegue l'eliminazione globale del namespace */
+        $sql = "delete from `settings` where `class` = ?";
+
+        try {
+            $deleted = $this->db->query($sql, [$namespace]);
+        }
+        catch (\Throwable $e) {
+            log_message('error', 'Errore eliminazione settings ' . $namespace . ': ' . $e->getMessage());
+            return false;
+        }
+
+        if ($deleted === false):
+            log_message('error', 'Errore eliminazione settings ' . $namespace . '.');
             return false;
         endif;
 
@@ -544,10 +596,6 @@ class SettingsModel extends BackendModel
         if (isset($this->settingsCache[$namespace])) :
             unset($this->settingsCache[$namespace]);
         endif;
-
-        /** Esegue l'eliminazione globale del namespace */
-        $sql = "delete from `settings` where `class` = ?";
-        $this->db->query($sql, [$namespace]);
 
         $currentAdmin = service('authorization')->currentAdmin();
         log_admin_activity('DELETE_SETTINGS', 'settings', lang('backend/settings.audits.deleteSettings'), $currentAdmin);

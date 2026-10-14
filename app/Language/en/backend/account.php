@@ -49,13 +49,18 @@ return [
 		'enterOtpCode' => 'Enter the 6-digit code',
 		'rememberMe' => 'Remember Me', 
 		'currentDevice' => 'Current session',
+		'mobile' => 'Mobile device',
+		'robot' => 'Robot',
+		'currentPassword' => 'Current password',
+		'currentPasswordEmailHelp' => 'Required only when changing the email address.',
 	], 
 	'placeholders' => [
 		'firstname' => 'Enter first name...', 
 		'lastname' => 'Enter last name...', 
 		'email' => 'Enter email...', 
 		'phone' => 'Enter phone...', 
-		'note' => 'Enter additional notes...', 
+		'note' => 'Enter additional notes...',
+		'currentPassword' => 'Enter your current password...',
 	], 
 	'buttons' => [
 		'sendData' => 'Save Data', 
@@ -64,10 +69,14 @@ return [
 		'resetPassword' => 'Proceed with Password Reset',
 		'verifyAndActivate' => 'Verify and Activate', 
 		'undoClose' => 'Close Setup and Exit', 
-		'delete' => 'Delete'
+		'delete' => 'Delete',
+		'showPassword' => 'Show password'
 	], 
 	'errors' => [
-		'id' => 'Invalid ID.', 
+		'id' => 'Invalid ID.',
+		'safeText' => 'Characters not allowed.',
+		'currentPasswordRequired' => 'Enter your current password.',
+		'currentPasswordInvalid' => 'The current password is incorrect.',
 	], 
 	'audits' => [
 	    'updateData'     => 'General data update %s %s',
@@ -91,7 +100,7 @@ return [
 		'noTokensFound' => 'No tokens found.', 
 		'deleteTokenSuccess' => 'The token for %s %s was deleted successfully.', 
 		'deleteTokenError' => 'Token deletion failed.', 
-		'expiringDate' => '<div class="pb-3">You have requested a password reset.</div><div class="pb-3">Check your email and complete the operation.</div>You have until %s</div>',
+		'expiringDate' => '<div class="pb-3">You have requested a password reset.</div><div class="pb-3">Check your email and complete the operation.</div>You have until %s',
 		'methodNotValid' => 'Invalid or unsupported method.', 
 		'updateSecuritySettingsError' => 'Unable to update security settings.', 
 		'updateSecuritySettingsSuccess' => 'Security settings updated successfully.', 
@@ -103,5 +112,7 @@ return [
 		'totpConfigurationSuccess' => 'The authenticator app was configured successfully.', 
 		'areYouSureChangeMethod' => 'Are you sure you want to change the two-factor authentication method?', 
 		'cannotDeleteCurrentToken' => 'Cannot delete the current session.',
+		'tooManyResetRequests' => 'Too many password reset requests. Try again later.',
+		'tooManyAttempts' => 'Too many attempts. Try again later.',
 	]
 ];

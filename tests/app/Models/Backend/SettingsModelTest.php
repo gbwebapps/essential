@@ -44,6 +44,20 @@ class SettingsModelTest extends \CodeIgniter\Test\CIUnitTestCase
 
         $this->assertArrayHasKey('attempts', $result);
 
+        $this->assertArrayHasKey('twoFactorAttempts', $result);
+
+        $this->assertArrayHasKey('twoFactorAttemptsInterval', $result);
+
+        $this->assertArrayHasKey('resetAttempts', $result);
+
+        $this->assertArrayHasKey('resetAttemptsLimit', $result);
+
+        $this->assertArrayHasKey('resetAttemptsInterval', $result);
+
+        $this->assertArrayNotHasKey('resetPasswordLimit', $result);
+
+        $this->assertArrayNotHasKey('resetPasswordInterval', $result);
+
         $this->assertArrayHasKey('sessionTime', $result);
     }
 
@@ -109,6 +123,11 @@ class SettingsModelTest extends \CodeIgniter\Test\CIUnitTestCase
         $this->assertArrayHasKey('timezone', $result );
 
         $this->assertArrayHasKey('dateFormat', $result );
+
+        $this->assertContains(
+            'in_list[d MMMM yyyy HH:mm:ss,dd/MM/yyyy HH:mm,MMMM d yyyy h:mm:ss a,MM/dd/yyyy h:mm a,yyyy-MM-dd HH:mm:ss]',
+            $result['dateFormat']['rules']
+        );
     }
 
     public function testHasDatabaseSettingsReturnsTrueWhenRecordExists()
@@ -279,7 +298,7 @@ class SettingsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             );
     }
 
-    public function testDeleteSettingsReturnsFalseWhenNoSettingsExist()
+    public function testDeleteSettingsReturnsNullWhenNoSettingsExist()
     {
         $modelClass
             =
@@ -311,7 +330,7 @@ class SettingsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             );
 
         $this
-            ->assertFalse(
+            ->assertNull(
                 $result
             );
     }
@@ -386,7 +405,8 @@ class SettingsModelTest extends \CodeIgniter\Test\CIUnitTestCase
                     'delete from'
                 ),
                 ['App\\Config\\App']
-            );
+            )
+            ->willReturn(true);
 
         $injectDb
             =
@@ -825,7 +845,8 @@ class SettingsModelTest extends \CodeIgniter\Test\CIUnitTestCase
                             );
                     }
                 )
-            );
+            )
+            ->willReturn(true);
 
         $injectDb
             =
@@ -1233,7 +1254,8 @@ class SettingsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             )
             ->method(
                 'query'
-            );
+            )
+            ->willReturn(true);
 
         $injectDb
             =
@@ -1404,6 +1426,49 @@ class SettingsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             );
     }
 
+    public function testSaveSettingsReturnsErrorWhenDatabaseQueryFails(): void
+    {
+        $model = $this->getMockBuilder(SettingsModel::class)
+            ->onlyMethods(['hasDatabaseSettings'])
+            ->getMock();
+        $model->method('hasDatabaseSettings')->willReturn(false);
+
+        $db = $this->createMock(\CodeIgniter\Database\BaseConnection::class);
+        $db->expects($this->once())
+            ->method('query')
+            ->willReturn(false);
+
+        $injectDb = function($connection): void {
+            $this->db = $connection;
+        };
+        \Closure::bind($injectDb, $model, SettingsModel::class)($db);
+
+        $result = $model->saveSettings('Backend\\General', ['timezone' => 'Europe/Rome']);
+
+        $this->assertFalse($result['result']);
+        $this->assertSame(lang('backend/settings.messages.saveError'), $result['message']);
+    }
+
+    public function testDeleteSettingsReturnsFalseWhenDatabaseQueryFails(): void
+    {
+        $model = $this->getMockBuilder(SettingsModel::class)
+            ->onlyMethods(['hasDatabaseSettings'])
+            ->getMock();
+        $model->method('hasDatabaseSettings')->willReturn(true);
+
+        $db = $this->createMock(\CodeIgniter\Database\BaseConnection::class);
+        $db->expects($this->once())
+            ->method('query')
+            ->willReturn(false);
+
+        $injectDb = function($connection): void {
+            $this->db = $connection;
+        };
+        \Closure::bind($injectDb, $model, SettingsModel::class)($db);
+
+        $this->assertFalse($model->deleteSettings('Backend\\General'));
+    }
+
     public function testGetSettingsFiltersResultsWhenKeysAreProvided()
     {
         $model
@@ -1514,5 +1579,25 @@ class SettingsModelTest extends \CodeIgniter\Test\CIUnitTestCase
                 'beta',
                 $result
             );
+    }
+
+    public function testSettingsTranslationsContainRecoveryAndDatabaseMessages(): void
+    {
+        foreach (['it', 'en', 'es', 'fr', 'de', 'zh'] as $locale):
+            $translations = require APPPATH . 'Language/' . $locale . '/backend/settings.php';
+
+            $this->assertArrayHasKey('resetPasswordSecurity', $translations['labels'], $locale);
+            $this->assertArrayHasKey('resetAttempts', $translations['labels'], $locale);
+            $this->assertArrayHasKey('resetAttemptsLimit', $translations['labels'], $locale);
+            $this->assertArrayHasKey('resetAttemptsInterval', $translations['labels'], $locale);
+            $this->assertArrayHasKey('resetAttemptsLimit', $translations['placeholders'], $locale);
+            $this->assertArrayHasKey('resetAttemptsInterval', $translations['placeholders'], $locale);
+            $this->assertArrayHasKey('twoFactorAttemptsSecurity', $translations['labels'], $locale);
+            $this->assertArrayHasKey('twoFactorAttempts', $translations['labels'], $locale);
+            $this->assertArrayHasKey('twoFactorAttemptsInterval', $translations['labels'], $locale);
+            $this->assertArrayHasKey('twoFactorAttemptsInterval', $translations['placeholders'], $locale);
+            $this->assertArrayHasKey('saveError', $translations['messages'], $locale);
+            $this->assertArrayHasKey('deleteError', $translations['messages'], $locale);
+        endforeach;
     }
 }

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="index, follow, all" />
+    <title>App\Libraries\Backend\AdminsClass | Essential API</title>
+
+            <link rel="stylesheet" type="text/css" href="../../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../../css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="../../../css/doctum.css">
+        <link rel="stylesheet" type="text/css" href="../../../fonts/doctum-font.css">
+        <script src="../../../js/jquery-3.5.1.slim.min.js"></script>
+        <script async defer src="../../../doctum.js"></script>
+        <script async defer src="../../../js/bootstrap.min.js"></script>
+        <script async defer src="../../../js/autocomplete.min.js"></script>
+        <meta name="MobileOptimized" content="width">
+        <meta name="HandheldFriendly" content="true">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+
+    </head>
+
+    <body id="class" data-name="class:App_Libraries_Backend_AdminsClass" data-root-path="../../../" data-search-index-url="../../../doctum-search.json">
+            <div id="content">
+        <div id="left-column">
+                <div id="control-panel">
+                <div class="search-bar hidden" id="search-progress-bar-container">
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" id="search-progress-bar"
+                    aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+            </div>
+        </div>
+        <form id="search-form" action="../../../search.html">
+            <span class="icon icon-search"></span>
+            <input name="search"
+                   id="doctum-search-auto-complete"
+                   class="typeahead form-control"
+                   type="search"
+                   placeholder="Search"
+                   spellcheck="false"
+                   autocorrect="off"
+                   autocomplete="off"
+                   autocapitalize="off">
+            <div class="auto-complete-results" id="auto-complete-results"></div>
+        </form>
+    </div>
+
+                <div id="api-tree"></div>
+
+        </div>
+        <div id="right-column">
+                <nav id="site-nav" class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-elements">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="../../../index.html">Essential API</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-elements">
+                <ul class="nav navbar-nav">
+                    <li><a href="../../../classes.html">Classes</a></li>
+                    <li><a href="../../../namespaces.html">Namespaces</a></li>
+                    <li><a href="../../../interfaces.html">Interfaces</a></li>
+                    <li><a href="../../../traits.html">Traits</a></li>
+                    <li><a href="../../../doc-index.html">Index</a></li>
+                    <li><a href="../../../search.html">Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+                        <div class="namespace-breadcrumbs">
+            <ol class="breadcrumb">
+                <li><span class="label label-default">class</span></li>
+                        <li><a href="../../../App.html">App</a></li><li class="backslash">\</li><li><a href="../../../App/Libraries.html">Libraries</a></li><li class="backslash">\</li><li><a href="../../../App/Libraries/Backend.html">Backend</a></li><li class="backslash">\</li><li>AdminsClass</li>
+            </ol>
+        </div>
+                <div id="page-content">
+    <div class="page-header">
+        <h1>AdminsClass    
+            </h1>
+    </div>
+
+    
+    <p>        class
+    <strong>AdminsClass</strong>
+</p>
+
+        
+        
+    
+        
+
+            <div class="description">
+            <p><p>Classe di supporto (utility/presentazione) per la gestione dell'interfaccia della sezione Amministratori.</p></p>            <p><p>Centralizza la logica di preparazione dei componenti grafici contestuali (barre di navigazione,
+iniezione mirata di asset CSS/JS). Struttura i payload che verranno successivamente elaborati
+e stampati a video dal metodo render() del BackendController, mantenendo il controller di sezione snello.</p></p>        </div>
+            
+        
+    
+    
+            <h2>Methods</h2>
+
+            <div class="container-fluid underlined">
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getLinksBarShowAll">getLinksBarShowAll</a>()
+        
+                                            <p><p>Genera la configurazione della barra di navigazione contestuale per la vista ad elenco (Show All).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getLinksBarAdd">getLinksBarAdd</a>()
+        
+                                            <p><p>Genera la configurazione della barra di navigazione per l'interfaccia di creazione (Add).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getLinksBarEdit">getLinksBarEdit</a>(string|null $uuid = null)
+        
+                                            <p><p>Costruisce la barra di navigazione dinamica per l'interfaccia di modifica (Edit).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getLinksBarShow">getLinksBarShow</a>(string|null $uuid = null)
+        
+                                            <p><p>Prepara la barra dei collegamenti per la vista di dettaglio del singolo profilo (Show).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getJsShowAll">getJsShowAll</a>()
+        
+                                            <p><p>Genera l'array di configurazione per l'iniezione dinamica degli script JavaScript nella vista ad elenco.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getJsShow">getJsShow</a>()
+        
+                                            <p><p>Definisce gli asset JavaScript specifici da iniettare nella vista di dettaglio (Show).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getCssShowAll">getCssShowAll</a>()
+        
+                                            <p><p>Restituisce l'array di configurazione per il caricamento condizionale dei fogli di stile (CSS).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+            </div>
+
+
+        <h2>Details</h2>
+
+            <div id="method-details">
+                    <div class="method-item">
+                    <h3 id="method_getLinksBarShowAll">
+        <div class="location">at line 24</div>
+        <code>                    array
+    <strong>getLinksBarShowAll</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Genera la configurazione della barra di navigazione contestuale per la vista ad elenco (Show All).</p></p>                <p><p>Espone le azioni globali disponibili in questa schermata, come il pulsante per
+l'inserimento di un nuovo utente, formattando le relative icone, etichette localizzate e rotte.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Struttura dati per la renderizzazione della links bar</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getLinksBarAdd">
+        <div class="location">at line 41</div>
+        <code>                    array
+    <strong>getLinksBarAdd</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Genera la configurazione della barra di navigazione per l'interfaccia di creazione (Add).</p></p>                <p><p>Fornisce all'operatore i collegamenti di ritorno o le azioni pertinenti
+durante la fase di inserimento di un nuovo amministratore.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Struttura dati per la renderizzazione della links bar</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getLinksBarEdit">
+        <div class="location">at line 60</div>
+        <code>                    array
+    <strong>getLinksBarEdit</strong>(string|null $uuid = null)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Costruisce la barra di navigazione dinamica per l'interfaccia di modifica (Edit).</p></p>                <p><p>Inietta dinamicamente l'UUID dell'amministratore in lavorazione per generare link contestuali
+(es. passaggio rapido alla vista di dettaglio). Implementa un meccanismo di sicurezza che
+restituisce un array vuoto qualora l'identificatore risulti mancante, prevenendo errori di routing.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string|null</td>
+                <td>$uuid</td>
+                <td><p>L'identificatore univoco dell'amministratore in fase di modifica</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Struttura dati popolata con i link contestuali, o array vuoto come fallback</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getLinksBarShow">
+        <div class="location">at line 83</div>
+        <code>                    array
+    <strong>getLinksBarShow</strong>(string|null $uuid = null)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Prepara la barra dei collegamenti per la vista di dettaglio del singolo profilo (Show).</p></p>                <p><p>Sfrutta l'UUID fornito per esporre azioni mirate sull'utente visualizzato (es. passaggio
+rapido alla modalità di modifica), gestendo in modo silente l'assenza del parametro.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string|null</td>
+                <td>$uuid</td>
+                <td><p>L'identificatore univoco dell'amministratore visualizzato</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Struttura dati popolata con i link contestuali, o array vuoto come fallback</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getJsShowAll">
+        <div class="location">at line 107</div>
+        <code>                    array
+    <strong>getJsShowAll</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Genera l'array di configurazione per l'iniezione dinamica degli script JavaScript nella vista ad elenco.</p></p>                <p><p>Configura il caricamento di librerie esterne necessarie alla pagina (es. Flatpickr per i filtri data).
+Interroga le impostazioni globali del framework per determinare la lingua attiva e inietta
+dinamicamente il file di localizzazione corrispondente, definendo le corrette dipendenze gerarchiche nel DOM.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Insieme strutturato degli asset JS da iniettare nel layout</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getJsShow">
+        <div class="location">at line 126</div>
+        <code>                    array
+    <strong>getJsShow</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Definisce gli asset JavaScript specifici da iniettare nella vista di dettaglio (Show).</p></p>                <p><p>Predispone il caricamento condizionale di librerie di utilità (es. html2pdf) necessarie
+unicamente per le funzionalità operative presenti nel profilo del singolo amministratore.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Insieme strutturato degli asset JS da iniettare nel layout</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getCssShowAll">
+        <div class="location">at line 143</div>
+        <code>                    array
+    <strong>getCssShowAll</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Restituisce l'array di configurazione per il caricamento condizionale dei fogli di stile (CSS).</p></p>                <p><p>Applica i fogli di stile esterni richiesti dalla vista ad elenco (es. il tema base di Flatpickr),
+ottimizzando il peso della pagina evitando di caricare queste risorse globalmente in tutto il backend.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Insieme strutturato degli asset CSS da iniettare nel layout</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+            </div>
+
+    
+</div><div id="footer">
+        Generated by <a href="https://github.com/code-lts/doctum">Doctum, a API Documentation generator and fork of Sami</a>.</div></div>
+    </div>
+    </body>
+
+</html>

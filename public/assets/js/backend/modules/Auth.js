@@ -7,9 +7,9 @@ export class LoginManager {
         if (LoginManager.instance) {
             return LoginManager.instance;
         }
+
         LoginManager.instance = this;
 
-        /* Parametri di configurazione della sezione dedicati e hardcoded (Guest Mode) */
         this.formId = 'login_form';
         this.url = urlbase + 'backend/auth/login';
 
@@ -19,105 +19,129 @@ export class LoginManager {
             onLoginError: null
         }, hooks);
 
-        /* Variabili di stato per la sicurezza */
         this.eventsBound = false;
         this.isSubmitting = false;
-    }
-    
-    init() {
-        const form = document.getElementById(this.formId);
-        if ( ! form) return;
+        this.destroyed = false;
 
-        /* Impedisce cloni dei listener */
-        if (this.eventsBound) return;
+        this.eventsController = new AbortController();
+    }
+
+    init() {
+        if (this.destroyed || this.eventsBound) return;
+
+        const form = document.getElementById(this.formId);
+        if (!form) return;
+
         this.eventsBound = true;
 
         form.addEventListener('submit', async e => {
             e.preventDefault();
+
+            if (this.isSubmitting || this.destroyed) return;
+
             const formData = new FormData(form);
-            await this.login(formData, form);
+
+            await this.login(formData);
+        }, {
+            signal: this.eventsController.signal
         });
     }
-    
-    async login(formData, form) {
-        
-        /* Se c'è già una richiesta in corso, blocca */
-        if (this.isSubmitting) return;
+
+    async login(formData) {
+        if (this.destroyed || this.isSubmitting) return;
+
         this.isSubmitting = true;
 
-        if (typeof this.hooks.onLoginBefore === 'function') {
-            const stop = this.hooks.onLoginBefore(formData);
-            if (stop === false) {
-                this.isSubmitting = false;
-                return;
-            }
-        }
-
-        /* Reset immediato degli errori visivi */
-        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
-
         try {
+            if (typeof this.hooks.onLoginBefore === 'function') {
+                const stop = await this.hooks.onLoginBefore(formData);
+
+                if (stop === false) return;
+            }
+
             const response = await apiFetch(this.url, {
                 method: 'POST',
                 body: formData
             });
 
             const data = await response.json();
-            
-            /* Controllo per gli errori di input (Validazione) */
+
+            if (this.destroyed) return;
+
+            document.querySelectorAll('[class^="error_"]').forEach(el => { el.innerHTML = '\u00A0'; });
+
             if (data.errors) {
-                if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+                if (typeof handleValidationErrors === 'function') {
+                    handleValidationErrors(data.errors);
+                }
+
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
                 return;
             }
 
-            /* Controllo per fallimento generico (es. Credenziali errate) */
             if (data.result === false) {
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
                 return;
             }
 
-            /* NUOVO: Controllo per Secondo Fattore Richiesto (2FA) */
             if (data.result === '2fa_required') {
-                /* Effettua il reindirizzamento pulito alla pagina di verifica.
-                   Il server saprà già quale utente validare leggendolo dalla sessione. */
                 window.location.href = urlbase + 'backend/auth/verify';
                 return;
             }
 
-            /* Login avvenuto con successo */
             if (data.result === true) {
                 if (typeof this.hooks.onLoginAfter === 'function') {
-                    this.hooks.onLoginAfter(data);
+                    await this.hooks.onLoginAfter(data);
                 }
-                
+
                 if (data.redirect) {
                     window.location.href = data.redirect;
                 }
             }
 
         } catch (error) {
-
-            /* Qui finiscono solo gli errori di rete o i crash del server */
             if (typeof this.hooks.onLoginError === 'function') {
-                this.hooks.onLoginError(error);
+                try {
+                    await this.hooks.onLoginError(error);
+                } catch (hookError) {
+                    console.error('Errore hook LoginManager:', hookError);
+                }
             }
-            console.error("Errore LoginManager:", error);
+
+            console.error('Errore LoginManager:', error);
+
         } finally {
             this.isSubmitting = false;
+        }
+    }
+
+    destroy() {
+        if (this.destroyed) return;
+
+        this.destroyed = true;
+        this.eventsController.abort();
+        this.eventsBound = false;
+
+        if (LoginManager.instance === this) {
+            LoginManager.instance = null;
         }
     }
 }
 
 export class ResetPasswordManager {
     constructor(hooks = {}) {
-
         if (ResetPasswordManager.instance) {
             return ResetPasswordManager.instance;
         }
+
         ResetPasswordManager.instance = this;
 
-        /* Parametri di configurazione della sezione dedicati e hardcoded (Guest Mode) */
         this.formId = 'reset_password_form';
         this.url = urlbase + 'backend/auth/resetPassword';
 
@@ -127,44 +151,46 @@ export class ResetPasswordManager {
             onResetError: null
         }, hooks);
 
-        /* Variabili di stato per la sicurezza */
         this.eventsBound = false;
         this.isSubmitting = false;
-    }
-    
-    init() {
-        const form = document.getElementById(this.formId);
-        if ( ! form) return;
+        this.destroyed = false;
 
-        /* Impedisce cloni dei listener */
-        if (this.eventsBound) return;
+        this.eventsController = new AbortController();
+    }
+
+    init() {
+        if (this.destroyed || this.eventsBound) return;
+
+        const form = document.getElementById(this.formId);
+        if (!form) return;
+
         this.eventsBound = true;
 
         form.addEventListener('submit', async e => {
             e.preventDefault();
+
+            if (this.isSubmitting || this.destroyed) return;
+
             const formData = new FormData(form);
+
             await this.resetPassword(formData);
+        }, {
+            signal: this.eventsController.signal
         });
     }
-    
+
     async resetPassword(formData) {
-        
-        /* Se c'è già una richiesta in corso, blocca */
-        if (this.isSubmitting) return;
+        if (this.destroyed || this.isSubmitting) return;
+
         this.isSubmitting = true;
 
-        if (typeof this.hooks.onResetBefore === 'function') {
-            const stop = this.hooks.onResetBefore(formData);
-            if (stop === false) {
-                this.isSubmitting = false;
-                return;
-            }
-        }
-
-        /* Pulizia immediata degli errori visivi */
-        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
-
         try {
+            if (typeof this.hooks.onResetBefore === 'function') {
+                const stop = await this.hooks.onResetBefore(formData);
+
+                if (stop === false) return;
+            }
+
             const response = await apiFetch(this.url, {
                 method: 'POST',
                 body: formData
@@ -172,25 +198,36 @@ export class ResetPasswordManager {
 
             const data = await response.json();
 
-            /* Errori di input (Validazione) */
+            if (this.destroyed) return;
+
+            document.querySelectorAll('[class^="error_"]').forEach(el => { el.innerHTML = '\u00A0'; });
+
             if (data.errors) {
-                if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
-                return;
-            }
-
-            /* Fallimento logico (es. email non trovata) */
-            if (data.result === false) {
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
-                return;
-            }
-
-            /* Successo */
-            if (data.result === true) {
-
-                if (typeof this.hooks.onResetAfter === 'function') {
-                    this.hooks.onResetAfter(data);
+                if (typeof handleValidationErrors === 'function') {
+                    handleValidationErrors(data.errors);
                 }
+
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
+                return;
+            }
+
+            if (data.result === false) {
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
+                return;
+            }
+
+            if (data.result === true) {
+                if (typeof this.hooks.onResetAfter === 'function') {
+                    await this.hooks.onResetAfter(data);
+                }
+
+                if (this.destroyed) return;
 
                 document.getElementById(this.formId)?.reset();
 
@@ -200,29 +237,42 @@ export class ResetPasswordManager {
             }
 
         } catch (error) {
-
-            /* Qui finiscono solo gli errori di rete o i crash del server */
             if (typeof this.hooks.onResetError === 'function') {
-                this.hooks.onResetError(error);
+                try {
+                    await this.hooks.onResetError(error);
+                } catch (hookError) {
+                    console.error('Errore hook ResetPasswordManager:', hookError);
+                }
             }
-            console.error("Errore ResetPasswordManager:", error);
-        } finally {
 
-            /* Rilascia sempre il blocco */
+            console.error('Errore ResetPasswordManager:', error);
+
+        } finally {
             this.isSubmitting = false;
+        }
+    }
+
+    destroy() {
+        if (this.destroyed) return;
+
+        this.destroyed = true;
+        this.eventsController.abort();
+        this.eventsBound = false;
+
+        if (ResetPasswordManager.instance === this) {
+            ResetPasswordManager.instance = null;
         }
     }
 }
 
 export class SetPasswordManager {
     constructor(hooks = {}) {
-
         if (SetPasswordManager.instance) {
             return SetPasswordManager.instance;
         }
+
         SetPasswordManager.instance = this;
 
-        /* Parametri di configurazione della sezione dedicati e hardcoded (Guest Mode) */
         this.formId = 'set_password_form';
         this.url = urlbase + 'backend/auth/setPassword';
 
@@ -232,44 +282,46 @@ export class SetPasswordManager {
             onSetError: null
         }, hooks);
 
-        /* Variabili di stato per la sicurezza */
         this.eventsBound = false;
         this.isSubmitting = false;
-    }
-    
-    init() {
-        const form = document.getElementById(this.formId);
-        if ( ! form) return;
+        this.destroyed = false;
 
-        /* Impedisce cloni dei listener */
-        if (this.eventsBound) return;
+        this.eventsController = new AbortController();
+    }
+
+    init() {
+        if (this.destroyed || this.eventsBound) return;
+
+        const form = document.getElementById(this.formId);
+        if (!form) return;
+
         this.eventsBound = true;
 
-        form.addEventListener('submit', async (e) => {
+        form.addEventListener('submit', async e => {
             e.preventDefault();
+
+            if (this.isSubmitting || this.destroyed) return;
+
             const formData = new FormData(form);
+
             await this.savePassword(formData);
+        }, {
+            signal: this.eventsController.signal
         });
     }
-    
+
     async savePassword(formData) {
-        
-        /* Se c'è già una richiesta in corso, blocca */
-        if (this.isSubmitting) return;
+        if (this.destroyed || this.isSubmitting) return;
+
         this.isSubmitting = true;
 
-        if (typeof this.hooks.onSetBefore === 'function') {
-            const stop = this.hooks.onSetBefore(formData);
-            if (stop === false) {
-                this.isSubmitting = false;
-                return;
-            }
-        }
-
-        /* Pulizia immediata degli errori visivi */
-        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
-
         try {
+            if (typeof this.hooks.onSetBefore === 'function') {
+                const stop = await this.hooks.onSetBefore(formData);
+
+                if (stop === false) return;
+            }
+
             const response = await apiFetch(this.url, {
                 method: 'POST',
                 body: formData
@@ -277,25 +329,36 @@ export class SetPasswordManager {
 
             const data = await response.json();
 
-            /* Controllo per gli errori di input (Validazione) */
+            if (this.destroyed) return;
+
+            document.querySelectorAll('[class^="error_"]').forEach(el => { el.innerHTML = '\u00A0'; });
+
             if (data.errors) {
-                if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
-                return;
-            }
-
-            /* Controllo per fallimento logico (es. token scaduto o invalido) */
-            if (data.result === false) {
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
-                return;
-            }
-
-            /* Successo Finale */
-            if (data.result === true) {
-                
-                if (typeof this.hooks.onSetAfter === 'function') {
-                    this.hooks.onSetAfter(data);
+                if (typeof handleValidationErrors === 'function') {
+                    handleValidationErrors(data.errors);
                 }
+
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
+                return;
+            }
+
+            if (data.result === false) {
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
+                return;
+            }
+
+            if (data.result === true) {
+                if (typeof this.hooks.onSetAfter === 'function') {
+                    await this.hooks.onSetAfter(data);
+                }
+
+                if (this.destroyed) return;
 
                 document.getElementById(this.formId)?.reset();
 
@@ -305,29 +368,42 @@ export class SetPasswordManager {
             }
 
         } catch (error) {
-
-            /* Qui finiscono solo gli errori di rete o i crash del server */
             if (typeof this.hooks.onSetError === 'function') {
-                this.hooks.onSetError(error);
+                try {
+                    await this.hooks.onSetError(error);
+                } catch (hookError) {
+                    console.error('Errore hook SetPasswordManager:', hookError);
+                }
             }
-            console.error("Errore SetPasswordManager:", error);
+
+            console.error('Errore SetPasswordManager:', error);
+
         } finally {
-            
-            /* Rilascia sempre il blocco */
             this.isSubmitting = false;
+        }
+    }
+
+    destroy() {
+        if (this.destroyed) return;
+
+        this.destroyed = true;
+        this.eventsController.abort();
+        this.eventsBound = false;
+
+        if (SetPasswordManager.instance === this) {
+            SetPasswordManager.instance = null;
         }
     }
 }
 
 export class VerifyManager {
     constructor(hooks = {}) {
-
         if (VerifyManager.instance) {
             return VerifyManager.instance;
         }
+
         VerifyManager.instance = this;
 
-        /* Configurazione dedicata alla sezione di verifica OTP */
         this.formId = 'verify_form';
         this.url = urlbase + 'backend/auth/verify';
 
@@ -337,82 +413,114 @@ export class VerifyManager {
             onVerifyError: null
         }, hooks);
 
-        /* Variabili di stato per la sicurezza */
         this.eventsBound = false;
         this.isSubmitting = false;
-    }
-    
-    init() {
-        const form = document.getElementById(this.formId);
-        if ( ! form) return;
+        this.destroyed = false;
 
-        /* Impedisce cloni dei listener */
-        if (this.eventsBound) return;
+        this.eventsController = new AbortController();
+    }
+
+    init() {
+        if (this.destroyed || this.eventsBound) return;
+
+        const form = document.getElementById(this.formId);
+        if (!form) return;
+
         this.eventsBound = true;
 
         form.addEventListener('submit', async e => {
             e.preventDefault();
+
+            if (this.isSubmitting || this.destroyed) return;
+
             const formData = new FormData(form);
-            await this.verify(formData, form);
+
+            await this.verify(formData);
+        }, {
+            signal: this.eventsController.signal
         });
     }
-    
-    async verify(formData, form) {
-        
-        /* Se c'è già una richiesta in corso, blocca */
-        if (this.isSubmitting) return;
+
+    async verify(formData) {
+        if (this.destroyed || this.isSubmitting) return;
+
         this.isSubmitting = true;
 
-        if (typeof this.hooks.onVerifyBefore === 'function') {
-            const stop = this.hooks.onVerifyBefore(formData);
-            if (stop === false) {
-                this.isSubmitting = false;
-                return;
-            }
-        }
-
-        /* Reset immediato degli errori visivi */
-        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
-
         try {
+            if (typeof this.hooks.onVerifyBefore === 'function') {
+                const stop = await this.hooks.onVerifyBefore(formData);
+
+                if (stop === false) return;
+            }
+
             const response = await apiFetch(this.url, {
                 method: 'POST',
                 body: formData
             });
 
             const data = await response.json();
-            
-            /* Controllo per gli errori di input (Validazione formale del codice) */
+
+            if (this.destroyed) return;
+
+            document.querySelectorAll('[class^="error_"]').forEach(el => {
+                el.innerHTML = '\u00A0';
+            });
+
             if (data.errors) {
-                if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+                if (typeof handleValidationErrors === 'function') {
+                    handleValidationErrors(data.errors);
+                }
+
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
                 return;
             }
 
-            /* Controllo per codice errato o tentativi falliti */
             if (data.result === false) {
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
                 return;
             }
 
-            /* Verifica superata con successo */
             if (data.result === true) {
                 if (typeof this.hooks.onVerifyAfter === 'function') {
-                    this.hooks.onVerifyAfter(data);
+                    await this.hooks.onVerifyAfter(data);
                 }
-                
-                window.location.href = urlbase + 'backend/dashboard';
+
+                if (this.destroyed) return;
+
+                window.location.href = data.redirect || urlbase + 'backend/dashboard';
             }
 
         } catch (error) {
-
-            /* Errori di rete o crash del server */
             if (typeof this.hooks.onVerifyError === 'function') {
-                this.hooks.onVerifyError(error);
+                try {
+                    await this.hooks.onVerifyError(error);
+                } catch (hookError) {
+                    console.error('Errore hook VerifyManager:', hookError);
+                }
             }
-            console.error("Errore VerifyManager:", error);
+
+            console.error('Errore VerifyManager:', error);
+
         } finally {
             this.isSubmitting = false;
+        }
+    }
+
+    destroy() {
+        if (this.destroyed) return;
+
+        this.destroyed = true;
+        this.eventsController.abort();
+        this.eventsBound = false;
+
+        if (VerifyManager.instance === this) {
+            VerifyManager.instance = null;
         }
     }
 }

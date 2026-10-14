@@ -45,7 +45,7 @@ class Menu extends BaseConfig
             ['label' => lang('backend/global.menu.topRight.tokens'), 'route' => 'backend/tokens', 'icon' => '<i class="fa-solid fa-chain"></i>', 'controller' => 'tokens'],
             ['label' => lang('backend/global.menu.topRight.logs'), 'route' => 'backend/logs', 'icon' => '<i class="fa-solid fa-user-clock"></i>', 'controller' => 'logs'],
             ['label' => lang('backend/global.menu.topRight.account'), 'route' => 'backend/account', 'icon' => '<i class="fa-solid fa-user-gear"></i>', 'controller' => 'account'],
-            ['label' => lang('backend/global.menu.topRight.logout'), 'route' => 'backend/auth/logout', 'icon' => '<i class="fa-solid fa-right-to-bracket"></i>', 'controller' => 'auth'],
+            ['label' => lang('backend/global.menu.topRight.logout'), 'route' => 'backend/auth/logout', 'icon' => '<i class="fa-solid fa-right-to-bracket"></i>', 'controller' => 'auth', 'method' => 'post'],
         ];
 
         $this->bottomLeft = [

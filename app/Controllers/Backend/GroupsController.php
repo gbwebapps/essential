@@ -7,7 +7,6 @@ use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
 use App\Models\Backend\GroupsModel;
-use App\Libraries\Backend\GroupsClass;
 use App\Controllers\Backend\BackendController; 
 
 /**
@@ -25,12 +24,6 @@ class GroupsController extends BackendController
     protected GroupsModel $groupsModel;
 
     /**
-     * Istanza della libreria helper contenente funzioni per la formattazione dei dati relativi ai gruppi.
-     * @var GroupsClass 
-     */ 
-    protected GroupsClass $groupsClass;
-
-    /**
      * Inizializza le dipendenze specifiche per la gestione dei gruppi, caricando le relative classi e modelli.
      *
      * @param RequestInterface $request L'oggetto rappresentante la richiesta HTTP.
@@ -44,7 +37,6 @@ class GroupsController extends BackendController
         $this->data['controller'] = 'groups';
 
         $this->groupsModel = model(GroupsModel::class);
-        $this->groupsClass = new GroupsClass($this->groupsModel);
     }
 
     /**
@@ -130,7 +122,7 @@ class GroupsController extends BackendController
             /* Recuperiamo i dati del gruppo (nome e descrizione) */
             $group = $this->groupsModel->getGroupById($posts);
             if ( ! $group):
-                return $this->jsonResponse(['result' => false, 'message' => 'Gruppo non trovato.']);
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/groups.messages.noGroupFound')]);
             endif; 
 
             $this->data['group'] = $group;
@@ -412,7 +404,7 @@ class GroupsController extends BackendController
             /* Recuperiamo i dettagli dell'amministratore (ci servirà il suo group_id) */
             $admin = $this->groupsModel->getAdminByUuid($posts);
             if ( ! $admin):
-                return $this->jsonResponse(['result' => false, 'message' => 'Amministratore non trovato.']);
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/groups.messages.noAdminFound')]);
             endif;
 
             $this->data['uuid'] = $posts['uuid'];

@@ -41,7 +41,7 @@ return [
 	], 
 	'audits' => [
 		'loginRefused' => 'Tentativo di accesso con account inesistente', 
-		'loginBlocked' => 'Accesso rifiutato, account bloccato %s %s', 
+		'loginBlocked' => 'Accesso rifiutato per limite tentativi',
 		'loginFailed' => 'Tentativo di accesso fallito %s %s', 
 		'2faRequired' => 'Richiesto codice di verifica 2FA %s %s %s', 
 		'loginSuccess' => 'Accesso effettuato %s %s', 
@@ -61,12 +61,13 @@ return [
 		'setPasswordFailed' => 'Errore durante impostazione password.', 
 		'setPasswordError' => 'Errore durante impostazione password.', 
 		'checkAuthError' => 'Codice di autenticazione non valido oppure scaduto.', 
-		'tooManyAttempts' => 'Sono stati effettuati troppi tentativi.', 
+		'tooManyAttempts' => 'Limite di tentativi raggiunto. Riprova più tardi.',
 	    'currentSessionOn' => '%s %s sessione ancora in corso.', 
 		'validationErrors' => 'Errori di validazione.', 
-		'resetPasswordSuccess' => 'Processo di reset password impostato. Verifica l\'email inviata per terminare le operazioni.', 
+		'resetPasswordSuccess' => 'Se l\'indirizzo è associato a un account attivo, riceverai un\'email con le istruzioni per reimpostare la password.',
 		'resetPasswordSuccessNoEmail' => 'Processo di reset password impostato, ma l\'email non è stata inviata. Contattare l\'amministratore.', 
 		'expiredCode' => 'Codice OTP scaduto.',
 		'wrongCode' => 'Codice OTP errato.', 
+		'twoFactorEmailSendError' => 'Impossibile inviare il codice di verifica via email. Riprova tra qualche istante.',
 	]
 ];

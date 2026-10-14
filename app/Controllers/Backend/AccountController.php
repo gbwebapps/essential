@@ -8,7 +8,6 @@ use Psr\Log\LoggerInterface;
 use CodeIgniter\HTTP\UserAgent;
 
 use App\Models\Backend\AccountModel;
-use App\Libraries\Backend\AccountClass;
 use App\Controllers\Backend\BackendController; 
 
 use App\Models\Backend\Components\GalleryOneModel;
@@ -25,12 +24,6 @@ class AccountController extends BackendController
     protected AccountModel $accountModel;
 
     /**
-     * Istanza della libreria contenente le logiche operative e di formattazione specifiche dell'account
-     * @var AccountClass 
-     */
-    protected AccountClass $accountClass;
-
-    /**
      * Istanza del modello per la gestione e l'elaborazione dell'immagine di profilo (avatar)
      * @var GalleryOneModel 
      */
@@ -42,8 +35,9 @@ class AccountController extends BackendController
      * @param RequestInterface $request Istanza della richiesta HTTP corrente
      * @param ResponseInterface $response Istanza della risposta HTTP per il client
      * @param LoggerInterface $logger Istanza del sistema di log per la registrazione degli eventi
+	 * @return void
      */
-    public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
+    public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger): void
     {
         parent::initController($request, $response, $logger);
 
@@ -54,7 +48,6 @@ class AccountController extends BackendController
         $this->data['title'] = lang('backend/account.titles.index');
 
         $this->accountModel = model(AccountModel::class);
-        $this->accountClass = new AccountClass($this->accountModel);
 
         $this->galleryOneModel = model(GalleryOneModel::class);
 
@@ -154,10 +147,24 @@ class AccountController extends BackendController
 
             /* Passiamo l'UUID sicuro ricavato dall'oggetto dell'admin loggato */
             $rules = $this->accountModel->editValidationRules($this->currentAdmin->uuid);
+			$emailChanged = isset($this->currentAdmin->email)
+				&& strtolower(trim((string) ($posts['email'] ?? '')))
+				!== strtolower((string) $this->currentAdmin->email);
+
+			if ($emailChanged):
+				$rules = array_merge($rules, $this->accountModel->currentPasswordValidationRules());
+			endif;
 
             if ( ! $this->validateData($posts, $rules)):
                 return $this->jsonResponse(['errors' => $this->validator->getErrors(), 'message' => lang('backend/account.messages.validationErrors')]);
             endif;
+
+			if ($emailChanged && ! $this->accountModel->verifyCurrentPassword($this->currentAdmin->uuid, (string) $posts['currentPassword'])):
+				return $this->jsonResponse([
+					'errors' => ['currentPassword' => lang('backend/account.errors.currentPasswordInvalid')],
+					'message' => lang('backend/account.messages.validationErrors'),
+				]);
+			endif;
 
             $json = $this->accountModel->edit($posts, $this->currentAdmin);
 
@@ -222,7 +229,7 @@ class AccountController extends BackendController
      *
      * @return string HTML renderizzato della vista per le immagini
      */
-    public function images()
+    public function images(): string
     {
         $this->data['action'] = 'images';
 
@@ -244,7 +251,7 @@ class AccountController extends BackendController
     {
         $this->data['userAgent'] = new UserAgent();
         $this->data['tokens'] = $this->accountModel->getTokens($this->currentAdmin->uuid);
-        
+
         /* Delega totale al Model per recuperare l'ID della sessione in uso */
         $this->data['currentTokenId'] = $this->accountModel->getCurrentTokenId();
 
@@ -256,6 +263,7 @@ class AccountController extends BackendController
         endif;
 
         $this->data['action'] = 'tokens';
+
         return $this->render('backend/account/tokensView', $this->data);
     }
 
@@ -298,13 +306,32 @@ class AccountController extends BackendController
     }
 
     /**
-     * Gestisce la procedura di modifica della password dell'account, validando i requisiti di robustezza e le scadenze temporali.
+	 * Avvia la procedura protetta per l'impostazione di una nuova password tramite link inviato via e-mail.
      *
      * @return string|ResponseInterface Risposta JSON con l'esito dell'operazione o l'HTML della vista per il reset
      */
     public function resetPassword(): string|ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
+			$posts = (array) $this->request->getPost();
+
+			if ( ! $this->validateData($posts, $this->accountModel->currentPasswordValidationRules())):
+				return $this->jsonResponse(['errors' => $this->validator->getErrors(), 'message' => lang('backend/account.messages.validationErrors')]);
+			endif;
+
+			$config = setting('Backend\Auth');
+			$throttleKey = 'account-password-reset-' . hash('sha256', $this->currentAdmin->uuid . '|' . $this->request->getIPAddress());
+
+			if ( ! service('throttler')->check($throttleKey, (int) $config->resetPasswordLimit, (int) $config->resetPasswordInterval, 1)):
+				return $this->jsonResponse(['result' => false, 'message' => lang('backend/account.messages.tooManyResetRequests')], 429);
+			endif;
+
+			if ( ! $this->accountModel->verifyCurrentPassword($this->currentAdmin->uuid, (string) $posts['currentPassword'])):
+				return $this->jsonResponse([
+					'errors' => ['currentPassword' => lang('backend/account.errors.currentPasswordInvalid')],
+					'message' => lang('backend/account.messages.validationErrors'),
+				]);
+			endif;
 
             $result = $this->accountModel->resetPassword($this->currentAdmin, $this->request);
 
@@ -347,6 +374,56 @@ class AccountController extends BackendController
     }
 
     /**
+     * Verifica preliminarmente la password corrente prima di mostrare conferme per operazioni sensibili.
+     *
+     * La verifica è limitata per amministratore e indirizzo IP. Le operazioni definitive
+     * continuano a validare autonomamente la password e non si affidano a questo controllo preliminare.
+     *
+     * @return ResponseInterface Risposta JSON con l'esito della verifica oppure errore HTTP 429
+     */
+    public function verifyCurrentPassword(): ResponseInterface
+    {
+        if ($this->request->isAJAX() && $this->request->is('post')):
+            $posts = [
+                'currentPassword' => (string) $this->request->getPost('currentPassword'),
+            ];
+
+            if ( ! $this->validateData($posts, $this->accountModel->currentPasswordValidationRules())):
+                $errors = $this->validator->getErrors();
+
+                return $this->jsonResponse([
+                    'result' => false,
+                    'errors' => $errors,
+                    'message' => $errors['currentPassword'] ?? lang('backend/account.messages.validationErrors'),
+                ]);
+            endif;
+
+            $config = setting('Backend\Auth');
+            $throttler = service('throttler');
+            $throttleKey = 'account-current-password-' . hash('sha256', $this->currentAdmin->uuid . '|' . $this->request->getIPAddress());
+
+            /* Il costo zero controlla un eventuale blocco senza consumare tentativi validi. */
+            if ( ! $throttler->check($throttleKey, (int) $config->attemptsLimit, (int) $config->attemptsInterval, 0)):
+                return $this->jsonResponse(['result' => false, 'message' => lang('backend/account.messages.tooManyAttempts')], 429);
+            endif;
+
+            if ( ! $this->accountModel->verifyCurrentPassword($this->currentAdmin->uuid, $posts['currentPassword'])):
+                $throttler->check($throttleKey, (int) $config->attemptsLimit, (int) $config->attemptsInterval, 1);
+
+                return $this->jsonResponse([
+                    'result' => false,
+                    'errors' => ['currentPassword' => lang('backend/account.errors.currentPasswordInvalid')],
+                    'message' => lang('backend/account.errors.currentPasswordInvalid'),
+                ]);
+            endif;
+
+            return $this->jsonResponse(['result' => true]);
+        endif;
+
+        return service('response')->setStatusCode(400);
+    }
+
+    /**
      * Valida e salva in modo asincrono il metodo di autenticazione a due fattori di base selezionato (es. email o disattivato).
      *
      * @return ResponseInterface Risposta JSON con l'esito dell'aggiornamento delle preferenze
@@ -354,14 +431,35 @@ class AccountController extends BackendController
     public function saveBasicMethod(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')) :
+			$posts = [
+				'twoFactorMethod' => (string) $this->request->getPost('twoFactorMethod'),
+				'currentPassword' => (string) $this->request->getPost('currentPassword'),
+			];
+			$method = (string) $posts['twoFactorMethod'];
+			$allowedMethods = setting('Backend\Auth')->twoFactorMethods;
 
-            $method = (string) $this->request->getPost('twoFactorMethod');
-            $allowedMethods = setting('Backend\Auth')->twoFactorMethods;
+			/* Il metodo viene verificato prima delle altre dipendenze operative. */
+			if ( ! in_array($method, $allowedMethods, true) || $method === 'totp'):
+				return $this->jsonResponse(['result' => false, 'message' => lang('backend/account.messages.methodNotValid')]);
+			endif;
 
-            /* Validazione dell'input */
-            if ( ! in_array($method, $allowedMethods, true) || $method === 'totp') :
-                return $this->jsonResponse(['result' => false, 'message' => lang('backend/account.messages.methodNotValid')]);
-            endif;
+			$rules = array_merge([
+				'twoFactorMethod' => [
+					'label' => lang('backend/account.titles.twoFactor'),
+					'rules' => ['required'],
+				],
+			], $this->accountModel->currentPasswordValidationRules());
+
+			if ( ! $this->validateData($posts, $rules)):
+				return $this->jsonResponse(['errors' => $this->validator->getErrors(), 'message' => lang('backend/account.messages.validationErrors')]);
+			endif;
+
+			if ( ! $this->accountModel->verifyCurrentPassword($this->currentAdmin->uuid, (string) $posts['currentPassword'])):
+				return $this->jsonResponse([
+					'errors' => ['currentPassword' => lang('backend/account.errors.currentPasswordInvalid')],
+					'message' => lang('backend/account.messages.validationErrors'),
+				]);
+			endif;
 
             /* Eseguo l'aggiornamento nel Model */
             $updated = $this->accountModel->setBasicMethod($this->currentAdmin, $method);
@@ -385,6 +483,20 @@ class AccountController extends BackendController
     public function setupTotp(): ResponseInterface 
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
+			$posts = [
+				'currentPassword' => (string) $this->request->getPost('currentPassword'),
+			];
+
+			if ( ! $this->validateData($posts, $this->accountModel->currentPasswordValidationRules())):
+				return $this->jsonResponse(['errors' => $this->validator->getErrors(), 'message' => lang('backend/account.messages.validationErrors')]);
+			endif;
+
+			if ( ! $this->accountModel->verifyCurrentPassword($this->currentAdmin->uuid, (string) $posts['currentPassword'])):
+				return $this->jsonResponse([
+					'errors' => ['currentPassword' => lang('backend/account.errors.currentPasswordInvalid')],
+					'message' => lang('backend/account.messages.validationErrors'),
+				]);
+			endif;
 
             $adminUuid = $this->currentAdmin->uuid;
 
@@ -392,7 +504,7 @@ class AccountController extends BackendController
             $otpService = new \App\Libraries\AppOtpService();
             $secret = $otpService->generateSecret();
 
-            /* Salvo il secret temporaneo nel DB (imposta enabled = 0) */
+			/* Il secret resta in sessione e non modifica il metodo TOTP già attivo */
             $saved = $this->accountModel->saveTemporarySecret($adminUuid, $secret);
 
             if ( ! $saved) :
@@ -440,13 +552,19 @@ class AccountController extends BackendController
             /* Sanifico l'input filtrando l'array $_POST */
             $posts = array_intersect_key($this->request->getPost(), array_flip($allowedFields));
 
-            if ( ! $this->validateData($posts, ['otp' => 'required|is_natural_no_zero|exact_length[6]'])) :
+            if ( ! $this->validateData($posts, ['otp' => 'required|regex_match[/^[0-9]{6}$/]'])) :
                 return $this->jsonResponse(['result'  => false, 'message' => lang('backend/account.messages.missingCode')]);
             endif;
 
             /* Da qui in poi lavoriamo solo sul parametro sanificato e validato */
             $otpCode = (string) $posts['otp'];
             $adminUuid = $this->currentAdmin->uuid;
+			$config = setting('Backend\Auth');
+			$throttleKey = 'account-totp-confirm-' . hash('sha256', $adminUuid . '|' . $this->request->getIPAddress());
+
+			if ( ! service('throttler')->check($throttleKey, (int) $config->twoFactorLimit, (int) $config->twoFactorTime, 1)):
+				return $this->jsonResponse(['result' => false, 'message' => lang('backend/account.messages.tooManyAttempts')], 429);
+			endif;
 
             /* Recupero il secret temporaneo */
             $secret = $this->accountModel->getTemporarySecret($adminUuid);
@@ -462,7 +580,7 @@ class AccountController extends BackendController
             endif;
 
             /* Attivo definitivamente il TOTP nel DB */
-            $activated = $this->accountModel->activateTotpMethod($adminUuid, $this->currentAdmin);
+			$activated = $this->accountModel->activateTotpMethod($adminUuid, $secret, $this->currentAdmin);
 
             if ( ! $activated) :
                 return $this->jsonResponse(['result' => false, 'message' => lang('backend/account.messages.totpActivationNotPossible')]);
@@ -474,4 +592,20 @@ class AccountController extends BackendController
 
         return service('response')->setStatusCode(400);
     }
+
+	/**
+	 * Annulla la configurazione TOTP in corso eliminando il segreto temporaneo dalla sessione.
+	 *
+	 * @return ResponseInterface Risposta JSON con l'esito dell'annullamento
+	 */
+	public function cancelTotpSetup(): ResponseInterface
+	{
+		if ($this->request->isAJAX() && $this->request->is('post')):
+			$this->accountModel->clearTemporarySecret();
+
+			return $this->jsonResponse(['result' => true]);
+		endif;
+
+		return service('response')->setStatusCode(400);
+	}
 }

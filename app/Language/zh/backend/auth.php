@@ -41,7 +41,7 @@ return [
 	],
 	'audits' => [
 	    'loginRefused'      => '使用不存在的账号登录尝试',
-	    'loginBlocked'      => '访问被拒绝，账号已被锁定 %s %s',
+	    'loginBlocked'      => '因达到尝试次数限制而拒绝访问',
 	    'loginFailed'       => '登录尝试失败 %s %s',
 	    '2faRequired'       => '需要 2FA 验证码 %s %s %s',
 	    'loginSuccess'      => '登录成功 %s %s',
@@ -61,12 +61,13 @@ return [
 		'setPasswordFailed' => '设置密码时出错。', 
 		'setPasswordError' => '设置密码时出错。', 
 		'checkAuthError' => '身份验证码无效或已过期。', 
-		'tooManyAttempts' => '尝试次数过多。', 
+		'tooManyAttempts' => '已达到尝试次数限制，请稍后再试。',
 	    'currentSessionOn' => '%s %s 会话仍在进行中。', 
 		'validationErrors' => '验证错误。', 
-		'resetPasswordSuccess' => '重置密码流程已设置。请检查发送的电子邮件以完成操作。', 
+		'resetPasswordSuccess' => '如果该地址属于有效账户，您将收到一封包含密码重置说明的电子邮件。',
 		'resetPasswordSuccessNoEmail' => '重置密码流程已设置，但电子邮件未发送。请联系管理员。', 
 		'expiredCode' => 'OTP 验证码已过期。',
 		'wrongCode' => 'OTP 验证码错误。', 
+		'twoFactorEmailSendError' => '无法通过电子邮件发送验证码。请稍后重试。',
 	]
 ];

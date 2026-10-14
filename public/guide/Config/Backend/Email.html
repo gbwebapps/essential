@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="index, follow, all" />
+    <title>Config\Backend\Email | Essential API</title>
+
+            <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/doctum.css">
+        <link rel="stylesheet" type="text/css" href="../../fonts/doctum-font.css">
+        <script src="../../js/jquery-3.5.1.slim.min.js"></script>
+        <script async defer src="../../doctum.js"></script>
+        <script async defer src="../../js/bootstrap.min.js"></script>
+        <script async defer src="../../js/autocomplete.min.js"></script>
+        <meta name="MobileOptimized" content="width">
+        <meta name="HandheldFriendly" content="true">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+
+    </head>
+
+    <body id="class" data-name="class:Config_Backend_Email" data-root-path="../../" data-search-index-url="../../doctum-search.json">
+            <div id="content">
+        <div id="left-column">
+                <div id="control-panel">
+                <div class="search-bar hidden" id="search-progress-bar-container">
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" id="search-progress-bar"
+                    aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+            </div>
+        </div>
+        <form id="search-form" action="../../search.html">
+            <span class="icon icon-search"></span>
+            <input name="search"
+                   id="doctum-search-auto-complete"
+                   class="typeahead form-control"
+                   type="search"
+                   placeholder="Search"
+                   spellcheck="false"
+                   autocorrect="off"
+                   autocomplete="off"
+                   autocapitalize="off">
+            <div class="auto-complete-results" id="auto-complete-results"></div>
+        </form>
+    </div>
+
+                <div id="api-tree"></div>
+
+        </div>
+        <div id="right-column">
+                <nav id="site-nav" class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-elements">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="../../index.html">Essential API</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-elements">
+                <ul class="nav navbar-nav">
+                    <li><a href="../../classes.html">Classes</a></li>
+                    <li><a href="../../namespaces.html">Namespaces</a></li>
+                    <li><a href="../../interfaces.html">Interfaces</a></li>
+                    <li><a href="../../traits.html">Traits</a></li>
+                    <li><a href="../../doc-index.html">Index</a></li>
+                    <li><a href="../../search.html">Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+                        <div class="namespace-breadcrumbs">
+            <ol class="breadcrumb">
+                <li><span class="label label-default">class</span></li>
+                        <li><a href="../../Config.html">Config</a></li><li class="backslash">\</li><li><a href="../../Config/Backend.html">Backend</a></li><li class="backslash">\</li><li>Email</li>
+            </ol>
+        </div>
+                <div id="page-content">
+    <div class="page-header">
+        <h1>Email    
+            </h1>
+    </div>
+
+    
+    <p>        class
+    <strong>Email</strong>        extends <abbr title="CodeIgniter\Config\BaseConfig">BaseConfig</abbr>
+</p>
+
+        
+        
+    
+        
+
+            
+        
+    
+            <h2>Properties</h2>
+
+            <table class="table table-condensed">
+                    <tr>
+                <td class="type" id="property_fromEmail">
+                                                                                string
+                                                                                
+                                    </td>
+                <td>$fromEmail</td>
+                <td class="last"><p>Indirizzo email predefinito del mittente per le comunicazioni in uscita.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_fromName">
+                                                                                string
+                                                                                
+                                    </td>
+                <td>$fromName</td>
+                <td class="last"><p>Nome predefinito del mittente visualizzato nelle comunicazioni in uscita.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_recipients">
+                                                                                string
+                                                                                
+                                    </td>
+                <td>$recipients</td>
+                <td class="last"><p>Indirizzi email dei destinatari predefiniti (separati da virgola), se necessario.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_userAgent">
+                                                                                string
+                                                                                
+                                    </td>
+                <td>$userAgent</td>
+                <td class="last"><p>L'"user agent" inviato nelle intestazioni dell'email.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_protocol">
+                                                                                string
+                                                                                
+                                    </td>
+                <td>$protocol</td>
+                <td class="last"><p>Il protocollo di invio delle email: mail, sendmail, smtp.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_mailPath">
+                                                                                string
+                                                                                
+                                    </td>
+                <td>$mailPath</td>
+                <td class="last"><p>Il percorso del server per l'eseguibile Sendmail.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_SMTPHost">
+                                                                                string
+                                                                                
+                                    </td>
+                <td>$SMTPHost</td>
+                <td class="last"><p>Nome dell'host del server SMTP.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_SMTPAuthMethod">
+                                                                                string
+                                                                                
+                                    </td>
+                <td>$SMTPAuthMethod</td>
+                <td class="last"><p>Metodo di autenticazione SMTP da utilizzare: login, plain.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_SMTPUser">
+                                                                                string
+                                                                                
+                                    </td>
+                <td>$SMTPUser</td>
+                <td class="last"><p>Nome utente (Username) per l'autenticazione SMTP.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_SMTPPass">
+                                                                                string
+                                                                                
+                                    </td>
+                <td>$SMTPPass</td>
+                <td class="last"><p>Password per l'autenticazione SMTP.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_SMTPPort">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$SMTPPort</td>
+                <td class="last"><p>Porta di connessione al server SMTP.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_SMTPTimeout">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$SMTPTimeout</td>
+                <td class="last"><p>Tempo massimo di attesa (in secondi) per le connessioni SMTP.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_SMTPKeepAlive">
+                                                                                bool
+                                                                                
+                                    </td>
+                <td>$SMTPKeepAlive</td>
+                <td class="last"><p>Abilita le connessioni SMTP persistenti.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_SMTPCrypto">
+                                                                                string
+                                                                                
+                                    </td>
+                <td>$SMTPCrypto</td>
+                <td class="last"><p>Crittografia SMTP.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_wordWrap">
+                                                                                bool
+                                                                                
+                                    </td>
+                <td>$wordWrap</td>
+                <td class="last"><p>Abilita l'a capo automatico delle parole (word-wrap).</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_wrapChars">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$wrapChars</td>
+                <td class="last"><p>Numero di caratteri a cui forzare l'a capo automatico.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_mailType">
+                                                                                string
+                                                                                
+                                    </td>
+                <td>$mailType</td>
+                <td class="last"><p>Tipo di formato per le email, può essere 'text' (testo normale) o 'html'.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_charset">
+                                                                                string
+                                                                                
+                                    </td>
+                <td>$charset</td>
+                <td class="last"><p>Set di caratteri utilizzato (utf-8, iso-8859-1, ecc.).</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_validate">
+                                                                                bool
+                                                                                
+                                    </td>
+                <td>$validate</td>
+                <td class="last"><p>Determina se convalidare formalmente l'indirizzo email prima dell'invio.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_priority">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$priority</td>
+                <td class="last"><p>Priorità dell'email. 1 = massima, 5 = minima, 3 = normale.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_CRLF">
+                                                                                string
+                                                                                
+                                    </td>
+                <td>$CRLF</td>
+                <td class="last"><p>Carattere di ritorno a capo. (Usa "\r\n" per rispettare lo standard RFC 822).</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_newline">
+                                                                                string
+                                                                                
+                                    </td>
+                <td>$newline</td>
+                <td class="last"><p>Carattere di nuova riga. (Usa "\r\n" per rispettare lo standard RFC 822).</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_BCCBatchMode">
+                                                                                bool
+                                                                                
+                                    </td>
+                <td>$BCCBatchMode</td>
+                <td class="last"><p>Abilita la modalità a blocchi (batch) per i destinatari in copia nascosta (BCC).</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_BCCBatchSize">
+                                                                                int
+                                                                                
+                                    </td>
+                <td>$BCCBatchSize</td>
+                <td class="last"><p>Numero di email incluse in ogni blocco BCC.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_DSN">
+                                                                                bool
+                                                                                
+                                    </td>
+                <td>$DSN</td>
+                <td class="last"><p>Abilita i messaggi di notifica di stato della consegna (DSN) dal server.</p></td>
+                <td></td>
+            </tr>
+            </table>
+
+    
+    
+</div><div id="footer">
+        Generated by <a href="https://github.com/code-lts/doctum">Doctum, a API Documentation generator and fork of Sami</a>.</div></div>
+    </div>
+    </body>
+
+</html>

@@ -12,6 +12,7 @@ const actions = {
         const auditsManager = new ListManager({
             controller: 'audits',
             url: urlbase + 'backend/audits',
+            rootId: 'audits-list',
             containerId: 'index-audits-container',
             searchFields: ['username', 'action', 'section', 'details'],
             searchDates: ['created_at']
@@ -19,12 +20,12 @@ const actions = {
         auditsManager.init();
 
         /* 2. Attiviamo Flatpickr sui wrapper (leggerà i valori appena inseriti dal manager) */
-        const { pickerFrom, pickerTo } = initRangeDatePicker('#wrapper-audits-created_at-from', '#wrapper-audits-created_at-to');
+        initRangeDatePicker('#wrapper-audits-created_at-from', '#wrapper-audits-created_at-to');
 
         const exportManager = new ExportCsvManager({ controller: 'audits' });
         exportManager.init();
 
-        initOffcanvasAutoClose('actionsOffcanvas');
+        initOffcanvasAutoClose('audits-actionsOffcanvas');
 
     },
 };

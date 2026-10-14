@@ -1,0 +1,3189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="index, follow, all" />
+    <title>App\Models\Backend\AdminsModel | Essential API</title>
+
+            <link rel="stylesheet" type="text/css" href="../../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../../css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="../../../css/doctum.css">
+        <link rel="stylesheet" type="text/css" href="../../../fonts/doctum-font.css">
+        <script src="../../../js/jquery-3.5.1.slim.min.js"></script>
+        <script async defer src="../../../doctum.js"></script>
+        <script async defer src="../../../js/bootstrap.min.js"></script>
+        <script async defer src="../../../js/autocomplete.min.js"></script>
+        <meta name="MobileOptimized" content="width">
+        <meta name="HandheldFriendly" content="true">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+
+    </head>
+
+    <body id="class" data-name="class:App_Models_Backend_AdminsModel" data-root-path="../../../" data-search-index-url="../../../doctum-search.json">
+            <div id="content">
+        <div id="left-column">
+                <div id="control-panel">
+                <div class="search-bar hidden" id="search-progress-bar-container">
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" id="search-progress-bar"
+                    aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+            </div>
+        </div>
+        <form id="search-form" action="../../../search.html">
+            <span class="icon icon-search"></span>
+            <input name="search"
+                   id="doctum-search-auto-complete"
+                   class="typeahead form-control"
+                   type="search"
+                   placeholder="Search"
+                   spellcheck="false"
+                   autocorrect="off"
+                   autocomplete="off"
+                   autocapitalize="off">
+            <div class="auto-complete-results" id="auto-complete-results"></div>
+        </form>
+    </div>
+
+                <div id="api-tree"></div>
+
+        </div>
+        <div id="right-column">
+                <nav id="site-nav" class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-elements">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="../../../index.html">Essential API</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-elements">
+                <ul class="nav navbar-nav">
+                    <li><a href="../../../classes.html">Classes</a></li>
+                    <li><a href="../../../namespaces.html">Namespaces</a></li>
+                    <li><a href="../../../interfaces.html">Interfaces</a></li>
+                    <li><a href="../../../traits.html">Traits</a></li>
+                    <li><a href="../../../doc-index.html">Index</a></li>
+                    <li><a href="../../../search.html">Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+                        <div class="namespace-breadcrumbs">
+            <ol class="breadcrumb">
+                <li><span class="label label-default">class</span></li>
+                        <li><a href="../../../App.html">App</a></li><li class="backslash">\</li><li><a href="../../../App/Models.html">Models</a></li><li class="backslash">\</li><li><a href="../../../App/Models/Backend.html">Backend</a></li><li class="backslash">\</li><li>AdminsModel</li>
+            </ol>
+        </div>
+                <div id="page-content">
+    <div class="page-header">
+        <h1>AdminsModel    
+            </h1>
+    </div>
+
+    
+    <p>        class
+    <strong>AdminsModel</strong>        extends <a href="../../../App/Models/Backend/BackendModel.html"><abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a>        implements        <a href="../../../App/Interfaces/ImportValidationInterface.html"><abbr title="App\Interfaces\ImportValidationInterface">ImportValidationInterface</abbr></a>, <a href="../../../App/Interfaces/ExportValidationInterface.html"><abbr title="App\Interfaces\ExportValidationInterface">ExportValidationInterface</abbr></a>
+</p>
+
+        
+        
+    
+        
+
+            <div class="description">
+            <p><p>Modello principale per la gestione degli Amministratori di sistema.</p></p>            <p><p>Estende il BackendModel. Incapsula la business logic, le query e le transazioni CRUD
+per l'entità "admins". Gestisce operazioni critiche come la creazione degli utenti,
+l'assegnazione ai gruppi, l'override dei permessi (eccezioni), i blocchi di sicurezza
+(es. protezione del Superadmin), le sospensioni temporanee e le eliminazioni (sia fisiche che logiche).</p></p>        </div>
+            
+        
+    
+            <h2>Properties</h2>
+
+            <table class="table table-condensed">
+                    <tr>
+                <td class="type" id="property_db">
+                                        protected                                        <abbr title="CodeIgniter\Database\BaseConnection">BaseConnection</abbr>
+                                                                                
+                                    </td>
+                <td>$db</td>
+                <td class="last"><p>Istanza condivisa della connessione primaria al database.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/BaseModel.html#property_db">
+<abbr title="App\Models\BaseModel">BaseModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_module">
+                                        protected                                        string
+                                                                                
+                                    </td>
+                <td>$module</td>
+                <td class="last"><p>Nome identificativo del modulo (tabella principale 'admins') usato dal motore genitore.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_hasSoftDelete">
+                                        protected                                        bool
+                                                                                
+                                    </td>
+                <td>$hasSoftDelete</td>
+                <td class="last"><p>Flag strutturale che abilita la gestione del "Cestino" (Soft Delete).</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_getDataQuery">
+                                        protected                                        string
+                                                                                
+                                    </td>
+                <td>$getDataQuery</td>
+                <td class="last"><p>Query principale per il caricamento della griglia utenti.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_getUUIDQuery">
+                                        protected                                        string
+                                                                                
+                                    </td>
+                <td>$getUUIDQuery</td>
+                <td class="last"><p>Query utilizzata per estrarre il profilo completo di un singolo amministratore tramite UUID.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_getNumRowsQuery">
+                                        protected                                        string
+                                                                                
+                                    </td>
+                <td>$getNumRowsQuery</td>
+                <td class="last"><p>Query SQL essenziale per calcolare il numero totale degli amministratori,
+necessaria al frontend per creare i bottoni della paginazione.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_defaultColumn">
+                                        protected                                        string|null
+                                                                                
+                                    </td>
+                <td>$defaultColumn</td>
+                <td class="last"><p>La colonna di default a cui ricorrere per l'ordinamento (ORDER BY) in assenza di direttive del client.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_defaultColumn">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_defaultOrder">
+                                        protected                                        string|null
+                                                                                
+                                    </td>
+                <td>$defaultOrder</td>
+                <td class="last"><p>L'ordinamento di default a cui ricorrere per l'ordinamento in assenza di direttive del client.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_defaultOrder">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_toCompare">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$toCompare</td>
+                <td class="last"><p>Elenco dei campi anagrafici monitorati per rilevare cambiamenti effettivi
+prima di lanciare una query di UPDATE a database.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_showAllAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$showAllAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti durante la richiesta di visualizzazione dell'elenco amministratori.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_showAllSearchAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$showAllSearchAllowedFields</td>
+                <td class="last"><p>Whitelist delle colonne anagrafiche e di contatto su cui è attiva la ricerca testuale (LIKE).</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_showAllSearchAllowedDates">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$showAllSearchAllowedDates</td>
+                <td class="last"><p>Whitelist delle colonne temporali su cui è possibile effettuare filtri per intervallo di date (Da - A).</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_addAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$addAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti per la creazione di un nuovo amministratore.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_editAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$editAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti per la modifica di un amministratore esistente.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_delAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$delAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti per l'eliminazione (Soft Delete) di un amministratore.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_changeStatusAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$changeStatusAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti per l'operazione di cambio stato rapido (es. da attivo a sospeso).</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_allowedOrderColumns">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$allowedOrderColumns</td>
+                <td class="last"><p>Array combinato che indica quali colonne sono esposte all'ordinamento
+e alla ricerca testuale o temporale, validando rigorosamente l'input dell'operatore.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_resetPasswordAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$resetPasswordAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti per forzare il ripristino della password dal pannello di controllo.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_changePermissionAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$changePermissionAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti per l'aggiornamento asincrono di un singolo permesso (toggle).</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_deleteTokenAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$deleteTokenAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti per invalidare una sessione o un token di accesso remoto.</p></td>
+                <td></td>
+            </tr>
+            </table>
+
+    
+            <h2>Methods</h2>
+
+            <div class="container-fluid underlined">
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8">
+                    <a href="#method___construct">__construct</a>()
+        
+                                            <p><p>Costruttore principale del modello.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/BaseModel.html#method___construct">
+<abbr title="App\Models\BaseModel">BaseModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_initModel">initModel</a>()
+        
+                                            <p><p>Hook nativo di CodeIgniter 4.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getData">getData</a>(array $posts)
+        
+                                            <p><p>Motore principale per l'estrazione paginata, ordinata e filtrata dei dataset (DataTables e Liste).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_getData">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    int
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getNumRows">getNumRows</a>(array $paramsFilter)
+        
+                                            <p><p>Calcola in modo chirurgico il numero totale dei record che soddisfano la query corrente.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_getNumRows">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_buildFilters">buildFilters</a>(array $searchFields, array $params)
+        
+                                            <p><p>Costruisce in modo dinamico i costrutti logici SQL (LIKE) per la ricerca testuale (Full Search).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_buildFilters">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_buildDateFilters">buildDateFilters</a>(array $searchDates, array $params)
+        
+                                            <p><p>Genera i costrutti logici operazionali (&gt;= e &lt;=) per il partizionamento e filtraggio temporale.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_buildDateFilters">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_buildTrashFilter">buildTrashFilter</a>(string $filter, string $table, bool $hasSoftDelete = true)
+        
+                                            <p><p>Implementa la logica a scudo (Shield) per l'isolamento dei record sottoposti a cancellazione logica.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_buildTrashFilter">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getByUUID">getByUUID</a>(string $uuid)
+        
+                                            <p><p>Recupera un singolo record dal database avvalendosi dell'Identificatore Univoco Universale (UUID).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_getByUUID">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_hasDataChanged">hasDataChanged</a>(array $posts, object $original)
+        
+                                            <p><p>Esegue una validazione euristica delle differenze per l'ottimizzazione degli UPDATE transazionali.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_hasDataChanged">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_insertImages">insertImages</a>(array $filenames, string $uuid, string $entity, string $action = &#039;add&#039;)
+        
+                                            <p><p>Orchestratore logico per l'inserimento massivo (Bulk Insert) delle dipendenze fotografiche (Images).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_insertImages">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_rrmdir">rrmdir</a>(string $dir)
+        
+                                            <p><p>Algoritmo File System distruttivo per la rimozione ricorsiva di cartelle ad albero (RRMDIR).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_rrmdir">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_generateUUID">generateUUID</a>()
+        
+                                            <p><p>Fabbrica crittograficamente sicura per la generazione di Identificatori Univoci Universali (UUID versione 4).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_generateUUID">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_checkAllowedFields">checkAllowedFields</a>(array $posts, array $allowedFields)
+        
+                                            <p><p>Scudo Architetturale Anti Mass-Assignment per la disinfezione dell'input HTTP POST.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_checkAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <a href="../../../App/Libraries/Backend/UploadClass.html"><abbr title="App\Libraries\Backend\UploadClass">UploadClass</abbr></a>
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getUploadService">getUploadService</a>()
+        
+                                            <p><p>Restituisce l'istanza del servizio di upload.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_getUploadService">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_logActivitySafely">logActivitySafely</a>(string $action, string $details)
+        
+                                            <p><p>Registra l'audit senza alterare l'esito di una transazione già consolidata.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_cleanupUploadedImages">cleanupUploadedImages</a>(array $filenames, string $uuid)
+        
+                                            <p><p>Rimuove i file creati durante un upload che non ha raggiunto il commit.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_showAllValidationRules">showAllValidationRules</a>()
+        
+                                            <p><p>Regole di validazione per la griglia dati (paginazione, ordinamento e filtro cestino).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_showAllSearchValidationRules">showAllSearchValidationRules</a>()
+        
+                                            <p><p>Regole di validazione per i filtri di ricerca degli amministratori.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_addValidationRules">addValidationRules</a>()
+        
+                                            <p><p>Regole di validazione per la creazione di un nuovo Amministratore (Add).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_editValidationRules">editValidationRules</a>(array $posts)
+        
+                                            <p><p>Regole di validazione per la modifica di un Amministratore esistente (Edit).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_importAllowedFields">importAllowedFields</a>()
+        
+                                            <p><p>Whitelist dei campi fisici importabili dal CRUD amministratori.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_exportAllowedFields">exportAllowedFields</a>()
+        
+                                            <p><p>Whitelist dei campi esportabili dal CRUD amministratori.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_importAddValidationRules">importAddValidationRules</a>()
+        
+                                            <p><p>Regole applicative dedicate all'inserimento di amministratori tramite ImportModel.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_importEditValidationRules">importEditValidationRules</a>(array $data)
+        
+                                            <p><p>Regole applicative dedicate alla modifica di amministratori tramite ImportModel.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_importBusinessValidationErrors">importBusinessValidationErrors</a>(string $action, array $data, array|null $currentRow)
+        
+                                            <p><p>Vincoli di dominio aggiuntivi per l'import CRUD degli amministratori.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_changeGroupValidationRules">changeGroupValidationRules</a>()
+        
+                                            <p><p>Regole di validazione per il cambio rapido del Gruppo (Ruolo) di un utente.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_delValidationRules">delValidationRules</a>()
+        
+                                            <p><p>Regole di validazione per le richieste di eliminazione (Soft/Hard Delete).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_resetPasswordValidationRules">resetPasswordValidationRules</a>()
+        
+                                            <p><p>Regole di validazione per la richiesta di Reset Password.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_changeStatusValidationRules">changeStatusValidationRules</a>()
+        
+                                            <p><p>Regole di validazione per il cambio di stato (Attivo/Sospeso).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getTokensValidationRules">getTokensValidationRules</a>()
+        
+                                            <p><p>Regole di validazione per la richiesta di estrazione dei token di sicurezza (es. sessioni).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_generalDataValidationRules">generalDataValidationRules</a>()
+        
+                                            <p><p>Regole di validazione generiche per l'estrazione parziale dei dati anagrafici (General Data).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_metaDataValidationRules">metaDataValidationRules</a>()
+        
+                                            <p><p>Regole di validazione per l'estrazione dei metadati di sistema dell'utente (Metadata).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getPermissionsValidationRules">getPermissionsValidationRules</a>()
+        
+                                            <p><p>Regole di validazione per l'estrazione della matrice dei permessi (nativi ed eccezioni).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_deleteTokenValidationRules">deleteTokenValidationRules</a>()
+        
+                                            <p><p>Regole di validazione per la revoca forzata di un token (es. disconnessione remota).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_changePermissionValidationRules">changePermissionValidationRules</a>()
+        
+                                            <p><p>Regole di validazione per l'impostazione o la rimozione di una singola eccezione di permesso (Switch).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getPermissions">getPermissions</a>(string $uuid)
+        
+                                            <p><p>Restituisce i permessi (eccezioni) assegnati in modo diretto allo specifico amministratore.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getTokens">getTokens</a>(string $uuid)
+        
+                                            <p><p>Estrae lo storico dei token (login, sessioni, attivazioni) attivi o scaduti dell'utente.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getAttempts">getAttempts</a>(string $uuid)
+        
+                                            <p><p>Estrae lo storico dei log relativi ai tentativi di accesso standard.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getTwoFaAttempts">getTwoFaAttempts</a>(string $uuid)
+        
+                                            <p><p>Estrae lo storico dei log relativi ai tentativi di accesso protetti da 2FA (Autenticazione a Due Fattori).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getTwoFaCodes">getTwoFaCodes</a>(string $uuid)
+        
+                                            <p><p>Estrae i codici di backup (recovery codes) 2FA associati all'utente.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    object|null
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getTwoFa">getTwoFa</a>(string $uuid)
+        
+                                            <p><p>Recupera l'impostazione principale e il metodo 2FA attualmente configurato per l'utente.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getGroups">getGroups</a>()
+        
+                                            <p><p>Recupera l'elenco di tutti i Gruppi (Ruoli) amministrativi disponibili a sistema.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getGroupPermissions">getGroupPermissions</a>(int $groupId)
+        
+                                            <p><p>Estrae i permessi base associati a un Gruppo convertendoli in un array piatto di stringhe.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getAdminExceptions">getAdminExceptions</a>(string $uuid)
+        
+                                            <p><p>Recupera le eccezioni di permesso dell'utente (override) sotto forma di array associativo.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_add">add</a>(array $posts, <abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr> $request)
+        
+                                            <p><p>Crea un nuovo Amministratore all'interno del sistema (Transazionale).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_edit">edit</a>(array $posts)
+        
+                                            <p><p>Aggiorna i dati anagrafici e i permessi di un Amministratore esistente (Transazionale).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_hasAdminChanged">hasAdminChanged</a>(array $posts, object $original)
+        
+                                            <p><p>Verifica in modo euristico se l'anagrafica o i permessi dell'utente hanno subito reali mutazioni.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_hardDelete">hardDelete</a>(array $posts)
+        
+                                            <p><p>Elimina definitivamente e irrevocabilmente l'Amministratore dal sistema (Transazionale).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_softDelete">softDelete</a>(array $posts)
+        
+                                            <p><p>Cestina logicamente l'Amministratore sospendendone istantaneamente gli accessi (Transazionale).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_restoreDelete">restoreDelete</a>(array $posts)
+        
+                                            <p><p>Ripristina un Amministratore precedentemente spostato nel cestino (Transazionale).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_resetPassword">resetPassword</a>(array $posts, <abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr> $request)
+        
+                                            <p><p>Avvia la procedura per forzare il recupero credenziali dell'Amministratore (Transazionale).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_changeStatus">changeStatus</a>(array $posts)
+        
+                                            <p><p>Alterna lo stato di attivazione dell'Amministratore (Attivo &lt;-&gt; Sospeso).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_changePermission">changePermission</a>(array $posts)
+        
+                                            <p><p>Abilita o revoca un singolo permesso in modalità "switch" direttamente dalla scheda utente (Transazionale).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_deleteToken">deleteToken</a>(array $posts)
+        
+                                            <p><p>Forza la revoca e l'eliminazione di un singolo token di sessione dell'Amministratore.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_deletePermissions">deletePermissions</a>(string $admin_uuid)
+        
+                                            <p><p>Metodo di utilità per la rimozione totale di tutte le eccezioni di permesso associate a un utente.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+            </div>
+
+
+        <h2>Details</h2>
+
+            <div id="method-details">
+                    <div class="method-item">
+                    <h3 id="method___construct">
+        <div class="location">in <a href="../../../App/Models/BaseModel.html#method___construct">
+<abbr title="App\Models\BaseModel">BaseModel</abbr></a> at line 34</div>
+        <code>                    
+    <strong>__construct</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Costruttore principale del modello.</p></p>                <p><p>Al momento dell'istanziazione di qualsiasi classe figlia, innesca automaticamente
+il metodo di inizializzazione interno per predisporre le risorse di base (come il DB).</p></p>        
+        </div>
+        <div class="tags">
+            
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_initModel">
+        <div class="location">at line 181</div>
+        <code>            protected        void
+    <strong>initModel</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Hook nativo di CodeIgniter 4.</p></p>                <p><p>Inizializza il modello richiamando il costruttore della classe padre, predisponendo
+le connessioni al DB e gli helper condivisi.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getData">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_getData">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 159</div>
+        <code>                    array
+    <strong>getData</strong>(array $posts)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Motore principale per l'estrazione paginata, ordinata e filtrata dei dataset (DataTables e Liste).</p></p>                <p><p>Svolge il lavoro pesante incapsulando: sanitizzazione del payload tramite Whitelist, validazione
+rigorosa delle colonne di ordinamento e calcolo degli offset matematici (LIMIT/OFFSET).
+Compila dinamicamente la stringa SQL finale iniettando costrutti protetti per il filtro Cestino,
+i parametri di ricerca testuale (LIKE) e i range di date. Interroga infine getNumRows() passando
+i filtri esatti per garantire la perfetta coerenza totale/risultati.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Il payload POST strutturato proveniente dall'interfaccia client</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Struttura standardizzata comprendente l'esito (result), il blocco record, i dati di paginazione e l'offset ultimo</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getNumRows">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_getNumRows">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 228</div>
+        <code>            protected        int
+    <strong>getNumRows</strong>(array $paramsFilter)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Calcola in modo chirurgico il numero totale dei record che soddisfano la query corrente.</p></p>                <p><p>Metodo ancillare, rigorosamente accoppiato a getData(). Elabora l'identico set di parametri e filtri
+($paramsFilter) sfruttando query preparate, garantendo al motore di paginazione frontend
+di conoscere l'esatto volume di dati indipendentemente dai limiti della singola "pagina" SQL.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$paramsFilter</td>
+                <td><p>Array contenente i flag e i valori validati (trash_filter, searchFields, searchDates)</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td><p>Il conteggio intero dei record validi estratti dal database</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_buildFilters">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_buildFilters">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 259</div>
+        <code>            protected        string
+    <strong>buildFilters</strong>(array $searchFields, array $params)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Costruisce in modo dinamico i costrutti logici SQL (LIKE) per la ricerca testuale (Full Search).</p></p>                <p><p>Processa l'array di ricerca confrontando ogni chiave con la whitelist dedicata ($showAllSearchAllowedFields).
+Se il campo è autorizzato, concatena la stringa SQL e appende il valore mascherato (%) per riferimento
+nell'array dei parametri ($params), delegando la protezione contro l'Injection al driver PDO.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$searchFields</td>
+                <td><p>Valori di ricerca estratti dal payload del client</p></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$params</td>
+                <td><p>Riferimento all'array PDO per il data binding</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>Porzione di query SQL formattata (es. " AND table.column LIKE ?")</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_buildDateFilters">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_buildDateFilters">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 284</div>
+        <code>            protected        string
+    <strong>buildDateFilters</strong>(array $searchDates, array $params)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Genera i costrutti logici operazionali (&gt;= e &lt;=) per il partizionamento e filtraggio temporale.</p></p>                <p><p>Basandosi sulla whitelist delle colonne Data ammesse ($showAllSearchAllowedDates), intercetta
+convenzionalmente i suffissi di input '-from' e '-to'. Gestisce range temporali parziali o totali,
+accodando i valori referenziati all'array di bind per preservare l'integrità strutturale dell'interrogazione.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$searchDates</td>
+                <td><p>Valori temporali (date/datetime) estratti dal payload del client</p></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$params</td>
+                <td><p>Riferimento all'array PDO per il data binding</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>Porzione di query SQL formattata (es. " AND table.date_col &gt;= ? AND table.date_col &lt;= ?")</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_buildTrashFilter">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_buildTrashFilter">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 320</div>
+        <code>            protected        string
+    <strong>buildTrashFilter</strong>(string $filter, string $table, bool $hasSoftDelete = true)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Implementa la logica a scudo (Shield) per l'isolamento dei record sottoposti a cancellazione logica.</p></p>                <p><p>La funzione analizza lo stato richiesto, rimuove proattivamente i caratteri anomali dal nome tabella via Regex
+per impedire injection sulla stringa. Include un blocco di salvaguardia: se il modulo non possiede
+un cestino logico ($hasSoftDelete = false) restituisce una stringa vuota, prevenendo eccezioni SQL per colonne inesistenti.
+Il comportamento di fallback obbligatorio (active) sigilla l'esposizione dei record cancellati.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$filter</td>
+                <td><p>Lo stato di visibilità richiesto (active, trashed, all)</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$table</td>
+                <td><p>Il nome stringa della tabella di riferimento (sanitizzato internamente)</p></td>
+            </tr>
+                    <tr>
+                <td>bool</td>
+                <td>$hasSoftDelete</td>
+                <td><p>Flag strutturale sulla persistenza logica (default true)</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>Clausola condizionale SQL mirata (es. " AND table.deleted_at IS NULL") o vuota</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getByUUID">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_getByUUID">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 352</div>
+        <code>                    array
+    <strong>getByUUID</strong>(string $uuid)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Recupera un singolo record dal database avvalendosi dell'Identificatore Univoco Universale (UUID).</p></p>                <p><p>Sfrutta la query nativa fornita dal modulo figlio (getUUIDQuery), avvolgendo l'interrogazione in
+un blocco Try/Catch per catturare silenziando disallineamenti gravi a database. Restituisce una struttura
+di array fissa e immutabile, garantendo al BackendController un pattern di risposta standard per l'elaborazione.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$uuid</td>
+                <td><p>La stringa alfanumerica di 36 caratteri (Identificatore)</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Array associativo contenente un booleano (result) e l'oggetto dati (row) in caso di query fortunata</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_hasDataChanged">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_hasDataChanged">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 383</div>
+        <code>            protected        bool
+    <strong>hasDataChanged</strong>(array $posts, object $original)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Esegue una validazione euristica delle differenze per l'ottimizzazione degli UPDATE transazionali.</p></p>                <p><p>Effettua un'analisi comparativa tra il payload POST in ingresso e l'oggetto originario prelevato dal DB.
+Castando temporaneamente entrambi i poli di confronto a stringa, neutralizza le divergenze puramente sintattiche
+tra NULL e stringhe vuote. Effettua uno scanning secondario sulle chiavi di tipo 'images' per rilevare
+l'esistenza di operazioni multimediali in pendenza, ritornando true al primo differenziale rilevato per limitare il dispendio CPU.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dataset sanificato sottomesso via HTTP POST</p></td>
+            </tr>
+                    <tr>
+                <td>object</td>
+                <td>$original</td>
+                <td><p>L'oggetto rappresentativo dell'istanza fisica residente nel database</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td><p>True se è emersa un'effettiva mutazione logica (testo o file immessi), false viceversa</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_insertImages">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_insertImages">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 429</div>
+        <code>            protected        bool
+    <strong>insertImages</strong>(array $filenames, string $uuid, string $entity, string $action = &#039;add&#039;)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Orchestratore logico per l'inserimento massivo (Bulk Insert) delle dipendenze fotografiche (Images).</p></p>                <p><p>Metodo ad elevata efficienza che aggrega tuple in una singola query preparata, minimizzando le latenze I/O con il database.
+Analizza il contesto operativo ('add' o 'edit') allocando in modo automatico l'attributo 'is_cover' (copertina)
+alla prima immagine dell'array iterato, qualora un query lookup preventivo certifichi l'assenza di copertine attuali.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$filenames</td>
+                <td><p>Array monolitico contenente le stringhe alfanumeriche dei file già consolidati su disco</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$uuid</td>
+                <td><p>L'identificatore univoco del record padrone (proprietario della galleria)</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$entity</td>
+                <td><p>Lo slug/nome dell'entità proprietaria associata (es. 'admins')</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$action</td>
+                <td><p>Parametro comportamentale ('add' per prima allocazione, 'edit' per accodamento)</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td><p>True se tutte le immagini sono state registrate, false altrimenti</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_rrmdir">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_rrmdir">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 485</div>
+        <code>            protected        void
+    <strong>rrmdir</strong>(string $dir)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Algoritmo File System distruttivo per la rimozione ricorsiva di cartelle ad albero (RRMDIR).</p></p>                <p><p>Implementazione a basso livello progettata per disintegrare un'intera directory e le sue foglie
+(es. al momento dell'eliminazione fisica di un utente o entità). Scandisce gli inode e si richiama ricorsivamente.
+Fa uso intensivo del soppressore d'errore <code>@</code> di PHP per ammortizzare eccezioni fatali derivanti
+da file in stato "Locked" (OS I/O block) o transitorie indisponibilità di permessi CHMOD.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$dir</td>
+                <td><p>Percorso assoluto root della directory bersaglio sul server</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_generateUUID">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_generateUUID">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 514</div>
+        <code>            protected        string
+    <strong>generateUUID</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Fabbrica crittograficamente sicura per la generazione di Identificatori Univoci Universali (UUID versione 4).</p></p>                <p><p>Ricorre all'API CSPRNG nativa di PHP (random_bytes) per produrre un pool entropico a 16 byte.
+Modifica bit a bit i metadati (AND/OR logici) per conformare la sequenza al rigoroso standard RFC 4122 (versione 4, variante).
+Converte infine il buffer binario in esadecimale stringa con trattini (hyphen).</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>Stringa formattata (es. 'b5e5a210-9e63-4a1c-99a3-5c8e3d304ec8')</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_checkAllowedFields">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_checkAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 537</div>
+        <code>            protected        array
+    <strong>checkAllowedFields</strong>(array $posts, array $allowedFields)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Scudo Architetturale Anti Mass-Assignment per la disinfezione dell'input HTTP POST.</p></p>                <p><p>Filtra e decostruisce l'array dei parametri in ingresso basandosi severamente su una Whitelist fornita come matrice.
+Utilizzando in_array in modalità strict, sgancia ed esegue l'unset su qualsiasi chiave POST arbitraria o malevola
+introdotta per forzare alterazioni su colonne sensibili del database (es. iniezione del campo superadmin o permessi).</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Array grezzo o parzialmente manipolato prelevato dalla request HTTP</p></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$allowedFields</td>
+                <td><p>Array monolitico (Whitelist) dei nodi (chiavi) consentite per il ciclo vitale attuale</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>L'array bonificato e compattato, pronto per i layer Data Access o Validazione</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getUploadService">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_getUploadService">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 558</div>
+        <code>            protected        <a href="../../../App/Libraries/Backend/UploadClass.html"><abbr title="App\Libraries\Backend\UploadClass">UploadClass</abbr></a>
+    <strong>getUploadService</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Restituisce l'istanza del servizio di upload.</p></p>                <p><p>Metodo wrapper utilizzato per incapsulare l'istanziazione diretta
+della libreria, facilitando l'iniezione delle dipendenze (Mocking)
+durante l'esecuzione dei test unitari tramite il pattern Extract Method.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><a href="../../../App/Libraries/Backend/UploadClass.html"><abbr title="App\Libraries\Backend\UploadClass">UploadClass</abbr></a></td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_logActivitySafely">
+        <div class="location">at line 192</div>
+        <code>            protected        void
+    <strong>logActivitySafely</strong>(string $action, string $details)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Registra l'audit senza alterare l'esito di una transazione già consolidata.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$action</td>
+                <td><p>Codice dell'azione eseguita</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$details</td>
+                <td><p>Dettaglio descrittivo dell'operazione</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_cleanupUploadedImages">
+        <div class="location">at line 214</div>
+        <code>            protected        void
+    <strong>cleanupUploadedImages</strong>(array $filenames, string $uuid)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Rimuove i file creati durante un upload che non ha raggiunto il commit.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$filenames</td>
+                <td><p>Nomi dei file caricati nella transazione corrente</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$uuid</td>
+                <td><p>Identificativo del proprietario delle immagini</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_showAllValidationRules">
+        <div class="location">at line 226</div>
+        <code>                    array
+    <strong>showAllValidationRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per la griglia dati (paginazione, ordinamento e filtro cestino).</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole native per i parametri strutturali</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_showAllSearchValidationRules">
+        <div class="location">at line 255</div>
+        <code>                    array
+    <strong>showAllSearchValidationRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per i filtri di ricerca degli amministratori.</p></p>                <p><p>Verifica che i campi di testo (nome, cognome, email, telefono) e le date (Da/A)
+rispettino pattern sicuri, prevenendo injection direttamente sui parametri di ricerca.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole per i filtri</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_addValidationRules">
+        <div class="location">at line 301</div>
+        <code>                    array
+    <strong>addValidationRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per la creazione di un nuovo Amministratore (Add).</p></p>                <p><p>Verifica la correttezza formale dei dati anagrafici, impone l'univocità assoluta dell'indirizzo email
+(<code>is_unique[admins.email]</code>) e valida l'ID del gruppo assegnato. Include anche il controllo sulle immagini caricate.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole strutturate</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_editValidationRules">
+        <div class="location">at line 352</div>
+        <code>                    array
+    <strong>editValidationRules</strong>(array $posts)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per la modifica di un Amministratore esistente (Edit).</p></p>                <p><p>Estrae dinamicamente la lista dei permessi validi per popolare la regola <code>in_list</code>.
+Aggiorna i controlli di univocità (UUID e Email) configurandoli in modo da ignorare il record in corso di modifica,
+evitando così falsi conflitti con i dati dell'utente stesso.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>I dati inviati dal form (serve a recuperare l'UUID corrente)</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole strutturate</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_importAllowedFields">
+        <div class="location">at line 428</div>
+        <code>                    array
+    <strong>importAllowedFields</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Whitelist dei campi fisici importabili dal CRUD amministratori.</p></p>                <p><p>Esclude esplicitamente colonne di sicurezza e di stato gestite dal backend.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_exportAllowedFields">
+        <div class="location">at line 438</div>
+        <code>                    array
+    <strong>exportAllowedFields</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Whitelist dei campi esportabili dal CRUD amministratori.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Nomi fisici delle colonne esportabili dal CRUD.</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_importAddValidationRules">
+        <div class="location">at line 452</div>
+        <code>                    array
+    <strong>importAddValidationRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole applicative dedicate all'inserimento di amministratori tramite ImportModel.</p></p>                <p><p>Restano separate dalle regole del form CRUD perché l'importazione non gestisce
+immagini, permessi o altri dati di interfaccia. Le regole vengono sovrapposte
+al fallback strutturale generato dallo schema della tabella.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole di validazione nel formato supportato da CodeIgniter</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_importEditValidationRules">
+        <div class="location">at line 503</div>
+        <code>                    array
+    <strong>importEditValidationRules</strong>(array $data)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole applicative dedicate alla modifica di amministratori tramite ImportModel.</p></p>                <p><p>ImportModel applica queste regole solo alle colonne presenti nel CSV, permettendo
+aggiornamenti parziali. L'UUID resta il riferimento del record e le regole specifiche
+sostituiscono, per i campi interessati, il fallback derivato dallo schema SQL.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$data</td>
+                <td><p>Dati di contesto del record, inclusa la primary key quando disponibile</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole di validazione nel formato supportato da CodeIgniter</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_importBusinessValidationErrors">
+        <div class="location">at line 552</div>
+        <code>                    array
+    <strong>importBusinessValidationErrors</strong>(string $action, array $data, array|null $currentRow)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Vincoli di dominio aggiuntivi per l'import CRUD degli amministratori.</p></p>                <p><p>Le normali operazioni di modifica proteggono superadmin e record cestinati; l'importazione
+deve mantenere gli stessi invarianti anche se scrive tramite il motore generico.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$action</td>
+                <td><p>insert oppure update</p></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$data</td>
+                <td><p>Dati normalizzati provenienti dal CSV</p></td>
+            </tr>
+                    <tr>
+                <td>array|null</td>
+                <td>$currentRow</td>
+                <td><p>Record corrente del database per gli update, null per gli insert</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Errori di business; array vuoto se l'operazione è consentita</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_changeGroupValidationRules">
+        <div class="location">at line 574</div>
+        <code>                    array
+    <strong>changeGroupValidationRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per il cambio rapido del Gruppo (Ruolo) di un utente.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole per uuid e group_id</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_delValidationRules">
+        <div class="location">at line 593</div>
+        <code>                    array
+    <strong>delValidationRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per le richieste di eliminazione (Soft/Hard Delete).</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole per il campo uuid</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_resetPasswordValidationRules">
+        <div class="location">at line 612</div>
+        <code>                    array
+    <strong>resetPasswordValidationRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per la richiesta di Reset Password.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole per il campo uuid</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_changeStatusValidationRules">
+        <div class="location">at line 634</div>
+        <code>                    array
+    <strong>changeStatusValidationRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per il cambio di stato (Attivo/Sospeso).</p></p>                <p><p>Oltre all'UUID, valida il campo 'context' che definisce da quale vista
+è partita la richiesta (es. vista di dettaglio 'show').</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole per uuid e context</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getTokensValidationRules">
+        <div class="location">at line 663</div>
+        <code>                    array
+    <strong>getTokensValidationRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per la richiesta di estrazione dei token di sicurezza (es. sessioni).</p></p>                <p><p>Assicura che l'identificativo fornito sia un UUID valido, impedendo query malformate
+o tentativi di estrazione dati arbitrari.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole per la validazione dell'UUID</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_generalDataValidationRules">
+        <div class="location">at line 685</div>
+        <code>                    array
+    <strong>generalDataValidationRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione generiche per l'estrazione parziale dei dati anagrafici (General Data).</p></p>                <p><p>Verifica la correttezza dell'UUID e valida il parametro 'context', assicurandosi che la richiesta
+provenga da una vista autorizzata a mostrare ('show') o modificare ('edit') tali informazioni.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole per UUID e context</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_metaDataValidationRules">
+        <div class="location">at line 715</div>
+        <code>                    array
+    <strong>metaDataValidationRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per l'estrazione dei metadati di sistema dell'utente (Metadata).</p></p>                <p><p>Metodo essenziale che filtra la richiesta limitandosi a confermare l'integrità formale
+dell'UUID (tramite Regex) prima di procedere con l'estrazione dei dati temporali (creazione, modifica, ecc.).</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole per la validazione dell'UUID</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getPermissionsValidationRules">
+        <div class="location">at line 738</div>
+        <code>                    array
+    <strong>getPermissionsValidationRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per l'estrazione della matrice dei permessi (nativi ed eccezioni).</p></p>                <p><p>Valida rigorosamente sia l'UUID dell'utente bersaglio sia il contesto ('show' o 'edit')
+dal quale parte la richiesta, garantendo che le informazioni sensibili sulle autorizzazioni
+vengano caricate solo in scenari previsti dall'architettura.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole per UUID e context</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_deleteTokenValidationRules">
+        <div class="location">at line 769</div>
+        <code>                    array
+    <strong>deleteTokenValidationRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per la revoca forzata di un token (es. disconnessione remota).</p></p>                <p><p>Verifica che la richiesta fornisca sia un UUID valido (l'utente proprietario del token)
+sia un ID numerico positivo (il token stesso), bloccando manipolazioni del payload
+finalizzate a eliminare sessioni di altri amministratori.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole incrociate per UUID e ID del token</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_changePermissionValidationRules">
+        <div class="location">at line 800</div>
+        <code>                    array
+    <strong>changePermissionValidationRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per l'impostazione o la rimozione di una singola eccezione di permesso (Switch).</p></p>                <p><p>Carica dinamicamente il dizionario globale dei permessi e lo compila in una stringa piatta
+per alimentare la regola <code>in_list</code>. Questo garantisce che nessun permesso fittizio, inesistente
+o deprecato possa essere iniettato nel database alterando l'integrità del sistema ACL.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole per UUID e chiave del permesso</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getPermissions">
+        <div class="location">at line 840</div>
+        <code>                    array
+    <strong>getPermissions</strong>(string $uuid)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Restituisce i permessi (eccezioni) assegnati in modo diretto allo specifico amministratore.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$uuid</td>
+                <td><p>Identificativo univoco</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Array di oggetti contenente i permessi personalizzati</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getTokens">
+        <div class="location">at line 853</div>
+        <code>                    array
+    <strong>getTokens</strong>(string $uuid)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Estrae lo storico dei token (login, sessioni, attivazioni) attivi o scaduti dell'utente.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$uuid</td>
+                <td><p>Identificativo univoco</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Array di oggetti (log dei token)</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getAttempts">
+        <div class="location">at line 866</div>
+        <code>                    array
+    <strong>getAttempts</strong>(string $uuid)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Estrae lo storico dei log relativi ai tentativi di accesso standard.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$uuid</td>
+                <td><p>Identificativo univoco</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Array di oggetti</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getTwoFaAttempts">
+        <div class="location">at line 879</div>
+        <code>                    array
+    <strong>getTwoFaAttempts</strong>(string $uuid)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Estrae lo storico dei log relativi ai tentativi di accesso protetti da 2FA (Autenticazione a Due Fattori).</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$uuid</td>
+                <td><p>Identificativo univoco</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Array di oggetti</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getTwoFaCodes">
+        <div class="location">at line 892</div>
+        <code>                    array
+    <strong>getTwoFaCodes</strong>(string $uuid)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Estrae i codici di backup (recovery codes) 2FA associati all'utente.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$uuid</td>
+                <td><p>Identificativo univoco</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Array di oggetti (codici attivi o già utilizzati)</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getTwoFa">
+        <div class="location">at line 905</div>
+        <code>                    object|null
+    <strong>getTwoFa</strong>(string $uuid)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Recupera l'impostazione principale e il metodo 2FA attualmente configurato per l'utente.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$uuid</td>
+                <td><p>Identificativo univoco</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>object|null</td>
+            <td><p>Oggetto con le impostazioni 2FA o null se non presente</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getGroups">
+        <div class="location">at line 917</div>
+        <code>                    array
+    <strong>getGroups</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Recupera l'elenco di tutti i Gruppi (Ruoli) amministrativi disponibili a sistema.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Elenco dei gruppi</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getGroupPermissions">
+        <div class="location">at line 929</div>
+        <code>                    array
+    <strong>getGroupPermissions</strong>(int $groupId)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Estrae i permessi base associati a un Gruppo convertendoli in un array piatto di stringhe.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>int</td>
+                <td>$groupId</td>
+                <td><p>L'ID del gruppo</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Elenco testuale dei permessi (es. ['users_index', 'logs_view'])</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getAdminExceptions">
+        <div class="location">at line 950</div>
+        <code>                    array
+    <strong>getAdminExceptions</strong>(string $uuid)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Recupera le eccezioni di permesso dell'utente (override) sotto forma di array associativo.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$uuid</td>
+                <td><p>Identificativo univoco</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Dizionario [permesso =&gt; 0 o 1] (0 per revoca, 1 per concessione)</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_add">
+        <div class="location">at line 980</div>
+        <code>                    array
+    <strong>add</strong>(array $posts, <abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr> $request)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Crea un nuovo Amministratore all'interno del sistema (Transazionale).</p></p>                <p><p>Gestisce l'intera catena di provisioning: genera l'UUID, inserisce l'anagrafica,
+crea un token crittografico di attivazione account a scadenza, imposta il metodo 2FA di base (email),
+gestisce l'eventuale upload dell'immagine del profilo e invia l'email di benvenuto.
+In caso di fallimento in uno di questi passaggi, il Rollback annulla ogni operazione sul DB.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dataset anagrafico filtrato dalla request</p></td>
+            </tr>
+                    <tr>
+                <td><abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr></td>
+                <td>$request</td>
+                <td><p>Oggetto per estrarre IP e User Agent ai fini del token</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Esito strutturato dell'operazione</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_edit">
+        <div class="location">at line 1099</div>
+        <code>                    array
+    <strong>edit</strong>(array $posts)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Aggiorna i dati anagrafici e i permessi di un Amministratore esistente (Transazionale).</p></p>                <p><p>Implementa Scudi di Sicurezza (blocca modifiche su superadmin o record cestinati) e uno
+Sbarramento prestazionale (hasAdminChanged). In transazione: aggiorna l'anagrafica, svuota
+le vecchie eccezioni sui permessi, ricalcola matematicamente le nuove differenze confrontando
+i permessi sottomessi con quelli nativi del nuovo gruppo assegnato (generando eccezioni positive a 1
+o negative a 0), e gestisce le eventuali nuove immagini.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dataset aggiornato filtrato dalla request</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Esito strutturato con il record aggiornato</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_hasAdminChanged">
+        <div class="location">at line 1235</div>
+        <code>                    bool
+    <strong>hasAdminChanged</strong>(array $posts, object $original)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Verifica in modo euristico se l'anagrafica o i permessi dell'utente hanno subito reali mutazioni.</p></p>                <p><p>Oltre a chiamare il metodo base (hasDataChanged), ricalcola la matrice dei permessi attuali
+dell'utente fondendo le regole del suo gruppo con le sue eccezioni a database.
+Ordina e confronta questa matrice con i permessi inviati tramite form: restituisce true al primo disallineamento.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dati provenienti dal form</p></td>
+            </tr>
+                    <tr>
+                <td>object</td>
+                <td>$original</td>
+                <td><p>L'oggetto rappresentativo dello stato attuale nel database</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td><p>True se è necessaria la query di UPDATE, false altrimenti</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_hardDelete">
+        <div class="location">at line 1295</div>
+        <code>                    array
+    <strong>hardDelete</strong>(array $posts)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Elimina definitivamente e irrevocabilmente l'Amministratore dal sistema (Transazionale).</p></p>                <p><p>Scudo di Sicurezza: vieta sempre e comunque la cancellazione del record designato come Superadmin.
+Rimuove i record dalla tabella <code>admins</code> e <code>images</code>, fa il commit, e solo a quel punto invoca
+il file system per distruggere fisicamente la cartella con le foto profilo collegate a quell'UUID.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dataset contenente l'UUID dell'utente da eliminare</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Esito dell'operazione</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_softDelete">
+        <div class="location">at line 1373</div>
+        <code>                    array
+    <strong>softDelete</strong>(array $posts)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Cestina logicamente l'Amministratore sospendendone istantaneamente gli accessi (Transazionale).</p></p>                <p><p>Scudo di Sicurezza: protetto il Superadmin. L'operazione inserisce il timestamp <code>deleted_at</code>,
+e per evitare che l'email dell'utente cestinato entri in conflitto UNIQUE bloccando registrazioni future,
+la offusca concatenandola con un marcatore temporale (es. '.deleted.16912345').
+Elimina inoltre tutti i token di sessione e i codici 2FA per chiudere immediatamente gli accessi aperti.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dataset contenente l'UUID</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Esito dell'operazione</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_restoreDelete">
+        <div class="location">at line 1453</div>
+        <code>                    array
+    <strong>restoreDelete</strong>(array $posts)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Ripristina un Amministratore precedentemente spostato nel cestino (Transazionale).</p></p>                <p><p>Tenta di rimuovere il marcatore '.deleted.' dall'email originale. Controlla a database
+se, durante il periodo di cestinamento, un altro utente attivo si è registrato con quella stessa email.</p>
+<ul>
+<li>Se NON c'è conflitto: ripristina l'email originale e azzera il <code>deleted_at</code>.</li>
+<li>Se c'è CONFLITTO: assegna all'utente un'email fittizia (es. '16912345@temp.local'),
+lo ripristina bloccandolo (<code>status = 0</code>) e avvisa l'operatore tramite un messaggio specifico.</li>
+</ul></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dataset contenente l'UUID</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Esito dell'operazione e messaggio contestuale</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_resetPassword">
+        <div class="location">at line 1541</div>
+        <code>                    array
+    <strong>resetPassword</strong>(array $posts, <abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr> $request)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Avvia la procedura per forzare il recupero credenziali dell'Amministratore (Transazionale).</p></p>                <p><p>Scudi attivi: bloccato su cestinati e superadmin. Azzera i vecchi token di attivazione,
+genera un nuovo token crittografico, lo salva a database e invia in tempo reale l'email
+con il link di ripristino per impostare la nuova password.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dataset contenente l'UUID</p></td>
+            </tr>
+                    <tr>
+                <td><abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr></td>
+                <td>$request</td>
+                <td><p>Richiesta HTTP per logging IP/Agent</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Esito dell'operazione (o avviso in caso di invio email fallito)</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_changeStatus">
+        <div class="location">at line 1641</div>
+        <code>                    array
+    <strong>changeStatus</strong>(array $posts)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Alterna lo stato di attivazione dell'Amministratore (Attivo &lt;-&gt; Sospeso).</p></p>                <p><p>Scudi attivi: bloccato su cestinati e superadmin. La logica matematica legge lo stato corrente
+e lo inverte (da 0 a 1, o da 1 a 0). Se lo stato passa a Sospeso (0), valorizza la colonna
+<code>suspended_at</code> con il timestamp attuale; altrimenti la resetta a NULL. L'operazione è transazionale.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dataset contenente l'UUID</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Esito con il record utente aggiornato</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_changePermission">
+        <div class="location">at line 1732</div>
+        <code>                    array
+    <strong>changePermission</strong>(array $posts)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Abilita o revoca un singolo permesso in modalità "switch" direttamente dalla scheda utente (Transazionale).</p></p>                <p><p>L'algoritmo valuta se il permesso richiesto è nativo del gruppo dell'utente:</p>
+<ul>
+<li>Se SÌ: un click lo disabilita creando un'eccezione negativa (<code>allow = 0</code>). Un secondo click rimuove l'eccezione ripristinando il default.</li>
+<li>Se NO: un click lo abilita creando un'eccezione positiva (<code>allow = 1</code>). Un secondo click rimuove l'eccezione ripristinando il blocco.
+Questo sistema mantiene la tabella delle eccezioni pulita, salvando solo le deviazioni reali dal ruolo assegnato.</li>
+</ul></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dataset contenente UUID e il codice stringa del permesso</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Esito con i dati dell'amministratore per aggiornare l'interfaccia</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_deleteToken">
+        <div class="location">at line 1830</div>
+        <code>                    array
+    <strong>deleteToken</strong>(array $posts)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Forza la revoca e l'eliminazione di un singolo token di sessione dell'Amministratore.</p></p>                <p><p>Scudi attivi: bloccato su cestinati e superadmin. Se il token corrisponde a una sessione o cookie (login),
+registra l'interruzione nel log impostando la causale a 'banned'. Successivamente rimuove
+la riga dalla tabella <code>admins_tokens</code> disconnettendo all'istante l'utente da quel dispositivo.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dataset contenente ID del token e UUID dell'utente</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Esito dell'operazione</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_deletePermissions">
+        <div class="location">at line 1905</div>
+        <code>                    
+    <strong>deletePermissions</strong>(string $admin_uuid)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Metodo di utilità per la rimozione totale di tutte le eccezioni di permesso associate a un utente.</p></p>                <p><p>Utilizzato principalmente durante l'operazione di <code>edit</code> (modifica) per ripulire la matrice utente
+prima di inserire il nuovo set di eccezioni calcolato rispetto al gruppo.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$admin_uuid</td>
+                <td><p>L'identificativo univoco</p></td>
+            </tr>
+            </table>
+
+            
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+            </div>
+
+    
+</div><div id="footer">
+        Generated by <a href="https://github.com/code-lts/doctum">Doctum, a API Documentation generator and fork of Sami</a>.</div></div>
+    </div>
+    </body>
+
+</html>

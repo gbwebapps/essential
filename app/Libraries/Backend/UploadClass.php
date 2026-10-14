@@ -102,7 +102,6 @@ class UploadClass
 
             try {
                 $file->move($path, $filename, true); 
-                $uploaded[] = $filename;
 
                 /* Generazione Medium e Small */ 
                 $folders = [
@@ -113,10 +112,15 @@ class UploadClass
                 foreach ($folders as $k => $v):
                     $dest = $baseImg . '/' . $k . '/' . $filename;
                     /* Rimossa l'iniezione del parametro position */
-                    $this->cropImage($destination, $dest, $v[0], $v[1]);
+                    if ( ! $this->cropImage($destination, $dest, $v[0], $v[1])):
+                        throw new \RuntimeException('Generazione variante immagine non riuscita: ' . $k);
+                    endif;
                 endforeach;
 
-            } catch (\Exception $e) {
+                $uploaded[] = $filename;
+
+            } catch (\Throwable $e) {
+                \App\Libraries\ImageFileSystemService::removeSingleImage($entity, $uuid, $filename);
                 log_message('error', 'Errore elaborazione immagine: ' . $e->getMessage());
                 continue;
             }

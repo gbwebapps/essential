@@ -21,14 +21,26 @@ if ( ! function_exists('log_admin_activity')) :
      * @param string $action Chiave identificativa dell'operazione eseguita (es. 'UPDATE', 'DELETE', 'LOGIN')
      * @param string $section Il modulo o il perimetro applicativo interessato dall'evento (es. 'admins', 'settings')
      * @param string $details Descrizione testuale estesa e contestuale dell'operazione registrata
-     * @param object|null $currentAdmin L'oggetto che rappresenta l'amministratore esecutore. Se omesso, la logica sottostante tenterà l'identificazione automatica
+     * @param object|null $currentAdmin L'oggetto che rappresenta l'amministratore esecutore. Se omesso, l'evento viene registrato come guest
      * @return bool Esito dell'operazione: true se il record di audit è stato memorizzato con successo, false altrimenti
      */
     function log_admin_activity(string $action, string $section, string $details, ?object $currentAdmin = null): bool 
     {
-        /* Istanziamo il modello che contiene la logica fisica di scrittura con la query nativa */
-        $auditsModel = model(AuditsModel::class);
-        
-        return $auditsModel->logActivity($action, $section, $details, $currentAdmin);
+        try
+        {
+            $auditsModel = model(AuditsModel::class);
+            $result = $auditsModel->logActivity($action, $section, $details, $currentAdmin);
+
+            if ($result === false):
+                log_message('error', 'Registrazione audit non riuscita: ' . $action . ' [' . $section . ']');
+            endif;
+
+            return $result;
+        }
+        catch (\Throwable $e)
+        {
+            log_message('error', 'Errore registrazione audit: ' . $action . ' [' . $section . '] - ' . $e->getMessage());
+            return false;
+        }
     }
 endif;

@@ -15,7 +15,7 @@ return [
 		'id' => 'ID no conforme.',
 	],
 	'actions' => [
-		'hardDelete' => 'Desconectar'
+		'disconnectSession' => 'Desconectar'
 	],
 	'labels' => [
 		'username' => 'Nombre de usuario',
@@ -35,7 +35,11 @@ return [
 		'banned' => 'Bloqueado',
 		'undefined' => 'Indefinido',
 		'pending' => 'En curso...',
-		'duration' => 'Duración'
+		'duration' => 'Duración',
+		'mobile' => 'Dispositivo móvil',
+		'robot' => 'Robot',
+		'filtersAndOptions' => 'Opciones y filtros',
+		'showSystemDetails' => 'Mostrar detalles del sistema'
 	],
 	'placeholders' => [
 		'searchUsername' => 'Buscar por nombre de usuario...',
@@ -44,15 +48,15 @@ return [
 		'searchLogoutReason' => 'Buscar por motivo de desconexión...'
 	],
 	'audits' => [
-	    'deleteToken' => 'Interrupción forzada de la sesión actual',
+	    'disconnectSession' => 'Interrupción forzada de la sesión actual',
 	],
 	'messages' => [
 		'noLogsFound' => 'No se encontraron registros.',
-		'areYouSureHardDelete' => '¿Estás seguro de que deseas desconectar a <b>%s %s?</b>',
+		'areYouSureDisconnectSession' => '¿Estás seguro de que deseas desconectar a <b>%s %s?</b>',
 		'validationErrors' => 'Errores de validación.',
 		'validationToastErrors' => '%s',
-		'deleteTokenSuccess' => '%s %s se ha desconectado con éxito.',
-		'deleteTokenError' => 'La desconexión no se ha podido completar.',
+		'disconnectSessionSuccess' => '%s %s se ha desconectado con éxito.',
+		'disconnectSessionError' => 'La desconexión no se ha podido completar.',
 		'protectedAdmin' => 'Protegido contra modificaciones.',
 		'cannotModifyDeleted' => 'No es posible modificar un administrador eliminado.',
 	]

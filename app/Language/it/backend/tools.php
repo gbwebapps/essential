@@ -89,8 +89,10 @@ return [
 		'areYouSureToDeleteBackups' => 'Sei sicuro di voler eliminare il backup generato il <br><b>%s</b>?', 
 		'areYouSureToDeleteLogs' => '<p>Sei sicuro di voler eliminare gli accessi dal <b>%s</b> al <b>%s</b>?</p> <p>Verranno eliminati <b>%d</b> accessi.</p>',
 		'noAuditsDeleted' => 'Non sono state eliminate attività nel range delle date selezionate.', 
+		'deleteAuditsError' => 'Non è stato possibile eliminare le attività richieste.',
 		'noAuditsFound' => 'Non sono state trovate attività nel range delle date selezionate.', 
 		'noLogsDeleted' => 'Non sono stati eliminati accessi nel range delle date selezionate.', 
+		'deleteLogsError' => 'Non è stato possibile eliminare gli accessi richiesti.',
 		'noLogsFound' => 'Non sono stati trovati accessi nel range delle date selezionate.', 
 		'deleteAuditsSuccess' => 'Sono state eliminate con successo %d attività <br>dal %s al %s.', 
 		'deleteLogsSuccess' => 'Sono stati eliminati con successo %d accessi <br>dal %s al %s.', 
@@ -108,5 +110,7 @@ return [
 		'noStructure' => 'Non ci sono dati per la struttura di questa tabella.', 
 		'confirmCleanFolder' => 'Sei sicuro di svuotare la cartella <b>%s</b>? <br>L\'azione è irreversibile e potrebbe causare malfunzionamenti.', 
 		'folderCleanSuccess' => 'Sono stati eliminati %d files dalla cartella %s.', 
+		'folderCleanError' => 'Non è stato possibile eliminare %d files dalla cartella %s.',
+		'folderCleanUnavailable' => 'La cartella %s non è disponibile o non è leggibile.',
 	], 
 ];

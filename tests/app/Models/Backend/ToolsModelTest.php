@@ -1917,15 +1917,13 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             'users';
 
         $mockModel->expects(
-            $this->once()
+            $this->exactly(2)
         )
         ->method(
             'getTablesStatus'
         )
-        ->with(
-            $targetTable
-        )
-        ->willReturn(
+        ->willReturnOnConsecutiveCalls(
+            [['name' => $targetTable, 'engine' => 'InnoDB']],
             $statusArr
         );
 
@@ -2051,12 +2049,16 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             ['status' => 'all_ok'];
 
         $mockModel->expects(
-            $this->once()
+            $this->exactly(2)
         )
         ->method(
             'getTablesStatus'
         )
-        ->willReturn(
+        ->willReturnOnConsecutiveCalls(
+            [
+                ['name' => 'users', 'engine' => 'InnoDB'],
+                ['name' => 'logs', 'engine' => 'InnoDB']
+            ],
             $statusArr
         );
 
@@ -2160,6 +2162,54 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             $statusArr,
             $result
         );
+    }
+
+    public function testRunOptimizationRejectsUnknownTable(): void
+    {
+        $model = $this->getMockBuilder(\App\Models\Backend\ToolsModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getTablesStatus'])
+            ->getMock();
+
+        $model->method('getTablesStatus')->willReturn([
+            ['name' => 'users', 'engine' => 'InnoDB'],
+        ]);
+
+        $db = $this->createMock(\CodeIgniter\Database\BaseConnection::class);
+        $db->expects($this->never())->method('query');
+
+        \Closure::bind(function() use ($db) {
+            $this->db = $db;
+        }, $model, $model)();
+
+        $this->assertFalse($model->runOptimization('unknown_table'));
+    }
+
+    public function testRunOptimizationReturnsFalseOnDatabaseMaintenanceError(): void
+    {
+        $model = $this->getMockBuilder(\App\Models\Backend\ToolsModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getTablesStatus'])
+            ->getMock();
+
+        $model->expects($this->once())->method('getTablesStatus')->willReturn([
+            ['name' => 'users', 'engine' => 'InnoDB'],
+        ]);
+
+        $query = $this->createMock(\CodeIgniter\Database\BaseResult::class);
+        $query->method('getResultArray')->willReturn([
+            ['Msg_type' => 'error', 'Msg_text' => 'Operation failed'],
+        ]);
+
+        $db = $this->createMock(\CodeIgniter\Database\BaseConnection::class);
+        $db->method('escapeIdentifiers')->willReturn('`users`');
+        $db->expects($this->once())->method('query')->willReturn($query);
+
+        \Closure::bind(function() use ($db) {
+            $this->db = $db;
+        }, $model, $model)();
+
+        $this->assertFalse($model->runOptimization('users'));
     }
 
     public function testGetDatabase()
@@ -2305,10 +2355,10 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
         endif;
 
         $fileOld =
-            $bkpDir . 'test_old.zip';
+            $bkpDir . 'backup_2026-10-10_10-00-00.zip';
 
         $fileNew =
-            $bkpDir . 'test_new.zip';
+            $bkpDir . 'backup_2026-10-11_10-00-00.zip';
 
         file_put_contents(
             $fileOld,
@@ -2347,13 +2397,13 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
 
         $idxOld =
             array_search(
-                'test_old.zip',
+                'backup_2026-10-10_10-00-00.zip',
                 $keys
             );
 
         $idxNew =
             array_search(
-                'test_new.zip',
+                'backup_2026-10-11_10-00-00.zip',
                 $keys
             );
 
@@ -2604,6 +2654,25 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             ['test_table']
         );
 
+        $mockDb
+        ->method(
+            'getFieldNames'
+        )
+        ->with(
+            'test_table'
+        )
+        ->willReturn(
+            ['id', 'name']
+        );
+
+        $mockDb
+        ->method(
+            'escapeIdentifiers'
+        )
+        ->willReturnCallback(
+            fn($identifier) => '`' . $identifier . '`'
+        );
+
         /* Mock Query Schema */
         $mockQuerySchema = 
         $this
@@ -2628,13 +2697,12 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
 
         $mockQueryData
         ->method(
-            'getResultArray'
+            'getUnbufferedRow'
         )
-        ->willReturn(
-            [
-                ['id' => '1', 'name' => 'test'],
-                ['id' => '2', 'name' => null]
-            ]
+        ->willReturnOnConsecutiveCalls(
+            ['id' => '1', 'name' => 'test'],
+            ['id' => '2', 'name' => null],
+            null
         );
 
         /* Configurazione callback per query diverse */
@@ -2650,14 +2718,13 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
                 $mockQueryData
             ) {
                 $isSchema = 
-                strpos(
-                    $sql, 
-                    'SHOW CREATE TABLE'
+                str_starts_with(
+                    strtolower($sql),
+                    'show create table'
                 );
                 
                 if (
-                    $isSchema !== 
-                    false
+                    $isSchema
                 ):
                     return 
                     $mockQuerySchema;
@@ -2763,7 +2830,7 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
         endif;
         
         $filename = 
-        'test_delete.zip';
+        'backup_2026-10-12_10-00-05.zip';
         
         $fullPath = 
         $path . 
@@ -2804,7 +2871,7 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
         new \App\Models\Backend\ToolsModel();
         
         $filename = 
-        'not_exist.zip';
+        'backup_2026-10-12_10-00-06.zip';
 
         /* Esecuzione */
         $result = 
@@ -2941,6 +3008,52 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             $result
             ['result']
         );
+    }
+
+    public function testCleanWritableFolderReturnsFalseWhenWhitelistedDirectoryIsMissing(): void
+    {
+        $model = new \App\Models\Backend\ToolsModel();
+        $folder = 'missing_cleanable_folder';
+
+        \Closure::bind(function() use ($folder) {
+            $this->cleanableFolders = [$folder];
+        }, $model, $model)();
+
+        $this->assertFalse($model->cleanWritableFolder($folder)['result']);
+    }
+
+    public function testCleanWritableFolderDeletesNestedFilesAndPreservesDirectoryTree(): void
+    {
+        if ( ! function_exists(__NAMESPACE__ . '\log_admin_activity')):
+            function log_admin_activity($a, $b, $c, $d) {
+            }
+        endif;
+
+        $model = new \App\Models\Backend\ToolsModel();
+        $folder = 'test_folder_recursive';
+        $path = WRITEPATH . $folder;
+        $nestedPath = $path . DIRECTORY_SEPARATOR . 'nested';
+
+        mkdir($nestedPath, 0775, true);
+        file_put_contents($path . DIRECTORY_SEPARATOR . 'index.html', 'protected');
+        file_put_contents($nestedPath . DIRECTORY_SEPARATOR . 'data.tmp', 'temporary');
+
+        \Closure::bind(function() use ($folder) {
+            $this->cleanableFolders = [$folder];
+        }, $model, $model)();
+
+        $this->assertSame(1, $model->getWritableFoldersStatus()[0]['count']);
+
+        $result = $model->cleanWritableFolder($folder);
+
+        $this->assertTrue($result['result']);
+        $this->assertDirectoryExists($nestedPath);
+        $this->assertFileExists($path . DIRECTORY_SEPARATOR . 'index.html');
+        $this->assertFileDoesNotExist($nestedPath . DIRECTORY_SEPARATOR . 'data.tmp');
+
+        unlink($path . DIRECTORY_SEPARATOR . 'index.html');
+        rmdir($nestedPath);
+        rmdir($path);
     }
 
     public function testCleanWritableFolderReturnsTrueOnSuccess(): void
@@ -3295,9 +3408,7 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
         ):
             $dummyZip = 
             $path . 
-            'backup_dummy_' . 
-            $i . 
-            '.zip';
+            sprintf('backup_2025-01-%02d_00-00-00.zip', $i + 1);
 
             file_put_contents(
                 $dummyZip, 
@@ -3376,5 +3487,32 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
                 $f
             );
         endforeach;
+    }
+
+    public function testGenerateDatabaseBackupsCreatesReadableArchiveFromTestDatabase(): void
+    {
+        $model = new \App\Models\Backend\ToolsModel();
+        $path = WRITEPATH . 'backups/database/';
+
+        $this->assertTrue($model->generateDatabaseBackups());
+
+        $files = glob($path . 'backup_*.zip') ?: [];
+        $this->assertNotEmpty($files);
+
+        usort($files, fn($a, $b) => filemtime($b) <=> filemtime($a));
+        $zipPath = $files[0];
+        $zip = new \ZipArchive();
+
+        $this->assertTrue($zip->open($zipPath) === true);
+        $this->assertSame(1, $zip->numFiles);
+
+        $sql = $zip->getFromIndex(0);
+        $this->assertIsString($sql);
+        $this->assertStringContainsString('set foreign_key_checks = 0;', $sql);
+        $this->assertStringContainsString('set foreign_key_checks = 1;', $sql);
+
+        $zip->close();
+        $this->assertSame([], glob($path . '*.sql') ?: []);
+        $this->assertTrue(unlink($zipPath));
     }
 }

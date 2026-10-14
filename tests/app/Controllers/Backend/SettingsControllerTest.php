@@ -1245,7 +1245,7 @@ class SettingsControllerTest extends CIUnitTestCase
             'deleteSettings'
         )
         ->willReturn(
-            false
+            null
         );
 
         $controller = 
@@ -2242,5 +2242,39 @@ class SettingsControllerTest extends CIUnitTestCase
             $expectedResponse, 
             $result
         );
+    }
+
+    public function testDeleteSettingsReturnsDatabaseError(): void
+    {
+        $request = $this->createMock(\CodeIgniter\HTTP\IncomingRequest::class);
+        $request->method('isAJAX')->willReturn(true);
+        $request->method('is')->with('post')->willReturn(true);
+        $request->method('getPost')->willReturn(['env' => 'general']);
+
+        $settingsModel = $this->createMock(\App\Models\Backend\SettingsModel::class);
+        $settingsModel->method('deleteSettings')
+            ->with('Backend\\General')
+            ->willReturn(false);
+
+        $expectedResponse = $this->createMock(\CodeIgniter\HTTP\ResponseInterface::class);
+        $controller = $this->getMockBuilder(\App\Controllers\Backend\SettingsController::class)
+            ->onlyMethods(['jsonResponse'])
+            ->getMock();
+        $controller->method('jsonResponse')
+            ->willReturnCallback(function(array $data) use ($expectedResponse) {
+                $this->assertFalse($data['result']);
+                $this->assertSame(lang('backend/settings.messages.deleteError'), $data['message']);
+
+                return $expectedResponse;
+            });
+
+        $injectDependencies = function() use ($request, $settingsModel): void {
+            $this->request = $request;
+            $this->settingsModel = $settingsModel;
+            $this->allowedEnvs = ['general'];
+        };
+        \Closure::bind($injectDependencies, $controller, $controller)();
+
+        $this->assertSame($expectedResponse, $controller->deleteSettings());
     }
 }

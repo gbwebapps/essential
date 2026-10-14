@@ -7,7 +7,7 @@
                 <h5><?= $permission['icon']; ?> <?= ucfirst($permission['title']); ?></h5>
             </div>
             <div class="col-6 text-end">
-                <a href="#" class="select-all" data-controller="<?= $permission['controller']; ?>">
+                <a href="#" class="select-all" data-controller="<?= esc($permission['controller'], 'attr'); ?>">
                     <i class="fa-solid fa-square-check"></i>
                     <?= lang('backend/global.links.selectAll'); ?>
                 </a>
@@ -38,8 +38,8 @@
                         <div class="col-12 col-lg-3 text-center py-1">
                             <ul class="list-group list-group-flush border rounded-2">
                                 <li class="list-group-item" style="min-height: 75px;">
-                                    <label for="exc_<?= $k; ?>" class="fw-bold text-dark d-block mb-1">
-                                        <i class="fa-solid fa-circle-arrow-down"></i><?= $v; ?>
+                                    <label for="exc_<?= esc($k, 'attr'); ?>" class="fw-bold text-dark d-block mb-1">
+                                        <i class="fa-solid fa-circle-arrow-down"></i><?= esc($v); ?>
                                     </label>
                                     
                                     <?php if ($isGroupActive): ?>
@@ -50,7 +50,7 @@
                                 </li>
                                 <li class="list-group-item">
                                     <div class="form-check form-switch d-inline-block">
-                                        <input type="checkbox" class="form-check-input btn-trigger-admin-perm-switch <?= $permission['controller']; ?>" name="permissions[]" value="<?= $k; ?>" id="exc_<?= $k; ?>" <?= $isChecked; ?>>
+                                        <input type="checkbox" class="form-check-input btn-trigger-admin-perm-switch <?= esc($permission['controller'], 'attr'); ?>" name="permissions[]" value="<?= esc($k, 'attr'); ?>" id="exc_<?= esc($k, 'attr'); ?>" <?= $isChecked; ?>>
                                     </div>
                                 </li>
                             </ul>

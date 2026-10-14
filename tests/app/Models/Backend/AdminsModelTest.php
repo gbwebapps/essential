@@ -7,29 +7,60 @@ use CodeIgniter\Test\DatabaseTestTrait;
 use Config\Services;
 use App\Models\Backend\AdminsModel; // Adatta il path se necessario
 
-/* 1. Mock della funzione setting() nel namespace del Model */
-if ( ! function_exists('App\Models\Backend\setting')):
-    function setting($item) {
-        $config = new \stdClass();
-        $config->hashKey        = 'test_hash_key_123';
-        $config->activationTime = 86400; // 24 ore fittizie
-        return $config;
-    }
-endif;
+use CodeIgniter\Config\Factories;
+use Tests\Support\Libraries\MocksSettings;
 
-/* 2. Mock della funzione log_admin_activity() nel namespace del Model */
-if ( ! function_exists('App\Models\Backend\log_admin_activity')):
-    function log_admin_activity($action, $module, $message, $admin) {
-        return true; 
+if ( ! function_exists(__NAMESPACE__ . '\log_admin_activity')):
+    function log_admin_activity($action, $section, $details, $currentAdmin = null): bool
+    {
+        return true;
     }
 endif;
 
 class AdminsModelTest extends CIUnitTestCase
 {
     use DatabaseTestTrait;
+    use MocksSettings;
 
     /* Disabilitiamo le migrazioni poiché usi il DDL manuale */
     protected $migrate = false;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Factories::reset();
+        helper('settings');
+
+        $this->mockSettings([
+            'Backend\\Auth' => [
+                'hashKey' => 'test_hash_key_123',
+                'activationTime' => 86400,
+            ],
+        ]);
+    }
+
+    public function testAuditFailureDoesNotEscapeFromSafeLogger(): void
+    {
+        $authorization = $this->createMock(\App\Libraries\Backend\AuthorizationClass::class);
+        $authorization
+            ->method('currentAdmin')
+            ->willThrowException(new \RuntimeException('Audit unavailable'));
+
+        Services::injectMock('authorization', $authorization);
+
+        $model = new class extends AdminsModel {
+            public function invokeSafeAudit(): void
+            {
+                $this->logActivitySafely('TEST_ADMIN', 'Test audit');
+            }
+        };
+
+        $model->invokeSafeAudit();
+        $this->addToAssertionCount(1);
+
+        Services::resetSingle('authorization');
+    }
 
     public function testAddAdminSuccessfully(): void
     {
@@ -439,17 +470,6 @@ class AdminsModelTest extends CIUnitTestCase
 
     public function testEditSucceeds(): void
     {
-        /* 0. MOCK HELPER LOG ATTIVITA' */
-        if ( ! function_exists('App\Models\Backend\log_admin_activity')):
-            function log_admin_activity(
-                $a,
-                $b,
-                $c,
-                $d = null
-            ) {
-            }
-        endif;
-
         /* 1. MOCK DATABASE: Creiamo il mock prima per poterlo iniettare */
         $mockDb = 
             $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class)
@@ -673,6 +693,8 @@ class AdminsModelTest extends CIUnitTestCase
 
         $db->table('admins_groups')->where('id', 9999)->delete();
 
+        $this->resetSettingsMocks();
+
         \Config\Services::reset(true);
         \CodeIgniter\Config\Factories::reset();
 
@@ -772,17 +794,6 @@ class AdminsModelTest extends CIUnitTestCase
 
     public function testSoftDeleteSucceeds(): void
     {
-        /* 0. MOCK HELPER LOG ATTIVITA' */
-        if ( ! function_exists('App\Models\Backend\log_admin_activity')):
-            function log_admin_activity(
-                $a,
-                $b,
-                $c,
-                $d = null
-            ) {
-            }
-        endif;
-
         /* 1. MOCK DATABASE: Creiamo il mock per intercettare le query di pulizia */
         $mockDb = 
             $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class)
@@ -982,17 +993,6 @@ class AdminsModelTest extends CIUnitTestCase
 
     public function testHardDeleteSucceeds(): void
     {
-        /* 0. MOCK HELPER LOG ATTIVITA' */
-        if ( ! function_exists('App\Models\Backend\log_admin_activity')):
-            function log_admin_activity(
-                $a,
-                $b,
-                $c,
-                $d = null
-            ) {
-            }
-        endif;
-
         /* 1. MOCK DATABASE */
         $mockDb = 
             $this->getMockBuilder(\CodeIgniter\Database\BaseConnection::class)
@@ -4167,16 +4167,21 @@ class AdminsModelTest extends CIUnitTestCase
             'note' => [
                 'label' => lang('backend/admins.labels.note'),
                 'rules' => ['permit_empty', 'trim', 'max_length[500]', 'safeText'],
-                'errors' => ['safeText' => 'Caratteri non ammessi.'],
+                'errors' => ['safeText' => lang('backend/admins.errors.safeText')],
             ],
             'group_id' => [
                 'label' => lang('backend/admins.labels.group'),
                 'rules' => ['required', 'is_natural_no_zero', 'is_not_unique[admins_groups.id]'],
             ],
+            'permissions' => [
+                'label' => lang('backend/admins.labels.permissions'),
+                'rules' => ['permit_empty', 'permissionArray'],
+                'errors' => ['permissionArray' => lang('backend/admins.messages.wrongPermissionsFormat')],
+            ],
             'permissions.*' => [
                 'label' => lang('backend/admins.labels.permissions'),
                 'rules' => ['permit_empty', 'in_list[' . $inListString . ']'],
-                'errors' => ['in_list' => lang('Backend/admins.errors.permission')],
+                'errors' => ['in_list' => lang('backend/admins.errors.permission')],
             ],
             'images' => [
                 'label' => lang('backend/admins.labels.images'),

@@ -59,9 +59,12 @@ class AuthTest extends CIUnitTestCase
         $this->assertTrue($config->attempts);
         $this->assertSame(600, $config->attemptsInterval);
         $this->assertSame(3, $config->attemptsLimit);
+        $this->assertSame(20, $config->attemptsIpMultiplier);
         $this->assertTrue($config->twoFactor);
+        $this->assertTrue($config->twoFactorAttempts);
         $this->assertSame(3, $config->twoFactorLimit);
         $this->assertSame(600, $config->twoFactorTime);
+        $this->assertSame(600, $config->twoFactorAttemptsInterval);
         $this->assertSame('Essential', $config->twoFactorIssuer);
         $this->assertSame(6, $config->twoFactorDigits);
         $this->assertSame(1, $config->twoFactorWindow);
@@ -71,6 +74,11 @@ class AuthTest extends CIUnitTestCase
         $this->assertSame(864000, $config->rememberMeTime);
         $this->assertSame(1200, $config->sessionTime);
         $this->assertSame(43200, $config->activationTime);
+        $this->assertTrue($config->resetAttempts);
+        $this->assertSame(3, $config->resetAttemptsLimit);
+        $this->assertSame(600, $config->resetAttemptsInterval);
+        $this->assertSame(5, $config->resetPasswordLimit);
+        $this->assertSame(900, $config->resetPasswordInterval);
         $this->assertSame('/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/', $config->passwordRegex);
     }
 

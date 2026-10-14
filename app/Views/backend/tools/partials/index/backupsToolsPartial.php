@@ -20,30 +20,30 @@
             <?php foreach($backups as $backup): ?>
                 
                 <!-- Rimossa la classe d-flex globale, gestiamo tutto con la Row interna -->
-                <li class="list-group-item py-3" data-filename="<?= $backup['filename']; ?>">
+                <li class="list-group-item py-3" data-filename="<?= esc($backup['filename'], 'attr'); ?>">
                     
                     <div class="row align-items-center text-start">
                         
                         <!-- Dettagli File -->
                         <div class="col-12 col-md-8 col-lg-9 mb-3 mb-md-0">
-                            <h6 class="mb-1 fw-bold"><?= $backup['filename']; ?></h6>
+                            <h6 class="mb-1 fw-bold"><?= esc($backup['filename']); ?></h6>
                             <small class="text-muted">
-                                <span class="me-3"><i class="fa-regular fa-calendar me-1"></i><?= $backup['humanDateTime']; ?></span>
-                                <span><i class="fa-solid fa-hard-drive me-1"></i><?= sprintf(lang('backend/tools.labels.totalSpace'), $backup['size']); ?></span> 
+                                <span class="me-3"><i class="fa-regular fa-calendar me-1"></i><?= esc($backup['humanDateTime']); ?></span>
+                                <span><i class="fa-solid fa-hard-drive me-1"></i><?= esc(sprintf(lang('backend/tools.labels.totalSpace'), $backup['size'])); ?></span>
                             </small>
                         </div>
 
                         <!-- Azioni -->
                         <div class="col-12 col-md-4 col-lg-3">
                             <div class="d-flex justify-content-center justify-content-md-end gap-2">
-                                <button type="button" class="btn btn-sm btn-primary flex-fill flex-md-grow-0 btn-download-backups" data-filename="<?= $backup['filename']; ?>">
+                                <button type="button" class="btn btn-sm btn-primary flex-fill flex-md-grow-0 btn-download-backups" data-filename="<?= esc($backup['filename'], 'attr'); ?>">
                                     <i class="fa-solid fa-download me-1"></i><?= lang('backend/tools.buttons.download'); ?>
                                 </button>
                                 
                                 <!-- Iniezione singola della data discorsiva tramite sprintf -->
                                 <button type="button" class="btn btn-sm btn-danger flex-fill flex-md-grow-0 btn-delete-backups" 
-                                        data-filename="<?= $backup['filename']; ?>" 
-                                        data-message="<?= sprintf(lang('backend/tools.messages.areYouSureToDeleteBackups'), $backup['humanDateTime']); ?>">
+                                        data-filename="<?= esc($backup['filename'], 'attr'); ?>"
+                                        data-message="<?= esc(sprintf(lang('backend/tools.messages.areYouSureToDeleteBackups'), $backup['humanDateTime']), 'attr'); ?>">
                                     <i class="fa-solid fa-trash me-1"></i><?= lang('backend/tools.buttons.delete'); ?>
                                 </button>
                             </div>

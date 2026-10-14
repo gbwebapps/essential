@@ -17,7 +17,7 @@
 
                             <!-- Numero dei record visualizzati in una pagina. Serve al Trick per evitare che all'eliminazione
                             dell'ultimo record in una pagina che non è la prima, la visualizzazione rimanga bloccata e non passi alla pagina successiva. -->
-                            <div id="lastItemPage" data-lastitempage="<?= $data['lastItemPage']; ?>"></div>
+                            <div class="lastItemPage" data-lastitempage="<?= $data['lastItemPage']; ?>"></div>
 
                             <table class="table table-condensed mb-0 text-nowrap">
                                 <thead>
@@ -97,13 +97,13 @@
                                                 <?php if(is_null($cover)): ?>
                                                     <span class="fw-bold text-danger"><?= lang('backend/admins.labels.noImage'); ?></span>
                                                 <?php else: ?>
-                                                    <img src="<?= base_url('images/backend/admins/' . esc($admin->uuid) . '/small/' . rawurlencode($cover)); ?>" class="img-polaroid" alt="">
+                                                    <img src="<?= esc(base_url('images/backend/admins/' . rawurlencode($admin->uuid) . '/small/' . rawurlencode($cover)), 'attr'); ?>" class="img-polaroid" alt="">
                                                 <?php endif; ?>
                                             </td>
 
                                             <!-- Cella chevron -->
                                             <td class="align-middle fw-bold">
-                                                <button class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 text-secondary shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($admin->uuid); ?>" aria-expanded="false" title="Mostra dettagli di sistema">
+                                                <button class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 text-secondary shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($admin->uuid, 'attr'); ?>" aria-expanded="false" title="Mostra dettagli di sistema">
                                                     <i class="fa-solid fa-chevron-right"></i>
                                                 </button>
                                             </td>
@@ -145,9 +145,9 @@
                                                                 $statusClass ="text-danger btn btn-link shadow-none fw-bold";
                                                             endif;
                                                         ?>
-                                                        <form class="changeStatus" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureChangeStatus'), esc($admin->firstname), esc($admin->lastname)); ?>">
-                                                            <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
-                                                            <button type="submit" class="<?= $statusClass; ?>">
+                                                        <form class="changeStatus" data-controller="admins" data-message="<?= esc(sprintf(lang('backend/admins.messages.areYouSureChangeStatus'), $admin->firstname, $admin->lastname), 'attr'); ?>">
+                                                            <input type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>">
+                                                            <button type="submit" class="<?= esc($statusClass, 'attr'); ?>">
                                                                 <?= $statusText; ?>
                                                             </button>
                                                         </form>
@@ -171,26 +171,26 @@
                                                         <?php if( ! $isTrashed): ?>
                                                             
                                                             <!-- Pulsante Dettaglio -->
-                                                            <a href="<?= base_url('backend/admins/show/' . esc($admin->uuid)); ?>" class="text-decoration-none badge bg-secondary-subtle text-secondary-emphasis action">
+                                                            <a href="<?= esc(base_url('backend/admins/show/' . rawurlencode($admin->uuid)), 'attr'); ?>" class="text-decoration-none badge bg-secondary-subtle text-secondary-emphasis action">
                                                                 <i class="fa-solid fa-user fa-fw"></i> <?= lang('backend/admins.actions.show'); ?>
                                                             </a>
 
                                                             <!-- Pulsante Aggiorna -->
-                                                            <a href="<?= base_url('backend/admins/edit/' . esc($admin->uuid)); ?>" class="text-decoration-none badge bg-secondary-subtle text-secondary-emphasis action">
+                                                            <a href="<?= esc(base_url('backend/admins/edit/' . rawurlencode($admin->uuid)), 'attr'); ?>" class="text-decoration-none badge bg-secondary-subtle text-secondary-emphasis action">
                                                                 <i class="fa-solid fa-user-pen fa-fw"></i> <?= lang('backend/admins.actions.edit'); ?>
                                                             </a>
 
                                                             <!-- Pulsante Reset password -->
-                                                            <form class="resetAdmin m-0 p-0" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureReset'), esc($admin->firstname), esc($admin->lastname)); ?>">
-                                                                <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
+                                                            <form class="resetAdmin m-0 p-0" data-message="<?= esc(sprintf(lang('backend/admins.messages.areYouSureReset'), $admin->firstname, $admin->lastname), 'attr'); ?>">
+                                                                <input type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>">
                                                                 <button type="submit" class="btn badge bg-secondary-subtle text-secondary-emphasis action shadow-none w-100 border-0">
                                                                     <i class="fa-solid fa-unlock fa-fw"></i> <?= lang('backend/admins.actions.reset'); ?>
                                                                 </button>
                                                             </form>
 
                                                             <!-- Pulsante Elimina (Soft Delete) -->
-                                                            <form class="deleteRecord m-0 p-0" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureSoftDelete'), esc($admin->firstname), esc($admin->lastname)); ?>">
-                                                                <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
+                                                            <form class="deleteRecord m-0 p-0" data-controller="admins" data-message="<?= esc(sprintf(lang('backend/admins.messages.areYouSureSoftDelete'), $admin->firstname, $admin->lastname), 'attr'); ?>">
+                                                                <input type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>">
                                                                 <button type="submit" class="btn badge bg-danger-subtle text-danger-emphasis action shadow-none w-100 border-0">
                                                                     <i class="fa-solid fa-xmark fa-fw"></i> <?= lang('backend/admins.actions.softDelete'); ?>
                                                                 </button>
@@ -199,16 +199,16 @@
                                                         <?php else: ?>
                                                             
                                                             <!-- Pulsante Ripristina (Restore Delete) -->
-                                                            <form class="restoreRecord m-0 p-0" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureRestoreDelete'), esc($admin->firstname), esc($admin->lastname)); ?>">
-                                                                <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
+                                                            <form class="restoreRecord m-0 p-0" data-controller="admins" data-message="<?= esc(sprintf(lang('backend/admins.messages.areYouSureRestoreDelete'), $admin->firstname, $admin->lastname), 'attr'); ?>">
+                                                                <input type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>">
                                                                 <button type="submit" class="btn badge bg-success-subtle text-success-emphasis action shadow-none w-100 border-0">
                                                                     <i class="fa-solid fa-trash-arrow-up fa-fw"></i> <?= lang('backend/admins.actions.restoreDelete'); ?>
                                                                 </button>
                                                             </form>
 
                                                             <!-- Pulsante Elimina Definitivamente (Hard Delete) -->
-                                                            <form class="hardDeleteRecord m-0 p-0" data-message="<?= sprintf(lang('backend/admins.messages.areYouSureHardDelete'), esc($admin->firstname), esc($admin->lastname)); ?>">
-                                                                <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
+                                                            <form class="hardDeleteRecord m-0 p-0" data-controller="admins" data-message="<?= esc(sprintf(lang('backend/admins.messages.areYouSureHardDelete'), $admin->firstname, $admin->lastname), 'attr'); ?>">
+                                                                <input type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>">
                                                                 <button type="submit" class="btn badge bg-danger-subtle text-danger-emphasis action shadow-none w-100 border-0">
                                                                     <i class="fa-solid fa-xmark fa-fw"></i> <?= lang('backend/admins.actions.hardDelete'); ?>
                                                                 </button>
@@ -230,7 +230,7 @@
                                             <td colspan="9" class="p-0 border-0">
                                                 
                                                 <!-- Contenitore collassabile puntato dal bottone -->
-                                                <div class="collapse" id="meta-<?= esc($admin->uuid); ?>">
+                                                <div class="collapse" id="meta-<?= esc($admin->uuid, 'attr'); ?>">
                                                     
                                                     <!-- Box effettivo dei metadati: spazioso, con background neutro -->
                                                     <div class="p-2 border-bottom <?= $isTrashed ? 'text-decoration-line-through' : ''; ?> <?= $isSuperadmin ? 'bg-light text-dark' : 'bg-light text-secondary'; ?> small">

@@ -48,14 +48,19 @@ return [
         'totpSecretKey'      => '安全密钥（手动配置）',
 		'enterOtpCode' => '输入 6 位数验证码',
 		'rememberMe' => '记住我', 
-		'currentDevice' => '当前会话'
+		'currentDevice' => '当前会话',
+		'mobile' => '移动设备',
+		'robot' => '机器人',
+		'currentPassword' => '当前密码',
+		'currentPasswordEmailHelp' => '仅在更改电子邮件地址时需要。'
 	], 
 	'placeholders' => [
 		'firstname' => '请输入名字...', 
 		'lastname' => '请输入姓氏...', 
 		'email' => '请输入电子邮件...', 
 		'phone' => '请输入电话...', 
-		'note' => '请输入附加备注...', 
+		'note' => '请输入附加备注...',
+		'currentPassword' => '请输入当前密码...',
 	], 
 	'buttons' => [
 		'sendData' => '保存数据', 
@@ -64,10 +69,14 @@ return [
 		'resetPassword' => '继续重置密码',
 		'verifyAndActivate' => '验证并激活', 
 		'undoClose' => '关闭配置并退出', 
-		'delete' => '删除'
+		'delete' => '删除',
+		'showPassword' => '显示密码'
 	], 
 	'errors' => [
-		'id' => 'ID 不符合规范。', 
+		'id' => 'ID 不符合规范。',
+		'safeText' => '包含不允许的字符。',
+		'currentPasswordRequired' => '请输入当前密码。',
+		'currentPasswordInvalid' => '当前密码不正确。',
 	], 
 	'audits' => [
 	    'updateData'     => '更新通用数据 %s %s',
@@ -91,7 +100,7 @@ return [
 		'noTokensFound' => '未找到令牌。', 
 		'deleteTokenSuccess' => '%s %s 的令牌已成功删除。', 
 		'deleteTokenError' => '删除令牌失败', 
-		'expiringDate' => '<div class="pb-3">您已请求重置密码。</div><div class="pb-3">请检查您的电子邮件并完成操作。</div>您可以在 %s 之前完成操作。</div>',
+		'expiringDate' => '<div class="pb-3">您已请求重置密码。</div><div class="pb-3">请检查您的电子邮件并完成操作。</div>您可以在 %s 之前完成操作。',
 		'methodNotValid' => '无效或不支持的方法。', 
 		'updateSecuritySettingsError' => '无法更新安全设置。', 
 		'updateSecuritySettingsSuccess' => '安全设置更新成功。', 
@@ -102,6 +111,8 @@ return [
 		'totpActivationNotPossible' => '无法激活 TOTP 身份验证。', 
 		'totpConfigurationSuccess' => '身份验证器应用配置成功。', 
 		'areYouSureChangeMethod' => '您确定要更改双重身份验证方法吗？', 
-		'cannotDeleteCurrentToken' => '无法删除当前会话。'
+		'cannotDeleteCurrentToken' => '无法删除当前会话。',
+		'tooManyResetRequests' => '密码重置请求过多，请稍后重试。',
+		'tooManyAttempts' => '尝试次数过多，请稍后重试。'
 	]
 ];

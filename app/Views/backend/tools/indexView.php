@@ -24,15 +24,15 @@
                         ?>
 
                         <div class="accordion-item mb-3 border shadow-sm">
-                            <h2 class="accordion-header" id="main_heading_<?= $env; ?>">
-                                <button class="accordion-button collapsed shadow-none bg-light text-secondary py-3 btn-trigger-<?= $env; ?>-tools" data-env="<?= $env; ?>" type="button" aria-expanded="false" aria-controls="main_collapse_<?= $env; ?>">
+                            <h2 class="accordion-header" id="main_heading_<?= esc($env, 'attr'); ?>">
+                                <button class="accordion-button collapsed shadow-none bg-light text-secondary py-3 btn-trigger-<?= esc($env, 'attr'); ?>-tools" data-env="<?= esc($env, 'attr'); ?>" type="button" aria-expanded="false" aria-controls="main_collapse_<?= esc($env, 'attr'); ?>">
                                     <h2 class="card-title mb-0 fs-5">
-                                        <i class="fa-solid <?= $icon; ?> me-2"></i><?= lang('backend/tools.panels.' . $env); ?>
+                                        <i class="fa-solid <?= esc($icon, 'attr'); ?> me-2"></i><?= esc(lang('backend/tools.panels.' . $env)); ?>
                                     </h2>
                                 </button>
                             </h2>
-                            <div id="main_collapse_<?= $env; ?>" class="accordion-collapse collapse" aria-labelledby="main_heading_<?= $env; ?>" data-bs-parent="#mainToolsDashboard">
-                                <div id="<?= $env; ?>-tools-container" class="accordion-body bg-white border-top mb-0"></div>
+                            <div id="main_collapse_<?= esc($env, 'attr'); ?>" class="accordion-collapse collapse" aria-labelledby="main_heading_<?= esc($env, 'attr'); ?>" data-bs-parent="#mainToolsDashboard">
+                                <div id="<?= esc($env, 'attr'); ?>-tools-container" class="accordion-body bg-white border-top mb-0"></div>
                             </div>
                         </div>
 

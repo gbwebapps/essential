@@ -79,7 +79,7 @@ class ToolsController extends BackendController
      *
      * @return ResponseInterface Risposta JSON con l'HTML del pannello popolato con i dati in tempo reale.
      */
-    public function openTools(): ?ResponseInterface
+    public function openTools(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -110,7 +110,7 @@ class ToolsController extends BackendController
 
         endif;
 
-        return null;
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -120,7 +120,7 @@ class ToolsController extends BackendController
      *
      * @return ResponseInterface Risposta JSON contenente il conteggio dei record identificati e il testo localizzato per il prompt di conferma.
      */
-    public function validateAuditsDateRequest(): ?ResponseInterface
+    public function validateAuditsDateRequest(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -155,7 +155,7 @@ class ToolsController extends BackendController
 
         endif;
 
-        return null;
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -164,7 +164,7 @@ class ToolsController extends BackendController
      *
      * @return ResponseInterface Risposta JSON indicante il successo dell'operazione di pulizia.
      */
-    public function deleteAudits(): ?ResponseInterface
+    public function deleteAudits(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -181,7 +181,7 @@ class ToolsController extends BackendController
 
         endif;
 
-        return null;
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -191,7 +191,7 @@ class ToolsController extends BackendController
      *
      * @return ResponseInterface Risposta JSON con le statistiche dei file rintracciati.
      */
-    public function validateLogsDateRequest(): ?ResponseInterface
+    public function validateLogsDateRequest(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -226,7 +226,7 @@ class ToolsController extends BackendController
 
         endif;
 
-        return null;
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -234,7 +234,7 @@ class ToolsController extends BackendController
      *
      * @return ResponseInterface Risposta JSON con l'esito della cancellazione dei file.
      */
-    public function deleteLogs(): ?ResponseInterface
+    public function deleteLogs(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -251,7 +251,7 @@ class ToolsController extends BackendController
 
         endif;
 
-        return null;
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -260,7 +260,7 @@ class ToolsController extends BackendController
      *
      * @return ResponseInterface Risposta JSON contenente lo status dell'operazione e i dati post-ottimizzazione.
      */
-    public function optimizeTable(): ?ResponseInterface
+    public function optimizeTable(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
             
@@ -289,7 +289,7 @@ class ToolsController extends BackendController
 
         endif;
 
-        return null;
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -299,7 +299,7 @@ class ToolsController extends BackendController
      *
      * @return ResponseInterface Payload JSON strutturato in base all'esito dell'azione specificata.
      */
-    public function backups(): ?ResponseInterface 
+    public function backups(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
 
@@ -308,7 +308,7 @@ class ToolsController extends BackendController
             $rules = ['action' => 'required|in_list[generateBackups,deleteBackups,downloadBackups]'];
 
             if ($action === 'deleteBackups' || $action === 'downloadBackups'):
-                $rules['filename'] = 'required|regex_match[/^[a-zA-Z0-9_\-\.]+$/]';
+                $rules['filename'] = 'required|regex_match[/^backup_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.zip$/]';
             endif;
 
             /* 3. Esecuzione della validazione sicura sui dati in ingresso */
@@ -348,7 +348,7 @@ class ToolsController extends BackendController
                 $path = WRITEPATH . 'backups/database/' . $filename;
                 
                 if (is_file($path)):
-                    return $this->jsonResponse(['result' => true, 'downloadUrl' => base_url('backend/tools/downloadBackups/' . $filename)]);
+                    return $this->jsonResponse(['result' => true, 'downloadUrl' => base_url('backend/tools/downloadBackups/' . rawurlencode($filename))]);
                 else:
                     return $this->jsonResponse(['result' => false, 'message' => lang('backend/tools.messages.backupNotFoundError')]);
                 endif;
@@ -357,7 +357,7 @@ class ToolsController extends BackendController
 
         endif;
 
-        return null;
+        return service('response')->setStatusCode(400);
     }
 
     /**
@@ -369,6 +369,10 @@ class ToolsController extends BackendController
      */
     public function downloadBackups(string $filename): ResponseInterface
     {
+        if (preg_match('/^backup_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.zip$/', $filename) !== 1):
+            return redirect()->to(base_url('backend/dashboard'))->with('error', lang('backend/tools.messages.backupNotFoundError'));
+        endif;
+
         /* basename() impedisce tentativi di directory traversal (sicurezza) */
         $path = WRITEPATH . 'backups/database/' . basename($filename);
         
@@ -391,7 +395,7 @@ class ToolsController extends BackendController
      *
      * @return ResponseInterface Risposta JSON ritornata dal Model attestante l'esito della pulizia della cartella.
      */
-    public function cleanFolder(): ?ResponseInterface
+    public function cleanFolder(): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
             
@@ -411,6 +415,6 @@ class ToolsController extends BackendController
 
         endif;
 
-        return null;
+        return service('response')->setStatusCode(400);
     }
 }

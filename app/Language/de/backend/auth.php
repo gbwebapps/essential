@@ -41,7 +41,7 @@ return [
 	],
 	'audits' => [
 	    'loginRefused'      => 'Anmeldeversuch mit nicht existierendem Konto',
-	    'loginBlocked'      => 'Zugriff verweigert, Konto gesperrt %s %s',
+	    'loginBlocked'      => 'Zugriff wegen des Versuchslimits verweigert',
 	    'loginFailed'       => 'Fehlgeschlagener Anmeldeversuch %s %s',
 	    '2faRequired'       => '2FA-Bestätigungscode erforderlich %s %s %s',
 	    'loginSuccess'      => 'Anmeldung erfolgreich %s %s',
@@ -61,12 +61,13 @@ return [
 		'setPasswordFailed' => 'Fehler beim Festlegen des Passworts.', 
 		'setPasswordError' => 'Fehler beim Festlegen des Passworts.', 
 		'checkAuthError' => 'Ungültiger oder abgelaufener Authentifizierungscode.', 
-		'tooManyAttempts' => 'Es wurden zu viele Versuche unternommen.', 
+		'tooManyAttempts' => 'Versuchslimit erreicht. Bitte versuchen Sie es später erneut.',
 	    'currentSessionOn' => 'Sitzung von %s %s läuft noch.', 
 		'validationErrors' => 'Validierungsfehler.', 
-		'resetPasswordSuccess' => 'Passwort-Reset-Prozess eingerichtet. Bitte überprüfen Sie Ihre E-Mail, um den Vorgang abzuschließen.', 
+		'resetPasswordSuccess' => 'Wenn die Adresse zu einem aktiven Konto gehört, erhalten Sie eine E-Mail mit Anweisungen zum Zurücksetzen des Passworts.',
 		'resetPasswordSuccessNoEmail' => 'Passwort-Reset-Prozess eingerichtet, aber die E-Mail konnte nicht gesendet werden. Bitte kontaktieren Sie den Administrator.', 
 		'expiredCode' => 'OTP-Code abgelaufen.',
 		'wrongCode' => 'Falscher OTP-Code.', 
+		'twoFactorEmailSendError' => 'Der Bestätigungscode konnte nicht per E-Mail gesendet werden. Bitte versuchen Sie es in wenigen Augenblicken erneut.',
 	]
 ];

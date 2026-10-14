@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="index, follow, all" />
+    <title>App\Libraries\Backend\SettingsClass | Essential API</title>
+
+            <link rel="stylesheet" type="text/css" href="../../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../../css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="../../../css/doctum.css">
+        <link rel="stylesheet" type="text/css" href="../../../fonts/doctum-font.css">
+        <script src="../../../js/jquery-3.5.1.slim.min.js"></script>
+        <script async defer src="../../../doctum.js"></script>
+        <script async defer src="../../../js/bootstrap.min.js"></script>
+        <script async defer src="../../../js/autocomplete.min.js"></script>
+        <meta name="MobileOptimized" content="width">
+        <meta name="HandheldFriendly" content="true">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+
+    </head>
+
+    <body id="class" data-name="class:App_Libraries_Backend_SettingsClass" data-root-path="../../../" data-search-index-url="../../../doctum-search.json">
+            <div id="content">
+        <div id="left-column">
+                <div id="control-panel">
+                <div class="search-bar hidden" id="search-progress-bar-container">
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" id="search-progress-bar"
+                    aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+            </div>
+        </div>
+        <form id="search-form" action="../../../search.html">
+            <span class="icon icon-search"></span>
+            <input name="search"
+                   id="doctum-search-auto-complete"
+                   class="typeahead form-control"
+                   type="search"
+                   placeholder="Search"
+                   spellcheck="false"
+                   autocorrect="off"
+                   autocomplete="off"
+                   autocapitalize="off">
+            <div class="auto-complete-results" id="auto-complete-results"></div>
+        </form>
+    </div>
+
+                <div id="api-tree"></div>
+
+        </div>
+        <div id="right-column">
+                <nav id="site-nav" class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-elements">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="../../../index.html">Essential API</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-elements">
+                <ul class="nav navbar-nav">
+                    <li><a href="../../../classes.html">Classes</a></li>
+                    <li><a href="../../../namespaces.html">Namespaces</a></li>
+                    <li><a href="../../../interfaces.html">Interfaces</a></li>
+                    <li><a href="../../../traits.html">Traits</a></li>
+                    <li><a href="../../../doc-index.html">Index</a></li>
+                    <li><a href="../../../search.html">Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+                        <div class="namespace-breadcrumbs">
+            <ol class="breadcrumb">
+                <li><span class="label label-default">class</span></li>
+                        <li><a href="../../../App.html">App</a></li><li class="backslash">\</li><li><a href="../../../App/Libraries.html">Libraries</a></li><li class="backslash">\</li><li><a href="../../../App/Libraries/Backend.html">Backend</a></li><li class="backslash">\</li><li>SettingsClass</li>
+            </ol>
+        </div>
+                <div id="page-content">
+    <div class="page-header">
+        <h1>SettingsClass    
+            </h1>
+    </div>
+
+    
+    <p>        class
+    <strong>SettingsClass</strong>
+</p>
+
+        
+        
+    
+        
+
+            <div class="description">
+            <p><p>Classe di supporto (utility/presentazione) dedicata alla gestione dell'interfaccia delle Impostazioni (Settings).</p></p>            <p><p>Centralizza la logica di configurazione visiva, predisponendo l'iniezione dinamica di librerie esterne
+(es. Tom Select) e fornendo dizionari di dati strutturati (fusi orari, formati data, lingue supportate)
+indispensabili per popolare correttamente i selettori (dropdown) del pannello di controllo.</p></p>        </div>
+            
+        
+    
+            <h2>Properties</h2>
+
+            <table class="table table-condensed">
+                    <tr>
+                <td class="type" id="property_settingsModel">
+                                        protected                                        <a href="../../../App/Models/Backend/SettingsModel.html"><abbr title="App\Models\Backend\SettingsModel">SettingsModel</abbr></a>
+                                                                                
+                                    </td>
+                <td>$settingsModel</td>
+                <td class="last"><p>Istanza del modello di riferimento, a disposizione per estrarre
+o confrontare parametri di configurazione globali propedeutici alla costruzione dell'interfaccia.</p></td>
+                <td></td>
+            </tr>
+            </table>
+
+    
+            <h2>Methods</h2>
+
+            <div class="container-fluid underlined">
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8">
+                    <a href="#method___construct">__construct</a>(<a href="../../../App/Models/Backend/SettingsModel.html"><abbr title="App\Models\Backend\SettingsModel">SettingsModel</abbr></a> $settingsModel)
+        
+                                            <p><p>Inizializza la libreria di supporto iniettando il modello associato alle impostazioni di sistema.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getJsIndex">getJsIndex</a>()
+        
+                                            <p><p>Genera l'array di configurazione per l'iniezione dinamica degli script JavaScript nella vista principale (Index).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getCssIndex">getCssIndex</a>()
+        
+                                            <p><p>Restituisce l'array di configurazione per il caricamento condizionale dei fogli di stile (CSS).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getTimezones">getTimezones</a>()
+        
+                                            <p><p>Recupera la lista completa e aggiornata dei fusi orari (timezones) supportati a livello server.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getLanguages">getLanguages</a>()
+        
+                                            <p><p>Costruisce il dizionario delle lingue ufficialmente supportate dal pannello di amministrazione.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getDateFormats">getDateFormats</a>()
+        
+                                            <p><p>Definisce il set di formati data/ora (basati sui pattern ICU) disponibili per la configurazione globale.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+            </div>
+
+
+        <h2>Details</h2>
+
+            <div id="method-details">
+                    <div class="method-item">
+                    <h3 id="method___construct">
+        <div class="location">at line 28</div>
+        <code>                    
+    <strong>__construct</strong>(<a href="../../../App/Models/Backend/SettingsModel.html"><abbr title="App\Models\Backend\SettingsModel">SettingsModel</abbr></a> $settingsModel)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Inizializza la libreria di supporto iniettando il modello associato alle impostazioni di sistema.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td><a href="../../../App/Models/Backend/SettingsModel.html"><abbr title="App\Models\Backend\SettingsModel">SettingsModel</abbr></a></td>
+                <td>$settingsModel</td>
+                <td><p>Il modello preposto alla gestione e all'elaborazione dei parametri globali</p></td>
+            </tr>
+            </table>
+
+            
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getJsIndex">
+        <div class="location">at line 42</div>
+        <code>                    array
+    <strong>getJsIndex</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Genera l'array di configurazione per l'iniezione dinamica degli script JavaScript nella vista principale (Index).</p></p>                <p><p>Predispone il caricamento della libreria Tom Select, essenziale per potenziare i selettori <code>&lt;select&gt;</code> nativi
+trasformandoli in interfacce avanzate con capacità di ricerca rapida, ideali per gestire moli di dati
+corpose come l'elenco dei fusi orari mondiali.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Insieme strutturato degli asset JS da iniettare nel layout</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getCssIndex">
+        <div class="location">at line 57</div>
+        <code>                    array
+    <strong>getCssIndex</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Restituisce l'array di configurazione per il caricamento condizionale dei fogli di stile (CSS).</p></p>                <p><p>Inietta il foglio di stile specifico (in variante Bootstrap 5) per il corretto rendering visuale
+del componente Tom Select, ottimizzando le performance limitandone l'inclusione alla sola schermata dedicata.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Insieme strutturato degli asset CSS da iniettare nel layout</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getTimezones">
+        <div class="location">at line 72</div>
+        <code>                    array
+    <strong>getTimezones</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Recupera la lista completa e aggiornata dei fusi orari (timezones) supportati a livello server.</p></p>                <p><p>Sfrutta la funzione nativa di PHP per estrarre l'elenco standard degli identificatori di fuso orario,
+fornendo il dataset primario necessario ad alimentare il relativo selettore nelle impostazioni di sistema.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Array indicizzato contenente tutti gli identificatori validi per i fusi orari (es. 'Europe/Rome')</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getLanguages">
+        <div class="location">at line 85</div>
+        <code>                    array
+    <strong>getLanguages</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Costruisce il dizionario delle lingue ufficialmente supportate dal pannello di amministrazione.</p></p>                <p><p>Mappa i codici standard ISO a due lettere (chiavi) alle rispettive etichette tradotte (valori), permettendo
+la generazione dinamica del selettore di localizzazione con stringhe sempre pertinenti all'idioma attuale dell'operatore.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Array associativo [codice_lingua =&gt; etichetta_localizzata]</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getDateFormats">
+        <div class="location">at line 106</div>
+        <code>                    array
+    <strong>getDateFormats</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Definisce il set di formati data/ora (basati sui pattern ICU) disponibili per la configurazione globale.</p></p>                <p><p>Fornisce un catalogo strutturato di formati standard (europei estesi/compatti, anglosassoni con meridiem e ISO tecnico)
+mappati sulle rispettive descrizioni descrittive localizzate. Questi pattern detteranno l'output visivo
+dei marcatori temporali nell'intero applicativo.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Array associativo [pattern_icu =&gt; descrizione_localizzata]</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+            </div>
+
+    
+</div><div id="footer">
+        Generated by <a href="https://github.com/code-lts/doctum">Doctum, a API Documentation generator and fork of Sami</a>.</div></div>
+    </div>
+    </body>
+
+</html>

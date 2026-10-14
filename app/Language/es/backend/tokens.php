@@ -31,7 +31,12 @@ return [
 		'createdAt' => 'Añadido el ',
 		'session' => 'Sesión',
 		'activation' => 'Activación',
-		'cookie' => 'Recuérdame'
+		'cookie' => 'Recuérdame',
+		'mobile' => 'Dispositivo móvil',
+		'robot' => 'Robot',
+		'unknown' => 'Desconocido',
+		'filtersAndOptions' => 'Opciones y filtros',
+		'showSystemDetails' => 'Mostrar detalles del sistema'
 	],
 	'errors' => [
 		'uuid' => 'UUID no conforme.',
@@ -44,7 +49,7 @@ return [
 		'actions' => 'Acciones'
 	],
 	'placeholders' => [
-		'searchUsername' => 'Buscar por nombre de usuario...',
+		'searchUsername' => 'Buscar por correo electrónico...',
 		'searchType' => 'Buscar por tipo...',
 		'dateFrom' => 'Buscar por fecha de inicio...',
 		'dateTo' => 'Buscar por fecha de fin...',

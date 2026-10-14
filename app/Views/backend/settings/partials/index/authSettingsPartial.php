@@ -46,7 +46,8 @@
                         <label for="auth_attemptsInterval" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.attemptsInterval'); ?></label>
                         <input type="number" id="auth_attemptsInterval" name="attemptsInterval" class="form-control shadow-none" min="10" value="<?= esc($authSettings['attemptsInterval']); ?>" placeholder="<?= lang('backend/settings.placeholders.attemptsInterval'); ?>">
                         <div class="error_attemptsInterval text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
-                    </div>  
+                    </div>
+
                 </div>
 
                 <!-- Sezione 2: Autenticazione a Due Fattori (2FA) -->
@@ -66,12 +67,6 @@
                             <option value="1" <?= (int) $authSettings['twoFactor'] === 1 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.enabled'); ?></option>
                         </select>
                         <div class="error_twoFactor text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
-                    </div>
-
-                    <div class="col-md-4 mb-3">
-                        <label for="auth_twoFactorLimit" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.twoFactorLimit'); ?></label>
-                        <input type="number" id="auth_twoFactorLimit" name="twoFactorLimit" class="form-control shadow-none" min="1" max="10" value="<?= esc($authSettings['twoFactorLimit']); ?>" placeholder="<?= lang('backend/settings.placeholders.twoFactorLimit'); ?>">
-                        <div class="error_twoFactorLimit text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
 
                     <div class="col-md-4 mb-3">
@@ -112,9 +107,70 @@
                         <input type="email" id="auth_twoFactorEmailFrom" name="twoFactorEmailFrom" class="form-control shadow-none" value="<?= esc($authSettings['twoFactorEmailFrom']); ?>" placeholder="<?= lang('backend/settings.placeholders.twoFactorEmailFrom'); ?>">
                         <div class="error_twoFactorEmailFrom text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
+
+                    <div class="col-12 mb-4">
+                        <div class="row g-0 bg-light pt-2 ps-2 pe-2 border rounded-2">
+                            <div class="col-12 text-start">
+                                <h5><i class="fa-solid fa-shield-halved me-2"></i><?= lang('backend/settings.labels.twoFactorAttemptsSecurity'); ?></h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="auth_twoFactorAttempts" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.twoFactorAttempts'); ?></label>
+                        <select id="auth_twoFactorAttempts" name="twoFactorAttempts" class="form-select shadow-none">
+                            <option value="0" <?= (int) $authSettings['twoFactorAttempts'] === 0 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.disabled'); ?></option>
+                            <option value="1" <?= (int) $authSettings['twoFactorAttempts'] === 1 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.enabled'); ?></option>
+                        </select>
+                        <div class="error_twoFactorAttempts text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="auth_twoFactorLimit" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.twoFactorLimit'); ?></label>
+                        <input type="number" id="auth_twoFactorLimit" name="twoFactorLimit" class="form-control shadow-none" min="1" max="10" value="<?= esc($authSettings['twoFactorLimit']); ?>" placeholder="<?= lang('backend/settings.placeholders.twoFactorLimit'); ?>">
+                        <div class="error_twoFactorLimit text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="auth_twoFactorAttemptsInterval" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.twoFactorAttemptsInterval'); ?></label>
+                        <input type="number" id="auth_twoFactorAttemptsInterval" name="twoFactorAttemptsInterval" class="form-control shadow-none" min="10" max="86400" value="<?= esc($authSettings['twoFactorAttemptsInterval']); ?>" placeholder="<?= lang('backend/settings.placeholders.twoFactorAttemptsInterval'); ?>">
+                        <div class="error_twoFactorAttemptsInterval text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                    </div>
                 </div>
 
-                <!-- Sezione 3: Sessioni e Persistenza -->
+                <!-- Sezione 3: Protezione Reset Password Pubblico -->
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <div class="row g-0 bg-light pt-2 ps-2 pe-2 border rounded-2">
+                            <div class="col-12 text-start">
+                                <h5><i class="fa-solid fa-unlock-keyhole me-2"></i><?= lang('backend/settings.labels.resetPasswordSecurity'); ?></h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="auth_resetAttempts" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.resetAttempts'); ?></label>
+                        <select id="auth_resetAttempts" name="resetAttempts" class="form-select shadow-none">
+                            <option value="0" <?= (int) $authSettings['resetAttempts'] === 0 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.disabled'); ?></option>
+                            <option value="1" <?= (int) $authSettings['resetAttempts'] === 1 ? 'selected' : ''; ?>><?= lang('backend/settings.labels.enabled'); ?></option>
+                        </select>
+                        <div class="error_resetAttempts text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="auth_resetAttemptsLimit" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.resetAttemptsLimit'); ?></label>
+                        <input type="number" id="auth_resetAttemptsLimit" name="resetAttemptsLimit" class="form-control shadow-none" min="1" max="20" value="<?= esc($authSettings['resetAttemptsLimit']); ?>" placeholder="<?= lang('backend/settings.placeholders.resetAttemptsLimit'); ?>">
+                        <div class="error_resetAttemptsLimit text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="auth_resetAttemptsInterval" class="form-label  mb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/settings.labels.resetAttemptsInterval'); ?></label>
+                        <input type="number" id="auth_resetAttemptsInterval" name="resetAttemptsInterval" class="form-control shadow-none" min="60" max="86400" value="<?= esc($authSettings['resetAttemptsInterval']); ?>" placeholder="<?= lang('backend/settings.placeholders.resetAttemptsInterval'); ?>">
+                        <div class="error_resetAttemptsInterval text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                    </div>
+                </div>
+
+                <!-- Sezione 4: Sessioni e Persistenza -->
                 <div class="row">
                     <div class="col-12 mb-4">
                         <div class="row g-0 bg-light pt-2 ps-2 pe-2 border rounded-2">

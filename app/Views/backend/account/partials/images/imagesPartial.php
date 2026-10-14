@@ -1,6 +1,6 @@
 <!-- Sezione: Upload e Preview Immagini Profilo -->
 <div id="uploadPreview">
-    <?= $this->include('backend/components/uploadPreviewImg/uploadPreviewImgView'); ?>
+    <?= $this->include('backend/components/uploadPreview/uploadPreviewView'); ?>
 </div>
 <!-- End Sezione: Upload e Preview Immagini Profilo -->
 

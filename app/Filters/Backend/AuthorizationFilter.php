@@ -71,7 +71,7 @@ class AuthorizationFilter implements FilterInterface
         endif;
 
         /* Redirect standard pulito dai with() in quanto già impostati nella sessione */
-        return redirect()->to(base_url('backend/auth'));
+        return redirect()->to(base_url('backend/auth'))->withCookies();
     }
 
     /**

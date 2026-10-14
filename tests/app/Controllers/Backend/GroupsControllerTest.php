@@ -62,10 +62,7 @@ class GroupsControllerTest extends CIUnitTestCase
                 ->data,
                 'groupsModel' => 
                 $this
-                ->groupsModel,
-                'groupsClass' => 
-                $this
-                ->groupsClass
+                ->groupsModel
             ];
         };
 
@@ -88,12 +85,6 @@ class GroupsControllerTest extends CIUnitTestCase
         ->assertIsObject(
             $properties
             ['groupsModel']
-        );
-
-        $this
-        ->assertIsObject(
-            $properties
-            ['groupsClass']
         );
     }
 
@@ -669,7 +660,7 @@ class GroupsControllerTest extends CIUnitTestCase
 
                 $this
                 ->assertEquals(
-                    'Gruppo non trovato.', 
+                    lang('backend/groups.messages.noGroupFound'),
                     $data
                     ['message']
                 );
@@ -3643,7 +3634,7 @@ class GroupsControllerTest extends CIUnitTestCase
 
                 $this
                 ->assertEquals(
-                    'Amministratore non trovato.', 
+                    lang('backend/groups.messages.noAdminFound'),
                     $data
                     ['message']
                 );

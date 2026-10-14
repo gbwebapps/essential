@@ -1,7 +1,7 @@
 <div class="row align-items-center mb-3">
 
     <div class="col-12 col-md-4 text-center text-md-start">
-        <h1 class="mb-0"><?= $icon; ?> <?= $title; ?></h1>
+        <h1 class="mb-0"><?= $icon; ?> <?= esc($title); ?></h1>
     </div>
 
     <div class="col-12 col-md-4 text-center my-2 my-md-0">
@@ -12,9 +12,9 @@
 
             if ($msgClass && $msgContent): 
         ?>
-            <div class="alert alert-<?= $msgClass; ?> alert-session alert-dismissible fade show border-0 d-flex align-items-center p-3 mb-0" role="alert">
+            <div class="alert alert-<?= esc($msgClass, 'attr'); ?> alert-session alert-dismissible fade show border-0 d-flex align-items-center p-3 mb-0" role="alert">
                 <div class="w-100 text-center p-0 ms-4">
-                    <?= $msgIcon; ?> <?= $msgContent; ?>
+                    <?= $msgIcon; ?> <?= esc($msgContent); ?>
                 </div>
                 <!-- Pulsante stile badge per la chiusura dell'alert -->
                 <button type="button" class="badge bg-danger p-2 border-0 rounded-1 ms-auto" data-bs-dismiss="alert" style="cursor: pointer;">

@@ -774,7 +774,7 @@ class TokensControllerTest extends CIUnitTestCase
         );
     }
 
-    public function testHardDeleteReturnsNullWhenNotAjaxOrPost(): void
+    public function testHardDeleteReturnsBadRequestWhenNotAjaxOrPost(): void
     {
         $request = 
         $this
@@ -821,8 +821,9 @@ class TokensControllerTest extends CIUnitTestCase
         ->hardDelete();
 
         $this
-        ->assertNull(
-            $result
+        ->assertSame(
+            400,
+            $result->getStatusCode()
         );
     }
 
@@ -1114,5 +1115,25 @@ class TokensControllerTest extends CIUnitTestCase
             $expectedResponse, 
             $result
         );
+    }
+
+    public function testViewsExposeTheCurrentListAndDeleteContracts(): void
+    {
+        $indexView = file_get_contents(APPPATH . 'Views/backend/tokens/indexView.php');
+        $partialView = file_get_contents(APPPATH . 'Views/backend/tokens/partials/index/indexPartial.php');
+
+        $this->assertIsString($indexView);
+        $this->assertStringContainsString('class="form-select changeNumRows"', $indexView);
+        $this->assertStringContainsString('class="collapse search-bar"', $indexView);
+
+        foreach (['email', 'token_type', 'token_create-from', 'token_create-to'] as $field):
+            $this->assertStringContainsString('data-search-field="' . $field . '"', $indexView);
+            $this->assertStringContainsString('data-search-error="' . $field . '"', $indexView);
+        endforeach;
+
+        $this->assertIsString($partialView);
+        $this->assertStringContainsString('class="lastItemPage"', $partialView);
+        $this->assertStringNotContainsString('id="lastItemPage"', $partialView);
+        $this->assertStringContainsString('data-controller="tokens"', $partialView);
     }
 }

@@ -2,8 +2,6 @@
 
 namespace App\Libraries\Backend;
 
-use App\Models\Backend\LogsModel;
-
 /**
  * Classe di supporto (utility/presentazione) per la gestione dell'interfaccia della sezione Logs (Log applicativi).
  * 
@@ -13,23 +11,6 @@ use App\Models\Backend\LogsModel;
  */
 class LogsClass 
 {
-	/**
-	 * Istanza del modello di riferimento, a disposizione per eventuali interrogazioni 
-	 * o formattazioni propedeutiche alla costruzione dell'interfaccia di analisi dei log.
-	 * @var LogsModel 
-	 */
-	protected LogsModel $logsModel;
-
-	/**
-	 * Inizializza la libreria di supporto iniettando il modello associato alla sezione dei log applicativi.
-	 *
-	 * @param LogsModel $logsModel Il modello preposto alla lettura, al parsing e all'estrazione dei log di sistema
-	 */
-	public function __construct(LogsModel $logsModel) 
-	{
-		$this->logsModel = $logsModel;
-	}
-
 	/**
 	 * Genera l'array di configurazione per l'iniezione dinamica degli script JavaScript nella vista principale (Index).
 	 * 

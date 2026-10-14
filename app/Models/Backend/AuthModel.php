@@ -15,6 +15,9 @@ use App\Models\Backend\BackendModel;
  */
 class AuthModel extends BackendModel
 {
+    /** Hash password valido usato per uniformare il costo di verifica degli account inesistenti. */
+    private const DUMMY_PASSWORD_HASH = '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi';
+
     /**
      * Contenitore per i parametri di configurazione globali del modulo Auth 
      * (es. limiti di tentativi, durata sessioni, espressioni regolari per le password).
@@ -76,8 +79,8 @@ class AuthModel extends BackendModel
     /**
      * Regole di validazione per il form di Login.
      * 
-     * Verifica che l'email sia in un formato valido e che la password rispetti rigorosamente 
-     * l'espressione regolare di sicurezza (Regex) definita dinamicamente nelle configurazioni di sistema.
+     * Verifica che l'email sia in un formato valido e che la password sia presente entro la lunghezza massima.
+     * La validità effettiva della credenziale viene determinata dal confronto con l'hash memorizzato.
      *
      * @return array Regole native di CodeIgniter
      */
@@ -90,10 +93,7 @@ class AuthModel extends BackendModel
             ], 
             'password' => [
                 'label' => 'Password',
-                'rules' => ['required', 'min_length[8]', 'max_length[255]', "regex_match[{$this->config->passwordRegex}]"],
-                'errors' => [
-                    'regex_match' => lang('backend/auth.errors.passwordFormatNotValid')
-                ]
+                'rules' => ['required', 'max_length[255]'],
             ]
         ];
     }
@@ -151,8 +151,8 @@ class AuthModel extends BackendModel
     /**
      * Regole di validazione per la verifica del codice OTP (2FA).
      * 
-     * Assicura che il codice immesso sia un numero intero naturale e che sia composto 
-     * esattamente da 6 cifre (`exact_length[6]`), bloccando stringhe malformate o tentativi di injection.
+     * Assicura che il codice immesso sia composto esattamente da 6 cifre,
+     * preservando anche gli eventuali zeri iniziali.
      *
      * @return array Regole per il campo code
      */
@@ -161,8 +161,7 @@ class AuthModel extends BackendModel
         return [
             'code' => [
                 'label' => 'Codice',
-                /* CORRETTO: exact_length blocca la stringa a 6 caratteri, is_natural permette i numeri interi */
-                'rules' => ['required', 'is_natural', 'exact_length[6]'], 
+                'rules' => ['required', 'regex_match[/^[0-9]{6}$/]'],
             ],
         ];
     }
@@ -172,9 +171,9 @@ class AuthModel extends BackendModel
      * 
      * Metodo denso e protetto:
      * 1. Filtra i dati in ingresso e legge le configurazioni (es. limiti tentativi, 2FA).
-     * 2. Estrae l'utente verificando subito gli Scudi (deve essere attivo, non cestinato, non sospeso).
-     * 3. Applica il controllo Throttling: se l'utente ha superato il limite di tentativi falliti nel tempo previsto, slitta il blocco e respinge l'accesso.
-     * 4. Valida l'hash della password. Se fallisce, registra il tentativo errato a DB in transazione.
+     * 2. Applica il throttling uniforme per email anonimizzata e indirizzo IP, anche per account inesistenti.
+     * 3. Estrae l'utente verificando subito gli scudi (deve essere attivo, non cestinato, non sospeso).
+     * 4. Valida l'hash della password con costo uniforme. Se fallisce, registra il tentativo errato a DB in transazione.
      * 5. Se la password è corretta ma il 2FA è attivo, parcheggia i dati sicuri in una sessione temporanea server-side, 
      *    invia l'eventuale OTP via email e avvisa il controller di richiedere il secondo fattore (`result => '2fa_required'`).
      * 6. Se il 2FA non è richiesto, azzera i tentativi falliti e demanda la creazione della sessione a `innerLogin()`.
@@ -183,84 +182,95 @@ class AuthModel extends BackendModel
      * @param \CodeIgniter\HTTP\IncomingRequest $request Richiesta per estrarre Indirizzo IP
      * @return array Risposta strutturata con esito e messaggi per il router o il client
      */
-    public function login(array $posts, \CodeIgniter\HTTP\IncomingRequest $request)
+    public function login(array $posts, \CodeIgniter\HTTP\IncomingRequest $request): array
     {
+        $transactionStarted = false;
+
         try 
         {
             /* Inizializzazione variabili e parametri di configurazione */
             $posts = $this->checkAllowedFields($posts, $this->loginAllowedFields);
+            $posts['email'] = strtolower(trim($posts['email']));
 
             $rememberMe = (isset($posts['rememberMe']) && $posts['rememberMe']) ? true : false;
             $ip_address = $request->getIPAddress();
+            $emailHash = $this->getAttemptIdentifierHash($posts['email']);
 
             /* Lettura centralizzata delle configurazioni per evitare chiamate ridondanti */
             $allowAttempts = (bool) $this->config->attempts;
             $allowTwoFactor = (bool) $this->config->twoFactor;
 
-            /* Costruzione della query di lettura iniziale dell'utente */
             if ($allowAttempts):
-                $secondsInterval = (int) $this->config->attemptsInterval;
-                $attemptsInterval = date('Y-m-d H:i:s', time() - $secondsInterval);
-                
-                /* Inserita clausola di sicurezza AND admins.deleted_at IS NULL */
-                $sql = "select admins.uuid, admins.firstname, admins.lastname, admins.email, admins.password_hash, COUNT(admins_attempts.id) as times
-                        from admins
-                        left join admins_attempts
-                        on admins_attempts.admin_uuid = admins.uuid and admins_attempts.timestamp > ?
-                        where admins.email = ? and admins.status = 1 and admins.suspended_at IS NULL and admins.deleted_at IS NULL
-                        group by admins.uuid limit 1";
-                $params = [$attemptsInterval, $posts['email']];
-            else:
-                /* Inserita clausola di sicurezza AND deleted_at IS NULL */
-                $sql = "select uuid, firstname, lastname, email, password_hash from admins where email = ? and status = 1 and suspended_at IS NULL and deleted_at IS NULL limit 1";
-                $params = [$posts['email']];
+                $attemptStatus = $this->getAttemptsStatus(
+                    'login',
+                    ['email_hash' => $emailHash],
+                    $ip_address,
+                    (int) $this->config->attemptsLimit,
+                    (int) $this->config->attemptsInterval
+                );
+
+                if ($attemptStatus['limited']):
+                    if ( ! $this->db->transBegin()):
+                        throw new \RuntimeException('login: impossibile avviare la transazione tentativi.');
+                    endif;
+
+                    $transactionStarted = true;
+                    $this->renewAttemptsWindow('login', ['email_hash' => $emailHash], $ip_address, $attemptStatus);
+
+                    if ( ! $this->db->transCommit()):
+                        throw new \RuntimeException('login: commit tentativi non riuscito.');
+                    endif;
+
+                    $transactionStarted = false;
+
+                    log_admin_activity('LOGIN_BLOCKED', 'auth', lang('backend/auth.audits.loginBlocked'));
+
+                    return ['result' => false, 'message' => lang('backend/auth.messages.tooManyAttempts')];
+                endif;
             endif;
 
-            /* Esecuzione della lettura (fuori transazione per ottimizzare le prestazioni) */
-            $admin = $this->db->query($sql, $params)->getRow();
+            $sql = "select uuid, firstname, lastname, email, password_hash from admins where email = ? and status = 1 and suspended_at is null and deleted_at is null limit 1";
+            $admin = $this->db->query($sql, [$posts['email']])->getRow();
 
-            /* Se l'utente non esiste, esce immediatamente con errore generico (sicurezza) */
             if ( ! $admin):
+                password_verify($posts['password'], self::DUMMY_PASSWORD_HASH);
+
+                if ($allowAttempts):
+                    if ( ! $this->db->transBegin()):
+                        throw new \RuntimeException('login: impossibile avviare la transazione tentativi.');
+                    endif;
+
+                    $transactionStarted = true;
+                    $this->registerAttempt('login', ['admin_uuid' => null, 'email_hash' => $emailHash], $ip_address);
+
+                    if ( ! $this->db->transCommit()):
+                        throw new \RuntimeException('login: commit tentativi non riuscito.');
+                    endif;
+
+                    $transactionStarted = false;
+                endif;
+
                 log_admin_activity('LOGIN_REFUSED', 'auth', lang('backend/auth.audits.loginRefused'));
                 return ['result' => false, 'message' => lang('backend/auth.messages.loginFailed')];
             endif;
 
-            /* Controllo immediato del blocco tentativi */
-            if ($allowAttempts && isset($admin->times)):
-                if ($admin->times >= (int) $this->config->attemptsLimit):
-                    
-                    $this->db->transBegin();
-
-                    /* Recuperiamo il timestamp dell'ultimo tentativo per questo specifico admin all'interno della finestra */
-                    $sql = "select MAX(timestamp) as last_ts from admins_attempts where admin_uuid = ? and timestamp > ?";
-                    $row = $this->db->query($sql, [$admin->uuid, $attemptsInterval])->getRow();
-
-                    /* Se troviamo l'ultimo tentativo, ne aggiorniamo l'orario a questo istante per far slittare il blocco */
-                    if ($row && $row->last_ts) :
-                        $sql = "update admins_attempts set timestamp = ? where admin_uuid = ? and timestamp = ?";
-                        $this->db->query($sql, [date('Y-m-d H:i:s'), $admin->uuid, $row->last_ts]);
-                    endif;
-
-                    $this->db->transCommit();
-
-                    log_admin_activity('LOGIN_BLOCKED', 'auth', sprintf(lang('backend/auth.audits.loginBlocked'), esc($admin->firstname), esc($admin->lastname)), $admin);
-
-                    return ['result' => false, 'message' => lang('backend/auth.messages.tooMAnyAttempts')];
-                endif;
-            endif;
-
             /* Verifica della password */
             if ( ! password_verify($posts['password'], $admin->password_hash)):
-                
-                /* La transazione si apre solo ora, poiché dobbiamo effettuare una scrittura sul DB */
-                $this->db->transBegin();
-                
-                if ($allowAttempts):
-                    $sql = "insert into admins_attempts (admin_uuid, ip_address, timestamp) values (?, ?, ?)";
-                    $this->db->query($sql, [$admin->uuid, $ip_address, date('Y-m-d H:i:s')]);
-                endif;
 
-                $this->db->transCommit();
+                if ($allowAttempts):
+                    if ( ! $this->db->transBegin()):
+                        throw new \RuntimeException('login: impossibile avviare la transazione tentativi.');
+                    endif;
+
+                    $transactionStarted = true;
+                    $this->registerAttempt('login', ['admin_uuid' => $admin->uuid, 'email_hash' => $emailHash], $ip_address);
+
+                    if ( ! $this->db->transCommit()):
+                        throw new \RuntimeException('login: commit tentativi non riuscito.');
+                    endif;
+
+                    $transactionStarted = false;
+                endif;
 
                 log_admin_activity('LOGIN_FAILED', 'auth', sprintf(lang('backend/auth.audits.loginFailed'), esc($admin->firstname), esc($admin->lastname)), $admin);
 
@@ -275,20 +285,40 @@ class AuthModel extends BackendModel
                 $twofa = $this->db->query($sql, [$admin->uuid])->getRow();
 
                 if ($allowAttempts):
-                    $sqlClearAttempts = "delete from admins_attempts where admin_uuid = ?";
-                    $this->db->query($sqlClearAttempts, [$admin->uuid]);
+                    $this->clearAttempts('login', ['admin_uuid' => $admin->uuid, 'email_hash' => $emailHash]);
                 endif;
 
                 if ($twofa):
                     /* IMPLEMENTAZIONE SICURA: Scrittura dei dati sensibili in sessione server protetta */
-                    session()->set('auth_2fa_pending', ['admin_uuid'  => $admin->uuid, 'rememberMe' => $rememberMe, 'method' => $twofa->method]);
+                    session()->set('auth_2fa_pending', [
+                        'admin_uuid' => $admin->uuid,
+                        'rememberMe' => $rememberMe,
+                        'method' => $twofa->method,
+                        'created_at' => time(),
+                        'redirect' => session()->get('intended_url') ?? base_url('backend/dashboard'),
+                    ]);
 
                     /* Eliminazione preventiva di eventuali codici presenti in admins_2fa_codes per l'utente corrente */
                     $sql = "delete from admins_2fa_codes where admin_uuid = ?";
                     $this->db->query($sql, [$admin->uuid]);
 
                     if ($twofa->method === 'email'):
-                        (new \App\Libraries\EmailOtpService())->send($admin->uuid);
+
+                        $sent = (new \App\Libraries\EmailOtpService())->send($admin->uuid);
+
+                        if ( ! $sent):
+
+                            /* Elimina l'eventuale OTP registrato prima del fallimento dell'invio */
+                            $sql = "delete from admins_2fa_codes where admin_uuid = ?";
+                            $this->db->query($sql, [$admin->uuid]);
+
+                            /* Annulla lo stato di autenticazione parziale */
+                            session()->remove('auth_2fa_pending');
+
+                            return ['result' => false, 'message' => lang('backend/auth.messages.twoFactorEmailSendError')];
+
+                        endif;
+
                     endif;
 
                     log_admin_activity('2FA_REQUIRED', 'auth', sprintf(lang('backend/auth.audits.2faRequired'), esc($twofa->method), esc($admin->firstname), esc($admin->lastname)), $admin);
@@ -300,26 +330,33 @@ class AuthModel extends BackendModel
             endif;
 
             /* Fase finale del Login (Password e 2FA non richiesto) */
-            $this->db->transBegin();
-
             if ($allowAttempts):
-                $sql = "delete from admins_attempts where admin_uuid = ?";
-                $this->db->query($sql, [$admin->uuid]);
-            endif;
+                if ( ! $this->db->transBegin()):
+                    throw new \RuntimeException('login: impossibile avviare la transazione di pulizia tentativi.');
+                endif;
 
-            /* Chiusura della transazione prima del passaggio di consegne */
-            $this->db->transCommit();
+                $transactionStarted = true;
+                $this->clearAttempts('login', ['admin_uuid' => $admin->uuid, 'email_hash' => $emailHash]);
+
+                if ( ! $this->db->transCommit()):
+                    throw new \RuntimeException('login: commit pulizia tentativi non riuscito.');
+                endif;
+
+                $transactionStarted = false;
+            endif;
 
             /* Delega la finalizzazione (creazione sessioni/cookie) al metodo interno */
             return $this->innerLogin($admin, $rememberMe, $request);
 
         } catch (\Throwable $e) {
-            /* In CodeIgniter 4 si esegue il rollback sicuro verificando lo stato interno del database */
-            if ($this->db->transStatus() === false):
+
+            /* Annulla un'eventuale transazione ancora aperta */
+            if ($transactionStarted):
                 $this->db->transRollback();
             endif;
-            
+
             log_message('error', lang('backend/auth.messages.loginFailed') . ' - ' . $e);
+
             return ['result' => false, 'message' => lang('backend/auth.messages.loginFailed')];
         }
     }
@@ -338,6 +375,7 @@ class AuthModel extends BackendModel
      * @param \CodeIgniter\HTTP\IncomingRequest $request Richiesta per tracciare User Agent e IP
      * @return array Esito positivo
      */
+
     private function innerLogin(object $admin, bool $rememberMe, \CodeIgniter\HTTP\IncomingRequest $request): array
     {
         if ($rememberMe):
@@ -351,68 +389,91 @@ class AuthModel extends BackendModel
         $token = new \App\Libraries\Token();
         $tokenHash = $token->getHash($this->config->hashKey);
 
-        /* Generazione delle stringhe DATETIME corrette per admins_tokens */
+        /* Generazione delle stringhe DATETIME per admins_tokens */
         $tokenCreate = date('Y-m-d H:i:s');
         $lastActivity = date('Y-m-d H:i:s');
         $tokenExpire = date('Y-m-d H:i:s', time() + $time);
 
-        /* 3. Pulizia dei vecchi token di tipo sessione se applicabile */
-        if ($tokenType === 'session'):
-            $sql = "delete from admins_tokens where admin_uuid = ? and token_type = ?";
-            $this->db->query($sql, [$admin->uuid, 'session']);
-        endif;
-
-        /* 4. Registrazione del nuovo token nel database con i metodi nativi di CI4 */
         $userAgent = $request->getUserAgent()->getAgentString();
         $ip_address = $request->getIPAddress();
 
-        $sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, last_activity, token_expire, token_type, user_agent, ip_address, created_at) values(?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $this->db->query($sql, [
-            $admin->uuid,
-            $tokenHash,
-            $tokenCreate,
-            $lastActivity, 
-            $tokenExpire,
-            $tokenType,
-            $userAgent,
-            $ip_address, 
-            date('Y-m-d H:i:s')
-        ]);
+        /* Transazione autonoma per la creazione del login */
+        if ( ! $this->db->transBegin()):
+            throw new \RuntimeException('innerLogin: impossibile avviare la transazione.');
+        endif;
 
-        $token_id = $this->db->insertID();
+        try {
+            /* Pulizia dei vecchi token di sessione, se applicabile */
+            if ($tokenType === 'session'):
+                $sql = "update admins_logs as l join admins_tokens as t on t.id = l.token_id set l.logout = coalesce(t.last_activity, ?), l.logout_reason = 'timeout' where t.admin_uuid = ? and t.token_type = ? and l.logout is null";
+                $this->db->query($sql, [date('Y-m-d H:i:s'), $admin->uuid, 'session']);
 
-        $sql = "insert into admins_logs (token_id, admin_uuid, username, login, token_type, user_agent, ip_address, created_at) values (?, ?, ?, ?, ?, ?, ?, ?)";
-        $this->db->query($sql, [
-            $token_id, 
-            $admin->uuid,
-            $admin->email, /* Disponibile grazie alla SELECT in login() */
-            date('Y-m-d H:i:s'),
-            $tokenType,
-            $userAgent,
-            $ip_address,
-            date('Y-m-d H:i:s')
-        ]);
+                $sql = "delete from admins_tokens where admin_uuid = ? and token_type = ?";
+                $this->db->query($sql, [$admin->uuid, 'session']);
+            endif;
 
-        /* Recupero immediato dell'ID autogenerato del log per il futuro logout */
-        $loginLogId = $this->db->insertID();
+            /* Registrazione del nuovo token */
+            $sql = "insert into admins_tokens (admin_uuid, token_hash, token_create, last_activity, token_expire, token_type, user_agent, ip_address, created_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $this->db->query($sql, [
+                $admin->uuid,
+                $tokenHash,
+                $tokenCreate,
+                $lastActivity,
+                $tokenExpire,
+                $tokenType,
+                $userAgent,
+                $ip_address,
+                date('Y-m-d H:i:s')
+            ]);
 
-        /* Chiude la transazione aperta nel metodo principale prima di impostare gli stati del client */
-        $this->db->transCommit();
+            $token_id = $this->db->insertID();
 
+            /* Registrazione del log di accesso */
+            $sql = "insert into admins_logs (token_id, admin_uuid, username, login, token_type, user_agent, ip_address, created_at) values (?, ?, ?, ?, ?, ?, ?, ?)";
+            $this->db->query($sql, [
+                $token_id,
+                $admin->uuid,
+                $admin->email,
+                date('Y-m-d H:i:s'),
+                $tokenType,
+                $userAgent,
+                $ip_address,
+                date('Y-m-d H:i:s')
+            ]);
+
+            /* ID del log utilizzato successivamente durante il logout */
+            $loginLogId = $this->db->insertID();
+
+            /* Verifica dell'esito delle operazioni SQL */
+            if ($this->db->transStatus() === false):
+                $dbError = $this->db->error();
+                throw new \RuntimeException('innerLogin: errore durante la registrazione del login. ' .($dbError['message'] ?? ''));
+            endif;
+
+            /* Conferma definitiva delle operazioni */
+            if ( ! $this->db->transCommit()):
+                throw new \RuntimeException('innerLogin: commit della transazione non riuscito.');
+            endif;
+
+        } catch (\Throwable $e) {
+            $this->db->transRollback();
+            throw $e;
+        }
+
+        /* Audit del login riuscito */
         log_admin_activity('LOGIN_SUCCESS', 'auth', sprintf(lang('backend/auth.audits.loginSuccess'), esc($admin->firstname), esc($admin->lastname)), $admin);
 
-        /* 5. Rigenerazione dell'ID di sessione per prevenire Session Fixation */
+        /* Rigenerazione dell'ID di sessione contro Session Fixation */
         session()->regenerate(true);
 
-        /* Salvataggio dell'ID del log di accesso per aggiornarlo al momento del logout */
+        /* ID del log per il futuro logout */
         session()->set('login_log_id', $loginLogId);
 
-        /* 6. Assegnazione del token al client (con cifratura per il cookie Remember Me) */
+        /* Assegnazione del token al client */
         if ($rememberMe):
-            /* Cifratura del token raw tramite il servizio globale prima di inserirlo nel cookie */
+
             $encryptedToken = service('crypto')->encrypt($token->getValue());
 
-            /* Utilizzo della funzione nativa set_cookie di CI4 per l'impostazione sicura del cookie */
             set_cookie([
                 'name'     => 'backendRememberMe',
                 'value'    => $encryptedToken,
@@ -421,19 +482,17 @@ class AuthModel extends BackendModel
                 'secure'   => true,
                 'samesite' => 'Lax'
             ]);
+
         else:
-            /* Memorizzazione standard nella sessione server */
+
             session()->set('backendSession', $token->getValue());
+
         endif;
 
-        /* 7. Configurazione del messaggio flash di avvenuto login */
+        /* Messaggio di benvenuto */
         $welcomeMessage = sprintf(lang('backend/auth.messages.welcome'), esc($admin->firstname), esc($admin->lastname));
-        
-        session()->setFlashdata([
-            'message' => $welcomeMessage,
-            'class'   => 'light text-success fw-bold',
-            'icon'    => '<i class="fa-solid fa-handshake"></i>'
-        ]);
+
+        session()->setFlashdata(['message' => $welcomeMessage, 'class' => 'light text-success fw-bold', 'icon' => '<i class="fa-solid fa-handshake"></i>']);
 
         return ['result' => true];
     }
@@ -453,8 +512,65 @@ class AuthModel extends BackendModel
     public function resetPassword(array $posts, \CodeIgniter\HTTP\IncomingRequest $request): array
     {
         $posts = $this->checkAllowedFields($posts, $this->resetPasswordAllowedFields);
+        $posts['email'] = strtolower(trim($posts['email']));
 
-        $sql = "select uuid, firstname, lastname, email from admins where email = ? and deleted_at IS NULL";
+        $successMessage = lang('backend/auth.messages.resetPasswordSuccess');
+
+        if ((bool) $this->config->resetAttempts):
+            $attemptTransactionStarted = false;
+
+            try {
+                $emailHash = $this->getAttemptIdentifierHash($posts['email']);
+                $ipAddress = $request->getIPAddress();
+                $attemptStatus = $this->getAttemptsStatus(
+                    'reset',
+                    ['email_hash' => $emailHash],
+                    $ipAddress,
+                    (int) $this->config->resetAttemptsLimit,
+                    (int) $this->config->resetAttemptsInterval
+                );
+
+                if ($attemptStatus['limited']):
+                    if ( ! $this->db->transBegin()):
+                        throw new \RuntimeException('resetPassword: impossibile avviare la transazione tentativi.');
+                    endif;
+
+                    $attemptTransactionStarted = true;
+                    $this->renewAttemptsWindow('reset', ['email_hash' => $emailHash], $ipAddress, $attemptStatus);
+
+                    if ( ! $this->db->transCommit()):
+                        throw new \RuntimeException('resetPassword: commit tentativi non riuscito.');
+                    endif;
+
+                    $attemptTransactionStarted = false;
+
+                    log_message('warning', 'Richiesta reset password limitata per IP/email hash.');
+                    return ['result' => false, 'message' => lang('backend/auth.messages.tooManyAttempts')];
+                endif;
+
+                if ( ! $this->db->transBegin()):
+                    throw new \RuntimeException('resetPassword: impossibile avviare la transazione tentativi.');
+                endif;
+
+                $attemptTransactionStarted = true;
+                $this->registerAttempt('reset', ['email_hash' => $emailHash], $ipAddress);
+
+                if ( ! $this->db->transCommit()):
+                    throw new \RuntimeException('resetPassword: commit tentativi non riuscito.');
+                endif;
+
+                $attemptTransactionStarted = false;
+            } catch (\Throwable $e) {
+                if ($attemptTransactionStarted):
+                    $this->db->transRollback();
+                endif;
+
+                log_message('error', 'Errore controllo tentativi reset password - ' . $e);
+                return ['result' => false, 'message' => lang('backend/auth.messages.resetPasswordFailed')];
+            }
+        endif;
+
+        $sql = "select uuid, firstname, lastname, email from admins where email = ? and status = 1 and suspended_at is null and deleted_at is null limit 1";
         $admin = $this->db->query($sql, [$posts['email']])->getRow();
 
         if ($admin):
@@ -508,34 +624,263 @@ class AuthModel extends BackendModel
             /* Chiamata al metodo con i nuovi parametri separati e gestione dei ritorni */
             if ( ! $emailService->sendActivationEmail($admin, $token->getValue(), $module, $template, $subjectLangKey)):
 
-                $message = sprintf(lang('backend/auth.messages.resetPasswordSuccessNoEmail'), esc($admin->firstname), esc($admin->lastname));
-                return ['result' => false, 'message' => $message];
+                try {
+                    $this->db->transBegin();
+                    $this->db->query("delete from admins_tokens where admin_uuid = ? and token_type = ?", [$admin->uuid, 'activation']);
+                    $this->db->query("update admins set resetted_at = ? where uuid = ?", [null, $admin->uuid]);
+                    $this->db->transCommit();
+                } catch (\Throwable $e) {
+                    $this->db->transRollback();
+                    log_message('error', 'Errore pulizia token reset password non inviato - ' . $e);
+                }
+
+                return ['result' => true, 'message' => $successMessage];
                 
             else:
                 
-                $message = sprintf(lang('backend/auth.messages.resetPasswordSuccess'), esc($admin->firstname), esc($admin->lastname));
-                return ['result' => true, 'message' => $message];
+                return ['result' => true, 'message' => $successMessage];
                 
             endif;
 
         endif;
 
-        /* Fallback di sicurezza se l'admin non viene trovato nel database */
-        return ['result' => false, 'message' => lang('backend/auth.messages.resetPasswordFailed')];
+        /* Risposta indistinguibile per impedire l'enumerazione degli account */
+        return ['result' => true, 'message' => $successMessage];
+    }
+
+    /**
+     * Calcola l'HMAC stabile dell'identificatore senza memorizzare l'email in chiaro.
+     *
+     * @param string $identifier Identificatore già normalizzato.
+     * @return string Hash esadecimale SHA-256.
+     */
+    private function getAttemptIdentifierHash(string $identifier): string
+    {
+        return hash_hmac('sha256', $identifier, $this->config->hashKey);
+    }
+
+    /**
+     * Restituisce lo stato della finestra tentativi per identificatore e indirizzo IP.
+     *
+     * Prima del conteggio elimina in modo uniforme i record scaduti. Il limite IP è
+     * intenzionalmente più alto e deriva dal moltiplicatore interno non esposto nei Settings.
+     *
+     * @param string $scope Ambito supportato: login, verify oppure reset.
+     * @param array<string, string|null> $identifier Identificatore specifico dell'ambito.
+     * @param string $ipAddress Indirizzo IP della richiesta.
+     * @param int $limit Limite configurato per l'identificatore.
+     * @param int $interval Finestra temporale configurata in secondi.
+     * @return array{limited:bool,identifier_limited:bool,ip_limited:bool,identifier_attempts:int,ip_attempts:int,cutoff:string}
+     */
+    private function getAttemptsStatus(string $scope, array $identifier, string $ipAddress, int $limit, int $interval): array
+    {
+        $limit = max(1, $limit);
+        $interval = max(1, $interval);
+        $ipLimit = $limit * max(1, (int) $this->config->attemptsIpMultiplier);
+        $cutoff = date('Y-m-d H:i:s', time() - $interval);
+        $table = $this->getAttemptsTable($scope);
+
+        $this->db->query("delete from {$table} where timestamp <= ?", [$cutoff]);
+
+        switch ($scope):
+            case 'login':
+            case 'reset':
+                $sql = "select
+                            count(case when email_hash = ? then 1 end) as identifier_attempts,
+                            count(case when ip_address = ? then 1 end) as ip_attempts
+                        from {$table}
+                        where timestamp > ? and (email_hash = ? or ip_address = ?)";
+                $params = [$identifier['email_hash'], $ipAddress, $cutoff, $identifier['email_hash'], $ipAddress];
+                break;
+
+            case 'verify':
+                $sql = "select
+                            count(case when admin_uuid = ? and method = ? then 1 end) as identifier_attempts,
+                            count(case when ip_address = ? then 1 end) as ip_attempts
+                        from {$table}
+                        where timestamp > ? and ((admin_uuid = ? and method = ?) or ip_address = ?)";
+                $params = [
+                    $identifier['admin_uuid'],
+                    $identifier['method'],
+                    $ipAddress,
+                    $cutoff,
+                    $identifier['admin_uuid'],
+                    $identifier['method'],
+                    $ipAddress,
+                ];
+                break;
+
+            default:
+                throw new \InvalidArgumentException('Ambito tentativi non supportato.');
+        endswitch;
+
+        $row = $this->db->query($sql, $params)->getRow();
+        $identifierAttempts = (int) ($row->identifier_attempts ?? 0);
+        $ipAttempts = (int) ($row->ip_attempts ?? 0);
+
+        $identifierLimited = $identifierAttempts >= $limit;
+        $ipLimited = $ipAttempts >= $ipLimit;
+
+        return [
+            'limited' => $identifierLimited || $ipLimited,
+            'identifier_limited' => $identifierLimited,
+            'ip_limited' => $ipLimited,
+            'identifier_attempts' => $identifierAttempts,
+            'ip_attempts' => $ipAttempts,
+            'cutoff' => $cutoff,
+        ];
+    }
+
+    /**
+     * Registra un tentativo nella tabella associata all'ambito richiesto.
+     *
+     * @param string $scope Ambito supportato: login, verify oppure reset.
+     * @param array<string, string|null> $identifier Dati identificativi specifici dell'ambito.
+     * @param string $ipAddress Indirizzo IP della richiesta.
+     * @return void
+     */
+    private function registerAttempt(string $scope, array $identifier, string $ipAddress): void
+    {
+        $timestamp = date('Y-m-d H:i:s');
+
+        switch ($scope):
+            case 'login':
+                $sql = "insert into admins_attempts (admin_uuid, email_hash, ip_address, timestamp) values (?, ?, ?, ?)";
+                $params = [$identifier['admin_uuid'], $identifier['email_hash'], $ipAddress, $timestamp];
+                break;
+
+            case 'verify':
+                $sql = "insert into admins_2fa_attempts (admin_uuid, method, ip_address, timestamp) values (?, ?, ?, ?)";
+                $params = [$identifier['admin_uuid'], $identifier['method'], $ipAddress, $timestamp];
+                break;
+
+            case 'reset':
+                $sql = "insert into admins_reset_attempts (email_hash, ip_address, timestamp) values (?, ?, ?)";
+                $params = [$identifier['email_hash'], $ipAddress, $timestamp];
+                break;
+
+            default:
+                throw new \InvalidArgumentException('Ambito tentativi non supportato.');
+        endswitch;
+
+        $this->db->query($sql, $params);
+    }
+
+    /**
+     * Rinnova l'intera finestra del gruppo che ha causato il blocco.
+     *
+     * @param string $scope Ambito supportato: login, verify oppure reset.
+     * @param array<string, string|null> $identifier Identificatore specifico dell'ambito.
+     * @param string $ipAddress Indirizzo IP della richiesta.
+     * @param array{identifier_limited:bool,ip_limited:bool,cutoff:string} $status Stato del limite corrente.
+     * @return void
+     */
+    private function renewAttemptsWindow(string $scope, array $identifier, string $ipAddress, array $status): void
+    {
+        $table = $this->getAttemptsTable($scope);
+        $timestamp = date('Y-m-d H:i:s');
+
+        switch ($scope):
+            case 'login':
+            case 'reset':
+                if ($status['identifier_limited'] && $status['ip_limited']):
+                    $sql = "update {$table} set timestamp = ? where timestamp > ? and (email_hash = ? or ip_address = ?)";
+                    $params = [$timestamp, $status['cutoff'], $identifier['email_hash'], $ipAddress];
+                elseif ($status['identifier_limited']):
+                    $sql = "update {$table} set timestamp = ? where timestamp > ? and email_hash = ?";
+                    $params = [$timestamp, $status['cutoff'], $identifier['email_hash']];
+                else:
+                    $sql = "update {$table} set timestamp = ? where timestamp > ? and ip_address = ?";
+                    $params = [$timestamp, $status['cutoff'], $ipAddress];
+                endif;
+                break;
+
+            case 'verify':
+                if ($status['identifier_limited'] && $status['ip_limited']):
+                    $sql = "update {$table} set timestamp = ? where timestamp > ? and ((admin_uuid = ? and method = ?) or ip_address = ?)";
+                    $params = [$timestamp, $status['cutoff'], $identifier['admin_uuid'], $identifier['method'], $ipAddress];
+                elseif ($status['identifier_limited']):
+                    $sql = "update {$table} set timestamp = ? where timestamp > ? and admin_uuid = ? and method = ?";
+                    $params = [$timestamp, $status['cutoff'], $identifier['admin_uuid'], $identifier['method']];
+                else:
+                    $sql = "update {$table} set timestamp = ? where timestamp > ? and ip_address = ?";
+                    $params = [$timestamp, $status['cutoff'], $ipAddress];
+                endif;
+                break;
+
+            default:
+                throw new \InvalidArgumentException('Ambito tentativi non supportato.');
+        endswitch;
+
+        $this->db->query($sql, $params);
+    }
+
+    /**
+     * Elimina i tentativi dopo il completamento positivo di Login o Verify.
+     *
+     * @param string $scope Ambito supportato: login oppure verify.
+     * @param array<string, string|null> $identifier Identificatore specifico dell'ambito.
+     * @return void
+     */
+    private function clearAttempts(string $scope, array $identifier): void
+    {
+        switch ($scope):
+            case 'login':
+                $this->db->query(
+                    "delete from admins_attempts where email_hash = ? or admin_uuid = ?",
+                    [$identifier['email_hash'], $identifier['admin_uuid']]
+                );
+                break;
+
+            case 'verify':
+                $this->db->query(
+                    "delete from admins_2fa_attempts where admin_uuid = ? and method = ?",
+                    [$identifier['admin_uuid'], $identifier['method']]
+                );
+                break;
+
+            default:
+                throw new \InvalidArgumentException('Pulizia tentativi non supportata per questo ambito.');
+        endswitch;
+    }
+
+    /**
+     * Risolve esclusivamente le tabelle autorizzate per evitare identificatori SQL dinamici arbitrari.
+     *
+     * @param string $scope Ambito supportato.
+     * @return string Nome della tabella tentativi.
+     */
+    private function getAttemptsTable(string $scope): string
+    {
+        switch ($scope):
+            case 'login':
+                return 'admins_attempts';
+
+            case 'verify':
+                return 'admins_2fa_attempts';
+
+            case 'reset':
+                return 'admins_reset_attempts';
+
+            default:
+                throw new \InvalidArgumentException('Ambito tentativi non supportato.');
+        endswitch;
     }
 
     /**
      * Salva la nuova password dopo la convalida del token di reset/attivazione.
      * 
      * Recupera l'utente a partire dall'hash del token fornito. Esegue in transazione 
-     * la rigenerazione dell'hash della password (`password_hash`), azzera la data di reset 
-     * ed elimina il token ormai consumato (monouso) dal database, chiudendo il ciclo di recupero.
+     * la rigenerazione dell'hash della password (`password_hash`), azzera la data di reset,
+     * chiude i log aperti e revoca tutti i token attivi dell'amministratore.
      *
      * @param array $posts Dati POST contenenti la nuova password e il token
      * @return array Esito del salvataggio
      */
     public function setPassword(array $posts): array
     {
+        $transactionStarted = false;
+
         try
         {
             $posts = $this->checkAllowedFields($posts, $this->setPasswordAllowedFields);
@@ -544,28 +889,40 @@ class AuthModel extends BackendModel
             $token = new \App\Libraries\Token($posts['token']);
             $tokenHash = $token->getHash($this->config->hashKey);
 
-            /* 2. Sostituito fetch() con getRow() */
-            $sql = "select uuid, firstname, lastname, email from admins as u join admins_tokens as t on u.uuid = t.admin_uuid where t.token_hash = ? and t.token_type = ? limit 1";
-            $admin = $this->db->query($sql, [$tokenHash, 'activation'])->getRow();
+            if ( ! $this->db->transBegin()):
+                throw new \RuntimeException('setPassword: impossibile avviare la transazione.');
+            endif;
+
+            $transactionStarted = true;
+
+            /* 2. Blocca il token valido per impedirne l'uso concorrente */
+            $sql = "select u.uuid, u.firstname, u.lastname, u.email from admins as u join admins_tokens as t on u.uuid = t.admin_uuid where t.token_hash = ? and t.token_type = ? and t.token_expire > ? and u.status = 1 and u.suspended_at is null and u.deleted_at is null limit 1 for update";
+            $admin = $this->db->query($sql, [$tokenHash, 'activation', date('Y-m-d H:i:s')])->getRow();
 
             if($admin):
-
-                /* 3. Sintassi transazioni nativa CI4 */
-                $this->db->transBegin();
 
                 $sql = "update admins set password_hash = ?, resetted_at = ? where uuid = ?";
                 $this->db->query($sql, [password_hash($posts['password'], PASSWORD_DEFAULT), null, $admin->uuid]);
 
-                $sql = "delete from admins_tokens where admin_uuid = ? and token_type = ?";
-                $this->db->query($sql, [$admin->uuid, 'activation']);
+                /* Chiude formalmente e revoca tutte le sessioni esistenti dell'account */
+                $sql = "update admins_logs as l join admins_tokens as t on t.id = l.token_id set l.logout = ?, l.logout_reason = ? where t.admin_uuid = ? and t.token_type in ('session', 'cookie') and l.logout_reason is null";
+                $this->db->query($sql, [date('Y-m-d H:i:s'), 'manual', $admin->uuid]);
+
+                $sql = "delete from admins_tokens where admin_uuid = ?";
+                $this->db->query($sql, [$admin->uuid]);
 
                 /* 4. Verifica stato transazione prima del commit */
                 if ($this->db->transStatus() === false):
                     $this->db->transRollback();
+                    $transactionStarted = false;
                     return ['result' => false, 'message' => lang('backend/auth.messages.setPasswordError')];
                 endif;
 
-                $this->db->transCommit();
+                if ( ! $this->db->transCommit()):
+                    throw new \RuntimeException('setPassword: commit della transazione non riuscito.');
+                endif;
+
+                $transactionStarted = false;
 
                 log_admin_activity('SET_PASSWORD', 'auth', sprintf(lang('backend/auth.audits.setPassword'), esc($admin->firstname), esc($admin->lastname)), $admin);
 
@@ -575,12 +932,15 @@ class AuthModel extends BackendModel
 
             endif;
 
+            $this->db->transRollback();
+            $transactionStarted = false;
+
             return ['result' => false, 'message' => lang('backend/auth.messages.setPasswordFailed')];
 
         } catch (\Throwable $e) {
 
             /* 5. Rollback di sicurezza solo se la transazione era effettivamente in corso */
-            if ($this->db->transStatus() !== true):
+            if ($transactionStarted):
                 $this->db->transRollback();
             endif;
 
@@ -613,7 +973,10 @@ class AuthModel extends BackendModel
                 join admins_tokens as t 
                 on t.admin_uuid = u.uuid 
                 where t.token_hash = ? 
-                and t.token_type = ? 
+                and t.token_type = ?
+                and u.status = 1
+                and u.suspended_at is null
+                and u.deleted_at is null
                 limit 1";
 
             $query = $this->db->query($sql, [$tokenHash, 'activation'])->getRow();
@@ -646,16 +1009,26 @@ class AuthModel extends BackendModel
      */
     public function verify(array $posts, \CodeIgniter\HTTP\IncomingRequest $request): array
     {
+        $transactionStarted = false;
+
         try 
         {
             $posts = $this->checkAllowedFields($posts, $this->verifyAllowedFields);
 
             $config = $this->config;
             $ip_address = $request->getIPAddress();
+            $allowTwoFactorAttempts = (bool) $config->twoFactorAttempts;
 
             /* Recupero e validazione immediata della sessione protetta temporanea */
             $sessionData = session()->get('auth_2fa_pending');
-            if ((empty($sessionData)) || ( ! isset($sessionData['admin_uuid']))):
+            if ((empty($sessionData)) || ( ! isset($sessionData['admin_uuid'], $sessionData['method'], $sessionData['created_at']))):
+                session()->remove('auth_2fa_pending');
+                return ['result' => false, 'message' => lang('backend/auth.messages.sessionExpired')];
+            endif;
+
+            if ((time() - (int) $sessionData['created_at']) > (int) $config->twoFactorTime):
+                $this->db->query("delete from admins_2fa_codes where admin_uuid = ?", [(string) $sessionData['admin_uuid']]);
+                session()->remove('auth_2fa_pending');
                 return ['result' => false, 'message' => lang('backend/auth.messages.sessionExpired')];
             endif;
 
@@ -664,37 +1037,41 @@ class AuthModel extends BackendModel
             $rememberMe = (bool) $sessionData['rememberMe'];
 
             /* Recupero l'oggetto anagrafico dell'admin per il login finale, bloccando rigorosamente i record cestinati */
-            $admin = $this->db->query("select * from admins where uuid = ? and status = 1 and deleted_at IS NULL limit 1", [$adminUuid])->getRow();
+            $admin = $this->db->query("select * from admins where uuid = ? and status = 1 and suspended_at is null and deleted_at is null limit 1", [$adminUuid])->getRow();
             if ( ! $admin):
+                session()->remove('auth_2fa_pending');
                 log_admin_activity('VERIFY_FAILED', 'auth', lang('backend/auth.audits.verifyFailed'));
                 return ['result' => false, 'message' => lang('backend/auth.messages.verifyFailed')];
             endif;
 
-            /* Controllo Throttling Anti Brute-Force (2FA) */
-            $cutoffTime = date('Y-m-d H:i:s', time() - (int)$config->twoFactorTime);
+            if ($allowTwoFactorAttempts):
+                $attemptIdentifier = ['admin_uuid' => $adminUuid, 'method' => $method];
+                $attemptStatus = $this->getAttemptsStatus(
+                    'verify',
+                    $attemptIdentifier,
+                    $ip_address,
+                    (int) $config->twoFactorLimit,
+                    (int) $config->twoFactorAttemptsInterval
+                );
 
-            /* Conteggio tentativi falliti */
-            $sql = "select COUNT(id) as cnt from admins_2fa_attempts where admin_uuid = ? and method = ? and timestamp > ?";
-            $cntRow = $this->db->query($sql, [$adminUuid, $method, $cutoffTime])->getRow();
+                if ($attemptStatus['limited']):
+                    if ( ! $this->db->transBegin()):
+                        throw new \RuntimeException('verify: impossibile avviare la transazione tentativi.');
+                    endif;
 
-            if ($cntRow && (int) $cntRow->cnt >= (int) $config->twoFactorLimit):
-                
-                $this->db->transBegin();
+                    $transactionStarted = true;
+                    $this->renewAttemptsWindow('verify', $attemptIdentifier, $ip_address, $attemptStatus);
 
-                /* Aggiorna il timestamp dell'ultimo tentativo fallito per mantenere attivo il blocco */
-                $sql = "select MAX(timestamp) as last_ts from admins_2fa_attempts where admin_uuid = ? and method = ? and timestamp > ?";
-                $row = $this->db->query($sql, [$adminUuid, $method, $cutoffTime])->getRow();
+                    if ( ! $this->db->transCommit()):
+                        throw new \RuntimeException('verify: commit tentativi non riuscito.');
+                    endif;
 
-                if ($row && $row->last_ts):
-                    $sql = "update admins_2fa_attempts set timestamp = ? where admin_uuid = ? and method = ? and timestamp = ?";
-                    $this->db->query($sql, [date('Y-m-d H:i:s'), $adminUuid, $method, $row->last_ts]);
+                    $transactionStarted = false;
+
+                    log_admin_activity('2FA_BLOCKED', 'auth', sprintf(lang('backend/auth.audits.2faBlocked'), esc($admin->firstname), esc($admin->lastname)), $admin);
+
+                    return ['result' => false, 'message' => lang('backend/auth.messages.tooManyAttempts')];
                 endif;
-
-                $this->db->transCommit();
-
-                log_admin_activity('2FA_BLOCKED', 'auth', sprintf(lang('backend/auth.audits.2faBlocked'), esc($admin->firstname), esc($admin->lastname)), $admin);
-
-                return ['result' => false, 'message' => lang('backend/auth.messages.tooManyAttempts')];
             endif;
 
             /* Validazione del codice OTP (TOTP o Email) */
@@ -705,8 +1082,13 @@ class AuthModel extends BackendModel
                 $sql = "select secret from admins_2fa where admin_uuid = ? and method = 'totp' and enabled = 1 limit 1";
                 $row = $this->db->query($sql, [$adminUuid])->getRow();
 
-                if ($row && ! empty($row->secret)):
-                    $isValidCode = (new \App\Libraries\AppOtpService())->verify($row->secret, $posts['code']);
+				if ($row && ! empty($row->secret)):
+					$otpService = new \App\Libraries\AppOtpService();
+					$secret = $otpService->revealSecret((string) $row->secret);
+
+					if ($secret !== null):
+						$isValidCode = $otpService->verify($secret, $posts['code']);
+					endif;
                 endif;
 
             elseif ($method === 'email'):
@@ -728,15 +1110,22 @@ class AuthModel extends BackendModel
                 endif;
             endif;
 
-            /* Gestione Esito Validazione */
-            $this->db->transBegin();
-
             if ( ! $isValidCode):
                 /* Qualsiasi fallimento conta come tentativo errato per la sicurezza */
-                $sql = "insert into admins_2fa_attempts (admin_uuid, method, ip_address, timestamp) values (?, ?, ?, ?)";
-                $this->db->query($sql, [$adminUuid, $method, $ip_address, date('Y-m-d H:i:s')]);
+                if ($allowTwoFactorAttempts):
+                    if ( ! $this->db->transBegin()):
+                        throw new \RuntimeException('verify: impossibile avviare la transazione tentativi.');
+                    endif;
 
-                $this->db->transCommit();
+                    $transactionStarted = true;
+                    $this->registerAttempt('verify', ['admin_uuid' => $adminUuid, 'method' => $method], $ip_address);
+
+                    if ( ! $this->db->transCommit()):
+                        throw new \RuntimeException('verify: commit tentativo non riuscito.');
+                    endif;
+
+                    $transactionStarted = false;
+                endif;
 
                 log_admin_activity('2FA_FAILED', 'auth', sprintf(lang('backend/auth.audits.2faFailed'), esc($admin->firstname), esc($admin->lastname)), $admin);
 
@@ -747,24 +1136,42 @@ class AuthModel extends BackendModel
             endif;
 
             /* Codice Corretto: Pulizia tabelle temporanee dell'utente */
-            $sql = "delete from admins_2fa_attempts where admin_uuid = ? and method = ?";
-            $this->db->query($sql, [$adminUuid, $method]);
+            if ( ! $this->db->transBegin()):
+                throw new \RuntimeException('verify: impossibile avviare la transazione di verifica.');
+            endif;
+
+            $transactionStarted = true;
+
+            if ($allowTwoFactorAttempts):
+                $this->clearAttempts('verify', ['admin_uuid' => $adminUuid, 'method' => $method]);
+            endif;
 
             $sql = "delete from admins_2fa_codes where admin_uuid = ?";
             $this->db->query($sql, [$adminUuid]);
 
-            $this->db->transCommit();
+            if ( ! $this->db->transCommit()):
+                throw new \RuntimeException('verify: commit verifica non riuscito.');
+            endif;
+
+            $transactionStarted = false;
 
             /* Rimozione tassativa della sessione temporanea e Finalizzazione Login */
             session()->remove('auth_2fa_pending');
 
-            return $this->innerLogin($admin, $rememberMe, $request);
+            $result = $this->innerLogin($admin, $rememberMe, $request);
+            $result['redirect'] = $sessionData['redirect'] ?? base_url('backend/dashboard');
+
+            return $result;
 
         } catch (\Throwable $e) {
-            /* Forza tassativamente il rollback se c'è una transazione attiva al momento del crash */
-            $this->db->transRollback();
 
-            log_message('error', 'Errore nel metodo verify 2FA: ' . $e->getMessage());
+            /* Annulla un'eventuale transazione ancora aperta */
+            if ($transactionStarted):
+                $this->db->transRollback();
+            endif;
+
+            log_message('error', 'Errore nel metodo verify 2FA: ' . $e);
+
             return ['result' => false, 'message' => lang('backend/auth.messages.verifyError')];
         }
     }
@@ -788,37 +1195,13 @@ class AuthModel extends BackendModel
                 $token = new \App\Libraries\Token($sessionValue);
                 $tokenHash = $token->getHash($this->config->hashKey);
 
-                if (session()->has('login_log_id')):
-                    $logId = session()->get('login_log_id');
+                $this->closeLoginLog($tokenHash, 'session', $reason);
 
-                    /* 1. Guard Clause: Verifico lo stato attuale del log */
-                    $sqlLogCheck = "select logout_reason from admins_logs where id = ?";
-                    $logRow = $this->db->query($sqlLogCheck, [$logId])->getRow();
-
-                    /* 2. Se il log è aperto (null), procedo alla chiusura formale */
-                    if ($logRow && is_null($logRow->logout_reason)):
-
-                        /* Leggo last_activity PRIMA di eliminare il token */
-                        $sqlSelect = "select last_activity from admins_tokens where token_hash = ? and token_type = ?";
-                        $tokenRow = $this->db->query($sqlSelect, [$tokenHash, 'session'])->getRow();
-                        
-                        $logoutTime = ($tokenRow && $reason === 'timeout' && ! empty($tokenRow->last_activity)) ? $tokenRow->last_activity : date('Y-m-d H:i:s');
-
-                        /* 3. Scrivo la disconnessione nel log */
-                        $sqlLogUpdate = "update admins_logs set logout = ?, logout_reason = ? where id = ?";
-                        $this->db->query($sqlLogUpdate, [$logoutTime, $reason, $logId]);
-
-                    endif;
-
-                    /* Rimuovo il tracciante locale a prescindere dall'esito */
-                    session()->remove('login_log_id');
-                endif;
-
-                /* 4. Elimino fisicamente il token (se non è già stato eliminato da altri) */
+                /* Elimino fisicamente il token (se non è già stato eliminato da altri) */
                 $sqlDelete = "delete from admins_tokens where token_hash = ? and token_type = ?";
                 $this->db->query($sqlDelete, [$tokenHash, 'session']);
 
-                /* 5. Distruzione sessione locale */
+                /* Distruzione sessione locale */
                 session()->remove('backendSession');
                 session()->regenerate(true);
 
@@ -835,47 +1218,59 @@ class AuthModel extends BackendModel
      * del cookie inviato dal browser. Chiude il log aperto registrando il timestamp di logout 
      * ed elimina definitivamente il token di tipo 'cookie' dal database, invalidando gli accessi futuri.
      *
-     * @param string $cookieValue Il valore decifrato del cookie 'backendRememberMe'
+     * @param string $cookieValue Il valore crittografato del cookie 'backendRememberMe'
      * @param string $reason Motivo della disconnessione (default: 'manual')
      */
     public function logoutByCookie(string $cookieValue, string $reason = 'manual'): void
     {
         try {
-            $token = new \App\Libraries\Token($cookieValue);
-            $tokenHash = $token->getHash($this->config->hashKey);
+            $decryptedValue = service('crypto')->decrypt($cookieValue);
 
-            if (session()->has('login_log_id')):
-                $logId = session()->get('login_log_id');
-
-                /* 1. Guard Clause: Verifico lo stato attuale del log */
-                $sqlLogCheck = "select logout_reason from admins_logs where id = ?";
-                $logRow = $this->db->query($sqlLogCheck, [$logId])->getRow();
-
-                /* 2. Se il log è aperto (null), procedo alla chiusura formale */
-                if ($logRow && is_null($logRow->logout_reason)):
-
-                        /* Leggo last_activity PRIMA di eliminare il token */
-                        $sqlSelect = "select last_activity from admins_tokens where token_hash = ? and token_type = ?";
-                        $tokenRow = $this->db->query($sqlSelect, [$tokenHash, 'cookie'])->getRow();
-                        
-                        $logoutTime = ($tokenRow && $reason === 'timeout' && ! empty($tokenRow->last_activity)) ? $tokenRow->last_activity : date('Y-m-d H:i:s');
-
-                        /* 3. Scrivo la disconnessione nel log */
-                        $sqlLogUpdate = "update admins_logs set logout = ?, logout_reason = ? where id = ?";
-                        $this->db->query($sqlLogUpdate, [$logoutTime, $reason, $logId]);
-
-                endif;
-
-                /* Rimuovo il tracciante locale a prescindere dall'esito */
-                session()->remove('login_log_id');
+            if ( ! $decryptedValue):
+                return;
             endif;
 
-            /* 4. Elimino fisicamente il token (se non è già stato eliminato da altri) */
+            $token = new \App\Libraries\Token($decryptedValue);
+            $tokenHash = $token->getHash($this->config->hashKey);
+
+            $this->closeLoginLog($tokenHash, 'cookie', $reason);
+
+            /* Elimino fisicamente il token (se non è già stato eliminato da altri) */
             $sqlDelete = "delete from admins_tokens where token_hash = ? and token_type = ?";
             $this->db->query($sqlDelete, [$tokenHash, 'cookie']);
 
         } catch (\Throwable $e) {
             log_message('error', lang('backend/auth.messages.logoutCookieError') . ' - ' . $e);
+        } finally {
+            session()->remove('login_log_id');
+            delete_cookie('backendRememberMe');
         }
+    }
+
+    /**
+     * Chiude il log di accesso associato a un token senza sovrascrivere log già conclusi.
+     *
+     * @param string $tokenHash Hash del token di autenticazione.
+     * @param string $tokenType Tipo del token: session oppure cookie.
+     * @param string $reason Motivo della disconnessione.
+     * @return void
+     */
+    private function closeLoginLog(string $tokenHash, string $tokenType, string $reason): void
+    {
+        $sqlSelect = "select id, last_activity from admins_tokens where token_hash = ? and token_type = ?";
+        $tokenRow = $this->db->query($sqlSelect, [$tokenHash, $tokenType])->getRow();
+        $logoutTime = ($tokenRow && $reason === 'timeout' && ! empty($tokenRow->last_activity))
+            ? $tokenRow->last_activity
+            : date('Y-m-d H:i:s');
+
+        if (session()->has('login_log_id')):
+            $logId = session()->get('login_log_id');
+            $sqlLogUpdate = "update admins_logs set logout = ?, logout_reason = ? where id = ? and logout is null";
+            $this->db->query($sqlLogUpdate, [$logoutTime, $reason, $logId]);
+            session()->remove('login_log_id');
+        elseif ($tokenRow):
+            $sqlLogUpdate = "update admins_logs set logout = ?, logout_reason = ? where token_id = ? and logout is null";
+            $this->db->query($sqlLogUpdate, [$logoutTime, $reason, $tokenRow->id]);
+        endif;
     }
 }

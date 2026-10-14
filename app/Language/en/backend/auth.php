@@ -40,7 +40,7 @@ return [
 	],
 	'audits' => [
 	    'loginRefused'      => 'Login attempt with non-existent account',
-	    'loginBlocked'      => 'Access denied, account blocked %s %s',
+	    'loginBlocked'      => 'Access denied due to the attempts limit',
 	    'loginFailed'       => 'Failed login attempt %s %s',
 	    '2faRequired'       => '2FA verification code required %s %s %s',
 	    'loginSuccess'      => 'Login successful %s %s',
@@ -60,12 +60,13 @@ return [
 		'setPasswordFailed' => 'Error setting password.', 
 		'setPasswordError' => 'Error setting password.', 
 		'checkAuthError' => 'Authentication code is invalid or expired.', 
-		'tooManyAttempts' => 'Too many attempts have been made.', 
+		'tooManyAttempts' => 'Attempts limit reached. Try again later.',
 	    'currentSessionOn' => '%s %s session still in progress.', 
 		'validationErrors' => 'Validation errors.', 
-		'resetPasswordSuccess' => 'Password reset process initiated. Check the sent email to complete the operations.', 
+		'resetPasswordSuccess' => 'If the address belongs to an active account, you will receive an email with password reset instructions.',
 		'resetPasswordSuccessNoEmail' => 'Password reset process initiated, but the email was not sent. Please contact the administrator.', 
 		'expiredCode' => 'OTP code expired.',
 		'wrongCode' => 'Incorrect OTP code.', 
+		'twoFactorEmailSendError' => 'Unable to send the verification code by email. Please try again in a few moments.',
 	]
 ];

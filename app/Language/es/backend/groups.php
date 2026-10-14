@@ -16,6 +16,7 @@ return [
 	],
 	'labels' => [
 		'id' => 'ID',
+		'uuid' => 'UUID',
 		'groupName' => 'Nombre del grupo',
 		'groupDescription' => 'Descripción del grupo',
 		'assignedToGroup' => 'Asignado al GRUPO',

@@ -6,6 +6,16 @@ use CodeIgniter\Test\CIUnitTestCase;
 
 class AdminsRulesTest extends CIUnitTestCase
 {
+    public function testPermissionArrayAcceptsOnlyArrays(): void
+    {
+        $rules = new AdminsRules();
+
+        $this->assertTrue($rules->permissionArray([]));
+        $this->assertTrue($rules->permissionArray(['users_index']));
+        $this->assertFalse($rules->permissionArray('users_index'));
+        $this->assertFalse($rules->permissionArray(null));
+    }
+
     public function testSafeTextReturnsTrueForValidText(): void
     {
         $rules = new AdminsRules();

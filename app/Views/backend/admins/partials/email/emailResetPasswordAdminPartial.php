@@ -7,7 +7,7 @@
         <?= sprintf(lang("backend/email.admins.resetPassword.usernameReminder"), esc($email)); ?>
     </p>
     <p>
-        <a href="<?= base_url('backend/auth/setPassword/' . esc($token)); ?>">
+        <a href="<?= esc(base_url('backend/auth/setPassword/' . rawurlencode($token)), 'attr'); ?>">
             <?= lang("backend/email.admins.resetPassword.setPasswordButton"); ?>
         </a>
     </p>

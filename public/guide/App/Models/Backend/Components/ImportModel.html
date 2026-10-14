@@ -1,0 +1,3167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="index, follow, all" />
+    <title>App\Models\Backend\Components\ImportModel | Essential API</title>
+
+            <link rel="stylesheet" type="text/css" href="../../../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../../../css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="../../../../css/doctum.css">
+        <link rel="stylesheet" type="text/css" href="../../../../fonts/doctum-font.css">
+        <script src="../../../../js/jquery-3.5.1.slim.min.js"></script>
+        <script async defer src="../../../../doctum.js"></script>
+        <script async defer src="../../../../js/bootstrap.min.js"></script>
+        <script async defer src="../../../../js/autocomplete.min.js"></script>
+        <meta name="MobileOptimized" content="width">
+        <meta name="HandheldFriendly" content="true">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+
+    </head>
+
+    <body id="class" data-name="class:App_Models_Backend_Components_ImportModel" data-root-path="../../../../" data-search-index-url="../../../../doctum-search.json">
+            <div id="content">
+        <div id="left-column">
+                <div id="control-panel">
+                <div class="search-bar hidden" id="search-progress-bar-container">
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" id="search-progress-bar"
+                    aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+            </div>
+        </div>
+        <form id="search-form" action="../../../../search.html">
+            <span class="icon icon-search"></span>
+            <input name="search"
+                   id="doctum-search-auto-complete"
+                   class="typeahead form-control"
+                   type="search"
+                   placeholder="Search"
+                   spellcheck="false"
+                   autocorrect="off"
+                   autocomplete="off"
+                   autocapitalize="off">
+            <div class="auto-complete-results" id="auto-complete-results"></div>
+        </form>
+    </div>
+
+                <div id="api-tree"></div>
+
+        </div>
+        <div id="right-column">
+                <nav id="site-nav" class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-elements">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="../../../../index.html">Essential API</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-elements">
+                <ul class="nav navbar-nav">
+                    <li><a href="../../../../classes.html">Classes</a></li>
+                    <li><a href="../../../../namespaces.html">Namespaces</a></li>
+                    <li><a href="../../../../interfaces.html">Interfaces</a></li>
+                    <li><a href="../../../../traits.html">Traits</a></li>
+                    <li><a href="../../../../doc-index.html">Index</a></li>
+                    <li><a href="../../../../search.html">Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+                        <div class="namespace-breadcrumbs">
+            <ol class="breadcrumb">
+                <li><span class="label label-default">class</span></li>
+                        <li><a href="../../../../App.html">App</a></li><li class="backslash">\</li><li><a href="../../../../App/Models.html">Models</a></li><li class="backslash">\</li><li><a href="../../../../App/Models/Backend.html">Backend</a></li><li class="backslash">\</li><li><a href="../../../../App/Models/Backend/Components.html">Components</a></li><li class="backslash">\</li><li>ImportModel</li>
+            </ol>
+        </div>
+                <div id="page-content">
+    <div class="page-header">
+        <h1>ImportModel    
+            </h1>
+    </div>
+
+    
+    <p>        class
+    <strong>ImportModel</strong>        extends <a href="../../../../App/Models/Backend/BackendModel.html"><abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a>
+</p>
+
+        
+        
+    
+        
+
+            <div class="description">
+            <p><p>Modello dedicato al Componente Globale di Importazione Dati (ImportModel).</p></p>            <p><p>Estende il BackendModel e orchestra l'intero ciclo di vita dell'importazione massiva da file CSV.
+Implementa un approccio a due fasi (Parsing/Staging e Esecuzione asincrona) per gestire
+file di grandi dimensioni senza bloccare il server. Integra funzionalità avanzate come
+la validazione dinamica dedotta dallo schema SQL, il calcolo differenziale per gli aggiornamenti (Upsert)
+e la creazione di backup di sicurezza preventivi.</p></p>        </div>
+            
+        
+            <h2>Constants</h2>    <table class="table table-condensed">
+                    <tr>
+                <td>
+                                                                                                                        IMPORT_MODE_CRUD
+                                    </td>
+                <td class="last">
+                    <p><em></em></p>
+                    <p></p>
+                </td>
+            </tr>
+                    <tr>
+                <td>
+                                                                                                                        IMPORT_MODE_DATABASE
+                                    </td>
+                <td class="last">
+                    <p><em></em></p>
+                    <p></p>
+                </td>
+            </tr>
+                    <tr>
+                <td>
+                                                            private
+                                                                                STAGING_VERSION
+                                    </td>
+                <td class="last">
+                    <p><em></em></p>
+                    <p></p>
+                </td>
+            </tr>
+                    <tr>
+                <td>
+                                                            private
+                                                                                STAGING_TTL
+                                    </td>
+                <td class="last">
+                    <p><em></em></p>
+                    <p></p>
+                </td>
+            </tr>
+                    <tr>
+                <td>
+                                                            private
+                                                                                STAGING_FILENAME
+                                    </td>
+                <td class="last">
+                    <p><em></em></p>
+                    <p></p>
+                </td>
+            </tr>
+                    <tr>
+                <td>
+                                                            private
+                                                                                STAGING_MANIFEST
+                                    </td>
+                <td class="last">
+                    <p><em></em></p>
+                    <p></p>
+                </td>
+            </tr>
+                    <tr>
+                <td>
+                                                            private
+                                                                                STAGING_LOCK
+                                    </td>
+                <td class="last">
+                    <p><em></em></p>
+                    <p></p>
+                </td>
+            </tr>
+                    <tr>
+                <td>
+                                                            private
+                                                                                STAGING_RECOVERY_FLAG
+                                    </td>
+                <td class="last">
+                    <p><em></em></p>
+                    <p></p>
+                </td>
+            </tr>
+                    <tr>
+                <td>
+                                                            private
+                                                                                STAGING_CHUNK_JOURNAL
+                                    </td>
+                <td class="last">
+                    <p><em></em></p>
+                    <p></p>
+                </td>
+            </tr>
+                    <tr>
+                <td>
+                                                            private
+                                                                                BACKUP_FILENAME
+                                    </td>
+                <td class="last">
+                    <p><em></em></p>
+                    <p></p>
+                </td>
+            </tr>
+                    <tr>
+                <td>
+                                                            private
+                                                                                IMPORT_CHUNK_SIZE
+                                    </td>
+                <td class="last">
+                    <p><em></em></p>
+                    <p></p>
+                </td>
+            </tr>
+                    <tr>
+                <td>
+                                                            private
+                                                                                BACKUP_CHUNK_SIZE
+                                    </td>
+                <td class="last">
+                    <p><em></em></p>
+                    <p></p>
+                </td>
+            </tr>
+                    <tr>
+                <td>
+                                                            private
+                                                                                BACKUP_MAX_STATEMENT_BYTES
+                                    </td>
+                <td class="last">
+                    <p><em></em></p>
+                    <p></p>
+                </td>
+            </tr>
+                    <tr>
+                <td>
+                                                            private
+                                                                                BACKUP_RETENTION
+                                    </td>
+                <td class="last">
+                    <p><em></em></p>
+                    <p></p>
+                </td>
+            </tr>
+                    <tr>
+                <td>
+                                                            private
+                                                                                STATUS_STAGED
+                                    </td>
+                <td class="last">
+                    <p><em></em></p>
+                    <p></p>
+                </td>
+            </tr>
+                    <tr>
+                <td>
+                                                            private
+                                                                                STATUS_READY
+                                    </td>
+                <td class="last">
+                    <p><em></em></p>
+                    <p></p>
+                </td>
+            </tr>
+                    <tr>
+                <td>
+                                                            private
+                                                                                STATUS_PROCESSING
+                                    </td>
+                <td class="last">
+                    <p><em></em></p>
+                    <p></p>
+                </td>
+            </tr>
+                    <tr>
+                <td>
+                                                            private
+                                                                                STATUS_FAILED
+                                    </td>
+                <td class="last">
+                    <p><em></em></p>
+                    <p></p>
+                </td>
+            </tr>
+                    <tr>
+                <td>
+                                                            private
+                                                                                STATUS_COMPLETED
+                                    </td>
+                <td class="last">
+                    <p><em></em></p>
+                    <p></p>
+                </td>
+            </tr>
+            </table>
+
+    
+            <h2>Properties</h2>
+
+            <table class="table table-condensed">
+                    <tr>
+                <td class="type" id="property_db">
+                                        protected                                        <abbr title="CodeIgniter\Database\BaseConnection">BaseConnection</abbr>
+                                                                                
+                                    </td>
+                <td>$db</td>
+                <td class="last"><p>Istanza condivisa della connessione primaria al database.</p></td>
+                <td><small>from&nbsp;<a href="../../../../App/Models/BaseModel.html#property_db">
+<abbr title="App\Models\BaseModel">BaseModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_module">
+                                        protected                                        string|null
+                                                                                
+                                    </td>
+                <td>$module</td>
+                <td class="last"><p>Nome identificativo del modulo di pertinenza (es. 'admins', 'logs').</p></td>
+                <td><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#property_module">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_hasSoftDelete">
+                                        protected                                        bool
+                                                                                
+                                    </td>
+                <td>$hasSoftDelete</td>
+                <td class="last"><p>Definisce se l'entità corrente supporta la cancellazione logica (Soft Delete).</p></td>
+                <td><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#property_hasSoftDelete">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_getDataQuery">
+                                        protected                                        string|null
+                                                                                
+                                    </td>
+                <td>$getDataQuery</td>
+                <td class="last"><p>Costrutto SQL nativo preparato per l'estrazione paginata dei record (metodo getData).</p></td>
+                <td><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#property_getDataQuery">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_getUUIDQuery">
+                                        protected                                        string|null
+                                                                                
+                                    </td>
+                <td>$getUUIDQuery</td>
+                <td class="last"><p>Costrutto SQL nativo preparato per la singola estrazione tramite identificatore (metodo getByUUID).</p></td>
+                <td><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#property_getUUIDQuery">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_getNumRowsQuery">
+                                        protected                                        string|null
+                                                                                
+                                    </td>
+                <td>$getNumRowsQuery</td>
+                <td class="last"><p>Costrutto SQL nativo (COUNT) indispensabile per il calcolo matematico della paginazione (metodo getNumRows).</p></td>
+                <td><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#property_getNumRowsQuery">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_defaultColumn">
+                                        protected                                        string|null
+                                                                                
+                                    </td>
+                <td>$defaultColumn</td>
+                <td class="last"><p>La colonna di default a cui ricorrere per l'ordinamento (ORDER BY) in assenza di direttive del client.</p></td>
+                <td><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#property_defaultColumn">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_defaultOrder">
+                                        protected                                        string|null
+                                                                                
+                                    </td>
+                <td>$defaultOrder</td>
+                <td class="last"><p>L'ordinamento di default a cui ricorrere per l'ordinamento in assenza di direttive del client.</p></td>
+                <td><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#property_defaultOrder">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_toCompare">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$toCompare</td>
+                <td class="last"><p>Elenco dei campi tabella soggetti al controllo euristico di mutazione dati (metodo hasDataChanged).</p></td>
+                <td><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#property_toCompare">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_showAllAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$showAllAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti durante la richiesta di visualizzazione dell'elenco record (es. DataTables).</p></td>
+                <td><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#property_showAllAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_showAllSearchAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$showAllSearchAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi su cui è abilitata l'esecuzione della ricerca testuale (barra di ricerca globale).</p></td>
+                <td><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#property_showAllSearchAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_showAllSearchAllowedDates">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$showAllSearchAllowedDates</td>
+                <td class="last"><p>Whitelist specifica per i campi data ammessi come filtri temporali nell'elenco record.</p></td>
+                <td><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#property_showAllSearchAllowedDates">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_addAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$addAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti durante la creazione (INSERT) di un nuovo record.</p></td>
+                <td><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#property_addAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_editAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$editAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti durante la modifica (UPDATE) di un record esistente.</p></td>
+                <td><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#property_editAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_delAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$delAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti durante la richiesta di eliminazione (Soft Delete o fisica) di un record.</p></td>
+                <td><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#property_delAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_changeStatusAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$changeStatusAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi ammessi per l'operazione di cambio stato rapido (es. toggle attivazione/disattivazione).</p></td>
+                <td><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#property_changeStatusAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_allowedOrderColumns">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$allowedOrderColumns</td>
+                <td class="last"><p>Whitelist delle colonne del database su cui è consentito applicare l'ordinamento (ORDER BY) nelle viste ad elenco.</p></td>
+                <td><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#property_allowedOrderColumns">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+            </table>
+
+    
+            <h2>Methods</h2>
+
+            <div class="container-fluid underlined">
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8">
+                    <a href="#method___construct">__construct</a>()
+        
+                                            <p><p>Costruttore principale del modello.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../../App/Models/BaseModel.html#method___construct">
+<abbr title="App\Models\BaseModel">BaseModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_initModel">initModel</a>()
+        
+                                            <p><p>Inizializza le risorse strutturali del modello.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#method_initModel">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getData">getData</a>(array $posts)
+        
+                                            <p><p>Motore principale per l'estrazione paginata, ordinata e filtrata dei dataset (DataTables e Liste).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#method_getData">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    int
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getNumRows">getNumRows</a>(array $paramsFilter)
+        
+                                            <p><p>Calcola in modo chirurgico il numero totale dei record che soddisfano la query corrente.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#method_getNumRows">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_buildFilters">buildFilters</a>(array $searchFields, array $params)
+        
+                                            <p><p>Costruisce in modo dinamico i costrutti logici SQL (LIKE) per la ricerca testuale (Full Search).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#method_buildFilters">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_buildDateFilters">buildDateFilters</a>(array $searchDates, array $params)
+        
+                                            <p><p>Genera i costrutti logici operazionali (&gt;= e &lt;=) per il partizionamento e filtraggio temporale.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#method_buildDateFilters">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_buildTrashFilter">buildTrashFilter</a>(string $filter, string $table, bool $hasSoftDelete = true)
+        
+                                            <p><p>Implementa la logica a scudo (Shield) per l'isolamento dei record sottoposti a cancellazione logica.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#method_buildTrashFilter">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getByUUID">getByUUID</a>(string $uuid)
+        
+                                            <p><p>Recupera un singolo record dal database avvalendosi dell'Identificatore Univoco Universale (UUID).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#method_getByUUID">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_hasDataChanged">hasDataChanged</a>(array $posts, object $original)
+        
+                                            <p><p>Esegue una validazione euristica delle differenze per l'ottimizzazione degli UPDATE transazionali.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#method_hasDataChanged">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_insertImages">insertImages</a>(array $filenames, string $uuid, string $entity, string $action = &#039;add&#039;)
+        
+                                            <p><p>Orchestratore logico per l'inserimento massivo (Bulk Insert) delle dipendenze fotografiche (Images).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#method_insertImages">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_rrmdir">rrmdir</a>(string $dir)
+        
+                                            <p><p>Algoritmo File System distruttivo per la rimozione ricorsiva di cartelle ad albero (RRMDIR).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#method_rrmdir">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_generateUUID">generateUUID</a>()
+        
+                                            <p><p>Fabbrica crittograficamente sicura per la generazione di Identificatori Univoci Universali (UUID versione 4).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#method_generateUUID">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_checkAllowedFields">checkAllowedFields</a>(array $posts, array $allowedFields)
+        
+                                            <p><p>Scudo Architetturale Anti Mass-Assignment per la disinfezione dell'input HTTP POST.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#method_checkAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <a href="../../../../App/Libraries/Backend/UploadClass.html"><abbr title="App\Libraries\Backend\UploadClass">UploadClass</abbr></a>
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getUploadService">getUploadService</a>()
+        
+                                            <p><p>Restituisce l'istanza del servizio di upload.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#method_getUploadService">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <a href="../../../../App/Models/Backend/BackendModel.html"><abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a>|null
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getTargetModelInstance">getTargetModelInstance</a>(string $entity)
+        
+                                            <p><p>Recupera il model dell'entità solo quando espone regole di validazione specifiche per l'importazione.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <a href="../../../../App/Interfaces/ImportValidationInterface.html"><abbr title="App\Interfaces\ImportValidationInterface">ImportValidationInterface</abbr></a>|null
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getImportValidationProvider">getImportValidationProvider</a>(string $entity)
+        
+                                            <p><p>Restituisce il provider import-specifico solo per i model che aderiscono esplicitamente al contratto.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_cleanupExpiredStagingImports">cleanupExpiredStagingImports</a>()
+        
+                                            <p><p>Rimuove opportunisticamente gli staging scaduti che non richiedono recovery.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_cleanupExpiredImportBackups">cleanupExpiredImportBackups</a>()
+        
+                                            <p><p>Rimuove i backup orfani più vecchi della retention configurata.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array|null
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_createStagingContext">createStagingContext</a>()
+        
+                                            <p><p>Crea un'identità crittograficamente casuale per una nuova importazione e la relativa directory privata di staging.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string|null
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getImportOwnerFingerprint">getImportOwnerFingerprint</a>()
+        
+                                            <p><p>Restituisce un'impronta non reversibile della sessione amministrativa corrente.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_writeStagingManifest">writeStagingManifest</a>(string $importId, string $entity, string $mode, string $filePath, array $headers, array $plan)
+        
+                                            <p><p>Persiste il manifest server-side che lega importId, entità, staging, stato e progresso dell'importazione.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_persistStagingManifest">persistStagingManifest</a>(string $importId, array $manifest)
+        
+                                            <p><p>Scrive il manifest tramite file temporaneo per ridurre il rischio di JSON parzialmente scritto.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    resource|null
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_acquireImportLock">acquireImportLock</a>(string $importId)
+        
+                                            <p><p>Acquisisce un lock esclusivo non bloccante per impedire l'esecuzione concorrente dello stesso import.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_releaseImportLock">releaseImportLock</a>(resource $handle)
+        
+                                            <p><p>Rilascia il lock esclusivo dell'importazione.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_markImportFailed">markImportFailed</a>(string $importId, array $manifest, string $reason)
+        
+                                            <p><p>Registra nel manifest un fallimento senza eliminare staging e backup, così il recovery resta possibile.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_writeRecoveryFlag">writeRecoveryFlag</a>(string $importId, string $reason)
+        
+                                            <p><p>Crea un flag di recovery quando il database è già stato modificato ma il progresso non è più persistibile.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_writeChunkJournal">writeChunkJournal</a>(string $importId, array $progress)
+        
+                                            <p><p>Scrive un journal prima del chunk. Se il processo termina in modo anomalo, la presenza del file
+impedisce di rieseguire alla cieca un blocco il cui esito sul database potrebbe essere ambiguo.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_deleteChunkJournal">deleteChunkJournal</a>(string $importId)
+        
+                                            <p><p>Rimuove il journal solo quando l'esito del chunk è noto e il manifest è stato aggiornato.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array|null
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_resolveStagingContext">resolveStagingContext</a>(string $importId, bool $verifyChecksum = false, bool $allowExpired = false)
+        
+                                            <p><p>Risolve un importId nel relativo contesto server-side e verifica ownership, scadenza e integrità di base.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_isCsvRowEmpty">isCsvRowEmpty</a>(array $row)
+        
+                                            <p><p>Determina se una riga CSV è realmente vuota senza trattare valori validi come "0" come falsy.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_buildRowSnapshot">buildRowSnapshot</a>(array $row, array $headers, string $mode)
+        
+                                            <p><p>Calcola un'impronta deterministica dello stato DB rilevante per una riga di importazione.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_validateStagingDefinition">validateStagingDefinition</a>(array $headers, array $manifest, array $structure, string|null $primaryKey)
+        
+                                            <p><p>Verifica che lo staging sia tecnicamente coerente con manifest e schema autorizzato corrente.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_deleteStagingDirectory">deleteStagingDirectory</a>(string $directory)
+        
+                                            <p><p>Rimuove una directory di staging appena creata quando il manifest non è ancora disponibile.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_deleteStagingImport">deleteStagingImport</a>(string $importId)
+        
+                                            <p><p>Elimina in modo controllato tutti gli artefatti di staging associati a un'importazione.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_backupImport">backupImport</a>(string $importId)
+        
+                                            <p><p>Esegue una sola volta il backup preventivo della tabella e lo collega al manifest dell'importazione.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_writeStream">writeStream</a>(resource $handle, string $data)
+        
+                                            <p><p>Scrive integralmente una stringa sullo stream gestendo anche eventuali write parziali.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_escapeBackupValue">escapeBackupValue</a>(mixed $value, array $field)
+        
+                                            <p><p>Serializza un valore del database in SQL preservando i payload binari byte-per-byte.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_writeBackupInsertStatement">writeBackupInsertStatement</a>(resource $handle, string $prefix, array $tuples)
+        
+                                            <p><p>Scrive uno statement INSERT multi-row, mantenendo la costruzione SQL centralizzata.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array|null
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_createTableBackup">createTableBackup</a>(string $entity, string $importId)
+        
+                                            <p><p>Crea un backup SQL ripristinabile e restituisce i metadati necessari a verificarne l'integrità.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_isImportBackupValid">isImportBackupValid</a>(string $importId, array $manifest, bool $verifyChecksum = false)
+        
+                                            <p><p>Verifica che il backup associato al manifest esista e, opzionalmente, che l'hash corrisponda.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_deleteBackupArtifacts">deleteBackupArtifacts</a>(string $importId)
+        
+                                            <p><p>Rimuove un backup incompleto o non ancora collegato a un manifest valido.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getTableStructure">getTableStructure</a>(string $table)
+        
+                                            <p><p>Estrae e formatta la struttura fisica (Schema) di una tabella del database.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getImportTableStructure">getImportTableStructure</a>(string $entity, string $mode = self::IMPORT_MODE_CRUD)
+        
+                                            <p><p>Restituisce lo schema effettivamente esposto a un import in base al contesto.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_parseAndValidateCsv">parseAndValidateCsv</a>(<abbr title="CodeIgniter\HTTP\Files\UploadedFile">UploadedFile</abbr> $file, string $entity, string $mode = self::IMPORT_MODE_CRUD)
+        
+                                            <p><p>Fase 1: Analisi, validazione e preparazione del file CSV (Staging).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_executeImport">executeImport</a>(string $importId)
+        
+                                            <p><p>Fase 2: esegue materialmente l'importazione leggendo il file di staging validato.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_buildDynamicRules">buildDynamicRules</a>(array $structure, string $action, string $mode)
+        
+                                            <p><p>Traduce lo schema fisico del database in un set di regole di validazione (Fallback Rules).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_isUuidPrimaryKey">isUuidPrimaryKey</a>(array $field)
+        
+                                            <p><p>Determina se una primary key testuale può essere generata dal motore di importazione come UUID.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+            </div>
+
+
+        <h2>Details</h2>
+
+            <div id="method-details">
+                    <div class="method-item">
+                    <h3 id="method___construct">
+        <div class="location">in <a href="../../../../App/Models/BaseModel.html#method___construct">
+<abbr title="App\Models\BaseModel">BaseModel</abbr></a> at line 34</div>
+        <code>                    
+    <strong>__construct</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Costruttore principale del modello.</p></p>                <p><p>Al momento dell'istanziazione di qualsiasi classe figlia, innesca automaticamente
+il metodo di inizializzazione interno per predisporre le risorse di base (come il DB).</p></p>        
+        </div>
+        <div class="tags">
+            
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_initModel">
+        <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_initModel">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 140</div>
+        <code>            protected        void
+    <strong>initModel</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Inizializza le risorse strutturali del modello.</p></p>                <p><p>Legge la configurazione globale del database e stabilisce la connessione fisica,
+valorizzando la proprietà protetta <code>$db</code>. Questo metodo è progettato per poter essere
+esteso (con <code>parent::initModel()</code>) dalle classi figlie che necessitano di ulteriore
+setup al momento del caricamento.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getData">
+        <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_getData">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 159</div>
+        <code>                    array
+    <strong>getData</strong>(array $posts)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Motore principale per l'estrazione paginata, ordinata e filtrata dei dataset (DataTables e Liste).</p></p>                <p><p>Svolge il lavoro pesante incapsulando: sanitizzazione del payload tramite Whitelist, validazione
+rigorosa delle colonne di ordinamento e calcolo degli offset matematici (LIMIT/OFFSET).
+Compila dinamicamente la stringa SQL finale iniettando costrutti protetti per il filtro Cestino,
+i parametri di ricerca testuale (LIKE) e i range di date. Interroga infine getNumRows() passando
+i filtri esatti per garantire la perfetta coerenza totale/risultati.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Il payload POST strutturato proveniente dall'interfaccia client</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Struttura standardizzata comprendente l'esito (result), il blocco record, i dati di paginazione e l'offset ultimo</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getNumRows">
+        <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_getNumRows">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 228</div>
+        <code>            protected        int
+    <strong>getNumRows</strong>(array $paramsFilter)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Calcola in modo chirurgico il numero totale dei record che soddisfano la query corrente.</p></p>                <p><p>Metodo ancillare, rigorosamente accoppiato a getData(). Elabora l'identico set di parametri e filtri
+($paramsFilter) sfruttando query preparate, garantendo al motore di paginazione frontend
+di conoscere l'esatto volume di dati indipendentemente dai limiti della singola "pagina" SQL.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$paramsFilter</td>
+                <td><p>Array contenente i flag e i valori validati (trash_filter, searchFields, searchDates)</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td><p>Il conteggio intero dei record validi estratti dal database</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_buildFilters">
+        <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_buildFilters">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 259</div>
+        <code>            protected        string
+    <strong>buildFilters</strong>(array $searchFields, array $params)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Costruisce in modo dinamico i costrutti logici SQL (LIKE) per la ricerca testuale (Full Search).</p></p>                <p><p>Processa l'array di ricerca confrontando ogni chiave con la whitelist dedicata ($showAllSearchAllowedFields).
+Se il campo è autorizzato, concatena la stringa SQL e appende il valore mascherato (%) per riferimento
+nell'array dei parametri ($params), delegando la protezione contro l'Injection al driver PDO.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$searchFields</td>
+                <td><p>Valori di ricerca estratti dal payload del client</p></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$params</td>
+                <td><p>Riferimento all'array PDO per il data binding</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>Porzione di query SQL formattata (es. " AND table.column LIKE ?")</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_buildDateFilters">
+        <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_buildDateFilters">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 284</div>
+        <code>            protected        string
+    <strong>buildDateFilters</strong>(array $searchDates, array $params)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Genera i costrutti logici operazionali (&gt;= e &lt;=) per il partizionamento e filtraggio temporale.</p></p>                <p><p>Basandosi sulla whitelist delle colonne Data ammesse ($showAllSearchAllowedDates), intercetta
+convenzionalmente i suffissi di input '-from' e '-to'. Gestisce range temporali parziali o totali,
+accodando i valori referenziati all'array di bind per preservare l'integrità strutturale dell'interrogazione.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$searchDates</td>
+                <td><p>Valori temporali (date/datetime) estratti dal payload del client</p></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$params</td>
+                <td><p>Riferimento all'array PDO per il data binding</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>Porzione di query SQL formattata (es. " AND table.date_col &gt;= ? AND table.date_col &lt;= ?")</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_buildTrashFilter">
+        <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_buildTrashFilter">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 320</div>
+        <code>            protected        string
+    <strong>buildTrashFilter</strong>(string $filter, string $table, bool $hasSoftDelete = true)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Implementa la logica a scudo (Shield) per l'isolamento dei record sottoposti a cancellazione logica.</p></p>                <p><p>La funzione analizza lo stato richiesto, rimuove proattivamente i caratteri anomali dal nome tabella via Regex
+per impedire injection sulla stringa. Include un blocco di salvaguardia: se il modulo non possiede
+un cestino logico ($hasSoftDelete = false) restituisce una stringa vuota, prevenendo eccezioni SQL per colonne inesistenti.
+Il comportamento di fallback obbligatorio (active) sigilla l'esposizione dei record cancellati.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$filter</td>
+                <td><p>Lo stato di visibilità richiesto (active, trashed, all)</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$table</td>
+                <td><p>Il nome stringa della tabella di riferimento (sanitizzato internamente)</p></td>
+            </tr>
+                    <tr>
+                <td>bool</td>
+                <td>$hasSoftDelete</td>
+                <td><p>Flag strutturale sulla persistenza logica (default true)</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>Clausola condizionale SQL mirata (es. " AND table.deleted_at IS NULL") o vuota</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getByUUID">
+        <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_getByUUID">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 352</div>
+        <code>                    array
+    <strong>getByUUID</strong>(string $uuid)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Recupera un singolo record dal database avvalendosi dell'Identificatore Univoco Universale (UUID).</p></p>                <p><p>Sfrutta la query nativa fornita dal modulo figlio (getUUIDQuery), avvolgendo l'interrogazione in
+un blocco Try/Catch per catturare silenziando disallineamenti gravi a database. Restituisce una struttura
+di array fissa e immutabile, garantendo al BackendController un pattern di risposta standard per l'elaborazione.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$uuid</td>
+                <td><p>La stringa alfanumerica di 36 caratteri (Identificatore)</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Array associativo contenente un booleano (result) e l'oggetto dati (row) in caso di query fortunata</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_hasDataChanged">
+        <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_hasDataChanged">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 383</div>
+        <code>            protected        bool
+    <strong>hasDataChanged</strong>(array $posts, object $original)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Esegue una validazione euristica delle differenze per l'ottimizzazione degli UPDATE transazionali.</p></p>                <p><p>Effettua un'analisi comparativa tra il payload POST in ingresso e l'oggetto originario prelevato dal DB.
+Castando temporaneamente entrambi i poli di confronto a stringa, neutralizza le divergenze puramente sintattiche
+tra NULL e stringhe vuote. Effettua uno scanning secondario sulle chiavi di tipo 'images' per rilevare
+l'esistenza di operazioni multimediali in pendenza, ritornando true al primo differenziale rilevato per limitare il dispendio CPU.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dataset sanificato sottomesso via HTTP POST</p></td>
+            </tr>
+                    <tr>
+                <td>object</td>
+                <td>$original</td>
+                <td><p>L'oggetto rappresentativo dell'istanza fisica residente nel database</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td><p>True se è emersa un'effettiva mutazione logica (testo o file immessi), false viceversa</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_insertImages">
+        <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_insertImages">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 429</div>
+        <code>            protected        bool
+    <strong>insertImages</strong>(array $filenames, string $uuid, string $entity, string $action = &#039;add&#039;)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Orchestratore logico per l'inserimento massivo (Bulk Insert) delle dipendenze fotografiche (Images).</p></p>                <p><p>Metodo ad elevata efficienza che aggrega tuple in una singola query preparata, minimizzando le latenze I/O con il database.
+Analizza il contesto operativo ('add' o 'edit') allocando in modo automatico l'attributo 'is_cover' (copertina)
+alla prima immagine dell'array iterato, qualora un query lookup preventivo certifichi l'assenza di copertine attuali.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$filenames</td>
+                <td><p>Array monolitico contenente le stringhe alfanumeriche dei file già consolidati su disco</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$uuid</td>
+                <td><p>L'identificatore univoco del record padrone (proprietario della galleria)</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$entity</td>
+                <td><p>Lo slug/nome dell'entità proprietaria associata (es. 'admins')</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$action</td>
+                <td><p>Parametro comportamentale ('add' per prima allocazione, 'edit' per accodamento)</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td><p>True se tutte le immagini sono state registrate, false altrimenti</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_rrmdir">
+        <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_rrmdir">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 485</div>
+        <code>            protected        void
+    <strong>rrmdir</strong>(string $dir)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Algoritmo File System distruttivo per la rimozione ricorsiva di cartelle ad albero (RRMDIR).</p></p>                <p><p>Implementazione a basso livello progettata per disintegrare un'intera directory e le sue foglie
+(es. al momento dell'eliminazione fisica di un utente o entità). Scandisce gli inode e si richiama ricorsivamente.
+Fa uso intensivo del soppressore d'errore <code>@</code> di PHP per ammortizzare eccezioni fatali derivanti
+da file in stato "Locked" (OS I/O block) o transitorie indisponibilità di permessi CHMOD.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$dir</td>
+                <td><p>Percorso assoluto root della directory bersaglio sul server</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_generateUUID">
+        <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_generateUUID">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 514</div>
+        <code>            protected        string
+    <strong>generateUUID</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Fabbrica crittograficamente sicura per la generazione di Identificatori Univoci Universali (UUID versione 4).</p></p>                <p><p>Ricorre all'API CSPRNG nativa di PHP (random_bytes) per produrre un pool entropico a 16 byte.
+Modifica bit a bit i metadati (AND/OR logici) per conformare la sequenza al rigoroso standard RFC 4122 (versione 4, variante).
+Converte infine il buffer binario in esadecimale stringa con trattini (hyphen).</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>Stringa formattata (es. 'b5e5a210-9e63-4a1c-99a3-5c8e3d304ec8')</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_checkAllowedFields">
+        <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_checkAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 537</div>
+        <code>            protected        array
+    <strong>checkAllowedFields</strong>(array $posts, array $allowedFields)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Scudo Architetturale Anti Mass-Assignment per la disinfezione dell'input HTTP POST.</p></p>                <p><p>Filtra e decostruisce l'array dei parametri in ingresso basandosi severamente su una Whitelist fornita come matrice.
+Utilizzando in_array in modalità strict, sgancia ed esegue l'unset su qualsiasi chiave POST arbitraria o malevola
+introdotta per forzare alterazioni su colonne sensibili del database (es. iniezione del campo superadmin o permessi).</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Array grezzo o parzialmente manipolato prelevato dalla request HTTP</p></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$allowedFields</td>
+                <td><p>Array monolitico (Whitelist) dei nodi (chiavi) consentite per il ciclo vitale attuale</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>L'array bonificato e compattato, pronto per i layer Data Access o Validazione</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getUploadService">
+        <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_getUploadService">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 558</div>
+        <code>            protected        <a href="../../../../App/Libraries/Backend/UploadClass.html"><abbr title="App\Libraries\Backend\UploadClass">UploadClass</abbr></a>
+    <strong>getUploadService</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Restituisce l'istanza del servizio di upload.</p></p>                <p><p>Metodo wrapper utilizzato per incapsulare l'istanziazione diretta
+della libreria, facilitando l'iniezione delle dipendenze (Mocking)
+durante l'esecuzione dei test unitari tramite il pattern Extract Method.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><a href="../../../../App/Libraries/Backend/UploadClass.html"><abbr title="App\Libraries\Backend\UploadClass">UploadClass</abbr></a></td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getTargetModelInstance">
+        <div class="location">at line 50</div>
+        <code>                private    <a href="../../../../App/Models/Backend/BackendModel.html"><abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a>|null
+    <strong>getTargetModelInstance</strong>(string $entity)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Recupera il model dell'entità solo quando espone regole di validazione specifiche per l'importazione.</p></p>                <p><p>Il provider è richiesto solo dal flusso CRUD, che opera in opt-in e fail-closed.
+Tools &gt; Database non usa model di dominio e resta basato esclusivamente sullo schema SQL.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$entity</td>
+                <td><p>Il nome della tabella/modulo (es. 'admins', 'logs')</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><a href="../../../../App/Models/Backend/BackendModel.html"><abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a>|null</td>
+            <td><p>Il model dell'entità, se disponibile</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getImportValidationProvider">
+        <div class="location">at line 76</div>
+        <code>                private    <a href="../../../../App/Interfaces/ImportValidationInterface.html"><abbr title="App\Interfaces\ImportValidationInterface">ImportValidationInterface</abbr></a>|null
+    <strong>getImportValidationProvider</strong>(string $entity)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Restituisce il provider import-specifico solo per i model che aderiscono esplicitamente al contratto.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$entity</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><a href="../../../../App/Interfaces/ImportValidationInterface.html"><abbr title="App\Interfaces\ImportValidationInterface">ImportValidationInterface</abbr></a>|null</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_cleanupExpiredStagingImports">
+        <div class="location">at line 90</div>
+        <code>                private    void
+    <strong>cleanupExpiredStagingImports</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Rimuove opportunisticamente gli staging scaduti che non richiedono recovery.</p></p>                <p><p>I fallimenti espliciti e gli import con flag/journal di recovery vengono conservati per consentire
+diagnosi e ripristino manuale. Il cleanup usa lo stesso lock dell'esecuzione per non interferire
+con chunk attivi.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_cleanupExpiredImportBackups">
+        <div class="location">at line 172</div>
+        <code>                private    void
+    <strong>cleanupExpiredImportBackups</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Rimuove i backup orfani più vecchi della retention configurata.</p></p>                <p><p>Finché esiste uno staging omonimo il backup viene conservato: un import in recovery non deve
+mai perdere il proprio snapshot. Vengono rimossi soltanto artefatti senza staging associato.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_createStagingContext">
+        <div class="location">at line 225</div>
+        <code>                private    array|null
+    <strong>createStagingContext</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Crea un'identità crittograficamente casuale per una nuova importazione e la relativa directory privata di staging.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array|null</td>
+            <td><p>Contesto filesystem oppure null se non creabile</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getImportOwnerFingerprint">
+        <div class="location">at line 255</div>
+        <code>                private    string|null
+    <strong>getImportOwnerFingerprint</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Restituisce un'impronta non reversibile della sessione amministrativa corrente.</p></p>                <p><p>L'impronta lega lo staging alla sessione che lo ha creato senza persistere il token di sessione in chiaro.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string|null</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_writeStagingManifest">
+        <div class="location">at line 269</div>
+        <code>                private    bool
+    <strong>writeStagingManifest</strong>(string $importId, string $entity, string $mode, string $filePath, array $headers, array $plan)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Persiste il manifest server-side che lega importId, entità, staging, stato e progresso dell'importazione.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$importId</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$entity</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$mode</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$filePath</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$headers</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$plan</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_persistStagingManifest">
+        <div class="location">at line 325</div>
+        <code>                private    bool
+    <strong>persistStagingManifest</strong>(string $importId, array $manifest)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Scrive il manifest tramite file temporaneo per ridurre il rischio di JSON parzialmente scritto.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$importId</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$manifest</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_acquireImportLock">
+        <div class="location">at line 366</div>
+        <code>                private    resource|null
+    <strong>acquireImportLock</strong>(string $importId)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Acquisisce un lock esclusivo non bloccante per impedire l'esecuzione concorrente dello stesso import.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$importId</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>resource|null</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_releaseImportLock">
+        <div class="location">at line 397</div>
+        <code>                private    void
+    <strong>releaseImportLock</strong>(resource $handle)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Rilascia il lock esclusivo dell'importazione.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>resource</td>
+                <td>$handle</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_markImportFailed">
+        <div class="location">at line 406</div>
+        <code>                private    void
+    <strong>markImportFailed</strong>(string $importId, array $manifest, string $reason)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Registra nel manifest un fallimento senza eliminare staging e backup, così il recovery resta possibile.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$importId</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$manifest</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$reason</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_writeRecoveryFlag">
+        <div class="location">at line 425</div>
+        <code>                private    void
+    <strong>writeRecoveryFlag</strong>(string $importId, string $reason)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Crea un flag di recovery quando il database è già stato modificato ma il progresso non è più persistibile.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$importId</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$reason</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_writeChunkJournal">
+        <div class="location">at line 448</div>
+        <code>                private    bool
+    <strong>writeChunkJournal</strong>(string $importId, array $progress)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Scrive un journal prima del chunk. Se il processo termina in modo anomalo, la presenza del file
+impedisce di rieseguire alla cieca un blocco il cui esito sul database potrebbe essere ambiguo.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$importId</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$progress</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_deleteChunkJournal">
+        <div class="location">at line 474</div>
+        <code>                private    void
+    <strong>deleteChunkJournal</strong>(string $importId)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Rimuove il journal solo quando l'esito del chunk è noto e il manifest è stato aggiornato.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$importId</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_resolveStagingContext">
+        <div class="location">at line 488</div>
+        <code>                private    array|null
+    <strong>resolveStagingContext</strong>(string $importId, bool $verifyChecksum = false, bool $allowExpired = false)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Risolve un importId nel relativo contesto server-side e verifica ownership, scadenza e integrità di base.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$importId</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>bool</td>
+                <td>$verifyChecksum</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>bool</td>
+                <td>$allowExpired</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array|null</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_isCsvRowEmpty">
+        <div class="location">at line 591</div>
+        <code>                private    bool
+    <strong>isCsvRowEmpty</strong>(array $row)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Determina se una riga CSV è realmente vuota senza trattare valori validi come "0" come falsy.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$row</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_buildRowSnapshot">
+        <div class="location">at line 608</div>
+        <code>                private    string
+    <strong>buildRowSnapshot</strong>(array $row, array $headers, string $mode)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Calcola un'impronta deterministica dello stato DB rilevante per una riga di importazione.</p></p>                <p><p>Vengono considerate esclusivamente le colonne presenti nel CSV. Nel flusso CRUD i timestamp
+applicativi sono esclusi perché gestiti internamente; in modalità database restano dati ordinari.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$row</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$headers</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$mode</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_validateStagingDefinition">
+        <div class="location">at line 636</div>
+        <code>                private    bool
+    <strong>validateStagingDefinition</strong>(array $headers, array $manifest, array $structure, string|null $primaryKey)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Verifica che lo staging sia tecnicamente coerente con manifest e schema autorizzato corrente.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$headers</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$manifest</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$structure</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>string|null</td>
+                <td>$primaryKey</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_deleteStagingDirectory">
+        <div class="location">at line 680</div>
+        <code>                private    void
+    <strong>deleteStagingDirectory</strong>(string $directory)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Rimuove una directory di staging appena creata quando il manifest non è ancora disponibile.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$directory</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_deleteStagingImport">
+        <div class="location">at line 700</div>
+        <code>                    bool
+    <strong>deleteStagingImport</strong>(string $importId)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Elimina in modo controllato tutti gli artefatti di staging associati a un'importazione.</p></p>                <p><p>Il backup non viene eliminato: costituisce un artefatto di recovery separato.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$importId</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_backupImport">
+        <div class="location">at line 756</div>
+        <code>                    bool
+    <strong>backupImport</strong>(string $importId)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Esegue una sola volta il backup preventivo della tabella e lo collega al manifest dell'importazione.</p></p>                <p><p>Il metodo è idempotente: se il backup valido esiste già, non ne crea un secondo.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$importId</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_writeStream">
+        <div class="location">at line 835</div>
+        <code>                private    bool
+    <strong>writeStream</strong>(resource $handle, string $data)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Scrive integralmente una stringa sullo stream gestendo anche eventuali write parziali.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>resource</td>
+                <td>$handle</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$data</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_escapeBackupValue">
+        <div class="location">at line 856</div>
+        <code>                private    string
+    <strong>escapeBackupValue</strong>(mixed $value, array $field)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Serializza un valore del database in SQL preservando i payload binari byte-per-byte.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>mixed</td>
+                <td>$value</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$field</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_writeBackupInsertStatement">
+        <div class="location">at line 884</div>
+        <code>                private    bool
+    <strong>writeBackupInsertStatement</strong>(resource $handle, string $prefix, array $tuples)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Scrive uno statement INSERT multi-row, mantenendo la costruzione SQL centralizzata.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>resource</td>
+                <td>$handle</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$prefix</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$tuples</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_createTableBackup">
+        <div class="location">at line 901</div>
+        <code>                private    array|null
+    <strong>createTableBackup</strong>(string $entity, string $importId)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Crea un backup SQL ripristinabile e restituisce i metadati necessari a verificarne l'integrità.</p></p>                <p><p>Il backup viene creato anche per una tabella vuota: in quel caso il TRUNCATE rappresenta lo stato iniziale.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$entity</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$importId</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array|null</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_isImportBackupValid">
+        <div class="location">at line 1135</div>
+        <code>                private    bool
+    <strong>isImportBackupValid</strong>(string $importId, array $manifest, bool $verifyChecksum = false)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Verifica che il backup associato al manifest esista e, opzionalmente, che l'hash corrisponda.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$importId</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$manifest</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>bool</td>
+                <td>$verifyChecksum</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_deleteBackupArtifacts">
+        <div class="location">at line 1174</div>
+        <code>                private    void
+    <strong>deleteBackupArtifacts</strong>(string $importId)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Rimuove un backup incompleto o non ancora collegato a un manifest valido.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$importId</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getTableStructure">
+        <div class="location">at line 1203</div>
+        <code>                    array
+    <strong>getTableStructure</strong>(string $table)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Estrae e formatta la struttura fisica (Schema) di una tabella del database.</p></p>                <p><p>Interroga il motore del database per ottenere l'elenco delle colonne, i tipi di dato (es. varchar, int),
+i limiti massimi di lunghezza e le configurazioni delle chiavi (Primary Key e Indici).
+Costituisce la base su cui il motore di importazione mappa le colonne del CSV e deduce
+le regole di validazione di fallback.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$table</td>
+                <td><p>Il nome esatto della tabella</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Mappa strutturata delle colonne e dei relativi vincoli fisici</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getImportTableStructure">
+        <div class="location">at line 1277</div>
+        <code>                    array
+    <strong>getImportTableStructure</strong>(string $entity, string $mode = self::IMPORT_MODE_CRUD)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Restituisce lo schema effettivamente esposto a un import in base al contesto.</p></p>                <p><p>In modalità database viene restituito l'intero schema fisico. In modalità CRUD il model
+deve implementare ImportValidationInterface e la struttura viene ridotta alla whitelist
+importAllowedFields(); configurazioni incoerenti falliscono in modo chiuso.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$entity</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$mode</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseAndValidateCsv">
+        <div class="location">at line 1355</div>
+        <code>                    array
+    <strong>parseAndValidateCsv</strong>(<abbr title="CodeIgniter\HTTP\Files\UploadedFile">UploadedFile</abbr> $file, string $entity, string $mode = self::IMPORT_MODE_CRUD)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Fase 1: Analisi, validazione e preparazione del file CSV (Staging).</p></p>                <p><p>Metodo estremamente denso che esegue i controlli preliminari prima di scrivere a database.</p>
+<ol>
+<li>Confronta le intestazioni del CSV con le colonne reali della tabella (bloccando colonne estranee).</li>
+<li>Estrae gli ID dal CSV e scarica i record già esistenti dal DB per eseguire un diff in memoria.</li>
+<li>Analizza riga per riga: se i dati cambiano pianifica un 'update', se il record non esiste pianifica un 'insert', se sono identici fa 'skip'.</li>
+<li>Valida ogni riga tramite le regole del Model (o quelle dinamiche di fallback).</li>
+<li>Scrive le righe validate in un file temporaneo sicuro di Staging, aggiungendo la direttiva operativa (<code>__import_action</code>).</li>
+</ol></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td><abbr title="CodeIgniter\HTTP\Files\UploadedFile">UploadedFile</abbr></td>
+                <td>$file</td>
+                <td><p>L'oggetto file caricato dalla richiesta HTTP</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$entity</td>
+                <td><p>Il nome della tabella di destinazione</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$mode</td>
+                <td><p>Contesto server-side dell'importazione: CRUD applicativo o database raw</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Struttura dati con l'esito, le statistiche dell'operazione (plan) e i primi record da mostrare in anteprima</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_executeImport">
+        <div class="location">at line 1736</div>
+        <code>                    array
+    <strong>executeImport</strong>(string $importId)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Fase 2: esegue materialmente l'importazione leggendo il file di staging validato.</p></p>                <p><p>Il progresso è mantenuto server-side nel manifest: il client non può scegliere offset o saltare record.
+Ogni chunk è protetto da lock esclusivo e transazione DB. Il backup preventivo deve esistere prima
+della prima scrittura. In caso di errore lo staging e il backup vengono conservati per il recovery.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$importId</td>
+                <td><p>Identità server-side dell'importazione generata in fase di staging</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Esito del chunk, progresso cumulativo e stato finale dell'importazione</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_buildDynamicRules">
+        <div class="location">at line 2389</div>
+        <code>            protected        array
+    <strong>buildDynamicRules</strong>(array $structure, string $action, string $mode)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Traduce lo schema fisico del database in un set di regole di validazione (Fallback Rules).</p></p>                <p><p>Funzione cruciale che entra in azione quando il modulo non ha regole scritte a mano nel Model.
+Legge i metadati estratti da <code>getTableStructure</code> e mappa i tipi SQL nelle rispettive regole di CodeIgniter:
+es. <code>varchar(255)</code> diventa <code>string|max_length[255]</code>, <code>int</code> diventa <code>integer</code>, <code>datetime</code> diventa <code>valid_date</code>.
+Garantisce che l'importazione rispetti i limiti stringenti del database prevenendo eccezioni PDO.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$structure</td>
+                <td><p>Lo schema delle colonne generato da getTableStructure</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$action</td>
+                <td><p>Operazione pianificata per la riga: insert oppure update</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$mode</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Dizionario di regole di validazione nel formato nativo di CodeIgniter</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_isUuidPrimaryKey">
+        <div class="location">at line 2465</div>
+        <code>                private    bool
+    <strong>isUuidPrimaryKey</strong>(array $field)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Determina se una primary key testuale può essere generata dal motore di importazione come UUID.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$field</td>
+                <td><p>Metadati della colonna estratti da getTableStructure()</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td><p>True per PK CHAR/VARCHAR con spazio sufficiente a contenere un UUID standard</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+            </div>
+
+    
+</div><div id="footer">
+        Generated by <a href="https://github.com/code-lts/doctum">Doctum, a API Documentation generator and fork of Sami</a>.</div></div>
+    </div>
+    </body>
+
+</html>

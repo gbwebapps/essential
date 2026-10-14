@@ -26,7 +26,7 @@ $routes->group('backend', function($routes) {
     });
 
     /* LOGOUT (AUTHORIZED) */
-    $routes->get('auth/logout', '\App\Controllers\Backend\AuthController::logout', ['filter' => 'authorization']);
+    $routes->post('auth/logout', '\App\Controllers\Backend\AuthController::logout', ['filter' => 'authorization']);
 
     /* AUTHORIZED */
     $routes->group('', ['filter' => 'authorization'], function($routes) {
@@ -48,9 +48,11 @@ $routes->group('backend', function($routes) {
             $routes->match(['GET', 'POST'], 'resetPassword', '\App\Controllers\Backend\AccountController::resetPassword');
 
             $routes->get('security', '\App\Controllers\Backend\AccountController::security');
+            $routes->post('verifyCurrentPassword', '\App\Controllers\Backend\AccountController::verifyCurrentPassword');
             $routes->post('saveBasicMethod', '\App\Controllers\Backend\AccountController::saveBasicMethod');
             $routes->post('setupTotp', '\App\Controllers\Backend\AccountController::setupTotp');
             $routes->post('confirmTotp', '\App\Controllers\Backend\AccountController::confirmTotp');
+			$routes->post('cancelTotpSetup', '\App\Controllers\Backend\AccountController::cancelTotpSetup');
         });
 
         /* MESSAGES */
@@ -68,7 +70,7 @@ $routes->group('backend', function($routes) {
         });
 
         /* IMAGES PREVIEW */
-        $routes->group('uploadPreviewImg', ['filter' => 'authorization'], function($routes) {
+        $routes->group('uploadPreview', ['filter' => 'authorization'], function($routes) {
             $routes->post('saveImages', '\App\Controllers\Backend\Components\UploadPreviewController::saveImages');
         });
 
@@ -85,14 +87,6 @@ $routes->group('backend', function($routes) {
     /* SUPERADMIN */
     $routes->group('', ['filter' => ['authorization', 'superadmin']], function($routes) {
 
-        /* EXPORT CSV */
-        // $routes->group('export', function($routes) {
-        //     $routes->post('showModal', '\App\Controllers\Backend\Components\ExportController::showModal');
-        //     $routes->post('generate', '\App\Controllers\Backend\Components\ExportController::generate');
-        //     $routes->post('remove', '\App\Controllers\Backend\Components\ExportController::remove');
-        //     $routes->get('download/(:any)', '\App\Controllers\Backend\Components\ExportController::download/$1');
-        // });
-        
         $routes->group('export', function($routes) {
             $routes->post('showModal', '\App\Controllers\Backend\Components\ExportController::showModal');
             $routes->post('generate', '\App\Controllers\Backend\Components\ExportController::generate');
@@ -104,15 +98,6 @@ $routes->group('backend', function($routes) {
                 $routes->post('generate', '\App\Controllers\Backend\Components\ExportController::generateDatabase');
             });
         });
-
-        /* IMPORT CSV */
-        // $routes->group('import', function($routes) {
-        //     $routes->post('showModal', '\App\Controllers\Backend\Components\ImportController::showModal');
-        //     $routes->get('download/(:any)', '\App\Controllers\Backend\Components\ImportController::download/$1');
-        //     $routes->post('processCsv', '\App\Controllers\Backend\Components\ImportController::processCsv');
-        //     $routes->post('executeImport', '\App\Controllers\Backend\Components\ImportController::executeImport');
-        //     $routes->post('deleteFile', '\App\Controllers\Backend\Components\ImportController::deleteFile');
-        // });
         
         /* IMPORT CSV */
         $routes->group('import', function($routes) {
@@ -140,7 +125,6 @@ $routes->group('backend', function($routes) {
             $routes->post('openSettings', '\App\Controllers\Backend\SettingsController::openSettings');
             $routes->post('saveSettings', '\App\Controllers\Backend\SettingsController::saveSettings');
             $routes->post('deleteSettings', '\App\Controllers\Backend\SettingsController::deleteSettings');
-            $routes->post('getSettings', '\App\Controllers\Backend\SettingsController::getSettings');
             $routes->post('checkDeleteSettings', '\App\Controllers\Backend\SettingsController::checkDeleteSettings');
         });
 
@@ -194,7 +178,7 @@ $routes->group('backend', function($routes) {
         /* LOGS */
         $routes->group('logs', function($routes) {
             $routes->match(['GET', 'POST'], '/', '\App\Controllers\Backend\LogsController::index');
-            $routes->post('hardDelete', '\App\Controllers\Backend\LogsController::hardDelete');
+            $routes->post('disconnectSession', '\App\Controllers\Backend\LogsController::disconnectSession');
         });
 
         /* ADMINS */

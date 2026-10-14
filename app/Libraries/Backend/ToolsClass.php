@@ -45,7 +45,7 @@ class ToolsClass
 	    $locale = ($lang === 'en' ? 'default' : $lang);
 
 	    return [
-	        ['id' => 'flatpickr-js', 'path' => 'assets/vendor/flatpickr/js/flatpickr.min.js', 'position' => 'before', 'target' => 'audits-js'], 
+	        ['id' => 'flatpickr-js', 'path' => 'assets/vendor/flatpickr/js/flatpickr.min.js', 'position' => 'before', 'target' => 'tools-js'],
 	        ['id' => $locale . '-js', 'path' => 'assets/vendor/flatpickr/js/' . $locale . '.js', 'position' => 'after', 'target' => 'flatpickr-js']
 	    ];
 	}

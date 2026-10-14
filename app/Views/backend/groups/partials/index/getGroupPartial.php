@@ -1,17 +1,17 @@
 <div class="card-body p-0">
-    <form class="edit-group-form" data-id="<?= $group->id; ?>">
+    <form class="edit-group-form" data-id="<?= esc($group->id, 'attr'); ?>">
 
-        <input type="hidden" name="id" value="<?= $group->id; ?>">
+        <input type="hidden" name="id" value="<?= esc($group->id, 'attr'); ?>">
 
         <div class="row mb-3">
             <div class="col-12 col-lg-4 mb-2 mb-lg-0">
                 <label for="name" class="pb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/groups.labels.groupName'); ?></label>
-                <input type="text" name="name" id="name" class="form-control" placeholder="<?= lang('backend/groups.placeholders.groupName'); ?>" value="<?= esc($group->name); ?>">
+                <input type="text" name="name" id="name" class="form-control" placeholder="<?= esc(lang('backend/groups.placeholders.groupName'), 'attr'); ?>" value="<?= esc($group->name, 'attr'); ?>">
                 <div class="error_name text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
             </div>
             <div class="col-12 col-lg-8">
                 <label for="description" class="pb-1"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/groups.labels.groupDescription'); ?></label>
-                <input type="text" name="description" id="description" class="form-control" placeholder="<?= lang('backend/groups.placeholders.groupDescription'); ?>" value="<?= esc($group->description); ?>">
+                <input type="text" name="description" id="description" class="form-control" placeholder="<?= esc(lang('backend/groups.placeholders.groupDescription'), 'attr'); ?>" value="<?= esc($group->description, 'attr'); ?>">
                 <div class="error_description text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
             </div>
         </div>
@@ -20,10 +20,10 @@
 
             <div class="row mb-2 g-0 bg-light pt-2 ps-2 pe-2 border rounded-2">
                 <div class="col-6 text-start">
-                    <h5><?= $permission['icon']; ?> <?= ucfirst($permission['title']); ?></h5>
+                    <h5><?= $permission['icon']; ?> <?= esc(ucfirst($permission['title'])); ?></h5>
                 </div>
                 <div class="col-6 text-end">
-                    <a href="#" class="select-all" data-controller="<?= $permission['controller']; ?>">
+                    <a href="#" class="select-all" data-controller="<?= esc($permission['controller'], 'attr'); ?>">
                         <i class="fa-solid fa-square-check"></i>
                         <?= lang('backend/global.links.selectAll'); ?>
                     </a>
@@ -32,7 +32,7 @@
 
             <?php $marginClass = ($key === array_key_last($permissions)) ? '' : 'mb-3'; ?>
 
-            <div class="row <?= $marginClass; ?>">
+            <div class="row <?= esc($marginClass, 'attr'); ?>">
 
                 <div class="col-12">
                     <div class="row">
@@ -47,13 +47,13 @@
                             <div class="col-12 col-lg-3 text-center py-1">
                                 <ul class="list-group list-group-flush border rounded-2">
                                     <li class="list-group-item">
-                                        <label for="<?= $k; ?>">
-                                            <i class="fa-solid fa-circle-arrow-down"></i> <?= $v; ?>
+                                        <label for="<?= esc($k, 'attr'); ?>">
+                                            <i class="fa-solid fa-circle-arrow-down"></i> <?= esc($v); ?>
                                         </label>
                                     </li>
                                     <li class="list-group-item">
                                         <div class="form-check form-switch d-inline-block">
-                                            <input type="checkbox" class="form-check-input <?= $permission['controller']; ?>" name="permissions[]" value="<?= $k; ?>" id="<?= $k; ?>" <?= $isChecked; ?>>
+                                            <input type="checkbox" class="form-check-input <?= esc($permission['controller'], 'attr'); ?>" name="permissions[]" value="<?= esc($k, 'attr'); ?>" id="<?= esc($k, 'attr'); ?>" <?= $isChecked; ?>>
                                         </div>
                                     </li>
                                 </ul>
@@ -72,10 +72,10 @@
         <div class="row">
             <div class="col-12">
                 <div class="d-flex flex-column flex-md-row justify-content-center gap-2">
-                    <button type="button" class="btn btn-danger btn-sm btn-delete-group" data-id="<?= $group->id; ?>" data-message="<?= sprintf(lang('backend/groups.messages.areYouSureDeleteGroup'), $group->name); ?>">
+                    <button type="button" class="btn btn-danger btn-sm btn-delete-group" data-id="<?= esc($group->id, 'attr'); ?>" data-message="<?= esc(sprintf(lang('backend/groups.messages.areYouSureDeleteGroup'), $group->name), 'attr'); ?>">
                         <i class="fa-solid fa-trash-can me-1"></i> <?= lang('backend/groups.buttons.delete'); ?>
                     </button>
-                    <button type="button" class="btn btn-warning text-dark btn-sm btn-refresh-group" data-id="<?= $group->id; ?>" data-message="<?= lang('backend/groups.messages.areYouSureToReload'); ?>">
+                    <button type="button" class="btn btn-warning text-dark btn-sm btn-refresh-group" data-id="<?= esc($group->id, 'attr'); ?>" data-message="<?= esc(lang('backend/groups.messages.areYouSureToReload'), 'attr'); ?>">
                         <i class="fa-solid fa-refresh me-1"></i> <?= lang('backend/groups.buttons.refreshData'); ?>
                     </button>
                     <button type="submit" class="btn btn-success btn-sm">

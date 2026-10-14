@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="index, follow, all" />
+    <title>App\Controllers\Backend\UsersController | Essential API</title>
+
+            <link rel="stylesheet" type="text/css" href="../../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../../css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="../../../css/doctum.css">
+        <link rel="stylesheet" type="text/css" href="../../../fonts/doctum-font.css">
+        <script src="../../../js/jquery-3.5.1.slim.min.js"></script>
+        <script async defer src="../../../doctum.js"></script>
+        <script async defer src="../../../js/bootstrap.min.js"></script>
+        <script async defer src="../../../js/autocomplete.min.js"></script>
+        <meta name="MobileOptimized" content="width">
+        <meta name="HandheldFriendly" content="true">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+
+    </head>
+
+    <body id="class" data-name="class:App_Controllers_Backend_UsersController" data-root-path="../../../" data-search-index-url="../../../doctum-search.json">
+            <div id="content">
+        <div id="left-column">
+                <div id="control-panel">
+                <div class="search-bar hidden" id="search-progress-bar-container">
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" id="search-progress-bar"
+                    aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+            </div>
+        </div>
+        <form id="search-form" action="../../../search.html">
+            <span class="icon icon-search"></span>
+            <input name="search"
+                   id="doctum-search-auto-complete"
+                   class="typeahead form-control"
+                   type="search"
+                   placeholder="Search"
+                   spellcheck="false"
+                   autocorrect="off"
+                   autocomplete="off"
+                   autocapitalize="off">
+            <div class="auto-complete-results" id="auto-complete-results"></div>
+        </form>
+    </div>
+
+                <div id="api-tree"></div>
+
+        </div>
+        <div id="right-column">
+                <nav id="site-nav" class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-elements">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="../../../index.html">Essential API</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-elements">
+                <ul class="nav navbar-nav">
+                    <li><a href="../../../classes.html">Classes</a></li>
+                    <li><a href="../../../namespaces.html">Namespaces</a></li>
+                    <li><a href="../../../interfaces.html">Interfaces</a></li>
+                    <li><a href="../../../traits.html">Traits</a></li>
+                    <li><a href="../../../doc-index.html">Index</a></li>
+                    <li><a href="../../../search.html">Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+                        <div class="namespace-breadcrumbs">
+            <ol class="breadcrumb">
+                <li><span class="label label-default">class</span></li>
+                        <li><a href="../../../App.html">App</a></li><li class="backslash">\</li><li><a href="../../../App/Controllers.html">Controllers</a></li><li class="backslash">\</li><li><a href="../../../App/Controllers/Backend.html">Backend</a></li><li class="backslash">\</li><li>UsersController</li>
+            </ol>
+        </div>
+                <div id="page-content">
+    <div class="page-header">
+        <h1>UsersController    
+            </h1>
+    </div>
+
+    
+    <p>        class
+    <strong>UsersController</strong>        extends <a href="../../../App/Controllers/Backend/BackendController.html"><abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a>
+</p>
+
+        
+        
+    
+        
+
+            <div class="description">
+            <p><p>Class UsersController</p></p>            <p><p>Controller dedicato alla gestione completa, alla profilazione e alle operazioni
+anagrafiche relative agli utenti dell'applicazione (Users) all'interno del Backend.</p></p>        </div>
+            
+        
+    
+            <h2>Properties</h2>
+
+            <table class="table table-condensed">
+                    <tr>
+                <td class="type" id="property_helpers">
+                                        protected                                        <abbr title="App\Controllers\Backend\list&lt;string&gt;">list&lt;string&gt;</abbr>
+                                                                                
+                                    </td>
+                <td>$helpers</td>
+                <td class="last"><p>Array di helper precaricati da CodeIgniter per essere disponibili in tutto il backend.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#property_helpers">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_data">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$data</td>
+                <td class="last"><p>Array associativo globale utilizzato per passare variabili e contesti strutturati alle viste.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#property_data">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_session">
+                                        protected                                        <abbr title="CodeIgniter\Session\Session">Session</abbr>
+                                                                                
+                                    </td>
+                <td>$session</td>
+                <td class="last"><p>Istanza del gestore nativo delle sessioni di CodeIgniter.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#property_session">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_backendClass">
+                                        protected                                        <a href="../../../App/Libraries/Backend/BackendClass.html"><abbr title="App\Libraries\Backend\BackendClass">BackendClass</abbr></a>
+                                                                                
+                                    </td>
+                <td>$backendClass</td>
+                <td class="last"><p>Istanza della classe helper contenente le logiche di supporto e formattazione generali.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#property_backendClass">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_regexp">
+                                        protected                                        <a href="../../../App/Libraries/RegExp.html"><abbr title="App\Libraries\RegExp">RegExp</abbr></a>
+                                                                                
+                                    </td>
+                <td>$regexp</td>
+                <td class="last"><p>Istanza del servizio dedicato alla validazione e manipolazione tramite espressioni regolari.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#property_regexp">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_customCss">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$customCss</td>
+                <td class="last"><p>Elenco dei percorsi per i fogli di stile (CSS) personalizzati che devono essere accodati al rendering.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#property_customCss">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_customJs">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$customJs</td>
+                <td class="last"><p>Elenco dei percorsi per gli script (JS) personalizzati che devono essere accodati al rendering.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#property_customJs">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_currentAdmin">
+                                        protected                                        object|null
+                                                                                
+                                    </td>
+                <td>$currentAdmin</td>
+                <td class="last"><p>Oggetto rappresentante l'amministratore attualmente autenticato.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#property_currentAdmin">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_usersModel">
+                                        protected                                        <a href="../../../App/Models/Backend/UsersModel.html"><abbr title="App\Models\Backend\UsersModel">UsersModel</abbr></a>
+                                                                                
+                                    </td>
+                <td>$usersModel</td>
+                <td class="last"><p>Istanza del modello dedicato alla persistenza e alla gestione dei dati degli utenti.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_usersClass">
+                                        protected                                        <a href="../../../App/Libraries/Backend/UsersClass.html"><abbr title="App\Libraries\Backend\UsersClass">UsersClass</abbr></a>
+                                                                                
+                                    </td>
+                <td>$usersClass</td>
+                <td class="last"><p>Istanza della libreria logica per l'elaborazione delle funzionalità del modulo utenti.</p></td>
+                <td></td>
+            </tr>
+            </table>
+
+    
+            <h2>Methods</h2>
+
+            <div class="container-fluid underlined">
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_initController">initController</a>(<abbr title="CodeIgniter\HTTP\RequestInterface">RequestInterface</abbr> $request, <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr> $response, <abbr title="Psr\Log\LoggerInterface">LoggerInterface</abbr> $logger)
+        
+                                            <p><p>Inizializza il controller impostando il contesto operativo e istanziando modello e libreria specifici.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_addCss">addCss</a>(array $css)
+        
+                                            <p><p>Accoda dinamicamente nuovi percorsi ai fogli di stile personalizzati da caricare nella vista.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#method_addCss">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_addJs">addJs</a>(array $js)
+        
+                                            <p><p>Accoda dinamicamente nuovi percorsi agli script JavaScript personalizzati da caricare nella vista.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#method_addJs">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_render">render</a>(string $view, array $data = [])
+        
+                                            <p><p>Motore di renderizzazione centrale.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#method_render">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    object|null
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getHelperClass">getHelperClass</a>()
+        
+                                            <p><p>Analizza le proprietà protette del controller tramite Reflection API per individuare
+e restituire l'eventuale istanza della classe helper dedicata (identificata dal suffisso 'Class').</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#method_getHelperClass">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_jsonResponse">jsonResponse</a>(array $data, int $statusCode = 200)
+        
+                                            <p><p>Restituisce una risposta formattata in JSON.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#method_jsonResponse">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_index">index</a>()
+        
+                                            <p><p>Renderizza la pagina principale del modulo di gestione degli utenti.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_showAll">showAll</a>()
+        
+                                            <p class="no-description">No description</p>
+                                    </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_show">show</a>()
+        
+                                            <p class="no-description">No description</p>
+                                    </div>
+                <div class="col-md-2"></div>
+            </div>
+            </div>
+
+
+        <h2>Details</h2>
+
+            <div id="method-details">
+                    <div class="method-item">
+                    <h3 id="method_initController">
+        <div class="location">at line 43</div>
+        <code>                    
+    <strong>initController</strong>(<abbr title="CodeIgniter\HTTP\RequestInterface">RequestInterface</abbr> $request, <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr> $response, <abbr title="Psr\Log\LoggerInterface">LoggerInterface</abbr> $logger)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Inizializza il controller impostando il contesto operativo e istanziando modello e libreria specifici.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td><abbr title="CodeIgniter\HTTP\RequestInterface">RequestInterface</abbr></td>
+                <td>$request</td>
+                <td><p>Istanza della richiesta HTTP corrente</p></td>
+            </tr>
+                    <tr>
+                <td><abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr></td>
+                <td>$response</td>
+                <td><p>Istanza della risposta HTTP per il client</p></td>
+            </tr>
+                    <tr>
+                <td><abbr title="Psr\Log\LoggerInterface">LoggerInterface</abbr></td>
+                <td>$logger</td>
+                <td><p>Istanza del sistema di log per la registrazione degli eventi</p></td>
+            </tr>
+            </table>
+
+            
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_addCss">
+        <div class="location">in <a href="../../../App/Controllers/Backend/BackendController.html#method_addCss">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a> at line 120</div>
+        <code>            protected        void
+    <strong>addCss</strong>(array $css)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Accoda dinamicamente nuovi percorsi ai fogli di stile personalizzati da caricare nella vista.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$css</td>
+                <td><p>Array contenente i percorsi dei file CSS aggiuntivi.</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_addJs">
+        <div class="location">in <a href="../../../App/Controllers/Backend/BackendController.html#method_addJs">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a> at line 130</div>
+        <code>            protected        void
+    <strong>addJs</strong>(array $js)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Accoda dinamicamente nuovi percorsi agli script JavaScript personalizzati da caricare nella vista.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$js</td>
+                <td><p>Array contenente i percorsi dei file JS aggiuntivi.</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_render">
+        <div class="location">in <a href="../../../App/Controllers/Backend/BackendController.html#method_render">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a> at line 146</div>
+        <code>            protected        string
+    <strong>render</strong>(string $view, array $data = [])
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Motore di renderizzazione centrale.</p></p>                <p><p>Utilizza la reflection per individuare eventuali classi helper associate al controller corrente.
+Se trovate, ne estrae automaticamente asset specifici (CSS/JS) e frammenti di interfaccia
+(es. linksBar, options) basandosi sul nome dell'azione in corso, prima di compilare la vista finale.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$view</td>
+                <td><p>Il percorso relativo della vista da elaborare.</p></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$data</td>
+                <td><p>Dati opzionali aggiuntivi da iniettare nel contesto della vista.</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>Il codice HTML elaborato e pronto per l'output.</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getHelperClass">
+        <div class="location">in <a href="../../../App/Controllers/Backend/BackendController.html#method_getHelperClass">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a> at line 204</div>
+        <code>            protected        object|null
+    <strong>getHelperClass</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Analizza le proprietà protette del controller tramite Reflection API per individuare
+e restituire l'eventuale istanza della classe helper dedicata (identificata dal suffisso 'Class').</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>object|null</td>
+            <td><p>L'istanza dell'helper trovato, oppure null.</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_jsonResponse">
+        <div class="location">in <a href="../../../App/Controllers/Backend/BackendController.html#method_jsonResponse">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a> at line 246</div>
+        <code>            protected        <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+    <strong>jsonResponse</strong>(array $data, int $statusCode = 200)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Restituisce una risposta formattata in JSON.</p></p>                <p><p>Integra automaticamente nel payload di risposta i token CSRF rigenerati per mantenere
+la validità e la sicurezza delle successive richieste asincrone (AJAX).</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$data</td>
+                <td><p>L'array associativo contenente i dati da inviare.</p></td>
+            </tr>
+                    <tr>
+                <td>int</td>
+                <td>$statusCode</td>
+                <td><p>Il codice di stato HTTP associato alla risposta (predefinito: 200).</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr></td>
+            <td><p>L'oggetto Response di CodeIgniter contenente il payload JSON.</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_index">
+        <div class="location">at line 58</div>
+        <code>                    string
+    <strong>index</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Renderizza la pagina principale del modulo di gestione degli utenti.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>La vista HTML iniziale dell'indice.</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_showAll">
+        <div class="location">at line 68</div>
+        <code>                    string
+    <strong>showAll</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p class="no-description">No description</p>
+                    
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_show">
+        <div class="location">at line 78</div>
+        <code>                    string
+    <strong>show</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p class="no-description">No description</p>
+                    
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+            </div>
+
+    
+</div><div id="footer">
+        Generated by <a href="https://github.com/code-lts/doctum">Doctum, a API Documentation generator and fork of Sami</a>.</div></div>
+    </div>
+    </body>
+
+</html>

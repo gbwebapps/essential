@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="index, follow, all" />
+    <title>App\Controllers\Backend\AdminsController | Essential API</title>
+
+            <link rel="stylesheet" type="text/css" href="../../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../../css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="../../../css/doctum.css">
+        <link rel="stylesheet" type="text/css" href="../../../fonts/doctum-font.css">
+        <script src="../../../js/jquery-3.5.1.slim.min.js"></script>
+        <script async defer src="../../../doctum.js"></script>
+        <script async defer src="../../../js/bootstrap.min.js"></script>
+        <script async defer src="../../../js/autocomplete.min.js"></script>
+        <meta name="MobileOptimized" content="width">
+        <meta name="HandheldFriendly" content="true">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+
+    </head>
+
+    <body id="class" data-name="class:App_Controllers_Backend_AdminsController" data-root-path="../../../" data-search-index-url="../../../doctum-search.json">
+            <div id="content">
+        <div id="left-column">
+                <div id="control-panel">
+                <div class="search-bar hidden" id="search-progress-bar-container">
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" id="search-progress-bar"
+                    aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+            </div>
+        </div>
+        <form id="search-form" action="../../../search.html">
+            <span class="icon icon-search"></span>
+            <input name="search"
+                   id="doctum-search-auto-complete"
+                   class="typeahead form-control"
+                   type="search"
+                   placeholder="Search"
+                   spellcheck="false"
+                   autocorrect="off"
+                   autocomplete="off"
+                   autocapitalize="off">
+            <div class="auto-complete-results" id="auto-complete-results"></div>
+        </form>
+    </div>
+
+                <div id="api-tree"></div>
+
+        </div>
+        <div id="right-column">
+                <nav id="site-nav" class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-elements">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="../../../index.html">Essential API</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-elements">
+                <ul class="nav navbar-nav">
+                    <li><a href="../../../classes.html">Classes</a></li>
+                    <li><a href="../../../namespaces.html">Namespaces</a></li>
+                    <li><a href="../../../interfaces.html">Interfaces</a></li>
+                    <li><a href="../../../traits.html">Traits</a></li>
+                    <li><a href="../../../doc-index.html">Index</a></li>
+                    <li><a href="../../../search.html">Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+                        <div class="namespace-breadcrumbs">
+            <ol class="breadcrumb">
+                <li><span class="label label-default">class</span></li>
+                        <li><a href="../../../App.html">App</a></li><li class="backslash">\</li><li><a href="../../../App/Controllers.html">Controllers</a></li><li class="backslash">\</li><li><a href="../../../App/Controllers/Backend.html">Backend</a></li><li class="backslash">\</li><li>AdminsController</li>
+            </ol>
+        </div>
+                <div id="page-content">
+    <div class="page-header">
+        <h1>AdminsController    
+            </h1>
+    </div>
+
+    
+    <p>        class
+    <strong>AdminsController</strong>        extends <a href="../../../App/Controllers/Backend/BackendController.html"><abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a>
+</p>
+
+        
+        
+    
+        
+
+            <div class="description">
+            <p><p>Gestisce la sezione amministrativa dedicata alla gestione degli utenti con privilegi di sistema (amministratori), controllandone permessi, sessioni e anagrafiche.</p></p>                    </div>
+            
+        
+    
+            <h2>Properties</h2>
+
+            <table class="table table-condensed">
+                    <tr>
+                <td class="type" id="property_helpers">
+                                        protected                                        <abbr title="App\Controllers\Backend\list&lt;string&gt;">list&lt;string&gt;</abbr>
+                                                                                
+                                    </td>
+                <td>$helpers</td>
+                <td class="last"><p>Array di helper precaricati da CodeIgniter per essere disponibili in tutto il backend.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#property_helpers">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_data">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$data</td>
+                <td class="last"><p>Array associativo globale utilizzato per passare variabili e contesti strutturati alle viste.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#property_data">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_session">
+                                        protected                                        <abbr title="CodeIgniter\Session\Session">Session</abbr>
+                                                                                
+                                    </td>
+                <td>$session</td>
+                <td class="last"><p>Istanza del gestore nativo delle sessioni di CodeIgniter.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#property_session">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_backendClass">
+                                        protected                                        <a href="../../../App/Libraries/Backend/BackendClass.html"><abbr title="App\Libraries\Backend\BackendClass">BackendClass</abbr></a>
+                                                                                
+                                    </td>
+                <td>$backendClass</td>
+                <td class="last"><p>Istanza della classe helper contenente le logiche di supporto e formattazione generali.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#property_backendClass">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_regexp">
+                                        protected                                        <a href="../../../App/Libraries/RegExp.html"><abbr title="App\Libraries\RegExp">RegExp</abbr></a>
+                                                                                
+                                    </td>
+                <td>$regexp</td>
+                <td class="last"><p>Istanza del servizio dedicato alla validazione e manipolazione tramite espressioni regolari.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#property_regexp">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_customCss">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$customCss</td>
+                <td class="last"><p>Elenco dei percorsi per i fogli di stile (CSS) personalizzati che devono essere accodati al rendering.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#property_customCss">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_customJs">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$customJs</td>
+                <td class="last"><p>Elenco dei percorsi per gli script (JS) personalizzati che devono essere accodati al rendering.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#property_customJs">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_currentAdmin">
+                                        protected                                        object|null
+                                                                                
+                                    </td>
+                <td>$currentAdmin</td>
+                <td class="last"><p>Oggetto rappresentante l'amministratore attualmente autenticato.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#property_currentAdmin">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_adminsModel">
+                                        protected                                        <a href="../../../App/Models/Backend/AdminsModel.html"><abbr title="App\Models\Backend\AdminsModel">AdminsModel</abbr></a>
+                                                                                
+                                    </td>
+                <td>$adminsModel</td>
+                <td class="last"><p>Istanza del modello dedicato all'interazione con il database per i dati degli amministratori</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_adminsClass">
+                                        protected                                        <a href="../../../App/Libraries/Backend/AdminsClass.html"><abbr title="App\Libraries\Backend\AdminsClass">AdminsClass</abbr></a>
+                                                                                
+                                    </td>
+                <td>$adminsClass</td>
+                <td class="last"><p>Istanza della libreria contenente logiche di controllo e formattazione specifiche per gli amministratori</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_galleryOneModel">
+                                        protected                                        <a href="../../../App/Models/Backend/Components/GalleryOneModel.html"><abbr title="App\Models\Backend\Components\GalleryOneModel">GalleryOneModel</abbr></a>
+                                                                                
+                                    </td>
+                <td>$galleryOneModel</td>
+                <td class="last"><p>Istanza del modello responsabile della gestione dell'immagine di profilo (avatar) dell'amministratore</p></td>
+                <td></td>
+            </tr>
+            </table>
+
+    
+            <h2>Methods</h2>
+
+            <div class="container-fluid underlined">
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_initController">initController</a>(<abbr title="CodeIgniter\HTTP\RequestInterface">RequestInterface</abbr> $request, <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr> $response, <abbr title="Psr\Log\LoggerInterface">LoggerInterface</abbr> $logger)
+        
+                                            <p><p>Inizializza il controller, configura i metadati della pagina e istanzia i modelli e le classi necessarie.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_addCss">addCss</a>(array $css)
+        
+                                            <p><p>Accoda dinamicamente nuovi percorsi ai fogli di stile personalizzati da caricare nella vista.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#method_addCss">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_addJs">addJs</a>(array $js)
+        
+                                            <p><p>Accoda dinamicamente nuovi percorsi agli script JavaScript personalizzati da caricare nella vista.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#method_addJs">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_render">render</a>(string $view, array $data = [])
+        
+                                            <p><p>Motore di renderizzazione centrale.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#method_render">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    object|null
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getHelperClass">getHelperClass</a>()
+        
+                                            <p><p>Analizza le proprietà protette del controller tramite Reflection API per individuare
+e restituire l'eventuale istanza della classe helper dedicata (identificata dal suffisso 'Class').</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#method_getHelperClass">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_jsonResponse">jsonResponse</a>(array $data, int $statusCode = 200)
+        
+                                            <p><p>Restituisce una risposta formattata in JSON.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Controllers/Backend/BackendController.html#method_jsonResponse">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>|null
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_targetAccessError">targetAccessError</a>(array $record)
+        
+                                            <p class="no-description">No description</p>
+                                    </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_index">index</a>()
+        
+                                            <p><p>Renderizza la vista iniziale (dashboard/riepilogo) della sezione amministratori.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string|<abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_showAll">showAll</a>()
+        
+                                            <p><p>Gestisce il caricamento e il filtraggio asincrono della tabella contenente l'elenco di tutti gli amministratori.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string|<abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_add">add</a>()
+        
+                                            <p><p>Gestisce la creazione di un nuovo amministratore, includendo la validazione dei dati anagrafici e l'upload dell'immagine profilo.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string|<abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_edit">edit</a>(string|null $uuid = null)
+        
+                                            <p><p>Gestisce la modifica di un amministratore esistente, verificandone i privilegi (protezione superadmin e cestino) e aggiornando permessi o anagrafica.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_changeGroup">changeGroup</a>()
+        
+                                            <p><p>Ricalcola dinamicamente e restituisce l'interfaccia dei permessi quando viene selezionato un nuovo gruppo di appartenenza durante la fase di modifica.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <abbr title="CodeIgniter\HTTP\RedirectResponse">RedirectResponse</abbr>|string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_show">show</a>(string $uuid)
+        
+                                            <p><p>Renderizza la vista di dettaglio di un singolo amministratore, mostrando anagrafica, permessi attuali e sessioni attive.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_hardDelete">hardDelete</a>()
+        
+                                            <p><p>Elimina in modo irreversibile dal database i dati dell'amministratore e i record ad esso associati.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_softDelete">softDelete</a>()
+        
+                                            <p><p>Sposta temporaneamente un amministratore nel cestino, revocandone l'accesso senza cancellare i dati dal database (eliminazione logica).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_restoreDelete">restoreDelete</a>()
+        
+                                            <p><p>Ripristina un amministratore precedentemente inserito nel cestino, riabilitandone l'account.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_resetPassword">resetPassword</a>()
+        
+                                            <p><p>Genera e invia via email un link temporaneo per consentire all'amministratore di reimpostare la propria password.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_changeStatus">changeStatus</a>()
+        
+                                            <p><p>Modifica asincronamente lo stato di un amministratore (es. da attivo a sospeso) e aggiorna la porzione di interfaccia interessata.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_changePermission">changePermission</a>()
+        
+                                            <p><p>Aggiunge o rimuove un permesso specifico, generando un'eccezione rispetto alle regole predefinite del gruppo di appartenenza dell'amministratore.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getGeneralData">getGeneralData</a>()
+        
+                                            <p><p>Recupera e ricarica i dati anagrafici e generali dell'amministratore aggiornando la singola porzione della vista di dettaglio o di modifica.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getMetaData">getMetaData</a>()
+        
+                                            <p><p>Ricarica i metadati di sistema dell'amministratore (date di creazione, modifica, ultimo accesso, ecc.) per l'aggiornamento dell'interfaccia.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getPermissions">getPermissions</a>()
+        
+                                            <p><p>Ricarica l'intera struttura dei permessi, calcolando dinamicamente la fusione tra i permessi di gruppo e le eccezioni dell'utente.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getTokens">getTokens</a>()
+        
+                                            <p><p>Ricarica e restituisce la lista dei dispositivi attualmente connessi e delle sessioni attive dell'amministratore.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_deleteToken">deleteToken</a>()
+        
+                                            <p><p>Disconnette forzatamente un dispositivo remoto, invalidando ed eliminando il token di sessione corrispondente.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+            </div>
+
+
+        <h2>Details</h2>
+
+            <div id="method-details">
+                    <div class="method-item">
+                    <h3 id="method_initController">
+        <div class="location">at line 67</div>
+        <code>                    
+    <strong>initController</strong>(<abbr title="CodeIgniter\HTTP\RequestInterface">RequestInterface</abbr> $request, <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr> $response, <abbr title="Psr\Log\LoggerInterface">LoggerInterface</abbr> $logger)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Inizializza il controller, configura i metadati della pagina e istanzia i modelli e le classi necessarie.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td><abbr title="CodeIgniter\HTTP\RequestInterface">RequestInterface</abbr></td>
+                <td>$request</td>
+                <td><p>Istanza della richiesta HTTP corrente</p></td>
+            </tr>
+                    <tr>
+                <td><abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr></td>
+                <td>$response</td>
+                <td><p>Istanza della risposta HTTP per il client</p></td>
+            </tr>
+                    <tr>
+                <td><abbr title="Psr\Log\LoggerInterface">LoggerInterface</abbr></td>
+                <td>$logger</td>
+                <td><p>Istanza del sistema di log per la registrazione degli eventi</p></td>
+            </tr>
+            </table>
+
+            
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_addCss">
+        <div class="location">in <a href="../../../App/Controllers/Backend/BackendController.html#method_addCss">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a> at line 120</div>
+        <code>            protected        void
+    <strong>addCss</strong>(array $css)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Accoda dinamicamente nuovi percorsi ai fogli di stile personalizzati da caricare nella vista.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$css</td>
+                <td><p>Array contenente i percorsi dei file CSS aggiuntivi.</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_addJs">
+        <div class="location">in <a href="../../../App/Controllers/Backend/BackendController.html#method_addJs">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a> at line 130</div>
+        <code>            protected        void
+    <strong>addJs</strong>(array $js)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Accoda dinamicamente nuovi percorsi agli script JavaScript personalizzati da caricare nella vista.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$js</td>
+                <td><p>Array contenente i percorsi dei file JS aggiuntivi.</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_render">
+        <div class="location">in <a href="../../../App/Controllers/Backend/BackendController.html#method_render">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a> at line 146</div>
+        <code>            protected        string
+    <strong>render</strong>(string $view, array $data = [])
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Motore di renderizzazione centrale.</p></p>                <p><p>Utilizza la reflection per individuare eventuali classi helper associate al controller corrente.
+Se trovate, ne estrae automaticamente asset specifici (CSS/JS) e frammenti di interfaccia
+(es. linksBar, options) basandosi sul nome dell'azione in corso, prima di compilare la vista finale.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$view</td>
+                <td><p>Il percorso relativo della vista da elaborare.</p></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$data</td>
+                <td><p>Dati opzionali aggiuntivi da iniettare nel contesto della vista.</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>Il codice HTML elaborato e pronto per l'output.</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getHelperClass">
+        <div class="location">in <a href="../../../App/Controllers/Backend/BackendController.html#method_getHelperClass">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a> at line 204</div>
+        <code>            protected        object|null
+    <strong>getHelperClass</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Analizza le proprietà protette del controller tramite Reflection API per individuare
+e restituire l'eventuale istanza della classe helper dedicata (identificata dal suffisso 'Class').</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>object|null</td>
+            <td><p>L'istanza dell'helper trovato, oppure null.</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_jsonResponse">
+        <div class="location">in <a href="../../../App/Controllers/Backend/BackendController.html#method_jsonResponse">
+<abbr title="App\Controllers\Backend\BackendController">BackendController</abbr></a> at line 246</div>
+        <code>            protected        <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+    <strong>jsonResponse</strong>(array $data, int $statusCode = 200)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Restituisce una risposta formattata in JSON.</p></p>                <p><p>Integra automaticamente nel payload di risposta i token CSRF rigenerati per mantenere
+la validità e la sicurezza delle successive richieste asincrone (AJAX).</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$data</td>
+                <td><p>L'array associativo contenente i dati da inviare.</p></td>
+            </tr>
+                    <tr>
+                <td>int</td>
+                <td>$statusCode</td>
+                <td><p>Il codice di stato HTTP associato alla risposta (predefinito: 200).</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr></td>
+            <td><p>L'oggetto Response di CodeIgniter contenente il payload JSON.</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_targetAccessError">
+        <div class="location">at line 22</div>
+        <code>                private    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>|null
+    <strong>targetAccessError</strong>(array $record)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p class="no-description">No description</p>
+                    
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$record</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>|null</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_index">
+        <div class="location">at line 85</div>
+        <code>                    string
+    <strong>index</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Renderizza la vista iniziale (dashboard/riepilogo) della sezione amministratori.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>HTML renderizzato della vista index</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_showAll">
+        <div class="location">at line 100</div>
+        <code>                    string|<abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+    <strong>showAll</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Gestisce il caricamento e il filtraggio asincrono della tabella contenente l'elenco di tutti gli amministratori.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string|<abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr></td>
+            <td><p>Risposta JSON con i dati filtrati o l'HTML della vista per l'elenco generale</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_add">
+        <div class="location">at line 157</div>
+        <code>                    string|<abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+    <strong>add</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Gestisce la creazione di un nuovo amministratore, includendo la validazione dei dati anagrafici e l'upload dell'immagine profilo.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string|<abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr></td>
+            <td><p>Risposta JSON con l'esito del salvataggio o l'HTML del modulo di inserimento</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_edit">
+        <div class="location">at line 204</div>
+        <code>                    string|<abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+    <strong>edit</strong>(string|null $uuid = null)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Gestisce la modifica di un amministratore esistente, verificandone i privilegi (protezione superadmin e cestino) e aggiornando permessi o anagrafica.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string|null</td>
+                <td>$uuid</td>
+                <td><p>Identificativo univoco dell'amministratore da modificare</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string|<abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr></td>
+            <td><p>Risposta JSON con l'esito dell'aggiornamento o l'HTML del modulo di modifica</p></td>
+        </tr>
+    </table>
+
+            
+                            <h4>Exceptions</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td><abbr title="CodeIgniter\Exceptions\PageNotFoundException">PageNotFoundException</abbr></td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_changeGroup">
+        <div class="location">at line 330</div>
+        <code>                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+    <strong>changeGroup</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Ricalcola dinamicamente e restituisce l'interfaccia dei permessi quando viene selezionato un nuovo gruppo di appartenenza durante la fase di modifica.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr></td>
+            <td><p>Risposta JSON contenente la vista aggiornata dei permessi assegnabili</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_show">
+        <div class="location">at line 378</div>
+        <code>                    <abbr title="CodeIgniter\HTTP\RedirectResponse">RedirectResponse</abbr>|string
+    <strong>show</strong>(string $uuid)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Renderizza la vista di dettaglio di un singolo amministratore, mostrando anagrafica, permessi attuali e sessioni attive.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$uuid</td>
+                <td><p>Identificativo univoco dell'amministratore</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><abbr title="CodeIgniter\HTTP\RedirectResponse">RedirectResponse</abbr>|string</td>
+            <td><p>Redirect in caso di parametri non validi o l'HTML renderizzato della vista di dettaglio</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_hardDelete">
+        <div class="location">at line 427</div>
+        <code>                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+    <strong>hardDelete</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Elimina in modo irreversibile dal database i dati dell'amministratore e i record ad esso associati.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr></td>
+            <td><p>Risposta JSON con l'esito dell'eliminazione definitiva</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_softDelete">
+        <div class="location">at line 454</div>
+        <code>                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+    <strong>softDelete</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Sposta temporaneamente un amministratore nel cestino, revocandone l'accesso senza cancellare i dati dal database (eliminazione logica).</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr></td>
+            <td><p>Risposta JSON con l'esito della disattivazione</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_restoreDelete">
+        <div class="location">at line 481</div>
+        <code>                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+    <strong>restoreDelete</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Ripristina un amministratore precedentemente inserito nel cestino, riabilitandone l'account.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr></td>
+            <td><p>Risposta JSON con l'esito dell'operazione di ripristino</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_resetPassword">
+        <div class="location">at line 508</div>
+        <code>                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+    <strong>resetPassword</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Genera e invia via email un link temporaneo per consentire all'amministratore di reimpostare la propria password.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr></td>
+            <td><p>Risposta JSON con l'esito dell'invio della richiesta</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_changeStatus">
+        <div class="location">at line 535</div>
+        <code>                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+    <strong>changeStatus</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Modifica asincronamente lo stato di un amministratore (es. da attivo a sospeso) e aggiorna la porzione di interfaccia interessata.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr></td>
+            <td><p>Risposta JSON con l'esito del cambio di stato e l'HTML aggiornato</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_changePermission">
+        <div class="location">at line 577</div>
+        <code>                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+    <strong>changePermission</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Aggiunge o rimuove un permesso specifico, generando un'eccezione rispetto alle regole predefinite del gruppo di appartenenza dell'amministratore.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr></td>
+            <td><p>Risposta JSON con l'esito dell'operazione e l'interfaccia dei permessi aggiornata</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getGeneralData">
+        <div class="location">at line 620</div>
+        <code>                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+    <strong>getGeneralData</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Recupera e ricarica i dati anagrafici e generali dell'amministratore aggiornando la singola porzione della vista di dettaglio o di modifica.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr></td>
+            <td><p>Risposta JSON contenente l'HTML aggiornato dei dati generali</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getMetaData">
+        <div class="location">at line 678</div>
+        <code>                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+    <strong>getMetaData</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Ricarica i metadati di sistema dell'amministratore (date di creazione, modifica, ultimo accesso, ecc.) per l'aggiornamento dell'interfaccia.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr></td>
+            <td><p>Risposta JSON contenente l'HTML aggiornato dei metadati</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getPermissions">
+        <div class="location">at line 724</div>
+        <code>                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+    <strong>getPermissions</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Ricarica l'intera struttura dei permessi, calcolando dinamicamente la fusione tra i permessi di gruppo e le eccezioni dell'utente.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr></td>
+            <td><p>Risposta JSON contenente l'interfaccia aggiornata dei permessi assegnati</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getTokens">
+        <div class="location">at line 787</div>
+        <code>                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+    <strong>getTokens</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Ricarica e restituisce la lista dei dispositivi attualmente connessi e delle sessioni attive dell'amministratore.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr></td>
+            <td><p>Risposta JSON contenente l'interfaccia aggiornata con l'elenco dei token</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_deleteToken">
+        <div class="location">at line 836</div>
+        <code>                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
+    <strong>deleteToken</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Disconnette forzatamente un dispositivo remoto, invalidando ed eliminando il token di sessione corrispondente.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr></td>
+            <td><p>Risposta JSON con l'esito della disconnessione e l'elenco aggiornato dei dispositivi attivi</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+            </div>
+
+    
+</div><div id="footer">
+        Generated by <a href="https://github.com/code-lts/doctum">Doctum, a API Documentation generator and fork of Sami</a>.</div></div>
+    </div>
+    </body>
+
+</html>

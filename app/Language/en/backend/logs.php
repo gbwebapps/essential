@@ -15,7 +15,7 @@ return [
 		'id' => 'Invalid ID.', 
 	], 
 	'actions' => [
-		'hardDelete' => 'Disconnect'
+		'disconnectSession' => 'Disconnect'
 	],
 	'labels' => [
 		'username' => 'Username', 
@@ -35,7 +35,11 @@ return [
 		'banned' => 'Banned', 
 		'undefined' => 'Undefined', 
 		'pending' => 'Pending...', 
-		'duration' => 'Duration'
+		'duration' => 'Duration',
+		'mobile' => 'Mobile device',
+		'robot' => 'Robot',
+		'filtersAndOptions' => 'Options and filters',
+		'showSystemDetails' => 'Show system details'
 	],
 	'placeholders' => [
 		'searchUsername' => 'Search by username...', 
@@ -44,15 +48,15 @@ return [
 		'searchLogoutReason' => 'Search by logout reason...'
 	], 
 	'audits' => [
-	    'deleteToken' => 'Forced termination of current session',
+	    'disconnectSession' => 'Forced termination of current session',
 	],
 	'messages' => [
 		'noLogsFound' => 'No logs found.', 
-		'areYouSureHardDelete' => 'Are you sure you want to disconnect <b>%s %s</b>?', 
+		'areYouSureDisconnectSession' => 'Are you sure you want to disconnect <b>%s %s</b>?', 
 		'validationErrors' => 'Validation errors.', 
 		'validationToastErrors' => '%s', 
-		'deleteTokenSuccess' => '%s %s was disconnected successfully.', 
-		'deleteTokenError' => 'Disconnection failed.', 
+		'disconnectSessionSuccess' => '%s %s was disconnected successfully.', 
+		'disconnectSessionError' => 'Disconnection failed.', 
 		'protectedAdmin' => 'Protected from modifications.', 
 		'cannotModifyDeleted' => 'Cannot modify a deleted admin.', 
 	]

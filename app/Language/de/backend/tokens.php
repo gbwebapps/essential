@@ -31,7 +31,12 @@ return [
 		'createdAt' => 'Hinzugefügt am ', 
 		'session' => 'Sitzung', 
 		'activation' => 'Aktivierung', 
-		'cookie' => 'Angemeldet bleiben'
+		'cookie' => 'Angemeldet bleiben',
+		'mobile' => 'Mobilgerät',
+		'robot' => 'Robot',
+		'unknown' => 'Unbekannt',
+		'filtersAndOptions' => 'Optionen und Filter',
+		'showSystemDetails' => 'Systemdetails anzeigen'
 	],
 	'errors' => [
 		'uuid' => 'Ungültige UUID.', 
@@ -44,7 +49,7 @@ return [
 		'actions' => 'Aktionen'
 	], 
 	'placeholders' => [
-		'searchUsername' => 'Nach Benutzernamen suchen...', 
+		'searchUsername' => 'Nach E-Mail suchen...',
 		'searchType' => 'Nach Typ suchen...', 
 		'dateFrom' => 'Nach Startdatum suchen...', 
 		'dateTo' => 'Nach Enddatum suchen...',

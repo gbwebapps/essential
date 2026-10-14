@@ -1,0 +1,2214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="index, follow, all" />
+    <title>App\Models\Backend\GroupsModel | Essential API</title>
+
+            <link rel="stylesheet" type="text/css" href="../../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../../css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="../../../css/doctum.css">
+        <link rel="stylesheet" type="text/css" href="../../../fonts/doctum-font.css">
+        <script src="../../../js/jquery-3.5.1.slim.min.js"></script>
+        <script async defer src="../../../doctum.js"></script>
+        <script async defer src="../../../js/bootstrap.min.js"></script>
+        <script async defer src="../../../js/autocomplete.min.js"></script>
+        <meta name="MobileOptimized" content="width">
+        <meta name="HandheldFriendly" content="true">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+
+    </head>
+
+    <body id="class" data-name="class:App_Models_Backend_GroupsModel" data-root-path="../../../" data-search-index-url="../../../doctum-search.json">
+            <div id="content">
+        <div id="left-column">
+                <div id="control-panel">
+                <div class="search-bar hidden" id="search-progress-bar-container">
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" id="search-progress-bar"
+                    aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+            </div>
+        </div>
+        <form id="search-form" action="../../../search.html">
+            <span class="icon icon-search"></span>
+            <input name="search"
+                   id="doctum-search-auto-complete"
+                   class="typeahead form-control"
+                   type="search"
+                   placeholder="Search"
+                   spellcheck="false"
+                   autocorrect="off"
+                   autocomplete="off"
+                   autocapitalize="off">
+            <div class="auto-complete-results" id="auto-complete-results"></div>
+        </form>
+    </div>
+
+                <div id="api-tree"></div>
+
+        </div>
+        <div id="right-column">
+                <nav id="site-nav" class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-elements">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="../../../index.html">Essential API</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-elements">
+                <ul class="nav navbar-nav">
+                    <li><a href="../../../classes.html">Classes</a></li>
+                    <li><a href="../../../namespaces.html">Namespaces</a></li>
+                    <li><a href="../../../interfaces.html">Interfaces</a></li>
+                    <li><a href="../../../traits.html">Traits</a></li>
+                    <li><a href="../../../doc-index.html">Index</a></li>
+                    <li><a href="../../../search.html">Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+                        <div class="namespace-breadcrumbs">
+            <ol class="breadcrumb">
+                <li><span class="label label-default">class</span></li>
+                        <li><a href="../../../App.html">App</a></li><li class="backslash">\</li><li><a href="../../../App/Models.html">Models</a></li><li class="backslash">\</li><li><a href="../../../App/Models/Backend.html">Backend</a></li><li class="backslash">\</li><li>GroupsModel</li>
+            </ol>
+        </div>
+                <div id="page-content">
+    <div class="page-header">
+        <h1>GroupsModel    
+            </h1>
+    </div>
+
+    
+    <p>        class
+    <strong>GroupsModel</strong>        extends <a href="../../../App/Models/Backend/BackendModel.html"><abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a>
+</p>
+
+        
+        
+    
+        
+
+            <div class="description">
+            <p><p>Modello principale per la gestione dei Gruppi di Amministrazione e delle policy di Permesso.</p></p>            <p><p>Estende il BackendModel. Si occupa di incapsulare tutta la business logic legata alla creazione,
+aggiornamento ed eliminazione dei ruoli di sistema (es. Superadmin, Editor, ecc.),
+oltre a gestire in modo avanzato l'assegnazione massiva (Bulk Insert) dei permessi e
+la risoluzione delle eccezioni (override) assegnate ai singoli utenti.</p></p>        </div>
+            
+        
+    
+            <h2>Properties</h2>
+
+            <table class="table table-condensed">
+                    <tr>
+                <td class="type" id="property_db">
+                                        protected                                        <abbr title="CodeIgniter\Database\BaseConnection">BaseConnection</abbr>
+                                                                                
+                                    </td>
+                <td>$db</td>
+                <td class="last"><p>Istanza condivisa della connessione primaria al database.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/BaseModel.html#property_db">
+<abbr title="App\Models\BaseModel">BaseModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_module">
+                                        protected                                        string|null
+                                                                                
+                                    </td>
+                <td>$module</td>
+                <td class="last"><p>Nome identificativo del modulo di pertinenza (es. 'admins', 'logs').</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_module">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_hasSoftDelete">
+                                        protected                                        bool
+                                                                                
+                                    </td>
+                <td>$hasSoftDelete</td>
+                <td class="last"><p>Definisce se l'entità corrente supporta la cancellazione logica (Soft Delete).</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_hasSoftDelete">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_getDataQuery">
+                                        protected                                        string|null
+                                                                                
+                                    </td>
+                <td>$getDataQuery</td>
+                <td class="last"><p>Costrutto SQL nativo preparato per l'estrazione paginata dei record (metodo getData).</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_getDataQuery">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_getUUIDQuery">
+                                        protected                                        string|null
+                                                                                
+                                    </td>
+                <td>$getUUIDQuery</td>
+                <td class="last"><p>Costrutto SQL nativo preparato per la singola estrazione tramite identificatore (metodo getByUUID).</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_getUUIDQuery">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_getNumRowsQuery">
+                                        protected                                        string|null
+                                                                                
+                                    </td>
+                <td>$getNumRowsQuery</td>
+                <td class="last"><p>Costrutto SQL nativo (COUNT) indispensabile per il calcolo matematico della paginazione (metodo getNumRows).</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_getNumRowsQuery">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_defaultColumn">
+                                        protected                                        string|null
+                                                                                
+                                    </td>
+                <td>$defaultColumn</td>
+                <td class="last"><p>La colonna di default a cui ricorrere per l'ordinamento (ORDER BY) in assenza di direttive del client.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_defaultColumn">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_defaultOrder">
+                                        protected                                        string|null
+                                                                                
+                                    </td>
+                <td>$defaultOrder</td>
+                <td class="last"><p>L'ordinamento di default a cui ricorrere per l'ordinamento in assenza di direttive del client.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_defaultOrder">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_toCompare">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$toCompare</td>
+                <td class="last"><p>Elenco dei campi strutturali utilizzati dal motore del modello per il calcolo differenziale (Diffing).</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_showAllAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$showAllAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti durante la richiesta di visualizzazione dell'elenco record (es. DataTables).</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_showAllAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_showAllSearchAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$showAllSearchAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi su cui è abilitata l'esecuzione della ricerca testuale (barra di ricerca globale).</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_showAllSearchAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_showAllSearchAllowedDates">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$showAllSearchAllowedDates</td>
+                <td class="last"><p>Whitelist specifica per i campi data ammessi come filtri temporali nell'elenco record.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_showAllSearchAllowedDates">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_addAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$addAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti durante la creazione di un nuovo gruppo di ruoli.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_editAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$editAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti durante la modifica di un gruppo esistente.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_delAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$delAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti per l'eliminazione fisica o logica di un gruppo.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_changeStatusAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$changeStatusAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi ammessi per l'operazione di cambio stato rapido (es. toggle attivazione/disattivazione).</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_changeStatusAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_allowedOrderColumns">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$allowedOrderColumns</td>
+                <td class="last"><p>Whitelist delle colonne del database su cui è consentito applicare l'ordinamento (ORDER BY) nelle viste ad elenco.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_allowedOrderColumns">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_getGroupByIdAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$getGroupByIdAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti per la richiesta di estrazione dei dettagli di un gruppo.</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_saveExceptionsAllowedFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$saveExceptionsAllowedFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti per l'assegnazione delle eccezioni sui permessi (ad personam).</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_dropdownAdminsFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$dropdownAdminsFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti per le interrogazioni asincrone delle interfacce a comparsa (es. Dropdown o Select2).</p></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_getAdminByUuidFields">
+                                        protected                                        array
+                                                                                
+                                    </td>
+                <td>$getAdminByUuidFields</td>
+                <td class="last"><p>Whitelist dei campi consentiti per l'estrazione in lettura dei dati di un singolo amministratore.</p></td>
+                <td></td>
+            </tr>
+            </table>
+
+    
+            <h2>Methods</h2>
+
+            <div class="container-fluid underlined">
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8">
+                    <a href="#method___construct">__construct</a>()
+        
+                                            <p><p>Costruttore principale del modello.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/BaseModel.html#method___construct">
+<abbr title="App\Models\BaseModel">BaseModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_initModel">initModel</a>()
+        
+                                            <p><p>Hook di inizializzazione nativo di CodeIgniter 4.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getData">getData</a>(array $posts)
+        
+                                            <p><p>Motore principale per l'estrazione paginata, ordinata e filtrata dei dataset (DataTables e Liste).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_getData">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    int
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getNumRows">getNumRows</a>(array $paramsFilter)
+        
+                                            <p><p>Calcola in modo chirurgico il numero totale dei record che soddisfano la query corrente.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_getNumRows">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_buildFilters">buildFilters</a>(array $searchFields, array $params)
+        
+                                            <p><p>Costruisce in modo dinamico i costrutti logici SQL (LIKE) per la ricerca testuale (Full Search).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_buildFilters">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_buildDateFilters">buildDateFilters</a>(array $searchDates, array $params)
+        
+                                            <p><p>Genera i costrutti logici operazionali (&gt;= e &lt;=) per il partizionamento e filtraggio temporale.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_buildDateFilters">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_buildTrashFilter">buildTrashFilter</a>(string $filter, string $table, bool $hasSoftDelete = true)
+        
+                                            <p><p>Implementa la logica a scudo (Shield) per l'isolamento dei record sottoposti a cancellazione logica.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_buildTrashFilter">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getByUUID">getByUUID</a>(string $uuid)
+        
+                                            <p><p>Recupera un singolo record dal database avvalendosi dell'Identificatore Univoco Universale (UUID).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_getByUUID">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_hasDataChanged">hasDataChanged</a>(array $posts, object $original)
+        
+                                            <p><p>Esegue una validazione euristica delle differenze per l'ottimizzazione degli UPDATE transazionali.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_hasDataChanged">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_insertImages">insertImages</a>(array $filenames, string $uuid, string $entity, string $action = &#039;add&#039;)
+        
+                                            <p><p>Orchestratore logico per l'inserimento massivo (Bulk Insert) delle dipendenze fotografiche (Images).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_insertImages">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_rrmdir">rrmdir</a>(string $dir)
+        
+                                            <p><p>Algoritmo File System distruttivo per la rimozione ricorsiva di cartelle ad albero (RRMDIR).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_rrmdir">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_generateUUID">generateUUID</a>()
+        
+                                            <p><p>Fabbrica crittograficamente sicura per la generazione di Identificatori Univoci Universali (UUID versione 4).</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_generateUUID">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_checkAllowedFields">checkAllowedFields</a>(array $posts, array $allowedFields)
+        
+                                            <p><p>Scudo Architetturale Anti Mass-Assignment per la disinfezione dell'input HTTP POST.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_checkAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <a href="../../../App/Libraries/Backend/UploadClass.html"><abbr title="App\Libraries\Backend\UploadClass">UploadClass</abbr></a>
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getUploadService">getUploadService</a>()
+        
+                                            <p><p>Restituisce l'istanza del servizio di upload.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_getUploadService">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    void
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_logActivitySafely">logActivitySafely</a>(string $action, string $details)
+        
+                                            <p><p>Registra l'audit senza alterare l'esito di una transazione già consolidata.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_addValidationRules">addValidationRules</a>()
+        
+                                            <p><p>Genera il set di regole di validazione per la creazione di un nuovo Gruppo.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getGroupByIdValidationRules">getGroupByIdValidationRules</a>()
+        
+                                            <p><p>Regole di validazione per l'estrazione di un singolo Gruppo tramite ID.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_editValidationRules">editValidationRules</a>(array $posts)
+        
+                                            <p><p>Regole di validazione per la modifica di un Gruppo esistente.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_delValidationRules">delValidationRules</a>()
+        
+                                            <p><p>Regole di validazione per l'eliminazione fisica di un Gruppo.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_saveExceptionsValidationRules">saveExceptionsValidationRules</a>()
+        
+                                            <p><p>Regole di validazione per il salvataggio delle eccezioni utente.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_dropdownAdminsRules">dropdownAdminsRules</a>()
+        
+                                            <p><p>Regole di validazione per la ricerca degli amministratori tramite dropdown (AJAX).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_adminPermissionsValidationRules">adminPermissionsValidationRules</a>()
+        
+                                            <p><p>Regola base per validare rapidamente l'UUID di un amministratore.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getGroups">getGroups</a>()
+        
+                                            <p><p>Estrae l'elenco completo dei Gruppi disponibili a database.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getGroup">getGroup</a>(int $groupId)
+        
+                                            <p><p>Estrae l'elenco dei permessi (stringhe) attualmente associati a uno specifico gruppo.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    object|null
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getGroupById">getGroupById</a>(array $posts)
+        
+                                            <p><p>Recupera i dettagli anagrafici (ID, nome, descrizione) di un gruppo specifico.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_add">add</a>(array $posts)
+        
+                                            <p><p>Crea un nuovo Gruppo e gli associa i permessi selezionati.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_edit">edit</a>(array $posts)
+        
+                                            <p><p>Aggiorna i dati anagrafici e i permessi di un Gruppo esistente.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_del">del</a>(array $posts)
+        
+                                            <p><p>Rimuove definitivamente un Gruppo dal sistema.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_hasGroupChanged">hasGroupChanged</a>(array $posts, object $original)
+        
+                                            <p><p>Controlla in modo intelligente se i dati (o i permessi) di un Gruppo sono stati alterati.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getDropdownAdmins">getDropdownAdmins</a>(array $posts)
+        
+                                            <p><p>Popola il menu a tendina asincrono per la ricerca degli amministratori.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array|null
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getAdminByUuid">getAdminByUuid</a>(array $posts)
+        
+                                            <p><p>Recupera le informazioni base di un Amministratore (e il suo Gruppo) partendo dall'UUID.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getGroupPermissionsArray">getGroupPermissionsArray</a>(int $groupId)
+        
+                                            <p><p>Metodo alias/helper per estrarre la matrice permessi di un gruppo come Array.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getAdminExceptionsArray">getAdminExceptionsArray</a>(string $adminUuid)
+        
+                                            <p><p>Estrae le Eccezioni di permesso (Positive o Negative) assegnate a un utente.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_saveExceptions">saveExceptions</a>(array $posts)
+        
+                                            <p><p>Ricalcola e salva le eccezioni di permesso esclusive applicate al singolo Utente (Override).</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_hasAdminsAttached">hasAdminsAttached</a>(int $groupId)
+        
+                                            <p><p>Verifica se un Gruppo ha attualmente degli amministratori associati.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+            </div>
+
+
+        <h2>Details</h2>
+
+            <div id="method-details">
+                    <div class="method-item">
+                    <h3 id="method___construct">
+        <div class="location">in <a href="../../../App/Models/BaseModel.html#method___construct">
+<abbr title="App\Models\BaseModel">BaseModel</abbr></a> at line 34</div>
+        <code>                    
+    <strong>__construct</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Costruttore principale del modello.</p></p>                <p><p>Al momento dell'istanziazione di qualsiasi classe figlia, innesca automaticamente
+il metodo di inizializzazione interno per predisporre le risorse di base (come il DB).</p></p>        
+        </div>
+        <div class="tags">
+            
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_initModel">
+        <div class="location">at line 89</div>
+        <code>            protected        void
+    <strong>initModel</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Hook di inizializzazione nativo di CodeIgniter 4.</p></p>                <p><p>Richiama l'inizializzazione del BackendModel genitore, assicurando il corretto
+setup di connessioni al database, classi helper e proprietà ereditate
+prima di qualsiasi operazione sul modello.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getData">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_getData">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 159</div>
+        <code>                    array
+    <strong>getData</strong>(array $posts)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Motore principale per l'estrazione paginata, ordinata e filtrata dei dataset (DataTables e Liste).</p></p>                <p><p>Svolge il lavoro pesante incapsulando: sanitizzazione del payload tramite Whitelist, validazione
+rigorosa delle colonne di ordinamento e calcolo degli offset matematici (LIMIT/OFFSET).
+Compila dinamicamente la stringa SQL finale iniettando costrutti protetti per il filtro Cestino,
+i parametri di ricerca testuale (LIKE) e i range di date. Interroga infine getNumRows() passando
+i filtri esatti per garantire la perfetta coerenza totale/risultati.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Il payload POST strutturato proveniente dall'interfaccia client</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Struttura standardizzata comprendente l'esito (result), il blocco record, i dati di paginazione e l'offset ultimo</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getNumRows">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_getNumRows">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 228</div>
+        <code>            protected        int
+    <strong>getNumRows</strong>(array $paramsFilter)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Calcola in modo chirurgico il numero totale dei record che soddisfano la query corrente.</p></p>                <p><p>Metodo ancillare, rigorosamente accoppiato a getData(). Elabora l'identico set di parametri e filtri
+($paramsFilter) sfruttando query preparate, garantendo al motore di paginazione frontend
+di conoscere l'esatto volume di dati indipendentemente dai limiti della singola "pagina" SQL.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$paramsFilter</td>
+                <td><p>Array contenente i flag e i valori validati (trash_filter, searchFields, searchDates)</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td><p>Il conteggio intero dei record validi estratti dal database</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_buildFilters">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_buildFilters">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 259</div>
+        <code>            protected        string
+    <strong>buildFilters</strong>(array $searchFields, array $params)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Costruisce in modo dinamico i costrutti logici SQL (LIKE) per la ricerca testuale (Full Search).</p></p>                <p><p>Processa l'array di ricerca confrontando ogni chiave con la whitelist dedicata ($showAllSearchAllowedFields).
+Se il campo è autorizzato, concatena la stringa SQL e appende il valore mascherato (%) per riferimento
+nell'array dei parametri ($params), delegando la protezione contro l'Injection al driver PDO.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$searchFields</td>
+                <td><p>Valori di ricerca estratti dal payload del client</p></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$params</td>
+                <td><p>Riferimento all'array PDO per il data binding</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>Porzione di query SQL formattata (es. " AND table.column LIKE ?")</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_buildDateFilters">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_buildDateFilters">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 284</div>
+        <code>            protected        string
+    <strong>buildDateFilters</strong>(array $searchDates, array $params)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Genera i costrutti logici operazionali (&gt;= e &lt;=) per il partizionamento e filtraggio temporale.</p></p>                <p><p>Basandosi sulla whitelist delle colonne Data ammesse ($showAllSearchAllowedDates), intercetta
+convenzionalmente i suffissi di input '-from' e '-to'. Gestisce range temporali parziali o totali,
+accodando i valori referenziati all'array di bind per preservare l'integrità strutturale dell'interrogazione.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$searchDates</td>
+                <td><p>Valori temporali (date/datetime) estratti dal payload del client</p></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$params</td>
+                <td><p>Riferimento all'array PDO per il data binding</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>Porzione di query SQL formattata (es. " AND table.date_col &gt;= ? AND table.date_col &lt;= ?")</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_buildTrashFilter">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_buildTrashFilter">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 320</div>
+        <code>            protected        string
+    <strong>buildTrashFilter</strong>(string $filter, string $table, bool $hasSoftDelete = true)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Implementa la logica a scudo (Shield) per l'isolamento dei record sottoposti a cancellazione logica.</p></p>                <p><p>La funzione analizza lo stato richiesto, rimuove proattivamente i caratteri anomali dal nome tabella via Regex
+per impedire injection sulla stringa. Include un blocco di salvaguardia: se il modulo non possiede
+un cestino logico ($hasSoftDelete = false) restituisce una stringa vuota, prevenendo eccezioni SQL per colonne inesistenti.
+Il comportamento di fallback obbligatorio (active) sigilla l'esposizione dei record cancellati.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$filter</td>
+                <td><p>Lo stato di visibilità richiesto (active, trashed, all)</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$table</td>
+                <td><p>Il nome stringa della tabella di riferimento (sanitizzato internamente)</p></td>
+            </tr>
+                    <tr>
+                <td>bool</td>
+                <td>$hasSoftDelete</td>
+                <td><p>Flag strutturale sulla persistenza logica (default true)</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>Clausola condizionale SQL mirata (es. " AND table.deleted_at IS NULL") o vuota</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getByUUID">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_getByUUID">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 352</div>
+        <code>                    array
+    <strong>getByUUID</strong>(string $uuid)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Recupera un singolo record dal database avvalendosi dell'Identificatore Univoco Universale (UUID).</p></p>                <p><p>Sfrutta la query nativa fornita dal modulo figlio (getUUIDQuery), avvolgendo l'interrogazione in
+un blocco Try/Catch per catturare silenziando disallineamenti gravi a database. Restituisce una struttura
+di array fissa e immutabile, garantendo al BackendController un pattern di risposta standard per l'elaborazione.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$uuid</td>
+                <td><p>La stringa alfanumerica di 36 caratteri (Identificatore)</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Array associativo contenente un booleano (result) e l'oggetto dati (row) in caso di query fortunata</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_hasDataChanged">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_hasDataChanged">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 383</div>
+        <code>            protected        bool
+    <strong>hasDataChanged</strong>(array $posts, object $original)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Esegue una validazione euristica delle differenze per l'ottimizzazione degli UPDATE transazionali.</p></p>                <p><p>Effettua un'analisi comparativa tra il payload POST in ingresso e l'oggetto originario prelevato dal DB.
+Castando temporaneamente entrambi i poli di confronto a stringa, neutralizza le divergenze puramente sintattiche
+tra NULL e stringhe vuote. Effettua uno scanning secondario sulle chiavi di tipo 'images' per rilevare
+l'esistenza di operazioni multimediali in pendenza, ritornando true al primo differenziale rilevato per limitare il dispendio CPU.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dataset sanificato sottomesso via HTTP POST</p></td>
+            </tr>
+                    <tr>
+                <td>object</td>
+                <td>$original</td>
+                <td><p>L'oggetto rappresentativo dell'istanza fisica residente nel database</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td><p>True se è emersa un'effettiva mutazione logica (testo o file immessi), false viceversa</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_insertImages">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_insertImages">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 429</div>
+        <code>            protected        bool
+    <strong>insertImages</strong>(array $filenames, string $uuid, string $entity, string $action = &#039;add&#039;)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Orchestratore logico per l'inserimento massivo (Bulk Insert) delle dipendenze fotografiche (Images).</p></p>                <p><p>Metodo ad elevata efficienza che aggrega tuple in una singola query preparata, minimizzando le latenze I/O con il database.
+Analizza il contesto operativo ('add' o 'edit') allocando in modo automatico l'attributo 'is_cover' (copertina)
+alla prima immagine dell'array iterato, qualora un query lookup preventivo certifichi l'assenza di copertine attuali.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$filenames</td>
+                <td><p>Array monolitico contenente le stringhe alfanumeriche dei file già consolidati su disco</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$uuid</td>
+                <td><p>L'identificatore univoco del record padrone (proprietario della galleria)</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$entity</td>
+                <td><p>Lo slug/nome dell'entità proprietaria associata (es. 'admins')</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$action</td>
+                <td><p>Parametro comportamentale ('add' per prima allocazione, 'edit' per accodamento)</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td><p>True se tutte le immagini sono state registrate, false altrimenti</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_rrmdir">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_rrmdir">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 485</div>
+        <code>            protected        void
+    <strong>rrmdir</strong>(string $dir)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Algoritmo File System distruttivo per la rimozione ricorsiva di cartelle ad albero (RRMDIR).</p></p>                <p><p>Implementazione a basso livello progettata per disintegrare un'intera directory e le sue foglie
+(es. al momento dell'eliminazione fisica di un utente o entità). Scandisce gli inode e si richiama ricorsivamente.
+Fa uso intensivo del soppressore d'errore <code>@</code> di PHP per ammortizzare eccezioni fatali derivanti
+da file in stato "Locked" (OS I/O block) o transitorie indisponibilità di permessi CHMOD.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$dir</td>
+                <td><p>Percorso assoluto root della directory bersaglio sul server</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_generateUUID">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_generateUUID">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 514</div>
+        <code>            protected        string
+    <strong>generateUUID</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Fabbrica crittograficamente sicura per la generazione di Identificatori Univoci Universali (UUID versione 4).</p></p>                <p><p>Ricorre all'API CSPRNG nativa di PHP (random_bytes) per produrre un pool entropico a 16 byte.
+Modifica bit a bit i metadati (AND/OR logici) per conformare la sequenza al rigoroso standard RFC 4122 (versione 4, variante).
+Converte infine il buffer binario in esadecimale stringa con trattini (hyphen).</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td><p>Stringa formattata (es. 'b5e5a210-9e63-4a1c-99a3-5c8e3d304ec8')</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_checkAllowedFields">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_checkAllowedFields">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 537</div>
+        <code>            protected        array
+    <strong>checkAllowedFields</strong>(array $posts, array $allowedFields)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Scudo Architetturale Anti Mass-Assignment per la disinfezione dell'input HTTP POST.</p></p>                <p><p>Filtra e decostruisce l'array dei parametri in ingresso basandosi severamente su una Whitelist fornita come matrice.
+Utilizzando in_array in modalità strict, sgancia ed esegue l'unset su qualsiasi chiave POST arbitraria o malevola
+introdotta per forzare alterazioni su colonne sensibili del database (es. iniezione del campo superadmin o permessi).</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Array grezzo o parzialmente manipolato prelevato dalla request HTTP</p></td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$allowedFields</td>
+                <td><p>Array monolitico (Whitelist) dei nodi (chiavi) consentite per il ciclo vitale attuale</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>L'array bonificato e compattato, pronto per i layer Data Access o Validazione</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getUploadService">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_getUploadService">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 558</div>
+        <code>            protected        <a href="../../../App/Libraries/Backend/UploadClass.html"><abbr title="App\Libraries\Backend\UploadClass">UploadClass</abbr></a>
+    <strong>getUploadService</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Restituisce l'istanza del servizio di upload.</p></p>                <p><p>Metodo wrapper utilizzato per incapsulare l'istanziazione diretta
+della libreria, facilitando l'iniezione delle dipendenze (Mocking)
+durante l'esecuzione dei test unitari tramite il pattern Extract Method.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><a href="../../../App/Libraries/Backend/UploadClass.html"><abbr title="App\Libraries\Backend\UploadClass">UploadClass</abbr></a></td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_logActivitySafely">
+        <div class="location">at line 100</div>
+        <code>            protected        void
+    <strong>logActivitySafely</strong>(string $action, string $details)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Registra l'audit senza alterare l'esito di una transazione già consolidata.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$action</td>
+                <td><p>Codice dell'azione eseguita</p></td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$details</td>
+                <td><p>Dettaglio descrittivo dell'operazione</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>void</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_addValidationRules">
+        <div class="location">at line 125</div>
+        <code>                    array
+    <strong>addValidationRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Genera il set di regole di validazione per la creazione di un nuovo Gruppo.</p></p>                <p><p>Legge dinamicamente il file di configurazione centrale dei permessi (Permissions config)
+ed estrae tutte le chiavi valide in modo da costruire una regola <code>in_list</code> stringente.
+Questo garantisce che nessun permesso inventato o malevolo possa essere salvato a database.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Array strutturato con le regole native di CodeIgniter</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getGroupByIdValidationRules">
+        <div class="location">at line 166</div>
+        <code>                    array
+    <strong>getGroupByIdValidationRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per l'estrazione di un singolo Gruppo tramite ID.</p></p>                <p><p>Assicura che l'ID fornito sia un numero intero naturale e, soprattutto,
+controlla (tramite <code>is_not_unique</code>) che esista effettivamente nella tabella admins_groups,
+bloccando richieste per record inesistenti.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole per la validazione dell'ID</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_editValidationRules">
+        <div class="location">at line 186</div>
+        <code>                    array
+    <strong>editValidationRules</strong>(array $posts)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per la modifica di un Gruppo esistente.</p></p>                <p><p>Simile a addValidationRules(), ma aggiunge la protezione sull'ID da modificare e
+adatta la regola <code>is_unique</code> sul nome del gruppo in modo da escludere l'ID corrente,
+permettendo di salvare il modulo senza che il sistema segnali falsi conflitti sul nome stesso.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>I dati in ingresso (necessari per estrarre l'ID corrente)</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Array strutturato con le regole</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_delValidationRules">
+        <div class="location">at line 230</div>
+        <code>                    array
+    <strong>delValidationRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per l'eliminazione fisica di un Gruppo.</p></p>                <p><p>Applica i filtri sull'ID assicurandosi che il gruppo esista a database prima
+di tentare la query di DELETE.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole per la validazione dell'ID</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_saveExceptionsValidationRules">
+        <div class="location">at line 249</div>
+        <code>                    array
+    <strong>saveExceptionsValidationRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per il salvataggio delle eccezioni utente.</p></p>                <p><p>Verifica che l'UUID dell'amministratore sia in un formato valido (tramite Regex)
+e compila dinamicamente la whitelist dei permessi concessi, analogamente a quanto
+fatto per l'inserimento dei gruppi.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole di validazione strutturate</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_dropdownAdminsRules">
+        <div class="location">at line 289</div>
+        <code>                    array
+    <strong>dropdownAdminsRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regole di validazione per la ricerca degli amministratori tramite dropdown (AJAX).</p></p>                <p><p>Filtra la stringa immessa dall'utente (query) consentendo lettere, spazi
+e caratteri accentati (utili per i cognomi), scartando input complessi o pericolosi.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole per la chiave 'query'</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_adminPermissionsValidationRules">
+        <div class="location">at line 307</div>
+        <code>                    array
+    <strong>adminPermissionsValidationRules</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Regola base per validare rapidamente l'UUID di un amministratore.</p></p>                <p><p>Verifica esclusivamente che la stringa fornita rispetti l'esatto formato di un UUID versione 4,
+rispondendo con messaggi di errore localizzati.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Regole di validazione</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getGroups">
+        <div class="location">at line 329</div>
+        <code>                    array
+    <strong>getGroups</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Estrae l'elenco completo dei Gruppi disponibili a database.</p></p>                <p><p>Query base utile per popolare selettori, filtri o liste. Restituisce semplicemente
+ID e nome del gruppo ordinati per data di creazione.</p></p>        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Array di oggetti (risultati), array vuoto in caso di errore</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getGroup">
+        <div class="location">at line 354</div>
+        <code>                    array
+    <strong>getGroup</strong>(int $groupId)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Estrae l'elenco dei permessi (stringhe) attualmente associati a uno specifico gruppo.</p></p>                <p><p>Appiattisce i risultati della query su una singola dimensione estraendo solo il valore
+della colonna 'permission', semplificando i successivi confronti logici.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>int</td>
+                <td>$groupId</td>
+                <td><p>L'identificativo del gruppo</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Array monodimensionale di stringhe (es. ['manage_users', 'view_logs'])</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getGroupById">
+        <div class="location">at line 380</div>
+        <code>                    object|null
+    <strong>getGroupById</strong>(array $posts)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Recupera i dettagli anagrafici (ID, nome, descrizione) di un gruppo specifico.</p></p>                <p><p>Applica la whitelist al parametro ID in ingresso per prevenire injection e
+restituisce un singolo oggetto corrispondente al record.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>I dati POST filtrati (deve contenere 'id')</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>object|null</td>
+            <td><p>Oggetto con i dati del gruppo, o null se non trovato</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_add">
+        <div class="location">at line 410</div>
+        <code>                    array
+    <strong>add</strong>(array $posts)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Crea un nuovo Gruppo e gli associa i permessi selezionati.</p></p>                <p><p>Esegue l'operazione all'interno di una Transazione. Scrive prima i dati base
+nella tabella <code>admins_groups</code>, recupera l'ID appena generato e lo utilizza per
+collegare tutti i permessi richiesti eseguendo una singola e performante "Bulk Insert".
+In caso di fallimento effettua il rollback automatico e registra tutto nei log di sistema.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dataset sanificato e validato contenente nome, descrizione e permessi</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Risposta strutturata (result, message) per il controller</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_edit">
+        <div class="location">at line 478</div>
+        <code>                    array
+    <strong>edit</strong>(array $posts)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Aggiorna i dati anagrafici e i permessi di un Gruppo esistente.</p></p>                <p><p>Implementa un controllo "Sbarramento": se non ci sono differenze reali tra
+i dati inviati e quelli a database, blocca subito l'esecuzione ottimizzando il carico.
+Se ci sono differenze, apre una transazione, aggiorna nome e descrizione,
+svuota (DELETE) fisicamente i vecchi permessi e inserisce i nuovi (Bulk Insert),
+prevenendo accavallamenti o doppioni.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dataset sanificato con ID, nome, descrizione e nuovi permessi</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Risposta strutturata per l'utente</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_del">
+        <div class="location">at line 556</div>
+        <code>                    array
+    <strong>del</strong>(array $posts)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Rimuove definitivamente un Gruppo dal sistema.</p></p>                <p><p>In transazione, estrae prima il nome del gruppo per poterlo scrivere chiaramente
+nell'Audit Log e procede poi all'eliminazione (DELETE) fisica dalla tabella.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>I dati POST filtrati (deve contenere 'id')</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Risultato dell'operazione e messaggio</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_hasGroupChanged">
+        <div class="location">at line 606</div>
+        <code>            protected        bool
+    <strong>hasGroupChanged</strong>(array $posts, object $original)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Controlla in modo intelligente se i dati (o i permessi) di un Gruppo sono stati alterati.</p></p>                <p><p>Prima sfrutta il metodo globale per le stringhe (hasDataChanged), dopodiché scarica
+i permessi attuali, li ordina in modo speculare rispetto a quelli ricevuti dal form,
+ed esegue un confronto assoluto. Se gli array non combaciano, rileva la modifica.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dataset aggiornato proveniente dal form</p></td>
+            </tr>
+                    <tr>
+                <td>object</td>
+                <td>$original</td>
+                <td><p>Oggetto contenente lo stato originale del record a database</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td><p>True se sono stati rilevati cambiamenti, false altrimenti</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getDropdownAdmins">
+        <div class="location">at line 641</div>
+        <code>                    array
+    <strong>getDropdownAdmins</strong>(array $posts)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Popola il menu a tendina asincrono per la ricerca degli amministratori.</p></p>                <p><p>Cerca la stringa immessa dall'utente sia sul nome che sul cognome ignorando
+la formattazione (trasforma tutto in minuscolo con <code>lower</code> ed elimina gli spazi).
+Restituisce una lista (UUID e nome completo concatenato) facile da leggere lato client.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dati POST contenenti la chiave 'query'</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Array associativo formattato per il frontend</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getAdminByUuid">
+        <div class="location">at line 683</div>
+        <code>                    array|null
+    <strong>getAdminByUuid</strong>(array $posts)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Recupera le informazioni base di un Amministratore (e il suo Gruppo) partendo dall'UUID.</p></p>                <p><p>Sfrutta una JOIN per ricavare contemporaneamente il nome del gruppo di appartenenza.
+Molto utile per popolare viste o elaborare logiche in contesti legati alla profilazione.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dati POST filtrati (deve contenere 'uuid')</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array|null</td>
+            <td><p>Array associativo con i dati estratti o null/vuoto se non trovato</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getGroupPermissionsArray">
+        <div class="location">at line 713</div>
+        <code>                    array
+    <strong>getGroupPermissionsArray</strong>(int $groupId)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Metodo alias/helper per estrarre la matrice permessi di un gruppo come Array.</p></p>                <p><p>Fa esattamente il lavoro di getGroup() ma con un nome più esplicito, restituendo
+una lista monodimensionale pulita delle chiavi di permesso attive per l'ID richiesto.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>int</td>
+                <td>$groupId</td>
+                <td><p>L'ID del gruppo in esame</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Elenco dei permessi attivi</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getAdminExceptionsArray">
+        <div class="location">at line 729</div>
+        <code>                    array
+    <strong>getAdminExceptionsArray</strong>(string $adminUuid)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Estrae le Eccezioni di permesso (Positive o Negative) assegnate a un utente.</p></p>                <p><p>Ricava i record dalla tabella <code>admins_permissions</code> (quindi staccati dal gruppo) e li converte
+in un array associativo dove la chiave è il permesso e il valore è 1 (concesso) o 0 (revocato).</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$adminUuid</td>
+                <td><p>L'identificatore utente</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Dizionario [permesso =&gt; 0/1]</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_saveExceptions">
+        <div class="location">at line 755</div>
+        <code>                    array
+    <strong>saveExceptions</strong>(array $posts)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Ricalcola e salva le eccezioni di permesso esclusive applicate al singolo Utente (Override).</p></p>                <p><p>Metodo denso e fondamentale. Include "Scudi Enterprise": blocca l'operazione se l'utente è un
+superadmin (ha già tutti i diritti per definizione) o se è stato cestinato.
+Ricalcola matematicamente quali permessi l'utente possiede tramite il gruppo e li confronta
+con quelli sottomessi dal modulo. Crea due liste (i permessi da concedere in extra e quelli
+ereditati da revocare), pulisce la tabella dalle vecchie eccezioni chiamando l'AdminsModel
+e salva le nuove differenze con un rapido Bulk Insert.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$posts</td>
+                <td><p>Dati sanificati con 'uuid' e la nuova matrice 'permissions'</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td><p>Esito, messaggio ed eventuali errori bloccanti</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_hasAdminsAttached">
+        <div class="location">at line 865</div>
+        <code>                    bool
+    <strong>hasAdminsAttached</strong>(int $groupId)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Verifica se un Gruppo ha attualmente degli amministratori associati.</p></p>                <p><p>Metodo di utilità per impedire eliminazioni accidentali di Gruppi ancora in uso.
+Conta semplicemente gli UUID agganciati all'ID del gruppo interrogato.</p></p>        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>int</td>
+                <td>$groupId</td>
+                <td><p>L'ID del gruppo da verificare</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td><p>True se ci sono utenti agganciati, false se è vuoto</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+            </div>
+
+    
+</div><div id="footer">
+        Generated by <a href="https://github.com/code-lts/doctum">Doctum, a API Documentation generator and fork of Sami</a>.</div></div>
+    </div>
+    </body>
+
+</html>

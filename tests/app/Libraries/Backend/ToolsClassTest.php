@@ -32,6 +32,7 @@ class ToolsClassTest extends CIUnitTestCase
         $this->assertIsArray($result);
         $this->assertCount(2, $result);
         $this->assertSame('flatpickr-js', $result[0]['id']);
+        $this->assertSame('tools-js', $result[0]['target']);
         $this->assertSame('default-js', $result[1]['id']);
         $this->assertSame('assets/vendor/flatpickr/js/default.js', $result[1]['path']);
     }

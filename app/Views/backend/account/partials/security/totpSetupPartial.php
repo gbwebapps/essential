@@ -5,7 +5,7 @@
             <!-- Colonna QR Code (Centrato ovunque) -->
             <div class="col-12 col-lg-6 text-center">
                 <div class="bg-white p-3 d-inline-block rounded border shadow-sm">
-                    <img src="<?= esc($qrCode); ?>" alt="QR Code TOTP" class="img-fluid" style="max-width: 220px;">
+					<img src="<?= esc($qrCode, 'attr'); ?>" alt="QR Code TOTP" class="img-fluid" style="max-width: 220px;">
                 </div>
             </div>
 
@@ -20,14 +20,17 @@
                         <!-- Chiave Segreta: Piena larghezza in portrait, affiancata in landscape -->
                         <div class="col-12 col-lg-7">
                             <label class="form-label text-muted small fw-bold mb-1"><?= lang('backend/account.labels.totpSecretKey'); ?></label>
-                            <div class="input-group input-group-sm">
-                                <button class="btn btn-secondary bg-white border" type="button" id="toggle-secret-visibility">
-                                    <i class="fa-solid fa-eye text-muted" id="toggle-secret-icon"></i>
+                            <div class="input-group">
+                                <button class="btn btn-secondary bg-white border toggle-password-visibility"
+                                        type="button"
+                                        aria-label="<?= esc(lang('backend/account.buttons.showPassword'), 'attr'); ?>"
+                                        aria-pressed="false">
+                                    <i class="fa-solid fa-eye text-muted"></i>
                                 </button>
-                                <input type="password" 
-                                       id="totp-secret-field" 
-                                       class="form-control bg-white font-monospace text-uppercase" 
-                                       value="<?= esc($totpSecret); ?>" 
+                                <input type="password"
+                                       id="totp-secret-field"
+                                       class="form-control bg-white font-monospace text-uppercase"
+									   value="<?= esc($totpSecret, 'attr'); ?>"
                                        readonly>
                             </div>
                         </div>
@@ -39,6 +42,9 @@
                                    id="otp-code" 
                                    name="otp" 
                                    class="form-control form-control-sm text-center font-monospace w-100" 
+								   inputmode="numeric"
+								   autocomplete="one-time-code"
+								   pattern="[0-9]{6}"
                                    maxlength="6" 
                                    placeholder="000000" 
                                    style="letter-spacing: 4px; font-size: 1.1rem;">

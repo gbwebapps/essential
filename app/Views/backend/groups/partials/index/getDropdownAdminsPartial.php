@@ -3,8 +3,8 @@
         <?php foreach ($admins as $admin): ?>
             <button type="button" 
                     class="list-group-item list-group-item-action text-start btn-select-admin" 
-                    data-id="<?= $admin['uuid'] ?>" 
-                    data-identity="<?= esc($admin['identity']) ?>">
+                    data-id="<?= esc($admin['uuid'], 'attr') ?>"
+                    data-identity="<?= esc($admin['identity'], 'attr') ?>">
                 <i class="fa-solid fa-user me-2 text-muted"></i>
                 <?= esc($admin['identity']) ?>
             </button>

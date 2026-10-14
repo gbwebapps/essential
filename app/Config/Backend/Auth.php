@@ -68,11 +68,25 @@ class Auth extends BaseConfig
     public int $attemptsLimit = 3; 
 
     /**
+     * Moltiplicatore interno applicato al limite per identificatore per ricavare il limite IP
+     *
+     * @var int
+     */
+    public int $attemptsIpMultiplier = 20;
+
+    /**
      * Indica se l'autenticazione a due fattori (2FA) è abilitata globalmente
      * 
      * @var bool 
      */
     public bool $twoFactor = true;
+
+    /**
+     * Indica se il controllo dei tentativi OTP falliti è attivo
+     *
+     * @var bool
+     */
+    public bool $twoFactorAttempts = true;
 
     /**
      * Limite massimo di tentativi errati consentiti per la verifica del codice 2FA
@@ -82,11 +96,18 @@ class Auth extends BaseConfig
     public int $twoFactorLimit = 3;
 
     /**
-     * Finestra temporale di validità in secondi per il codice 2FA
+     * Durata massima in secondi della sessione temporanea di verifica 2FA
      * 
      * @var int 
      */
     public int $twoFactorTime = 600;
+
+    /**
+     * Finestra temporale in secondi per il controllo dei tentativi OTP falliti
+     *
+     * @var int
+     */
+    public int $twoFactorAttemptsInterval = 600;
 
     /**
      * Nome dell'emittente associato alla generazione dei codici OTP
@@ -115,6 +136,13 @@ class Auth extends BaseConfig
      * @var int 
      */
     public int $twoFactorEmailExpiry = 60;
+
+    /**
+     * Tempo di scadenza in secondi per il codice 2FA inviato via app
+     *
+     * @var int
+     */
+    public int $twoFactorOtpExpiry = 30;
 
     /**
      * Indirizzo email predefinito utilizzato per l'invio dei codici 2FA
@@ -150,6 +178,41 @@ class Auth extends BaseConfig
      * @var int 
      */
     public int $activationTime = 43200;
+
+    /**
+     * Indica se il controllo dei tentativi di reset password pubblico è attivo
+     *
+     * @var bool
+     */
+    public bool $resetAttempts = true;
+
+    /**
+     * Numero massimo di richieste di reset password pubblico consentite per email
+     *
+     * @var int
+     */
+    public int $resetAttemptsLimit = 3;
+
+    /**
+     * Finestra temporale in secondi per i tentativi di reset password pubblico
+     *
+     * @var int
+     */
+    public int $resetAttemptsInterval = 600;
+
+    /**
+     * Numero massimo di richieste di reset password dall'account autenticato
+     *
+     * @var int
+     */
+    public int $resetPasswordLimit = 5;
+
+    /**
+     * Finestra temporale in secondi per il reset password dall'account autenticato
+     *
+     * @var int
+     */
+    public int $resetPasswordInterval = 900;
 
     /**
      * Espressione regolare per la validazione della robustezza delle password

@@ -237,7 +237,7 @@ export class UploadPreviewImgManager {
                 formData.append(`images[${id}]`, file);
             });
                     
-            const response = await apiFetch(urlbase + 'backend/uploadPreviewImg/saveImages', {
+            const response = await apiFetch(urlbase + 'backend/uploadPreview/saveImages', {
                 method: 'POST',
                 body: formData
             });

@@ -5,7 +5,7 @@
         <div class="col-12 col-lg-6">
             <div class="mb-2">
                 <label for="firstname" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.firstname'); ?></label>
-                <input type="text" id="firstname" name="firstname" value="<?= esc($admin->firstname); ?>" class="form-control" placeholder="<?= lang('backend/admins.placeholders.firstname'); ?>">
+                <input type="text" id="firstname" name="firstname" value="<?= esc($admin->firstname, 'attr'); ?>" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.firstname'), 'attr'); ?>">
                 <!-- Contenitore dinamico per l'errore di validazione -->
                 <div class="error_firstname text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
             </div>
@@ -13,7 +13,7 @@
         <div class="col-12 col-lg-6">
             <div class="mb-2">
                 <label for="lastname" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.lastname'); ?></label>
-                <input type="text" id="lastname" name="lastname" value="<?= esc($admin->lastname); ?>" class="form-control" placeholder="<?= lang('backend/admins.placeholders.lastname'); ?>">
+                <input type="text" id="lastname" name="lastname" value="<?= esc($admin->lastname, 'attr'); ?>" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.lastname'), 'attr'); ?>">
                 <div class="error_lastname text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
             </div>
         </div>
@@ -25,14 +25,14 @@
         <div class="col-12 col-lg-6">
             <div class="mb-2">
                 <label for="email" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.email'); ?></label>
-                <input type="text" id="email" name="email" value="<?= esc($admin->email); ?>" class="form-control" placeholder="<?= lang('backend/admins.placeholders.email'); ?>">
+                <input type="text" id="email" name="email" value="<?= esc($admin->email, 'attr'); ?>" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.email'), 'attr'); ?>">
                 <div class="error_email text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
             </div>
         </div>
         <div class="col-12 col-lg-6">
             <div class="mb-2">
                 <label for="phone" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.phone'); ?></label>
-                <input type="text" id="phone" name="phone" value="<?= esc($admin->phone); ?>" class="form-control" placeholder="<?= lang('backend/admins.placeholders.phone'); ?>">
+                <input type="text" id="phone" name="phone" value="<?= esc($admin->phone, 'attr'); ?>" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.phone'), 'attr'); ?>">
                 <div class="error_phone text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
             </div>
         </div>
@@ -46,10 +46,10 @@
                 <label for="group_id" class="form-label">
                     <i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.group'); ?>
                 </label>
-                <select name="group_id" class="form-select" id="group_id" data-message="<?= lang('backend/admins.messages.areYouSureChangeGroup'); ?>">
+                <select name="group_id" class="form-select" id="group_id" data-message="<?= esc(lang('backend/admins.messages.areYouSureChangeGroup'), 'attr'); ?>">
                     <?php if ( ! empty($groups)): ?>
                         <?php foreach ($groups as $group): ?>
-                            <option value="<?= $group->id; ?>"<?= ($group->id == $admin->group_id) ? ' selected' : ''; ?>><?= esc($group->name); ?></option>
+                            <option value="<?= esc($group->id, 'attr'); ?>"<?= ($group->id == $admin->group_id) ? ' selected' : ''; ?>><?= esc($group->name); ?></option>
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </select>
@@ -74,7 +74,7 @@
         <div class="col-12">
             <div class="mb-2">
                 <label for="note"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.note'); ?></label>
-                <textarea name="note" id="note" rows="7" class="form-control" placeholder="<?= lang('backend/admins.placeholders.note'); ?>"><?= esc($admin->note); ?></textarea>
+                <textarea name="note" id="note" rows="7" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.note'), 'attr'); ?>"><?= esc($admin->note); ?></textarea>
                 <div class="error_note text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
             </div>
         </div>

@@ -1,8 +1,8 @@
 <div class="card-body">
     <form id="dbMaintenance-tools-form" autocomplete="off"
-      data-lang-total-space="<?= lang('backend/tools.labels.totalSpace'); ?>"
-      data-lang-rows="<?= lang('backend/tools.labels.rows'); ?>"
-      data-lang-overhead="<?= lang('backend/tools.labels.overhead'); ?>">
+      data-lang-total-space="<?= esc(lang('backend/tools.labels.totalSpace'), 'attr'); ?>"
+      data-lang-rows="<?= esc(lang('backend/tools.labels.rows'), 'attr'); ?>"
+      data-lang-overhead="<?= esc(lang('backend/tools.labels.overhead'), 'attr'); ?>">
         <div class="row">
             <div class="col-12">
 
@@ -32,9 +32,9 @@
                             <div class="col-12 col-lg-3 mb-3 mb-lg-0">
                                 <!-- Rimossi i bordi e i margini dal div -->
                                 <div>
-                                    <h5 class="mb-1 fw-bold"><i class="fa-solid fa-database me-2"></i><?= $database['dbName']; ?></h5>
+                                    <h5 class="mb-1 fw-bold"><i class="fa-solid fa-database me-2"></i><?= esc($database['dbName']); ?></h5>
                                     <div class="text-muted">
-                                        <span><i class="fa-solid fa-microchip me-1"></i><?= $database['dbDriver']; ?> <?= $database['dbVersion']; ?></span>
+                                        <span><i class="fa-solid fa-microchip me-1"></i><?= esc($database['dbDriver']); ?> <?= esc($database['dbVersion']); ?></span>
                                     </div>
                                 </div>
                                 <!-- Inserita la linea visibile solo su mobile e tablet portrait -->
@@ -53,7 +53,7 @@
                             <!-- Blocco Destra: Azione Globale -->
                             <div class="col-12 col-lg-2">
                                 <!-- Passiamo l'intero array di tabelle codificato in JSON al dataset -->
-                                <button type="button" class="btn btn-sm btn-primary btn-optimize-all w-100" data-tables='<?= json_encode($allTableNames); ?>'>
+                                <button type="button" class="btn btn-sm btn-primary btn-optimize-all w-100" data-tables="<?= esc(json_encode($allTableNames, JSON_THROW_ON_ERROR), 'attr'); ?>">
                                     <i class="fa-solid fa-wand-magic-sparkles me-2"></i><?= lang('backend/tools.buttons.dbOptimize'); ?>
                                 </button>
                             </div>
@@ -63,14 +63,14 @@
 
                     <?php foreach($tables as $table): ?>
 
-                        <li class="list-group-item py-3" data-table="<?= $table['name']; ?>">
+                        <li class="list-group-item py-3" data-table="<?= esc($table['name'], 'attr'); ?>">
                             
                             <div class="row text-start align-items-lg-center">
                                 
                                 <!-- Blocco Sinistra: Nome Tabella -->
                                 <div class="col-12 col-lg-3 mb-3 mb-lg-0">
                                     <div class="fw-bold">
-                                        <i class="fa-solid fa-table me-2"></i><?= $table['name']; ?>
+                                        <i class="fa-solid fa-table me-2"></i><?= esc($table['name']); ?>
                                     </div>
                                     <!-- Linea visibile solo su mobile e tablet portrait -->
                                     <hr class="d-lg-none my-3 text-secondary">
@@ -87,13 +87,13 @@
                                 
                                 <!-- Blocco Destra: Azioni -->
                                 <div class="col-12 col-lg-2">
-                                    <a href="#" class="btn-optimize-table d-block mb-2 text-decoration-none" data-table="<?= $table['name']; ?>">
+                                    <a href="#" class="btn-optimize-table d-block mb-2 text-decoration-none" data-table="<?= esc($table['name'], 'attr'); ?>">
                                         <i class="fa-solid fa-wand-magic-sparkles me-1"></i> <?= lang('backend/tools.buttons.tableOptimize'); ?>
                                     </a>
-                                    <a href="#" class="export-entity d-block mb-2 text-decoration-none" data-export-entity="<?= $table['name']; ?>">
+                                    <a href="#" class="export-entity d-block mb-2 text-decoration-none" data-export-entity="<?= esc($table['name'], 'attr'); ?>">
                                         <i class="fa-solid fa-file-export me-1"></i> <?= lang('backend/components/export.links.export'); ?>
                                     </a>
-                                    <a href="#" class="import-entity d-block text-decoration-none" data-import-entity="<?= $table['name']; ?>">
+                                    <a href="#" class="import-entity d-block text-decoration-none" data-import-entity="<?= esc($table['name'], 'attr'); ?>">
                                         <i class="fa-solid fa-file-import me-1"></i> <?= lang('backend/components/import.links.import'); ?>
                                     </a>
                                 </div>

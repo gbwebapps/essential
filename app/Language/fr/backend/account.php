@@ -48,14 +48,19 @@ return [
         'totpSecretKey'      => 'Clé secrète (configuration manuelle)',
 		'enterOtpCode' => 'Saisir le code à 6 chiffres',
 		'rememberMe' => 'Se souvenir de moi', 
-		'currentDevice' => 'Session actuelle'
+		'currentDevice' => 'Session actuelle',
+		'mobile' => 'Appareil mobile',
+		'robot' => 'Robot',
+		'currentPassword' => 'Mot de passe actuel',
+		'currentPasswordEmailHelp' => 'Requis uniquement lors du changement d\'adresse e-mail.'
 	], 
 	'placeholders' => [
 		'firstname' => 'Saisir le prénom...', 
 		'lastname' => 'Saisir le nom...', 
 		'email' => 'Saisir l\'e-mail...', 
 		'phone' => 'Saisir le téléphone...', 
-		'note' => 'Saisir des notes complémentaires...', 
+		'note' => 'Saisir des notes complémentaires...',
+		'currentPassword' => 'Saisir le mot de passe actuel...',
 	], 
 	'buttons' => [
 		'sendData' => 'Enregistrer les données', 
@@ -64,10 +69,14 @@ return [
 		'resetPassword' => 'Procéder à la réinitialisation du mot de passe',
 		'verifyAndActivate' => 'Vérifier et activer', 
 		'undoClose' => 'Fermer la configuration et quitter', 
-		'delete' => 'Supprimer'
+		'delete' => 'Supprimer',
+		'showPassword' => 'Afficher le mot de passe'
 	], 
 	'errors' => [
-		'id' => 'ID non conforme.', 
+		'id' => 'ID non conforme.',
+		'safeText' => 'Caractères non autorisés.',
+		'currentPasswordRequired' => 'Saisissez votre mot de passe actuel.',
+		'currentPasswordInvalid' => 'Le mot de passe actuel est incorrect.',
 	], 
 	'audits' => [
 	    'updateData'     => 'Mise à jour des données générales %s %s',
@@ -91,7 +100,7 @@ return [
 		'noTokensFound' => 'Aucun jeton trouvé.', 
 		'deleteTokenSuccess' => 'Le jeton de %s %s a été supprimé avec succès.', 
 		'deleteTokenError' => 'La suppression du jeton a échoué.', 
-		'expiringDate' => '<div class="pb-3">Vous avez demandé la réinitialisation du mot de passe.</div><div class="pb-3">Veuillez vérifier vos e-mails et terminer l\'opération.</div>Vous avez jusqu\'au %s</div>', 
+		'expiringDate' => '<div class="pb-3">Vous avez demandé la réinitialisation du mot de passe.</div><div class="pb-3">Veuillez vérifier vos e-mails et terminer l\'opération.</div>Vous avez jusqu\'au %s',
 		'methodNotValid' => 'Méthode non valide ou non prise en charge.', 
 		'updateSecuritySettingsError' => 'Impossible de mettre à jour les paramètres de sécurité.', 
 		'updateSecuritySettingsSuccess' => 'Paramètres de sécurité mis à jour avec succès.', 
@@ -102,6 +111,8 @@ return [
 		'totpActivationNotPossible' => 'Impossible d\'activer l\'authentification TOTP.', 
 		'totpConfigurationSuccess' => 'L\'application d\'authentification a été configurée avec succès.', 
 		'areYouSureChangeMethod' => 'Êtes-vous sûr de vouloir changer la méthode du deuxième facteur d\'authentification ?', 
-		'cannotDeleteCurrentToken' => 'Impossible de supprimer la session actuelle.'
+		'cannotDeleteCurrentToken' => 'Impossible de supprimer la session actuelle.',
+		'tooManyResetRequests' => 'Trop de demandes de réinitialisation. Réessayez plus tard.',
+		'tooManyAttempts' => 'Trop de tentatives. Réessayez plus tard.'
 	]
 ];

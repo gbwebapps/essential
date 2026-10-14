@@ -17,7 +17,7 @@
 
                             <!-- Numero dei record visualizzati in una pagina. Serve al Trick per evitare che all'eliminazione
                             dell'ultimo record in una pagina che non è la prima, la visualizzazione rimanga bloccata e non passi alla pagina successiva. -->
-                            <div id="lastItemPage" data-lastitempage="<?= $data['lastItemPage']; ?>"></div>
+                            <div class="lastItemPage" data-lastitempage="<?= $data['lastItemPage']; ?>"></div>
 
                             <table class="table table-condensed mb-0 text-nowrap">
                                 <thead>
@@ -84,7 +84,7 @@
                                             $typeMap = [
                                                 'session'    => lang('backend/tokens.labels.session'),
                                                 'activation' => lang('backend/tokens.labels.activation'),
-                                                'cookie'     => lang('backend/tokens.labels.rememberMe')
+                                                'cookie'     => lang('backend/tokens.labels.cookie')
                                             ];
 
                                             /* Assegnazione con fallback automatico se la chiave non esiste */
@@ -96,7 +96,7 @@
                                         <tr class="border-end border-start table-row-60<?= $isSuperadmin ? ' table-bg-superadmin' : ''; ?>">
                                             <!-- Cella chevron -->
                                             <td class="align-middle fw-bold">
-                                                <button class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 text-secondary shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($token->id); ?>" aria-expanded="false" title="Mostra dettagli di sistema">
+                                                <button class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 text-secondary shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($token->id, 'attr'); ?>" aria-expanded="false" title="<?= esc(lang('backend/tokens.labels.showSystemDetails'), 'attr'); ?>">
                                                     <i class="fa-solid fa-chevron-right"></i>
                                                 </button>
                                             </td>
@@ -134,9 +134,9 @@
                                                     <div class="d-flex flex-column gap-1">
 
                                                         <!-- Pulsante Elimina Definitivamente (Hard Delete) -->
-                                                        <form class="hardDeleteRecord m-0 p-0" data-message="<?= sprintf(lang('backend/tokens.messages.areYouSureHardDelete'), esc($token->firstname), esc($token->lastname)); ?>">
-                                                            <input type="hidden" name="uuid" value="<?= esc($token->uuid); ?>">
-                                                            <input type="hidden" name="id" value="<?= esc($token->id); ?>">
+                                                        <form class="hardDeleteRecord m-0 p-0" data-controller="tokens" data-message="<?= esc(sprintf(lang('backend/tokens.messages.areYouSureHardDelete'), $token->firstname, $token->lastname), 'attr'); ?>">
+                                                            <input type="hidden" name="uuid" value="<?= esc($token->uuid, 'attr'); ?>">
+                                                            <input type="hidden" name="id" value="<?= esc($token->id, 'attr'); ?>">
                                                             <button type="submit" class="btn btn-link p-0 m-0 text-danger text-decoration-none action shadow-none">
                                                                 <i class="fa-solid fa-xmark fa-fw"></i> <?= lang('backend/tokens.actions.hardDelete'); ?>
                                                             </button>
@@ -156,7 +156,7 @@
                                             <td colspan="7" class="p-0 border-0">
                                                 
                                                 <!-- Contenitore collassabile puntato dal bottone -->
-                                                <div class="collapse" id="meta-<?= esc($token->id); ?>">
+                                                <div class="collapse" id="meta-<?= esc($token->id, 'attr'); ?>">
                                                     
                                                     <!-- Box effettivo dei metadati: spazioso, con background neutro -->
                                                     <div class="p-2 border-bottom bg-light text-secondary small">
@@ -164,20 +164,20 @@
                                                         <!-- Parte useragent -->
                                                         <?php 
                                                             /* Parsing della stringa User Agent tramite l'istanza passata dal Controller */
-                                                            $userAgent->parse(esc($token->user_agent)); 
+                                                            $userAgent->parse($token->user_agent);
 
                                                             /* Inizializzazione corretta della variabile in camelCase */
-                                                            $agentText = lang('backend/tokens.labels.operatingSystem') . ' <span class="text-primary fw-bold">' . $userAgent->getPlatform() . '</span>';
+                                                            $agentText = lang('backend/tokens.labels.operatingSystem') . ' <span class="text-primary fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
                                                         ?>
 
                                                         <?php
                                                             /* Valutazione con metodi nativi in camelCase di CodeIgniter 4 */
                                                             if($userAgent->isBrowser()):
-                                                                $agentText .= ' &bull; ' . lang('backend/tokens.labels.browser') . ' <span class="text-primary fw-bold">' . $userAgent->getBrowser() . '</span>';
+                                                                $agentText .= ' &bull; ' . lang('backend/tokens.labels.browser') . ' <span class="text-primary fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
                                                             elseif($userAgent->isMobile()):
-                                                                $agentText .= ' &bull; ' . lang('backend/tokens.labels.mobile') . ' <span class="text-primary fw-bold">' . $userAgent->getMobile() . '</span>';
+                                                                $agentText .= ' &bull; ' . lang('backend/tokens.labels.mobile') . ' <span class="text-primary fw-bold">' . esc($userAgent->getMobile()) . '</span>';
                                                             elseif($userAgent->isRobot()):
-                                                                $agentText .= ' &bull; ' . lang('backend/tokens.labels.robot') . ' Robot <span class="text-primary fw-bold">' . $userAgent->getRobot() . '</span>';
+                                                                $agentText .= ' &bull; ' . lang('backend/tokens.labels.robot') . ' <span class="text-primary fw-bold">' . esc($userAgent->getRobot()) . '</span>';
                                                             endif;
                                                         ?>
 

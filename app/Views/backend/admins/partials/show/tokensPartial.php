@@ -24,18 +24,18 @@
                     $tokenType = $typeMap[$token->token_type] ?? lang('backend/admins.labels.unknown');
 
                     /* Parsing della stringa User Agent tramite l'istanza passata dal Controller */
-                    $userAgent->parse(esc($token->user_agent)); 
+                    $userAgent->parse($token->user_agent);
                     
                     /* Inizializzazione corretta della variabile in camelCase */
-                    $agentText = lang('backend/account.labels.operatingSystem') . ' <span class="text-primary">' . $userAgent->getPlatform() . '</span>';
+                    $agentText = lang('backend/account.labels.operatingSystem') . ' <span class="text-primary">' . esc($userAgent->getPlatform()) . '</span>';
                     
                     /* Valutazione con metodi nativi in camelCase di CodeIgniter 4 */
                     if($userAgent->isBrowser()):
-                        $agentText .= ' &bull; ' . lang('backend/account.labels.browser') . ' <span class="text-primary">' . $userAgent->getBrowser() . '</span>';
+                        $agentText .= ' &bull; ' . lang('backend/account.labels.browser') . ' <span class="text-primary">' . esc($userAgent->getBrowser()) . '</span>';
                     elseif($userAgent->isMobile()):
-                        $agentText .= ' &bull; ' . lang('backend/account.labels.mobile') . ' <span class="text-primary">' . $userAgent->getMobile() . '</span>';
+                        $agentText .= ' &bull; ' . lang('backend/account.labels.mobile') . ' <span class="text-primary">' . esc($userAgent->getMobile()) . '</span>';
                     elseif($userAgent->isRobot()):
-                        $agentText .= ' &bull; ' . lang('backend/account.labels.robot') . ' Robot <span class="text-primary">' . $userAgent->getRobot() . '</span>';
+                        $agentText .= ' &bull; ' . lang('backend/account.labels.robot') . ' Robot <span class="text-primary">' . esc($userAgent->getRobot()) . '</span>';
                     endif;
                 ?>
 
@@ -77,9 +77,9 @@
                         
                         <!-- Azione (Elimina) -->
                         <div class="col-12 col-lg-auto mt-3 mt-lg-0 text-start text-lg-end">
-                            <form class="deleteToken d-grid d-lg-block" data-message="<?= sprintf(lang('backend/account.messages.areYouSureDeleteToken'), esc($admin->firstname), esc($admin->lastname)); ?>">
-                                <input type="hidden" name="id" value="<?= esc($token->id); ?>">
-                                <input type="hidden" name="uuid" value="<?= esc($admin->uuid); ?>">
+                            <form class="deleteToken d-grid d-lg-block" data-message="<?= esc(sprintf(lang('backend/account.messages.areYouSureDeleteToken'), $admin->firstname, $admin->lastname), 'attr'); ?>">
+                                <input type="hidden" name="id" value="<?= esc($token->id, 'attr'); ?>">
+                                <input type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>">
                                 <button type="submit" class="btn btn-danger btn-sm shadow-none">
                                     <i class="fa-solid fa-trash me-1"></i> <?= lang('backend/account.buttons.delete'); ?>
                                 </button>

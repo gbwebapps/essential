@@ -25,6 +25,10 @@ return [
 		'operatingSystem' => '操作系统', 
 		'browser' => '网页浏览器', 
 		'ipAddress' => 'IP 地址', 
+		'mobile' => '移动设备',
+		'robot' => '机器人',
+		'filtersAndOptions' => '选项和筛选',
+		'showSystemDetails' => '显示系统详情',
 		'dateFrom' => '开始日期', 
 		'dateTo' => '结束日期',
 	],
@@ -37,6 +41,7 @@ return [
 		'dateTo' => '按结束日期搜索...',
 	], 
 	'messages' => [
+		'validationToastErrors' => '%s',
 		'validationErrors' => '验证错误。', 
 		'noAuditsFound' => '未找到活动记录。', 
 	]

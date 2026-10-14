@@ -24,147 +24,211 @@ export class GroupsManager {
 
         /* Variabili di stato per evitare ricaricamenti inutili */
         this.isListLoaded = false;
-        this.isExceptionsLoaded = false; 
+        this.isExceptionsLoaded = false;
         this.isAddLoaded = false;
-        
+
         /* Proprietà per il controllo del debounce */
         this.searchTimeout = null;
-        
-        /* Variabile di stato per la sicurezza */
+
+        /* Variabili di stato per la sicurezza */
         this.isSubmitting = false;
+        this.isDeleting = false;
+        this.isConfirming = false;
+        this.destroyed = false;
+        this.eventsBound = false;
+
+        this.eventsController = new AbortController();
+        this.pendingPanels = new Set();
+        this.panelVersions = { add: 0, list: 0, exceptions: 0 };
+        this.loadingGroups = new WeakSet();
+        this.searchVersion = 0;
+        this.permissionsVersion = 0;
 
         this.init();
     }
 
     init() {
+        if (this.destroyed) return;
+
         this.bindDynamicEvents();
+    }
+
+    listen(type, handler) {
+        document.addEventListener(type, handler, {
+            signal: this.eventsController.signal
+        });
     }
 
     /* Gestione dei listener sugli elementi generati dinamicamente via AJAX */
     bindDynamicEvents() {
+        if (this.eventsBound || this.destroyed) return;
+        this.eventsBound = true;
 
         /* 1. Intercettiamo solo la CHIUSURA del singolo gruppo per svuotarlo */
-        document.addEventListener('hidden.bs.collapse', e => {
+        this.listen('hidden.bs.collapse', e => {
             const subCollapse = e.target.closest('#groupsAccordion .accordion-collapse');
-            if ( ! subCollapse) return;
+            if (!subCollapse) return;
 
-            /* Blocchiamo il bubbling anche in chiusura */
             e.stopPropagation();
 
             const bodyContainer = subCollapse.querySelector('.template-container');
+
             if (bodyContainer) {
                 smoothReplace(bodyContainer, '');
             }
         });
 
         /* 2. Intercettiamo il submit del form di aggiunta nuovo gruppo */
-        document.addEventListener('submit', e => {
+        this.listen('submit', e => {
             if (e.target && e.target.id === 'new-group') {
                 this.handleAddGroup(e);
             }
         });
 
         /* 3. Intercettiamo il submit dei form di edit generati dinamicamente */
-        document.addEventListener('submit', e => {
+        this.listen('submit', e => {
             const editForm = e.target.closest('.edit-group-form');
+
             if (editForm) {
                 e.preventDefault();
                 this.handleEditGroup(e);
             }
         });
 
-        /* 4. Intercettiamo il click sul pulsante ripristino (refresh) del gruppo */
-        document.addEventListener('click', async (e) => {
+        /* 4. Intercettiamo il click sul pulsante ripristino del gruppo */
+        this.listen('click', async e => {
             const refreshBtn = e.target.closest('.btn-refresh-group');
+
             if (refreshBtn) {
                 e.preventDefault();
 
-                const message = refreshBtn.dataset.message;
-                const ok = await askConfirm(message);
-                if ( ! ok) return;
+                if (this.isSubmitting || this.isDeleting || this.isConfirming || this.destroyed) return;
 
-                await this.handleRefreshGroup(refreshBtn);
+                this.isConfirming = true;
+
+                try {
+                    const ok = await askConfirm(refreshBtn.dataset.message);
+
+                    if (ok && !this.destroyed) {
+                        await this.handleRefreshGroup(refreshBtn);
+                    }
+                } catch (error) {
+                    console.error('Errore conferma refresh gruppo:', error);
+                } finally {
+                    this.isConfirming = false;
+                }
             }
         });
 
         /* 5. Intercettiamo il click sul pulsante elimina del gruppo */
-        document.addEventListener('click', async (e) => {
+        this.listen('click', async e => {
             const deleteBtn = e.target.closest('.btn-delete-group');
+
             if (deleteBtn) {
                 e.preventDefault();
 
-                if (this.isSubmitting) return;
+                if (this.isSubmitting || this.isDeleting || this.isConfirming || this.destroyed) return;
 
-                /* 1. SCUDO PREVENTIVO UX: Verifichiamo i vincoli in background */
-                const isSafeToDelete = await this.checkDeleteConstraints(deleteBtn.dataset.id);
-                
-                /* Se l'esito è negativo, ci fermiamo qui (il messaggio è già comparso) */
-                if ( ! isSafeToDelete) return; 
+                this.isDeleting = true;
+                this.isConfirming = true;
 
-                /* 2. Via libera: mostriamo il normale alert di conferma */
-                const message = deleteBtn.dataset.message;
-                const ok = await askConfirm(message);
-                if ( ! ok) return;
+                try {
+                    const isSafeToDelete = await this.checkDeleteConstraints(deleteBtn.dataset.id);
 
-                /* 3. Esecuzione reale */
-                await this.handleDeleteGroup(deleteBtn);
+                    if (!isSafeToDelete || this.destroyed) return;
+
+                    const ok = await askConfirm(deleteBtn.dataset.message);
+
+                    if (!ok || this.destroyed) return;
+
+                    await this.handleDeleteGroup(deleteBtn);
+                } catch (error) {
+                    console.error('Errore conferma eliminazione gruppo:', error);
+                } finally {
+                    this.isDeleting = false;
+                    this.isConfirming = false;
+                }
             }
         });
 
         /* 6. Intercettiamo il reset del form di aggiunta */
-        document.addEventListener('click', async (e) => {
+        this.listen('click', async e => {
             const resetBtn = e.target.closest('.btn-reset-group');
+
             if (resetBtn) {
                 e.preventDefault();
 
-                const message = resetBtn.dataset.message;
-                const ok = await askConfirm(message);
-                if ( ! ok) return;
+                if (this.isSubmitting || this.isDeleting || this.isConfirming || this.destroyed) return;
 
-                await this.handleResetGroup(resetBtn);
+                this.isConfirming = true;
+
+                try {
+                    const ok = await askConfirm(resetBtn.dataset.message);
+
+                    if (ok && !this.destroyed) {
+                        await this.handleResetGroup(resetBtn);
+                    }
+                } catch (error) {
+                    console.error('Errore conferma reset gruppo:', error);
+                } finally {
+                    this.isConfirming = false;
+                }
             }
         });
 
         /* 7. Intercettiamo la digitazione nel campo di ricerca amministratori */
-        document.addEventListener('input', e => {
+        this.listen('input', e => {
             if (e.target && e.target.id === 'search-admin') {
                 this.handleAdminSearch(e.target);
             }
         });
 
-        /* 8. Intercettiamo il click sulla selezione dell'amministratore dal dropdown */
-        document.addEventListener('click', e => {
+        /* 8. Intercettiamo la selezione dell'amministratore dal dropdown */
+        this.listen('click', e => {
             const adminBtn = e.target.closest('.btn-select-admin');
+
             if (adminBtn) {
                 e.preventDefault();
                 this.handleSelectAdmin(adminBtn);
             }
         });
 
-        /* 9. Intercettiamo il submit del form eccezioni permessi dell'amministratore */
-        document.addEventListener('submit', e => {
+        /* 9. Intercettiamo il submit del form eccezioni */
+        this.listen('submit', e => {
             if (e.target && e.target.id === 'edit-admin-exceptions-form') {
                 this.handleSaveAdminPermissions(e);
             }
         });
 
-        /* 10. Intercettiamo il click sul pulsante ricarica dati delle eccezioni dell'amministratore */
-        document.addEventListener('click', async (e) => {
+        /* 10. Intercettiamo il refresh dei permessi dell'amministratore */
+        this.listen('click', async e => {
             const refreshAdminBtn = e.target.closest('.btn-refresh-admin-perms');
+
             if (refreshAdminBtn) {
                 e.preventDefault();
 
-                const message = refreshAdminBtn.dataset.message;
-                const ok = await askConfirm(message);
-                if ( ! ok) return;
-                
-                await this.handleRefreshAdminPermissions(refreshAdminBtn);
+                if (this.isSubmitting || this.isDeleting || this.isConfirming || this.destroyed) return;
+
+                this.isConfirming = true;
+
+                try {
+                    const ok = await askConfirm(refreshAdminBtn.dataset.message);
+
+                    if (ok && !this.destroyed) {
+                        await this.handleRefreshAdminPermissions(refreshAdminBtn);
+                    }
+                } catch (error) {
+                    console.error('Errore conferma refresh permessi:', error);
+                } finally {
+                    this.isConfirming = false;
+                }
             }
         });
 
-        /* 11. Intercettiamo il click sul pulsante X per svuotare la ricerca amministratori */
-        document.addEventListener('click', e => {
+        /* 11. Intercettiamo il pulsante X della ricerca amministratori */
+        this.listen('click', e => {
             const resetSearchBtn = e.target.closest('.reset-search-field');
+
             if (resetSearchBtn) {
                 e.preventDefault();
                 this.handleResetAdminSearch(resetSearchBtn);
@@ -173,10 +237,13 @@ export class GroupsManager {
     }
 
     /**
-     * Esegue la fetch asincrona per recuperare i dettagli di un singolo gruppo (Sotto-gruppo)
-     * e inietta l'output nel contenitore designato.
+     * Recupera i dettagli di un singolo gruppo e aggiorna il relativo contenitore.
      */
     async loadSingleGroupData(groupId, bodyContainer) {
+        if (this.destroyed || !bodyContainer || this.loadingGroups.has(bodyContainer)) return false;
+
+        this.loadingGroups.add(bodyContainer);
+
         try {
             const formData = new FormData();
             formData.append('id', groupId);
@@ -188,28 +255,36 @@ export class GroupsManager {
 
             const data = await response.json();
 
-            /* Controllo per fallimento logico (es. token scaduto o invalido) */
+            if (this.destroyed || !bodyContainer.isConnected) return false;
+
             if (data.result === false) {
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
-                return;
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+                return false;
             }
 
             if (data.result === true && data.output) {
                 smoothReplace(bodyContainer, data.output);
                 return true;
             }
+
             return false;
+
         } catch (error) {
-            console.error("Errore caricamento form edit gruppo:", error);
+            console.error('Errore caricamento form edit gruppo:', error);
             return false;
+        } finally {
+            this.loadingGroups.delete(bodyContainer);
         }
     }
 
-    /* Gestisce l'invio asincrono del form per la creazione di un nuovo gruppo */
+    /* Gestisce la creazione di un nuovo gruppo */
     async handleAddGroup(e) {
         e.preventDefault();
 
-        if (this.isSubmitting) return;
+        if (this.isSubmitting || this.isDeleting || this.isConfirming || this.destroyed) return;
+
         this.isSubmitting = true;
 
         const formEl = e.target;
@@ -222,12 +297,16 @@ export class GroupsManager {
                 method: 'POST',
                 body: formData
             });
+
             const data = await response.json();
+
+            if (this.destroyed) return;
 
             if (data.errors) {
                 if (typeof handleValidationErrors === 'function') {
                     handleValidationErrors(data.errors);
                 }
+
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('danger', data.message);
                 }
@@ -242,33 +321,37 @@ export class GroupsManager {
             }
 
             if (data.result === true) {
-                
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('success', data.message);
                 }
-                
+
                 formEl.reset();
 
                 this.isListLoaded = false;
+
                 const mainCollapseList = document.getElementById('main_collapse_list');
+
                 if (mainCollapseList && mainCollapseList.classList.contains('show')) {
                     this.loadGroupsList();
                 }
             }
+
         } catch (error) {
-            console.error("Errore durante l'invio del form nuovo gruppo:", error);
+            console.error('Errore durante l\'invio del form nuovo gruppo:', error);
         } finally {
             this.isSubmitting = false;
         }
     }
 
+    /* Ripristina il form di aggiunta */
     async handleResetGroup(btnEl) {
+        if (this.isSubmitting || this.isDeleting || this.destroyed) return;
 
-        if (this.isSubmitting) return;
         this.isSubmitting = true;
-        
+
         const container = document.getElementById('add-groups-container');
-        if ( ! container) {
+
+        if (!container) {
             this.isSubmitting = false;
             return;
         }
@@ -284,21 +367,23 @@ export class GroupsManager {
 
             const data = await response.json();
 
+            if (this.destroyed) return;
+
             if (data.result === true && data.output) {
                 smoothReplace(container, data.output);
             }
 
         } catch (error) {
-            console.error("Errore durante il ripristino dei dati del gruppo:", error);
+            console.error('Errore durante il ripristino dei dati del gruppo:', error);
         } finally {
             this.isSubmitting = false;
         }
     }
 
-    /* Gestisce l'invio asincrono del form per la modifica di un gruppo esistente */
+    /* Gestisce la modifica di un gruppo esistente */
     async handleEditGroup(e) {
+        if (this.isSubmitting || this.isDeleting || this.isConfirming || this.destroyed) return;
 
-        if (this.isSubmitting) return;
         this.isSubmitting = true;
 
         const formEl = e.target;
@@ -314,11 +399,13 @@ export class GroupsManager {
 
             const data = await response.json();
 
+            if (this.destroyed) return;
+
             if (data.errors) {
                 if (typeof handleValidationErrors === 'function') {
                     handleValidationErrors(data.errors);
                 }
-                
+
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('danger', data.message);
                 }
@@ -340,28 +427,28 @@ export class GroupsManager {
                 const groupId = formEl.dataset.id;
                 const toggleBtnSpan = document.querySelector(`[data-bs-target="#collapse_group_${groupId}"] span`);
                 const nameInput = formEl.querySelector('input[name="name"]');
+
                 if (toggleBtnSpan && nameInput) {
                     toggleBtnSpan.textContent = nameInput.value;
                 }
 
                 this.isListLoaded = false;
             }
+
         } catch (error) {
-            console.error("Errore durante l'invio del form modifica gruppo:", error);
+            console.error('Errore durante l\'invio del form modifica gruppo:', error);
         } finally {
             this.isSubmitting = false;
         }
     }
 
-    /* Richiede al backend i dati originali del gruppo e ripristina lo stato del form */
+    /* Ripristina i dati originali di un gruppo */
     async handleRefreshGroup(btnEl) {
+        if (this.isSubmitting || this.isDeleting || this.destroyed) return;
 
-        if (this.isSubmitting) return;
         this.isSubmitting = true;
 
         const groupId = btnEl.dataset.id;
-        
-        /* Ricerca elementi DOM senza bloccare il flusso */
         const formEl = document.querySelector(`.edit-group-form[data-id="${groupId}"]`);
         const container = formEl ? formEl.closest('.accordion-body .template-container') : null;
 
@@ -377,6 +464,8 @@ export class GroupsManager {
 
             const data = await response.json();
 
+            if (this.destroyed) return;
+
             if (data.result === false) {
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('danger', data.message);
@@ -389,16 +478,16 @@ export class GroupsManager {
             }
 
         } catch (error) {
-            console.error("Errore:", error);
+            console.error('Errore durante il ripristino del gruppo:', error);
         } finally {
             this.isSubmitting = false;
         }
     }
 
-    /* Gestisce l'eliminazione asincrona di un gruppo previa conferma dell'utente */
+    /* Gestisce l'eliminazione di un gruppo */
     async handleDeleteGroup(btnEl) {
+        if (this.isSubmitting || this.destroyed) return;
 
-        if (this.isSubmitting) return;
         this.isSubmitting = true;
 
         const groupId = btnEl.dataset.id;
@@ -414,6 +503,8 @@ export class GroupsManager {
 
             const data = await response.json();
 
+            if (this.destroyed) return;
+
             if (data.result === false) {
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('danger', data.message);
@@ -427,143 +518,200 @@ export class GroupsManager {
                 }
 
                 this.isListLoaded = false;
+
                 const mainCollapseList = document.getElementById('main_collapse_list');
+
                 if (mainCollapseList && mainCollapseList.classList.contains('show')) {
                     this.loadGroupsList();
                 }
             }
+
         } catch (error) {
-            console.error("Errore durante l'eliminazione del gruppo:", error);
+            console.error('Errore durante l\'eliminazione del gruppo:', error);
         } finally {
             this.isSubmitting = false;
         }
     }
 
-    /* Carica lo scheletro iniziale del pannello di aggiunta nuovo gruppo (Primo livello) */
+    /* Carica il pannello di aggiunta prima dell'apertura dell'accordion */
     async loadAddGroupPanel() {
-        if (this.isAddLoaded) return false;
+        if (this.destroyed || this.isAddLoaded || this.pendingPanels.has('add')) return false;
 
         const container = document.getElementById('add-groups-container');
-        if ( ! container) return false;
+        if (!container) return false;
+
+        const version = this.panelVersions.add;
+        this.pendingPanels.add('add');
 
         try {
-            const response = await apiFetch(this.getOpenAddGroup, { method: 'POST' });
+            const response = await apiFetch(this.getOpenAddGroup, {
+                method: 'POST'
+            });
 
             const data = await response.json();
+
+            if (this.destroyed || version !== this.panelVersions.add) return false;
 
             if (data.result === true) {
                 smoothReplace(container, data.output);
                 this.isAddLoaded = true;
                 return true;
             }
+
             return false;
+
         } catch (error) {
-            console.error("Errore durante il caricamento del form aggiunta gruppo:", error);
+            console.error('Errore durante il caricamento del form aggiunta gruppo:', error);
             return false;
+        } finally {
+            this.pendingPanels.delete('add');
         }
     }
 
-    /* Svuota il container alla chiusura del pannello per distruggere il form dal DOM */
+    /* Svuota il pannello di aggiunta alla chiusura */
     resetAddContainer() {
+        this.panelVersions.add++;
+
         const container = document.getElementById('add-groups-container');
+
         if (container) {
             smoothReplace(container, '');
-            this.isAddLoaded = false; 
+            this.isAddLoaded = false;
         }
     }
 
-    /* Carica l'elenco dei gruppi (Primo livello AJAX) */
+    /* Carica l'elenco gruppi prima dell'apertura dell'accordion */
     async loadGroupsList() {
-        if (this.isListLoaded) return false;
+        if (this.destroyed || this.isListLoaded || this.pendingPanels.has('list')) return false;
 
         const container = document.getElementById('showAll-groups-container');
-        if ( ! container) return false;
+        if (!container) return false;
+
+        const version = this.panelVersions.list;
+        this.pendingPanels.add('list');
 
         try {
-            const response = await apiFetch(this.getGroupsUrl, { method: 'POST' });
+            const response = await apiFetch(this.getGroupsUrl, {
+                method: 'POST'
+            });
 
             const data = await response.json();
+
+            if (this.destroyed || version !== this.panelVersions.list) return false;
 
             if (data.result === true) {
                 smoothReplace(container, data.output);
                 this.isListLoaded = true;
                 return true;
             }
+
             return false;
+
         } catch (error) {
-            console.error("Errore caricamento lista gruppi:", error);
+            console.error('Errore caricamento lista gruppi:', error);
             return false;
+        } finally {
+            this.pendingPanels.delete('list');
         }
     }
 
-    /* Metodo pubblico per resettare lo stato della lista principale quando viene chiusa */
+    /* Svuota la lista alla chiusura */
     resetListContainer() {
+        this.panelVersions.list++;
+
         const container = document.getElementById('showAll-groups-container');
+
         if (container) {
-            smoothReplace(container, ''); 
-            this.isListLoaded = false; 
+            smoothReplace(container, '');
+            this.isListLoaded = false;
         }
     }
 
-    /* Carica lo scheletro iniziale del pannello eccezioni (Terzo livello) */
+    /* Carica il pannello eccezioni prima dell'apertura dell'accordion */
     async loadExceptionsPanel() {
-        if (this.isExceptionsLoaded) return false;
+        if (this.destroyed || this.isExceptionsLoaded || this.pendingPanels.has('exceptions')) return false;
 
         const container = document.getElementById('exceptions-groups-container');
-        if ( ! container) return false;
+        if (!container) return false;
+
+        const version = this.panelVersions.exceptions;
+        this.pendingPanels.add('exceptions');
 
         try {
-            const response = await apiFetch(this.getOpenExceptionsGroup, { method: 'POST' });
+            const response = await apiFetch(this.getOpenExceptionsGroup, {
+                method: 'POST'
+            });
 
             const data = await response.json();
+
+            if (this.destroyed || version !== this.panelVersions.exceptions) return false;
 
             if (data.result === true) {
                 smoothReplace(container, data.output);
                 this.isExceptionsLoaded = true;
                 return true;
             }
+
             return false;
+
         } catch (error) {
-            console.error("Errore durante il caricamento del form aggiunta gruppo:", error);
+            console.error('Errore durante il caricamento del pannello eccezioni:', error);
             return false;
+        } finally {
+            this.pendingPanels.delete('exceptions');
         }
     }
 
-    /* Svuota il container alla chiusura del pannello per distruggere il form dal DOM */
+    /* Svuota il pannello eccezioni alla chiusura */
     resetExceptionsContainer() {
+        this.panelVersions.exceptions++;
+
+        clearTimeout(this.searchTimeout);
+        ++this.searchVersion;
+        ++this.permissionsVersion;
+
         const container = document.getElementById('exceptions-groups-container');
+
         if (container) {
             smoothReplace(container, '');
-            this.isExceptionsLoaded = false; 
+            this.isExceptionsLoaded = false;
         }
     }
 
+    /* Ricerca amministratori con debounce e protezione dai risultati obsoleti */
     handleAdminSearch(inputEl) {
-        /* Cancella il timeout precedente se l'utente sta ancora digitando */
+        if (this.destroyed) return;
+
+        const version = ++this.searchVersion;
+        ++this.permissionsVersion;
+
         clearTimeout(this.searchTimeout);
 
-        /* Gestione visibilità della X al volo */
         const resetBtn = inputEl.closest('.input-group')?.querySelector('.reset-search-field');
+
         if (resetBtn) {
             resetBtn.style.display = inputEl.value.length > 0 ? 'flex' : 'none';
         }
 
-        /* Rimuove la griglia dei permessi appena si digitano caratteri */
         const permissionsGrid = document.getElementById('admin-permissions-container');
-        if (permissionsGrid) smoothReplace(permissionsGrid, '');
+
+        if (permissionsGrid) {
+            smoothReplace(permissionsGrid, '');
+        }
 
         const query = inputEl.value.trim();
         const container = document.getElementById('dropdownAdmins');
-        if ( ! container) return;
 
-        /* Se la query è inferiore a 3 caratteri svuotiamo il dropdown e ci fermiamo */
+        if (!container) return;
+
         if (query.length < 3) {
             smoothReplace(container, '');
             return;
         }
 
-        /* Avviamo il timer di 500ms */
         this.searchTimeout = setTimeout(async () => {
+            if (this.destroyed || version !== this.searchVersion || !inputEl.isConnected) return;
+
             try {
                 const formData = new FormData();
                 formData.append('query', query);
@@ -574,6 +722,13 @@ export class GroupsManager {
                 });
 
                 const data = await response.json();
+
+                if (
+                    this.destroyed ||
+                    version !== this.searchVersion ||
+                    !inputEl.isConnected ||
+                    inputEl.value.trim() !== query
+                ) return;
 
                 if (data.result === false) {
                     if (data.message && typeof showAlert === 'function') {
@@ -587,32 +742,39 @@ export class GroupsManager {
                 } else {
                     smoothReplace(container, '');
                 }
+
             } catch (error) {
-                console.error("Errore durante la ricerca degli amministratori:", error);
+                console.error('Errore durante la ricerca degli amministratori:', error);
             }
         }, 500);
     }
 
-    /**
-     * Gestisce il click sull'amministratore dal dropdown, aggiorna il campo testo,
-     * distrugge il dropdown e carica via AJAX la griglia dei permessi/eccezioni.
-     */
+    /* Seleziona l'amministratore e carica la griglia delle eccezioni */
     async handleSelectAdmin(btnEl) {
+        if (this.destroyed) return;
+
+        clearTimeout(this.searchTimeout);
+        ++this.searchVersion;
+
+        const version = ++this.permissionsVersion;
         const adminUuid = btnEl.dataset.id;
         const adminIdentity = btnEl.dataset.identity;
 
         const searchInput = document.getElementById('search-admin');
+
         if (searchInput) {
             searchInput.value = adminIdentity;
         }
 
         const dropdownContainer = document.getElementById('dropdownAdmins');
+
         if (dropdownContainer) {
             smoothReplace(dropdownContainer, '');
         }
 
         const permissionsContainer = document.getElementById('admin-permissions-container');
-        if ( ! permissionsContainer) return;
+
+        if (!permissionsContainer) return;
 
         try {
             const formData = new FormData();
@@ -625,21 +787,29 @@ export class GroupsManager {
 
             const data = await response.json();
 
+            if (
+                this.destroyed ||
+                version !== this.permissionsVersion ||
+                !permissionsContainer.isConnected
+            ) return;
+
             if (data.result === true && data.output) {
                 smoothReplace(permissionsContainer, data.output);
             } else if (data.message && typeof showAlert === 'function') {
                 showAlert('danger', data.message);
             }
+
         } catch (error) {
-            console.error("Errore caricamento permessi:", error);
+            console.error('Errore caricamento permessi:', error);
         }
     }
 
-    /* Gestisce l'invio asincrono del form delle eccezioni permessi per il salvataggio */
+    /* Salva le eccezioni dei permessi dell'amministratore */
     async handleSaveAdminPermissions(e) {
         e.preventDefault();
 
-        if (this.isSubmitting) return;
+        if (this.isSubmitting || this.isDeleting || this.isConfirming || this.destroyed) return;
+
         this.isSubmitting = true;
 
         const formEl = e.target;
@@ -655,10 +825,13 @@ export class GroupsManager {
 
             const data = await response.json();
 
+            if (this.destroyed) return;
+
             if (data.errors) {
                 if (typeof handleValidationErrors === 'function') {
                     handleValidationErrors(data.errors);
                 }
+
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('danger', data.message);
                 }
@@ -677,22 +850,22 @@ export class GroupsManager {
                     showAlert('success', data.message);
                 }
             }
+
         } catch (error) {
-            console.error("Errore durante il salvataggio delle eccezioni:", error);
+            console.error('Errore durante il salvataggio delle eccezioni:', error);
         } finally {
             this.isSubmitting = false;
         }
     }
 
-    /* Ricarica ed esegue il refresh della griglia permessi dell'amministratore selezionato */
+    /* Ripristina i permessi dell'amministratore selezionato */
     async handleRefreshAdminPermissions(btnEl) {
+        if (this.isSubmitting || this.isDeleting || this.destroyed) return;
 
-        if (this.isSubmitting) return;
+        const version = ++this.permissionsVersion;
         this.isSubmitting = true;
 
         const adminUuid = btnEl.dataset.uuid;
-        
-        /* Ricerca del contenitore senza bloccare il flusso */
         const permissionsContainer = document.getElementById('admin-permissions-container');
 
         try {
@@ -706,6 +879,12 @@ export class GroupsManager {
 
             const data = await response.json();
 
+            if (
+                this.destroyed ||
+                version !== this.permissionsVersion ||
+                !permissionsContainer?.isConnected
+            ) return;
+
             if (data.result === false) {
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('danger', data.message);
@@ -713,42 +892,48 @@ export class GroupsManager {
                 return;
             }
 
-            /* Esegue il rimpiazzo solo se il backend restituisce true e il contenitore esiste */
             if (data.result === true && data.output && permissionsContainer) {
                 smoothReplace(permissionsContainer, data.output);
             }
 
         } catch (error) {
-            console.error("Errore durante il ripristino delle eccezioni:", error);
+            console.error('Errore durante il ripristino delle eccezioni:', error);
         } finally {
             this.isSubmitting = false;
         }
     }
 
-    /* Svuota il campo di testo ricerca, nasconde la X e azzera il DOM dei risultati e dei permessi */
+    /* Svuota ricerca, dropdown e griglia permessi */
     handleResetAdminSearch(btnEl) {
+        if (this.destroyed) return;
+
+        clearTimeout(this.searchTimeout);
+        ++this.searchVersion;
+        ++this.permissionsVersion;
+
         const inputGroup = btnEl.closest('.input-group');
         const searchInput = inputGroup?.querySelector('#search-admin');
-        
+
         if (searchInput) {
             searchInput.value = '';
         }
 
-        /* Nascondiamo la X */
         btnEl.style.display = 'none';
 
-        /* Svuotiamo dropdown e griglia permessi */
         const dropdownContainer = document.getElementById('dropdownAdmins');
-        if (dropdownContainer) smoothReplace(dropdownContainer, '');
 
+        if (dropdownContainer) {
+            smoothReplace(dropdownContainer, '');
+        }
 
         const permissionsContainer = document.getElementById('admin-permissions-container');
-        if (permissionsContainer) smoothReplace(permissionsContainer, '');
+
+        if (permissionsContainer) {
+            smoothReplace(permissionsContainer, '');
+        }
     }
 
-    /**
-     * Contatta il backend per verificare se ci sono vincoli prima di eliminare.
-     */
+    /* Verifica i vincoli di eliminazione del gruppo */
     async checkDeleteConstraints(groupId) {
         try {
             const formData = new FormData();
@@ -761,7 +946,8 @@ export class GroupsManager {
 
             const data = await response.json();
 
-            /* Se il backend restituisce false (es. ci sono utenti), mostra l'errore e blocca tutto */
+            if (this.destroyed) return false;
+
             if (data.result === false) {
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('info', data.message);
@@ -769,12 +955,34 @@ export class GroupsManager {
                 return false;
             }
 
-            /* Via libera */
-            return true;
-            
+            return data.result === true;
+
         } catch (error) {
-            console.error("Errore durante il controllo vincoli di eliminazione:", error);
+            console.error('Errore durante il controllo vincoli di eliminazione:', error);
             return false;
+        }
+    }
+
+    destroy() {
+        if (this.destroyed) return;
+
+        this.destroyed = true;
+        this.eventsController.abort();
+        this.eventsBound = false;
+
+        clearTimeout(this.searchTimeout);
+
+        ++this.searchVersion;
+        ++this.permissionsVersion;
+
+        this.panelVersions.add++;
+        this.panelVersions.list++;
+        this.panelVersions.exceptions++;
+
+        this.pendingPanels.clear();
+
+        if (GroupsManager.instance === this) {
+            GroupsManager.instance = null;
         }
     }
 }

@@ -20,6 +20,28 @@ use CodeIgniter\Config\BaseService;
 class Services extends BaseService
 {
     /**
+     * Inizializza e restituisce il servizio Email utilizzando le impostazioni unificate (database + configurazione).
+     *
+     * @param array|\Config\Email|null $config Configurazione esplicita opzionale.
+     * @param bool $getShared Determina se restituire l'istanza condivisa (Singleton) o una nuova istanza.
+     * @return \CodeIgniter\Email\Email
+     */
+    public static function email($config = null, bool $getShared = true)
+    {
+        if ($getShared):
+            return static::getSharedInstance('email', $config);
+        endif;
+
+        if ($config === null):
+            helper('settings');
+            $config = (array) setting('Backend\\Email');
+            $config['SMTPPort'] = (int) $config['SMTPPort'];
+        endif;
+
+        return new \CodeIgniter\Email\Email($config);
+    }
+
+    /**
      * Inizializza e restituisce il servizio di gestione dell'autorizzazione e dei permessi per gli amministratori.
      *
      * @param bool $getShared Determina se restituire l'istanza condivisa (Singleton) o una nuova istanza.

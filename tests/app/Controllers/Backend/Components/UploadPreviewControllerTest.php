@@ -376,8 +376,8 @@ class UploadPreviewControllerTest extends CIUnitTestCase
         ->method(
             'getPost'
         )
-        ->willReturn(
-            ['uuid' => 'test-uuid', 'entity' => 'users', 'context' => 'profile']
+		->willReturn(
+			['uuid' => 'test-uuid', 'entity' => 'admins', 'context' => 'edit']
         );
 
         $uploadPreviewModel = 
@@ -478,7 +478,7 @@ class UploadPreviewControllerTest extends CIUnitTestCase
         );
 
         $closure = 
-        function() use (
+		function() use (
             $request,
             $validator
         ) {
@@ -489,6 +489,11 @@ class UploadPreviewControllerTest extends CIUnitTestCase
             $this
             ->validator = 
             $validator;
+
+			$this->currentAdmin = (object) [
+				'uuid' => 'test-uuid',
+				'superadmin' => 0,
+			];
         };
 
         \Closure::bind(
@@ -554,8 +559,8 @@ class UploadPreviewControllerTest extends CIUnitTestCase
 
         $postData = [
             'uuid' => 'test-uuid', 
-            'entity' => 'users', 
-            'context' => 'profile'
+			'entity' => 'admins',
+			'context' => 'edit'
         ];
 
         $request
@@ -676,6 +681,11 @@ class UploadPreviewControllerTest extends CIUnitTestCase
             $this
             ->request = 
             $request;
+
+			$this->currentAdmin = (object) [
+				'uuid' => 'test-uuid',
+				'superadmin' => 0,
+			];
         };
 
         \Closure::bind(
@@ -694,4 +704,30 @@ class UploadPreviewControllerTest extends CIUnitTestCase
             $result
         );
     }
+
+	public function testAvatarUploadAccessIsLimitedToOwnerOrSuperadmin(): void
+	{
+		$controller = new \App\Controllers\Backend\Components\UploadPreviewController();
+		$invokeAccess = \Closure::bind(
+			function (array $posts): bool {
+				return $this->canAccess($posts);
+			},
+			$controller,
+			\App\Controllers\Backend\Components\UploadPreviewController::class
+		);
+		$setAdmin = \Closure::bind(
+			function (object $admin): void {
+				$this->currentAdmin = $admin;
+			},
+			$controller,
+			\App\Controllers\Backend\Components\UploadPreviewController::class
+		);
+
+		$setAdmin((object) ['uuid' => 'owner-uuid', 'superadmin' => 0]);
+		$this->assertTrue($invokeAccess(['entity' => 'admins', 'uuid' => 'owner-uuid']));
+		$this->assertFalse($invokeAccess(['entity' => 'admins', 'uuid' => 'other-uuid']));
+
+		$setAdmin((object) ['uuid' => 'super-uuid', 'superadmin' => 1]);
+		$this->assertTrue($invokeAccess(['entity' => 'admins', 'uuid' => 'other-uuid']));
+	}
 }

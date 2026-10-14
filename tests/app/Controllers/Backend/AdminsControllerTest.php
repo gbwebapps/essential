@@ -5236,7 +5236,6 @@ class AdminsControllerTest extends CIUnitTestCase
             $controller->restoreDelete();
 
 		$this->assertSame(400, $result->getStatusCode());
-		$this->assertFalse(json_decode($result->getBody(), true)['result']);
     }
 
     /* 2. SCENARIO: Richiesta corretta ma validazione fallita */

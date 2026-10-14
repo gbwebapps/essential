@@ -2,7 +2,6 @@
 
 namespace App\Libraries\Backend;
 
-use App\Models\Backend\AdminsModel;
 use CodeIgniter\Test\CIUnitTestCase;
 use Tests\Support\Libraries\MocksSettings;
 
@@ -17,7 +16,7 @@ class AdminsClassTest extends CIUnitTestCase
         parent::setUp();
 
         $this->mockSettings(['Backend\General' => ['language' => 'it']]);
-        $this->admins = new AdminsClass($this->createMock(AdminsModel::class));
+        $this->admins = new AdminsClass();
     }
 
     protected function tearDown(): void

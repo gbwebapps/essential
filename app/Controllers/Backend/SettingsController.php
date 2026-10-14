@@ -252,8 +252,12 @@ class SettingsController extends BackendController
             /* Elimina interamente la sezione configurata */
             $deleted = $this->settingsModel->deleteSettings($namespace);
 
-            if ( ! $deleted) :
+            if ($deleted === null) :
                 return $this->jsonResponse(['result'  => false, 'message' => lang('backend/settings.messages.alreadyDefault')]);
+            endif;
+
+            if ($deleted === false) :
+                return $this->jsonResponse(['result'  => false, 'message' => lang('backend/settings.messages.deleteError')]);
             endif;
 
             return $this->jsonResponse(['result'  => true, 'message' => lang('backend/settings.messages.deleteSuccess')]);

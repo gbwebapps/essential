@@ -30,11 +30,9 @@ class AuditsClassTest extends CIUnitTestCase
             =
             \App\Libraries\Backend\AuditsClass::class;
 
-        $modelMock = $this->createMock(\App\Models\Backend\AuditsModel::class);
-
         $instance
             =
-            new $class(new $modelMock);
+            new $class();
 
         $result
             =
@@ -77,11 +75,9 @@ class AuditsClassTest extends CIUnitTestCase
             =
             \App\Libraries\Backend\AuditsClass::class;
 
-        $modelMock = $this->createMock(\App\Models\Backend\AuditsModel::class);
-
         $instance
             =
-            new $class(new $modelMock);
+            new $class();
 
         $result
             =

@@ -92,6 +92,28 @@ class GroupsModel extends BackendModel
 	}
 
     /**
+     * Registra l'audit senza alterare l'esito di una transazione già consolidata.
+     *
+     * @param string $action Codice dell'azione eseguita
+     * @param string $details Dettaglio descrittivo dell'operazione
+     */
+    protected function logActivitySafely(string $action, string $details): void
+    {
+        try
+        {
+            $currentAdmin = service('authorization')->currentAdmin();
+
+            if (log_admin_activity($action, 'groups', $details, $currentAdmin) === false):
+                log_message('error', 'Registrazione audit Groups non riuscita: ' . $action);
+            endif;
+        }
+        catch (\Throwable $e)
+        {
+            log_message('error', 'Errore registrazione audit Groups: ' . $e);
+        }
+    }
+
+    /**
      * Genera il set di regole di validazione per la creazione di un nuovo Gruppo.
      * 
      * Legge dinamicamente il file di configurazione centrale dei permessi (Permissions config) 
@@ -115,11 +137,11 @@ class GroupsModel extends BackendModel
 	    return [
 	        'name' => [
 	            'label' => lang('backend/groups.labels.name'),
-	            'rules' => ['required', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'], 
+	            'rules' => ['required', 'max_length[50]', 'is_unique[admins_groups.name]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'],
 	        ],
 	        'description' => [
 	            'label' => lang('backend/groups.labels.description'),
-	            'rules' => ['required', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'], 
+	            'rules' => ['required', 'max_length[255]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'],
 	        ],
             /* Validazione di ogni singolo elemento contenuto nell'array delle eccezioni */
             'permissions.*' => [
@@ -180,11 +202,11 @@ class GroupsModel extends BackendModel
             ],
             'name' => [
                 'label' => lang('backend/groups.labels.name'),
-                'rules' => ['required', "is_unique[admins_groups.name,id,{$posts['id']}]", 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'], 
+                'rules' => ['required', 'max_length[50]', "is_unique[admins_groups.name,id,{$posts['id']}]", 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'],
             ],
             'description' => [
                 'label' => lang('backend/groups.labels.description'),
-                'rules' => ['required', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'], 
+                'rules' => ['required', 'max_length[255]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'],
             ],
             /* Validazione di ciascun permesso inviato nell'array del gruppo */
             'permissions.*' => [
@@ -264,12 +286,12 @@ class GroupsModel extends BackendModel
      *
      * @return array Regole per la chiave 'query'
      */
-    public function dropdownAdminsRules()
+    public function dropdownAdminsRules(): array
     {
         return [
             'query' => [
                 'label' => lang('backend/groups.labels.query'),
-                'rules' => ['permit_empty', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'], 
+                'rules' => ['required', 'min_length[3]', 'max_length[100]', 'regex_match[/^[a-zA-ZÀ-ÖØ-öø-ÿ\'\’\‘\` ]+$/u]'],
             ],
         ];
     }
@@ -282,7 +304,7 @@ class GroupsModel extends BackendModel
      *
      * @return array Regole di validazione
      */
-    public function adminPermissionsValidationRules()
+    public function adminPermissionsValidationRules(): array
     {
         return [
             'uuid' => [
@@ -428,8 +450,7 @@ class GroupsModel extends BackendModel
 
             $this->db->transCommit();
 
-            $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('ADD_GROUP', 'groups', sprintf(lang('backend/groups.audits.addGroup'), esc($posts['name'])), $currentAdmin);
+            $this->logActivitySafely('ADD_GROUP', sprintf(lang('backend/groups.audits.addGroup'), esc($posts['name'])));
 
             return ['result' => true, 'message' => lang('backend/groups.messages.addSuccess')];
         } 
@@ -510,8 +531,7 @@ class GroupsModel extends BackendModel
 
             $this->db->transCommit();
 
-            $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('EDIT_GROUP', 'groups', sprintf(lang('backend/groups.audits.editGroup'), esc($posts['name'])), $currentAdmin);
+            $this->logActivitySafely('EDIT_GROUP', sprintf(lang('backend/groups.audits.editGroup'), esc($posts['name'])));
 
             return ['result' => true, 'message' => lang('backend/groups.messages.editSuccess')];
         } 
@@ -558,8 +578,7 @@ class GroupsModel extends BackendModel
 
             $this->db->transCommit();
 
-            $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('DELETE_GROUP', 'groups', sprintf(lang('backend/groups.audits.deleteGroup'), esc($group->name)), $currentAdmin);
+            $this->logActivitySafely('DELETE_GROUP', sprintf(lang('backend/groups.audits.deleteGroup'), esc($group->name)));
 
             return ['result' => true, 'message' => lang('backend/groups.messages.delSuccess')];
 
@@ -635,7 +654,11 @@ class GroupsModel extends BackendModel
             */
             $sql = 'select uuid, concat(firstname, " ", lastname) as identity  
                     from admins 
-                    where (lower(firstname) like ? or lower(lastname) like ?)';
+                    where (lower(firstname) like ? or lower(lastname) like ?)
+                    and deleted_at is null
+                    and superadmin = 0
+                    order by firstname asc, lastname asc
+                    limit 20';
             
             $query = $this->db->query($sql, [$bindValue, $bindValue]);
 
@@ -819,8 +842,7 @@ class GroupsModel extends BackendModel
 
             $this->db->transCommit();
 
-            $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('SAVE_EXCEPTIONS', 'groups', sprintf(lang('backend/groups.audits.saveExceptions'), esc($admin->firstname), esc($admin->lastname)), $currentAdmin);
+            $this->logActivitySafely('SAVE_EXCEPTIONS', sprintf(lang('backend/groups.audits.saveExceptions'), esc($admin->firstname), esc($admin->lastname)));
 
             return ['result' => true, 'message' => sprintf(lang('backend/groups.messages.saveExceptionsSuccess'), esc($admin->firstname), esc($admin->lastname))];
 

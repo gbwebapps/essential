@@ -6,7 +6,7 @@
                     <?php if ($stats['total'] === 0): ?>
                         <?= lang('backend/tools.labels.noLogsStats'); ?>
                     <?php else: ?>
-                        <?= sprintf(lang('backend/tools.labels.logsStats'), $stats['total'], convertDate($stats['min_date'], 'conversational'), convertDate($stats['max_date'], 'conversational')); ?>
+                        <?= esc(sprintf(lang('backend/tools.labels.logsStats'), $stats['total'], convertDate($stats['min_date'], 'conversational'), convertDate($stats['max_date'], 'conversational'))); ?>
                     <?php endif; ?>
                 </div>
             </div>
@@ -20,7 +20,7 @@
                             <!-- Campo Data Da -->
                             <label for="logs-created_at-from"><?= lang('backend/logs.labels.dateFrom'); ?></label>
                             <div id="wrapper-logs-created_at-from" class="input-group">
-                                <input type="text" id="logs-created_at-from" name="fromDate" data-input class="form-control" placeholder="<?= lang('backend/logs.placeholders.dateFrom'); ?>" autocomplete="off">
+                                <input type="text" id="logs-created_at-from" name="fromDate" data-input class="form-control" placeholder="<?= esc(lang('backend/logs.placeholders.dateFrom'), 'attr'); ?>" autocomplete="off">
                                 <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                 <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                             </div>
@@ -35,7 +35,7 @@
                             <!-- Campo Data A -->
                             <label for="logs-created_at-to"><?= lang('backend/logs.labels.dateTo'); ?></label>
                             <div id="wrapper-logs-created_at-to" class="input-group">
-                                <input type="text" id="logs-created_at-to" name="toDate" data-input class="form-control" placeholder="<?= lang('backend/logs.placeholders.dateTo'); ?>" autocomplete="off">
+                                <input type="text" id="logs-created_at-to" name="toDate" data-input class="form-control" placeholder="<?= esc(lang('backend/logs.placeholders.dateTo'), 'attr'); ?>" autocomplete="off">
                                 <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                 <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                             </div>
@@ -49,7 +49,7 @@
                 <!-- Pulsanti -->
                 <div class="row mt-lg-2">
                     <div class="col-12 d-flex align-middle justify-content-center">
-                        <button type="button" class="btn btn-warning text-dark btn-sm me-2 btn-reset-tools" data-confirm="<?= lang('backend/tools.messages.areYouSureToResetData'); ?>">
+                        <button type="button" class="btn btn-warning text-dark btn-sm me-2 btn-reset-tools" data-confirm="<?= esc(lang('backend/tools.messages.areYouSureToResetData'), 'attr'); ?>">
                             <i class="fa-solid fa-refresh me-1"></i><?= lang('backend/tools.buttons.resetData'); ?>
                         </button>
                         <button type="button" class="btn btn-success btn-sm mx-2 btn-action-logs" data-action="delete">

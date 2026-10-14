@@ -26,8 +26,7 @@ class LogsClassTest extends CIUnitTestCase
 
     public function testGetJsIndexReturnsCorrectConfigurationWithLocale(): void
     {
-        $modelMock = $this->createMock(\App\Models\Backend\LogsModel::class);
-        $result = (new \App\Libraries\Backend\LogsClass($modelMock))->getJsIndex();
+        $result = (new \App\Libraries\Backend\LogsClass())->getJsIndex();
 
         $this->assertIsArray($result);
         $this->assertCount(2, $result);
@@ -38,8 +37,7 @@ class LogsClassTest extends CIUnitTestCase
 
     public function testGetCssIndexReturnsCorrectConfiguration(): void
     {
-        $modelMock = $this->createMock(\App\Models\Backend\LogsModel::class);
-        $result = (new \App\Libraries\Backend\LogsClass($modelMock))->getCssIndex();
+        $result = (new \App\Libraries\Backend\LogsClass())->getCssIndex();
 
         $this->assertIsArray($result);
         $this->assertCount(1, $result);

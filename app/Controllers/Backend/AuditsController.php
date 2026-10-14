@@ -43,7 +43,7 @@ class AuditsController extends BackendController
         $this->data['entity'] = 'audits';
 
         $this->auditsModel = model(AuditsModel::class);
-        $this->auditsClass = new AuditsClass($this->auditsModel);
+        $this->auditsClass = new AuditsClass();
     }
 
     /**
@@ -73,10 +73,7 @@ class AuditsController extends BackendController
                 return $this->jsonResponse(['errors' => $formattedErrors, 'message' => lang('backend/audits.messages.validationErrors')]);
             endif;
 
-            /* Attiviamo il contesto audit e lasciamo che getData() faccia tutto il lavoro pesante */
             $this->data['data'] = $this->auditsModel->getData($posts);
-
-            /* ... resto del controller invariato ... */
 
             $json = [];
 

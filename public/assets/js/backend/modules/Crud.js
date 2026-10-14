@@ -6,25 +6,24 @@ import { UploadPreviewImgManager } from '../components/UploadPreview.js';
 
 /* --- LIST MANAGER (Custom SSR) --- */
 export class ListManager {
-    constructor(config = {}, hooks = {}) {
+    static instances = {};
 
-        /* 1. Registro istanze basato su containerId */
-        if ( ! ListManager.instances) {
-            ListManager.instances = {};
+    constructor(config = {}, hooks = {}) {
+        if (!config.rootId || !config.containerId || !config.controller || !config.url) {
+            throw new Error('ListManager: rootId, containerId, controller e url sono obbligatori.');
         }
 
         if (ListManager.instances[config.containerId]) {
             return ListManager.instances[config.containerId];
         }
-        
-        ListManager.instances[config.containerId] = this;
 
-        /* 2. Aggiunto debounceTime in configurazione */
         this.config = Object.assign({
             controller: '',
             url: '',
-            containerId: '', 
-            searchFields: [], 
+            rootId: '',
+            containerId: '',
+            storageKey: '',
+            searchFields: [],
             searchDates: [],
             debounceTime: 500
         }, config);
@@ -35,283 +34,266 @@ export class ListManager {
             onShowError: null
         }, hooks);
 
-        this.state = {
-            column: localStorage.getItem(`${this.config.controller}_column`) || 'id',
-            order: localStorage.getItem(`${this.config.controller}_order`) || 'desc',
-            page: localStorage.getItem(`${this.config.controller}_page`) || 1,
-            rows: localStorage.getItem(`${this.config.controller}_rows`) || 5,
-            trash_filter: localStorage.getItem(`${this.config.controller}_trash_filter`) || 'active',
+        // Default retrocompatibile; per due liste dello stesso controller
+        // configurare due storageKey differenti.
+        this.storageKey = this.config.storageKey || this.config.controller;
+        const read = (key, fallback) => localStorage.getItem(`${this.storageKey}_${key}`) ?? fallback;
 
+        this.state = {
+            column: read('column', 'id'),
+            order: read('order', 'desc'),
+            page: read('page', '1'),
+            rows: read('rows', '5'),
+            trash_filter: read('trash_filter', 'active'),
             searchFields: {},
             searchDates: {}
         };
 
-        this.debounceTimer = null;
-        this.container = document.querySelector(`#${this.config.containerId}`);
+        this.root = document.getElementById(this.config.rootId);
+        this.container = document.getElementById(this.config.containerId);
 
+        if (!this.root || !this.container || !this.root.contains(this.container)) {
+            throw new Error('ListManager: il contenitore dei risultati deve trovarsi nel root indicato.');
+        }
+
+        this.debounceTimer = null;
         this.eventsBound = false;
         this.isLoading = false;
         this.isResetting = false;
+        this.initialized = false;
+        this.pendingRefresh = false;
+        this.loadingPromise = null;
+        this.destroyed = false;
+        this.eventsController = new AbortController();
+
+        ListManager.instances[this.config.containerId] = this;
+    }
+
+    getFields() {
+        return [
+            ...this.config.searchFields.map(name => ({ name, type: 'searchFields', isDate: false })),
+            ...this.config.searchDates.flatMap(name => [
+                { name: `${name}-from`, type: 'searchDates', isDate: true },
+                { name: `${name}-to`, type: 'searchDates', isDate: true }
+            ])
+        ];
+    }
+
+    getField(name) {
+        return Array.from(this.root.querySelectorAll('[data-search-field]'))
+            .find(input => input.dataset.searchField === name) || null;
+    }
+
+    getFieldError(name) {
+        return Array.from(this.root.querySelectorAll('[data-search-error]'))
+            .find(el => el.dataset.searchError === name) || null;
     }
 
     init() {
-        if ( ! this.container) return;
+        if (this.destroyed || !this.root.isConnected || !this.container.isConnected) return;
+        if (this.initialized) return this.loadingPromise;
 
+        this.initialized = true;
         this.initFilters();
         this.initSearchBar();
         this.initTrashFilterUI();
         this.updateActiveSearchIndicator();
         this.bindEvents();
-        
-        this.showAll();
+        return this.showAll();
     }
 
     initFilters() {
-        const allFields = [];
-
-        this.config.searchFields.forEach(f => {
-            allFields.push({ name: f, type: 'searchFields', isDate: false });
-        });
-
-        this.config.searchDates.forEach(f => {
-            allFields.push({ name: `${f}-from`, type: 'searchDates', isDate: true });
-            allFields.push({ name: `${f}-to`, type: 'searchDates', isDate: true });
-        });
-
-        allFields.forEach(field => {
-            const key = `${this.config.controller}_${field.name}`;
-            const value = localStorage.getItem(key) || '';
-            
+        this.getFields().forEach(field => {
+            const value = localStorage.getItem(`${this.storageKey}_${field.name}`) ?? '';
             this.state[field.type][field.name] = value;
 
-            const inputEl = document.getElementById(`${this.config.controller}-${field.name}`);
-            if (inputEl) {
-                inputEl.value = value;
-                if (value !== '') {
-                    const resetBtn = inputEl.closest('.input-group')?.querySelector('.reset-search-field');
-                    if (resetBtn) resetBtn.style.display = 'flex';
-                }
-            }
+            const inputEl = this.getField(field.name);
+            if (!inputEl) return;
+            inputEl.value = value;
+            const resetBtn = inputEl.closest('.input-group')?.querySelector('.reset-search-field');
+            if (resetBtn) resetBtn.style.display = value ? 'flex' : 'none';
         });
 
-        const rowsSelect = document.getElementById('changeNumRows');
-        if (rowsSelect) {
-            rowsSelect.value = this.state.rows;
-        }
+        const rowsSelect = this.root.querySelector('.changeNumRows');
+        if (rowsSelect) rowsSelect.value = String(this.state.rows);
     }
 
     initTrashFilterUI() {
-        const currentTrashFilter = this.state.trash_filter;
-        document.querySelectorAll('[data-trash-filter]').forEach(el => {
-            if (el.dataset.trashFilter === currentTrashFilter) {
-                el.classList.add('active', 'text-success', 'fw-bold');
-            } else {
-                el.classList.remove('active', 'text-success', 'fw-bold');
-            }
+        this.root.querySelectorAll('[data-trash-filter]').forEach(el => {
+            el.classList.toggle('active', el.dataset.trashFilter === this.state.trash_filter);
+            el.classList.toggle('text-success', el.dataset.trashFilter === this.state.trash_filter);
+            el.classList.toggle('fw-bold', el.dataset.trashFilter === this.state.trash_filter);
         });
     }
 
     initSearchBar() {
-        const key = `${this.config.controller}_search_bar_visible`;
-        const searchBar = document.getElementById('search-bar');
-        const link = document.getElementById('link-search');
-        
-        if ( ! searchBar) return;
+        const searchBar = this.root.querySelector('.search-bar');
+        const link = this.root.querySelector('.link-search');
+        if (!searchBar) return;
 
-        if (localStorage.getItem(key) === '1') {
+        if (localStorage.getItem(`${this.storageKey}_search_bar_visible`) === '1') {
             searchBar.classList.add('show');
-            if (link) link.setAttribute('aria-expanded', 'true');
+            link?.setAttribute('aria-expanded', 'true');
         }
 
-        searchBar.addEventListener('shown.bs.collapse', () => localStorage.setItem(key, '1'));
-        searchBar.addEventListener('hidden.bs.collapse', () => localStorage.setItem(key, '0'));
+        searchBar.addEventListener('shown.bs.collapse', () => {
+            localStorage.setItem(`${this.storageKey}_search_bar_visible`, '1');
+        }, { signal: this.eventsController.signal });
+
+        searchBar.addEventListener('hidden.bs.collapse', () => {
+            localStorage.setItem(`${this.storageKey}_search_bar_visible`, '0');
+        }, { signal: this.eventsController.signal });
     }
 
     bindEvents() {
-        if (this.eventsBound) return;
+        if (this.eventsBound || this.destroyed) return;
         this.eventsBound = true;
+        const signal = this.eventsController.signal;
 
-        document.querySelectorAll('[data-trash-filter]').forEach(el => {
-            el.addEventListener('click', (e) => {
+        this.root.querySelectorAll('[data-trash-filter]').forEach(el => {
+            el.addEventListener('click', e => {
                 e.preventDefault();
-                const trashFilterValue = el.dataset.trashFilter;
-                
-                this.updateState('trash_filter', trashFilterValue);
+                this.updateState('trash_filter', el.dataset.trashFilter);
                 this.initTrashFilterUI();
                 this.resetSortingAndPagination();
                 this.showAll();
-            });
+            }, { signal });
         });
 
-        this.container.addEventListener('click', (e) => {
-            const sortEl = e.target.closest(`a.sort`);
-            if (sortEl) {
+        // Il contenitore AJAX è stabile; i suoi figli sono sostituiti a ogni refresh.
+        this.container.addEventListener('click', e => {
+            const sortEl = e.target.closest('a.sort');
+            if (sortEl && this.container.contains(sortEl)) {
                 e.preventDefault();
                 this.updateState('column', sortEl.dataset.column);
                 this.updateState('order', sortEl.dataset.order);
                 this.showAll();
+                return;
             }
 
-            const pageEl = e.target.closest(`.pagination li a`);
-            if (pageEl) {
+            const pageEl = e.target.closest('.pagination li a');
+            if (pageEl && this.container.contains(pageEl)) {
                 e.preventDefault();
                 this.updateState('page', pageEl.dataset.page);
                 this.showAll();
             }
-        });
+        }, { signal });
 
-        document.getElementById('changeNumRows')?.addEventListener('change', (e) => {
+        this.root.querySelector('.changeNumRows')?.addEventListener('change', e => {
             this.updateState('rows', e.target.value);
             this.resetSortingAndPagination();
             this.showAll();
-        });
+        }, { signal });
 
-        document.getElementById('link-reset-search')?.addEventListener('click', async (e) => {
+        this.root.querySelector('.link-reset-search')?.addEventListener('click', async e => {
             e.preventDefault();
-            
+            if (this.isResetting) return;
             this.isResetting = true;
-            
-            this.resetFilters();
-            this.resetSortingAndPagination();
-            
-            clearTimeout(this.debounceTimer);
-            this.isLoading = false;
-            
-            await this.showAll();
-            
-            this.isResetting = false;
-        });
+            try {
+                clearTimeout(this.debounceTimer);
+                this.debounceTimer = null;
+                this.resetFilters();
+                this.resetSortingAndPagination();
+                await this.showAll();
+            } finally {
+                this.isResetting = false;
+            }
+        }, { signal });
 
-        document.getElementById('reset-sorting-link')?.addEventListener('click', (e) => {
+        this.root.querySelector('.reset-sorting-link')?.addEventListener('click', e => {
             e.preventDefault();
             this.resetSortingAndPagination();
             this.showAll();
-        });
+        }, { signal });
 
-        document.getElementById('refresh-list')?.addEventListener('click', (e) => {
+        this.root.querySelector('.refresh-list')?.addEventListener('click', e => {
             e.preventDefault();
             this.showAll();
-        });
+        }, { signal });
 
-        const allFields = [];
+        this.getFields().forEach(field => {
+            const inputEl = this.getField(field.name);
+            if (!inputEl) return;
 
-        this.config.searchFields.forEach(f => {
-            allFields.push({ name: f, type: 'searchFields', isDate: false });
-        });
-
-        this.config.searchDates.forEach(f => {
-            allFields.push({ name: `${f}-from`, type: 'searchDates', isDate: true });
-            allFields.push({ name: `${f}-to`, type: 'searchDates', isDate: true });
-        });
-
-        allFields.forEach(field => {
-            const inputEl = document.getElementById(`${this.config.controller}-${field.name}`);
-            if ( ! inputEl) return;
-
-            const handleSearchUpdate = (useDebounce) => {
-
-                if (this.isResetting) return;
-
+            const handleSearchUpdate = useDebounce => {
+                if (this.isResetting || this.destroyed) return;
                 const value = inputEl.value;
-                
-                /* 3. Utilizzo del nuovo metodo per centralizzare lo stato nidificato */
                 this.updateNestedState(field.type, field.name, value);
 
                 const resetBtn = inputEl.closest('.input-group')?.querySelector('.reset-search-field');
                 if (resetBtn) resetBtn.style.display = value ? 'flex' : 'none';
-
                 this.updateActiveSearchIndicator();
 
                 const triggerSearch = () => {
-                    if ( ! value) {
-                        const errorDiv = document.querySelector(`.error_${this.config.controller}-${field.name}`);
+                    if (this.destroyed || this.isResetting) return;
+                    if (!value) {
+                        const errorDiv = this.getFieldError(field.name);
                         if (errorDiv) smoothReplace(errorDiv, '&nbsp;');
                     }
                     this.resetSortingAndPagination();
                     this.showAll();
                 };
 
+                clearTimeout(this.debounceTimer);
+                this.debounceTimer = null;
                 if (useDebounce) {
-                    clearTimeout(this.debounceTimer);
-                    /* 4. Applicazione del debounceTime configurabile */
-                    this.debounceTimer = setTimeout(triggerSearch, this.config.debounceTime);
+                    this.debounceTimer = setTimeout(() => {
+                        this.debounceTimer = null;
+                        triggerSearch();
+                    }, this.config.debounceTime);
                 } else {
                     triggerSearch();
                 }
             };
 
-            if (field.isDate) {
-                inputEl.addEventListener('change', () => handleSearchUpdate(false));
-            } else {
-                inputEl.addEventListener('input', () => handleSearchUpdate(true));
-            }
+            inputEl.addEventListener(field.isDate ? 'change' : 'input', () => {
+                handleSearchUpdate(!field.isDate);
+            }, { signal });
 
             const resetBtn = inputEl.closest('.input-group')?.querySelector('.reset-search-field');
             if (resetBtn) {
-                resetBtn.addEventListener('click', (e) => {
+                resetBtn.addEventListener('click', e => {
                     e.preventDefault();
                     e.stopPropagation();
-
                     const fp = inputEl._flatpickr || inputEl.closest('.input-group')?._flatpickr;
-
                     if (fp) {
                         fp.clear();
+                        // Flatpickr normalmente emette change in clear().
                     } else {
                         inputEl.value = '';
                         handleSearchUpdate(false);
                     }
-                });
+                }, { signal });
             }
         });
-    } 
+    }
 
     updateState(key, value) {
         this.state[key] = value;
-        localStorage.setItem(`${this.config.controller}_${key}`, value);
+        localStorage.setItem(`${this.storageKey}_${key}`, String(value));
     }
 
-    /* 5. Nuovo metodo per aggiornamento stato nidificato (Testi e Date) */
     updateNestedState(group, key, value) {
         this.state[group][key] = value;
-        localStorage.setItem(`${this.config.controller}_${key}`, value);
+        localStorage.setItem(`${this.storageKey}_${key}`, String(value));
     }
 
     resetFilters() {
-        const allFields = [];
-
-        this.config.searchFields.forEach(f => {
-            allFields.push({ name: f, type: 'searchFields' });
-        });
-
-        this.config.searchDates.forEach(f => {
-            allFields.push({ name: `${f}-from`, type: 'searchDates' });
-            allFields.push({ name: `${f}-to`, type: 'searchDates' });
-        });
-
-        allFields.forEach(field => {
-            const inputEl = document.getElementById(`${this.config.controller}-${field.name}`);
+        this.getFields().forEach(field => {
+            const inputEl = this.getField(field.name);
             if (inputEl) {
                 const fp = inputEl._flatpickr || inputEl.closest('.input-group')?._flatpickr;
-
-                if (fp) {
-                    fp.clear();
-                } else {
-                    inputEl.value = '';
-                }
+                if (fp) fp.clear();
+                else inputEl.value = '';
 
                 const resetBtn = inputEl.closest('.input-group')?.querySelector('.reset-search-field');
-                if (resetBtn) {
-                    resetBtn.style.display = 'none';
-                }
+                if (resetBtn) resetBtn.style.display = 'none';
             }
-            
-            /* Utilizzo del metodo centralizzato anche qui */
+
             this.updateNestedState(field.type, field.name, '');
-            
-            const errorDiv = document.querySelector(`.error_${this.config.controller}-${field.name}`);
+            const errorDiv = this.getFieldError(field.name);
             if (errorDiv) smoothReplace(errorDiv, '&nbsp;');
         });
-        
         this.updateActiveSearchIndicator();
     }
 
@@ -322,113 +304,135 @@ export class ListManager {
     }
 
     updateActiveSearchIndicator() {
-        const linkSearch = document.getElementById('link-search');
-        if ( ! linkSearch) return;
-
-        const hasTextFields = Object.values(this.state.searchFields).some(val => val?.trim() !== '');
-        const hasDateFields = Object.values(this.state.searchDates).some(val => val?.trim() !== '');
-        
-        linkSearch.classList.toggle('text-danger', hasTextFields || hasDateFields);
-        linkSearch.classList.toggle('fw-bold', hasTextFields || hasDateFields);
+        const link = this.root.querySelector('.link-search');
+        if (!link) return;
+        const hasText = Object.values(this.state.searchFields).some(value => value?.trim() !== '');
+        const hasDates = Object.values(this.state.searchDates).some(value => value?.trim() !== '');
+        link.classList.toggle('text-danger', hasText || hasDates);
+        link.classList.toggle('fw-bold', hasText || hasDates);
     }
 
-    async showAll() {
-
-        if (this.isLoading) return;
-        this.isLoading = true;
-
-        const urlParams = new URLSearchParams();
-
-        Object.keys(this.state).forEach(key => {
-            if (key === 'searchFields') {
-                Object.entries(this.state.searchFields).forEach(([subKey, val]) => {
-                    urlParams.append(`searchFields[${subKey}]`, val);
-                });
-            } else if (key === 'searchDates') {
-                Object.entries(this.state.searchDates).forEach(([subKey, val]) => {
-                    urlParams.append(`searchDates[${subKey}]`, val);
-                });
-            } else {
-                urlParams.append(key, this.state[key]);
-            }
-        });
-
-        if (typeof this.hooks.onShowBefore === 'function') {
-            const stop = this.hooks.onShowBefore(urlParams);
-            if (stop === false) {
-                this.isLoading = false;
-                return;
-            }
+    showAll() {
+        if (this.destroyed) return Promise.resolve();
+        if (this.isLoading) {
+            this.pendingRefresh = true;
+            return this.loadingPromise;
         }
+        this.isLoading = true;
+        this.loadingPromise = Promise.resolve().then(() => this.runRefresh());
+        return this.loadingPromise;
+    }
 
-        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
-
+    async runRefresh() {
         try {
-            const response = await apiFetch(this.config.url, {
-                method: 'POST',
-                body: urlParams
-            });
+            do {
+                this.pendingRefresh = false;
+                if (this.destroyed) break;
 
-            const data = await response.json();
-            const showAllEl = document.getElementById(this.config.containerId);
+                const urlParams = new URLSearchParams();
+                Object.keys(this.state).forEach(key => {
+                    if (key === 'searchFields' || key === 'searchDates') {
+                        Object.entries(this.state[key]).forEach(([field, value]) => {
+                            urlParams.append(`${key}[${field}]`, value);
+                        });
+                    } else {
+                        urlParams.append(key, this.state[key]);
+                    }
+                });
 
-            if (data.errors) {
-                if (typeof handleValidationErrors === 'function') handleValidationErrors(data.errors);
-                
-                if (showAllEl && data.message) {
-                    const errorTemplate = `<div class="text-center text-danger py-3 fw-bold">${data.message}</div>`;
-                    smoothReplace(showAllEl, errorTemplate);
+                try {
+                    if (typeof this.hooks.onShowBefore === 'function') {
+                        const stop = await this.hooks.onShowBefore(urlParams);
+                        if (stop === false) continue;
+                    }
+
+                    this.root.querySelectorAll('[data-search-error]').forEach(el => {
+                        el.innerHTML = '\u00A0';
+                    });
+
+                    const response = await apiFetch(this.config.url, {
+                        method: 'POST',
+                        body: urlParams
+                    });
+                    const data = await response.json();
+
+                    if (this.destroyed || this.pendingRefresh) continue;
+
+                    if (data.errors) {
+                        if (typeof handleValidationErrors === 'function') {
+                            handleValidationErrors(data.errors);
+                        }
+                        if (data.message) {
+                            await smoothReplace(this.container,
+                                `<div class="text-center text-danger py-3 fw-bold">${data.message}</div>`);
+                            if (typeof showAlert === 'function') showAlert('danger', data.message);
+                        }
+                        continue;
+                    }
+
+                    if (data.result === false) {
+                        if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+                        continue;
+                    }
+
+                    if (data.result === true) {
+                        if (data.output) await smoothReplace(this.container, data.output);
+                        if (typeof this.hooks.onShowAfter === 'function') {
+                            await this.hooks.onShowAfter(data);
+                        }
+                    }
+                } catch (error) {
+                    if (typeof this.hooks.onShowError === 'function') {
+                        try {
+                            await this.hooks.onShowError(error);
+                        } catch (hookError) {
+                            console.error('Errore hook ListManager:', hookError);
+                        }
+                    }
+                    console.error('Errore ListManager:', error);
+                    break;
                 }
-
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
-                return;
-            }
-
-            if (data.result === false) {
-                if (data.message && typeof showAlert === 'function') {
-                    showAlert('danger', data.message);
-                }
-                return;
-            }
-
-            if (data.result === true) {
-                if (showAllEl && data.output) {
-                    smoothReplace(showAllEl, data.output);
-                }
-
-                if (typeof this.hooks.onShowAfter === 'function') {
-                    this.hooks.onShowAfter(data);
-                }
-            }
-
-        } catch (error) {
-            if (typeof this.hooks.onShowError === 'function') {
-                this.hooks.onShowError(error);
-            }
-            console.error("Errore ListManager:", error);
-            
-            /* 6. Rilancio dell'errore per il chiamante asincrono */
-            throw error;
+            } while (this.pendingRefresh);
         } finally {
             this.isLoading = false;
+            this.loadingPromise = null;
+        }
+    }
+
+    destroy() {
+        if (this.destroyed) return;
+        this.destroyed = true;
+        clearTimeout(this.debounceTimer);
+        this.eventsController.abort();
+        this.eventsBound = false;
+        this.pendingRefresh = false;
+        this.initialized = false;
+        if (ListManager.instances[this.config.containerId] === this) {
+            delete ListManager.instances[this.config.containerId];
         }
     }
 }
 
 export class AddManager {
-    constructor(config = {}, hooks = {}) {
+    static instances = new Map();
 
-        if (AddManager.instance) {
-            return AddManager.instance;
+    constructor(config = {}, hooks = {}) {
+        const formSelector = config.formSelector;
+
+        if (!formSelector) {
+            throw new Error('AddManager: formSelector obbligatorio.');
         }
-        AddManager.instance = this;
+
+        if (AddManager.instances.has(formSelector)) {
+            return AddManager.instances.get(formSelector);
+        }
 
         this.config = Object.assign({
-            formSelector: '', 
+            formSelector: '',
             url: '',
-            resetSelector: '', 
-            containerId: '', 
-            imagePreviewManager: null,
+            resetSelector: '',
+            containerId: '',
+            imagePreviewManager: null
         }, config);
 
         this.hooks = Object.assign({
@@ -440,72 +444,84 @@ export class AddManager {
             onResetError: null
         }, hooks);
 
-        /* Variabili di stato per prevenire sovrapposizioni e doppi click */
         this.eventsBound = false;
         this.isSubmitting = false;
+        this.destroyed = false;
+
+        this.eventsController = new AbortController();
+
+        AddManager.instances.set(formSelector, this);
     }
 
     init() {
+        if (this.destroyed) return;
+
         this.bindEvents();
     }
 
     bindEvents() {
-        
-        /* Impedisce l'accumulo di listener multipli sul document globale */
-        if (this.eventsBound) return;
+        if (this.eventsBound || this.destroyed) return;
+
         this.eventsBound = true;
 
-        /* Gestione Invio Form tramite delegazione */
+        const signal = this.eventsController.signal;
+
         document.addEventListener('submit', async e => {
-            const formEl = e.target.closest(this.config.formSelector);
-            if ( ! formEl) return;
+            const formEl = e.target;
+
+            if (!(formEl instanceof HTMLFormElement)) return;
+            if (!formEl.matches(this.config.formSelector)) return;
 
             e.preventDefault();
+
+            if (this.isSubmitting) return;
+
             const formData = new FormData(formEl);
+
             await this.add(formData);
-        });
+        }, { signal });
 
-        /* Gestione Submit Form di Reset tramite delegazione */
-        document.addEventListener('submit', async e => {
-            const resetFormEl = e.target.closest(this.config.resetSelector);
-            if ( ! resetFormEl) return;
+        if (this.config.resetSelector) {
+            document.addEventListener('submit', async e => {
+                const resetFormEl = e.target;
 
-            e.preventDefault();
-            const message = resetFormEl.dataset.message;
-            const ok = await askConfirm(message);
-            if ( ! ok) return;
-            await this.reset();
-        });
+                if (!(resetFormEl instanceof HTMLFormElement)) return;
+                if (!resetFormEl.matches(this.config.resetSelector)) return;
+
+                e.preventDefault();
+
+                if (this.isSubmitting) return;
+
+                const message = resetFormEl.dataset.message;
+                const ok = await askConfirm(message);
+
+                if (!ok || this.isSubmitting || this.destroyed) return;
+
+                await this.reset();
+            }, { signal });
+        }
     }
 
     async add(formData) {
+        if (this.destroyed || this.isSubmitting) return;
 
-        /* Blocco esecuzione se c'è già una chiamata in corso */
-        if (this.isSubmitting) return;
         this.isSubmitting = true;
 
-        /* Hook opzionale prima dell'invio */
-        if (typeof this.hooks.onAddBefore === 'function') {
-            const stop = this.hooks.onAddBefore(formData);
-            if (stop === false) {
-                this.isSubmitting = false;
-                return;
-            }
-        }
-
-        /* Se presente, aggiunge le immagini selezionate */
-        if (this.config.imagePreviewManager) {
-            const files = this.config.imagePreviewManager.files;
-            files.forEach(({ id, file }) => {
-                formData.append(`images[${id}]`, file);
-            });
-        }
-
-        /* Pulizia immediata degli errori visivi prima dell'invio */
-        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
-
         try {
-            /* Chiamata POST */
+            if (typeof this.hooks.onAddBefore === 'function') {
+                const stop = await this.hooks.onAddBefore(formData);
+
+                if (stop === false) return;
+            }
+
+            if (this.config.imagePreviewManager) {
+                const files = this.config.imagePreviewManager.files;
+
+                files.forEach(({ id, file }) => {
+                    formData.append(`images[${id}]`, file);
+                });
+            }
+
             const response = await apiFetch(this.config.url, {
                 method: 'POST',
                 body: formData
@@ -513,87 +529,91 @@ export class AddManager {
 
             const data = await response.json();
 
-            /* Gestione Errori di Validazione */
+            document.querySelectorAll('[class^="error_"]').forEach(el => { el.innerHTML = '\u00A0'; });
+
             if (data.errors) {
                 if (typeof handleValidationErrors === 'function') {
                     handleValidationErrors(data.errors);
                 }
-                
-                if (this.config.imagePreviewManager && typeof handleValidationImages === 'function') {
+
+                if (
+                    this.config.imagePreviewManager &&
+                    typeof handleValidationImages === 'function'
+                ) {
                     handleValidationImages(data.errors);
                 }
-                
+
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('danger', data.message);
                 }
-                
+
                 return;
             }
 
-            /* Errore generico gestito dal backend */
             if (data.result === false) {
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
-                return;
-            }
-
-            /* Caso successo */
-            if (data.result === true) {
-
-				/* NUOVO: Sblocca manualmente prima di chiamare il reset */
-                this.isSubmitting = false;
-                
-                /* Esegue il reset attendendo il rendering del DOM prima di sbloccare la sottomissione */
-                await this.reset();
-
-                if (typeof this.hooks.onAddAfter === 'function') {
-                    this.hooks.onAddAfter(data);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
                 }
 
-                if (data.message && typeof showAlert === 'function') showAlert('success', data.message);
+                return;
+            }
+
+            if (data.result === true) {
+                // Reset interno: mantiene il blocco dell'operazione.
+                const resetCompleted = await this.performReset();
+
+                if (resetCompleted && typeof this.hooks.onAddAfter === 'function') {
+                    await this.hooks.onAddAfter(data);
+                }
+
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('success', data.message);
+                }
             }
         } catch (error) {
             if (typeof this.hooks.onAddError === 'function') {
-                this.hooks.onAddError(error);
+                try {
+                    await this.hooks.onAddError(error);
+                } catch (hookError) {
+                    console.error('Errore hook AddManager (add):', hookError);
+                }
             }
-            console.error("Errore AddManager (add):", error);
+
+            console.error('Errore AddManager (add):', error);
         } finally {
-            /* Rilascia il blocco solo adesso, a fine transazione */
             this.isSubmitting = false;
         }
     }
 
     async reset() {
+        if (this.destroyed || this.isSubmitting) return;
 
-        /* Blocco esecuzione se c'è già una chiamata in corso */
-        if (this.isSubmitting) return;
         this.isSubmitting = true;
 
-        /* Hook prima del reset: UNIFORMATO (mantiene stop per interruzione preventiva) */
-        if (typeof this.hooks.onResetBefore === 'function') {
-            const stop = this.hooks.onResetBefore();
-            if (stop === false) {
-                this.isSubmitting = false;
-                return;
-            }
-        }
-
-        if ( ! this.config.resetSelector) {
-            this.isSubmitting = false;
-            return;
-        }
-        
-        const resetForm = document.querySelector(this.config.resetSelector);
-        if ( ! resetForm) {
-            this.isSubmitting = false;
-            return;
-        }
-
-        /* Creazione diretta e pulita: prende sempre i dati dal form */
-        const formData = new FormData(resetForm);
-        formData.append('action', 'reset');
-
         try {
-            /* Chiamata POST */
+            await this.performReset();
+        } finally {
+            this.isSubmitting = false;
+        }
+    }
+
+    async performReset() {
+        try {
+            if (typeof this.hooks.onResetBefore === 'function') {
+                const stop = await this.hooks.onResetBefore();
+
+                if (stop === false) return false;
+            }
+
+            if (!this.config.resetSelector) return false;
+
+            const resetForm = document.querySelector(this.config.resetSelector);
+
+            if (!resetForm) return false;
+
+            const formData = new FormData(resetForm);
+            formData.append('action', 'reset');
+
             const response = await apiFetch(this.config.url, {
                 method: 'POST',
                 body: formData
@@ -601,145 +621,183 @@ export class AddManager {
 
             const data = await response.json();
 
-            /* 2. Gestione fallimento reset */
+            if (data.errors) {
+                if (typeof handleValidationErrors === 'function') {
+                    handleValidationErrors(data.errors);
+                }
+
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
+                return false;
+            }
+
             if (data.result === false) {
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
-                return;
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
+                return false;
             }
 
-            /* 3. Caso successo reset */
             if (data.result === true) {
+                if (!this.destroyed) {
+                    const showDataEl = document.getElementById(this.config.containerId);
 
-                const showDataEl = document.getElementById(this.config.containerId);
-                if (showDataEl && data.output) {
-                    smoothReplace(showDataEl, data.output);
+                    if (showDataEl && data.output) {
+                        smoothReplace(showDataEl, data.output);
+                    }
+
+                    if (this.config.imagePreviewManager) {
+                        this.config.imagePreviewManager.reset();
+                    }
+
+                    if (typeof this.hooks.onResetAfter === 'function') {
+                        await this.hooks.onResetAfter(data);
+                    }
                 }
 
-                /* Struttura Professionale: Al gestore immagini diciamo solo di resettare lo stato interno. */
-                /* Sarà lui, grazie alla delegazione degli eventi, a funzionare immediatamente sul nuovo HTML. */
-                if (this.config.imagePreviewManager) {
-                    this.config.imagePreviewManager.reset();
-                }
-
-                if (typeof this.hooks.onResetAfter === 'function') {
-                    this.hooks.onResetAfter(data);
-                }
+                return true;
             }
 
+            return false;
         } catch (error) {
-
-            /* Hook errore: UNIFORMATO (puro, senza stop/return ridondanti) */
             if (typeof this.hooks.onResetError === 'function') {
-                this.hooks.onResetError(error);
+                try {
+                    await this.hooks.onResetError(error);
+                } catch (hookError) {
+                    console.error('Errore hook AddManager (reset):', hookError);
+                }
             }
-            console.error("Errore AddManager (reset):", error);
-        } finally {
-            
-            /* Rilascia sempre il blocco al termine dell'operazione */
-            this.isSubmitting = false;
+
+            console.error('Errore AddManager (reset):', error);
+
+            return false;
+        }
+    }
+
+    destroy() {
+        if (this.destroyed) return;
+
+        this.destroyed = true;
+        this.eventsController.abort();
+        this.eventsBound = false;
+
+        if (AddManager.instances.get(this.config.formSelector) === this) {
+            AddManager.instances.delete(this.config.formSelector);
         }
     }
 }
 
 export class EditManager {
+    static instances = new Map();
+
     constructor(config = {}, hooks = {}) {
+        const formSelector = config.formSelector;
 
-        if (EditManager.instance) {
-            return EditManager.instance;
+        if (!formSelector) {
+            throw new Error('EditManager: formSelector obbligatorio.');
         }
-        EditManager.instance = this;
 
-        /* Inizializza la configurazione di base con i selettori dinamici */
+        if (EditManager.instances.has(formSelector)) {
+            return EditManager.instances.get(formSelector);
+        }
+
         this.config = Object.assign({
-            formSelector: '', 
+            formSelector: '',
             url: '',
-            refreshSelector: '', 
-            containerId: '', 
+            refreshSelector: '',
+            containerId: '',
             imagePreviewManager: null,
             galleryOneManager: null
         }, config);
 
-        /* Inizializza eventuali callback esterni da eseguire in momenti chiave */
         this.hooks = Object.assign({
             onEditBefore: null,
             onEditAfter: null,
             onEditError: null,
             onRefreshBefore: null,
             onRefreshAfter: null,
-            onRefreshError: null,
+            onRefreshError: null
         }, hooks);
 
-        /* Variabili di stato per la sicurezza */
         this.eventsBound = false;
         this.isSubmitting = false;
+        this.destroyed = false;
+
+        this.eventsController = new AbortController();
+
+        EditManager.instances.set(formSelector, this);
     }
 
     init() {
+        if (this.destroyed) return;
 
-        /* Unico punto di aggancio tramite delegazione globale */
         this.bindEvents();
     }
 
     bindEvents() {
+        if (this.eventsBound || this.destroyed) return;
 
-        /* Impedisce l'accumulo di listener multipli */
-        if (this.eventsBound) return;
         this.eventsBound = true;
 
-        /* Gestione Invio Form Edit tramite delegazione */
+        const signal = this.eventsController.signal;
+
         document.addEventListener('submit', async e => {
-            const formEl = e.target.closest(this.config.formSelector);
-            if (!formEl) return;
+            const formEl = e.target;
+
+            if (!(formEl instanceof HTMLFormElement)) return;
+            if (!formEl.matches(this.config.formSelector)) return;
 
             e.preventDefault();
-            const formData = new FormData(formEl);
-            await this.edit(formData);
-        });
 
-        /* Gestione Submit Form di Refresh (Annulla) tramite delegazione */
-        document.addEventListener('submit', async e => {
-            const refreshFormEl = e.target.closest(this.config.refreshSelector);
-            if (!refreshFormEl) return;
+            if (this.isSubmitting) return;
 
-            e.preventDefault();
-            const message = refreshFormEl.dataset.message;
-            const ok = await askConfirm(message);
-            if ( ! ok) return;
+            await this.edit(new FormData(formEl));
+        }, { signal });
 
-            const formData = new FormData(refreshFormEl);
-            await this.refresh(formData);
-        });
+        if (this.config.refreshSelector) {
+            document.addEventListener('submit', async e => {
+                const formEl = e.target;
+
+                if (!(formEl instanceof HTMLFormElement)) return;
+                if (!formEl.matches(this.config.refreshSelector)) return;
+
+                e.preventDefault();
+
+                if (this.isSubmitting) return;
+
+                const message = formEl.dataset.message;
+                const ok = await askConfirm(message);
+
+                if (!ok || this.isSubmitting || this.destroyed) return;
+
+                await this.refresh(new FormData(formEl));
+            }, { signal });
+        }
     }
 
     async edit(formData) {
+        if (this.destroyed || this.isSubmitting) return;
 
-        /* Se c'è già una richiesta in corso, blocca */
-        if (this.isSubmitting) return;
         this.isSubmitting = true;
 
-        /* Esegue hook personalizzato prima del salvataggio, blocca se ritorna false */
-        if (typeof this.hooks.onEditBefore === 'function') {
-            const stop = this.hooks.onEditBefore(formData);
-            if (stop === false) {
-                this.isSubmitting = false;
-                return;
-            }
-        }
-
-        /* Se presente, aggiunge le immagini dal preview manager */
-        if (this.config.imagePreviewManager) {
-            const files = this.config.imagePreviewManager.files;
-            files.forEach(({ id, file }) => {
-                formData.append(`images[${id}]`, file);
-            });
-        }
-
-        /* Pulizia immediata degli errori visivi prima dell'invio */
-        document.querySelectorAll('[class^="error_"]').forEach(el => el.innerHTML = '\u00A0');
-
         try {
+            if (typeof this.hooks.onEditBefore === 'function') {
+                const stop = await this.hooks.onEditBefore(formData);
 
-            /* Invio al backend */
+                if (stop === false) return;
+            }
+
+            if (this.config.imagePreviewManager) {
+                const files = this.config.imagePreviewManager.files;
+
+                files.forEach(({ id, file }) => {
+                    formData.append(`images[${id}]`, file);
+                });
+            }
+
             const response = await apiFetch(this.config.url, {
                 method: 'POST',
                 body: formData
@@ -747,91 +805,107 @@ export class EditManager {
 
             const data = await response.json();
 
-            /* Visualizza eventuali errori di validazione */
+            document.querySelectorAll('[class^="error_"]').forEach(el => { el.innerHTML = '\u00A0'; });
+
             if (data.errors) {
                 if (typeof handleValidationErrors === 'function') {
                     handleValidationErrors(data.errors);
                 }
-                
-                if (this.config.imagePreviewManager && typeof handleValidationImages === 'function') {
+
+                if (
+                    this.config.imagePreviewManager &&
+                    typeof handleValidationImages === 'function'
+                ) {
                     handleValidationImages(data.errors);
                 }
 
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('danger', data.message);
                 }
-                
+
                 return;
             }
 
-            /* Errore generico gestito dal backend */
             if (data.result === false) {
-                if (typeof showAlert === 'function') showAlert('danger', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
                 return;
             }
 
-            /* Caso positivo: salvataggio riuscito */
             if (data.result === true) {
+                const refreshFormEl = this.config.refreshSelector
+                    ? document.querySelector(this.config.refreshSelector)
+                    : null;
 
-                /* Recupera il form di refresh reale dal DOM per popolare correttamente i dati */
-                const refreshFormEl = document.querySelector(this.config.refreshSelector);
-                const refreshData = refreshFormEl ? new FormData(refreshFormEl) : new FormData();
+                const refreshData = refreshFormEl
+                    ? new FormData(refreshFormEl)
+                    : new FormData();
 
-                /* Se manca l'uuid nei dati del form, lo recupera come fallback */
                 const uuidEl = document.getElementById('uuid');
+
                 if (uuidEl && !refreshData.has('uuid')) {
                     refreshData.append('uuid', uuidEl.value);
                 }
 
-                /* Sblocca manualmente prima di chiamare il refresh */
-                this.isSubmitting = false;
+                // Il refresh interno mantiene attivo il blocco isSubmitting.
+                const refreshCompleted = await this.performRefresh(refreshData);
 
-                /* Esegue il refresh dei dati */
-                await this.refresh(refreshData); 
-
-                /* Hook personalizzato dopo il salvataggio */
-                if (typeof this.hooks.onEditAfter === 'function') {
-                    this.hooks.onEditAfter(data);
+                if (
+                    refreshCompleted &&
+                    typeof this.hooks.onEditAfter === 'function'
+                ) {
+                    await this.hooks.onEditAfter(data);
                 }
 
-                /* Mostra toast di successo */
-                if (typeof showAlert === 'function') showAlert('success', data.message);
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('success', data.message);
+                }
             }
         } catch (error) {
             if (typeof this.hooks.onEditError === 'function') {
-                this.hooks.onEditError(error);
+                try {
+                    await this.hooks.onEditError(error);
+                } catch (hookError) {
+                    console.error('Errore hook EditManager (edit):', hookError);
+                }
             }
-            console.error("Errore EditManager (edit):", error);
+
+            console.error('Errore EditManager (edit):', error);
         } finally {
             this.isSubmitting = false;
         }
     }
 
     async refresh(formData) {
-        
-        /* Se c'è già una richiesta in corso, blocca */
-        if (this.isSubmitting) return;
+        if (this.destroyed || this.isSubmitting) return;
+
         this.isSubmitting = true;
 
-        /* Aggiunge parametro action=refresh per il backend */
-        formData.append('action', 'refresh');
-
-        /* Se manca uuid, lo prende dal DOM */
-        const uuidEl = document.getElementById('uuid');
-        if (uuidEl && !formData.has('uuid')) {
-            formData.append('uuid', uuidEl.value);
-        }
-
-        /* Esegue hook prima del refresh (può bloccare se ritorna false) */
-        if (typeof this.hooks.onRefreshBefore === 'function') {
-            const stop = this.hooks.onRefreshBefore(formData);
-            if (stop === false) {
-                this.isSubmitting = false;
-                return;
-            }
-        }
-
         try {
+            return await this.performRefresh(formData);
+        } finally {
+            this.isSubmitting = false;
+        }
+    }
+
+    async performRefresh(formData) {
+        try {
+            formData.set('action', 'refresh');
+
+            const uuidEl = document.getElementById('uuid');
+
+            if (uuidEl && !formData.has('uuid')) {
+                formData.append('uuid', uuidEl.value);
+            }
+
+            if (typeof this.hooks.onRefreshBefore === 'function') {
+                const stop = await this.hooks.onRefreshBefore(formData);
+
+                if (stop === false) return false;
+            }
+
             const response = await apiFetch(this.config.url, {
                 method: 'POST',
                 body: formData
@@ -839,51 +913,92 @@ export class EditManager {
 
             const data = await response.json();
 
-            /* Caso errore generico */
-            if (data.result === false) {
-                if (typeof showAlert === 'function') showAlert('danger', data.message);
-                return;
+            if (data.errors) {
+                if (typeof handleValidationErrors === 'function') {
+                    handleValidationErrors(data.errors);
+                }
+
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
+                return false;
             }
 
-            /* Caso positivo: rigenera markup e resetta lo stato dei componenti */
+            if (data.result === false) {
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
+                return false;
+            }
+
             if (data.result === true) {
+                if (this.destroyed) return false;
+
                 const showDataEl = document.getElementById(this.config.containerId);
+
                 if (showDataEl && data.output) {
                     smoothReplace(showDataEl, data.output);
                 }
 
-                /* Ripristina lo stato interno del gestore di anteprime per svuotare la coda dei file */
                 if (this.config.imagePreviewManager) {
                     this.config.imagePreviewManager.reset();
                 }
 
-                /* Hook dopo il completamento del refresh */
                 if (typeof this.hooks.onRefreshAfter === 'function') {
-                    this.hooks.onRefreshAfter(data);
+                    await this.hooks.onRefreshAfter(data);
                 }
+
+                return true;
             }
+
+            return false;
         } catch (error) {
             if (typeof this.hooks.onRefreshError === 'function') {
-                this.hooks.onRefreshError(error);
+                try {
+                    await this.hooks.onRefreshError(error);
+                } catch (hookError) {
+                    console.error('Errore hook EditManager (refresh):', hookError);
+                }
             }
-            console.error("Errore EditManager (refresh):", error);
-        } finally {
-            this.isSubmitting = false;
+
+            console.error('Errore EditManager (refresh):', error);
+
+            return false;
+        }
+    }
+
+    destroy() {
+        if (this.destroyed) return;
+
+        this.destroyed = true;
+        this.eventsController.abort();
+        this.eventsBound = false;
+
+        if (EditManager.instances.get(this.config.formSelector) === this) {
+            EditManager.instances.delete(this.config.formSelector);
         }
     }
 }
 
 export class DeleteManager {
-    constructor(config = {}, hooks = {}){
+    static instances = new Map();
 
-        if (DeleteManager.instance) {
-            return DeleteManager.instance;
+    constructor(config = {}, hooks = {}) {
+        const controller = config.controller;
+
+        if (!controller) {
+            throw new Error('DeleteManager: controller obbligatorio.');
         }
-        DeleteManager.instance = this;
+
+        if (DeleteManager.instances.has(controller)) {
+            return DeleteManager.instances.get(controller);
+        }
 
         this.config = Object.assign({
             controller: '',
-            urls: {}, 
+            urls: {},
             listManager: null
         }, config);
 
@@ -895,61 +1010,106 @@ export class DeleteManager {
 
         this.eventsBound = false;
         this.isSubmitting = false;
+        this.destroyed = false;
+
+        this.eventsController = new AbortController();
+
+        DeleteManager.instances.set(controller, this);
     }
 
     init() {
+        if (this.destroyed) return;
+
         this.bindEvents();
     }
 
     bindEvents() {
+        if (this.eventsBound || this.destroyed) return;
 
-        if (this.eventsBound) return;
         this.eventsBound = true;
 
         document.addEventListener('submit', async e => {
+            const formEl = e.target;
 
-            /* Intercetta tutti e tre i form delle azioni */
-            const formEl = e.target.closest('.deleteRecord, .restoreRecord, .hardDeleteRecord');
-            if ( ! formEl) return;
+            if (!(formEl instanceof HTMLFormElement)) return;
+
+            const selector = [
+                '.deleteRecord',
+                '.restoreRecord',
+                '.hardDeleteRecord',
+                '.disconnectSessionRecord'
+            ].join(', ');
+
+            if (!formEl.matches(selector)) return;
+
+            // Se sono presenti più DeleteManager, ogni istanza
+            // deve gestire soltanto i form del proprio controller.
+            const formController = formEl.dataset.controller;
+
+            if (formController && formController !== this.config.controller) {
+                return;
+            }
 
             e.preventDefault();
 
-            const message = formEl.dataset.message;
-            const formData = new FormData(formEl);
+            if (this.isSubmitting || this.destroyed) return;
 
-            /* Instradamento basato sulla classe del form */
             let targetUrl = '';
+
             if (formEl.classList.contains('deleteRecord')) {
                 targetUrl = this.config.urls.softDelete;
             } else if (formEl.classList.contains('restoreRecord')) {
                 targetUrl = this.config.urls.restoreDelete;
             } else if (formEl.classList.contains('hardDeleteRecord')) {
                 targetUrl = this.config.urls.hardDelete;
+            } else if (formEl.classList.contains('disconnectSessionRecord')) {
+                targetUrl = this.config.urls.disconnectSession;
             }
 
-            if ( ! targetUrl) return;
+            if (!targetUrl) return;
 
-            const ok = await askConfirm(message);
-            if (ok) {
-                await this.processAction(targetUrl, formData);
+            // Blocchiamo anche il periodo di attesa della conferma.
+            this.isSubmitting = true;
+
+            try {
+                const message = formEl.dataset.message;
+                const ok = await askConfirm(message);
+
+                if (!ok || this.destroyed) return;
+
+                const formData = new FormData(formEl);
+
+                await this.executeAction(targetUrl, formData);
+            } catch (error) {
+                await this.handleError(error);
+            } finally {
+                this.isSubmitting = false;
             }
+        }, {
+            signal: this.eventsController.signal
         });
     }
 
     async processAction(url, formData) {
+        if (this.destroyed || this.isSubmitting) return;
 
-        if (this.isSubmitting) return;
         this.isSubmitting = true;
 
-        if (typeof this.hooks.onDeleteBefore === 'function') {
-            const stop = this.hooks.onDeleteBefore(formData);
-            if (stop === false) {
-                this.isSubmitting = false; 
-                return;
-            }
-        }
-
         try {
+            await this.executeAction(url, formData);
+        } finally {
+            this.isSubmitting = false;
+        }
+    }
+
+    async executeAction(url, formData) {
+        try {
+            if (typeof this.hooks.onDeleteBefore === 'function') {
+                const stop = await this.hooks.onDeleteBefore(formData);
+
+                if (stop === false) return;
+            }
+
             const response = await apiFetch(url, {
                 method: 'POST',
                 body: formData
@@ -957,35 +1117,58 @@ export class DeleteManager {
 
             const data = await response.json();
 
+            if (data.errors) {
+                if (typeof handleValidationErrors === 'function') {
+                    handleValidationErrors(data.errors);
+                }
+
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
+                return;
+            }
+
             if (data.result === false) {
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('danger', data.message);
                 }
+
                 return;
             }
-
+            
             if (data.result === true) {
-                const listManager = this.config.listManager;
-                
-                const lastItemEl = document.getElementById('lastItemPage');
-                const lastItemPage = lastItemEl ? parseInt(lastItemEl.dataset.lastitempage, 10) : 0;
+                if (this.destroyed) return;
 
-                const currentPage = parseInt(localStorage.getItem(`${this.config.controller}_page`), 10) || 1;
-                
+                const listManager = this.config.listManager;
+
+                const lastItemEl = listManager?.root?.querySelector('.lastItemPage');
+
+                const lastItemPage = lastItemEl
+                    ? parseInt(lastItemEl.dataset.lastitempage, 10)
+                    : 0;
+
+                const storageKey = listManager?.storageKey || this.config.controller;
+                const pageKey = `${storageKey}_page`;
+
+                const currentPage = parseInt(localStorage.getItem(pageKey), 10) || 1;
+
                 if (currentPage > 1 && lastItemPage === 1) {
                     const newPage = currentPage - 1;
-                    localStorage.setItem(`${this.config.controller}_page`, newPage);
-                    if (listManager && listManager.state) {
+
+                    localStorage.setItem(pageKey, String(newPage));
+
+                    if (listManager?.state) {
                         listManager.state.page = newPage;
                     }
                 }
 
                 if (listManager && typeof listManager.showAll === 'function') {
-                    listManager.showAll();
+                    await listManager.showAll();
                 }
 
                 if (typeof this.hooks.onDeleteAfter === 'function') {
-                    this.hooks.onDeleteAfter(data);
+                    await this.hooks.onDeleteAfter(data);
                 }
 
                 if (data.message && typeof showAlert === 'function') {
@@ -994,23 +1177,50 @@ export class DeleteManager {
             }
 
         } catch (error) {
-            if (typeof this.hooks.onDeleteError === 'function') {
-                this.hooks.onDeleteError(error);
+            await this.handleError(error);
+        }
+    }
+
+    async handleError(error) {
+        if (typeof this.hooks.onDeleteError === 'function') {
+            try {
+                await this.hooks.onDeleteError(error);
+            } catch (hookError) {
+                console.error('Errore hook DeleteManager:', hookError);
             }
-            console.error("Errore DeleteManager:", error);
-        } finally {
-            this.isSubmitting = false;
+        }
+
+        console.error('Errore DeleteManager:', error);
+    }
+
+    destroy() {
+        if (this.destroyed) return;
+
+        this.destroyed = true;
+
+        this.eventsController.abort();
+
+        this.eventsBound = false;
+
+        if (DeleteManager.instances.get(this.config.controller) === this) {
+            DeleteManager.instances.delete(this.config.controller);
         }
     }
 }
 
 export class ChangeStatusManager {
-    constructor(config = {}, hooks = {}) {
+    static instances = new Map();
 
-        if (ChangeStatusManager.instance) {
-            return ChangeStatusManager.instance;
+    constructor(config = {}, hooks = {}) {
+        const controller = config.controller;
+
+        if (!controller) {
+            throw new Error('ChangeStatusManager: controller obbligatorio.');
         }
-        ChangeStatusManager.instance = this;
+
+        if (ChangeStatusManager.instances.has(controller)) {
+            return ChangeStatusManager.instances.get(controller);
+        }
 
         this.config = Object.assign({
             controller: '',
@@ -1024,58 +1234,86 @@ export class ChangeStatusManager {
             onStatusError: null
         }, hooks);
 
-        /* NUOVO: Variabili di stato per la sicurezza */
         this.eventsBound = false;
         this.isSubmitting = false;
+        this.destroyed = false;
+
+        this.eventsController = new AbortController();
+
+        ChangeStatusManager.instances.set(controller, this);
     }
 
     init() {
+        if (this.destroyed) return;
+
         this.bindEvents();
     }
 
     bindEvents() {
+        if (this.eventsBound || this.destroyed) return;
 
-        /* NUOVO: Impedisce cloni dei listener */
-        if (this.eventsBound) return;
         this.eventsBound = true;
 
-        /* Gestione dell'invio dei dati (cattura il click sul button type="submit") */
         document.addEventListener('submit', async e => {
-            const formEl = e.target.closest('.changeStatus');
-            if ( ! formEl) return;
+            const formEl = e.target;
 
-            e.preventDefault();
+            if (!(formEl instanceof HTMLFormElement)) return;
+            if (!formEl.matches('.changeStatus')) return;
 
-            const message = formEl.dataset.message;
-            const ok = await askConfirm(message);
+            // Associa il form al controller corretto quando
+            // sono presenti più istanze nella stessa pagina.
+            const formController = formEl.dataset.controller;
 
-            if ( ! ok) {
-
-                /* Se l'utente annulla la conferma, interrompiamo semplicemente il flusso */
+            if (formController && formController !== this.config.controller) {
                 return;
             }
 
-            /* Recuperiamo i dati dal form e li passiamo alla funzione */
-            const formData = new FormData(formEl);
-            await this.changeStatus(formData);
+            e.preventDefault();
+
+            if (this.isSubmitting || this.destroyed) return;
+
+            // Blocca anche la fase di conferma.
+            this.isSubmitting = true;
+
+            try {
+                const message = formEl.dataset.message;
+                const ok = await askConfirm(message);
+
+                if (!ok || this.destroyed) return;
+
+                const formData = new FormData(formEl);
+
+                await this.executeStatusChange(formData);
+            } catch (error) {
+                await this.handleError(error);
+            } finally {
+                this.isSubmitting = false;
+            }
+        }, {
+            signal: this.eventsController.signal
         });
     }
 
     async changeStatus(formData) {
+        if (this.destroyed || this.isSubmitting) return;
 
-        /* NUOVO: Se c'è già una richiesta in corso, blocca */
-        if (this.isSubmitting) return;
         this.isSubmitting = true;
 
-        if (typeof this.hooks.onStatusBefore === 'function') {
-            const stop = this.hooks.onStatusBefore(formData);
-            if (stop === false) {
-                this.isSubmitting = false; /* <--- NUOVO RILASCIO */
-                return;
-            }
-        }
-
         try {
+            await this.executeStatusChange(formData);
+        } finally {
+            this.isSubmitting = false;
+        }
+    }
+
+    async executeStatusChange(formData) {
+        try {
+            if (typeof this.hooks.onStatusBefore === 'function') {
+                const stop = await this.hooks.onStatusBefore(formData);
+
+                if (stop === false) return;
+            }
+
             const response = await apiFetch(this.config.url, {
                 method: 'POST',
                 body: formData
@@ -1083,47 +1321,85 @@ export class ChangeStatusManager {
 
             const data = await response.json();
 
-             /* Gestione fallimento logico generico */
-            if (data.result === false) {
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+            if (data.errors) {
+                if (typeof handleValidationErrors === 'function') {
+                    handleValidationErrors(data.errors);
+                }
+
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
                 return;
             }
 
-            /* Caso successo */
+            if (data.result === false) {
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
+                return;
+            }
+
             if (data.result === true) {
+                if (this.destroyed) return;
 
                 if (typeof this.hooks.onStatusAfter === 'function') {
-                    this.hooks.onStatusAfter(data);
+                    await this.hooks.onStatusAfter(data);
                 }
 
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('success', data.message);
                 }
             }
-
         } catch (error) {
-            if (typeof this.hooks.onStatusError === 'function') {
-                this.hooks.onStatusError(error);
+            await this.handleError(error);
+        }
+    }
+
+    async handleError(error) {
+        if (typeof this.hooks.onStatusError === 'function') {
+            try {
+                await this.hooks.onStatusError(error);
+            } catch (hookError) {
+                console.error('Errore hook ChangeStatusManager:', hookError);
             }
-            console.error("Errore ChangeStatusManager:", error);
-        } finally {
-            /* NUOVO: Rilascia sempre il blocco */
-            this.isSubmitting = false;
+        }
+
+        console.error('Errore ChangeStatusManager:', error);
+    }
+
+    destroy() {
+        if (this.destroyed) return;
+
+        this.destroyed = true;
+        this.eventsController.abort();
+        this.eventsBound = false;
+
+        if (ChangeStatusManager.instances.get(this.config.controller) === this) {
+            ChangeStatusManager.instances.delete(this.config.controller);
         }
     }
 }
 
 export class GeneralDataManager {
-    constructor(config = {}, hooks = {}) {
+    static instances = new Map();
 
-        if (GeneralDataManager.instance) {
-            return GeneralDataManager.instance;
+    constructor(config = {}, hooks = {}) {
+        const formSelector = config.formSelector;
+
+        if (!formSelector) {
+            throw new Error('GeneralDataManager: formSelector obbligatorio.');
         }
-        GeneralDataManager.instance = this;
+
+        if (GeneralDataManager.instances.has(formSelector)) {
+            return GeneralDataManager.instances.get(formSelector);
+        }
 
         this.config = Object.assign({
-            url: '', 
-            formSelector: ''
+            url: '',
+            formSelector: '',
+            containerId: 'generalData'
         }, config);
 
         this.hooks = Object.assign({
@@ -1132,46 +1408,54 @@ export class GeneralDataManager {
             onGeneralDataError: null
         }, hooks);
 
-        /* NUOVO: Variabili di stato per la sicurezza */
         this.eventsBound = false;
         this.isSubmitting = false;
+        this.destroyed = false;
+
+        this.eventsController = new AbortController();
+
+        GeneralDataManager.instances.set(formSelector, this);
     }
 
     init() {
+        if (this.destroyed) return;
+
         this.bindEvents();
     }
 
     bindEvents() {
+        if (this.eventsBound || this.destroyed) return;
 
-        /* NUOVO: Impedisce cloni dei listener */
-        if (this.eventsBound) return;
         this.eventsBound = true;
 
         document.addEventListener('submit', async e => {
-            if ( ! e.target.matches(this.config.formSelector)) return;
+            const formEl = e.target;
+
+            if (!(formEl instanceof HTMLFormElement)) return;
+            if (!formEl.matches(this.config.formSelector)) return;
 
             e.preventDefault();
-            const formData = new FormData(e.target);
 
-            await this.getGeneralData(formData);
+            if (this.isSubmitting || this.destroyed) return;
+
+            await this.getGeneralData(new FormData(formEl));
+        }, {
+            signal: this.eventsController.signal
         });
     }
 
     async getGeneralData(formData) {
-        
-        /* NUOVO: Se c'è già una richiesta in corso, blocca */
-        if (this.isSubmitting) return;
+        if (this.destroyed || this.isSubmitting) return;
+
         this.isSubmitting = true;
 
-        if (typeof this.hooks.onGeneralDataBefore === 'function') {
-            const stop = this.hooks.onGeneralDataBefore(formData);
-            if (stop === false) {
-                this.isSubmitting = false; /* <--- NUOVO RILASCIO */
-                return;
-            }
-        }
-
         try {
+            if (typeof this.hooks.onGeneralDataBefore === 'function') {
+                const stop = await this.hooks.onGeneralDataBefore(formData);
+
+                if (stop === false) return;
+            }
+
             const response = await apiFetch(this.config.url, {
                 method: 'POST',
                 body: formData
@@ -1179,53 +1463,92 @@ export class GeneralDataManager {
 
             const data = await response.json();
 
-            /* Gestione fallimento logico generico */
-            if (data.result === false) {
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+            if (data.errors) {
+                if (typeof handleValidationErrors === 'function') {
+                    handleValidationErrors(data.errors);
+                }
+
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
                 return;
             }
 
-            /* Caso successo */
+            if (data.result === false) {
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
+                return;
+            }
+
             if (data.result === true) {
-               
-               const generalDataEl = document.getElementById('generalData');
+                if (this.destroyed) return;
+
+                const generalDataEl = document.getElementById(
+                    this.config.containerId
+                );
+
                 if (generalDataEl && data.output) {
                     smoothReplace(generalDataEl, data.output);
                 }
 
                 if (typeof this.hooks.onGeneralDataAfter === 'function') {
-                    this.hooks.onGeneralDataAfter(data);
+                    await this.hooks.onGeneralDataAfter(data);
                 }
 
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('success', data.message);
                 }
             }
-
         } catch (error) {
             if (typeof this.hooks.onGeneralDataError === 'function') {
-                this.hooks.onGeneralDataError(error);
+                try {
+                    await this.hooks.onGeneralDataError(error);
+                } catch (hookError) {
+                    console.error(
+                        'Errore hook GeneralDataManager:',
+                        hookError
+                    );
+                }
             }
-            console.error("Errore GeneralDataManager:", error);
-        } finally {
 
-            /* NUOVO: Rilascia sempre il blocco */
+            console.error('Errore GeneralDataManager:', error);
+        } finally {
             this.isSubmitting = false;
+        }
+    }
+
+    destroy() {
+        if (this.destroyed) return;
+
+        this.destroyed = true;
+        this.eventsController.abort();
+        this.eventsBound = false;
+
+        if (
+            GeneralDataManager.instances.get(this.config.formSelector) === this
+        ) {
+            GeneralDataManager.instances.delete(this.config.formSelector);
         }
     }
 }
 
 export class MetaDataManager {
-    constructor(config = {}, hooks = {}) {
+    static instances = new Map();
 
-        if (MetaDataManager.instance) {
-            return MetaDataManager.instance;
+    constructor(config = {}, hooks = {}) {
+        const formSelector = config.formSelector || '#getMetaData';
+
+        if (MetaDataManager.instances.has(formSelector)) {
+            return MetaDataManager.instances.get(formSelector);
         }
-        MetaDataManager.instance = this;
-        
+
         this.config = Object.assign({
-            url: '', 
-            formSelector: '#getMetaData'
+            url: '',
+            formSelector: '#getMetaData',
+            containerId: 'metaData'
         }, config);
 
         this.hooks = Object.assign({
@@ -1234,45 +1557,54 @@ export class MetaDataManager {
             onMetaDataError: null
         }, hooks);
 
-        /* NUOVO: Variabili di stato per la sicurezza */
         this.eventsBound = false;
         this.isSubmitting = false;
+        this.destroyed = false;
+
+        this.eventsController = new AbortController();
+
+        MetaDataManager.instances.set(formSelector, this);
     }
 
     init() {
+        if (this.destroyed) return;
+
         this.bindEvents();
     }
 
     bindEvents() {
+        if (this.eventsBound || this.destroyed) return;
 
-        /* NUOVO: Impedisce cloni dei listener */
-        if (this.eventsBound) return;
         this.eventsBound = true;
 
         document.addEventListener('submit', async e => {
-            if ( ! e.target.matches(this.config.formSelector)) return;
+            const formEl = e.target;
+
+            if (!(formEl instanceof HTMLFormElement)) return;
+            if (!formEl.matches(this.config.formSelector)) return;
+
             e.preventDefault();
 
-            const formData = new FormData(e.target);
-            await this.getMetaData(formData);
+            if (this.isSubmitting || this.destroyed) return;
+
+            await this.getMetaData(new FormData(formEl));
+        }, {
+            signal: this.eventsController.signal
         });
     }
 
     async getMetaData(formData) {
-        
-        /* NUOVO: Se c'è già una richiesta in corso, blocca */
-        if (this.isSubmitting) return;
+        if (this.destroyed || this.isSubmitting) return;
+
         this.isSubmitting = true;
 
-        if (typeof this.hooks.onMetaDataBefore === 'function') {
-            const stop = this.hooks.onMetaDataBefore(formData);
-            if (stop === false) {
-                this.isSubmitting = false; /* <--- NUOVO RILASCIO */
-                return;
-            }
-        }
-
         try {
+            if (typeof this.hooks.onMetaDataBefore === 'function') {
+                const stop = await this.hooks.onMetaDataBefore(formData);
+
+                if (stop === false) return;
+            }
+
             const response = await apiFetch(this.config.url, {
                 method: 'POST',
                 body: formData
@@ -1280,34 +1612,65 @@ export class MetaDataManager {
 
             const data = await response.json();
 
-            /* Gestione fallimento logico generico */
-            if (data.result === false) {
-                if (data.message && typeof showAlert === 'function') showAlert('danger', data.message);
+            if (data.errors) {
+                if (typeof handleValidationErrors === 'function') {
+                    handleValidationErrors(data.errors);
+                }
+
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
                 return;
             }
 
-            /* Caso successo */
+            if (data.result === false) {
+                if (data.message && typeof showAlert === 'function') {
+                    showAlert('danger', data.message);
+                }
+
+                return;
+            }
+
             if (data.result === true) {
-                
-                /* Gestione del DOM interna come concordato per elementi ad ID fisso */
-                const metaDataEl = document.getElementById('metaData');
+                if (this.destroyed) return;
+
+                const metaDataEl = document.getElementById(
+                    this.config.containerId
+                );
+
                 if (metaDataEl && data.output) {
-                    smoothReplace(metaDataEl, data.output);
+                    await smoothReplace(metaDataEl, data.output);
                 }
 
                 if (typeof this.hooks.onMetaDataAfter === 'function') {
-                    this.hooks.onMetaDataAfter(data);
+                    await this.hooks.onMetaDataAfter(data);
+                }
+            }
+        } catch (error) {
+            if (typeof this.hooks.onMetaDataError === 'function') {
+                try {
+                    await this.hooks.onMetaDataError(error);
+                } catch (hookError) {
+                    console.error('Errore hook MetaDataManager:', hookError);
                 }
             }
 
-        } catch (error) {
-            if (typeof this.hooks.onMetaDataError === 'function') {
-                this.hooks.onMetaDataError(error);
-            }
-            console.error("Errore MetaDataManager:", error);
+            console.error('Errore MetaDataManager:', error);
         } finally {
-            /* NUOVO: Rilascia sempre il blocco */
             this.isSubmitting = false;
+        }
+    }
+
+    destroy() {
+        if (this.destroyed) return;
+
+        this.destroyed = true;
+        this.eventsController.abort();
+        this.eventsBound = false;
+
+        if (MetaDataManager.instances.get(this.config.formSelector) === this) {
+            MetaDataManager.instances.delete(this.config.formSelector);
         }
     }
 }

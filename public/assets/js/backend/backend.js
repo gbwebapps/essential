@@ -6,6 +6,7 @@ export const urlbase = document.getElementById('hidden-urlbase').dataset.urlbase
 export const langDefinitions = document.getElementById('lang-definitions');
 
 import { ExportPdfManager } from './modules/ExportPdf.js';
+import { PasswordVisibility } from './modules/PasswordVisibility.js';
 
 /* Scrollup */
 window.addEventListener('scroll', function() {
@@ -31,6 +32,9 @@ document.addEventListener('click', function(e) {
 /* Avvio del gestore PDF al caricamento della pagina */
 new ExportPdfManager();
 
+/* Avvio del gestore Mostra/Nascondi password al caricamento della pagina */
+new PasswordVisibility();
+
 /* Listener globale per il pulsante di stampa */
 document.addEventListener('click', (e) => {
     const printBtn = e.target.closest('#show-print-button');
@@ -44,18 +48,24 @@ document.addEventListener('click', (e) => {
 /* --- Gestione globale Loader e Controlli --- */
 export function toggleLoader(show) {
     const loader = document.getElementById('show-loader');
-    if ( ! loader) return;
 
     if (show) {
-        loader.style.display = 'block';
-        loader.innerHTML = `<img src="${urlbase}assets/img/squares_wave.gif" alt="">`;
+        if (loader) {
+            loader.style.display = 'block';
+            loader.innerHTML = `<img src="${urlbase}assets/img/squares_wave.gif" alt="">`;
+        }
+
         disableAllControls();
     } else {
-        loader.style.display = 'none';
-        loader.innerHTML = '';
+        if (loader) {
+            loader.style.display = 'none';
+            loader.innerHTML = '';
+        }
+
         enableAllControls();
     }
 }
+
 
 /* Coda di esecuzione per evitare Race Conditions sulle chiamate simultanee */
 let fetchQueue = Promise.resolve();
@@ -193,24 +203,36 @@ function enableLinks() {
 /* Funzione per disabilitare tutti gli elementi di un form durante lka chiamata ajax */
 function disableAllControls() {
     const controls = document.querySelectorAll('input, select, textarea, button');
+
     controls.forEach(el => {
-        if (!el.classList.contains('no-general-disabled')) {
-            el.disabled = true;
-        }
+        if (el.classList.contains('no-general-disabled')) return;
+
+        // Conserva lo stato originale prima di disabilitare.
+        el.dataset.wasDisabled = el.disabled ? 'true' : 'false';
+
+        el.disabled = true;
     });
+
     disableLinks();
 }
 
 /* Funzione per abilitare tutti gli elementi di un form durante la chiamata ajax */
 function enableAllControls() {
     const controls = document.querySelectorAll('input, select, textarea, button');
+
     controls.forEach(el => {
-        if (!el.classList.contains('no-general-disabled')) {
-            el.disabled = false;
+        if (el.classList.contains('no-general-disabled')) return;
+
+        // Ripristina lo stato precedente alla richiesta AJAX.
+        if (el.dataset.wasDisabled !== undefined) {
+            el.disabled = el.dataset.wasDisabled === 'true';
+            delete el.dataset.wasDisabled;
         }
     });
+
     enableLinks();
 }
+
 
 /* Funzione per gestire gli errori di validazione */
 export function handleValidationErrors(errors) {
@@ -403,30 +425,42 @@ export async function askConfirm(message) {
     });
 }
 
-export function smoothReplace(container, newHtml) {
-    if ( ! container) return;
+const smoothReplaceTimers = new WeakMap();
 
-    /* Se l'HTML è vuoto, facciamo un fade-out prima di svuotare */
+export function smoothReplace(container, newHtml) {
+    if (!container) return;
+
+    // Annulla un eventuale svuotamento precedente.
+    const previousTimer = smoothReplaceTimers.get(container);
+
+    if (previousTimer !== undefined) {
+        clearTimeout(previousTimer);
+        smoothReplaceTimers.delete(container);
+    }
+
     if (newHtml === '') {
         container.style.transition = 'opacity 0.25s ease-in-out';
         container.style.opacity = '0';
-        
-        setTimeout(() => {
+
+        const timer = setTimeout(() => {
+            smoothReplaceTimers.delete(container);
+
             container.innerHTML = '';
             container.style.transition = '';
             container.style.opacity = '';
         }, 250);
+
+        smoothReplaceTimers.set(container, timer);
         return;
     }
 
-    /* Comportamento normale: fade-in del nuovo contenuto */
     container.style.transition = 'none';
     container.style.opacity = '0';
-    
+
     container.innerHTML = newHtml;
-    
-    container.offsetHeight; /* Forza il reflow */
-    
+
+    container.offsetHeight;
+
     container.style.transition = 'opacity 0.25s ease-in-out';
     container.style.opacity = '1';
 }
