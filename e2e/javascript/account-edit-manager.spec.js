@@ -99,6 +99,47 @@ test('Account EditManager gestisce la validazione e aggiorna account e navbar', 
 });
 
 
+test('Account EditManager mostra solo l alert se cambia email senza password corrente', async ({ page }) => {
+    await page.goto(pageUrl);
+    await expect(page).toHaveURL(/\/backend\/account\/edit\/?$/);
+
+    let requests = 0;
+
+    await page.route('**/backend/account/edit', async route => {
+        if (route.request().method() === 'POST') {
+            requests++;
+        }
+
+        await route.continue();
+    });
+
+    await page.evaluate(async path => {
+        const { EditManager } = await import(path);
+
+        EditManager.instance?.destroy();
+
+        const manager = new EditManager();
+        manager.init();
+
+        const form = document.getElementById('account-edit');
+        const emailInput = form.querySelector('[name="email"]');
+        const passwordInput = form.querySelector('[name="currentPassword"]');
+
+        emailInput.value = 'nuova-email-e2e@example.com';
+        passwordInput.value = '';
+
+        form.dispatchEvent(new Event('submit', {
+            bubbles: true,
+            cancelable: true
+        }));
+    }, modulePath);
+
+    expect(requests).toBe(0);
+    await expect(page.locator('#account-edit .error_currentPassword')).toHaveText('\u00A0');
+    await expect(page.locator('#alert-container [role="alert"]')).toContainText('Inserisci la password corrente.');
+});
+
+
 test('Account EditManager blocca operazioni duplicate durante il refresh', async ({ page }) => {
     await page.goto(pageUrl);
     await expect(page).toHaveURL(/\/backend\/account\/edit\/?$/);

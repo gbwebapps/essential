@@ -13,7 +13,7 @@ class SessionTest extends CIUnitTestCase
         $defaults = (new ReflectionClass(Session::class))->getDefaultProperties();
 
         $this->assertSame(FileHandler::class, $defaults['driver']);
-        $this->assertSame('ci_session', $defaults['cookieName']);
+        $this->assertSame('essential_session', $defaults['cookieName']);
         $this->assertSame(7200, $defaults['expiration']);
         $this->assertSame(WRITEPATH . 'session', $defaults['savePath']);
         $this->assertFalse($defaults['matchIP']);

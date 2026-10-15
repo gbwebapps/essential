@@ -12,9 +12,9 @@ class CookieTest extends CIUnitTestCase
 
         $this->assertSame('', $config->prefix);
         $this->assertSame(0, $config->expires);
-        $this->assertSame('/', $config->path);
+        $this->assertSame('/essential/', $config->path);
         $this->assertSame('', $config->domain);
-        $this->assertFalse($config->secure);
+        $this->assertTrue($config->secure);
         $this->assertTrue($config->httponly);
         $this->assertSame('Lax', $config->samesite);
         $this->assertFalse($config->raw);

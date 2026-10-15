@@ -1,5 +1,6 @@
 /* Import delle utility risalendo di un livello */
 import { urlbase, apiFetch, showAlert, handleValidationErrors } from '../backend.js';
+import { initOtpCountdown } from '../components/OtpCountdown.js';
 
 export class LoginManager {
     constructor(hooks = {}) {
@@ -416,6 +417,7 @@ export class VerifyManager {
         this.eventsBound = false;
         this.isSubmitting = false;
         this.destroyed = false;
+        this.otpCountdown = null;
 
         this.eventsController = new AbortController();
     }
@@ -427,6 +429,7 @@ export class VerifyManager {
         if (!form) return;
 
         this.eventsBound = true;
+        this.otpCountdown = initOtpCountdown(form);
 
         form.addEventListener('submit', async e => {
             e.preventDefault();
@@ -518,6 +521,8 @@ export class VerifyManager {
         this.destroyed = true;
         this.eventsController.abort();
         this.eventsBound = false;
+        this.otpCountdown?.stop();
+        this.otpCountdown = null;
 
         if (VerifyManager.instance === this) {
             VerifyManager.instance = null;

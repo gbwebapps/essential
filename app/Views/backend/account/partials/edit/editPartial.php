@@ -49,7 +49,7 @@
 						<button class="btn btn-secondary bg-white border toggle-password-visibility" type="button" aria-label="<?= esc(lang('backend/account.buttons.showPassword'), 'attr'); ?>" aria-pressed="false">
 							<i class="fa-solid fa-eye text-muted"></i>
 						</button>
-						<input type="password" id="currentPassword" name="currentPassword" class="form-control" autocomplete="current-password" placeholder="<?= esc(lang('backend/account.placeholders.currentPassword'), 'attr'); ?>">
+						<input type="password" id="currentPassword" name="currentPassword" class="form-control" autocomplete="current-password" data-required-message="<?= esc(lang('backend/account.errors.currentPasswordRequired'), 'attr'); ?>" placeholder="<?= esc(lang('backend/account.placeholders.currentPassword'), 'attr'); ?>">
 					</div>
 					<div class="form-text"><?= lang('backend/account.labels.currentPasswordEmailHelp'); ?></div>
 					<div class="error_currentPassword text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>

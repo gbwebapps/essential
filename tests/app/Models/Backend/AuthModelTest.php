@@ -131,14 +131,19 @@ final class AuthModelTest extends CIUnitTestCase
 
     public function testValidateLoginRulesExposeEmailAndPasswordSecurityRules(): void
     {
-        $model = $this->createModel($this->createMock(BaseConnection::class));
+        $passwordRegex = '/^PasswordSicura1!$/';
+        $model = $this->createModel(
+            $this->createMock(BaseConnection::class),
+            ['passwordRegex' => $passwordRegex]
+        );
 
         $rules = $model->validateLoginRules();
 
         $this->assertSame(['email', 'password'], array_keys($rules));
         $this->assertContains('valid_email', $rules['email']['rules']);
-        $this->assertContains('max_length[255]', $rules['password']['rules']);
-        $this->assertNotContains('regex_match[/.*/]', $rules['password']['rules']);
+        $this->assertContains('required', $rules['password']['rules']);
+        $this->assertContains("regex_match[{$passwordRegex}]", $rules['password']['rules']);
+        $this->assertNotContains('max_length[255]', $rules['password']['rules']);
     }
 
     public function testValidateResetPasswordRulesRequireValidEmail(): void
@@ -754,6 +759,32 @@ final class AuthModelTest extends CIUnitTestCase
         $db->expects($this->once())->method('query')->willThrowException(new \RuntimeException('read failure'));
 
         $this->assertFalse($this->createModel($db)->checkAuthToken('activation-token'));
+    }
+
+    public function testGetEmailOtpExpiresAtReturnsStoredExpiration(): void
+    {
+        $expiresAt = date('Y-m-d H:i:s', time() + 60);
+        $db = $this->createMock(BaseConnection::class);
+
+        $db->expects($this->once())->method('query')->with(
+            'select expires_at from admins_2fa_codes where admin_uuid = ? order by id desc limit 1',
+            [self::UUID]
+        )->willReturn($this->dbResult((object) ['expires_at' => $expiresAt]));
+
+        $result = $this->createModel($db)->getEmailOtpExpiresAt(self::UUID);
+
+        $this->assertSame(strtotime($expiresAt), $result);
+    }
+
+    public function testGetEmailOtpExpiresAtReturnsNullWithoutCode(): void
+    {
+        $db = $this->createMock(BaseConnection::class);
+
+        $db->expects($this->once())->method('query')->willReturn($this->dbResult(null));
+
+        $result = $this->createModel($db)->getEmailOtpExpiresAt(self::UUID);
+
+        $this->assertNull($result);
     }
 
     public function testVerifyFailsBeforeDatabaseAccessWhenPendingSessionIsMissing(): void

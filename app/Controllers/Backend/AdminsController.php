@@ -19,6 +19,20 @@ use App\Models\Backend\Components\GalleryOneModel;
  */
 class AdminsController extends BackendController 
 {
+	/**
+	 * Restituisce esclusivamente i file realmente inviati, escludendo il placeholder generato dal campo file vuoto.
+	 *
+	 * @return array<int, \CodeIgniter\HTTP\Files\UploadedFile> File ricevuti dalla richiesta
+	 */
+	private function getUploadedImages(): array
+	{
+		$images = $this->request->getFileMultiple('images') ?? [];
+
+		return array_values(array_filter($images, static function ($image): bool {
+			return $image->getError() !== UPLOAD_ERR_NO_FILE;
+		}));
+	}
+
 	private function targetAccessError(array $record): ?ResponseInterface
 	{
 		if ($record['result'] === false):
@@ -160,7 +174,7 @@ class AdminsController extends BackendController
 
         if ($this->request->isAJAX() && $this->request->is('post')):
 
-            $posts = array_merge($this->request->getPost(), ['images' => $this->request->getFileMultiple('images') ?? []]);
+            $posts = array_merge($this->request->getPost(), ['images' => $this->getUploadedImages()]);
 
             if (isset($posts['action']) && $posts['action'] === 'reset'):
                 return $this->jsonResponse(['result' => true,'output' => view('backend/admins/partials/add/addPartial', $this->data)]);
@@ -210,7 +224,7 @@ class AdminsController extends BackendController
 
         if ($this->request->isAJAX() && $this->request->is('post')):
 
-            $posts = array_merge($this->request->getPost(), ['images' => $this->request->getFileMultiple('images') ?? []]);
+            $posts = array_merge($this->request->getPost(), ['images' => $this->getUploadedImages()]);
 
             if(( ! isset($posts['uuid'])) || ( ! $this->regexp->validateUUID($posts['uuid']))):
                 return $this->jsonResponse(['result' => false, 'message' => lang('backend/admins.errors.uuid')]);

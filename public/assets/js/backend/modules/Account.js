@@ -1,5 +1,6 @@
 /* Import delle utility risalendo di un livello */
 import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace, handleValidationErrors } from '../backend.js';
+import { initOtpCountdown } from '../components/OtpCountdown.js';
 
 // Recupera la password corrente e gestisce localmente il campo obbligatorio.
 function readCurrentPassword(input) {
@@ -8,8 +9,12 @@ function readCurrentPassword(input) {
     if (input.value === '') {
         const message = input.dataset.requiredMessage || '';
 
-        if (message && typeof handleValidationErrors === 'function') {
-            handleValidationErrors({ currentPassword: message });
+        const scope = input.closest('form, .card-body') || document;
+        const errorElement = scope.querySelector('.error_currentPassword');
+
+        if (errorElement) {
+            errorElement.textContent = '\u00A0';
+            delete errorElement.dataset.validationAlertToken;
         }
 
         if (message && typeof showAlert === 'function') {
@@ -102,6 +107,14 @@ export class EditManager {
             e.preventDefault();
 
             if (this.isSubmitting || this.destroyed) return;
+
+            const emailInput = formEl.querySelector('[name="email"]');
+
+            if (
+                emailInput instanceof HTMLInputElement
+                && emailInput.value.trim().toLowerCase() !== emailInput.defaultValue.trim().toLowerCase()
+                && readCurrentPassword(formEl.querySelector('[name="currentPassword"]')) === null
+            ) return;
 
             await this.edit(new FormData(formEl));
         }, { signal });
@@ -983,6 +996,7 @@ export class SecurityManager {
         this.isSubmitting = false;
         this.setupPending = false;
         this.destroyed = false;
+        this.otpCountdown = null;
 
         this.eventsController = new AbortController();
 
@@ -999,6 +1013,12 @@ export class SecurityManager {
         if (this.destroyed) return;
 
         this.bindEvents();
+    }
+
+    // Arresta e scollega l'eventuale countdown TOTP attivo.
+    stopOtpCountdown() {
+        this.otpCountdown?.stop();
+        this.otpCountdown = null;
     }
 
     bindEvents() {
@@ -1026,6 +1046,7 @@ export class SecurityManager {
                     const wrapper = document.getElementById(this.wrapperId);
 
                     if (wrapper) {
+                        this.stopOtpCountdown();
                         await smoothReplace(wrapper, '');
                     }
 
@@ -1103,6 +1124,7 @@ export class SecurityManager {
                     const wrapper = document.getElementById(this.wrapperId);
 
                     if (wrapper) {
+                        this.stopOtpCountdown();
                         await smoothReplace(wrapper, '');
                     }
                 } finally {
@@ -1222,6 +1244,7 @@ export class SecurityManager {
         const wrapper = document.getElementById(this.wrapperId);
 
         if (wrapper) {
+            this.stopOtpCountdown();
             await smoothReplace(wrapper, '');
         }
 
@@ -1252,6 +1275,7 @@ export class SecurityManager {
             const wrapper = document.getElementById(this.wrapperId);
 
             if (wrapper) {
+                this.stopOtpCountdown();
                 await smoothReplace(wrapper, '');
             }
 
@@ -1303,6 +1327,9 @@ export class SecurityManager {
         await smoothReplace(wrapper, data.output);
 
         if (this.destroyed) return false;
+
+        this.stopOtpCountdown();
+        this.otpCountdown = initOtpCountdown(wrapper);
 
         // Ora il setup è disponibile per conferma o annullamento.
         this.setupPending = true;
@@ -1369,6 +1396,7 @@ export class SecurityManager {
         const wrapper = document.getElementById(this.wrapperId);
 
         if (wrapper) {
+            this.stopOtpCountdown();
             await smoothReplace(wrapper, '');
         }
 
@@ -1462,6 +1490,7 @@ export class SecurityManager {
 
         this.destroyed = true;
         this.eventsController.abort();
+        this.stopOtpCountdown();
 
         this.setupPending = false;
         this.eventsBound = false;

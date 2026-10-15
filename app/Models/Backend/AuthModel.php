@@ -79,8 +79,8 @@ class AuthModel extends BackendModel
     /**
      * Regole di validazione per il form di Login.
      * 
-     * Verifica che l'email sia in un formato valido e che la password sia presente entro la lunghezza massima.
-     * La validità effettiva della credenziale viene determinata dal confronto con l'hash memorizzato.
+     * Verifica che l'email sia in un formato valido e che la password rispetti la policy configurata.
+     * La validità effettiva della credenziale viene poi determinata dal confronto con l'hash memorizzato.
      *
      * @return array Regole native di CodeIgniter
      */
@@ -93,7 +93,7 @@ class AuthModel extends BackendModel
             ], 
             'password' => [
                 'label' => 'Password',
-                'rules' => ['required', 'max_length[255]'],
+                'rules' => ['required', "regex_match[{$this->config->passwordRegex}]"],
             ]
         ];
     }
@@ -991,6 +991,26 @@ class AuthModel extends BackendModel
             log_message('error', lang('backend/auth.messages.AuthTokenError') . ' - ' . $e);
             return false;
         }
+    }
+
+    /**
+     * Recupera la scadenza Unix dell'ultimo codice OTP email generato per l'amministratore.
+     *
+     * @param string $adminUuid Identificatore univoco dell'amministratore
+     * @return int|null Timestamp Unix della scadenza oppure null se il codice non è disponibile
+     */
+    public function getEmailOtpExpiresAt(string $adminUuid): ?int
+    {
+        $sql = "select expires_at from admins_2fa_codes where admin_uuid = ? order by id desc limit 1";
+        $row = $this->db->query($sql, [$adminUuid])->getRow();
+
+        if ( ! $row || empty($row->expires_at)):
+            return null;
+        endif;
+
+        $expiresAt = strtotime((string) $row->expires_at);
+
+        return $expiresAt !== false ? $expiresAt : null;
     }
 
     /**

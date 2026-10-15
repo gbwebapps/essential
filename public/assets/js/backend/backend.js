@@ -234,11 +234,21 @@ function enableAllControls() {
 }
 
 
+let validationErrorToken = 0;
+
 /* Funzione per gestire gli errori di validazione */
 export function handleValidationErrors(errors) {
+    const token = String(++validationErrorToken);
+
+    /* Scollega gli errori dal precedente alert senza modificarne il contenuto. */
+    document.querySelectorAll('[data-validation-alert-token]').forEach(el => {
+        delete el.dataset.validationAlertToken;
+    });
+
     Object.entries(errors).forEach(([key, value]) => {
         document.querySelectorAll('.error_' + key).forEach(el => {
             el.textContent = value;
+            el.dataset.validationAlertToken = token;
             // el.classList.add('error-show'); // fade-in
         });
     });
@@ -323,6 +333,14 @@ export function showAlert(type, message, customIcon = '')
     const alertContainer = document.getElementById('alert-container');
     if ( ! alertContainer) return;
 
+    /* Memorizza esclusivamente gli errori di validazione associati a questo alert. */
+    const validationErrors = Array.from(
+        document.querySelectorAll('[data-validation-alert-token]')
+    ).map(element => ({
+        element,
+        token: element.dataset.validationAlertToken
+    }));
+
     /* Cerca l'alert di sessione PHP e lo rimuove dal DOM se presente */
     const sessionAlert = document.querySelector('.alert-session');
     if (sessionAlert) {
@@ -339,8 +357,16 @@ export function showAlert(type, message, customIcon = '')
     alertContainer.appendChild(currentAlert);
 
     currentAlert.addEventListener('closed.bs.alert', function () {
+        validationErrors.forEach(({ element, token }) => {
+            /* Non cancella un eventuale errore più recente sullo stesso campo. */
+            if (element.dataset.validationAlertToken !== token) return;
+
+            element.textContent = '\u00A0';
+            delete element.dataset.validationAlertToken;
+        });
+
         this.remove();
-    });
+    }, { once: true });
 }
 
 let confirmModalInitialized = false;

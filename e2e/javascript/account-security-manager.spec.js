@@ -259,7 +259,7 @@ test('SecurityManager gestisce conferma e operazioni concorrenti', async ({ page
     await expect(modal).toBeHidden();
     expect(verificationRequests).toBe(0);
     expect(requests).toBe(0);
-    await expect(page.locator('#e2eSecurityFixture .error_currentPassword')).toHaveText('Inserisci la password corrente.');
+    await expect(page.locator('#e2eSecurityFixture .error_currentPassword')).toHaveText('\u00A0');
     await expect(page.locator('#alert-container [role="alert"]')).toContainText('Inserisci la password corrente.');
     await expect(page.locator('#method-none')).toBeChecked();
 

@@ -526,6 +526,9 @@ class AccountController extends BackendController
 
             $data['qrCode'] = $result->getDataUri();
             $data['totpSecret'] = $secret;
+			$data['otpCountdownServerTime'] = microtime(true);
+			$config = setting('Backend\Auth');
+			$data['otpCountdownPeriod'] = (int) ($config->twoFactorOtpExpiry ?? config(\Config\Backend\Auth::class)->twoFactorOtpExpiry);
 
             /* Renderizzo la vista parziale per l'attivazione del TOTP */
             $output = view('backend/account/partials/security/totpSetupPartial', $data);

@@ -38,16 +38,25 @@
                         <!-- Input Codice OTP: Piena larghezza in portrait, affiancato in landscape -->
                         <div class="col-12 col-lg-5">
                             <label for="otp-code" class="form-label small fw-bold mb-1"><?= lang('backend/account.labels.enterOtpCode'); ?></label>
-                            <input type="text" 
-                                   id="otp-code" 
-                                   name="otp" 
-                                   class="form-control form-control-sm text-center font-monospace w-100" 
-								   inputmode="numeric"
-								   autocomplete="one-time-code"
-								   pattern="[0-9]{6}"
-                                   maxlength="6" 
-                                   placeholder="000000" 
-                                   style="letter-spacing: 4px; font-size: 1.1rem;">
+                            <div class="input-group input-group-sm">
+                                <input type="text"
+                                       id="otp-code"
+                                       name="otp"
+                                       class="form-control text-center font-monospace"
+									   inputmode="numeric"
+									   autocomplete="one-time-code"
+									   pattern="[0-9]{6}"
+                                       maxlength="6"
+                                       placeholder="000000"
+                                       style="letter-spacing: 4px; font-size: 1.1rem;">
+                                <span class="input-group-text font-monospace"
+                                      data-otp-countdown
+                                      data-otp-countdown-mode="period"
+                                      data-server-time="<?= esc((string) $otpCountdownServerTime, 'attr'); ?>"
+                                      data-period="<?= esc((string) $otpCountdownPeriod, 'attr'); ?>"
+                                      role="timer"
+                                      aria-label="<?= esc(lang('backend/account.labels.enterOtpCode'), 'attr'); ?>">--s</span>
+                            </div>
                         </div>
 
                         <!-- Pulsanti di azione: Uno sopra l'altro a piena larghezza in portrait, affiancati sotto in landscape -->

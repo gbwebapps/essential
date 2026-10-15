@@ -21,6 +21,8 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    background: radial-gradient(circle at 50% 35%, var(--bs-light) 0%, var(--bs-gray-100) 48%, var(--bs-gray-300) 100%);
+    background-attachment: fixed;
 }
 
 label {

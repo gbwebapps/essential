@@ -15,6 +15,14 @@ use App\Models\Backend\BackendModel;
 class AccountModel extends BackendModel
 {
 	/**
+	 * Contenitore per i parametri di configurazione globali del modulo Auth 
+	 * (es. limiti di tentativi, durata sessioni, espressioni regolari per le password).
+	 * 
+	 * @var object 
+	 */
+	private object $config;
+	
+	/**
 	 * Identificativo del modulo corrente, impiegato per la risoluzione dinamica delle viste (es. template e-mail) e dei percorsi.
 	 * 
 	 * @var string|null 
@@ -43,6 +51,13 @@ class AccountModel extends BackendModel
 	 * @var array 
 	 */
     protected array $toCompare = ['firstname', 'lastname', 'email', 'phone', 'note'];
+
+    protected function initModel(): void 
+    {
+    	parent::initModel();
+
+    	$this->config = setting('Backend\Auth');
+    }
 
 	/**
 	 * Genera il set di regole di validazione nativo di CodeIgniter per l'aggiornamento dell'anagrafica.
@@ -93,7 +108,7 @@ class AccountModel extends BackendModel
 		return [
 			'currentPassword' => [
 				'label' => lang('backend/account.labels.currentPassword'),
-				'rules' => ['required', 'max_length[255]'],
+				'rules' => ['required', "regex_match[{$this->config->passwordRegex}]"],
 				'errors' => [
 					'required' => lang('backend/account.errors.currentPasswordRequired'),
 				],

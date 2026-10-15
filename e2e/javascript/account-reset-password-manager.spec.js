@@ -210,7 +210,7 @@ test('ResetPasswordManager gestisce conferma e invii duplicati', async ({ page }
     await expect(modal).toBeHidden();
     expect(verificationRequests).toBe(0);
     expect(requests).toBe(0);
-    await expect(form.locator('.error_currentPassword')).toHaveText('Inserisci la password corrente.');
+    await expect(form.locator('.error_currentPassword')).toHaveText('\u00A0');
     await expect(page.locator('#alert-container [role="alert"]')).toContainText('Inserisci la password corrente.');
 
     // Password errata: verifica server, alert immediato e nessun modale.

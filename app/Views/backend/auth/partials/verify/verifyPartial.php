@@ -7,7 +7,17 @@
             <!-- Campo code -->
             <div class="mb-2">
                 <label for="code" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/auth.labels.code'); ?></label>
-                <input type="text" id="code" name="code" class="form-control" placeholder="<?= lang('backend/auth.placeholders.code'); ?>" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="one-time-code" aria-describedby="error-code">
+                <div class="input-group">
+                    <input type="text" id="code" name="code" class="form-control" placeholder="<?= lang('backend/auth.placeholders.code'); ?>" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="one-time-code" aria-describedby="error-code">
+                    <span class="input-group-text font-monospace"
+                          data-otp-countdown
+                          data-otp-countdown-mode="<?= esc($otpCountdownMode, 'attr'); ?>"
+                          data-server-time="<?= esc((string) $otpCountdownServerTime, 'attr'); ?>"
+                          data-expires-at="<?= esc((string) $otpCountdownExpiresAt, 'attr'); ?>"
+                          data-period="<?= esc((string) $otpCountdownPeriod, 'attr'); ?>"
+                          role="timer"
+                          aria-label="<?= esc(lang('backend/auth.labels.code'), 'attr'); ?>">--s</span>
+                </div>
                 <div id="error-code" class="error_code text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
             </div>
             <!-- End Campo code -->
