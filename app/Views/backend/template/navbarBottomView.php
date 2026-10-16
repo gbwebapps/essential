@@ -1,5 +1,5 @@
 <!-- Barra di navigazione inferiore fissa (Footer Nav) -->
-<nav class="navbar fixed-bottom bg-light border-top"> 
+<nav class="navbar fixed-bottom app-bg-surface border-top">
     <div class="container-fluid d-flex align-items-center justify-content-between">
 
         <!-- Il contenuto viene renderizzato solo per utenti autenticati-->
@@ -7,7 +7,7 @@
 
             <!-- Sezione Sinistra: Menu a comparsa verso l'alto (Moduli) -->
             <div class="btn-group dropup me-auto">
-                <button type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-bs-toggle="dropdown" aria-expanded="false">
+                <button type="button" class="btn app-btn-secondary dropdown-toggle btn-sm" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa-solid fa-cubes"></i> 
                     <span><?= lang('backend/global.buttons.modules'); ?></span>
                 </button>
@@ -49,7 +49,7 @@
             <!-- Sezione Destra: Menu Servizi (visibile solo agli utenti Master) -->
             <?php if ((int) $currentAdmin->superadmin === 1): ?>
             <div class="btn-group dropup ms-auto">
-                <button type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-bs-toggle="dropdown" aria-expanded="false">
+                <button type="button" class="btn app-btn-secondary dropdown-toggle btn-sm" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa-solid fa-gears"></i> 
                     <span><?= lang('backend/global.buttons.services'); ?></span>
                 </button>
@@ -91,7 +91,7 @@
             <!-- Contenuto centrato -->
             <div class="text-center w-100">
                 <a href="https://www.gbwebapps.com" target="_blank">
-                    <img src="<?= base_url('assets/img/logo_gbwebapps.png'); ?>" alt="" height="30">
+                    <span class="brand-logo brand-logo-gbwebapps" role="img" aria-label="GB Web Apps"></span>
                 </a>
             </div>
 

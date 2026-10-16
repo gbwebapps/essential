@@ -1,13 +1,13 @@
 <div class="card-body">
 
     <!-- Indicatore della sorgente dati -->
-    <div class="ps-2 py-1 bg-light fw-bold small mb-3 border text-center rounded-2">
+    <div class="ps-2 py-1 app-bg-surface fw-bold small mb-3 border text-center rounded-2">
         <?php if (isset($isFromDatabase) && $isFromDatabase): ?>
-            <span class="text-primary">
+            <span class="app-text-accent">
                 <i class="fa-solid fa-database me-1"></i> <?= lang('backend/settings.messages.sourceDatabase'); ?>
             </span>
         <?php else: ?>
-            <span class="text-secondary">
+            <span class="app-text">
                 <i class="fa-solid fa-file-code me-1"></i> <?= lang('backend/settings.messages.sourceConfigFile'); ?>
             </span>
         <?php endif; ?>
@@ -20,7 +20,7 @@
                 <!-- Sezione 1: Sicurezza e Tentativi di Accesso -->
                 <div class="row">
                     <div class="col-12 mb-4">
-                        <div class="row g-0 bg-light pt-2 ps-2 pe-2 border rounded-2">
+                        <div class="row g-0 app-bg-surface pt-2 ps-2 pe-2 border rounded-2">
                             <div class="col-12 text-start">
                                 <h5><i class="fa-solid fa-globe me-2"></i><?= lang('backend/settings.labels.locale'); ?></h5>
                             </div>
@@ -39,7 +39,7 @@
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <div class="error_timezone text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                        <div class="error_timezone app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
 
                     <div class="col-md-4 mb-3">
@@ -54,7 +54,7 @@
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <div class="error_language text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                        <div class="error_language app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div> 
 
                     <div class="col-md-4 mb-3">
@@ -69,7 +69,7 @@
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <div class="error_dateFormat text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                        <div class="error_dateFormat app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
                 </div>
 
@@ -78,15 +78,15 @@
                         <!-- Flexbox: In colonna su mobile, in riga da tablet in poi, centrato orizzontalmente -->
                         <div class="d-flex flex-column flex-md-row justify-content-center gap-2">
                             
-                            <button type="button" class="btn btn-danger btn-sm btn-delete-general" data-message="<?= lang('backend/settings.messages.areYouSureDeleteSettings'); ?>">
+                            <button type="button" class="btn app-btn-danger btn-sm btn-delete-general" data-message="<?= lang('backend/settings.messages.areYouSureDeleteSettings'); ?>">
                                 <i class="fa-solid fa-trash-can me-1"></i><?= lang('backend/settings.buttons.restoreData'); ?>
                             </button>
                             
-                            <button type="button" class="btn btn-warning btn-sm text-dark btn-refresh-general" data-message="<?= lang('backend/settings.messages.areYouSureRefreshSettings'); ?>">
+                            <button type="button" class="btn app-btn-warning btn-sm btn-refresh-general" data-message="<?= lang('backend/settings.messages.areYouSureRefreshSettings'); ?>">
                                 <i class="fa-solid fa-rotate me-1"></i><?= lang('backend/settings.buttons.refreshData'); ?>
                             </button>
                             
-                            <button type="submit" class="btn btn-success btn-sm text-white btn-save-general">
+                            <button type="submit" class="btn app-btn-success btn-sm btn-save-general">
                                 <i class="fa-solid fa-floppy-disk me-1"></i><?= lang('backend/settings.buttons.sendData'); ?>
                             </button>
 

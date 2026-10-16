@@ -682,13 +682,13 @@ export class ToolsManager {
                         const row = document.querySelector(`li[data-table="${CSS.escape(String(table.name))}"]`);
 
                         if (row) {
-                            const dataContainer = row.querySelector('.text-muted.d-flex');
+                            const dataContainer = row.querySelector('.app-text-muted.d-flex');
 
                             if (dataContainer) {
                                 const htmlContent = `
                                     <span class="mb-2 mb-lg-0"><i class="fa-solid fa-list me-2"></i>${langRows.replace('%d', table.rows)}</span>
                                     <span class="mb-2 mb-lg-0"><i class="fa-solid fa-hard-drive me-2"></i>${langTotalSpace.replace('%s', table.size.toFixed(2))}</span>
-                                    <span class="text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>${langOverhead.replace('%s', table.overhead.toFixed(2))}</span>
+                                    <span class="app-text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>${langOverhead.replace('%s', table.overhead.toFixed(2))}</span>
                                 `;
 
                                 smoothReplace(dataContainer, htmlContent);
@@ -702,12 +702,12 @@ export class ToolsManager {
 
                     /* 3. Aggiorna l'header dopo l'ottimizzazione massiva */
                     if (tables.length > 1) {
-                        const headerSmall = document.querySelector('.text-muted.infoDb');
+                        const headerSmall = document.querySelector('.app-text-muted.infoDb');
 
                         if (headerSmall) {
                             const htmlHeader = `
                                 <span class="mb-2 mb-lg-0 me-lg-4"><i class="fa-solid fa-hard-drive me-2"></i>${langTotalSpace.replace('%s', totalSize.toFixed(2))}</span>
-                                <span class="text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>${langOverhead.replace('%s', totalOverhead.toFixed(2))}</span>
+                                <span class="app-text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>${langOverhead.replace('%s', totalOverhead.toFixed(2))}</span>
                             `;
 
                             smoothReplace(headerSmall, htmlHeader);

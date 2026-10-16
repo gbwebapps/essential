@@ -1,0 +1,504 @@
+/* Fonts */
+@font-face {
+    font-family: Comfortaa;
+    src: url(../../fonts/Comfortaa/Comfortaa-Light.ttf);
+}
+
+@font-face {
+    font-family: Montserrat;
+    src: url(../../fonts/Montserrat/Montserrat-Light.ttf);
+}
+
+@font-face {
+    font-family: Raleway;
+    src: url(../../fonts/Raleway/Raleway-Light.ttf);
+}
+
+/* Tags */
+body {
+    font-family: 'Comfortaa', sans-serif;
+    padding: 4.5rem 0 6rem 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    background: radial-gradient(ellipse at center, #e3e3e3 0%, #d2d2d2 48%, #aaa 100%);
+    background-attachment: fixed;
+}
+
+label {
+    cursor: pointer;
+    /* font-weight: 700; */
+}
+
+a {
+    color: RGBA(var(--bs-secondary-rgb), var(--bs-bg-opacity, 1)) !important;
+    text-decoration: none;
+}
+
+a:hover, button.btn-link:hover {
+    font-weight: 700;
+}
+
+textarea {
+    resize: none;
+}
+
+/* Mostra il cursore pointer sull'icona nativa degli input date e time */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+}
+
+/* Bootstrap's override */
+.dropdown-menu, .btn, .navbar, .card {
+    /* border-radius: 0!Important; */
+    box-shadow: 0 0 0 rgb(0 0 0 / 10%), 0 0 .15rem rgb(0 0 0 / 10%);
+}
+
+.btn-link {
+    text-decoration: none;
+}
+
+.dropdown-menu {
+    padding-top: 0;
+    padding-bottom: 0;
+    overflow: hidden;
+    border-radius: .25rem;
+}
+
+.dropdown-divider {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.dropdown-item {
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+}
+
+.dropdown-item:hover {
+    color: #fff !important;
+    background-color: rgba(var(--bs-secondary-rgb), var(--bs-bg-opacity, 1)) !important;
+    /* niente radius qui */
+}
+
+.dropdown-item.active {
+    background-color: #6c757d !important;
+    color: #ffffff !important;
+}
+
+.page-item:last-child .page-link {
+    /* border-top-right-radius: 0;
+    border-bottom-right-radius: 0; */
+}
+
+.page-item:first-child .page-link {
+    /* border-top-left-radius: 0;
+    border-bottom-left-radius: 0; */
+}
+
+.active > .page-link, .page-link.active {
+    background-color: var(--bs-secondary);
+    border-color: var(--bs-secondary);
+    color: var(--bs-white);
+}
+
+.page-link, .page-link:hover {
+    color: var(--bs-secondary);
+}
+
+.shadow-sm {
+    box-shadow: 0 0 0 rgb(0 0 0 / 10%), 0 0 .15rem rgb(0 0 0 / 10%) !important;
+}
+
+.modal-xl {
+    max-width: 80%!Important;
+}
+
+/* ==========================================================================
+    Gestione Alert Globali (JS e Sessioni)
+   ========================================================================== */
+
+/* Proprietà grafiche comuni e condivise */
+#alert-container .alert,
+.alert-session {
+    width: 51.25rem;
+    max-width: 90vw;
+    box-shadow: 0 0 0 rgb(0 0 0 / 30%), 0 0 .20rem rgb(0 0 0 / 30%);
+}
+
+/* Contenitore per gli Alert generati da JavaScript */
+#alert-container {
+    margin-top: 3.21rem;
+    position: relative; /* Questa riga attiva lo z-index */
+    z-index: 1080;
+}
+
+/* Alert generato da PHP (Sessione): ancorato fisso in alto nello stesso identico punto */
+.alert-session {
+    position: fixed;
+    top: 4.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1080; /* Stesso z-index dell'alert-container */
+}
+
+/* Correzione pulsante di chiusura per l'alert con d-flex */
+.alert-session .btn-close {
+    position: relative !important;
+    top: auto;
+    right: auto;
+    padding: 0;
+}
+
+/* Font Awesome override */
+.fa-solid {
+    padding-right: .40rem;
+}
+
+/* Custom style */
+#customBackdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1040;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+#customBackdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.disabled-link {
+    opacity: 0.6;
+    cursor: default;
+}
+
+/* Command bar */
+.bar {
+    background: #f8f9fa;
+    border: 0.0625rem solid rgba(0,0,0,.125);
+    padding: .5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 0 0 rgb(0 0 0 / 10%), 0 0 .15rem rgb(0 0 0 / 10%);
+    border-radius: .25rem;
+}
+
+.bar-item {
+    text-align: left;
+}
+
+/* Account left menu */
+.left-menu .list-group-item.active {
+    background: #6c757d;
+    border: none;
+    color: #fff!Important;
+}
+
+.left-menu .list-group-item:first-child {
+    /* border-top-left-radius: 0;
+    border-top-right-radius: 0; */
+}
+
+.left-menu .list-group-item:last-child {
+    /* border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0; */
+}
+
+/* Loader */
+#show-loader {
+    position: fixed;
+    top: 8%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: .2rem .5rem;
+    background: white;
+    display: none;
+    border: rgba(0, 0, 0, 0.175) solid 0.0625rem;
+    box-shadow: 0 0 0 rgb(0 0 0 / 10%), 0 0 .15rem rgb(0 0 0 / 10%);
+    z-index: 9999;
+}
+
+/* Scrollup */
+.scrollup {
+    position: fixed;
+    bottom: 3.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    box-shadow: 0 0 0 rgb(0 0 0 / 10%), 0 0 .15rem rgb(0 0 0 / 10%);
+    cursor: pointer;
+}
+
+.reset-search-field {
+    display: none;
+    cursor: pointer;
+}
+
+.img-polaroid {
+    -webkit-box-shadow: 0 0 0 rgb(0 0 0 / 50%), 0 0 .15rem rgb(0 0 0 / 50%);
+    -moz-box-shadow: 0 0 0 rgb(0 0 0 / 50%), 0 0 .15rem rgb(0 0 0 / 50%);
+    -o-box-shadow: 0 0 0 rgb(0 0 0 / 50%), 0 0 .15rem rgb(0 0 0 / 50%);
+    box-shadow: 0 0 0 rgb(0 0 0 / 50%), 0 0 .15rem rgb(0 0 0 / 50%);
+    padding: .125rem;
+    width:100%;
+    min-width:6rem;
+}
+
+.pagination-left,
+.pagination-right {
+    padding: 1.2rem .75rem .75rem .75rem
+}
+
+.pagination-center {
+    padding: 1rem 0 0 0;
+}
+
+.pagination-left {
+    text-align: left;
+}
+
+.pagination-right {
+    text-align: right;
+}
+
+/* transizione base */
+.fade-out,
+.fade-in {
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+/* uscita */
+.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* entrata */
+.fade-in {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Container dell'immagine */
+.preview-item {
+    position: relative;
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   Componente UploadPreviewImg
+   ========================================================================== */
+
+/* Overlay nero in fade, nascosto di default */
+.preview-item .preview-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    pointer-events: none; /* Evita di bloccare il cursore */
+}
+
+/* ==========================================================================
+   Componente GalleryOne
+   ========================================================================== */
+
+/* Overlay della galleria: nascosto di default */
+.preview-item .gallery-one-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Sfondo scuro trasparente */
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+/* Mostra l'overlay all'hover sul riquadro */
+.preview-item:hover .gallery-one-overlay {
+    opacity: 1;
+}
+
+/* Stile per le icone cliccabili della galleria */
+.galleryOneAction {
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+/* Effetto ingrandimento all'hover sulle singole icone */
+.galleryOneAction:hover {
+    transform: scale(1.2);
+}
+
+/* Mostra l'overlay al passaggio del mouse */
+.preview-item:hover .preview-overlay {
+    opacity: 1;
+    pointer-events: auto; /* Attiva i click sui pulsanti interni */
+}
+
+/* Spazio fisso per l'errore sotto la miniatura per evitare scatti di layout */
+.error-msg {
+    min-height: 21px;
+}
+
+.action {
+    font-size: 0.875rem;
+    font-weight: 700;
+}
+
+/* Forza l'altezza minima uguale per tutte le righe della tabella */
+.table-row-110 {
+    height: 110px; 
+}
+
+/* Forza l'altezza minima uguale per tutte le righe della tabella */
+.table-row-60 {
+    height: 60px; 
+}
+
+.table-bg-superadmin {
+    /* Diciamo a tutti i <td> di questa riga di usare questo colore di sfondo */
+    --bs-table-bg: #f8f9fa;
+    
+    /* Manteniamo il colore dei bordi standard della tabella, prevenendo l'ispessimento */
+    --bs-table-border-color: inherit; 
+}
+
+/* Gestione animazione ruotazione Chevron */
+.toggle-meta-btn i {
+    transition: transform 0.3s ease-in-out;
+}
+/* Quando Bootstrap apre il collapse, ruota l'icona di 90 gradi verso il basso */
+.toggle-meta-btn[aria-expanded="true"] i {
+    transform: rotate(90deg);
+}
+
+/* Comandi: link su desktop, pulsanti solidi su mobile */
+.cmd-link {
+    text-decoration: none;
+    color: #495057;
+    transition: all 0.2s ease-in-out;
+}
+
+.cmd-link:hover {
+    color: #0d6efd;
+}
+
+@media (max-width: 991px) {
+    .pagination-left, .pagination-right {
+        display: none;
+    }
+
+    .pagination-center {
+        margin: 0 0 0 0;
+        padding: .75rem 0;
+    }
+
+    /* Loader */
+    #show-loader {
+        top: 10.5%;
+    }
+}
+
+@media (max-width: 767px) {
+
+    /* Altezza del canvas applicata SOLO su mobile */
+    .offcanvas-bottom {
+        height: 75vh !important; 
+    }
+
+    .bar {
+        background: transparent;
+        padding: 0;
+        margin-bottom: 1rem;
+        border: 0;
+        box-shadow: none;
+    }
+
+    .bar-item {
+        background: #f8f9fa;
+        text-align: center;
+        padding: .5rem 0;
+        border: .0625rem solid #ccc;
+        border-radius: .25rem;
+    }
+
+    /* solo le bar_item che NON sono l’ultima hanno margin-bottom */
+    .bar .row > div:not(:last-child) .bar-item {
+        margin-bottom: .25rem;
+    }
+
+    .bar-item a {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+    }
+
+    .dropdown-mobile-center {
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        top: 100% !important; 
+    }
+
+    .cmd-link {
+        display: block;
+        padding: 0.6rem 1rem;
+        background-color: #f8f9fa;
+        color: #212529;
+        border-radius: 0.25rem;
+        margin-bottom: 0.5rem;
+        text-align: center;
+        border: 1px solid #dee2e6;
+    }
+
+    #dynamic_actions .btn-sm {
+        font-size: 0.75rem !important;
+        padding: 0.35rem 0.4rem !important;
+        white-space: nowrap; /* Impedisce che il testo vada a capo */
+    }
+    
+    #dynamic_actions .btn-sm i {
+        font-size: 0.7rem; /* Ridimensiona anche l'icona */
+    }
+
+    .modal-xl {
+        max-width: 95% !important;
+        margin: 0.5rem auto !important;
+    }
+}
+
+@media print {
+    /* Nasconde tutto il contenuto della pagina */
+    body * {
+        visibility: hidden;
+    }
+    
+    /* Rende visibile solo il div del dettaglio e i suoi elementi interni */
+    #show-wrapper, #show-wrapper * {
+        visibility: visible;
+    }
+    
+    /* Riposiziona il div in alto a sinistra nel foglio di carta */
+    #show-wrapper {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+
+    /* Nasconde la classe indesiderata all'interno del wrapper */
+    #show-wrapper .btn-secondary, 
+    #show-wrapper .scrollup {
+        display: none !important;
+    }
+}

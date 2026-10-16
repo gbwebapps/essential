@@ -12,12 +12,12 @@
 
             if ($msgClass && $msgContent): 
         ?>
-            <div class="alert alert-<?= esc($msgClass, 'attr'); ?> alert-session alert-dismissible fade show border-0 d-flex align-items-center p-3 mb-0" role="alert">
+            <div class="alert <?= esc($msgClass, 'attr'); ?> alert-session alert-dismissible fade show border-0 d-flex align-items-center p-3 mb-0" role="alert">
                 <div class="w-100 text-center p-0 ms-4">
                     <?= $msgIcon; ?> <?= esc($msgContent); ?>
                 </div>
                 <!-- Pulsante stile badge per la chiusura dell'alert -->
-                <button type="button" class="badge bg-danger p-2 border-0 rounded-1 ms-auto" data-bs-dismiss="alert" style="cursor: pointer;">
+                <button type="button" class="badge app-bg-danger p-2 border-0 rounded-1 ms-auto" data-bs-dismiss="alert" style="cursor: pointer;">
                     <i class="fa-solid fa-xmark"></i> <?= lang('backend/global.buttons.remove'); ?>
                 </button>
             </div>

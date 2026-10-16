@@ -115,7 +115,7 @@ class ImportController extends BackendController
         if ( ! preg_match('/^[a-zA-Z0-9_-]+$/', $entity)):
             return redirect()->back()
                 ->with('message', lang('backend/components/import.messages.invalidEntity'))
-                ->with('class', 'light text-danger fw-bold');
+                ->with('class', 'app-alert-danger fw-bold');
         endif;
 
         $structure = $this->importModel->getImportTableStructure($entity, $mode);
@@ -123,7 +123,7 @@ class ImportController extends BackendController
         if ($structure === []):
             return redirect()->back()
                 ->with('message', lang('backend/components/import.messages.noStructure'))
-                ->with('class', 'light text-danger fw-bold');
+                ->with('class', 'app-alert-danger fw-bold');
         endif;
 
         $headers = array_column($structure, 'name');

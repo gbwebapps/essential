@@ -31,7 +31,7 @@
                             </div>
 
                             <table class="table table-sm table-bordered align-middle">
-                                <thead class="table-light">
+                                <thead class="app-table-header">
                                     <tr>
                                         <th><?= lang('backend/components/import.labels.columnName'); ?></th>
                                         <th><?= lang('backend/components/import.labels.dataType'); ?></th>
@@ -48,9 +48,9 @@
                                                 <td><?= esc($field['max_length'] ?? '-'); ?></td>
                                                 <td class="text-center">
                                                     <?php if ($field['primary_key'] === 1): ?>
-                                                        <i class="fa-solid fa-key text-warning" title="Primary Key"></i>
+                                                        <i class="fa-solid fa-key app-text-warning" title="Primary Key"></i>
                                                     <?php elseif ($field['is_index']): ?>
-                                                        <i class="fa-solid fa-key text-secondary" title="Index"></i>
+                                                        <i class="fa-solid fa-key app-text-muted" title="Index"></i>
                                                     <?php else: ?>
                                                         -
                                                     <?php endif; ?>
@@ -59,7 +59,7 @@
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <tr>
-                                            <td colspan="4" class="text-center text-muted"><?= lang('backend/components/import.messages.noStructure'); ?></td>
+                                            <td colspan="4" class="text-center app-text-muted"><?= lang('backend/components/import.messages.noStructure'); ?></td>
                                         </tr>
                                     <?php endif; ?>
                                 </tbody>
@@ -79,10 +79,10 @@
             </div>
 
             <div class="modal-footer border-0">
-                <button type="button" id="btnCancelImport" class="btn btn-danger btn-sm" data-bs-dismiss="modal">
+                <button type="button" id="btnCancelImport" class="btn app-btn-danger btn-sm" data-bs-dismiss="modal">
                     <i class="fa-solid fa-xmark"></i> <?= lang('backend/components/import.buttons.close'); ?>
                 </button>
-                <button type="submit" class="btn btn-success btn-sm" form="importForm">
+                <button type="submit" class="btn app-btn-success btn-sm" form="importForm">
                     <i class="fa-solid fa-file-import"></i> <?= lang('backend/components/import.buttons.import'); ?>
                 </button>
             </div>

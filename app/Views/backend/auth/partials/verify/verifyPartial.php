@@ -18,14 +18,14 @@
                           role="timer"
                           aria-label="<?= esc(lang('backend/auth.labels.code'), 'attr'); ?>">--s</span>
                 </div>
-                <div id="error-code" class="error_code text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                <div id="error-code" class="error_code app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
             </div>
             <!-- End Campo code -->
 
             <div class="d-flex justify-content-end align-items-center">
 
                 <!-- Pulsante invio dati -->
-                <button type="submit" class="btn btn-sm btn-secondary"><i class="fa-solid fa-floppy-disk"></i><?= lang('backend/auth.buttons.verify'); ?></button>
+                <button type="submit" class="btn btn-sm app-btn-secondary"><i class="fa-solid fa-floppy-disk"></i><?= lang('backend/auth.buttons.verify'); ?></button>
                 <!-- End Pulsante invio dati -->
 
             </div>

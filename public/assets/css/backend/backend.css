@@ -21,8 +21,10 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    background: radial-gradient(circle at 50% 35%, var(--bs-light) 0%, var(--bs-gray-100) 48%, var(--bs-gray-300) 100%);
+    color: var(--app-text);
+    background: var(--app-page-bg);
     background-attachment: fixed;
+    box-shadow: var(--app-page-shadow, none);
 }
 
 label {
@@ -31,7 +33,7 @@ label {
 }
 
 a {
-    color: RGBA(var(--bs-secondary-rgb), var(--bs-bg-opacity, 1)) !important;
+    color: var(--app-text) !important;
     text-decoration: none;
 }
 
@@ -41,6 +43,26 @@ a:hover, button.btn-link:hover {
 
 textarea {
     resize: none;
+}
+
+.brand-logo {
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    vertical-align: middle;
+}
+
+.brand-logo-essential {
+    width: 8.5rem;
+    height: 1.75rem;
+    background-image: var(--app-logo-essential);
+}
+
+.brand-logo-gbwebapps {
+    width: 12.45rem;
+    height: 1.875rem;
+    background-image: var(--app-logo-gbwebapps);
 }
 
 /* Mostra il cursore pointer sull'icona nativa degli input date e time */
@@ -53,6 +75,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .dropdown-menu, .btn, .navbar, .card {
     /* border-radius: 0!Important; */
     box-shadow: 0 0 0 rgb(0 0 0 / 10%), 0 0 .15rem rgb(0 0 0 / 10%);
+}
+
+.card > .card-header:first-child {
+    border-radius: var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius) 0 0 !important;
 }
 
 .btn-link {
@@ -77,14 +103,14 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 .dropdown-item:hover {
-    color: #fff !important;
-    background-color: rgba(var(--bs-secondary-rgb), var(--bs-bg-opacity, 1)) !important;
+    color: var(--app-text-inverse) !important;
+    background-color: var(--app-surface-inverse) !important;
     /* niente radius qui */
 }
 
 .dropdown-item.active {
-    background-color: #6c757d !important;
-    color: #ffffff !important;
+    color: var(--app-text-inverse) !important;
+    background-color: var(--app-surface-inverse) !important;
 }
 
 .page-item:last-child .page-link {
@@ -98,13 +124,18 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 .active > .page-link, .page-link.active {
-    background-color: var(--bs-secondary);
-    border-color: var(--bs-secondary);
-    color: var(--bs-white);
+    color: var(--app-text-inverse);
+    background-color: var(--app-surface-inverse);
+    border-color: var(--app-border-strong);
 }
 
-.page-link, .page-link:hover {
-    color: var(--bs-secondary);
+.page-link {
+    color: var(--app-text);
+}
+
+.page-link:hover,
+.page-link:focus {
+    color: var(--app-text-inverse) !important;
 }
 
 .shadow-sm {
@@ -160,7 +191,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 #customBackdrop {
     position: fixed;
     inset: 0;
-    background: rgba(255,255,255,0.2);
+    background: var(--app-backdrop);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     z-index: 1040;
@@ -181,8 +212,8 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
 /* Command bar */
 .bar {
-    background: #f8f9fa;
-    border: 0.0625rem solid rgba(0,0,0,.125);
+    background: var(--app-surface);
+    border: 0.0625rem solid var(--app-border);
     padding: .5rem;
     margin-bottom: 1rem;
     box-shadow: 0 0 0 rgb(0 0 0 / 10%), 0 0 .15rem rgb(0 0 0 / 10%);
@@ -194,10 +225,27 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* Account left menu */
+.left-menu .list-group-item-action:hover,
+.left-menu .list-group-item-action:focus {
+    color: var(--app-text-inverse) !important;
+    background-color: var(--app-surface-inverse) !important;
+}
+
 .left-menu .list-group-item.active {
-    background: #6c757d;
+    background: var(--app-surface-inverse);
     border: none;
-    color: #fff!Important;
+    color: var(--app-text-inverse) !important;
+}
+
+#dropdownAdmins .btn-select-admin:hover,
+#dropdownAdmins .btn-select-admin:focus {
+    color: var(--app-text-inverse) !important;
+    background-color: var(--app-surface-inverse) !important;
+}
+
+#dropdownAdmins .btn-select-admin:hover i,
+#dropdownAdmins .btn-select-admin:focus i {
+    color: var(--app-text-inverse) !important;
 }
 
 .left-menu .list-group-item:first-child {
@@ -217,9 +265,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     left: 50%;
     transform: translateX(-50%);
     padding: .2rem .5rem;
-    background: white;
+    color: var(--app-text);
+    background: var(--app-surface);
     display: none;
-    border: rgba(0, 0, 0, 0.175) solid 0.0625rem;
+    border: var(--app-border) solid 0.0625rem;
     box-shadow: 0 0 0 rgb(0 0 0 / 10%), 0 0 .15rem rgb(0 0 0 / 10%);
     z-index: 9999;
 }
@@ -354,6 +403,8 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .action {
     font-size: 0.875rem;
     font-weight: 700;
+    color: var(--app-text-inverse) !important;
+    background-color: var(--app-surface-inverse) !important;
 }
 
 /* Forza l'altezza minima uguale per tutte le righe della tabella */
@@ -368,7 +419,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
 .table-bg-superadmin {
     /* Diciamo a tutti i <td> di questa riga di usare questo colore di sfondo */
-    --bs-table-bg: #f8f9fa;
+    --bs-table-bg: var(--app-surface-muted);
     
     /* Manteniamo il colore dei bordi standard della tabella, prevenendo l'ispessimento */
     --bs-table-border-color: inherit; 
@@ -386,12 +437,12 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 /* Comandi: link su desktop, pulsanti solidi su mobile */
 .cmd-link {
     text-decoration: none;
-    color: #495057;
+    color: var(--app-text);
     transition: all 0.2s ease-in-out;
 }
 
 .cmd-link:hover {
-    color: #0d6efd;
+    color: var(--app-text-muted);
 }
 
 @media (max-width: 991px) {
@@ -426,10 +477,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     }
 
     .bar-item {
-        background: #f8f9fa;
+        background: var(--app-surface);
         text-align: center;
         padding: .5rem 0;
-        border: .0625rem solid #ccc;
+        border: .0625rem solid var(--app-border);
         border-radius: .25rem;
     }
 
@@ -453,12 +504,12 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     .cmd-link {
         display: block;
         padding: 0.6rem 1rem;
-        background-color: #f8f9fa;
-        color: #212529;
+        background-color: var(--app-surface);
+        color: var(--app-text);
         border-radius: 0.25rem;
         margin-bottom: 0.5rem;
         text-align: center;
-        border: 1px solid #dee2e6;
+        border: 1px solid var(--app-border);
     }
 
     #dynamic_actions .btn-sm {

@@ -1,0 +1,326 @@
+/*
+ * Tema monocromatico Essential.
+ * Contiene esclusivamente variabili cromatiche e adattamenti Bootstrap.
+ */
+:root {
+    color-scheme: light;
+
+    --app-page-bg: #ffffff;
+    --app-surface: #ffffff;
+    --app-surface-elevated: #ffffff;
+    --app-surface-muted: #f2f2f2;
+    --app-surface-inverse: #000000;
+    --app-text: #000000;
+    --app-text-muted: #595959;
+    --app-text-inverse: #ffffff;
+    --app-border: #b5b5b5;
+    --app-border-strong: #000000;
+    --app-focus: rgba(0, 0, 0, .22);
+    --app-backdrop: rgba(0, 0, 0, .20);
+    --app-shadow: rgba(0, 0, 0, .16);
+    --app-logo-essential: url("../../img/Essential_Scuro_su_Chiaro.png");
+    --app-logo-gbwebapps: url("../../img/GB_Web_Apps_Scuro_su_Chiaro.png");
+
+    /* Stati semantici: monocromatici nel tema white. */
+    --app-primary: #000000;
+    --app-success: #000000;
+    --app-danger: #000000;
+    --app-warning: #000000;
+    --app-info: #000000;
+
+    /* Neutralizzazione della palette Bootstrap. */
+    --bs-body-color: var(--app-text);
+    --bs-body-color-rgb: 0, 0, 0;
+    --bs-body-bg: var(--app-page-bg);
+    --bs-body-bg-rgb: 255, 255, 255;
+    --bs-emphasis-color: var(--app-text);
+    --bs-emphasis-color-rgb: 0, 0, 0;
+    --bs-secondary-color: var(--app-text-muted);
+    --bs-secondary-color-rgb: 89, 89, 89;
+    --bs-secondary-bg: var(--app-surface-muted);
+    --bs-secondary-bg-rgb: 242, 242, 242;
+    --bs-tertiary-color: var(--app-text-muted);
+    --bs-tertiary-bg: var(--app-surface-muted);
+    --bs-primary: var(--app-primary);
+    --bs-primary-rgb: 0, 0, 0;
+    --bs-secondary: var(--app-text-muted);
+    --bs-secondary-rgb: 89, 89, 89;
+    --bs-success: var(--app-success);
+    --bs-success-rgb: 0, 0, 0;
+    --bs-danger: var(--app-danger);
+    --bs-danger-rgb: 0, 0, 0;
+    --bs-warning: var(--app-warning);
+    --bs-warning-rgb: 0, 0, 0;
+    --bs-info: var(--app-info);
+    --bs-info-rgb: 0, 0, 0;
+    --bs-light: var(--app-surface);
+    --bs-light-rgb: 255, 255, 255;
+    --bs-dark: var(--app-surface-inverse);
+    --bs-dark-rgb: 0, 0, 0;
+    --bs-link-color: var(--app-text);
+    --bs-link-color-rgb: 0, 0, 0;
+    --bs-link-hover-color: var(--app-text-muted);
+    --bs-link-hover-color-rgb: 89, 89, 89;
+    --bs-border-color: var(--app-border);
+    --bs-border-color-translucent: rgba(0, 0, 0, .18);
+    --bs-focus-ring-color: var(--app-focus);
+    --bs-form-valid-color: var(--app-text);
+    --bs-form-valid-border-color: var(--app-border-strong);
+    --bs-form-invalid-color: var(--app-text);
+    --bs-form-invalid-border-color: var(--app-border-strong);
+    --bs-gradient: none;
+}
+
+/* Superfici e testi semantici */
+.app-bg-surface {
+    background-color: var(--app-surface) !important;
+}
+
+.app-bg-surface-elevated {
+    background-color: var(--app-surface-elevated) !important;
+}
+
+.app-bg-muted {
+    background-color: var(--app-surface-muted) !important;
+}
+
+.app-bg-muted-subtle,
+.app-bg-success-subtle,
+.app-bg-danger-subtle {
+    background-color: var(--app-surface-muted) !important;
+}
+
+.app-bg-inverse,
+.app-bg-primary,
+.app-bg-success,
+.app-bg-danger,
+.app-bg-warning,
+.app-bg-info {
+    color: var(--app-text-inverse) !important;
+    background-color: var(--app-surface-inverse) !important;
+}
+
+.app-text,
+.app-text-accent,
+.app-text-success,
+.app-text-danger,
+.app-text-warning,
+.app-text-info {
+    color: var(--app-text) !important;
+}
+
+.app-text-muted {
+    color: var(--app-text-muted) !important;
+}
+
+.app-text-muted-emphasis,
+.app-text-success-emphasis,
+.app-text-danger-emphasis {
+    color: var(--app-text) !important;
+}
+
+.app-text-inverse {
+    color: var(--app-text-inverse) !important;
+}
+
+.app-border-accent,
+.app-border-success,
+.app-border-danger,
+.app-border-warning,
+.app-border-info {
+    border-color: var(--app-border-strong) !important;
+}
+
+.app-border-success-subtle {
+    border-color: var(--app-border) !important;
+}
+
+/* Pulsanti semantici */
+.app-btn-primary,
+.app-btn-success {
+    --bs-btn-color: var(--app-text-inverse);
+    --bs-btn-bg: var(--app-surface-inverse);
+    --bs-btn-border-color: var(--app-border-strong);
+    --bs-btn-hover-color: var(--app-text);
+    --bs-btn-hover-bg: var(--app-surface);
+    --bs-btn-hover-border-color: var(--app-border-strong);
+    --bs-btn-focus-shadow-rgb: 0, 0, 0;
+    --bs-btn-active-color: var(--app-text);
+    --bs-btn-active-bg: var(--app-surface-muted);
+    --bs-btn-active-border-color: var(--app-border-strong);
+    --bs-btn-disabled-color: var(--app-text-inverse);
+    --bs-btn-disabled-bg: var(--app-surface-inverse);
+    --bs-btn-disabled-border-color: var(--app-border-strong);
+}
+
+.app-btn-secondary,
+.app-btn-danger,
+.app-btn-warning,
+.app-btn-info,
+.app-btn-light,
+.app-btn-dark {
+    --bs-btn-color: var(--app-text);
+    --bs-btn-bg: var(--app-surface);
+    --bs-btn-border-color: var(--app-border-strong);
+    --bs-btn-hover-color: var(--app-text-inverse);
+    --bs-btn-hover-bg: var(--app-surface-inverse);
+    --bs-btn-hover-border-color: var(--app-border-strong);
+    --bs-btn-focus-shadow-rgb: 0, 0, 0;
+    --bs-btn-active-color: var(--app-text-inverse);
+    --bs-btn-active-bg: var(--app-surface-inverse);
+    --bs-btn-active-border-color: var(--app-border-strong);
+    --bs-btn-disabled-color: var(--app-text-muted);
+    --bs-btn-disabled-bg: var(--app-surface-muted);
+    --bs-btn-disabled-border-color: var(--app-border);
+}
+
+/* Messaggi e tabelle semantiche */
+.app-alert,
+.app-alert-success,
+.app-alert-danger,
+.app-alert-warning,
+.app-alert-info {
+    color: var(--app-text);
+    background-color: var(--app-surface);
+    border-color: var(--app-border-strong);
+}
+
+.app-table-header > * > *,
+.app-table-success > * > *,
+.app-table-warning > * > * {
+    --bs-table-color: var(--app-text);
+    --bs-table-bg: var(--app-surface-muted);
+    --bs-table-border-color: var(--app-border);
+}
+
+.app-table-inverse > * > * {
+    --bs-table-color: var(--app-text-inverse);
+    --bs-table-bg: var(--app-surface-inverse);
+    --bs-table-border-color: var(--app-border);
+}
+
+.app-list-group-item {
+    color: var(--app-text);
+    background-color: var(--app-surface);
+}
+
+/* Componenti Bootstrap che possiedono colori propri. */
+.accordion {
+    --bs-accordion-color: var(--app-text);
+    --bs-accordion-bg: var(--app-surface);
+    --bs-accordion-border-color: var(--app-border);
+    --bs-accordion-btn-color: var(--app-text);
+    --bs-accordion-btn-bg: var(--app-surface);
+    --bs-accordion-active-color: var(--app-text);
+    --bs-accordion-active-bg: var(--app-surface);
+    --bs-accordion-btn-focus-border-color: var(--app-border-strong);
+    --bs-accordion-btn-focus-box-shadow: 0 0 0 .25rem var(--app-focus);
+}
+
+.accordion-button,
+.accordion-button:not(.collapsed) {
+    background-image: none;
+    box-shadow: none;
+}
+
+.accordion-button::after {
+    filter: grayscale(1) contrast(2);
+}
+
+.form-control,
+.form-select,
+.input-group-text,
+.dropdown-menu,
+.list-group-item,
+.card,
+.modal-content,
+.offcanvas,
+.toast {
+    color: var(--app-text);
+    background-color: var(--app-surface);
+    border-color: var(--app-border);
+}
+
+.card-header {
+    color: var(--app-text);
+    background-color: var(--app-surface);
+    border-color: var(--app-border);
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+    color: var(--app-text);
+    background-color: var(--app-surface);
+    border-color: var(--app-border-strong);
+    box-shadow: 0 0 0 .25rem var(--app-focus);
+}
+
+.form-check-input:checked {
+    background-color: var(--app-surface-inverse);
+    border-color: var(--app-border-strong);
+}
+
+.dropdown-item {
+    color: var(--app-text);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus,
+.dropdown-item.active {
+    color: var(--app-text-inverse);
+    background-color: var(--app-surface-inverse);
+}
+
+.list-group-item-action:hover,
+.list-group-item-action:focus {
+    color: var(--app-text-inverse) !important;
+    background-color: var(--app-surface-inverse);
+}
+
+.list-group-item-action:hover i,
+.list-group-item-action:focus i {
+    color: var(--app-text-inverse) !important;
+}
+
+.btn-link,
+.page-link {
+    color: var(--app-text);
+}
+
+.page-link:hover,
+.page-link:focus {
+    color: var(--app-text-inverse);
+    background-color: var(--app-surface-inverse);
+    border-color: var(--app-border-strong);
+}
+
+.page-item.active .page-link {
+    color: var(--app-text-inverse);
+    background-color: var(--app-surface-inverse);
+    border-color: var(--app-border-strong);
+}
+
+.progress {
+    background-color: var(--app-surface-muted);
+}
+
+.progress-bar {
+    color: var(--app-text-inverse);
+    background-color: var(--app-surface-inverse);
+}
+
+.table {
+    --bs-table-color: var(--app-text);
+    --bs-table-bg: transparent;
+    --bs-table-border-color: var(--app-border);
+    --bs-table-striped-color: var(--app-text);
+    --bs-table-striped-bg: var(--app-surface-muted);
+    --bs-table-hover-color: var(--app-text);
+    --bs-table-hover-bg: var(--app-surface-muted);
+}
+
+::selection {
+    color: var(--app-text-inverse);
+    background-color: var(--app-surface-inverse);
+}

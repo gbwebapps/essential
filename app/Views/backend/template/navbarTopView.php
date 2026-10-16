@@ -1,9 +1,9 @@
 <!-- Barra di navigazione superiore fissa -->
-<nav class="navbar navbar-expand-lg fixed-top bg-light border-bottom">
+<nav class="navbar navbar-expand-lg fixed-top app-bg-surface border-bottom">
     <div class="container-fluid">
         <!-- Logo e link alla dashboard -->
         <a class="navbar-brand" href="<?= base_url('backend/dashboard'); ?>">
-            <img src="<?= base_url('assets/img/logo_essential.png'); ?>" alt="Essential Logo" height="28">
+            <span class="brand-logo brand-logo-essential" role="img" aria-label="Essential Logo"></span>
         </a>
         
         <!-- Il menu viene mostrato solo se l'utente è autenticato -->

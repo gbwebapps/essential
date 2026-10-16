@@ -299,23 +299,23 @@ class AdminsController extends BackendController
 
         /* GET Request - Caricamento iniziale della pagina */
         if (($uuid === null) || ( ! $this->regexp->validateUUID($uuid))):
-            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.errors.uuid'))->with('class', 'light text-danger fw-bold');
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.errors.uuid'))->with('class', 'app-alert-danger fw-bold');
         endif;
 
         $admin = $this->adminsModel->getByUUID($uuid);
 
         if($admin['result'] === false):
-            return redirect()->to(base_url('backend/admins/showAll'))->with('message', $admin['message'])->with('class', 'light text-danger fw-bold');
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', $admin['message'])->with('class', 'app-alert-danger fw-bold');
         endif;
 
         /* Scudo Enterprise: blocco immediato se il record si trova nel cestino */
         if ($admin['row']->deleted_at !== null):
-            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.cannotModifyDeleted'))->with('class', 'light text-danger fw-bold')->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.cannotModifyDeleted'))->with('class', 'app-alert-danger fw-bold')->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
         endif;
 
         /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il superadmin */
         if ((int) $admin['row']->superadmin === 1):
-            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.protectedAdmin'))->with('class', 'light text-danger fw-bold')->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.protectedAdmin'))->with('class', 'app-alert-danger fw-bold')->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
         endif;
         
         $this->data['action'] = 'edit';
@@ -392,23 +392,23 @@ class AdminsController extends BackendController
     public function show(string $uuid): RedirectResponse|string
     {
         if ( ! $this->regexp->validateUUID($uuid)):
-            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.errors.uuid'))->with('class', 'light text-danger fw-bold');
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.errors.uuid'))->with('class', 'app-alert-danger fw-bold');
         endif;
 
         $admin = $this->adminsModel->getByUUID($uuid);
 
         if ($admin['result'] === false):
-            return redirect()->to(base_url('backend/admins/showAll'))->with('message', $admin['message'])->with('class', 'light text-danger fw-bold');
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', $admin['message'])->with('class', 'app-alert-danger fw-bold');
         endif;
 
         /* Scudo Enterprise: blocco immediato se il record si trova nel cestino */
         if ($admin['row']->deleted_at !== null):
-            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.cannotModifyDeleted'))->with('class', 'light text-danger fw-bold')->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.cannotModifyDeleted'))->with('class', 'app-alert-danger fw-bold')->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
         endif;
 
         /* Scudo di sicurezza: blocchi subito se l'oggetto estratto è il superadmin */
         if ((int) $admin['row']->superadmin === 1):
-            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.protectedAdmin'))->with('class', 'light text-danger fw-bold')->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
+            return redirect()->to(base_url('backend/admins/showAll'))->with('message', lang('backend/admins.messages.protectedAdmin'))->with('class', 'app-alert-danger fw-bold')->with('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
         endif;
         
         $this->data['action'] = 'show';

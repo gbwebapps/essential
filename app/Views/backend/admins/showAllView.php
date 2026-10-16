@@ -26,7 +26,7 @@
 
                             <!-- Bottone Mobile per aprire l'Offcanvas -->
                             <div class="col-12 d-md-none mb-3">
-                                <button class="btn btn-secondary w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#admins-actionsOffcanvas" aria-controls="actionsOffcanvas">
+                                <button class="btn app-btn-secondary w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#admins-actionsOffcanvas" aria-controls="actionsOffcanvas">
                                     <i class="fa-solid fa-bars"></i> <?= lang('backend/admins.labels.filtersAndOptions'); ?>
                                 </button>
                             </div>
@@ -105,7 +105,7 @@
                                         <input type="text" id="admins-firstname" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.searchFirstname'), 'attr'); ?>" data-search-field="firstname" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
-                                    <div data-search-error="firstname" class="error_firstname text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="firstname" class="error_firstname app-text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End Ricerca avanzata per nome -->
@@ -118,7 +118,7 @@
                                         <input type="text" id="admins-lastname" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.searchLastname'), 'attr'); ?>" data-search-field="lastname" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
-                                    <div data-search-error="lastname" class="error_lastname text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="lastname" class="error_lastname app-text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End Ricerca avanzata per cognome -->
@@ -131,7 +131,7 @@
                                         <input type="text" id="admins-email" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.searchEmail'), 'attr'); ?>" data-search-field="email" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
-                                    <div data-search-error="email" class="error_email text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="email" class="error_email app-text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End Ricerca avanzata per email -->
@@ -144,7 +144,7 @@
                                         <input type="text" id="admins-phone" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.searchPhone'), 'attr'); ?>" data-search-field="phone" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
-                                    <div data-search-error="phone" class="error_phone text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="phone" class="error_phone app-text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End Ricerca avanzata per phone -->
@@ -163,7 +163,7 @@
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <div data-search-error="created_at-from" class="error_created_at-from text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="created_at-from" class="error_created_at-from app-text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End ricerca avanzata per data da -->
@@ -178,7 +178,7 @@
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <div data-search-error="created_at-to" class="error_created_at-to text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="created_at-to" class="error_created_at-to app-text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End ricerca avanzata per data a -->
@@ -193,7 +193,7 @@
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <div data-search-error="updated_at-from" class="error_updated_at-from text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="updated_at-from" class="error_updated_at-from app-text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End ricerca avanzata per data da -->
@@ -208,7 +208,7 @@
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <div data-search-error="updated_at-to" class="error_updated_at-to text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="updated_at-to" class="error_updated_at-to app-text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End ricerca avanzata per data a -->

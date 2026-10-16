@@ -21,7 +21,7 @@
                         </div>
                         <div class="col-6">
                             <label class="cursor-pointer w-100" for="pdf_portrait">
-                                <i class="fa-solid fa-file-lines fa-3x text-secondary mb-2"></i>
+                                <i class="fa-solid fa-file-lines fa-3x app-text-muted mb-2"></i>
                                 <div class="form-check d-flex justify-content-center align-items-center mt-2">
                                     <input class="form-check-input me-2 mt-0" type="radio" name="pdf_orientation" id="pdf_portrait" value="portrait" checked>
                                     <span class="fw-bold"><?= lang('backend/global.modals.exportPdfOrientationVert'); ?></span>
@@ -32,7 +32,7 @@
                         <div class="col-6">
                             <label class="cursor-pointer w-100" for="pdf_landscape">
                                 <!-- Icona ruotata per simulare il foglio in orizzontale -->
-                                <i class="fa-solid fa-file-lines fa-3x text-secondary mb-2" style="transform: rotate(-90deg);"></i>
+                                <i class="fa-solid fa-file-lines fa-3x app-text-muted mb-2" style="transform: rotate(-90deg);"></i>
                                 <div class="form-check d-flex justify-content-center align-items-center mt-2">
                                     <input class="form-check-input me-2 mt-0" type="radio" name="pdf_orientation" id="pdf_landscape" value="landscape">
                                     <span class="fw-bold"><?= lang('backend/global.modals.exportPdfOrientationHoriz'); ?></span>
@@ -109,10 +109,10 @@
             </div>
             
             <div class="modal-footer border-0">
-                <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">
+                <button type="button" class="btn app-btn-danger btn-sm" data-bs-dismiss="modal">
                     <i class="fa-solid fa-xmark"></i> <?= lang('backend/global.buttons.close'); ?>
             </button>
-                <button type="submit" class="btn btn-success btn-sm" form="exportPdfForm">
+                <button type="submit" class="btn app-btn-success btn-sm" form="exportPdfForm">
                     <i class="fa-solid fa-file-export"></i> <?= lang('backend/global.buttons.exportPdf'); ?>
             </button>
             </div>

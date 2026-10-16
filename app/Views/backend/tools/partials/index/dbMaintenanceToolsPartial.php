@@ -24,7 +24,7 @@
                 <ul class="list-group">
 
                     <!-- Header riassuntivo del Database -->
-                    <li class="list-group-item list-group-item-light py-3">
+                    <li class="list-group-item app-list-group-item py-3">
                         <!-- Impostato text-start su tutto il blocco -->
                         <div class="row text-start align-items-lg-center">
                             
@@ -33,27 +33,27 @@
                                 <!-- Rimossi i bordi e i margini dal div -->
                                 <div>
                                     <h5 class="mb-1 fw-bold"><i class="fa-solid fa-database me-2"></i><?= esc($database['dbName']); ?></h5>
-                                    <div class="text-muted">
+                                    <div class="app-text-muted">
                                         <span><i class="fa-solid fa-microchip me-1"></i><?= esc($database['dbDriver']); ?> <?= esc($database['dbVersion']); ?></span>
                                     </div>
                                 </div>
                                 <!-- Inserita la linea visibile solo su mobile e tablet portrait -->
-                                <hr class="d-lg-none my-3 text-secondary">
+                                <hr class="d-lg-none my-3 app-text-muted">
                             </div>
 
                             <!-- Blocco Centrale: Totali Spazio e Overhead -->
                             <div class="col-12 col-lg-7 mb-3 mb-lg-0">
                                 <!-- Rimosso justify-content-center e modificato l'allineamento verticale per mobile -->
-                                <div class="text-muted infoDb d-flex flex-column flex-lg-row align-items-start align-items-lg-center text-center">
+                                <div class="app-text-muted infoDb d-flex flex-column flex-lg-row align-items-start align-items-lg-center text-center">
                                     <span class="mb-2 mb-lg-0 me-lg-4"><i class="fa-solid fa-hard-drive me-2"></i><?= sprintf(lang('backend/tools.labels.totalSpace'), number_format($totalSize, 2)); ?></span>
-                                    <span class="text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i><?= sprintf(lang('backend/tools.labels.overhead'), number_format($totalOverhead, 2)); ?></span>
+                                    <span class="app-text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i><?= sprintf(lang('backend/tools.labels.overhead'), number_format($totalOverhead, 2)); ?></span>
                                 </div>
                             </div>
 
                             <!-- Blocco Destra: Azione Globale -->
                             <div class="col-12 col-lg-2">
                                 <!-- Passiamo l'intero array di tabelle codificato in JSON al dataset -->
-                                <button type="button" class="btn btn-sm btn-primary btn-optimize-all w-100" data-tables="<?= esc(json_encode($allTableNames, JSON_THROW_ON_ERROR), 'attr'); ?>">
+                                <button type="button" class="btn btn-sm app-btn-primary btn-optimize-all w-100" data-tables="<?= esc(json_encode($allTableNames, JSON_THROW_ON_ERROR), 'attr'); ?>">
                                     <i class="fa-solid fa-wand-magic-sparkles me-2"></i><?= lang('backend/tools.buttons.dbOptimize'); ?>
                                 </button>
                             </div>
@@ -73,15 +73,15 @@
                                         <i class="fa-solid fa-table me-2"></i><?= esc($table['name']); ?>
                                     </div>
                                     <!-- Linea visibile solo su mobile e tablet portrait -->
-                                    <hr class="d-lg-none my-3 text-secondary">
+                                    <hr class="d-lg-none my-3 app-text-muted">
                                 </div>
                                 
                                 <!-- Blocco Centrale: Statistiche -->
                                 <div class="col-12 col-lg-7 mb-3 mb-lg-0">
-                                    <div class="text-muted d-flex flex-column flex-lg-row justify-content-lg-around align-items-start align-items-lg-center"> 
+                                    <div class="app-text-muted d-flex flex-column flex-lg-row justify-content-lg-around align-items-start align-items-lg-center">
                                         <span class="mb-2 mb-lg-0"><i class="fa-solid fa-list me-2"></i><?= sprintf(lang('backend/tools.labels.rows'), $table['rows']); ?></span>
                                         <span class="mb-2 mb-lg-0"><i class="fa-solid fa-hard-drive me-2"></i><?= sprintf(lang('backend/tools.labels.totalSpace'), number_format($table['size'], 2)); ?></span>
-                                        <span class="text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i><?= sprintf(lang('backend/tools.labels.overhead'), number_format($table['overhead'], 2)); ?></span>
+                                        <span class="app-text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i><?= sprintf(lang('backend/tools.labels.overhead'), number_format($table['overhead'], 2)); ?></span>
                                     </div>
                                 </div>
                                 

@@ -5,7 +5,7 @@
                 <?php foreach ($images as $img): ?>
                     <div class="col-6 col-lg-3 mb-3 text-center">
 
-                        <?php $bg = ((int) $img['is_cover'] === 1) ? 'bg-secondary' : 'bg-white'; ?>
+                        <?php $bg = ((int) $img['is_cover'] === 1) ? 'app-bg-muted' : 'app-bg-surface-elevated'; ?>
 
                         <div class="position-relative preview-item rounded overflow-hidden <?= $bg; ?> p-1 border shadow-sm"
                              data-id="<?= esc($img['id']); ?>"
@@ -21,25 +21,25 @@
 
                                      <?php if ((int) $img['is_cover'] === 1): ?>
                                          <!-- Usiamo direttamente l'icona con un'ombra nativa per massima pulizia grafica -->
-                                         <i class="fa-solid fa-circle-check fa-2x position-absolute top-0 start-0 m-2 text-dark"></i>
+                                         <i class="fa-solid fa-circle-check fa-2x position-absolute top-0 start-0 m-2 app-text"></i>
                                      <?php endif; ?>
                                 
                                 <div class="gallery-one-overlay d-flex justify-content-center align-items-center">
                                     <?php if ((int) $img['is_cover'] === 1): ?>
-                                        <i class="fa-solid fa-minus galleryOneAction text-white mx-2 fs-5"
+                                        <i class="fa-solid fa-minus galleryOneAction app-text-inverse mx-2 fs-5"
                                            title="<?= lang('backend/components/galleryOne.labels.removeCover'); ?>"
                                            data-action="removeCover"
                                            data-message="<?= lang('backend/components/galleryOne.messages.areYouSureRemoveCover'); ?>">
                                         </i>
                                     <?php else: ?>
-                                        <i class="fa-solid fa-check galleryOneAction text-white mx-2 fs-5"
+                                        <i class="fa-solid fa-check galleryOneAction app-text-inverse mx-2 fs-5"
                                            title="<?= lang('backend/components/galleryOne.labels.setCover'); ?>"
                                            data-action="setCover"
                                            data-message="<?= lang('backend/components/galleryOne.messages.areYouSureSetCover'); ?>">
                                         </i>
                                     <?php endif; ?>
                                     
-                                    <i class="fa-solid fa-trash galleryOneAction text-white mx-2 fs-5"
+                                    <i class="fa-solid fa-trash galleryOneAction app-text-inverse mx-2 fs-5"
                                        title="<?= lang('backend/components/galleryOne.labels.delete'); ?>"
                                        data-action="deleteImage"
                                        data-message="<?= lang('backend/components/galleryOne.messages.areYouSureDeleteImage'); ?>">
@@ -47,7 +47,7 @@
                                     
                                     <a href="<?= base_url('images/backend/' . $entity . '/' . esc($uuid) . '/large/' . esc($img['filename'])); ?>"
                                        target="_blank"
-                                       class="text-white mx-2 fs-5"
+                                       class="app-text-inverse mx-2 fs-5"
                                        title="<?= lang('backend/components/galleryOne.labels.viewImage'); ?>">
                                         <i class="fa-solid fa-image"></i>
                                     </a>
@@ -64,7 +64,7 @@
 
                                     <?php if ((int) $img['is_cover'] === 1) : ?>
                                         <!-- C'è solo questa icona nell'angolo. Quella centrale è stata eliminata definitivamente -->
-                                        <i class="fa-solid fa-circle-check fa-2x position-absolute top-0 start-0 m-2 text-dark"></i>
+                                        <i class="fa-solid fa-circle-check fa-2x position-absolute top-0 start-0 m-2 app-text"></i>
                                     <?php endif; ?>
 
                                 </a>

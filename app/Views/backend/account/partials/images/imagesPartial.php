@@ -11,7 +11,7 @@
         <input type="hidden" name="uuid" value="<?= esc($currentAdmin->uuid); ?>">
         <input type="hidden" name="entity" value="<?= esc($entity); ?>">
         <input type="hidden" name="context" value="<?= esc($context); ?>">
-        <button type="submit" class="btn btn-sm btn-secondary">
+        <button type="submit" class="btn btn-sm app-btn-secondary">
             <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/components/galleryOne.buttons.reload'); ?>
         </button>
     </form>

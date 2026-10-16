@@ -492,7 +492,7 @@ class AuthModel extends BackendModel
         /* Messaggio di benvenuto */
         $welcomeMessage = sprintf(lang('backend/auth.messages.welcome'), esc($admin->firstname), esc($admin->lastname));
 
-        session()->setFlashdata(['message' => $welcomeMessage, 'class' => 'light text-success fw-bold', 'icon' => '<i class="fa-solid fa-handshake"></i>']);
+        session()->setFlashdata(['message' => $welcomeMessage, 'class' => 'app-alert-success fw-bold', 'icon' => '<i class="fa-solid fa-handshake"></i>']);
 
         return ['result' => true];
     }

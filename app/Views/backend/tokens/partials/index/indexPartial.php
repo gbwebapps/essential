@@ -78,7 +78,7 @@
                                             $now = new \DateTime();
 
                                             /* Applichiamo le classi in base al confronto (se adesso è maggiore della scadenza, è scaduto) */
-                                            $class = ($now > $dateExpire) ? 'text-danger fw-bold text-decoration-line-through' : 'text-success fw-bold';
+                                            $class = ($now > $dateExpire) ? 'app-text-danger fw-bold text-decoration-line-through' : 'app-text-success fw-bold';
 
                                             /* Mappatura delle traduzioni per i tipi di token */
                                             $typeMap = [
@@ -96,7 +96,7 @@
                                         <tr class="border-end border-start table-row-60<?= $isSuperadmin ? ' table-bg-superadmin' : ''; ?>">
                                             <!-- Cella chevron -->
                                             <td class="align-middle fw-bold">
-                                                <button class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 text-secondary shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($token->id, 'attr'); ?>" aria-expanded="false" title="<?= esc(lang('backend/tokens.labels.showSystemDetails'), 'attr'); ?>">
+                                                <button class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 app-text-muted shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($token->id, 'attr'); ?>" aria-expanded="false" title="<?= esc(lang('backend/tokens.labels.showSystemDetails'), 'attr'); ?>">
                                                     <i class="fa-solid fa-chevron-right"></i>
                                                 </button>
                                             </td>
@@ -137,7 +137,7 @@
                                                         <form class="hardDeleteRecord m-0 p-0" data-controller="tokens" data-message="<?= esc(sprintf(lang('backend/tokens.messages.areYouSureHardDelete'), $token->firstname, $token->lastname), 'attr'); ?>">
                                                             <input type="hidden" name="uuid" value="<?= esc($token->uuid, 'attr'); ?>">
                                                             <input type="hidden" name="id" value="<?= esc($token->id, 'attr'); ?>">
-                                                            <button type="submit" class="btn btn-link p-0 m-0 text-danger text-decoration-none action shadow-none">
+                                                            <button type="submit" class="btn btn-link px-2 py-1 m-0 app-text-danger text-decoration-none action shadow-none">
                                                                 <i class="fa-solid fa-xmark fa-fw"></i> <?= lang('backend/tokens.actions.hardDelete'); ?>
                                                             </button>
                                                         </form>
@@ -159,7 +159,7 @@
                                                 <div class="collapse" id="meta-<?= esc($token->id, 'attr'); ?>">
                                                     
                                                     <!-- Box effettivo dei metadati: spazioso, con background neutro -->
-                                                    <div class="p-2 border-bottom bg-light text-secondary small">
+                                                    <div class="p-2 border-bottom app-bg-surface app-text-muted small">
                                                         
                                                         <!-- Parte useragent -->
                                                         <?php 
@@ -167,24 +167,24 @@
                                                             $userAgent->parse($token->user_agent);
 
                                                             /* Inizializzazione corretta della variabile in camelCase */
-                                                            $agentText = lang('backend/tokens.labels.operatingSystem') . ' <span class="text-primary fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
+                                                            $agentText = lang('backend/tokens.labels.operatingSystem') . ' <span class="app-text-accent fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
                                                         ?>
 
                                                         <?php
                                                             /* Valutazione con metodi nativi in camelCase di CodeIgniter 4 */
                                                             if($userAgent->isBrowser()):
-                                                                $agentText .= ' &bull; ' . lang('backend/tokens.labels.browser') . ' <span class="text-primary fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
+                                                                $agentText .= ' &bull; ' . lang('backend/tokens.labels.browser') . ' <span class="app-text-accent fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
                                                             elseif($userAgent->isMobile()):
-                                                                $agentText .= ' &bull; ' . lang('backend/tokens.labels.mobile') . ' <span class="text-primary fw-bold">' . esc($userAgent->getMobile()) . '</span>';
+                                                                $agentText .= ' &bull; ' . lang('backend/tokens.labels.mobile') . ' <span class="app-text-accent fw-bold">' . esc($userAgent->getMobile()) . '</span>';
                                                             elseif($userAgent->isRobot()):
-                                                                $agentText .= ' &bull; ' . lang('backend/tokens.labels.robot') . ' <span class="text-primary fw-bold">' . esc($userAgent->getRobot()) . '</span>';
+                                                                $agentText .= ' &bull; ' . lang('backend/tokens.labels.robot') . ' <span class="app-text-accent fw-bold">' . esc($userAgent->getRobot()) . '</span>';
                                                             endif;
                                                         ?>
 
                                                         <?= $agentText; ?>
                                                         &nbsp;&bull;&nbsp;
                                                         <span><?= lang('backend/tokens.labels.ipAddress'); ?></span>
-                                                        <span class="text-primary fw-bold"><?= esc($token->ip_address); ?></span>
+                                                        <span class="app-text-accent fw-bold"><?= esc($token->ip_address); ?></span>
                                                         <!-- End parte useragent -->
 
                                                     </div>

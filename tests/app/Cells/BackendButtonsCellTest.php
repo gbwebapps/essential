@@ -24,9 +24,9 @@ class BackendButtonsCellTest extends CIUnitTestCase
         $result = $cell->render('users', 'add');
 
         $this->assertStringContainsString('<form method="post" id="add-reset"', $result);
-        $this->assertStringContainsString('class="btn&#x20;btn-warning&#x20;text-dark&#x20;btn-sm"', $result);
+        $this->assertStringContainsString('class="btn&#x20;app-btn-warning&#x20;btn-sm"', $result);
         $this->assertStringContainsString('class="fa-solid fa-refresh"', $result);
-        $this->assertStringContainsString('class="btn&#x20;btn-success&#x20;btn-sm"', $result);
+        $this->assertStringContainsString('class="btn&#x20;app-btn-success&#x20;btn-sm"', $result);
         $this->assertStringContainsString('form="users-add"', $result);
         $this->assertStringContainsString('class="fa-solid fa-floppy-disk"', $result);
     }
@@ -56,9 +56,9 @@ class BackendButtonsCellTest extends CIUnitTestCase
 
         $this->assertSame('add-reset', $result['id_output']);
         $this->assertSame('<i class="fa-solid fa-refresh"></i>', $result['icon_left']);
-        $this->assertSame('btn btn-warning text-dark btn-sm', $result['btn_left']);
+        $this->assertSame('btn app-btn-warning btn-sm', $result['btn_left']);
         $this->assertSame('<i class="fa-solid fa-floppy-disk"></i>', $result['icon_right']);
-        $this->assertSame('btn btn-success btn-sm', $result['btn_right']);
+        $this->assertSame('btn app-btn-success btn-sm', $result['btn_right']);
     }
 
     public function testGetButtonConfigReturnsEditConfiguration(): void
@@ -69,9 +69,9 @@ class BackendButtonsCellTest extends CIUnitTestCase
 
         $this->assertSame('edit-refresh', $result['id_output']);
         $this->assertSame('<i class="fa-solid fa-refresh"></i>', $result['icon_left']);
-        $this->assertSame('btn btn-warning text-dark btn-sm', $result['btn_left']);
+        $this->assertSame('btn app-btn-warning btn-sm', $result['btn_left']);
         $this->assertSame('<i class="fa-solid fa-floppy-disk"></i>', $result['icon_right']);
-        $this->assertSame('btn btn-success btn-sm', $result['btn_right']);
+        $this->assertSame('btn app-btn-success btn-sm', $result['btn_right']);
     }
 
     public function testGetButtonConfigReturnsShowConfiguration(): void
@@ -95,9 +95,9 @@ class BackendButtonsCellTest extends CIUnitTestCase
         $result = $this->invokeGetButtonConfig($cell, 'account', 'edit_account');
 
         $this->assertSame('edit-refresh', $result['id_output']);
-        $this->assertSame('btn btn-warning text-dark btn-sm', $result['btn_left']);
+        $this->assertSame('btn app-btn-warning btn-sm', $result['btn_left']);
         $this->assertSame('<i class="fa-solid fa-refresh"></i>', $result['icon_left']);
-        $this->assertSame('btn btn-success btn-sm', $result['btn_right']);
+        $this->assertSame('btn app-btn-success btn-sm', $result['btn_right']);
         $this->assertSame('<i class="fa-solid fa-floppy-disk"></i>', $result['icon_right']);
     }
 

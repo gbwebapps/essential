@@ -26,7 +26,7 @@
 
                             <!-- Bottone Mobile per aprire l'Offcanvas -->
                             <div class="col-12 d-md-none mb-3">
-                                <button class="btn btn-secondary w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#audits-actionsOffcanvas" aria-controls="audits-actionsOffcanvas">
+                                <button class="btn app-btn-secondary w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#audits-actionsOffcanvas" aria-controls="audits-actionsOffcanvas">
                                     <i class="fa-solid fa-bars"></i> <?= lang('backend/audits.labels.filtersAndOptions'); ?>
                                 </button>
                             </div>
@@ -87,7 +87,7 @@
                                         <input type="text" id="audits-username" class="form-control" placeholder="<?= esc(lang('backend/audits.placeholders.searchUsername'), 'attr'); ?>" data-search-field="username" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
-                                    <div data-search-error="username" class="error_username text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="username" class="error_username app-text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End Ricerca avanzata per username -->
@@ -100,7 +100,7 @@
                                         <input type="text" id="audits-action" class="form-control" placeholder="<?= esc(lang('backend/audits.placeholders.searchAction'), 'attr'); ?>" data-search-field="action" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
-                                    <div data-search-error="action" class="error_action text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="action" class="error_action app-text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End Ricerca avanzata per azione -->
@@ -113,7 +113,7 @@
                                         <input type="text" id="audits-section" class="form-control" placeholder="<?= esc(lang('backend/audits.placeholders.searchSection'), 'attr'); ?>" data-search-field="section" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
-                                    <div data-search-error="section" class="error_section text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="section" class="error_section app-text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End Ricerca avanzata per sezione -->
@@ -126,7 +126,7 @@
                                         <input type="text" id="audits-details" class="form-control" placeholder="<?= esc(lang('backend/audits.placeholders.searchDetails'), 'attr'); ?>" data-search-field="details" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
-                                    <div data-search-error="details" class="error_details text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="details" class="error_details app-text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End Ricerca avanzata per dettagli -->
@@ -145,7 +145,7 @@
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <div data-search-error="created_at-from" class="error_created_at-from text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="created_at-from" class="error_created_at-from app-text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End ricerca avanzata per data da -->
@@ -160,7 +160,7 @@
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <div data-search-error="created_at-to" class="error_created_at-to text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="created_at-to" class="error_created_at-to app-text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End ricerca avanzata per data a -->

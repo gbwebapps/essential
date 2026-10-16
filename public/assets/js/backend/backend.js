@@ -298,19 +298,19 @@ export function showAlert(type, message, customIcon = '')
     /* Determina classe e icona di default in base al tipo */
     switch (type) {
         case 'success':
-            alertClass = 'light text-success fw-bold';
+            alertClass = 'app-alert-success fw-bold';
             defaultIcon = '<i class="fa-solid fa-circle-check"></i>';
             break;
         case 'danger':
-            alertClass = 'light text-danger fw-bold';
+            alertClass = 'app-alert-danger fw-bold';
             defaultIcon = '<i class="fa-solid fa-triangle-exclamation"></i>';
             break;
         case 'info':
-            alertClass = 'light text-info fw-bold';
+            alertClass = 'app-alert-info fw-bold';
             defaultIcon = '<i class="fa-solid fa-circle-info"></i>';
             break;
         default:
-            alertClass = 'light text-secondary fw-bold';
+            alertClass = 'app-alert fw-bold';
             defaultIcon = '';
     }
 
@@ -321,11 +321,11 @@ export function showAlert(type, message, customIcon = '')
     const iconHTML = finalIcon ? `${finalIcon} ` : '';
 
     const alertHTML = `
-        <div class="alert alert-${alertClass} alert-dismissible fade show border-0 d-flex align-items-center p-3 mb-0" role="alert">
+        <div class="alert ${alertClass} alert-dismissible fade show border-0 d-flex align-items-center p-3 mb-0" role="alert">
             <div class="w-100 text-center p-0 ms-4">
                 ${iconHTML}${message}
             </div>
-            <button type="button" class="badge bg-danger p-2 border-0 rounded-1 ms-auto" data-bs-dismiss="alert" style="cursor: pointer;">
+            <button type="button" class="badge app-bg-danger p-2 border-0 rounded-1 ms-auto" data-bs-dismiss="alert" style="cursor: pointer;">
                 <i class="fa-solid fa-xmark"></i> ${ langDefinitions.dataset.remove }
             </button>
         </div>`;

@@ -7,10 +7,10 @@
                 </div>
                 <div class="modal-body"></div>
                 <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-sm btn-danger btn-cancel">
+                    <button type="button" class="btn btn-sm app-btn-danger btn-cancel">
                         <i class="fa-solid fa-xmark"></i> <?= lang('backend/global.buttons.no'); ?>
                     </button>
-                    <button type="button" class="btn btn-sm btn-success btn-ok">
+                    <button type="button" class="btn btn-sm app-btn-success btn-ok">
                         <i class="fa-solid fa-check"></i> <?= lang('backend/global.buttons.yes'); ?>
                     </button>
                 </div>

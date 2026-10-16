@@ -88,8 +88,8 @@
 
                                                 if ( ! empty($log->token_expire) && $now->isBefore($log->token_expire)):
                                                     
-                                                    $logoutHtml   = '<span class="text-success fw-bold">' . lang('backend/logs.labels.pending') . '</span>';
-                                                    $reasonHtml   = '<span class="text-success fw-bold">' . lang('backend/logs.labels.pending') . '</span>';
+                                                    $logoutHtml   = '<span class="app-text-success fw-bold">' . lang('backend/logs.labels.pending') . '</span>';
+                                                    $reasonHtml   = '<span class="app-text-success fw-bold">' . lang('backend/logs.labels.pending') . '</span>';
                                                     
                                                     $start = new \DateTime($log->login);
                                                     $end   = new \DateTime( ! empty($log->last_activity) ? $log->last_activity : $now->format('Y-m-d H:i:s'));
@@ -101,13 +101,13 @@
                                                     if ($diff->i > 0) $durationStr[] = $diff->i . 'm';
                                                     $durationStr[] = $diff->s . 's'; 
                                                     
-                                                    $durationHtml = '<span class="text-success fw-bold">' . implode(' ', $durationStr) . '</span>';
+                                                    $durationHtml = '<span class="app-text-success fw-bold">' . implode(' ', $durationStr) . '</span>';
                                                     
                                                 else:
                                                     
-                                                    $logoutHtml   = '<span class="text-danger fw-bold text-decoration-line-through">' . lang('backend/logs.labels.undefined') . '</span>';
-                                                    $durationHtml = '<span class="text-danger fw-bold text-decoration-line-through">' . lang('backend/logs.labels.undefined') . '</span>';
-                                                    $reasonHtml   = '<span class="text-danger fw-bold text-decoration-line-through">' . lang('backend/logs.labels.undefined') . '</span>';
+                                                    $logoutHtml   = '<span class="app-text-danger fw-bold text-decoration-line-through">' . lang('backend/logs.labels.undefined') . '</span>';
+                                                    $durationHtml = '<span class="app-text-danger fw-bold text-decoration-line-through">' . lang('backend/logs.labels.undefined') . '</span>';
+                                                    $reasonHtml   = '<span class="app-text-danger fw-bold text-decoration-line-through">' . lang('backend/logs.labels.undefined') . '</span>';
                                                     
                                                 endif;
 
@@ -116,7 +116,7 @@
 
                                         <tr class="border-end border-start table-row-60<?= $isSuperadmin ? ' table-bg-superadmin' : ''; ?>">
                                             <td class="align-middle fw-bold">
-                                                <button class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 text-secondary shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($log->id, 'attr'); ?>" aria-expanded="false" title="<?= esc(lang('backend/logs.labels.showSystemDetails'), 'attr'); ?>">
+                                                <button class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 app-text-muted shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($log->id, 'attr'); ?>" aria-expanded="false" title="<?= esc(lang('backend/logs.labels.showSystemDetails'), 'attr'); ?>">
                                                     <i class="fa-solid fa-chevron-right"></i>
                                                 </button>
                                             </td>
@@ -148,7 +148,7 @@
                                                             <!-- Pulsante di disconnessione della sessione -->
                                                             <form class="disconnectSessionRecord m-0 p-0" data-controller="logs" data-message="<?= esc(sprintf(lang('backend/logs.messages.areYouSureDisconnectSession'), $log->firstname, $log->lastname), 'attr'); ?>">
                                                                 <input type="hidden" name="tokenId" value="<?= esc($log->token_id_val, 'attr'); ?>">
-                                                                <button type="submit" class="btn btn-link p-0 m-0 text-danger text-decoration-none action shadow-none">
+                                                                <button type="submit" class="btn btn-link p-0 m-0 app-text-danger text-decoration-none action shadow-none">
                                                                     <i class="fa-solid fa-xmark fa-fw"></i> <?= lang('backend/logs.actions.disconnectSession'); ?>
                                                                 </button>
                                                             </form>
@@ -166,27 +166,27 @@
                                         <tr class="border-end border-start">
                                             <td colspan="7" class="p-0 border-0">
                                                 <div class="collapse" id="meta-<?= esc($log->id); ?>">
-                                                    <div class="p-2 border-bottom bg-light text-secondary small">
+                                                    <div class="p-2 border-bottom app-bg-surface app-text-muted small">
                                                         <?php 
                                                             $userAgent->parse($log->user_agent);
 
-                                                            $agentText = lang('backend/logs.labels.createdAt') . ' <span class="text-primary fw-bold">' . convertDate(esc($log->created_at), 'conversational') . '</span>';
-                                                            $agentText .= ' &bull; ' . lang('backend/logs.labels.typeToken') . ' <span class="text-primary fw-bold">' . esc($log->token_type) . '</span>';
-                                                            $agentText .= ' &bull; ' . lang('backend/logs.labels.operatingSystem') . ' <span class="text-primary fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
+                                                            $agentText = lang('backend/logs.labels.createdAt') . ' <span class="app-text-accent fw-bold">' . convertDate(esc($log->created_at), 'conversational') . '</span>';
+                                                            $agentText .= ' &bull; ' . lang('backend/logs.labels.typeToken') . ' <span class="app-text-accent fw-bold">' . esc($log->token_type) . '</span>';
+                                                            $agentText .= ' &bull; ' . lang('backend/logs.labels.operatingSystem') . ' <span class="app-text-accent fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
                                                         ?>
                                                         <?php
                                                             if($userAgent->isBrowser()):
-                                                                $agentText .= ' &bull; ' . lang('backend/logs.labels.browser') . ' <span class="text-primary fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
+                                                                $agentText .= ' &bull; ' . lang('backend/logs.labels.browser') . ' <span class="app-text-accent fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
                                                             elseif($userAgent->isMobile()):
-                                                                $agentText .= ' &bull; ' . lang('backend/logs.labels.mobile') . ' <span class="text-primary fw-bold">' . esc($userAgent->getMobile()) . '</span>';
+                                                                $agentText .= ' &bull; ' . lang('backend/logs.labels.mobile') . ' <span class="app-text-accent fw-bold">' . esc($userAgent->getMobile()) . '</span>';
                                                             elseif($userAgent->isRobot()):
-                                                                $agentText .= ' &bull; ' . lang('backend/logs.labels.robot') . ' <span class="text-primary fw-bold">' . esc($userAgent->getRobot()) . '</span>';
+                                                                $agentText .= ' &bull; ' . lang('backend/logs.labels.robot') . ' <span class="app-text-accent fw-bold">' . esc($userAgent->getRobot()) . '</span>';
                                                             endif;
                                                         ?>
                                                         <?= $agentText; ?>
                                                         &nbsp;&bull;&nbsp;
                                                         <span><?= lang('backend/logs.labels.ipAddress'); ?></span>
-                                                        <span class="text-primary fw-bold"><?= esc($log->ip_address); ?></span>
+                                                        <span class="app-text-accent fw-bold"><?= esc($log->ip_address); ?></span>
                                                     </div>
                                                 </div>
                                             </td>

@@ -1,0 +1,311 @@
+/*
+ * Tema dark Essential.
+ * Estende la base monocromatica black con superfici sfumate.
+ */
+@import url("black.css");
+
+:root {
+    --app-page-bg: #555555;
+    --app-page-shadow: inset 0 0 10rem rgba(0, 0, 0, .7);
+    --app-success: #198754;
+    --app-success-hover: #157347;
+    --app-danger: #dc3545;
+    --app-danger-hover: #bb2d3b;
+    --app-warning: #ffc107;
+    --app-warning-hover: #ffca2c;
+    --app-button-border: #111111;
+}
+
+body {
+    min-height: 100dvh;
+}
+
+.navbar.fixed-top {
+    background: linear-gradient(to bottom, #222222, #333333) !important;
+    border-bottom-color: #111111 !important;
+}
+
+.navbar.fixed-bottom {
+    background: linear-gradient(to bottom, #333333, #222222) !important;
+    border-top-color: #111111 !important;
+}
+
+#buttons_block .card,
+#buttons_block .card-body,
+#buttons-block .card,
+#buttons-block .card-body {
+    background: linear-gradient(to bottom, #222222, #333333) !important;
+    border-color: #111111 !important;
+}
+
+#buttons_block .card,
+#buttons-block .card {
+    border: .0625rem solid #111111 !important;
+    border-radius: var(--bs-card-border-radius) !important;
+}
+
+#buttons_block .card-body,
+#buttons-block .card-body {
+    border-radius: var(--bs-card-inner-border-radius) !important;
+}
+
+.accordion-button,
+.card-header {
+    background: linear-gradient(to bottom, #222222, #333333) !important;
+}
+
+.accordion-button {
+    background-size: 100% 200% !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}
+
+.card-header {
+    border: 0 !important;
+    border-bottom: .0625rem solid #111111 !important;
+}
+
+.card > .card-header:first-child {
+    border-radius: var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius) 0 0 !important;
+    background-clip: padding-box;
+}
+
+.accordion-body {
+    background-color: #444444 !important;
+}
+
+.card-body {
+    background-color: #444444 !important;
+}
+
+.card {
+    border: .0625rem solid #111111 !important;
+    border-radius: var(--bs-card-border-radius) !important;
+    background-clip: border-box;
+}
+
+.card > .card-body:first-child {
+    border-top-left-radius: var(--bs-card-inner-border-radius);
+    border-top-right-radius: var(--bs-card-inner-border-radius);
+}
+
+.card > .card-body:last-child {
+    border-bottom-right-radius: var(--bs-card-inner-border-radius);
+    border-bottom-left-radius: var(--bs-card-inner-border-radius);
+}
+
+.card > :last-child {
+    border-bottom-right-radius: var(--bs-card-inner-border-radius);
+    border-bottom-left-radius: var(--bs-card-inner-border-radius);
+    overflow: hidden;
+}
+
+.list-group-flush,
+.list-group-flush > .list-group-item {
+    background-color: transparent !important;
+    border-color: #111111 !important;
+}
+
+.form-control,
+.form-select {
+    color: #ffffff !important;
+    background-color: #555555 !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    color: #ffffff !important;
+    background-color: #555555 !important;
+}
+
+.input-group-text,
+.input-group > .toggle-password-visibility {
+    color: #ffffff !important;
+    background-color: #333333 !important;
+}
+
+.table,
+.table-responsive {
+    --bs-border-color: #111111;
+    --bs-table-border-color: #111111;
+    border-color: #111111 !important;
+}
+
+.table > :not(caption) > * > * {
+    border-color: #111111 !important;
+}
+
+.left-menu .list-group-item,
+.left-menu .list-group-item.active {
+    color: #ffffff !important;
+    background-color: #222222 !important;
+    border-color: #111111 !important;
+}
+
+.left-menu .list-group .list-group-item.active {
+    color: #ffffff !important;
+    background-color: #444444 !important;
+    border: .0625rem solid #111111 !important;
+}
+
+.left-menu .list-group .list-group-item-action:hover,
+.left-menu .list-group .list-group-item-action:focus {
+    color: #ffffff !important;
+    background-color: #444444 !important;
+}
+
+.left-menu .list-group .list-group-item-action:hover i,
+.left-menu .list-group .list-group-item-action:focus i {
+    color: #ffffff !important;
+}
+
+.navbar .dropdown-menu {
+    color: #ffffff !important;
+    background-color: #222222 !important;
+    border-color: #111111 !important;
+}
+
+.navbar .dropdown-menu .dropdown-item {
+    color: #ffffff !important;
+    background-color: #222222 !important;
+}
+
+.navbar .dropdown-menu .dropdown-item:hover,
+.navbar .dropdown-menu .dropdown-item:focus,
+.navbar .dropdown-menu .dropdown-item.active {
+    color: #ffffff !important;
+    background-color: #444444 !important;
+}
+
+.navbar .dropdown-menu .dropdown-item:hover i,
+.navbar .dropdown-menu .dropdown-item:focus i,
+.navbar .dropdown-menu .dropdown-item.active i {
+    color: #ffffff !important;
+}
+
+.navbar .dropdown-menu .dropdown-divider {
+    border-top-color: #111111 !important;
+}
+
+.navbar.fixed-bottom .btn-group > .btn.dropdown-toggle {
+    color: #ffffff !important;
+    background-color: #222222 !important;
+    border-color: #111111 !important;
+}
+
+.alert {
+    color: #ffffff !important;
+    background: linear-gradient(to bottom, #222222, #333333) !important;
+    border: .0625rem solid #111111 !important;
+}
+
+.alert button[data-bs-dismiss="alert"] {
+    color: #ffffff !important;
+    background: linear-gradient(to bottom, var(--app-danger), var(--app-danger-hover)) !important;
+    border: .0625rem solid #111111 !important;
+}
+
+.alert button[data-bs-dismiss="alert"]:hover,
+.alert button[data-bs-dismiss="alert"]:focus,
+.alert button[data-bs-dismiss="alert"]:active {
+    background: linear-gradient(to bottom, var(--app-danger-hover), var(--app-danger)) !important;
+}
+
+#globalConfirmModal .modal-content {
+    color: #ffffff !important;
+    background: linear-gradient(to bottom, #222222, #333333) !important;
+    border-color: #111111 !important;
+}
+
+.app-btn-secondary:not(.toggle-password-visibility) {
+    --bs-btn-color: #ffffff;
+    --bs-btn-border-color: var(--app-button-border);
+    --bs-btn-hover-color: #ffffff;
+    --bs-btn-hover-border-color: var(--app-button-border);
+    --bs-btn-active-color: #ffffff;
+    --bs-btn-active-border-color: var(--app-button-border);
+    background: linear-gradient(to bottom, #222222, #333333);
+}
+
+.app-btn-secondary:not(.toggle-password-visibility):hover,
+.app-btn-secondary:not(.toggle-password-visibility):focus,
+.app-btn-secondary:not(.toggle-password-visibility):active {
+    background: linear-gradient(to bottom, #333333, #222222);
+}
+
+#permissions-account-container .app-bg-surface,
+#permissions .app-bg-surface,
+#admin-permissions-container .app-bg-surface {
+    background-color: #555555 !important;
+    border-color: #111111 !important;
+}
+
+#permissions-account-container .border,
+#permissions .border,
+#admin-permissions-container .border {
+    border-color: #111111 !important;
+}
+
+#permissions-account-container .badge.app-border-success-subtle,
+#permissions .badge.app-border-success-subtle,
+#admin-permissions-container .badge.app-border-success-subtle {
+    color: #0a3622 !important;
+    background-color: #d1e7dd !important;
+    border-color: #a3cfbb !important;
+}
+
+#permissions-account-container .badge.app-bg-surface,
+#permissions .badge.app-bg-surface,
+#admin-permissions-container .badge.app-bg-surface {
+    color: #58151c !important;
+    background-color: #f8d7da !important;
+    border-color: #f1aeb5 !important;
+}
+
+.app-btn-success {
+    --bs-btn-color: #ffffff;
+    --bs-btn-border-color: var(--app-button-border);
+    --bs-btn-hover-color: #ffffff;
+    --bs-btn-hover-border-color: var(--app-button-border);
+    --bs-btn-active-color: #ffffff;
+    --bs-btn-active-border-color: var(--app-button-border);
+    background: linear-gradient(to bottom, var(--app-success), var(--app-success-hover));
+}
+
+.app-btn-success:hover,
+.app-btn-success:focus,
+.app-btn-success:active {
+    background: linear-gradient(to bottom, var(--app-success-hover), var(--app-success));
+}
+
+.app-btn-danger {
+    --bs-btn-color: #ffffff;
+    --bs-btn-border-color: var(--app-button-border);
+    --bs-btn-hover-color: #ffffff;
+    --bs-btn-hover-border-color: var(--app-button-border);
+    --bs-btn-active-color: #ffffff;
+    --bs-btn-active-border-color: var(--app-button-border);
+    background: linear-gradient(to bottom, var(--app-danger), var(--app-danger-hover));
+}
+
+.app-btn-danger:hover,
+.app-btn-danger:focus,
+.app-btn-danger:active {
+    background: linear-gradient(to bottom, var(--app-danger-hover), var(--app-danger));
+}
+
+.app-btn-warning {
+    --bs-btn-color: #000000;
+    --bs-btn-border-color: var(--app-button-border);
+    --bs-btn-hover-color: #000000;
+    --bs-btn-hover-border-color: var(--app-button-border);
+    --bs-btn-active-color: #000000;
+    --bs-btn-active-border-color: var(--app-button-border);
+    background: linear-gradient(to bottom, var(--app-warning), var(--app-warning-hover));
+}
+
+.app-btn-warning:hover,
+.app-btn-warning:focus,
+.app-btn-warning:active {
+    background: linear-gradient(to bottom, var(--app-warning-hover), var(--app-warning));
+}

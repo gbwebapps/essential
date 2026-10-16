@@ -8,7 +8,7 @@
                 <form id="getGeneralData">
                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>">
                     <input type="hidden" name="context" value="show">
-                    <button type="submit" class="btn btn-sm btn-secondary">
+                    <button type="submit" class="btn btn-sm app-btn-secondary">
                         <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/admins.buttons.reload'); ?>
                     </button>
                 </form>
@@ -24,7 +24,7 @@
                 <form id="getPermissions">
                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>">
                     <input type="hidden" name="context" value="show">
-                    <button type="submit" class="btn btn-sm btn-secondary">
+                    <button type="submit" class="btn btn-sm app-btn-secondary">
                         <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/admins.buttons.reload'); ?>
                     </button>
                 </form>
@@ -39,7 +39,7 @@
                 <h2 class="card-title text-start mb-0"><?= lang('backend/admins.panels.tokens'); ?></h2>
                 <form id="getTokens">
                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>">
-                    <button type="submit" class="btn btn-sm btn-secondary">
+                    <button type="submit" class="btn btn-sm app-btn-secondary">
                         <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/admins.buttons.reload'); ?>
                     </button>
                 </form>
@@ -56,7 +56,7 @@
                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>">
                     <input type="hidden" name="entity" value="<?= esc($entity, 'attr'); ?>">
                     <input type="hidden" name="context" value="<?= esc($context, 'attr'); ?>">
-                    <button type="submit" class="btn btn-sm btn-secondary">
+                    <button type="submit" class="btn btn-sm app-btn-secondary">
                         <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/components/galleryOne.buttons.reload'); ?>
                     </button>
                 </form>
@@ -71,7 +71,7 @@
                 <h2 class="card-title text-start mb-0"><?= lang('backend/admins.panels.metaData'); ?></h2>
                 <form id="getMetaData">
                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>">
-                    <button type="submit" class="btn btn-sm btn-secondary">
+                    <button type="submit" class="btn btn-sm app-btn-secondary">
                         <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/admins.buttons.reload'); ?>
                     </button>
                 </form>

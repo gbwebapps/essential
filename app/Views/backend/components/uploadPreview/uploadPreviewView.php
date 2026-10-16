@@ -1,17 +1,17 @@
 <style>
     .drop-zone-custom {
         height: 4.5rem; 
-        border: 2px dashed #adb5bd; /* Grigio Bootstrap intermedio */
+        border: 2px dashed var(--app-border);
         border-radius: 0.375rem; /* Bordo arrotondato standard Bootstrap */
-        background-color: #f8f9fa; /* Sfondo bg-light */
+        background-color: var(--app-surface);
         transition: background-color 0.2s ease, border-color 0.2s ease;
         cursor: pointer;
     }
 
     /* Attivata via JS quando il file è sopra l'area */
     .drop-zone-custom.is-dragover {
-        background-color: #e9ecef;
-        border-color: #6c757d;
+        background-color: var(--app-surface-muted);
+        border-color: var(--app-border-strong);
     }
 </style>
 
@@ -29,7 +29,7 @@
         <div class="col-6 d-flex justify-content-end align-items-center">
             <div>
                 <input type="file" name="images[]" id="inputImages" style="display: none;" multiple>
-                <button type="button" class="btn btn-sm btn-secondary" id="buttonImages">
+                <button type="button" class="btn btn-sm app-btn-secondary" id="buttonImages">
                     <i class="fa-solid fa-arrow-pointer me-1"></i><?= lang('backend/components/uploadPreview.buttons.uploadImages'); ?>
                 </button>
             </div>
@@ -40,7 +40,7 @@
                         <input type="hidden" name="uuid" value="<?= esc($uuid); ?>">
                         <input type="hidden" name="entity" value="<?= esc($entity); ?>">
                         <input type="hidden" name="context" value="<?= esc($context); ?>">
-                        <button type="submit" class="btn btn-sm btn-success">
+                        <button type="submit" class="btn btn-sm app-btn-success">
                             <i class="fa-solid fa-upload me-1"></i> <?= lang('backend/components/uploadPreview.buttons.sendImages'); ?>
                         </button>
                     </form>
@@ -56,7 +56,7 @@
         <div class="col-lg-12">
             
             <!-- 1. Area Drop Zone indipendente dal ciclo di vita delle anteprime -->
-            <div id="drop-zone-area" class="drop-zone-custom d-flex align-items-center justify-content-center p-3 mb-3 text-muted w-100">
+            <div id="drop-zone-area" class="drop-zone-custom d-flex align-items-center justify-content-center p-3 mb-3 app-text-muted w-100">
                 <span class="fw-bold">
                     <i class="fa-solid fa-cloud-arrow-up me-2"></i> <?= lang('backend/components/uploadPreview.labels.dragAndDrop'); ?>
                 </span>

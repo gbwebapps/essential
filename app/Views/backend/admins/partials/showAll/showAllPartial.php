@@ -89,13 +89,13 @@
 
                                             <!-- Cella allegati (rowspan rimosso, aggiunto py-3 per altezza) -->
                                             <td class="align-middle text-center border-end fw-bold py-3">
-                                                <span class="badge bg-info"><?= $admin->images_num; ?></span>
+                                                <span class="badge app-bg-info"><?= $admin->images_num; ?></span>
                                             </td>
 
                                             <!-- Cella immagine (rowspan rimosso, aggiunto py-3 per altezza) -->
-                                            <td class="align-middle text-center border-end bg-light py-3">
+                                            <td class="align-middle text-center border-end app-bg-surface py-3">
                                                 <?php if(is_null($cover)): ?>
-                                                    <span class="fw-bold text-danger"><?= lang('backend/admins.labels.noImage'); ?></span>
+                                                    <span class="fw-bold app-text-danger"><?= lang('backend/admins.labels.noImage'); ?></span>
                                                 <?php else: ?>
                                                     <img src="<?= esc(base_url('images/backend/admins/' . rawurlencode($admin->uuid) . '/small/' . rawurlencode($cover)), 'attr'); ?>" class="img-polaroid" alt="">
                                                 <?php endif; ?>
@@ -103,7 +103,7 @@
 
                                             <!-- Cella chevron -->
                                             <td class="align-middle fw-bold">
-                                                <button class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 text-secondary shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($admin->uuid, 'attr'); ?>" aria-expanded="false" title="Mostra dettagli di sistema">
+                                                <button class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 app-text shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($admin->uuid, 'attr'); ?>" aria-expanded="false" title="Mostra dettagli di sistema">
                                                     <i class="fa-solid fa-chevron-right"></i>
                                                 </button>
                                             </td>
@@ -139,10 +139,10 @@
 
                                                             if($status === 1):
                                                                 $statusText = lang('backend/admins.labels.active');
-                                                                $statusClass ="text-success btn btn-link shadow-none fw-bold";
+                                                                $statusClass ="app-text-success btn btn-link shadow-none fw-bold";
                                                             elseif($status === 0):
                                                                 $statusText = lang('backend/admins.labels.unactive');
-                                                                $statusClass ="text-danger btn btn-link shadow-none fw-bold";
+                                                                $statusClass ="app-text-danger btn btn-link shadow-none fw-bold";
                                                             endif;
                                                         ?>
                                                         <form class="changeStatus" data-controller="admins" data-message="<?= esc(sprintf(lang('backend/admins.messages.areYouSureChangeStatus'), $admin->firstname, $admin->lastname), 'attr'); ?>">
@@ -153,7 +153,7 @@
                                                         </form>
                                                     <?php else: ?>
                                                         <?php if($isTrashed): ?>
-                                                            <span class="badge bg-danger p-2 border-0 rounded-1"><?= lang('backend/admins.labels.deleted'); ?></span>
+                                                            <span class="badge app-bg-danger p-2 border-0 rounded-1"><?= lang('backend/admins.labels.deleted'); ?></span>
                                                         <?php endif; ?>
                                                     <?php endif; ?>
 
@@ -171,19 +171,19 @@
                                                         <?php if( ! $isTrashed): ?>
                                                             
                                                             <!-- Pulsante Dettaglio -->
-                                                            <a href="<?= esc(base_url('backend/admins/show/' . rawurlencode($admin->uuid)), 'attr'); ?>" class="text-decoration-none badge bg-secondary-subtle text-secondary-emphasis action">
+                                                            <a href="<?= esc(base_url('backend/admins/show/' . rawurlencode($admin->uuid)), 'attr'); ?>" class="text-decoration-none badge app-bg-muted-subtle app-text-muted-emphasis action">
                                                                 <i class="fa-solid fa-user fa-fw"></i> <?= lang('backend/admins.actions.show'); ?>
                                                             </a>
 
                                                             <!-- Pulsante Aggiorna -->
-                                                            <a href="<?= esc(base_url('backend/admins/edit/' . rawurlencode($admin->uuid)), 'attr'); ?>" class="text-decoration-none badge bg-secondary-subtle text-secondary-emphasis action">
+                                                            <a href="<?= esc(base_url('backend/admins/edit/' . rawurlencode($admin->uuid)), 'attr'); ?>" class="text-decoration-none badge app-bg-muted-subtle app-text-muted-emphasis action">
                                                                 <i class="fa-solid fa-user-pen fa-fw"></i> <?= lang('backend/admins.actions.edit'); ?>
                                                             </a>
 
                                                             <!-- Pulsante Reset password -->
                                                             <form class="resetAdmin m-0 p-0" data-message="<?= esc(sprintf(lang('backend/admins.messages.areYouSureReset'), $admin->firstname, $admin->lastname), 'attr'); ?>">
                                                                 <input type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>">
-                                                                <button type="submit" class="btn badge bg-secondary-subtle text-secondary-emphasis action shadow-none w-100 border-0">
+                                                                <button type="submit" class="btn badge app-bg-muted-subtle app-text-muted-emphasis action shadow-none w-100 border-0">
                                                                     <i class="fa-solid fa-unlock fa-fw"></i> <?= lang('backend/admins.actions.reset'); ?>
                                                                 </button>
                                                             </form>
@@ -191,7 +191,7 @@
                                                             <!-- Pulsante Elimina (Soft Delete) -->
                                                             <form class="deleteRecord m-0 p-0" data-controller="admins" data-message="<?= esc(sprintf(lang('backend/admins.messages.areYouSureSoftDelete'), $admin->firstname, $admin->lastname), 'attr'); ?>">
                                                                 <input type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>">
-                                                                <button type="submit" class="btn badge bg-danger-subtle text-danger-emphasis action shadow-none w-100 border-0">
+                                                                <button type="submit" class="btn badge app-bg-danger-subtle app-text-danger-emphasis action shadow-none w-100 border-0">
                                                                     <i class="fa-solid fa-xmark fa-fw"></i> <?= lang('backend/admins.actions.softDelete'); ?>
                                                                 </button>
                                                             </form>
@@ -201,7 +201,7 @@
                                                             <!-- Pulsante Ripristina (Restore Delete) -->
                                                             <form class="restoreRecord m-0 p-0" data-controller="admins" data-message="<?= esc(sprintf(lang('backend/admins.messages.areYouSureRestoreDelete'), $admin->firstname, $admin->lastname), 'attr'); ?>">
                                                                 <input type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>">
-                                                                <button type="submit" class="btn badge bg-success-subtle text-success-emphasis action shadow-none w-100 border-0">
+                                                                <button type="submit" class="btn badge app-bg-success-subtle app-text-success-emphasis action shadow-none w-100 border-0">
                                                                     <i class="fa-solid fa-trash-arrow-up fa-fw"></i> <?= lang('backend/admins.actions.restoreDelete'); ?>
                                                                 </button>
                                                             </form>
@@ -209,7 +209,7 @@
                                                             <!-- Pulsante Elimina Definitivamente (Hard Delete) -->
                                                             <form class="hardDeleteRecord m-0 p-0" data-controller="admins" data-message="<?= esc(sprintf(lang('backend/admins.messages.areYouSureHardDelete'), $admin->firstname, $admin->lastname), 'attr'); ?>">
                                                                 <input type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>">
-                                                                <button type="submit" class="btn badge bg-danger-subtle text-danger-emphasis action shadow-none w-100 border-0">
+                                                                <button type="submit" class="btn badge app-bg-danger-subtle app-text-danger-emphasis action shadow-none w-100 border-0">
                                                                     <i class="fa-solid fa-xmark fa-fw"></i> <?= lang('backend/admins.actions.hardDelete'); ?>
                                                                 </button>
                                                             </form>
@@ -233,7 +233,7 @@
                                                 <div class="collapse" id="meta-<?= esc($admin->uuid, 'attr'); ?>">
                                                     
                                                     <!-- Box effettivo dei metadati: spazioso, con background neutro -->
-                                                    <div class="p-2 border-bottom <?= $isTrashed ? 'text-decoration-line-through' : ''; ?> <?= $isSuperadmin ? 'bg-light text-dark' : 'bg-light text-secondary'; ?> small">
+                                                    <div class="p-2 border-bottom <?= $isTrashed ? 'text-decoration-line-through' : ''; ?> app-bg-surface app-text small">
                                                         
                                                         <!-- Parte creato -->
                                                         <?= lang('backend/admins.labels.createdAt'); ?> <span class="fw-bold"><?= convertDate(esc($admin->created_at), 'conversational'); ?></span>
@@ -247,19 +247,19 @@
                                                         <!-- Parte sospeso -->
                                                         <?php if( ! is_null($admin->suspended_at)): ?>
                                                             &nbsp;&bull;&nbsp;
-                                                            <?= lang('backend/admins.labels.suspendedAt'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->suspended_at), 'conversational'); ?></span>
+                                                            <?= lang('backend/admins.labels.suspendedAt'); ?> <span class="fw-bold app-text-danger"><?= convertDate(esc($admin->suspended_at), 'conversational'); ?></span>
                                                         <?php endif; ?>
 
                                                         <!-- Parte resettato -->
                                                         <?php if( ! is_null($admin->resetted_at)): ?>
                                                             &nbsp;&bull;&nbsp;
-                                                            <?= lang('backend/admins.labels.resettedAt'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->resetted_at), 'conversational'); ?></span>
+                                                            <?= lang('backend/admins.labels.resettedAt'); ?> <span class="fw-bold app-text-danger"><?= convertDate(esc($admin->resetted_at), 'conversational'); ?></span>
                                                         <?php endif; ?>
 
                                                         <!-- Parte eliminato (Cestinato) -->
                                                         <?php if($isTrashed): ?>
                                                             &nbsp;&bull;&nbsp;
-                                                            <?= lang('backend/admins.labels.deletedAt'); ?> <span class="fw-bold text-danger"><?= convertDate(esc($admin->deleted_at), 'conversational'); ?></span>
+                                                            <?= lang('backend/admins.labels.deletedAt'); ?> <span class="fw-bold app-text-danger"><?= convertDate(esc($admin->deleted_at), 'conversational'); ?></span>
                                                         <?php endif; ?>
 
                                                     </div>

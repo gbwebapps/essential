@@ -62,7 +62,7 @@ class AuthorizationFilter implements FilterInterface
 
         /* Imposta i flashdata validi per entrambi i flussi (AJAX e Standard) */
         session()->setFlashdata('message', $message);
-        session()->setFlashdata('class', 'light text-danger fw-bold');
+        session()->setFlashdata('class', 'app-alert-danger fw-bold');
         session()->setFlashdata('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
 
         /* Gestione della risposta: AJAX vs Standard */

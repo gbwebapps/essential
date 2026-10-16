@@ -6,8 +6,8 @@
             
             <!-- Framework -->
             <div class="card shadow-sm border mb-4">
-                <div class="card-header bg-light fw-bold">
-                    <i class="fa-solid fa-code me-2 text-primary"></i> <?= lang('backend/tools.labels.framework'); ?>
+                <div class="card-header app-bg-surface fw-bold">
+                    <i class="fa-solid fa-code me-2 app-text-accent"></i> <?= lang('backend/tools.labels.framework'); ?>
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -18,7 +18,7 @@
                         <span><?= lang('backend/tools.labels.environment'); ?></span>
                         <?php 
                             /* Badge verde per produzione, giallo per sviluppo */
-                            $envClass = ($sysInfo['framework']['environment'] === 'production') ? 'bg-success' : 'bg-warning text-dark'; 
+                            $envClass = ($sysInfo['framework']['environment'] === 'production') ? 'app-bg-success' : 'app-bg-warning';
                         ?>
                         <span class="badge <?= esc($envClass, 'attr'); ?>"><?= esc(ucfirst($sysInfo['framework']['environment'])); ?></span>
                     </li>
@@ -27,8 +27,8 @@
 
             <!-- Impostazioni Locali -->
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-light fw-bold">
-                    <i class="fa-solid fa-earth-europe me-2 text-primary"></i> <?= lang('backend/tools.labels.local'); ?>
+                <div class="card-header app-bg-surface fw-bold">
+                    <i class="fa-solid fa-earth-europe me-2 app-text-accent"></i> <?= lang('backend/tools.labels.local'); ?>
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -44,8 +44,8 @@
 
             <!-- Server -->
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-light fw-bold">
-                    <i class="fa-solid fa-server me-2 text-primary"></i> <?= lang('backend/tools.labels.server'); ?>
+                <div class="card-header app-bg-surface fw-bold">
+                    <i class="fa-solid fa-server me-2 app-text-accent"></i> <?= lang('backend/tools.labels.server'); ?>
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -61,13 +61,13 @@
 
             <!-- Estensioni -->
             <div class="card shadow-sm">
-                <div class="card-header bg-light fw-bold">
-                    <i class="fa-solid fa-puzzle-piece me-2 text-primary"></i> <?= lang('backend/tools.labels.extensions'); ?>
+                <div class="card-header app-bg-surface fw-bold">
+                    <i class="fa-solid fa-puzzle-piece me-2 app-text-accent"></i> <?= lang('backend/tools.labels.extensions'); ?>
                 </div>
                 <div class="card-body">
                     <div class="d-flex flex-wrap gap-3">
                         <?php foreach($sysInfo['extensions'] as $ext => $loaded): ?>
-                            <div class="badge border <?= esc($loaded ? 'border-success text-success' : 'border-danger text-danger', 'attr'); ?> bg-transparent p-2">
+                            <div class="badge border <?= esc($loaded ? 'app-border-success app-text-success' : 'app-border-danger app-text-danger', 'attr'); ?> bg-transparent p-2">
                                 <i class="fa-solid <?= esc($loaded ? 'fa-check' : 'fa-xmark', 'attr'); ?> me-1"></i> <?= esc(strtoupper($ext)); ?>
                             </div>
                         <?php endforeach; ?>
@@ -82,8 +82,8 @@
             
             <!-- PHP Core -->
             <div class="card shadow-sm">
-                <div class="card-header bg-light fw-bold">
-                    <i class="fa-brands fa-php me-2 text-primary"></i> <?= lang('backend/tools.labels.phpCore'); ?>
+                <div class="card-header app-bg-surface fw-bold">
+                    <i class="fa-brands fa-php me-2 app-text-accent"></i> <?= lang('backend/tools.labels.phpCore'); ?>
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -122,7 +122,7 @@
                         <span><?= lang('backend/tools.labels.displayErrors'); ?></span>
                         <?php 
                             /* Rosso se abilitato in produzione, verde se disabilitato */
-                            $errClass = ($sysInfo['php']['display_errors'] === 'On') ? 'text-danger' : 'text-success'; 
+                            $errClass = ($sysInfo['php']['display_errors'] === 'On') ? 'app-text-danger' : 'app-text-success';
                         ?>
                         <strong class="<?= esc($errClass, 'attr'); ?>"><?= esc($sysInfo['php']['display_errors']); ?></strong>
                     </li>
@@ -130,7 +130,7 @@
                         <span><?= lang('backend/tools.labels.opcache'); ?></span>
                         <?php 
                             /* Verde se abilitato, giallo se disabilitato */
-                            $opClass = ($sysInfo['php']['opcache'] === 'On') ? 'text-success' : 'text-warning'; 
+                            $opClass = ($sysInfo['php']['opcache'] === 'On') ? 'app-text-success' : 'app-text-warning';
                         ?>
                         <strong class="<?= esc($opClass, 'attr'); ?>"><?= esc($sysInfo['php']['opcache']); ?></strong>
                     </li>

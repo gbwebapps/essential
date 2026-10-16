@@ -39,6 +39,20 @@ a {
     max-width: 42em;
 }
 
+.main-logo-heading {
+    margin-bottom: 1rem;
+    line-height: 0;
+}
+
+.main-logo {
+    width: auto;
+    height: 5rem;
+}
+
+.main-slogan {
+    white-space: nowrap;
+}
+
 .features-list {
     display: grid;
     grid-template-columns: 1fr;
@@ -83,10 +97,14 @@ a {
 
 .footer-logo {
     width: auto;
-    height: 1.5rem;
+    height: 2.25rem;
     margin-bottom: 1rem;
-    filter: drop-shadow(0 0 1px rgba(255, 255, 255, .95))
-            drop-shadow(0 0 4px rgba(255, 255, 255, .65));
+}
+
+@media (max-width: 767.98px) {
+    .main-slogan {
+        white-space: normal;
+    }
 }
 
 .nav-masthead .nav-link {

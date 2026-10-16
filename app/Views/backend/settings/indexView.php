@@ -23,7 +23,7 @@
 
                         <div class="accordion-item mb-3 border shadow-sm">
                             <h2 class="accordion-header" id="main_heading_<?= $env; ?>">
-                                <button class="accordion-button collapsed shadow-none bg-light text-secondary py-3 btn-trigger-<?= $env; ?>-settings" data-env="<?= $env; ?>" type="button" aria-expanded="false" aria-controls="main_collapse_<?= $env; ?>">
+                                <button class="accordion-button collapsed shadow-none app-bg-surface app-text-muted py-3 btn-trigger-<?= $env; ?>-settings" data-env="<?= $env; ?>" type="button" aria-expanded="false" aria-controls="main_collapse_<?= $env; ?>">
                                     <h2 class="card-title mb-0 fs-5">
                                         <i class="fa-solid <?= $icon; ?> me-2"></i>
                                         <span id="lang_<?= $env; ?>"><?= lang('backend/settings.panels.' . $env . 'Setting'); ?></span>
@@ -31,7 +31,7 @@
                                 </button>
                             </h2>
                             <div id="main_collapse_<?= $env; ?>" class="accordion-collapse collapse" aria-labelledby="main_heading_<?= $env; ?>" data-bs-parent="#mainSettingsDashboard">
-                                <div id="<?= $env; ?>-settings-container" class="accordion-body bg-white border-top mb-0"></div>
+                                <div id="<?= $env; ?>-settings-container" class="accordion-body app-bg-surface-elevated border-top mb-0"></div>
                             </div>
                         </div>
 

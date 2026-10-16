@@ -8,13 +8,13 @@
             <div class="mb-2">
                 <label for="email" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/auth.labels.email'); ?></label>
                 <input type="email" id="email" name="email" class="form-control" placeholder="<?= lang('backend/auth.placeholders.email'); ?>" autocomplete="email" aria-describedby="error-email">
-                <div id="error-email" class="error_email text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                <div id="error-email" class="error_email app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
             </div>
             <!-- End Campo email -->
 
             <!-- Pulsante invio dati -->
             <div class="d-flex justify-content-end">
-                <button type="submit" class="btn btn-sm btn-secondary"><i class="fa-solid fa-floppy-disk"></i><?= lang('backend/auth.buttons.resetPassword'); ?></button>
+                <button type="submit" class="btn btn-sm app-btn-secondary"><i class="fa-solid fa-floppy-disk"></i><?= lang('backend/auth.buttons.resetPassword'); ?></button>
             </div>
             <!-- End Pulsante invio dati -->
 

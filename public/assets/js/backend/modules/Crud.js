@@ -121,7 +121,7 @@ export class ListManager {
     initTrashFilterUI() {
         this.root.querySelectorAll('[data-trash-filter]').forEach(el => {
             el.classList.toggle('active', el.dataset.trashFilter === this.state.trash_filter);
-            el.classList.toggle('text-success', el.dataset.trashFilter === this.state.trash_filter);
+            el.classList.toggle('app-text-success', el.dataset.trashFilter === this.state.trash_filter);
             el.classList.toggle('fw-bold', el.dataset.trashFilter === this.state.trash_filter);
         });
     }
@@ -308,7 +308,7 @@ export class ListManager {
         if (!link) return;
         const hasText = Object.values(this.state.searchFields).some(value => value?.trim() !== '');
         const hasDates = Object.values(this.state.searchDates).some(value => value?.trim() !== '');
-        link.classList.toggle('text-danger', hasText || hasDates);
+        link.classList.toggle('app-text-danger', hasText || hasDates);
         link.classList.toggle('fw-bold', hasText || hasDates);
     }
 
@@ -364,7 +364,7 @@ export class ListManager {
                         }
                         if (data.message) {
                             await smoothReplace(this.container,
-                                `<div class="text-center text-danger py-3 fw-bold">${data.message}</div>`);
+                                `<div class="text-center app-text-danger py-3 fw-bold">${data.message}</div>`);
                             if (typeof showAlert === 'function') showAlert('danger', data.message);
                         }
                         continue;

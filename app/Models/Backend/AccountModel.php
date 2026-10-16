@@ -513,9 +513,9 @@ class AccountModel extends BackendModel
 	    if($token = $this->db->query($sql, [$currentAdmin->uuid, 'activation'])->getRow()):
 
 		    if (date('Y-m-d H:i:s') < $token->token_expire):
-		        $expiringDate = '<span class="text-success">' . convertDate($token->token_expire, 'conversational') . '</span>';
+		        $expiringDate = '<span class="app-text-success">' . convertDate($token->token_expire, 'conversational') . '</span>';
 		    else:
-		        $expiringDate = '<span class="text-danger"><s>' . convertDate($token->token_expire, 'conversational') . '</s></span>';
+		        $expiringDate = '<span class="app-text-danger"><s>' . convertDate($token->token_expire, 'conversational') . '</s></span>';
 		    endif;
 
 		endif;

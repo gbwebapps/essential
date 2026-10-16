@@ -93,7 +93,7 @@ class GuestFilterTest extends CIUnitTestCase
 
         $this->assertSame($response, $result);
         $this->assertSame($message, session()->getFlashdata('message'));
-        $this->assertSame('light text-danger fw-bold', session()->getFlashdata('class'));
+        $this->assertSame('app-alert-danger fw-bold', session()->getFlashdata('class'));
         $this->assertSame('<i class="fa-solid fa-triangle-exclamation"></i>', session()->getFlashdata('icon'));
     }
 
@@ -134,7 +134,7 @@ class GuestFilterTest extends CIUnitTestCase
         $this->assertSame(base_url('backend/dashboard'), $result->getHeaderLine('Location'));
 
         $this->assertSame($message, session()->getFlashdata('message'));
-        $this->assertSame('light text-danger fw-bold', session()->getFlashdata('class'));
+        $this->assertSame('app-alert-danger fw-bold', session()->getFlashdata('class'));
         $this->assertSame('<i class="fa-solid fa-triangle-exclamation"></i>', session()->getFlashdata('icon'));
     }
 

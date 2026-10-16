@@ -149,7 +149,7 @@ class PermissionFilterTest extends CIUnitTestCase
         $this->assertSame(302, $result->getStatusCode());
         $this->assertSame(base_url('backend/dashboard'), $result->getHeaderLine('Location'));
         $this->assertSame(lang('backend/global.messages.permissionDenied'), session()->getFlashdata('message'));
-        $this->assertSame('light text-danger fw-bold', session()->getFlashdata('class'));
+        $this->assertSame('app-alert-danger fw-bold', session()->getFlashdata('class'));
         $this->assertSame('<i class="fa-solid fa-ban"></i>', session()->getFlashdata('icon'));
     }
 
@@ -171,7 +171,7 @@ class PermissionFilterTest extends CIUnitTestCase
         $this->assertSame(302, $result->getStatusCode());
         $this->assertSame(base_url('backend/dashboard'), $result->getHeaderLine('Location'));
         $this->assertSame(lang('backend/global.messages.permissionDenied'), session()->getFlashdata('message'));
-        $this->assertSame('light text-danger fw-bold', session()->getFlashdata('class'));
+        $this->assertSame('app-alert-danger fw-bold', session()->getFlashdata('class'));
         $this->assertSame('<i class="fa-solid fa-ban"></i>', session()->getFlashdata('icon'));
     }
 

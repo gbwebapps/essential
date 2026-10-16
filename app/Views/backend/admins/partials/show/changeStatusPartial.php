@@ -3,10 +3,10 @@
 
     if($status === 1):
         $statusText = lang('backend/admins.labels.active');
-        $statusClass = "text-success fw-bold btn btn-link shadow-none";
+        $statusClass = "app-text-success fw-bold btn btn-link shadow-none";
     elseif($status === 0):
         $statusText = lang('backend/admins.labels.unactive');
-        $statusClass = "text-danger fw-bold btn btn-link shadow-none";
+        $statusClass = "app-text-danger fw-bold btn btn-link shadow-none";
     endif;
 ?>
 <form class="changeStatus" data-message="<?= esc(sprintf(lang('backend/admins.messages.areYouSureChangeStatus'), $admin->firstname, $admin->lastname), 'attr'); ?>">

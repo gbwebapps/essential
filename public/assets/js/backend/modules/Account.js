@@ -1453,7 +1453,7 @@ export class SecurityManager {
             const card = radio.closest('.card');
 
             if (card) {
-                card.classList.remove('border-primary', 'bg-light');
+                card.classList.remove('app-border-accent', 'app-bg-surface');
             }
         });
 
@@ -1465,7 +1465,7 @@ export class SecurityManager {
             const card = activeRadio.closest('.card');
 
             if (card) {
-                card.classList.add('border-primary', 'bg-light');
+                card.classList.add('app-border-accent', 'app-bg-surface');
             }
         }
     }

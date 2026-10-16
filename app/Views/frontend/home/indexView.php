@@ -10,7 +10,7 @@
 
     <link rel="shortcut icon" type="image/png" href="<?= base_url('favicon.ico'); ?>">
     <link rel="stylesheet" href="<?= base_url('assets/vendor/bootstrap/css/bootstrap.min.css'); ?>">
-    <link rel="stylesheet" href="<?= base_url('assets/css/frontend/frontend.css'); ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/css/frontend/frontend.css?v=4'); ?>">
 </head>
 
 <body class="d-flex h-100 text-center">
@@ -27,18 +27,12 @@
         </header>
 
         <main class="px-3">
-            <h1>
-                Essential
+            <h1 class="main-logo-heading">
+                <img class="main-logo" src="<?= base_url('assets/img/Essential_Chiaro_su_Scuro.png?v=2'); ?>" width="860" height="177" alt="Essential">
             </h1>
 
-            <p class="lead">
+            <p class="lead main-slogan text-center">
                 Gestione centralizzata, semplice e sicura delle attività amministrative.
-            </p>
-
-            <p class="lead">
-                <a class="btn btn-light fw-bold border-white bg-white" href="<?= base_url('backend/auth'); ?>">
-                    Accedi al backend
-                </a>
             </p>
 
             <ul class="features-list" aria-label="Funzionalità principali">
@@ -51,11 +45,9 @@
         </main>
 
         <footer class="mt-auto text-white-50">
-            <p>
-                <a href="https://www.gbwebapps.com/" alt="GB Web Applications">
-                    &copy; <?= date('Y'); ?> GB Web Applications
-                </a>
-            </p>
+            <a href="https://www.gbwebapps.com/" aria-label="GB Web Apps">
+                <img class="footer-logo" src="<?= base_url('assets/img/GB_Web_Apps_Chiaro_su_Scuro.png?v=3'); ?>" width="1175" height="177" alt="GB Web Apps">
+            </a>
         </footer>
     </div>
 </body>

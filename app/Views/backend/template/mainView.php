@@ -63,7 +63,7 @@
     </div>
 
     <!-- Pulsante per lo scroll rapido verso l'alto -->
-    <button type="button" class="scrollup fade-out btn btn-secondary btn-sm">
+    <button type="button" class="scrollup fade-out btn app-btn-secondary btn-sm">
         <i class="fa-solid fa-arrow-circle-up"></i> 
         <span id="scroll-up-text"><?= lang('backend/global.buttons.backToTop'); ?></span>
     </button>

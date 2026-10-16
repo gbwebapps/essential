@@ -1,10 +1,10 @@
-<div class="card bg-light border mt-3 animate__animated animate__fadeIn">
+<div class="card app-bg-surface border mt-3 animate__animated animate__fadeIn">
     <div class="card-body p-4">
         <div class="row g-4 align-items-center">
             
             <!-- Colonna QR Code (Centrato ovunque) -->
             <div class="col-12 col-lg-6 text-center">
-                <div class="bg-white p-3 d-inline-block rounded border shadow-sm">
+                <div class="app-bg-surface-elevated p-3 d-inline-block rounded border shadow-sm">
 					<img src="<?= esc($qrCode, 'attr'); ?>" alt="QR Code TOTP" class="img-fluid" style="max-width: 220px;">
                 </div>
             </div>
@@ -12,24 +12,24 @@
             <!-- Colonna Contenuti e Form -->
             <div class="col-12 col-lg-6">
                 <h5 class="fw-bold mb-2"><?= lang('backend/account.titles.totpSetupTitle'); ?></h5>
-                <p class="text-muted small mb-3"><?= lang('backend/account.labels.totpSetupDesc'); ?></p>
+                <p class="app-text-muted small mb-3"><?= lang('backend/account.labels.totpSetupDesc'); ?></p>
 
                 <form id="confirm-totp-form" novalidate>
                     <div class="row g-3 align-items-end">
                         
                         <!-- Chiave Segreta: Piena larghezza in portrait, affiancata in landscape -->
                         <div class="col-12 col-lg-7">
-                            <label class="form-label text-muted small fw-bold mb-1"><?= lang('backend/account.labels.totpSecretKey'); ?></label>
+                            <label class="form-label app-text-muted small fw-bold mb-1"><?= lang('backend/account.labels.totpSecretKey'); ?></label>
                             <div class="input-group">
-                                <button class="btn btn-secondary bg-white border toggle-password-visibility"
+                                <button class="btn app-btn-secondary app-bg-surface-elevated border toggle-password-visibility"
                                         type="button"
                                         aria-label="<?= esc(lang('backend/account.buttons.showPassword'), 'attr'); ?>"
                                         aria-pressed="false">
-                                    <i class="fa-solid fa-eye text-muted"></i>
+                                    <i class="fa-solid fa-eye app-text-muted"></i>
                                 </button>
                                 <input type="password"
                                        id="totp-secret-field"
-                                       class="form-control bg-white font-monospace text-uppercase"
+                                       class="form-control app-bg-surface-elevated font-monospace text-uppercase"
 									   value="<?= esc($totpSecret, 'attr'); ?>"
                                        readonly>
                             </div>
@@ -62,10 +62,10 @@
                         <!-- Pulsanti di azione: Uno sopra l'altro a piena larghezza in portrait, affiancati sotto in landscape -->
                         <div class="col-12">
                             <div class="d-flex flex-column flex-sm-row gap-2">
-                                <button type="submit" class="btn btn-success btn-sm flex-fill">
+                                <button type="submit" class="btn app-btn-success btn-sm flex-fill">
                                     <i class="fa-solid fa-circle-check"></i> <?= lang('backend/account.buttons.verifyAndActivate'); ?>
                                 </button>
-                                <button type="button" id="cancel-setup-btn" class="btn btn-danger btn-sm flex-fill">
+                                <button type="button" id="cancel-setup-btn" class="btn app-btn-danger btn-sm flex-fill">
                                     <i class="fa-solid fa-xmark"></i> <?= lang('backend/account.buttons.undoClose'); ?>
                                 </button>
                             </div>

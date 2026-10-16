@@ -2167,7 +2167,7 @@ class AccountModelTest extends CIUnitTestCase
             );
 
         $b64Format = 
-            'PHNwYW4gY2xhc3M9InRleHQtZGFuZ2VyIj48cz5mb3JtYXR0ZWRfJXM8L3M+PC9zcGFuPg==';
+            'PHNwYW4gY2xhc3M9ImFwcC10ZXh0LWRhbmdlciI+PHM+Zm9ybWF0dGVkXyVzPC9zPjwvc3Bhbj4=';
             
         $expectedFormat = 
             base64_decode($b64Format);
@@ -2265,7 +2265,7 @@ class AccountModelTest extends CIUnitTestCase
             );
 
         $b64Format = 
-            'PHNwYW4gY2xhc3M9InRleHQtc3VjY2VzcyI+Zm9ybWF0dGVkXyVzPC9zcGFuPg==';
+            'PHNwYW4gY2xhc3M9ImFwcC10ZXh0LXN1Y2Nlc3MiPmZvcm1hdHRlZF8lczwvc3Bhbj4=';
             
         $expectedFormat = 
             base64_decode($b64Format);

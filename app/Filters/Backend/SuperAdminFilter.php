@@ -50,7 +50,7 @@ class SuperAdminFilter implements FilterInterface
         endif;
 
         session()->setFlashdata('message', $message);
-        session()->setFlashdata('class', 'light text-danger fw-bold');
+        session()->setFlashdata('class', 'app-alert-danger fw-bold');
         session()->setFlashdata('icon', '<i class="fa-solid fa-ban"></i>');
 
         /* Blocco AJAX: restituisce esito negativo e messaggio */

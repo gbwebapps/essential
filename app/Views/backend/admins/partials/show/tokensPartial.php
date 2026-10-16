@@ -11,7 +11,7 @@
                     $now = new \DateTime();
 
                     /* Applichiamo le classi in base al confronto (se adesso è maggiore della scadenza, è scaduto) */
-                    $class = ($now > $dateExpire) ? 'text-danger fw-bold text-decoration-line-through' : 'text-success fw-bold';
+                    $class = ($now > $dateExpire) ? 'app-text-danger fw-bold text-decoration-line-through' : 'app-text-success fw-bold';
 
                     /* Mappatura delle traduzioni per i tipi di token */
                     $typeMap = [
@@ -27,15 +27,15 @@
                     $userAgent->parse($token->user_agent);
                     
                     /* Inizializzazione corretta della variabile in camelCase */
-                    $agentText = lang('backend/account.labels.operatingSystem') . ' <span class="text-primary">' . esc($userAgent->getPlatform()) . '</span>';
+                    $agentText = lang('backend/account.labels.operatingSystem') . ' <span class="app-text-accent">' . esc($userAgent->getPlatform()) . '</span>';
                     
                     /* Valutazione con metodi nativi in camelCase di CodeIgniter 4 */
                     if($userAgent->isBrowser()):
-                        $agentText .= ' &bull; ' . lang('backend/account.labels.browser') . ' <span class="text-primary">' . esc($userAgent->getBrowser()) . '</span>';
+                        $agentText .= ' &bull; ' . lang('backend/account.labels.browser') . ' <span class="app-text-accent">' . esc($userAgent->getBrowser()) . '</span>';
                     elseif($userAgent->isMobile()):
-                        $agentText .= ' &bull; ' . lang('backend/account.labels.mobile') . ' <span class="text-primary">' . esc($userAgent->getMobile()) . '</span>';
+                        $agentText .= ' &bull; ' . lang('backend/account.labels.mobile') . ' <span class="app-text-accent">' . esc($userAgent->getMobile()) . '</span>';
                     elseif($userAgent->isRobot()):
-                        $agentText .= ' &bull; ' . lang('backend/account.labels.robot') . ' Robot <span class="text-primary">' . esc($userAgent->getRobot()) . '</span>';
+                        $agentText .= ' &bull; ' . lang('backend/account.labels.robot') . ' Robot <span class="app-text-accent">' . esc($userAgent->getRobot()) . '</span>';
                     endif;
                 ?>
 
@@ -47,15 +47,15 @@
                             
                             <div class="row">
                                 <div class="col-12 col-md-4 mb-3 mb-md-0 text-start">
-                                    <small class="text-muted fw-bold d-block mb-1"><i class="fa-solid fa-circle-arrow-down me-1"></i><?= lang('backend/account.labels.createdToken'); ?></small>
+                                    <small class="app-text-muted fw-bold d-block mb-1"><i class="fa-solid fa-circle-arrow-down me-1"></i><?= lang('backend/account.labels.createdToken'); ?></small>
                                     <span class="fw-bold"><?= convertDate(esc($token->token_create), 'conversational'); ?></span>
                                 </div>
                                 <div class="col-12 col-md-4 mb-3 mb-md-0 text-start">
-                                    <small class="text-muted fw-bold d-block mb-1"><i class="fa-solid fa-circle-arrow-down me-1"></i><?= lang('backend/account.labels.expiredToken'); ?></small>
+                                    <small class="app-text-muted fw-bold d-block mb-1"><i class="fa-solid fa-circle-arrow-down me-1"></i><?= lang('backend/account.labels.expiredToken'); ?></small>
                                     <span class="<?= $class; ?>"><?= convertDate($dateExpire->format('Y-m-d H:i:s'), 'conversational'); ?></span>
                                 </div>
                                 <div class="col-12 col-md-4 mb-3 mb-md-0 text-start">
-                                    <small class="text-muted fw-bold d-block mb-1"><i class="fa-solid fa-circle-arrow-down me-1"></i><?= lang('backend/account.labels.typeToken'); ?></small>
+                                    <small class="app-text-muted fw-bold d-block mb-1"><i class="fa-solid fa-circle-arrow-down me-1"></i><?= lang('backend/account.labels.typeToken'); ?></small>
                                     <span class="fw-bold"><?= esc($tokenType); ?></span>
                                 </div>
                             </div>
@@ -63,12 +63,12 @@
                             <!-- User Agent e IP -->
                             <div class="row mt-lg-3">
                                 <div class="col-12 text-start">
-                                    <hr class="d-md-none my-2 text-secondary">
+                                    <hr class="d-md-none my-2 app-text-muted">
                                     <small class="fw-bold">
                                         <?= $agentText; ?>
                                         &bull; 
                                         <span><?= lang('backend/account.labels.ipAddress'); ?></span>
-                                        <span class="text-primary"><?= esc($token->ip_address); ?></span>
+                                        <span class="app-text-accent"><?= esc($token->ip_address); ?></span>
                                     </small>
                                 </div>
                             </div>
@@ -80,7 +80,7 @@
                             <form class="deleteToken d-grid d-lg-block" data-message="<?= esc(sprintf(lang('backend/account.messages.areYouSureDeleteToken'), $admin->firstname, $admin->lastname), 'attr'); ?>">
                                 <input type="hidden" name="id" value="<?= esc($token->id, 'attr'); ?>">
                                 <input type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>">
-                                <button type="submit" class="btn btn-danger btn-sm shadow-none">
+                                <button type="submit" class="btn app-btn-danger btn-sm shadow-none">
                                     <i class="fa-solid fa-trash me-1"></i> <?= lang('backend/account.buttons.delete'); ?>
                                 </button>
                             </form>

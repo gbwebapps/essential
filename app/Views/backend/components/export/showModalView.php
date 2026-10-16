@@ -15,7 +15,7 @@
 
                 <!-- FASE 1: Selezione Colonne -->
                 <div id="export-selection-area">
-                    <p class="text-muted small mb-3"><?= lang('backend/components/export.labels.selectColumns'); ?></p>
+                    <p class="app-text-muted small mb-3"><?= lang('backend/components/export.labels.selectColumns'); ?></p>
 
                     <form id="export-columns-form">
                         <div class="form-check mb-3 border-bottom pb-2">
@@ -51,18 +51,18 @@
 
                 <!-- FASE 2: Loader di Esportazione (Inizialmente Nascosto) -->
                 <div id="export-spinner-area" class="d-none text-center py-4">
-                    <div class="spinner-border text-success mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
-                    <h5 class="fw-bold text-dark"><?= lang('backend/components/export.labels.runningExportation'); ?></h5>
-                    <p class="fw-bold text-success mb-0" id="export-progress-text"><?= lang('backend/components/export.labels.dataElaboration'); ?></p>
+                    <div class="spinner-border app-text-success mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
+                    <h5 class="fw-bold app-text"><?= lang('backend/components/export.labels.runningExportation'); ?></h5>
+                    <p class="fw-bold app-text-success mb-0" id="export-progress-text"><?= lang('backend/components/export.labels.dataElaboration'); ?></p>
                 </div>
 
             </div>
 
             <div class="modal-footer border-0 justify-content-center">
-                <button type="button" class="btn btn-sm btn-danger no-general-disabled" id="export-cancel-btn">
+                <button type="button" class="btn btn-sm app-btn-danger no-general-disabled" id="export-cancel-btn">
                     <i class="fa-solid fa-xmark"></i> <?= lang('backend/components/export.buttons.operationUndo'); ?>
                 </button>
-                <button type="button" class="btn btn-sm btn-success" id="export-start-btn">
+                <button type="button" class="btn btn-sm app-btn-success" id="export-start-btn">
                     <i class="fa-solid fa-play"></i> <?= lang('backend/components/export.buttons.exportationStart'); ?>
                 </button>
             </div>

@@ -15,12 +15,12 @@
                                         <i class="fa-regular fa-folder-open me-2"></i><?= esc($folder['name']); ?>
                                     </div>
                                     <!-- Linea visibile solo su mobile -->
-                                    <hr class="d-md-none my-2 text-secondary">
+                                    <hr class="d-md-none my-2 app-text-muted">
                                 </div>
                                 
                                 <!-- Blocco Centrale: Conteggio File -->
                                 <div class="col-12 col-md-4 mb-3 mb-md-0 text-start">
-                                    <div class="text-muted"> 
+                                    <div class="app-text-muted">
                                         <span><i class="fa-solid fa-file-lines me-2"></i>
                                             <?php $def = ($folder['count'] === 1) ? 'file' : 'files'; ?>
                                             <?= esc((string) $folder['count']); ?> <?= esc(lang('backend/tools.labels.' . $def)); ?>
@@ -30,7 +30,7 @@
                                 
                                 <!-- Blocco Destra: Pulsante Pulisci -->
                                 <div class="col-12 col-md-4 text-start text-md-end d-grid d-md-block">
-                                    <button type="button" class="btn btn-sm btn-danger btn-clean-folder" 
+                                    <button type="button" class="btn btn-sm app-btn-danger btn-clean-folder"
                                             data-folder="<?= esc($folder['name'], 'attr'); ?>"
                                             data-confirm="<?= esc(sprintf(lang('backend/tools.messages.confirmCleanFolder'), $folder['name']), 'attr'); ?>"
                                             <?= $folder['count'] == 0 ? 'disabled' : ''; ?>>

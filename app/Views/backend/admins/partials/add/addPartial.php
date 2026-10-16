@@ -23,14 +23,14 @@
                                     <label for="firstname" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.firstname'); ?></label>
                                     <input type="text" id="firstname" name="firstname" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.firstname'), 'attr'); ?>">
                                     <!-- Contenitore dinamico per l'errore di validazione -->
-                                    <div class="error_firstname text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                                    <div class="error_firstname app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                                 </div>
                             </div>
                             <div class="col-12 col-lg-6">
                                 <div class="mb-2">
                                     <label for="lastname" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.lastname'); ?></label>
                                     <input type="text" id="lastname" name="lastname" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.lastname'), 'attr'); ?>">
-                                    <div class="error_lastname text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                                    <div class="error_lastname app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                                 </div>
                             </div>
                         </div>
@@ -42,14 +42,14 @@
                                 <div class="mb-2">
                                     <label for="email" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.email'); ?></label>
                                     <input type="text" id="email" name="email" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.email'), 'attr'); ?>">
-                                    <div class="error_email text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                                    <div class="error_email app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                                 </div>
                             </div>
                             <div class="col-12 col-lg-6">
                                 <div class="mb-2">
                                     <label for="phone" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.phone'); ?></label>
                                     <input type="text" id="phone" name="phone" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.phone'), 'attr'); ?>">
-                                    <div class="error_phone text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                                    <div class="error_phone app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                                 </div>
                             </div>
                         </div>
@@ -69,7 +69,7 @@
                                             <?php endforeach; ?>
                                         <?php endif; ?>
                                     </select>
-                                    <div class="error_group_id text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                                    <div class="error_group_id app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                                 </div>
                             </div>
                             <div class="col-12 col-lg-6">
@@ -81,7 +81,7 @@
                                         <option value="1"><?= lang('backend/admins.labels.active'); ?></option>
                                         <option value="0"><?= lang('backend/admins.labels.unactive'); ?></option>
                                     </select>
-                                    <div class="error_status text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                                    <div class="error_status app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                                 </div>
                             </div>
                         </div>
@@ -93,7 +93,7 @@
                                 <div class="mb-2">
                                     <label for="note"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.note'); ?></label>
                                     <textarea name="note" id="note" rows="7" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.note'), 'attr'); ?>"></textarea>
-                                    <div class="error_note text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                                    <div class="error_note app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                                 </div>
                             </div>
                         </div>

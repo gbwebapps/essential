@@ -2,7 +2,7 @@
 <?php if(isset($options)): ?>
     <div class="dropdown pb-2">
         <!-- Pulsante di attivazione del menu Opzioni -->
-        <button class="btn btn-secondary dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <button class="btn app-btn-secondary dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             <?= lang('backend/global.buttons.options'); ?>
         </button>
         

@@ -1,5 +1,5 @@
 <div class="card-body p-0 mt-4">
-    <div class="ps-2 py-1 bg-light fw-bold small mb-2 border text-center rounded-2">
+    <div class="ps-2 py-1 app-bg-surface fw-bold small mb-2 border text-center rounded-2">
         <?= sprintf(lang('backend/groups.labels.groupNameBar'), esc($name)); ?>
     </div>
     <form id="edit-admin-exceptions-form" data-uuid="<?= esc($uuid, 'attr'); ?>">
@@ -8,7 +8,7 @@
 
         <?php foreach($permissions as $key => $permission): ?>
 
-            <div class="row mb-2 g-0 bg-light pt-2 ps-2 pe-2 border rounded-2">
+            <div class="row mb-2 g-0 app-bg-surface pt-2 ps-2 pe-2 border rounded-2">
                 <div class="col-6 text-start">
                     <h5><?= $permission['icon']; ?> <?= esc(ucfirst($permission['title'])); ?></h5>
                 </div>
@@ -44,14 +44,14 @@
                             <div class="col-12 col-lg-3 text-center py-1">
                                 <ul class="list-group list-group-flush border rounded-2">
                                     <li class="list-group-item" style="min-height: 75px;">
-                                        <label for="exc_<?= esc($k, 'attr'); ?>" class="fw-bold text-dark d-block mb-1">
+                                        <label for="exc_<?= esc($k, 'attr'); ?>" class="fw-bold app-text d-block mb-1">
                                             <i class="fa-solid fa-circle-arrow-down"></i><?= esc($v); ?>
                                         </label>
                                         
                                         <?php if ($isGroupActive): ?>
-                                            <span class="badge bg-success-subtle text-success border border-success-subtle fs-8"><?= lang('backend/groups.labels.assignedToGroup'); ?></span>
+                                            <span class="badge app-bg-inverse app-text-inverse border app-border-success-subtle fs-8"><?= lang('backend/groups.labels.assignedToGroup'); ?></span>
                                         <?php else: ?>
-                                            <span class="badge bg-light text-muted border fs-8"><?= lang('backend/groups.labels.notAssignedToGroup'); ?></span>
+                                            <span class="badge app-bg-surface app-text border fs-8"><?= lang('backend/groups.labels.notAssignedToGroup'); ?></span>
                                         <?php endif; ?>
                                     </li>
                                     <li class="list-group-item">
@@ -70,15 +70,15 @@
 
         <?php endforeach; ?>
 
-        <div class="error_permissions text-danger text-center small fw-bold pb-2">&nbsp;</div>
+        <div class="error_permissions app-text-danger text-center small fw-bold pb-2">&nbsp;</div>
 
         <div class="row">
             <div class="col-12">
                 <div class="d-flex flex-column flex-md-row justify-content-center gap-2">
-                    <button type="button" class="btn btn-warning text-dark btn-sm btn-refresh-admin-perms" data-uuid="<?= esc($uuid, 'attr'); ?>" data-message="<?= esc(lang('backend/groups.messages.areYouSureToReload'), 'attr'); ?>">
+                    <button type="button" class="btn app-btn-warning btn-sm btn-refresh-admin-perms" data-uuid="<?= esc($uuid, 'attr'); ?>" data-message="<?= esc(lang('backend/groups.messages.areYouSureToReload'), 'attr'); ?>">
                         <i class="fa-solid fa-refresh me-1"></i> <?= lang('backend/groups.buttons.resetData'); ?>
                     </button>
-                    <button type="submit" class="btn btn-success btn-sm">
+                    <button type="submit" class="btn app-btn-success btn-sm">
                         <i class="fa-solid fa-floppy-disk me-1"></i> <?= lang('backend/groups.buttons.sendData'); ?>
                     </button>
                 </div>

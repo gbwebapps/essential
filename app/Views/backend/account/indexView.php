@@ -13,7 +13,7 @@
                 <div class="<?= $section['class']; ?>">
                     <a href="<?= base_url($section['route']); ?>" class="text-decoration-none text-reset">
                         
-                        <div class="card h-100 bg-light text-secondary shadow-sm" id="<?= $key; ?>">
+                        <div class="card h-100 app-bg-surface app-text-muted shadow-sm" id="<?= $key; ?>">
                             <!-- Flexbox: colonna su mobile piccolo, riga da smartphone orizzontale in su -->
                             <div class="card-body d-flex flex-column flex-sm-row align-items-center justify-content-center justify-content-sm-between p-4">
                                 

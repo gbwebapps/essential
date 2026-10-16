@@ -126,7 +126,7 @@ class AuthorizationFilterTest extends CIUnitTestCase
         $filter->before($request);
 
         $this->assertSame(lang('backend/auth.messages.loginNeeded'), session()->getFlashdata('message'));
-        $this->assertSame('light text-danger fw-bold', session()->getFlashdata('class'));
+        $this->assertSame('app-alert-danger fw-bold', session()->getFlashdata('class'));
         $this->assertSame('<i class="fa-solid fa-triangle-exclamation"></i>', session()->getFlashdata('icon'));
     }
 
@@ -168,7 +168,7 @@ class AuthorizationFilterTest extends CIUnitTestCase
 
         $this->assertSame($response, $result);
         $this->assertSame(lang('backend/auth.messages.loginNeeded'), session()->getFlashdata('message'));
-        $this->assertSame('light text-danger fw-bold', session()->getFlashdata('class'));
+        $this->assertSame('app-alert-danger fw-bold', session()->getFlashdata('class'));
         $this->assertSame('<i class="fa-solid fa-triangle-exclamation"></i>', session()->getFlashdata('icon'));
     }
 

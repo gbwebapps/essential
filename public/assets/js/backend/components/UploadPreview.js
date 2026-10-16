@@ -175,15 +175,15 @@ export class UploadPreviewImgManager {
             col.className = 'col-6 col-md-4 col-lg-3 mb-3';
             col.dataset.id = id;
             col.innerHTML = `
-                <div class="position-relative preview-item rounded border overflow-hidden bg-white p-1 shadow-sm" data-id="${id}">
+                <div class="position-relative preview-item rounded border overflow-hidden app-bg-surface-elevated p-1 shadow-sm" data-id="${id}">
                     <img src="${e.target.result}" class="img-fluid w-100 d-block" alt="">
                     <div class="preview-overlay d-flex align-items-center justify-content-center">
-                        <button type="button" class="btn btn-danger btn-sm remove-preview" data-id="${id}">
+                        <button type="button" class="btn app-btn-danger btn-sm remove-preview" data-id="${id}">
                             <i class="fa-solid fa-trash me-1"></i> ${ langDefinitions.dataset.remove }
                         </button>
                     </div>
                 </div>
-                <div class="error-msg text-danger text-center small fw-bold px-1 pt-1" id="error-img-${id}">&nbsp;</div>
+                <div class="error-msg app-text-danger text-center small fw-bold px-1 pt-1" id="error-img-${id}">&nbsp;</div>
             `;
 
             this.smoothAdd(this.getRow(), col);

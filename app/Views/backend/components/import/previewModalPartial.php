@@ -7,7 +7,7 @@
     <?php if ($plan['insert'] === 0 && $plan['update'] === 0): ?>
 
         <!-- STATO: NESSUNA AZIONE NECESSARIA -->
-        <div class="alert alert-success d-flex align-items-center mb-3">
+        <div class="alert app-alert-success d-flex align-items-center mb-3">
             <i class="fa-solid fa-check-circle fa-2x me-3"></i>
             <div>
                 <strong><?= lang('backend/components/import.labels.perfectSync'); ?></strong><br>
@@ -17,7 +17,7 @@
     <?php else: ?>
         
         <!-- STATO: AZIONI TROVATE -->
-        <div class="alert alert-warning mb-3">
+        <div class="alert app-alert-warning mb-3">
             <i class="fa-solid fa-database me-2"></i>
             <?= sprintf(lang('backend/components/import.labels.executionPlan'), $plan['insert'], $plan['update'], $plan['skip']); ?>
         </div>
@@ -26,10 +26,10 @@
     <!-- CONTENITORE CON SCROLL VERTICALE -->
     <div class="table-responsive border rounded" style="max-height: 400px; overflow-y: auto;">
         <table class="table table-sm table-striped table-bordered align-middle mb-0">
-            <thead class="table-dark">
+            <thead class="app-table-inverse">
                 <tr>
                     <?php foreach ($headers as $header): ?>
-                        <th class="sticky-top bg-dark text-white"><?= esc($header); ?></th>
+                        <th class="sticky-top app-bg-inverse app-text-inverse"><?= esc($header); ?></th>
                     <?php endforeach; ?>
                 </tr>
             </thead>
@@ -40,14 +40,14 @@
                             $record = $rowItem['record'];
                             $action = $rowItem['action'];
                             $changed = $rowItem['changed'];
-                            $rowClass = ($action === 'insert') ? 'table-success' : '';
+                            $rowClass = ($action === 'insert') ? 'app-table-success' : '';
                         ?>
                         <tr class="<?= $rowClass ?>">
                             <?php foreach ($headers as $header): ?>
                                 <?php 
                                     $cellValue = $record[$header] ?? '';
                                     $isChanged = in_array($header, $changed, true);
-                                    $cellClass = $isChanged ? 'table-warning fw-bold' : '';
+                                    $cellClass = $isChanged ? 'app-table-warning fw-bold' : '';
                                 ?>
                                 <td class="<?= $cellClass ?>" <?= $isChanged ? 'title="Valore modificato"' : '' ?>>
                                     <?= esc((string) $cellValue); ?>
@@ -57,7 +57,7 @@
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="<?= count($headers); ?>" class="text-center text-muted p-3">
+                        <td colspan="<?= count($headers); ?>" class="text-center app-text-muted p-3">
                             <?= lang('backend/components/import.messages.noDataToPreview'); ?>
                         </td>
                     </tr>
@@ -72,7 +72,7 @@
         
         if ($totalToProcess > $previewCount): 
     ?>
-        <div class="text-center text-muted small mt-2">
+        <div class="text-center app-text-muted small mt-2">
             <i class="fa-solid fa-info-circle me-1"></i>
             <?= sprintf(lang('backend/components/import.labels.previewNotice'), $previewCount, $totalToProcess - $previewCount); ?>
         </div>

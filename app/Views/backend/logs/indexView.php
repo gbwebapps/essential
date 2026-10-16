@@ -26,7 +26,7 @@
 
                             <!-- Bottone Mobile per aprire l'Offcanvas -->
                             <div class="col-12 d-md-none mb-3">
-                                <button class="btn btn-secondary w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#actionsOffcanvas" aria-controls="actionsOffcanvas">
+                                <button class="btn app-btn-secondary w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#actionsOffcanvas" aria-controls="actionsOffcanvas">
                                     <i class="fa-solid fa-bars"></i> <?= lang('backend/logs.labels.filtersAndOptions'); ?>
                                 </button>
                             </div>
@@ -87,7 +87,7 @@
                                         <input type="text" id="logs-username" class="form-control" placeholder="<?= esc(lang('backend/logs.placeholders.searchUsername'), 'attr'); ?>" data-search-field="username" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
-                                    <div data-search-error="username" class="error_username text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="username" class="error_username app-text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End Ricerca avanzata per username -->
@@ -102,7 +102,7 @@
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <div data-search-error="login-from" class="error_login-from text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="login-from" class="error_login-from app-text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End ricerca avanzata per data da -->
@@ -117,7 +117,7 @@
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <div data-search-error="login-to" class="error_login-to text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="login-to" class="error_login-to app-text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End ricerca avanzata per data a -->
@@ -137,7 +137,7 @@
                                         </select>
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
-                                    <div data-search-error="logout_reason" class="error_logout_reason text-danger fw-bold small pt-1">&nbsp;</div>
+                                    <div data-search-error="logout_reason" class="error_logout_reason app-text-danger fw-bold small pt-1">&nbsp;</div>
                                 </div>
                             </div>
                             <!-- End Ricerca avanzata per logout_reason -->

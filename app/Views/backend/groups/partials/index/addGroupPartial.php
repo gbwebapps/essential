@@ -5,18 +5,18 @@
 			<div class="col-12 col-lg-4 mb-2 mb-lg-0">
 				<label for="name" class="pb-1"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/groups.labels.groupName'); ?></label>
 				<input type="text" name="name" id="name" class="form-control" placeholder="<?= esc(lang('backend/groups.placeholders.groupName'), 'attr'); ?>">
-				<div class="error_name text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+				<div class="error_name app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
 			</div>
 			<div class="col-12 col-lg-8">
 				<label for="description" class="pb-1"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/groups.labels.groupDescription'); ?></label>
 				<input type="text" name="description" id="description" class="form-control" placeholder="<?= esc(lang('backend/groups.placeholders.groupDescription'), 'attr'); ?>">
-				<div class="error_description text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+				<div class="error_description app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
 			</div>
 		</div>
 
 		<?php foreach($permissions as $key => $permission): ?>
 
-		    <div class="row mb-2 g-0 bg-light pt-2 ps-2 pe-2 border rounded-2">
+		    <div class="row mb-2 g-0 app-bg-surface pt-2 ps-2 pe-2 border rounded-2">
 		        <div class="col-6 text-start">
 		            <h5><?= $permission['icon']; ?> <?= esc(ucfirst($permission['title'])); ?></h5>
 		        </div>
@@ -60,15 +60,15 @@
 
 		<?php endforeach; ?>
 
-		<div class="error_permissions text-danger text-center small fw-bold pb-2">&nbsp;</div>
+		<div class="error_permissions app-text-danger text-center small fw-bold pb-2">&nbsp;</div>
 
 		<div class="row">
             <div class="col-12">
             	<div class="d-flex flex-column flex-md-row justify-content-center gap-2">
-                    <button type="button" class="btn btn-warning text-darka btn-sm btn-reset-group" data-message="<?= esc(lang('backend/groups.messages.areYouSureToResetData'), 'attr'); ?>">
+                    <button type="button" class="btn app-btn-warning btn-sm btn-reset-group" data-message="<?= esc(lang('backend/groups.messages.areYouSureToResetData'), 'attr'); ?>">
                 	    <i class="fa-solid fa-refresh me-1"></i><?= lang('backend/groups.buttons.resetData'); ?>
                 	</button>
-                    <button type="submit" class="btn btn-success btn-sm">
+                    <button type="submit" class="btn app-btn-success btn-sm">
                         <i class="fa-solid fa-floppy-disk me-1"></i><?= lang('backend/groups.buttons.sendData'); ?>
                     </button>
             	</div>
