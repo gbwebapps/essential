@@ -1,4 +1,4 @@
-<div class="card-body">
+<div class="card-body tools-card-body-dark">
     <form id="dbMaintenance-tools-form" autocomplete="off"
       data-lang-total-space="<?= esc(lang('backend/tools.labels.totalSpace'), 'attr'); ?>"
       data-lang-rows="<?= esc(lang('backend/tools.labels.rows'), 'attr'); ?>"

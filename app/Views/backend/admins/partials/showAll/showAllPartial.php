@@ -85,17 +85,20 @@
                                         <?php $isTrashed = ( ! is_null($admin->deleted_at)); ?>
                                         <?php $isSuperadmin = (int) $admin->superadmin === 1; ?>
                                         
-                                        <tr class="border-end border-start table-row-110<?= $isTrashed ? ' text-decoration-line-through' : ''; ?> <?= $isSuperadmin ? ' table-bg-superadmin' : ''; ?>">
+                                        <tr class="border-end border-start table-row-110 <?= $isSuperadmin ? 'table-bg-superadmin' : ''; ?>">
 
                                             <!-- Cella allegati (rowspan rimosso, aggiunto py-3 per altezza) -->
                                             <td class="align-middle text-center border-end fw-bold py-3">
-                                                <span class="badge app-bg-info"><?= $admin->images_num; ?></span>
+                                                <span class="badge app-bg-info admin-attachments-badge"><?= $admin->images_num; ?></span>
                                             </td>
 
                                             <!-- Cella immagine (rowspan rimosso, aggiunto py-3 per altezza) -->
-                                            <td class="align-middle text-center border-end app-bg-surface py-3">
+                                            <td class="align-middle text-center border-end app-bg-surface admin-cover-cell py-3<?= is_null($cover) ? ' no-preview-image' : ''; ?>">
                                                 <?php if(is_null($cover)): ?>
-                                                    <span class="fw-bold app-text-danger"><?= lang('backend/admins.labels.noImage'); ?></span>
+                                                    <span class="fa-stack" role="img" aria-label="<?= esc(lang('backend/admins.labels.noImage'), 'attr'); ?>">
+                                                        <i class="fa-solid fa-camera fa-stack-1x"></i>
+                                                        <i class="fa-solid fa-slash fa-stack-1x"></i>
+                                                    </span>
                                                 <?php else: ?>
                                                     <img src="<?= esc(base_url('images/backend/admins/' . rawurlencode($admin->uuid) . '/small/' . rawurlencode($cover)), 'attr'); ?>" class="img-polaroid" alt="">
                                                 <?php endif; ?>
@@ -153,7 +156,7 @@
                                                         </form>
                                                     <?php else: ?>
                                                         <?php if($isTrashed): ?>
-                                                            <span class="badge app-bg-danger p-2 border-0 rounded-1"><?= lang('backend/admins.labels.deleted'); ?></span>
+                                                            <span class="badge app-bg-danger admin-deleted-status p-2 border-0 rounded-1"><?= lang('backend/admins.labels.deleted'); ?></span>
                                                         <?php endif; ?>
                                                     <?php endif; ?>
 
@@ -233,15 +236,15 @@
                                                 <div class="collapse" id="meta-<?= esc($admin->uuid, 'attr'); ?>">
                                                     
                                                     <!-- Box effettivo dei metadati: spazioso, con background neutro -->
-                                                    <div class="p-2 border-bottom <?= $isTrashed ? 'text-decoration-line-through' : ''; ?> app-bg-surface app-text small">
+                                                    <div class="p-2 border-bottom app-bg-surface app-text small">
                                                         
                                                         <!-- Parte creato -->
-                                                        <?= lang('backend/admins.labels.createdAt'); ?> <span class="fw-bold"><?= convertDate(esc($admin->created_at), 'conversational'); ?></span>
+                                                        <?= lang('backend/admins.labels.createdAt'); ?> <span class="fw-bold app-text-success"><?= convertDate(esc($admin->created_at), 'conversational'); ?></span>
 
                                                         <!-- Parte aggiornato -->
                                                         <?php if( ! is_null($admin->updated_at)): ?>
                                                             &nbsp;&bull;&nbsp;
-                                                            <?= lang('backend/admins.labels.updatedAt'); ?> <span class="fw-bold"><?= convertDate(esc($admin->updated_at), 'conversational'); ?></span>
+                                                            <?= lang('backend/admins.labels.updatedAt'); ?> <span class="fw-bold app-text-success"><?= convertDate(esc($admin->updated_at), 'conversational'); ?></span>
                                                         <?php endif; ?>
 
                                                         <!-- Parte sospeso -->
@@ -253,7 +256,7 @@
                                                         <!-- Parte resettato -->
                                                         <?php if( ! is_null($admin->resetted_at)): ?>
                                                             &nbsp;&bull;&nbsp;
-                                                            <?= lang('backend/admins.labels.resettedAt'); ?> <span class="fw-bold app-text-danger"><?= convertDate(esc($admin->resetted_at), 'conversational'); ?></span>
+                                                            <?= lang('backend/admins.labels.resettedAt'); ?> <span class="fw-bold app-text-warning"><?= convertDate(esc($admin->resetted_at), 'conversational'); ?></span>
                                                         <?php endif; ?>
 
                                                         <!-- Parte eliminato (Cestinato) -->

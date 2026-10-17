@@ -71,6 +71,12 @@
     --bs-gradient: none;
 }
 
+.img-polaroid {
+    background-color: #ffffff !important;
+    padding: .0625rem;
+    border: .0625rem solid #ffffff !important;
+}
+
 /* Superfici e testi semantici */
 .app-bg-surface {
     background-color: var(--app-surface) !important;
@@ -245,6 +251,39 @@
     color: var(--app-text);
     background-color: var(--app-surface);
     border-color: var(--app-border);
+}
+
+.card {
+    border-radius: var(--bs-card-border-radius) !important;
+    background-clip: border-box;
+}
+
+.card > .card-header:first-child,
+.card > .card-body:first-child,
+.card > .card-footer:first-child,
+.card > :first-child > .card-header:first-child,
+.card > :first-child > .card-body:first-child,
+.card > form:first-child > :first-child > .card-header:first-child {
+    border-top-left-radius: var(--bs-card-inner-border-radius) !important;
+    border-top-right-radius: var(--bs-card-inner-border-radius) !important;
+}
+
+.card > .card-header:last-child,
+.card > .card-body:last-child,
+.card > .card-footer:last-child,
+.card > .list-group:last-child,
+.card > :last-child > .card-body:last-child,
+.card > :last-child > .card-footer:last-child,
+.card > :last-child > .list-group:last-child,
+.card > form:last-child > :last-child > .card-body:last-child {
+    border-bottom-right-radius: var(--bs-card-inner-border-radius) !important;
+    border-bottom-left-radius: var(--bs-card-inner-border-radius) !important;
+}
+
+.card > .list-group:last-child > .list-group-item:last-child,
+.card > :last-child > .list-group:last-child > .list-group-item:last-child {
+    border-bottom-right-radius: var(--bs-card-inner-border-radius) !important;
+    border-bottom-left-radius: var(--bs-card-inner-border-radius) !important;
 }
 
 .form-control:focus,

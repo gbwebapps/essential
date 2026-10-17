@@ -159,7 +159,7 @@
                                                 <div class="collapse" id="meta-<?= esc($token->id, 'attr'); ?>">
                                                     
                                                     <!-- Box effettivo dei metadati: spazioso, con background neutro -->
-                                                    <div class="p-2 border-bottom app-bg-surface app-text-muted small">
+                                                    <div class="p-2 border-bottom app-bg-surface token-system-details small">
                                                         
                                                         <!-- Parte useragent -->
                                                         <?php 
@@ -167,24 +167,24 @@
                                                             $userAgent->parse($token->user_agent);
 
                                                             /* Inizializzazione corretta della variabile in camelCase */
-                                                            $agentText = lang('backend/tokens.labels.operatingSystem') . ' <span class="app-text-accent fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
+                                                            $agentText = '<span class="text-white">' . lang('backend/tokens.labels.operatingSystem') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
                                                         ?>
 
                                                         <?php
                                                             /* Valutazione con metodi nativi in camelCase di CodeIgniter 4 */
                                                             if($userAgent->isBrowser()):
-                                                                $agentText .= ' &bull; ' . lang('backend/tokens.labels.browser') . ' <span class="app-text-accent fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
+                                                                $agentText .= ' &bull; <span class="text-white">' . lang('backend/tokens.labels.browser') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
                                                             elseif($userAgent->isMobile()):
-                                                                $agentText .= ' &bull; ' . lang('backend/tokens.labels.mobile') . ' <span class="app-text-accent fw-bold">' . esc($userAgent->getMobile()) . '</span>';
+                                                                $agentText .= ' &bull; <span class="text-white">' . lang('backend/tokens.labels.mobile') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getMobile()) . '</span>';
                                                             elseif($userAgent->isRobot()):
-                                                                $agentText .= ' &bull; ' . lang('backend/tokens.labels.robot') . ' <span class="app-text-accent fw-bold">' . esc($userAgent->getRobot()) . '</span>';
+                                                                $agentText .= ' &bull; <span class="text-white">' . lang('backend/tokens.labels.robot') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getRobot()) . '</span>';
                                                             endif;
                                                         ?>
 
                                                         <?= $agentText; ?>
                                                         &nbsp;&bull;&nbsp;
-                                                        <span><?= lang('backend/tokens.labels.ipAddress'); ?></span>
-                                                        <span class="app-text-accent fw-bold"><?= esc($token->ip_address); ?></span>
+                                                        <span class="text-white"><?= lang('backend/tokens.labels.ipAddress'); ?></span>
+                                                        <span class="text-primary fw-bold"><?= esc($token->ip_address); ?></span>
                                                         <!-- End parte useragent -->
 
                                                     </div>

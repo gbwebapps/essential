@@ -19,7 +19,7 @@ class Assets extends BaseConfig
         return [
             ['id' => 'bootstrap-css','path' => 'assets/vendor/bootstrap/css/bootstrap.min.css'],
             ['id' => 'fontawesome','path' => 'assets/vendor/fontawesome/css/all.min.css'],
-            ['id' => 'backend-theme','path' => 'assets/css/backend/dark.css'],
+            ['id' => 'backend-theme','path' => 'assets/css/backend/grey.css'],
             ['id' => 'backend-css','path' => 'assets/css/backend/backend.css'],
         ];
     }

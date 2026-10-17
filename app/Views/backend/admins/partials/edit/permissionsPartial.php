@@ -2,7 +2,7 @@
 
     <?php foreach($permissions as $key => $permission): ?>
 
-        <div class="row mb-2 g-0 app-bg-surface pt-2 ps-2 pe-2 border rounded-1">
+        <div class="row mb-2 g-0 app-bg-surface permission-section-title pt-2 ps-2 pe-2 border rounded-1">
             <div class="col-6 text-start">
                 <h5><?= $permission['icon']; ?> <?= ucfirst($permission['title']); ?></h5>
             </div>
@@ -33,12 +33,13 @@
                             /* L'interruttore finale è attivo se l'eccezione dice 1, OPPURE se non c'è eccezione ma il GRUPPO lo ha attivo */
                             $isAdminActive = $hasException ? ($admin_exceptions[$k] === 1) : $isGroupActive;
                             $isChecked = $isAdminActive ? 'checked' : ''; 
+                            $permissionStateClass = $isAdminActive ? 'app-text-success' : 'app-text-danger';
                         ?>
 
                         <div class="col-12 col-lg-3 text-center py-1">
                             <ul class="list-group list-group-flush border rounded-2">
                                 <li class="list-group-item" style="min-height: 75px;">
-                                    <label for="exc_<?= esc($k, 'attr'); ?>" class="fw-bold app-text d-block mb-1">
+                                    <label for="exc_<?= esc($k, 'attr'); ?>" class="fw-bold <?= esc($permissionStateClass, 'attr'); ?> d-block mb-1">
                                         <i class="fa-solid fa-circle-arrow-down"></i><?= esc($v); ?>
                                     </label>
                                     

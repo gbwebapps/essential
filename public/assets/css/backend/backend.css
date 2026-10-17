@@ -295,8 +295,11 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     -o-box-shadow: 0 0 0 rgb(0 0 0 / 50%), 0 0 .15rem rgb(0 0 0 / 50%);
     box-shadow: 0 0 0 rgb(0 0 0 / 50%), 0 0 .15rem rgb(0 0 0 / 50%);
     padding: .125rem;
-    width:100%;
-    min-width:6rem;
+    border-radius: var(--bs-border-radius);
+    width: 100%;
+    min-width: 6rem;
+    max-width: 100%;
+    height: auto;
 }
 
 .pagination-left,
@@ -371,6 +374,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     background-color: rgba(0, 0, 0, 0.7); /* Sfondo scuro trasparente */
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
+    gap: 1rem;
 }
 
 /* Mostra l'overlay all'hover sul riquadro */
@@ -381,11 +385,25 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 /* Stile per le icone cliccabili della galleria */
 .galleryOneAction {
     cursor: pointer;
+}
+
+.gallery-one-overlay > .galleryOneAction,
+.gallery-one-overlay > a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff !important;
+    margin: 0 !important;
+    text-decoration: none;
     transition: transform 0.15s ease;
 }
 
 /* Effetto ingrandimento all'hover sulle singole icone */
-.galleryOneAction:hover {
+.gallery-one-overlay > .galleryOneAction:hover,
+.gallery-one-overlay > .galleryOneAction:focus,
+.gallery-one-overlay > a:hover,
+.gallery-one-overlay > a:focus {
+    color: #ffffff !important;
     transform: scale(1.2);
 }
 

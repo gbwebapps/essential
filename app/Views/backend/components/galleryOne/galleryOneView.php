@@ -5,9 +5,7 @@
                 <?php foreach ($images as $img): ?>
                     <div class="col-6 col-lg-3 mb-3 text-center">
 
-                        <?php $bg = ((int) $img['is_cover'] === 1) ? 'app-bg-muted' : 'app-bg-surface-elevated'; ?>
-
-                        <div class="position-relative preview-item rounded overflow-hidden <?= $bg; ?> p-1 border shadow-sm"
+                        <div class="position-relative preview-item overflow-visible"
                              data-id="<?= esc($img['id']); ?>"
                              data-uuid="<?= esc($uuid); ?>"
                              data-entity="<?= esc($entity); ?>"
@@ -17,7 +15,7 @@
                             <?php if ($context === 'edit'): ?>
                                 <img src="<?= base_url('images/backend/' . $entity . '/' . esc($uuid) . '/medium/' . esc($img['filename'])); ?>"
                                      alt="Image"
-                                     class="img-fluid w-100 d-block">
+                                     class="img-polaroid img-fluid w-100 d-block">
 
                                      <?php if ((int) $img['is_cover'] === 1): ?>
                                          <!-- Usiamo direttamente l'icona con un'ombra nativa per massima pulizia grafica -->
@@ -60,7 +58,7 @@
                                     
                                     <img src="<?= base_url('images/backend/' . $entity . '/' . esc($uuid) . '/medium/' . esc($img['filename'])); ?>"
                                          alt="Image"
-                                         class="img-fluid w-100 d-block">
+                                         class="img-polaroid img-fluid w-100 d-block">
 
                                     <?php if ((int) $img['is_cover'] === 1) : ?>
                                         <!-- C'è solo questa icona nell'angolo. Quella centrale è stata eliminata definitivamente -->

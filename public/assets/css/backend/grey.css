@@ -1,0 +1,344 @@
+/*
+ * Tema grey Essential.
+ * Traduce la gerarchia cromatica del tema dark in tonalita grigie intermedie.
+ */
+@import url("dark.css");
+
+:root {
+    color-scheme: light;
+
+    --app-page-bg: #e9ecef;
+    --app-page-shadow: inset 0 0 10rem rgba(0, 0, 0, .18);
+    --app-surface: #dee2e6;
+    --app-surface-elevated: #dee2e6;
+    --app-surface-muted: #ced4da;
+    --app-surface-inverse: #212529;
+    --app-text: #212529;
+    --app-text-muted: #495057;
+    --app-text-inverse: #ffffff;
+    --app-border: #6c757d;
+    --app-border-strong: #6c757d;
+    --app-focus: rgba(13, 110, 253, .25);
+    --app-backdrop: rgba(0, 0, 0, .20);
+    --app-shadow: rgba(0, 0, 0, .18);
+    --app-button-border: #6c757d;
+    --app-logo-essential: url("../../img/Essential_Scuro_su_Chiaro.png");
+    --app-logo-gbwebapps: url("../../img/GB_Web_Apps_Scuro_su_Chiaro.png");
+
+    --app-info: #0dcaf0;
+
+    --bs-body-color: var(--app-text);
+    --bs-body-color-rgb: 33, 37, 41;
+    --bs-body-bg: var(--app-page-bg);
+    --bs-body-bg-rgb: 233, 236, 239;
+    --bs-emphasis-color: var(--app-text);
+    --bs-emphasis-color-rgb: 33, 37, 41;
+    --bs-secondary-color: var(--app-text-muted);
+    --bs-secondary-color-rgb: 73, 80, 87;
+    --bs-secondary-bg: var(--app-surface-muted);
+    --bs-secondary-bg-rgb: 206, 212, 218;
+    --bs-tertiary-color: var(--app-text-muted);
+    --bs-tertiary-bg: var(--app-surface-elevated);
+    --bs-primary: var(--app-primary);
+    --bs-primary-rgb: 13, 110, 253;
+    --bs-secondary: var(--app-text-muted);
+    --bs-secondary-rgb: 73, 80, 87;
+    --bs-success: var(--app-success);
+    --bs-success-rgb: 25, 135, 84;
+    --bs-danger: var(--app-danger);
+    --bs-danger-rgb: 220, 53, 69;
+    --bs-warning: var(--app-warning);
+    --bs-warning-rgb: 255, 193, 7;
+    --bs-info: var(--app-info);
+    --bs-info-rgb: 13, 202, 240;
+    --bs-light: var(--app-surface);
+    --bs-light-rgb: 222, 226, 230;
+    --bs-dark: var(--app-surface-inverse);
+    --bs-dark-rgb: 33, 37, 41;
+    --bs-link-color: var(--app-text);
+    --bs-link-color-rgb: 33, 37, 41;
+    --bs-link-hover-color: var(--app-text-muted);
+    --bs-link-hover-color-rgb: 73, 80, 87;
+    --bs-border-color: var(--app-border);
+    --bs-border-color-translucent: rgba(0, 0, 0, .20);
+    --bs-focus-ring-color: var(--app-focus);
+    --bs-form-valid-color: var(--app-success);
+    --bs-form-valid-border-color: var(--app-success);
+    --bs-form-invalid-color: var(--app-danger);
+    --bs-form-invalid-border-color: var(--app-danger);
+}
+
+.app-bg-primary {
+    color: #ffffff !important;
+    background-color: var(--app-primary) !important;
+}
+
+.app-bg-success {
+    color: #ffffff !important;
+    background-color: var(--app-success) !important;
+}
+
+.app-bg-danger {
+    color: #ffffff !important;
+    background-color: var(--app-danger) !important;
+}
+
+.app-bg-warning {
+    color: #000000 !important;
+    background-color: var(--app-warning) !important;
+}
+
+.app-bg-info {
+    color: #000000 !important;
+    background-color: var(--app-info) !important;
+}
+
+.bar,
+.permission-section-title,
+.security-section-title,
+#manageAudits-tools-form .app-bg-surface.border,
+#manageLogs-tools-form .app-bg-surface.border,
+.crud-list [id^="meta-"] > .p-2,
+#mainSettingsDashboard .accordion-body .app-bg-surface.border {
+    color: #212529 !important;
+    background-color: #adb5bd !important;
+    border-color: #6c757d !important;
+}
+
+.navbar.fixed-top {
+    background: linear-gradient(to bottom, #adb5bd, #ced4da) !important;
+    border-bottom-color: #6c757d !important;
+}
+
+.navbar.fixed-bottom {
+    background: linear-gradient(to bottom, #ced4da, #adb5bd) !important;
+    border-top-color: #6c757d !important;
+}
+
+#buttons_block .card,
+#buttons_block .card-body,
+#buttons-block .card,
+#buttons-block .card-body,
+.accordion-button,
+.card-header,
+.alert,
+#globalConfirmModal .modal-content,
+#importModal .modal-content,
+#exportModal .modal-content {
+    color: #212529 !important;
+    background: linear-gradient(to bottom, #adb5bd, #ced4da) !important;
+    border-color: #6c757d !important;
+}
+
+.navbar,
+.navbar .nav-link,
+.navbar .navbar-brand,
+.accordion-button,
+.card-header {
+    color: #212529 !important;
+}
+
+.accordion-item,
+.accordion-header,
+.accordion-button,
+.accordion-collapse,
+.accordion-body,
+.card,
+.card-header {
+    border-color: #6c757d !important;
+}
+
+.accordion-body,
+.card-body,
+#permissions-account-container,
+#permissions-account-container > .card-body {
+    background-color: #dee2e6 !important;
+}
+
+.list-group-flush,
+.list-group-flush > .list-group-item {
+    background-color: transparent !important;
+    border-color: #6c757d !important;
+}
+
+.form-control,
+.form-select,
+.form-control:focus,
+.form-select:focus {
+    color: #212529 !important;
+    background-color: #f8f9fa !important;
+    border-color: #6c757d !important;
+}
+
+.form-control::placeholder {
+    color: #444444 !important;
+}
+
+.drop-zone-custom,
+.input-group-text,
+.input-group > .toggle-password-visibility,
+#dbMaintenance-tools-container,
+#cleanSpace-tools-container,
+.card-body.tools-card-body-dark,
+#system-tools-container .list-group-item,
+#totp-setup-wrapper .app-bg-surface-elevated,
+#tokens-account-container .list-group-item,
+#tokens .list-group-item {
+    color: #212529 !important;
+    background-color: #ced4da !important;
+    border-color: #6c757d !important;
+}
+
+.table,
+.table-responsive {
+    --bs-border-color: #6c757d;
+    --bs-table-border-color: #6c757d;
+    border-color: #6c757d !important;
+}
+
+.table > :not(caption) > * > * {
+    border-color: #6c757d !important;
+}
+
+#dbMaintenance-tools-form .list-group-item,
+#cleanSpace-tools-form .list-group-item,
+#admins-list .admin-cover-cell {
+    color: #212529 !important;
+    background-color: #dee2e6 !important;
+    border-color: #6c757d !important;
+}
+
+#system-tools-container .badge,
+#dbMaintenance-tools-form .btn-optimize-all,
+#admins-list .action,
+#tokens-list .action {
+    color: #212529 !important;
+    background: linear-gradient(to bottom, #adb5bd, #ced4da) !important;
+    border-color: #6c757d !important;
+}
+
+#dbMaintenance-tools-form .btn-optimize-all:hover,
+#dbMaintenance-tools-form .btn-optimize-all:focus,
+#admins-list .action:hover,
+#admins-list .action:focus,
+#tokens-list .action:hover,
+#tokens-list .action:focus {
+    color: #212529 !important;
+    background: linear-gradient(to bottom, #ced4da, #adb5bd) !important;
+}
+
+#admins-list .action i,
+#tokens-list .action i {
+    color: #212529 !important;
+}
+
+.crud-list .pagination .page-link {
+    color: #212529 !important;
+    background-color: #adb5bd !important;
+    border-color: #6c757d !important;
+}
+
+.crud-list .pagination .page-link:hover,
+.crud-list .pagination .page-link:focus,
+.crud-list .pagination .page-item.active .page-link {
+    color: #212529 !important;
+    background-color: #dee2e6 !important;
+    border-color: #6c757d !important;
+}
+
+#admins-list .admin-attachments-badge {
+    color: #212529 !important;
+    background-color: #adb5bd !important;
+}
+
+#mainGroupsDashboard #dropdownAdmins .list-group-item,
+#mainGroupsDashboard #dropdownAdmins .btn-select-admin,
+.left-menu .list-group-item,
+.left-menu .list-group-item.active,
+.navbar .dropdown-menu,
+.navbar .dropdown-menu .dropdown-item,
+.navbar.fixed-bottom .btn-group > .btn.dropdown-toggle {
+    color: #212529 !important;
+    background-color: #adb5bd !important;
+    border-color: #6c757d !important;
+}
+
+#mainGroupsDashboard #dropdownAdmins .btn-select-admin:hover,
+#mainGroupsDashboard #dropdownAdmins .btn-select-admin:focus,
+.left-menu .list-group .list-group-item.active,
+.left-menu .list-group .list-group-item-action:hover,
+.left-menu .list-group .list-group-item-action:focus,
+.navbar .dropdown-menu .dropdown-item:hover,
+.navbar .dropdown-menu .dropdown-item:focus,
+.navbar .dropdown-menu .dropdown-item.active {
+    color: #212529 !important;
+    background-color: #dee2e6 !important;
+    border-color: #6c757d !important;
+}
+
+#mainGroupsDashboard #dropdownAdmins .btn-select-admin i,
+#mainGroupsDashboard #dropdownAdmins .btn-select-admin:hover i,
+#mainGroupsDashboard #dropdownAdmins .btn-select-admin:focus i,
+.left-menu .list-group .list-group-item-action:hover i,
+.left-menu .list-group .list-group-item-action:focus i,
+.navbar .dropdown-menu .dropdown-item:hover i,
+.navbar .dropdown-menu .dropdown-item:focus i,
+.navbar .dropdown-menu .dropdown-item.active i {
+    color: #212529 !important;
+}
+
+.navbar .dropdown-menu .dropdown-divider {
+    border-top-color: #6c757d !important;
+}
+
+.alert button[data-bs-dismiss="alert"] {
+    color: #ffffff !important;
+    border-color: #6c757d !important;
+}
+
+.app-btn-secondary:not(.toggle-password-visibility) {
+    --bs-btn-color: #212529;
+    --bs-btn-border-color: #6c757d;
+    --bs-btn-hover-color: #212529;
+    --bs-btn-hover-border-color: #6c757d;
+    --bs-btn-active-color: #212529;
+    --bs-btn-active-border-color: #6c757d;
+    background: linear-gradient(to bottom, #adb5bd, #ced4da);
+}
+
+.app-btn-secondary:not(.toggle-password-visibility):hover,
+.app-btn-secondary:not(.toggle-password-visibility):focus,
+.app-btn-secondary:not(.toggle-password-visibility):active {
+    background: linear-gradient(to bottom, #ced4da, #adb5bd);
+}
+
+#permissions-account-container .app-bg-surface,
+#permissions .app-bg-surface,
+#admin-permissions-container .app-bg-surface {
+    background-color: #f8f9fa !important;
+    border-color: #6c757d !important;
+}
+
+#permissions-account-container .permission-section-title,
+#permissions .permission-section-title,
+#admin-permissions-container .permission-section-title {
+    color: #212529 !important;
+    background-color: #adb5bd !important;
+    border-color: #6c757d !important;
+}
+
+#permissions-account-container .border,
+#permissions .border,
+#admin-permissions-container .border {
+    border-color: #6c757d !important;
+}
+
+.token-system-details,
+.token-system-details .text-white {
+    color: #212529 !important;
+}
+
+#importModal .spinner-border,
+#exportModal .spinner-border {
+    color: #212529 !important;
+}

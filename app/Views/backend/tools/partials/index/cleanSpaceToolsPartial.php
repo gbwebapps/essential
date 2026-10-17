@@ -1,4 +1,4 @@
-<div class="card-body">
+<div class="card-body tools-card-body-dark">
     <form id="cleanSpace-tools-form" autocomplete="off">
         <div class="row">
             <div class="col-12">

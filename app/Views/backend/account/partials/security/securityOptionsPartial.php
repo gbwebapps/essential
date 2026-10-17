@@ -1,6 +1,6 @@
 <div class="card-body">
 
-    <div class="row mb-3 g-0 app-bg-surface pt-2 ps-2 pe-2 border rounded-1">
+    <div class="row mb-3 g-0 app-bg-surface security-section-title pt-2 ps-2 pe-2 border rounded-1">
         <div class="col-12 text-start">
             <h5><?= lang('backend/account.titles.twoFactor'); ?></h5>
         </div>

@@ -18,7 +18,7 @@
 
         <?php foreach($permissions as $key => $permission): ?>
 
-            <div class="row mb-2 g-0 app-bg-surface pt-2 ps-2 pe-2 border rounded-2">
+            <div class="row mb-2 g-0 app-bg-surface permission-section-title pt-2 ps-2 pe-2 border rounded-2">
                 <div class="col-6 text-start">
                     <h5><?= $permission['icon']; ?> <?= esc(ucfirst($permission['title'])); ?></h5>
                 </div>

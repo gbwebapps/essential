@@ -27,15 +27,15 @@
 					$userAgent->parse((string) $token->user_agent);
                     
                     /* Inizializzazione corretta della variabile in camelCase */
-					$agentText = lang('backend/account.labels.operatingSystem') . ' <span class="app-text-accent">' . esc($userAgent->getPlatform()) . '</span>';
+					$agentText = '<span class="text-white">' . lang('backend/account.labels.operatingSystem') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
                     
                     /* Valutazione con metodi nativi in camelCase di CodeIgniter 4 */
                     if($userAgent->isBrowser()):
-						$agentText .= ' &bull; ' . lang('backend/account.labels.browser') . ' <span class="app-text-accent">' . esc($userAgent->getBrowser()) . '</span>';
+						$agentText .= ' &bull; <span class="text-white">' . lang('backend/account.labels.browser') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
                     elseif($userAgent->isMobile()):
-						$agentText .= ' &bull; ' . lang('backend/account.labels.mobile') . ' <span class="app-text-accent">' . esc($userAgent->getMobile()) . '</span>';
+						$agentText .= ' &bull; <span class="text-white">' . lang('backend/account.labels.mobile') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getMobile()) . '</span>';
                     elseif($userAgent->isRobot()):
-						$agentText .= ' &bull; ' . lang('backend/account.labels.robot') . ' <span class="app-text-accent">' . esc($userAgent->getRobot()) . '</span>';
+						$agentText .= ' &bull; <span class="text-white">' . lang('backend/account.labels.robot') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getRobot()) . '</span>';
                     endif;
                 ?>
 
@@ -64,11 +64,11 @@
                             <div class="row mt-lg-3">
                                 <div class="col-12 text-start">
                                     <hr class="d-md-none my-2 app-text-muted">
-                                    <small class="fw-bold">
+                                    <small class="token-system-details">
                                         <?= $agentText; ?>
                                         &bull; 
-                                        <span><?= lang('backend/account.labels.ipAddress'); ?></span>
-                                        <span class="app-text-accent"><?= esc($token->ip_address); ?></span>
+                                        <span class="text-white"><?= lang('backend/account.labels.ipAddress'); ?></span>
+                                        <span class="text-primary fw-bold"><?= esc($token->ip_address); ?></span>
                                     </small>
                                 </div>
                             </div>
