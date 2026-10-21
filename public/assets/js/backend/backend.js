@@ -8,6 +8,59 @@ export const langDefinitions = document.getElementById('lang-definitions');
 import { ExportPdfManager } from './modules/ExportPdf.js';
 import { PasswordVisibility } from './modules/PasswordVisibility.js';
 
+/* Gestione modalità schermo intero */
+const fullscreenToggle = document.getElementById('fullscreen-toggle');
+
+if (fullscreenToggle) {
+    const fullscreenIcon = fullscreenToggle.querySelector('i');
+    const fullscreenText = fullscreenToggle.querySelector('.fullscreen-toggle-text');
+    const expandText = fullscreenToggle.dataset.expandText;
+    const reduceText = fullscreenToggle.dataset.reduceText;
+    let fullscreenTransitionPending = false;
+
+    const updateFullscreenToggle = () => {
+        const isFullscreen = document.fullscreenElement !== null;
+        const currentText = isFullscreen ? reduceText : expandText;
+
+        fullscreenIcon?.classList.toggle('fa-expand', ! isFullscreen);
+        fullscreenIcon?.classList.toggle('fa-compress', isFullscreen);
+
+        if (fullscreenText) fullscreenText.textContent = currentText;
+
+        fullscreenToggle.setAttribute('aria-label', currentText);
+        fullscreenToggle.setAttribute('aria-pressed', String(isFullscreen));
+        fullscreenToggle.setAttribute('title', currentText);
+    };
+
+    if (document.fullscreenEnabled) {
+        fullscreenToggle.addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            if (fullscreenTransitionPending) return;
+
+            fullscreenTransitionPending = true;
+
+            try {
+                if (document.fullscreenElement) {
+                    await document.exitFullscreen();
+                } else {
+                    await document.documentElement.requestFullscreen();
+                }
+            } catch (error) {
+                showAlert('danger', fullscreenToggle.dataset.errorText);
+            } finally {
+                fullscreenTransitionPending = false;
+                updateFullscreenToggle();
+            }
+        });
+
+        document.addEventListener('fullscreenchange', updateFullscreenToggle);
+        updateFullscreenToggle();
+    } else {
+        fullscreenToggle.hidden = true;
+    }
+}
+
 /* Scrollup */
 window.addEventListener('scroll', function() {
     const scrollupElements = document.querySelectorAll('.scrollup');
@@ -450,6 +503,189 @@ export async function askConfirm(message) {
         modalInstance.show();
     });
 }
+
+/* Gestione globale delle modifiche non salvate */
+const unsavedFormSelector = 'form[data-unsaved-check]';
+const unsavedFormStates = new WeakMap();
+const unsavedExternalStates = new WeakMap();
+let allowPageUnload = false;
+let unsavedConfirmation = null;
+
+/* Restituisce uno stato confrontabile dei campi presenti nel form */
+function getUnsavedFormState(form) {
+    const state = [];
+    const formData = new FormData(form);
+
+    formData.forEach((value, key) => {
+        if (value instanceof File) {
+            if (value.name === '' && value.size === 0) return;
+
+            state.push([
+                key,
+                value.name,
+                value.size,
+                value.type,
+                value.lastModified
+            ]);
+            return;
+        }
+
+        state.push([key, String(value)]);
+    });
+
+    return JSON.stringify(state);
+}
+
+/* Registra il valore iniziale di un form monitorato */
+function registerUnsavedForm(form) {
+    if (!(form instanceof HTMLFormElement)) return;
+    if (!form.matches(unsavedFormSelector)) return;
+    if (unsavedFormStates.has(form)) return;
+
+    unsavedFormStates.set(form, getUnsavedFormState(form));
+    unsavedExternalStates.set(form, false);
+}
+
+/* Recupera i form monitorati presenti nel contesto indicato */
+function getUnsavedForms(scope = document) {
+    const forms = [];
+
+    if (scope instanceof HTMLFormElement && scope.matches(unsavedFormSelector)) {
+        forms.push(scope);
+    }
+
+    if (scope && typeof scope.querySelectorAll === 'function') {
+        scope.querySelectorAll(unsavedFormSelector).forEach(form => forms.push(form));
+    }
+
+    forms.forEach(registerUnsavedForm);
+
+    return forms;
+}
+
+/* Verifica la presenza di campi o risorse esterne non salvate */
+export function hasUnsavedChanges(scope = document) {
+    return getUnsavedForms(scope).some(form => {
+        const initialState = unsavedFormStates.get(form);
+        const currentState = getUnsavedFormState(form);
+        const hasExternalChanges = unsavedExternalStates.get(form) === true;
+
+        return initialState !== currentState || hasExternalChanges;
+    });
+}
+
+/* Imposta come salvato lo stato corrente dei form indicati */
+export function markUnsavedClean(scope) {
+    getUnsavedForms(scope).forEach(form => {
+        unsavedFormStates.set(form, getUnsavedFormState(form));
+        unsavedExternalStates.set(form, false);
+    });
+}
+
+/* Registra modifiche non rappresentate direttamente dai campi del form */
+export function setUnsavedExternalState(form, hasChanges) {
+    if (!(form instanceof HTMLFormElement)) return;
+    if (!form.matches(unsavedFormSelector)) return;
+
+    registerUnsavedForm(form);
+    unsavedExternalStates.set(form, hasChanges === true);
+}
+
+/* Richiede conferma prima di eliminare dati non salvati dal contesto */
+export async function confirmDiscardChanges(scope = document) {
+    if (!hasUnsavedChanges(scope)) return true;
+
+    if (unsavedConfirmation) return false;
+
+    const message = langDefinitions?.dataset.unsavedChanges || '';
+
+    unsavedConfirmation = askConfirm(message).finally(() => {
+        unsavedConfirmation = null;
+    });
+
+    return unsavedConfirmation;
+}
+
+/* Registra anche i form caricati successivamente tramite AJAX */
+const unsavedFormsObserver = new MutationObserver(mutations => {
+    mutations.forEach(mutation => {
+        mutation.addedNodes.forEach(node => {
+            if (!(node instanceof Element)) return;
+
+            if (node.matches(unsavedFormSelector)) {
+                registerUnsavedForm(node);
+            }
+
+            node.querySelectorAll(unsavedFormSelector).forEach(registerUnsavedForm);
+        });
+    });
+});
+
+getUnsavedForms(document);
+
+if (document.body) {
+    unsavedFormsObserver.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+}
+
+/* Navigazione tramite link interni o esterni */
+document.addEventListener('click', async e => {
+    if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+
+    const link = e.target.closest('a[href]');
+    if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
+
+    const href = link.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+
+    const destination = new URL(link.href, window.location.href);
+    if (!['http:', 'https:'].includes(destination.protocol)) return;
+
+    if (
+        destination.origin === window.location.origin &&
+        destination.pathname === window.location.pathname &&
+        destination.search === window.location.search
+    ) return;
+
+    if (!hasUnsavedChanges(document)) return;
+
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
+    const confirmed = await confirmDiscardChanges(document);
+    if (!confirmed) return;
+
+    allowPageUnload = true;
+    window.location.assign(destination.href);
+}, true);
+
+/* Navigazione tramite form esplicitamente destinati al cambio pagina */
+document.addEventListener('submit', async e => {
+    const form = e.target;
+
+    if (!(form instanceof HTMLFormElement)) return;
+    if (!form.matches('[data-unsaved-navigation]')) return;
+    if (!hasUnsavedChanges(document)) return;
+
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
+    const confirmed = await confirmDiscardChanges(document);
+    if (!confirmed) return;
+
+    allowPageUnload = true;
+    form.submit();
+}, true);
+
+/* Refresh, chiusura scheda e navigazione gestita direttamente dal browser */
+window.addEventListener('beforeunload', e => {
+    if (allowPageUnload || !hasUnsavedChanges(document)) return;
+
+    e.preventDefault();
+    e.returnValue = '';
+});
 
 const smoothReplaceTimers = new WeakMap();
 

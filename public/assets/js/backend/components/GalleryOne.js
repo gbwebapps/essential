@@ -2,12 +2,17 @@
 import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace } from '../backend.js';
 
 export class GalleryOneManager {
-    constructor() {
+    constructor(config = {}) {
 
         if (GalleryOneManager.instance) {
             return GalleryOneManager.instance;
         }
         GalleryOneManager.instance = this;
+
+        this.showGalleryUrl = config.showGalleryUrl ?? urlbase + 'backend/galleryOne/showGallery';
+        this.deleteImageUrl = config.deleteImageUrl ?? urlbase + 'backend/galleryOne/deleteImage';
+        this.removeCoverUrl = config.removeCoverUrl ?? urlbase + 'backend/galleryOne/removeCover';
+        this.setCoverUrl = config.setCoverUrl ?? urlbase + 'backend/galleryOne/setCover';
         
         this.containerId = '#imagesData';
         /* Rimosso this.container per evitare nodi orfani (fantasma) */
@@ -57,7 +62,7 @@ export class GalleryOneManager {
 
     async refresh(formData) {
         try {
-            const response = await apiFetch(urlbase + 'backend/galleryOne/showGallery', {
+            const response = await apiFetch(this.showGalleryUrl, {
                 method: 'POST',
                 body: formData
             });
@@ -70,7 +75,15 @@ export class GalleryOneManager {
 
     async handleAction(action, formData) {
         try {
-            const response = await apiFetch(urlbase + 'backend/galleryOne/' + action, {
+            const actionUrls = {
+                deleteImage: this.deleteImageUrl,
+                removeCover: this.removeCoverUrl,
+                setCover: this.setCoverUrl
+            };
+
+            if ( ! actionUrls[action]) return;
+
+            const response = await apiFetch(actionUrls[action], {
                 method: 'POST',
                 body: formData
             });
@@ -82,11 +95,6 @@ export class GalleryOneManager {
     }
 
     handleResponse(data, showSuccess) {
-        if (data.result === 'no_current_user_logged') {
-            window.location.href = urlbase + 'backend/auth/login';
-            return;
-        }
-
         if (data.result === false) {
             showAlert('danger', data.message);
             return;

@@ -76,9 +76,9 @@ class ImportControllerTest extends CIUnitTestCase
 
     public function testShowModalReturnsErrorWhenStructureIsEmpty(): void
     {
-        $this->configureAjaxPost(['entity' => 'users']);
+        $this->configureAjaxPost(['entity' => 'inventory_items']);
         $this->controller->method('validateData')->willReturn(true);
-        $this->mockImportModel->expects($this->once())->method('getImportTableStructure')->with('users', ImportModel::IMPORT_MODE_CRUD)->willReturn([]);
+        $this->mockImportModel->expects($this->once())->method('getImportTableStructure')->with('inventory_items', ImportModel::IMPORT_MODE_CRUD)->willReturn([]);
         $jsonReturn = $this->createMock(Response::class);
 
         $this->controller->expects($this->once())->method('jsonResponse')->with([
@@ -91,9 +91,9 @@ class ImportControllerTest extends CIUnitTestCase
 
     public function testShowModalSuccessReturnsJsonWithOutput(): void
     {
-        $this->configureAjaxPost(['entity' => 'users']);
+        $this->configureAjaxPost(['entity' => 'inventory_items']);
         $this->controller->method('validateData')->willReturn(true);
-        $this->mockImportModel->expects($this->once())->method('getImportTableStructure')->with('users', ImportModel::IMPORT_MODE_CRUD)->willReturn($this->sampleStructure());
+        $this->mockImportModel->expects($this->once())->method('getImportTableStructure')->with('inventory_items', ImportModel::IMPORT_MODE_CRUD)->willReturn($this->sampleStructure());
         $jsonReturn = $this->createMock(Response::class);
 
         $this->controller->expects($this->once())->method('jsonResponse')->with($this->callback(function (array $data): bool {
@@ -107,9 +107,9 @@ class ImportControllerTest extends CIUnitTestCase
 
     public function testShowDatabaseModalUsesDatabaseMode(): void
     {
-        $this->configureAjaxPost(['entity' => 'users']);
+        $this->configureAjaxPost(['entity' => 'inventory_items']);
         $this->controller->method('validateData')->willReturn(true);
-        $this->mockImportModel->expects($this->once())->method('getImportTableStructure')->with('users', ImportModel::IMPORT_MODE_DATABASE)->willReturn($this->sampleStructure());
+        $this->mockImportModel->expects($this->once())->method('getImportTableStructure')->with('inventory_items', ImportModel::IMPORT_MODE_DATABASE)->willReturn($this->sampleStructure());
         $jsonReturn = $this->createMock(Response::class);
         $this->controller->method('jsonResponse')->willReturn($jsonReturn);
 
@@ -126,9 +126,9 @@ class ImportControllerTest extends CIUnitTestCase
 
     public function testDownloadEmptyStructureRedirectsBack(): void
     {
-        $this->mockImportModel->expects($this->once())->method('getImportTableStructure')->with('users', ImportModel::IMPORT_MODE_CRUD)->willReturn([]);
+        $this->mockImportModel->expects($this->once())->method('getImportTableStructure')->with('inventory_items', ImportModel::IMPORT_MODE_CRUD)->willReturn([]);
 
-        $result = $this->controller->download('users');
+        $result = $this->controller->download('inventory_items');
 
         $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertTrue($result->hasHeader('Location'));
@@ -136,9 +136,9 @@ class ImportControllerTest extends CIUnitTestCase
 
     public function testDownloadSuccessReturnsCsvResponse(): void
     {
-        $this->mockImportModel->expects($this->once())->method('getImportTableStructure')->with('users', ImportModel::IMPORT_MODE_CRUD)->willReturn($this->sampleStructure());
+        $this->mockImportModel->expects($this->once())->method('getImportTableStructure')->with('inventory_items', ImportModel::IMPORT_MODE_CRUD)->willReturn($this->sampleStructure());
 
-        $result = $this->controller->download('users');
+        $result = $this->controller->download('inventory_items');
 
         $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertStringContainsString('text/csv', $result->getHeaderLine('Content-Type'));
@@ -146,9 +146,9 @@ class ImportControllerTest extends CIUnitTestCase
 
     public function testDownloadDatabaseUsesDatabaseMode(): void
     {
-        $this->mockImportModel->expects($this->once())->method('getImportTableStructure')->with('users', ImportModel::IMPORT_MODE_DATABASE)->willReturn($this->sampleStructure());
+        $this->mockImportModel->expects($this->once())->method('getImportTableStructure')->with('inventory_items', ImportModel::IMPORT_MODE_DATABASE)->willReturn($this->sampleStructure());
 
-        $result = $this->controller->downloadDatabase('users');
+        $result = $this->controller->downloadDatabase('inventory_items');
 
         $this->assertInstanceOf(ResponseInterface::class, $result);
     }
@@ -179,7 +179,7 @@ class ImportControllerTest extends CIUnitTestCase
 
     public function testProcessCsvReturnsErrorWhenUploadedFileIsMissing(): void
     {
-        $this->configureAjaxPost(['entity' => 'users']);
+        $this->configureAjaxPost(['entity' => 'inventory_items']);
         $this->mockRequest->method('getFile')->with('csvFile')->willReturn(null);
         $this->controller->method('validateData')->willReturn(true);
         $jsonReturn = $this->createMock(Response::class);
@@ -194,9 +194,9 @@ class ImportControllerTest extends CIUnitTestCase
 
     public function testProcessCsvModelValidationFailsWithStructuralErrors(): void
     {
-        $file = $this->configureCsvUploadRequest('users');
+        $file = $this->configureCsvUploadRequest('inventory_items');
         $this->controller->method('validateData')->willReturn(true);
-        $this->mockImportModel->expects($this->once())->method('parseAndValidateCsv')->with($file, 'users', ImportModel::IMPORT_MODE_CRUD)->willReturn([
+        $this->mockImportModel->expects($this->once())->method('parseAndValidateCsv')->with($file, 'inventory_items', ImportModel::IMPORT_MODE_CRUD)->willReturn([
             'status' => false,
             'validationErrors' => ['Row 2' => 'Missing value'],
         ]);
@@ -213,9 +213,9 @@ class ImportControllerTest extends CIUnitTestCase
 
     public function testProcessCsvModelFailsWithGenericError(): void
     {
-        $file = $this->configureCsvUploadRequest('users');
+        $file = $this->configureCsvUploadRequest('inventory_items');
         $this->controller->method('validateData')->willReturn(true);
-        $this->mockImportModel->expects($this->once())->method('parseAndValidateCsv')->with($file, 'users', ImportModel::IMPORT_MODE_CRUD)->willReturn([
+        $this->mockImportModel->expects($this->once())->method('parseAndValidateCsv')->with($file, 'inventory_items', ImportModel::IMPORT_MODE_CRUD)->willReturn([
             'status' => false,
             'message' => 'Generic parsing error',
         ]);
@@ -231,12 +231,12 @@ class ImportControllerTest extends CIUnitTestCase
 
     public function testProcessCsvSuccessReturnsPreviewData(): void
     {
-        $file = $this->configureCsvUploadRequest('users');
+        $file = $this->configureCsvUploadRequest('inventory_items');
         $this->controller->method('validateData')->willReturn(true);
         $importId = str_repeat('a', 64);
         $plan = ['insert' => 5, 'update' => 2, 'skip' => 0];
 
-        $this->mockImportModel->expects($this->once())->method('parseAndValidateCsv')->with($file, 'users', ImportModel::IMPORT_MODE_CRUD)->willReturn([
+        $this->mockImportModel->expects($this->once())->method('parseAndValidateCsv')->with($file, 'inventory_items', ImportModel::IMPORT_MODE_CRUD)->willReturn([
             'status' => true,
             'headers' => ['uuid', 'email'],
             'rows' => [],
@@ -258,11 +258,11 @@ class ImportControllerTest extends CIUnitTestCase
 
     public function testProcessDatabaseCsvUsesDatabaseMode(): void
     {
-        $file = $this->configureCsvUploadRequest('users');
+        $file = $this->configureCsvUploadRequest('inventory_items');
         $this->controller->method('validateData')->willReturn(true);
         $importId = str_repeat('b', 64);
 
-        $this->mockImportModel->expects($this->once())->method('parseAndValidateCsv')->with($file, 'users', ImportModel::IMPORT_MODE_DATABASE)->willReturn([
+        $this->mockImportModel->expects($this->once())->method('parseAndValidateCsv')->with($file, 'inventory_items', ImportModel::IMPORT_MODE_DATABASE)->willReturn([
             'status' => true,
             'headers' => ['id', 'uuid', 'email'],
             'rows' => [],

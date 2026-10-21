@@ -5,7 +5,7 @@
         <div class="card">
 
             <!-- Form identificato per la gestione AJAX -->
-            <form id="admins-add">
+            <form id="admins-add" data-unsaved-check>
 
                 <!-- General Data -->
                 <div id="generalData">

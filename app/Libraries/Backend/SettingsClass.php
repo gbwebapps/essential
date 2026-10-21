@@ -95,6 +95,21 @@ class SettingsClass
 	}
 
 	/**
+	 * Costruisce il dizionario dei temi grafici disponibili nel backend.
+	 *
+	 * @return array Array associativo [tema => etichetta_localizzata]
+	 */
+	public function getThemes(): array
+	{
+	    return [
+	        'white' => lang('backend/settings.themes.white'),
+	        'black' => lang('backend/settings.themes.black'),
+	        'grey'  => lang('backend/settings.themes.grey'),
+	        'dark'  => lang('backend/settings.themes.dark')
+	    ];
+	}
+
+	/**
 	 * Definisce il set di formati data/ora (basati sui pattern ICU) disponibili per la configurazione globale.
 	 * 
 	 * Fornisce un catalogo strutturato di formati standard (europei estesi/compatti, anglosassoni con meridiem e ISO tecnico) 

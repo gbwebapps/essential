@@ -1779,7 +1779,7 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
 
         $tableData =
             [
-                'Name'         => 'users',
+                'Name'         => 'inventory_items',
                 'Rows'         => 500,
                 'Data_length'  => 2097152,
                 'Index_length' => 0,
@@ -1814,7 +1814,7 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             'show table status like ?';
 
         $params =
-            ['users'];
+            ['inventory_items'];
 
         $mockDb->expects(
             $this->once()
@@ -1856,7 +1856,7 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
         $bind();
 
         $targetTable =
-            'users';
+            'inventory_items';
 
         $result =
             $model->getTablesStatus(
@@ -1865,7 +1865,7 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
 
         $expectedRow =
             [
-                'name'     => 'users',
+                'name'     => 'inventory_items',
                 'rows'     => 500,
                 'size'     => 2.0,
                 'overhead' => 1.0,
@@ -1914,7 +1914,7 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             ['status' => 'single_ok'];
 
         $targetTable =
-            'users';
+            'inventory_items';
 
         $mockModel->expects(
             $this->exactly(2)
@@ -2056,7 +2056,7 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
         )
         ->willReturnOnConsecutiveCalls(
             [
-                ['name' => 'users', 'engine' => 'InnoDB'],
+                ['name' => 'inventory_items', 'engine' => 'InnoDB'],
                 ['name' => 'logs', 'engine' => 'InnoDB']
             ],
             $statusArr
@@ -2149,7 +2149,7 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
 
         $targetArr =
             [
-                'users',
+                'inventory_items',
                 'logs'
             ];
 
@@ -2172,7 +2172,7 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             ->getMock();
 
         $model->method('getTablesStatus')->willReturn([
-            ['name' => 'users', 'engine' => 'InnoDB'],
+            ['name' => 'inventory_items', 'engine' => 'InnoDB'],
         ]);
 
         $db = $this->createMock(\CodeIgniter\Database\BaseConnection::class);
@@ -2193,7 +2193,7 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             ->getMock();
 
         $model->expects($this->once())->method('getTablesStatus')->willReturn([
-            ['name' => 'users', 'engine' => 'InnoDB'],
+            ['name' => 'inventory_items', 'engine' => 'InnoDB'],
         ]);
 
         $query = $this->createMock(\CodeIgniter\Database\BaseResult::class);
@@ -2202,14 +2202,14 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
         ]);
 
         $db = $this->createMock(\CodeIgniter\Database\BaseConnection::class);
-        $db->method('escapeIdentifiers')->willReturn('`users`');
+        $db->method('escapeIdentifiers')->willReturn('`inventory_items`');
         $db->expects($this->once())->method('query')->willReturn($query);
 
         \Closure::bind(function() use ($db) {
             $this->db = $db;
         }, $model, $model)();
 
-        $this->assertFalse($model->runOptimization('users'));
+        $this->assertFalse($model->runOptimization('inventory_items'));
     }
 
     public function testGetDatabase()
@@ -3030,7 +3030,7 @@ class ToolsModelTest extends \CodeIgniter\Test\CIUnitTestCase
         endif;
 
         $model = new \App\Models\Backend\ToolsModel();
-        $folder = 'test_folder_recursive';
+        $folder = 'test_folder_recursive_' . bin2hex(random_bytes(4));
         $path = WRITEPATH . $folder;
         $nestedPath = $path . DIRECTORY_SEPARATOR . 'nested';
 

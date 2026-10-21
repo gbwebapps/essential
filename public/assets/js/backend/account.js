@@ -1,5 +1,5 @@
 /* Import delle costanti e utility da backend.js */
-import { action } from './backend.js';
+import { action, urlbase } from './backend.js';
 
 /* Import dei componenti dalla sottocartella */
 import { EditManager, GetPermissionsManager, GetTokensManager, DeleteTokenManager, ResetPasswordManager, SecurityManager } from './modules/Account.js';
@@ -25,8 +25,15 @@ const actions = {
     }, 
     images: function() {
 
-        const galleryOneManager = new GalleryOneManager();
-        const imagePreviewManager = new UploadPreviewImgManager(galleryOneManager);
+        const galleryOneManager = new GalleryOneManager({
+            showGalleryUrl: urlbase + 'backend/account/galleryOne/showGallery',
+            deleteImageUrl: urlbase + 'backend/account/galleryOne/deleteImage',
+            removeCoverUrl: urlbase + 'backend/account/galleryOne/removeCover',
+            setCoverUrl: urlbase + 'backend/account/galleryOne/setCover'
+        });
+        const imagePreviewManager = new UploadPreviewImgManager(galleryOneManager, {
+            saveImagesUrl: urlbase + 'backend/account/uploadPreview/saveImages'
+        });
 
     }, 
     tokens: function() {

@@ -1,1 +1,0 @@
-<p>qui showPartial</p>

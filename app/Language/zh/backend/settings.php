@@ -111,6 +111,7 @@ return [
 		'timezone' => '时区', 
 		'language' => '语言', 
 		'dateFormat' => '日期格式', 
+		'theme' => '界面主题',
 	], 
 	'placeholders' => [
 		'attemptsLimit' => '请输入登录尝试限制...',
@@ -157,6 +158,12 @@ return [
 		'german' => '德语', 
 		'chinese' => '中文', 
 	], 
+	'themes' => [
+		'white' => '高对比度白色',
+		'black' => '高对比度黑色',
+		'grey' => '灰色',
+		'dark' => '深色',
+	],
 	'dateFormats' => [
 		'extended' => '2026年8月16日 15:30:00 (24小时制 完整)', 
 		'compact' => '16/08/2026 15:30 (24小时制 紧凑)', 

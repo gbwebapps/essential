@@ -166,27 +166,27 @@
                                         <tr class="border-end border-start">
                                             <td colspan="7" class="p-0 border-0">
                                                 <div class="collapse" id="meta-<?= esc($log->id); ?>">
-                                                    <div class="p-2 border-bottom app-bg-surface app-text-muted small">
+                                                    <div class="p-2 border-bottom app-bg-surface log-system-details small">
                                                         <?php 
                                                             $userAgent->parse($log->user_agent);
 
-                                                            $agentText = lang('backend/logs.labels.createdAt') . ' <span class="app-text-accent fw-bold">' . convertDate(esc($log->created_at), 'conversational') . '</span>';
-                                                            $agentText .= ' &bull; ' . lang('backend/logs.labels.typeToken') . ' <span class="app-text-accent fw-bold">' . esc($log->token_type) . '</span>';
-                                                            $agentText .= ' &bull; ' . lang('backend/logs.labels.operatingSystem') . ' <span class="app-text-accent fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
+                                                            $agentText = '<span class="text-white">' . lang('backend/logs.labels.createdAt') . '</span> <span class="app-text-success fw-bold">' . convertDate(esc($log->created_at), 'conversational') . '</span>';
+                                                            $agentText .= ' &bull; <span class="text-white">' . lang('backend/logs.labels.typeToken') . '</span> <span class="app-text-warning fw-bold">' . esc($log->token_type) . '</span>';
+                                                            $agentText .= ' &bull; <span class="text-white">' . lang('backend/logs.labels.operatingSystem') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
                                                         ?>
                                                         <?php
                                                             if($userAgent->isBrowser()):
-                                                                $agentText .= ' &bull; ' . lang('backend/logs.labels.browser') . ' <span class="app-text-accent fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
+                                                                $agentText .= ' &bull; <span class="text-white">' . lang('backend/logs.labels.browser') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
                                                             elseif($userAgent->isMobile()):
-                                                                $agentText .= ' &bull; ' . lang('backend/logs.labels.mobile') . ' <span class="app-text-accent fw-bold">' . esc($userAgent->getMobile()) . '</span>';
+                                                                $agentText .= ' &bull; <span class="text-white">' . lang('backend/logs.labels.mobile') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getMobile()) . '</span>';
                                                             elseif($userAgent->isRobot()):
-                                                                $agentText .= ' &bull; ' . lang('backend/logs.labels.robot') . ' <span class="app-text-accent fw-bold">' . esc($userAgent->getRobot()) . '</span>';
+                                                                $agentText .= ' &bull; <span class="text-white">' . lang('backend/logs.labels.robot') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getRobot()) . '</span>';
                                                             endif;
                                                         ?>
                                                         <?= $agentText; ?>
                                                         &nbsp;&bull;&nbsp;
-                                                        <span><?= lang('backend/logs.labels.ipAddress'); ?></span>
-                                                        <span class="app-text-accent fw-bold"><?= esc($log->ip_address); ?></span>
+                                                        <span class="text-white"><?= lang('backend/logs.labels.ipAddress'); ?></span>
+                                                        <span class="text-primary fw-bold"><?= esc($log->ip_address); ?></span>
                                                     </div>
                                                 </div>
                                             </td>

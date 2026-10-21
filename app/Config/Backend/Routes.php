@@ -42,6 +42,17 @@ $routes->group('backend', function($routes) {
             $routes->match(['GET', 'POST'], 'permissions', '\App\Controllers\Backend\AccountController::permissions');
             $routes->get('images', '\App\Controllers\Backend\AccountController::images');
 
+            $routes->group('uploadPreview', function($routes) {
+                $routes->post('saveImages', '\App\Controllers\Backend\Components\UploadPreviewController::saveImages');
+            });
+
+            $routes->group('galleryOne', function($routes) {
+                $routes->post('showGallery', '\App\Controllers\Backend\Components\GalleryOneController::showGallery/account');
+                $routes->post('deleteImage', '\App\Controllers\Backend\Components\GalleryOneController::deleteImage/account');
+                $routes->post('removeCover', '\App\Controllers\Backend\Components\GalleryOneController::removeCover/account');
+                $routes->post('setCover', '\App\Controllers\Backend\Components\GalleryOneController::setCover/account');
+            });
+
             $routes->match(['GET', 'POST'], 'tokens', '\App\Controllers\Backend\AccountController::tokens');
             $routes->post('deleteToken', '\App\Controllers\Backend\AccountController::deleteToken');
             
@@ -55,19 +66,14 @@ $routes->group('backend', function($routes) {
 			$routes->post('cancelTotpSetup', '\App\Controllers\Backend\AccountController::cancelTotpSetup');
         });
 
-        /* MESSAGES */
-        $routes->group('messages', ['filter' => 'authorization'], function($routes) {
-            $routes->get('/', '\App\Controllers\Backend\MessagesController::index', ['filter' => 'permission:messages_index']);
-            $routes->get('showAll', '\App\Controllers\Backend\MessagesController::showAll', ['filter' => 'permission:messages_showall']);
-            $routes->get('show', '\App\Controllers\Backend\MessagesController::show', ['filter' => 'permission:messages_show']);
-        });
+        /* BRANDS */
+        require ROOTPATH . 'Modules/Backend/Brands/Config/Routes.php';
 
-        /* USERS */
-        $routes->group('users', ['filter' => 'authorization'], function($routes) {
-            $routes->get('/', '\App\Controllers\Backend\UsersController::index', ['filter' => 'permission:users_index']);
-            $routes->get('showAll', '\App\Controllers\Backend\UsersController::showAll', ['filter' => 'permission:users_showall']);
-            $routes->get('show', '\App\Controllers\Backend\UsersController::show', ['filter' => 'permission:users_show']);
-        });
+        /* CATEGORIES */
+        require ROOTPATH . 'Modules/Backend/Categories/Config/Routes.php';
+
+        /* PRODUCTS */
+        require ROOTPATH . 'Modules/Backend/Products/Config/Routes.php';
 
         /* IMAGES PREVIEW */
         $routes->group('uploadPreview', ['filter' => 'authorization'], function($routes) {
@@ -87,6 +93,7 @@ $routes->group('backend', function($routes) {
     /* SUPERADMIN */
     $routes->group('', ['filter' => ['authorization', 'superadmin']], function($routes) {
 
+        /* EXPORT CSV */
         $routes->group('export', function($routes) {
             $routes->post('showModal', '\App\Controllers\Backend\Components\ExportController::showModal');
             $routes->post('generate', '\App\Controllers\Backend\Components\ExportController::generate');

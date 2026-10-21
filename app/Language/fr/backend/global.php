@@ -13,8 +13,9 @@ return [
         ],
         'bottomLeft' => [
             'dashboard' => 'Panneaux',
-            'users' => 'Utilisateurs',
-            'messages' => 'Messages',
+            'brands' => 'Marques',
+            'categories' => 'Catégories',
+            'products' => 'Produits',
         ],
         'bottomRight' => [
             'settings' => 'Paramètres',
@@ -34,6 +35,8 @@ return [
         'modules' => 'Modules',
         'services' => 'Services',
         'backToTop' => 'Retour en haut', 
+        'expandScreen' => 'Agrandir l’écran',
+        'reduceScreen' => 'Réduire l’écran',
         'options' => 'Options', 
         'undo' => 'Annuler', 
         'export' => 'Exporter', 
@@ -49,6 +52,7 @@ return [
         'err500' => 'Une erreur critique est survenue lors du traitement de la demande.',
         'err504' => 'Le serveur a mis trop de temps à répondre. Opération annulée.',
         'errNetwork' => 'Aucune connexion réseau. Veuillez vérifier l\'état de votre connexion Internet.',
+        'fullscreenError' => 'Impossible de modifier le mode plein écran.',
     ], 
     'modals' => [
         'exportPdfTitle' => 'Paramètres d\'exportation PDF', 
@@ -80,6 +84,7 @@ return [
         'getDataError' => 'Erreur lors de la récupération de la liste.',
         'getUUIDError' => 'Erreur lors de la récupération du détail.', 
         'UUIDNotFound' => 'Enregistrement introuvable.', 
-        'permissionDenied' => 'Accès refusé.'
+        'permissionDenied' => 'Accès refusé.',
+        'unsavedChanges' => 'Des modifications ne sont pas enregistrées. Voulez-vous quitter sans enregistrer ?'
     ]
 ];

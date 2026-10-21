@@ -13,8 +13,9 @@ return [
         ],
         'bottomLeft' => [
             'dashboard' => '控制面板',
-            'users' => '用户',
-            'messages' => '消息',
+            'brands' => '品牌',
+            'categories' => '类别',
+            'products' => '产品',
         ],
         'bottomRight' => [
             'settings' => '设置',
@@ -34,6 +35,8 @@ return [
         'modules' => '模块',
         'services' => '服务',
         'backToTop' => '返回顶部', 
+        'expandScreen' => '全屏显示',
+        'reduceScreen' => '退出全屏',
         'options' => '选项', 
         'undo' => '撤销', 
         'export' => '导出', 
@@ -49,6 +52,7 @@ return [
         'err500' => '处理请求时发生严重错误。',
         'err504' => '服务器响应超时。操作已取消。',
         'errNetwork' => '无网络连接。请检查您的互联网连接状态。',
+        'fullscreenError' => '无法更改全屏模式。',
     ], 
     'modals' => [
         'exportPdfTitle' => 'PDF 导出设置', 
@@ -80,6 +84,7 @@ return [
         'getDataError' => '获取列表操作时出错。',
         'getUUIDError' => '获取详情操作时出错。', 
         'UUIDNotFound' => '未找到记录。', 
-        'permissionDenied' => '拒绝访问。'
+        'permissionDenied' => '拒绝访问。',
+        'unsavedChanges' => '存在未保存的更改。是否放弃更改并离开？'
     ]
 ];

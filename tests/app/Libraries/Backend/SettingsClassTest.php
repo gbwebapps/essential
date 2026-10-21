@@ -213,4 +213,15 @@ class SettingsClassTest extends CIUnitTestCase
                 array_keys($result)
             );
     }
+
+    public function testGetThemesReturnsExpectedArray(): void
+    {
+        $modelMock = $this->createMock(\App\Models\Backend\SettingsModel::class);
+        $instance = new \App\Libraries\Backend\SettingsClass($modelMock);
+
+        $this->assertSame(
+            ['white', 'black', 'grey', 'dark'],
+            array_keys($instance->getThemes())
+        );
+    }
 }

@@ -278,6 +278,17 @@ e restituire l'eventuale istanza della classe helper dedicata (identificata dal 
             </div>
                     <div class="row">
                 <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getPosts">getPosts</a>(string|null $scope = null)
+        
+                                            <p class="no-description">No description</p>
+                                    </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
                     bool
                 </div>
                 <div class="col-md-8">
@@ -314,7 +325,7 @@ e restituire l'eventuale istanza della classe helper dedicata (identificata dal 
                     <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
                 </div>
                 <div class="col-md-8">
-                    <a href="#method_showGallery">showGallery</a>()
+                    <a href="#method_showGallery">showGallery</a>(string|null $scope = null)
         
                                             <p class="no-description">No description</p>
                                     </div>
@@ -325,7 +336,7 @@ e restituire l'eventuale istanza della classe helper dedicata (identificata dal 
                     <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
                 </div>
                 <div class="col-md-8">
-                    <a href="#method_deleteImage">deleteImage</a>()
+                    <a href="#method_deleteImage">deleteImage</a>(string|null $scope = null)
         
                                             <p class="no-description">No description</p>
                                     </div>
@@ -336,7 +347,7 @@ e restituire l'eventuale istanza della classe helper dedicata (identificata dal 
                     <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
                 </div>
                 <div class="col-md-8">
-                    <a href="#method_setCover">setCover</a>()
+                    <a href="#method_setCover">setCover</a>(string|null $scope = null)
         
                                             <p class="no-description">No description</p>
                                     </div>
@@ -347,7 +358,7 @@ e restituire l'eventuale istanza della classe helper dedicata (identificata dal 
                     <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
                 </div>
                 <div class="col-md-8">
-                    <a href="#method_removeCover">removeCover</a>()
+                    <a href="#method_removeCover">removeCover</a>(string|null $scope = null)
         
                                             <p class="no-description">No description</p>
                                     </div>
@@ -655,8 +666,52 @@ la validità e la sicurezza delle successive richieste asincrone (AJAX).</p></p>
 
             </div>
                     <div class="method-item">
-                    <h3 id="method_canAccess">
+                    <h3 id="method_getPosts">
         <div class="location">at line 21</div>
+        <code>                private    array
+    <strong>getPosts</strong>(string|null $scope = null)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p class="no-description">No description</p>
+                    
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string|null</td>
+                <td>$scope</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_canAccess">
+        <div class="location">at line 33</div>
         <code>                private    bool
     <strong>canAccess</strong>(array $posts)
         </code>
@@ -700,7 +755,7 @@ la validità e la sicurezza delle successive richieste asincrone (AJAX).</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_accessDenied">
-        <div class="location">at line 35</div>
+        <div class="location">at line 77</div>
         <code>                private    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
     <strong>accessDenied</strong>()
         </code>
@@ -734,7 +789,7 @@ la validità e la sicurezza delle successive richieste asincrone (AJAX).</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_invalidRequest">
-        <div class="location">at line 40</div>
+        <div class="location">at line 82</div>
         <code>                private    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
     <strong>invalidRequest</strong>()
         </code>
@@ -768,9 +823,9 @@ la validità e la sicurezza delle successive richieste asincrone (AJAX).</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_showGallery">
-        <div class="location">at line 45</div>
+        <div class="location">at line 87</div>
         <code>                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
-    <strong>showGallery</strong>()
+    <strong>showGallery</strong>(string|null $scope = null)
         </code>
     </h3>
     <div class="details">    
@@ -783,6 +838,16 @@ la validità e la sicurezza delle successive richieste asincrone (AJAX).</p></p>
                     
         </div>
         <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string|null</td>
+                <td>$scope</td>
+                <td></td>
+            </tr>
+            </table>
+
             
                             <h4>Return Value</h4>
 
@@ -802,9 +867,9 @@ la validità e la sicurezza delle successive richieste asincrone (AJAX).</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_deleteImage">
-        <div class="location">at line 67</div>
+        <div class="location">at line 109</div>
         <code>                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
-    <strong>deleteImage</strong>()
+    <strong>deleteImage</strong>(string|null $scope = null)
         </code>
     </h3>
     <div class="details">    
@@ -817,6 +882,16 @@ la validità e la sicurezza delle successive richieste asincrone (AJAX).</p></p>
                     
         </div>
         <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string|null</td>
+                <td>$scope</td>
+                <td></td>
+            </tr>
+            </table>
+
             
                             <h4>Return Value</h4>
 
@@ -836,9 +911,9 @@ la validità e la sicurezza delle successive richieste asincrone (AJAX).</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_setCover">
-        <div class="location">at line 93</div>
+        <div class="location">at line 135</div>
         <code>                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
-    <strong>setCover</strong>()
+    <strong>setCover</strong>(string|null $scope = null)
         </code>
     </h3>
     <div class="details">    
@@ -851,6 +926,16 @@ la validità e la sicurezza delle successive richieste asincrone (AJAX).</p></p>
                     
         </div>
         <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string|null</td>
+                <td>$scope</td>
+                <td></td>
+            </tr>
+            </table>
+
             
                             <h4>Return Value</h4>
 
@@ -870,9 +955,9 @@ la validità e la sicurezza delle successive richieste asincrone (AJAX).</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_removeCover">
-        <div class="location">at line 119</div>
+        <div class="location">at line 161</div>
         <code>                    <abbr title="CodeIgniter\HTTP\ResponseInterface">ResponseInterface</abbr>
-    <strong>removeCover</strong>()
+    <strong>removeCover</strong>(string|null $scope = null)
         </code>
     </h3>
     <div class="details">    
@@ -885,6 +970,16 @@ la validità e la sicurezza delle successive richieste asincrone (AJAX).</p></p>
                     
         </div>
         <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string|null</td>
+                <td>$scope</td>
+                <td></td>
+            </tr>
+            </table>
+
             
                             <h4>Return Value</h4>
 

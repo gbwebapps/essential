@@ -101,6 +101,7 @@ class SettingsController extends BackendController
                 $this->data['timezones'] = $this->settingsClass->getTimezones();
                 $this->data['languages'] = $this->settingsClass->getLanguages();
                 $this->data['dateFormats'] = $this->settingsClass->getDateFormats();
+                $this->data['themes'] = $this->settingsClass->getThemes();
             endif;
 
             return $this->jsonResponse(['result' => true, 'output' => view('backend/settings/partials/index/' . $env . 'SettingsPartial', $this->data)]);
@@ -156,6 +157,7 @@ class SettingsController extends BackendController
                 $this->data['timezones'] = $this->settingsClass->getTimezones();
                 $this->data['languages'] = $this->settingsClass->getLanguages();
                 $this->data['dateFormats'] = $this->settingsClass->getDateFormats();
+                $this->data['themes'] = $this->settingsClass->getThemes();
 
                 $this->data['action'] = 'index';
                 $this->data['title'] = lang('backend/settings.titles.index');
@@ -220,6 +222,7 @@ class SettingsController extends BackendController
                 $this->data['timezones'] = $this->settingsClass->getTimezones();
                 $this->data['languages'] = $this->settingsClass->getLanguages();
                 $this->data['dateFormats'] = $this->settingsClass->getDateFormats();
+                $this->data['themes'] = $this->settingsClass->getThemes();
             endif;
 
             return $this->jsonResponse(['result' => true, 'data' => $this->data[$env . 'Settings']]);
@@ -260,7 +263,11 @@ class SettingsController extends BackendController
                 return $this->jsonResponse(['result'  => false, 'message' => lang('backend/settings.messages.deleteError')]);
             endif;
 
-            return $this->jsonResponse(['result'  => true, 'message' => lang('backend/settings.messages.deleteSuccess')]);
+            return $this->jsonResponse([
+                'result'  => true,
+                'message' => lang('backend/settings.messages.deleteSuccess'),
+                'reload'  => $env === 'general'
+            ]);
 
         endif;
 

@@ -73,6 +73,22 @@ const assetsToCopy = [
     {
         from: 'node_modules/html2pdf.js/dist/html2pdf.bundle.min.js',
         to: 'public/assets/vendor/html2pdf/js/html2pdf.bundle.min.js'
+    },
+    {
+        from: 'Modules/Backend/Brands/Assets/js/brands.js',
+        to: 'public/assets/js/backend/brands.js'
+    },
+    {
+        from: 'Modules/Backend/Categories/Assets/js/categories.js',
+        to: 'public/assets/js/backend/categories.js'
+    },
+    {
+        from: 'Modules/Backend/Categories/Assets/js/modules/Categories.js',
+        to: 'public/assets/js/backend/modules/Categories.js'
+    },
+    {
+        from: 'Modules/Backend/Products/Assets/js/products.js',
+        to: 'public/assets/js/backend/products.js'
     }
 ];
 

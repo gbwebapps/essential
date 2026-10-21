@@ -70,7 +70,7 @@ class Routing extends BaseRouting
 
     /**
      * Sets the class/method that should be called if routing doesn't
-     * find a match. It can be the controller/method name like: Users::index
+     * find a match. It can be the controller/method name like: Brands::index
      *
      * This setting is passed to the Router class and handled there.
      *

@@ -50,8 +50,9 @@ class Menu extends BaseConfig
 
         $this->bottomLeft = [
             ['label' => lang('backend/global.menu.bottomLeft.dashboard'), 'route' => 'backend/dashboard', 'icon' => '<i class="fa-solid fa-gauge"></i>', 'controller' => 'dashboard'],
-            ['label' => lang('backend/global.menu.bottomLeft.users'), 'route' => 'backend/users/showAll', 'icon' => '<i class="fa-solid fa-cube"></i>', 'controller' => 'users'],
-            ['label' => lang('backend/global.menu.bottomLeft.messages'), 'route' => 'backend/messages/showAll','icon' => '<i class="fa-solid fa-cube"></i>', 'controller' => 'messages'],
+            ['label' => lang('backend/global.menu.bottomLeft.brands'), 'route' => 'backend/brands/showAll', 'icon' => '<i class="fa-solid fa-tags"></i>', 'controller' => 'brands'],
+            ['label' => lang('backend/global.menu.bottomLeft.categories'), 'route' => 'backend/categories/showAll', 'icon' => '<i class="fa-solid fa-folder-tree"></i>', 'controller' => 'categories'],
+            ['label' => lang('backend/global.menu.bottomLeft.products'), 'route' => 'backend/products/showAll', 'icon' => '<i class="fa-solid fa-boxes-stacked"></i>', 'controller' => 'products'],
         ];
 
         $this->bottomRight = [

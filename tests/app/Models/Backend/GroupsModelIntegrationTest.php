@@ -50,7 +50,7 @@ class GroupsModelIntegrationTest extends CIUnitTestCase
         $result = $this->model->add([
             'name' => $name,
             'description' => 'Integration group',
-            'permissions' => ['users_index', 'messages_index']
+            'permissions' => ['brands_add', 'brands_show_all']
         ]);
 
         $this->assertTrue($result['result']);
@@ -60,17 +60,17 @@ class GroupsModelIntegrationTest extends CIUnitTestCase
             ->getRow();
 
         $this->assertNotNull($group);
-        $this->assertSame(['messages_index', 'users_index'], $this->sortedPermissions((int) $group->id));
+        $this->assertSame(['brands_add', 'brands_show_all'], $this->sortedPermissions((int) $group->id));
 
         $result = $this->model->edit([
             'id' => (int) $group->id,
             'name' => $name,
             'description' => 'Updated integration group',
-            'permissions' => ['users_show']
+            'permissions' => ['brands_show']
         ]);
 
         $this->assertTrue($result['result']);
-        $this->assertSame(['users_show'], $this->sortedPermissions((int) $group->id));
+        $this->assertSame(['brands_show'], $this->sortedPermissions((int) $group->id));
 
         $result = $this->model->del(['id' => (int) $group->id]);
 
@@ -89,7 +89,7 @@ class GroupsModelIntegrationTest extends CIUnitTestCase
         $this->assertNotNull($admin);
 
         $activePermissions = $this->effectivePermissions($admin->uuid, (int) $admin->group_id);
-        $permission = 'users_delete';
+        $permission = 'brands_delete';
 
         if (in_array($permission, $activePermissions, true)):
             $submittedPermissions = array_values(array_diff($activePermissions, [$permission]));

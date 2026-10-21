@@ -100,10 +100,10 @@ class AccountModelTest extends CIUnitTestCase
             $builderQuery->getMock();
             
         $perm1 = 
-            (object) ['permission' => 'users.read'];
+            (object) ['permission' => 'brands_show'];
             
         $perm2 = 
-            (object) ['permission' => 'users.write'];
+            (object) ['permission' => 'brands_edit'];
             
         $resultsArray = 
             [
@@ -172,8 +172,8 @@ class AccountModelTest extends CIUnitTestCase
         /* 4. ASSERZIONE */
         $expected = 
             [
-                'users.read', 
-                'users.write'
+                'brands_show', 
+                'brands_edit'
             ];
             
         $this->assertEquals(
@@ -276,7 +276,7 @@ class AccountModelTest extends CIUnitTestCase
             $builderQuery->getMock();
             
         $exception1 = 
-            (object) ['permission' => 'users.delete', 'allow' => '1'];
+            (object) ['permission' => 'brands_delete', 'allow' => '1'];
             
         $exception2 = 
             (object) ['permission' => 'settings.view', 'allow' => 0];
@@ -348,7 +348,7 @@ class AccountModelTest extends CIUnitTestCase
         /* 4. ASSERZIONE (Ci aspettiamo gli interi 1 e 0 a causa del casting (int)) */
         $expected = 
             [
-                'users.delete'  => 1,
+                'brands_delete'  => 1,
                 'settings.view' => 0
             ];
             

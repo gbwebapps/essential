@@ -31,10 +31,9 @@ class MenuTest extends CIUnitTestCase
     {
         $config = new Menu();
 
-        $this->assertCount(3, $config->bottomLeft);
+        $this->assertCount(2, $config->bottomLeft);
         $this->assertSame('backend/dashboard', $config->bottomLeft[0]['route']);
-        $this->assertSame('backend/users/showAll', $config->bottomLeft[1]['route']);
-        $this->assertSame('backend/messages/showAll', $config->bottomLeft[2]['route']);
+        $this->assertSame('backend/brands/showAll', $config->bottomLeft[1]['route']);
     }
 
     public function testConstructorBuildsBottomRightMenu(): void

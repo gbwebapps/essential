@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS `essential`.`admins` (
     `suspended_at` DATETIME NULL DEFAULT NULL,
     `resetted_at` DATETIME NULL DEFAULT NULL,
     `deleted_at` DATETIME NULL DEFAULT NULL,
+    `restored_at` datetime null default null,
     PRIMARY KEY (`uuid`),
     INDEX (`id`),
     INDEX (`firstname`),
@@ -46,6 +47,12 @@ CREATE TABLE IF NOT EXISTS `essential`.`admins` (
     INDEX (`status`),
     INDEX (`superadmin`),
     INDEX (`group_id`),
+    index `idx_admins_created_at` (`created_at`),
+    index `idx_admins_updated_at` (`updated_at`),
+    index `idx_admins_suspended_at` (`suspended_at`),
+    index `idx_admins_resetted_at` (`resetted_at`),
+    index `idx_admins_deleted_at` (`deleted_at`),
+    index `idx_admins_restored_at` (`restored_at`),
     CONSTRAINT `fk_admins_group_id` 
         FOREIGN KEY (`group_id`) REFERENCES `essential`.`admins_groups`(`id`) ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE = INNODB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
@@ -210,6 +217,117 @@ CREATE TABLE IF NOT EXISTS `essential`.`images` (
     INDEX idx_images_cover (entity, entity_uuid, is_cover)
 ) ENGINE = INNODB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 
+-- TABELLA brands
+create table if not exists `essential`.`brands` (
+    `id` int unsigned auto_increment unique,
+    `uuid` char(36) not null,
+    `brand` varchar(255) not null unique,
+    `note` text null,
+    `status` tinyint(1) default 0 not null,
+    `created_at` datetime not null,
+    `updated_at` datetime null default null,
+    `deleted_at` datetime null default null,
+    `restored_at` datetime null default null,
+    primary key (`uuid`),
+    index `idx_brands_status` (`status`),
+    index `idx_brands_created_at` (`created_at`),
+    index `idx_brands_updated_at` (`updated_at`),
+    index `idx_brands_deleted_at` (`deleted_at`),
+    index `idx_brands_restored_at` (`restored_at`)
+) engine = innodb default charset = utf8mb4 collate = utf8mb4_general_ci;
+
+-- TABELLA categories
+create table if not exists `essential`.`categories` (
+    `id` int unsigned auto_increment unique,
+    `uuid` char(36) not null,
+    `parent_id` int unsigned null default null,
+    `category` varchar(255) not null,
+    `note` text null,
+    `status` tinyint(1) default 0 not null,
+    `created_at` datetime not null,
+    `updated_at` datetime null default null,
+    `deleted_at` datetime null default null,
+    `restored_at` datetime null default null,
+    primary key (`uuid`),
+    index `idx_categories_parent_id` (`parent_id`),
+    index `idx_categories_category` (`category`),
+    index `idx_categories_status` (`status`),
+    index `idx_categories_created_at` (`created_at`),
+    index `idx_categories_updated_at` (`updated_at`),
+    index `idx_categories_deleted_at` (`deleted_at`),
+    index `idx_categories_restored_at` (`restored_at`),
+    constraint `fk_categories_parent_id`
+        foreign key (`parent_id`)
+        references `essential`.`categories` (`id`)
+        on update cascade
+        on delete restrict
+) engine = innodb default charset = utf8mb4 collate = utf8mb4_general_ci;
+
+-- TABELLA products
+create table if not exists `essential`.`products` (
+    `id` int unsigned auto_increment unique,
+    `uuid` char(36) not null,
+    `sku` varchar(100) not null unique,
+    `product` varchar(255) not null,
+    `note` text null,
+    `quantity` int unsigned not null default 0,
+    `price` decimal(12,2) not null default 0.00,
+    `status` tinyint(1) default 0 not null,
+    `created_at` datetime not null,
+    `updated_at` datetime null default null,
+    `deleted_at` datetime null default null,
+    `restored_at` datetime null default null,
+    primary key (`uuid`),
+    index `idx_products_product` (`product`),
+    index `idx_products_quantity` (`quantity`),
+    index `idx_products_price` (`price`),
+    index `idx_products_status` (`status`),
+    index `idx_products_created_at` (`created_at`),
+    index `idx_products_updated_at` (`updated_at`),
+    index `idx_products_deleted_at` (`deleted_at`),
+    index `idx_products_restored_at` (`restored_at`)
+) engine = innodb default charset = utf8mb4 collate = utf8mb4_general_ci;
+
+-- TABELLA brands_to_products
+create table if not exists `essential`.`brands_to_products` (
+    `brand_id` int unsigned not null,
+    `product_id` int unsigned not null,
+    `status` tinyint(1) not null default 1,
+    primary key (`brand_id`, `product_id`),
+    index `idx_brands_to_products_product_id` (`product_id`),
+    index `idx_brands_to_products_status` (`status`),
+    constraint `fk_brands_to_products_brand_id`
+        foreign key (`brand_id`)
+        references `essential`.`brands` (`id`)
+        on update cascade
+        on delete restrict,
+    constraint `fk_brands_to_products_product_id`
+        foreign key (`product_id`)
+        references `essential`.`products` (`id`)
+        on update cascade
+        on delete cascade
+) engine = innodb default charset = utf8mb4 collate = utf8mb4_general_ci;
+
+-- TABELLA categories_to_products
+create table if not exists `essential`.`categories_to_products` (
+    `category_id` int unsigned not null,
+    `product_id` int unsigned not null,
+    `status` tinyint(1) not null default 1,
+    primary key (`category_id`, `product_id`),
+    index `idx_categories_to_products_product_id` (`product_id`),
+    index `idx_categories_to_products_status` (`status`),
+    constraint `fk_categories_to_products_category_id`
+        foreign key (`category_id`)
+        references `essential`.`categories` (`id`)
+        on update cascade
+        on delete restrict,
+    constraint `fk_categories_to_products_product_id`
+        foreign key (`product_id`)
+        references `essential`.`products` (`id`)
+        on update cascade
+        on delete cascade
+) engine = innodb default charset = utf8mb4 collate = utf8mb4_general_ci;
+
 CREATE TABLE IF NOT EXISTS `essential`.`settings` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `class` VARCHAR(255) NOT NULL,
@@ -249,37 +367,60 @@ FOREIGN KEY (`admin_uuid`) REFERENCES `essential`.`admins`(`uuid`) ON UPDATE CAS
 
 -- INSERIMENTO GRUPPI OPERATIVI STANDARD
 INSERT INTO `essential`.`admins_groups` (`id`, `name`, `description`, `created_at`) VALUES 
-(1, 'Administrator', 'Gestione operativa completa, configurazioni e supervisione utenti', NOW()),
-(2, 'Editor Manager', 'Gestione e pubblicazione dei contenuti, messaggi e schede informative', NOW()),
+(1, 'Administrator', 'Gestione operativa completa, configurazioni e supervisione', NOW()),
+(2, 'Editor Manager', 'Gestione e pubblicazione dei contenuti e delle schede informative', NOW()),
 (3, 'Operator Support', 'Visualizzazione dati, assistenza clienti e gestione ticket', NOW());
 
 -- SVUOTA LA TABELLA DEI PERMESSI DEI GRUPPI PER EVITARE DUPLICATI
 TRUNCATE TABLE `essential`.`admins_groups_permissions`;
 
 -- 1. PERMESSI PER IL GRUPPO: Administrator (ID: 1) -> Gestione totale
-INSERT INTO `essential`.`admins_groups_permissions` (`group_id`, `permission`) VALUES 
-(1, 'users_index'),
-(1, 'users_showall'),
-(1, 'users_show'),
-(1, 'users_delete'),
-(1, 'messages_index'),
-(1, 'messages_showall'),
-(1, 'messages_show'),
-(1, 'messages_delete');
+insert into `essential`.`admins_groups_permissions` (`group_id`, `permission`) values
+(1, 'brands_add'),
+(1, 'brands_edit'),
+(1, 'brands_show'),
+(1, 'brands_show_all'),
+(1, 'brands_delete'),
+(1, 'brands_change_status'),
+(1, 'categories_add'),
+(1, 'categories_edit'),
+(1, 'categories_show'),
+(1, 'categories_show_all'),
+(1, 'categories_delete'),
+(1, 'categories_change_status'),
+(1, 'products_add'),
+(1, 'products_edit'),
+(1, 'products_show'),
+(1, 'products_show_all'),
+(1, 'products_delete'),
+(1, 'products_change_status');
 
 -- 2. PERMESSI PER IL GRUPPO: Editor / Manager (ID: 2) -> Gestione contenuti, niente eliminazioni hard
-INSERT INTO `essential`.`admins_groups_permissions` (`group_id`, `permission`) VALUES 
-(2, 'users_index'),
-(2, 'users_show'),
-(2, 'messages_index'),
-(2, 'messages_showall'),
-(2, 'messages_show');
+insert into `essential`.`admins_groups_permissions` (`group_id`, `permission`) values
+(2, 'brands_add'),
+(2, 'brands_edit'),
+(2, 'brands_show'),
+(2, 'brands_show_all'),
+(2, 'brands_change_status'),
+(2, 'categories_add'),
+(2, 'categories_edit'),
+(2, 'categories_show'),
+(2, 'categories_show_all'),
+(2, 'categories_change_status'),
+(2, 'products_add'),
+(2, 'products_edit'),
+(2, 'products_show'),
+(2, 'products_show_all'),
+(2, 'products_change_status');
 
 -- 3. PERMESSI PER IL GRUPPO: Operator / Support (ID: 3) -> Solo visualizzazione base
-INSERT INTO `essential`.`admins_groups_permissions` (`group_id`, `permission`) VALUES 
-(3, 'users_index'),
-(3, 'messages_index'),
-(3, 'messages_show');
+insert into `essential`.`admins_groups_permissions` (`group_id`, `permission`) values
+(3, 'brands_show'),
+(3, 'brands_show_all'),
+(3, 'categories_show'),
+(3, 'categories_show_all'),
+(3, 'products_show'),
+(3, 'products_show_all');
 
 INSERT INTO `essential`.`admins` (
     `id`, `uuid`, `firstname`, `lastname`, `email`, `phone`, `status`, `superadmin`, `group_id`, `password_hash`, `created_at`

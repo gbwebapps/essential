@@ -145,7 +145,7 @@ class AccountModel extends BackendModel
 	 * restituendo un array monodimensionale di sole stringhe, facilitando la successiva fusione con le eccezioni utente.
 	 *
 	 * @param int $groupId L'ID numerico del gruppo associato all'amministratore
-	 * @return array Array sequenziale contenente i nomi dei permessi (es. ['manage_users', 'view_logs'])
+	 * @return array Array sequenziale contenente i nomi dei permessi (es. ['brands_show', 'view_logs'])
 	 */
 	public function getGroupPermissions(int $groupId): array
 	{

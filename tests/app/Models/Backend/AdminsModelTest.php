@@ -4,7 +4,6 @@ namespace App\Models\Backend; // Adatta il namespace se si trova in App\Models\B
 
 use CodeIgniter\Test\CIUnitTestCase;
 use CodeIgniter\Test\DatabaseTestTrait;
-use Config\Services;
 use App\Models\Backend\AdminsModel; // Adatta il path se necessario
 
 use CodeIgniter\Config\Factories;
@@ -38,28 +37,6 @@ class AdminsModelTest extends CIUnitTestCase
                 'activationTime' => 86400,
             ],
         ]);
-    }
-
-    public function testAuditFailureDoesNotEscapeFromSafeLogger(): void
-    {
-        $authorization = $this->createMock(\App\Libraries\Backend\AuthorizationClass::class);
-        $authorization
-            ->method('currentAdmin')
-            ->willThrowException(new \RuntimeException('Audit unavailable'));
-
-        Services::injectMock('authorization', $authorization);
-
-        $model = new class extends AdminsModel {
-            public function invokeSafeAudit(): void
-            {
-                $this->logActivitySafely('TEST_ADMIN', 'Test audit');
-            }
-        };
-
-        $model->invokeSafeAudit();
-        $this->addToAssertionCount(1);
-
-        Services::resetSingle('authorization');
     }
 
     public function testAddAdminSuccessfully(): void

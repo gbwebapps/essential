@@ -1,5 +1,5 @@
 /* Import delle costanti e utility da backend.js */
-import { action } from './backend.js';
+import { action, confirmDiscardChanges } from './backend.js';
 
 /* Import della classe logica polivalente */
 import { SettingsManager } from './modules/Settings.js';
@@ -26,8 +26,21 @@ const actions = {
             const isOpen = mainCollapse.classList.contains('show') || mainCollapse.classList.contains('collapsing');
 
             if (isOpen) {
+                const confirmed = await confirmDiscardChanges(mainCollapse);
+                if (!confirmed) return;
+
                 bsCollapse.hide();
                 return;
+            }
+
+            const currentCollapse = document.querySelector(
+                '#mainSettingsDashboard > .accordion-item > .accordion-collapse.show, ' +
+                '#mainSettingsDashboard > .accordion-item > .accordion-collapse.collapsing'
+            );
+
+            if (currentCollapse && currentCollapse !== mainCollapse) {
+                const confirmed = await confirmDiscardChanges(currentCollapse);
+                if (!confirmed) return;
             }
 
             const container = document.getElementById(`${env}-settings-container`);

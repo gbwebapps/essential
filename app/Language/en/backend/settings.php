@@ -111,6 +111,7 @@ return [
 		'timezone' => 'Timezone', 
 		'language' => 'Language', 
 		'dateFormat' => 'Date format', 
+		'theme' => 'Theme',
 	], 
 	'placeholders' => [
 		'attemptsLimit' => 'Enter access attempts limit...',
@@ -157,6 +158,12 @@ return [
 		'german' => 'German', 
 		'chinese' => 'Chinese', 
 	], 
+	'themes' => [
+		'white' => 'High-contrast white',
+		'black' => 'High-contrast black',
+		'grey' => 'Grey',
+		'dark' => 'Dark',
+	],
 	'dateFormats' => [
 		'extended' => 'August 16 2026 15:30:00 (Extended 24h)', 
 		'compact' => '08/16/2026 15:30 (Compact 24h)', 

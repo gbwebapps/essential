@@ -140,20 +140,27 @@ class ExportModel extends BackendModel
     private function getTargetModelInstance(string $entity): ?ExportValidationInterface
     {
         $classBase = str_replace(' ', '', ucwords(str_replace(['-', '_'], ' ', $entity)));
-        $className = 'App\\Models\\Backend\\' . $classBase . 'Model';
+        $classNames = [
+            'Modules\\Backend\\' . $classBase . '\\Models\\' . $classBase . 'Model',
+            'App\\Models\\Backend\\' . $classBase . 'Model',
+        ];
 
-        if (! class_exists($className)):
-            return null;
-        endif;
+        foreach ($classNames as $className):
+            if ( ! class_exists($className)):
+                continue;
+            endif;
 
-        try {
-            $model = model($className);
-        } catch (\Throwable $e) {
-            log_message('error', 'ExportModel: unable to resolve export validation provider for entity ' . $entity . ' - ' . $e->getMessage());
-            return null;
-        }
+            try {
+                $model = model($className);
+            } catch (\Throwable $e) {
+                log_message('error', 'ExportModel: unable to resolve export validation provider for entity ' . $entity . ' - ' . $e->getMessage());
+                return null;
+            }
 
-        return $model instanceof ExportValidationInterface ? $model : null;
+            return $model instanceof ExportValidationInterface ? $model : null;
+        endforeach;
+
+        return null;
     }
 
     /**

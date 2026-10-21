@@ -15,6 +15,20 @@
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <!-- Attivazione modalità schermo intero -->
+                    <li class="nav-item">
+                        <a id="fullscreen-toggle" class="nav-link" href="#" role="button"
+                           data-expand-text="<?= esc(lang('backend/global.buttons.expandScreen'), 'attr'); ?>"
+                           data-reduce-text="<?= esc(lang('backend/global.buttons.reduceScreen'), 'attr'); ?>"
+                           data-error-text="<?= esc(lang('backend/global.errors.fullscreenError'), 'attr'); ?>"
+                           aria-label="<?= esc(lang('backend/global.buttons.expandScreen'), 'attr'); ?>"
+                           aria-pressed="false"
+                           title="<?= esc(lang('backend/global.buttons.expandScreen'), 'attr'); ?>">
+                            <i class="fa-solid fa-expand" aria-hidden="true"></i>
+                            <span class="ms-1 fullscreen-toggle-text"><?= lang('backend/global.buttons.expandScreen'); ?></span>
+                        </a>
+                    </li>
+
                     <!-- Dropdown profilo utente -->
                     <li class="nav-item dropdown">
                         <!-- Verifica se la sezione corrente appartiene all'area utente/account -->
@@ -58,7 +72,7 @@
                             ?>
                                 <li>
                                     <?php if (($ele['method'] ?? 'get') === 'post'): ?>
-                                        <form action="<?= $href; ?>" method="post">
+                                        <form action="<?= $href; ?>" method="post" data-unsaved-navigation>
                                             <?= csrf_field(); ?>
                                             <button type="submit" class="dropdown-item<?= $activeClass; ?>"<?= $dataIdAttr; ?><?= $dataMessageAttr; ?>>
                                                 <?= $ele['icon'] ?? ''; ?> <span class="ms-1"><?= $ele['label'] ?? ''; ?></span>

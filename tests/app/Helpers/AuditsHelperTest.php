@@ -64,7 +64,7 @@ class AuditsHelperTest extends CIUnitTestCase
             ->method('logActivity')
             ->with(
                 'DELETE',
-                'users',
+                'inventory_items',
                 'Test failure',
                 null
             )
@@ -78,7 +78,7 @@ class AuditsHelperTest extends CIUnitTestCase
 
         $result = log_admin_activity(
             'DELETE',
-            'users',
+            'inventory_items',
             'Test failure'
         );
 

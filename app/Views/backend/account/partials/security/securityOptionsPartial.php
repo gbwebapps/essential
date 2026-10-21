@@ -6,18 +6,20 @@
         </div>
     </div>
 
-	<div class="row mb-3">
-		<div class="col-12 col-lg-4">
-			<label for="securityCurrentPassword" class="form-label"><?= lang('backend/account.labels.currentPassword'); ?></label>
-			<div class="input-group">
-				<button class="btn app-btn-secondary app-bg-surface-elevated border toggle-password-visibility" type="button" aria-label="<?= esc(lang('backend/account.buttons.showPassword'), 'attr'); ?>" aria-pressed="false">
-					<i class="fa-solid fa-eye app-text-muted"></i>
-				</button>
-				<input type="password" id="securityCurrentPassword" class="form-control" autocomplete="current-password" data-required-message="<?= esc(lang('backend/account.errors.currentPasswordRequired'), 'attr'); ?>" placeholder="<?= esc(lang('backend/account.placeholders.currentPassword'), 'attr'); ?>">
+	<form id="security-password-form" data-unsaved-check>
+		<div class="row mb-3">
+			<div class="col-12 col-lg-4">
+				<label for="securityCurrentPassword" class="form-label"><?= lang('backend/account.labels.currentPassword'); ?></label>
+				<div class="input-group">
+					<button class="btn app-btn-secondary app-bg-surface-elevated border toggle-password-visibility" type="button" aria-label="<?= esc(lang('backend/account.buttons.showPassword'), 'attr'); ?>" aria-pressed="false">
+						<i class="fa-solid fa-eye app-text-muted"></i>
+					</button>
+					<input type="password" id="securityCurrentPassword" name="currentPassword" class="form-control" autocomplete="current-password" data-required-message="<?= esc(lang('backend/account.errors.currentPasswordRequired'), 'attr'); ?>" placeholder="<?= esc(lang('backend/account.placeholders.currentPassword'), 'attr'); ?>">
+				</div>
+				<div class="error_currentPassword app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
 			</div>
-			<div class="error_currentPassword app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
 		</div>
-	</div>
+	</form>
 
     <!-- Aggiunto gy-3 per gestire lo spazio verticale automatico solo quando vanno a capo -->
     <div class="row gy-3">

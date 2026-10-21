@@ -18,8 +18,50 @@ class GalleryOneController extends BackendController
         $this->galleryModel = model(GalleryOneModel::class);
     }
 
+    private function getPosts(?string $scope = null): array
+    {
+        $posts = $this->request->getPost();
+
+        if ($scope === 'account'):
+            $posts['entity'] = 'admins';
+            $posts['uuid'] = (string) ($this->currentAdmin->uuid ?? '');
+        endif;
+
+        return $posts;
+    }
+
     private function canAccess(array $posts): bool
     {
+        if (($posts['entity'] ?? '') === 'brands'):
+            if ($this->currentAdmin === null):
+                return false;
+            endif;
+
+            return (isset($this->currentAdmin->permissions->all) && $this->currentAdmin->permissions->all === true)
+                || (isset($this->currentAdmin->permissions->brands_add) && $this->currentAdmin->permissions->brands_add === true)
+                || (isset($this->currentAdmin->permissions->brands_edit) && $this->currentAdmin->permissions->brands_edit === true);
+        endif;
+
+        if (($posts['entity'] ?? '') === 'categories'):
+            if ($this->currentAdmin === null):
+                return false;
+            endif;
+
+            return (isset($this->currentAdmin->permissions->all) && $this->currentAdmin->permissions->all === true)
+                || (isset($this->currentAdmin->permissions->categories_add) && $this->currentAdmin->permissions->categories_add === true)
+                || (isset($this->currentAdmin->permissions->categories_edit) && $this->currentAdmin->permissions->categories_edit === true);
+        endif;
+
+        if (($posts['entity'] ?? '') === 'products'):
+            if ($this->currentAdmin === null):
+                return false;
+            endif;
+
+            return (isset($this->currentAdmin->permissions->all) && $this->currentAdmin->permissions->all === true)
+                || (isset($this->currentAdmin->permissions->products_add) && $this->currentAdmin->permissions->products_add === true)
+                || (isset($this->currentAdmin->permissions->products_edit) && $this->currentAdmin->permissions->products_edit === true);
+        endif;
+
         if (($posts['entity'] ?? '') !== 'admins'):
             return true;
         endif;
@@ -42,10 +84,10 @@ class GalleryOneController extends BackendController
         return $this->jsonResponse(['result' => false, 'message' => lang('backend/global.errors.err403')], 400);
     }
 
-    public function showGallery(): ResponseInterface
+    public function showGallery(?string $scope = null): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
-            $posts = $this->request->getPost();
+            $posts = $this->getPosts($scope);
             $rules = $this->galleryModel->getImagesValidateFields();
 
             if ( ! $this->validateData($posts, $rules)):
@@ -64,10 +106,10 @@ class GalleryOneController extends BackendController
         return $this->invalidRequest();
     }
 
-    public function deleteImage(): ResponseInterface
+    public function deleteImage(?string $scope = null): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
-            $posts = $this->request->getPost();
+            $posts = $this->getPosts($scope);
             $rules = $this->galleryModel->deleteImageValidateFields();
 
             if ( ! $this->validateData($posts, $rules)):
@@ -90,10 +132,10 @@ class GalleryOneController extends BackendController
         return $this->invalidRequest();
     }
 
-    public function setCover(): ResponseInterface
+    public function setCover(?string $scope = null): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
-            $posts = $this->request->getPost();
+            $posts = $this->getPosts($scope);
             $rules = $this->galleryModel->coverValidateFields();
 
             if ( ! $this->validateData($posts, $rules)):
@@ -116,10 +158,10 @@ class GalleryOneController extends BackendController
         return $this->invalidRequest();
     }
 
-    public function removeCover(): ResponseInterface
+    public function removeCover(?string $scope = null): ResponseInterface
     {
         if ($this->request->isAJAX() && $this->request->is('post')):
-            $posts = $this->request->getPost();
+            $posts = $this->getPosts($scope);
             $rules = $this->galleryModel->coverValidateFields();
 
             if ( ! $this->validateData($posts, $rules)):

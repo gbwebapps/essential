@@ -1402,6 +1402,12 @@ class SettingsControllerTest extends CIUnitTestCase
                     ['result']
                 );
 
+                $this
+                ->assertTrue(
+                    $data
+                    ['reload']
+                );
+
                 return 
                 $expectedResponse;
             }
@@ -2099,6 +2105,12 @@ class SettingsControllerTest extends CIUnitTestCase
         $this
         ->assertArrayHasKey(
             'dateFormats', 
+            $controllerData
+        );
+
+        $this
+        ->assertArrayHasKey(
+            'themes',
             $controllerData
         );
     }

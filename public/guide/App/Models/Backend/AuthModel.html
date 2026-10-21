@@ -646,6 +646,16 @@ rigorosa di ogni accesso o disconnessione nell'Audit Log.</p></p>        </div>
             </div>
                     <div class="row">
                 <div class="col-md-2 type">
+                    int|null
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getEmailOtpExpiresAt">getEmailOtpExpiresAt</a>(string $adminUuid)
+        
+                                            <p><p>Recupera la scadenza Unix dell'ultimo codice OTP email generato per l'amministratore.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
                     array
                 </div>
                 <div class="col-md-8">
@@ -1345,8 +1355,8 @@ durante l'esecuzione dei test unitari tramite il pattern Extract Method.</p></p>
             
 
         <div class="method-description">
-                            <p><p>Regole di validazione per il form di Login.</p></p>                <p><p>Verifica che l'email sia in un formato valido e che la password sia presente entro la lunghezza massima.
-La validità effettiva della credenziale viene determinata dal confronto con l'hash memorizzato.</p></p>        
+                            <p><p>Regole di validazione per il form di Login.</p></p>                <p><p>Verifica che l'email sia in un formato valido e che la password rispetti la policy configurata.
+La validità effettiva della credenziale viene poi determinata dal confronto con l'hash memorizzato.</p></p>        
         </div>
         <div class="tags">
             
@@ -2033,8 +2043,51 @@ superato la data di scadenza prestabilita (<code>token_expire</code>).</p></p>
 
             </div>
                     <div class="method-item">
+                    <h3 id="method_getEmailOtpExpiresAt">
+        <div class="location">at line 1002</div>
+        <code>                    int|null
+    <strong>getEmailOtpExpiresAt</strong>(string $adminUuid)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Recupera la scadenza Unix dell'ultimo codice OTP email generato per l'amministratore.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$adminUuid</td>
+                <td><p>Identificatore univoco dell'amministratore</p></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int|null</td>
+            <td><p>Timestamp Unix della scadenza oppure null se il codice non è disponibile</p></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
                     <h3 id="method_verify">
-        <div class="location">at line 1010</div>
+        <div class="location">at line 1030</div>
         <code>                    array
     <strong>verify</strong>(array $posts, <abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr> $request)
         </code>
@@ -2087,7 +2140,7 @@ finalizza l'ingresso invocando <code>innerLogin()</code>.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_logoutBySession">
-        <div class="location">at line 1189</div>
+        <div class="location">at line 1209</div>
         <code>                    void
     <strong>logoutBySession</strong>(string $reason = &#039;manual&#039;)
         </code>
@@ -2133,7 +2186,7 @@ Infine distrugge il record del token dal database e resetta completamente la ses
             </div>
                     <div class="method-item">
                     <h3 id="method_logoutByCookie">
-        <div class="location">at line 1224</div>
+        <div class="location">at line 1244</div>
         <code>                    void
     <strong>logoutByCookie</strong>(string $cookieValue, string $reason = &#039;manual&#039;)
         </code>
@@ -2183,7 +2236,7 @@ ed elimina definitivamente il token di tipo 'cookie' dal database, invalidando g
             </div>
                     <div class="method-item">
                     <h3 id="method_closeLoginLog">
-        <div class="location">at line 1258</div>
+        <div class="location">at line 1278</div>
         <code>                private    void
     <strong>closeLoginLog</strong>(string $tokenHash, string $tokenType, string $reason)
         </code>

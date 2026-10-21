@@ -473,7 +473,7 @@ class GroupsModelTest extends \CodeIgniter\Test\CIUnitTestCase
             ->method('getResultArray')
             ->willReturn(
                 [
-                    ['permission' => 'manage_users'],
+                    ['permission' => 'brands_edit'],
                     ['permission' => 'manage_settings']
                 ]
             );
@@ -522,7 +522,7 @@ class GroupsModelTest extends \CodeIgniter\Test\CIUnitTestCase
         $this
             ->assertSame(
                 [
-                    'manage_users',
+                    'brands_edit',
                     'manage_settings'
                 ],
                 $result
@@ -922,7 +922,7 @@ class GroupsModelTest extends \CodeIgniter\Test\CIUnitTestCase
                     [
                         'permission'
                         =>
-                        'manage_users'
+                        'brands_edit'
                     ]
                 ]
             );
@@ -978,7 +978,7 @@ class GroupsModelTest extends \CodeIgniter\Test\CIUnitTestCase
         $this
             ->assertSame(
                 [
-                    'manage_users'
+                    'brands_edit'
                 ],
                 $result
             );

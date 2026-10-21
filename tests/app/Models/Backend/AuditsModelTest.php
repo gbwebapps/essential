@@ -70,7 +70,7 @@ class AuditsModelTest extends CIUnitTestCase
             'CREATE';
             
         $section = 
-            'users';
+            'inventory_items';
             
         $details = 
             'Created a new user';

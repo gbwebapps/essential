@@ -50,13 +50,13 @@ class PermissionFilterTest extends CIUnitTestCase
 
         $filter = new PermissionFilter();
 
-        $this->assertNull($filter->before($request, ['users.view']));
+        $this->assertNull($filter->before($request, ['brands_show']));
     }
 
     public function testBeforeReturnsNullWhenAdminHasRequiredPermission(): void
     {
         $admin = (object) [
-            'permissions' => (object) ['users.view' => true]
+            'permissions' => (object) ['brands_show' => true]
         ];
 
         Services::injectMock('authorization', $this->createAuthorizationMock($admin));
@@ -65,13 +65,28 @@ class PermissionFilterTest extends CIUnitTestCase
 
         $filter = new PermissionFilter();
 
-        $this->assertNull($filter->before($request, ['users.view']));
+        $this->assertNull($filter->before($request, ['brands_show']));
+    }
+
+    public function testBeforeReturnsNullWhenAdminHasOneOfTheRequiredPermissions(): void
+    {
+        $admin = (object) [
+            'permissions' => (object) ['brands_edit' => true]
+        ];
+
+        Services::injectMock('authorization', $this->createAuthorizationMock($admin));
+
+        $request = $this->createMock(IncomingRequest::class);
+
+        $filter = new PermissionFilter();
+
+        $this->assertNull($filter->before($request, ['brands_show', 'brands_edit']));
     }
 
     public function testBeforeDeniesAccessWhenPermissionValueIsFalse(): void
     {
         $admin = (object) [
-            'permissions' => (object) ['users.view' => false]
+            'permissions' => (object) ['brands_show' => false]
         ];
 
         Services::injectMock('authorization', $this->createAuthorizationMock($admin));
@@ -79,7 +94,7 @@ class PermissionFilterTest extends CIUnitTestCase
         $request = $this->createMock(IncomingRequest::class);
         $request->method('isAJAX')->willReturn(false);
 
-        $result = (new PermissionFilter())->before($request, ['users.view']);
+        $result = (new PermissionFilter())->before($request, ['brands_show']);
 
         $this->assertSame(302, $result->getStatusCode());
         $this->assertSame(base_url('backend/dashboard'), $result->getHeaderLine('Location'));
@@ -92,7 +107,7 @@ class PermissionFilterTest extends CIUnitTestCase
         $request = $this->createMock(IncomingRequest::class);
         $request->method('isAJAX')->willReturn(false);
 
-        $result = (new PermissionFilter())->before($request, ['users.view']);
+        $result = (new PermissionFilter())->before($request, ['brands_show']);
 
         $this->assertSame(302, $result->getStatusCode());
         $this->assertSame(base_url('backend/dashboard'), $result->getHeaderLine('Location'));
@@ -126,7 +141,7 @@ class PermissionFilterTest extends CIUnitTestCase
 
         $filter = new PermissionFilter();
 
-        $result = $filter->before($request, ['users.delete']);
+        $result = $filter->before($request, ['brands_delete']);
 
         $this->assertSame($response, $result);
     }
@@ -144,7 +159,7 @@ class PermissionFilterTest extends CIUnitTestCase
 
         $filter = new PermissionFilter();
 
-        $result = $filter->before($request, ['users.delete']);
+        $result = $filter->before($request, ['brands_delete']);
 
         $this->assertSame(302, $result->getStatusCode());
         $this->assertSame(base_url('backend/dashboard'), $result->getHeaderLine('Location'));

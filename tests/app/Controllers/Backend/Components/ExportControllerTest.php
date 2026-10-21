@@ -83,11 +83,11 @@ class ExportControllerTest extends CIUnitTestCase
 
     public function testShowModalReturnsJsonResponseWithOutputOnSuccess(): void
     {
-        $request = $this->ajaxPostRequest(['entity' => 'users']);
+        $request = $this->ajaxPostRequest(['entity' => 'inventory_items']);
 
         $exportModel = $this->createMock(ExportModel::class);
-        $exportModel->expects($this->once())->method('getExportColumns')->with('users', ExportModel::CONTEXT_CRUD)->willReturn(['uuid', 'name']);
-        $exportModel->expects($this->once())->method('getRequiredExportColumns')->with('users', ExportModel::CONTEXT_CRUD)->willReturn(['uuid']);
+        $exportModel->expects($this->once())->method('getExportColumns')->with('inventory_items', ExportModel::CONTEXT_CRUD)->willReturn(['uuid', 'name']);
+        $exportModel->expects($this->once())->method('getRequiredExportColumns')->with('inventory_items', ExportModel::CONTEXT_CRUD)->willReturn(['uuid']);
 
         $controller = $this->createController($request, $exportModel, ['validateData', 'jsonResponse']);
         $controller->method('validateData')->willReturn(true);
@@ -107,10 +107,10 @@ class ExportControllerTest extends CIUnitTestCase
 
     public function testShowModalFailsClosedWhenNoColumnsAreExportable(): void
     {
-        $request = $this->ajaxPostRequest(['entity' => 'users']);
+        $request = $this->ajaxPostRequest(['entity' => 'inventory_items']);
 
         $exportModel = $this->createMock(ExportModel::class);
-        $exportModel->expects($this->once())->method('getExportColumns')->with('users', ExportModel::CONTEXT_CRUD)->willReturn([]);
+        $exportModel->expects($this->once())->method('getExportColumns')->with('inventory_items', ExportModel::CONTEXT_CRUD)->willReturn([]);
         $exportModel->expects($this->never())->method('getRequiredExportColumns');
 
         $controller = $this->createController($request, $exportModel, ['validateData', 'jsonResponse']);
@@ -128,11 +128,11 @@ class ExportControllerTest extends CIUnitTestCase
 
     public function testShowDatabaseModalUsesDatabaseContext(): void
     {
-        $request = $this->ajaxPostRequest(['entity' => 'users']);
+        $request = $this->ajaxPostRequest(['entity' => 'inventory_items']);
 
         $exportModel = $this->createMock(ExportModel::class);
-        $exportModel->expects($this->once())->method('getExportColumns')->with('users', ExportModel::CONTEXT_DATABASE)->willReturn(['id', 'uuid', 'name']);
-        $exportModel->expects($this->once())->method('getRequiredExportColumns')->with('users', ExportModel::CONTEXT_DATABASE)->willReturn(['uuid']);
+        $exportModel->expects($this->once())->method('getExportColumns')->with('inventory_items', ExportModel::CONTEXT_DATABASE)->willReturn(['id', 'uuid', 'name']);
+        $exportModel->expects($this->once())->method('getRequiredExportColumns')->with('inventory_items', ExportModel::CONTEXT_DATABASE)->willReturn(['uuid']);
 
         $controller = $this->createController($request, $exportModel, ['validateData', 'jsonResponse']);
         $controller->method('validateData')->willReturn(true);
@@ -171,7 +171,7 @@ class ExportControllerTest extends CIUnitTestCase
     public function testGenerateInitialRequestUsesCrudContext(): void
     {
         $postData = [
-            'entity' => 'users',
+            'entity' => 'inventory_items',
             'selected_columns' => ['uuid', 'name'],
         ];
 
@@ -263,7 +263,7 @@ class ExportControllerTest extends CIUnitTestCase
     public function testGenerateDatabaseInitialRequestUsesDatabaseContext(): void
     {
         $postData = [
-            'entity' => 'users',
+            'entity' => 'inventory_items',
             'selected_columns' => ['id', 'uuid'],
         ];
 
@@ -406,7 +406,7 @@ class ExportControllerTest extends CIUnitTestCase
     public function testDownloadReturnsDownloadResponseWithManifestFileName(): void
     {
         $filePath = WRITEPATH . 'exports/staging/' . self::EXPORT_ID . '/data.csv';
-        $downloadName = 'export_users_08_10_2026_16_00_00.csv';
+        $downloadName = 'export_brands_08_10_2026_16_00_00.csv';
 
         $exportModel = $this->createMock(ExportModel::class);
         $exportModel->expects($this->once())->method('getDownloadFile')->with(self::EXPORT_ID)->willReturn([

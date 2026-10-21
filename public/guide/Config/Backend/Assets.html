@@ -108,7 +108,7 @@
                     static&nbsp;array
                 </div>
                 <div class="col-md-8">
-                    <a href="#method_getCoreCss">getCoreCss</a>()
+                    <a href="#method_getCoreCss">getCoreCss</a>(string|null $theme = null)
         
                                             <p><p>Restituisce l'elenco dei fogli di stile CSS di base necessari al backend.</p></p>                </div>
                 <div class="col-md-2"></div>
@@ -131,9 +131,9 @@
             <div id="method-details">
                     <div class="method-item">
                     <h3 id="method_getCoreCss">
-        <div class="location">at line 17</div>
+        <div class="location">at line 18</div>
         <code>        static            array
-    <strong>getCoreCss</strong>()
+    <strong>getCoreCss</strong>(string|null $theme = null)
         </code>
     </h3>
     <div class="details">    
@@ -145,6 +145,16 @@
                             <p><p>Restituisce l'elenco dei fogli di stile CSS di base necessari al backend.</p></p>                        
         </div>
         <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string|null</td>
+                <td>$theme</td>
+                <td><p>Nome del tema grafico selezionato</p></td>
+            </tr>
+            </table>
+
             
                             <h4>Return Value</h4>
 
@@ -164,7 +174,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_getCoreJs">
-        <div class="location">at line 32</div>
+        <div class="location">at line 37</div>
         <code>        static            array
     <strong>getCoreJs</strong>(string|null $controller = null)
         </code>

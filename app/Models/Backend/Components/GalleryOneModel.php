@@ -162,15 +162,35 @@ class GalleryOneModel extends BackendModel
     {
         $posts = $this->checkAllowedFields($posts, $this->allowedDeleteFields);
 
+        $sqlImage = "select filename from images where id = ? and entity = ? and entity_uuid = ? limit 1";
+        $imageQuery = $this->db->query($sqlImage, [(int) $posts['id'], $posts['entity'], $posts['uuid']]);
+
+        if ($imageQuery === false):
+            return false;
+        endif;
+
+        $image = $imageQuery->getRowArray();
+
+        if (empty($image)):
+            return false;
+        endif;
+
         $sql = "delete from images where id = ? and entity = ? and entity_uuid = ?";
-        $this->db->query($sql, [(int) $posts['id'], $posts['entity'], $posts['uuid']]);
+        $deleted = $this->db->query($sql, [(int) $posts['id'], $posts['entity'], $posts['uuid']]) !== false
+            && $this->db->affectedRows() === 1;
+
+        if ( ! $deleted):
+            return false;
+        endif;
 
         /* Elimini il file fisico */
-        ImageFileSystemService::removeSingleImage($posts['entity'], $posts['uuid'], $posts['filename']);
+        ImageFileSystemService::removeSingleImage($posts['entity'], $posts['uuid'], $image['filename']);
 
-        log_admin_activity('DELETE_IMAGE', 'gallery one', 'Eliminazione immagine.');
+        $currentAdmin = service('authorization')->currentAdmin();
 
-        return $this->db->affectedRows() > 0;
+        log_admin_activity('DELETE_IMAGE', 'gallery one', 'Eliminazione immagine.', $currentAdmin);
+
+        return true;
     }
 
     /**
@@ -190,6 +210,13 @@ class GalleryOneModel extends BackendModel
 
             $posts = $this->checkAllowedFields($posts, $this->coverFields); 
 
+            $sqlImage = "select id from images where id = ? and entity = ? and entity_uuid = ? limit 1";
+            $imageQuery = $this->db->query($sqlImage, [(int) $posts['id'], $posts['entity'], $posts['uuid']]);
+
+            if ($imageQuery === false || empty($imageQuery->getRowArray())):
+                return false;
+            endif;
+
             $this->db->transBegin();
 
             /* Azzera tutte le copertine per l'entità specifica */
@@ -198,16 +225,19 @@ class GalleryOneModel extends BackendModel
 
             /* Imposta la nuova copertina */
             $sqlSet = "update images set is_cover = 1 where id = ? and entity = ? and entity_uuid = ?";
-            $this->db->query($sqlSet, [(int) $posts['id'], $posts['entity'], $posts['uuid']]);
+            $updated = $this->db->query($sqlSet, [(int) $posts['id'], $posts['entity'], $posts['uuid']]) !== false
+                && $this->db->affectedRows() === 1;
 
-            if ($this->db->transStatus() === false):
+            if ( ! $updated || $this->db->transStatus() === false):
                 $this->db->transRollback();
                 return false;
             endif;
 
             $this->db->transCommit();
 
-            log_admin_activity('SET_COVER', 'gallery one', 'Impostazione cover.');
+            $currentAdmin = service('authorization')->currentAdmin();
+
+            log_admin_activity('SET_COVER', 'gallery one', 'Impostazione cover.', $currentAdmin);
 
             return true;
 
@@ -232,10 +262,17 @@ class GalleryOneModel extends BackendModel
         $posts = $this->checkAllowedFields($posts, $this->coverFields); 
 
         $sql = "update images set is_cover = 0 where id = ? and entity = ? and entity_uuid = ?";
-        $this->db->query($sql, [(int) $posts['id'], $posts['entity'], $posts['uuid']]);
+        $removed = $this->db->query($sql, [(int) $posts['id'], $posts['entity'], $posts['uuid']]) !== false
+            && $this->db->affectedRows() === 1;
 
-        log_admin_activity('REMOVE_COVER', 'gallery one', 'Rimozione cover.');
+        if ( ! $removed):
+            return false;
+        endif;
 
-        return $this->db->affectedRows() > 0;
+        $currentAdmin = service('authorization')->currentAdmin();
+
+        log_admin_activity('REMOVE_COVER', 'gallery one', 'Rimozione cover.', $currentAdmin);
+
+        return true;
     }
 }

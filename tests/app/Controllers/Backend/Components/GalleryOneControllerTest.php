@@ -40,7 +40,7 @@ class GalleryOneControllerTest extends CIUnitTestCase
         );
 
         $postData = [
-            'entity' => 'users'
+            'entity' => 'inventory_items'
         ];
 
         $request
@@ -182,7 +182,7 @@ class GalleryOneControllerTest extends CIUnitTestCase
         );
 
         $postData = [
-            'entity' => 'users',
+            'entity' => 'inventory_items',
             'uuid' => 'test-uuid',
             'context' => 'profile',
             'filename' => 'image.jpg'
@@ -369,7 +369,7 @@ class GalleryOneControllerTest extends CIUnitTestCase
         );
 
         $postData = [
-            'entity' => 'users'
+            'entity' => 'inventory_items'
         ];
 
         $request
@@ -511,7 +511,7 @@ class GalleryOneControllerTest extends CIUnitTestCase
         );
 
         $postData = [
-            'entity' => 'users',
+            'entity' => 'inventory_items',
             'uuid' => 'test-uuid',
             'context' => 'profile'
         ];
@@ -697,7 +697,7 @@ class GalleryOneControllerTest extends CIUnitTestCase
         );
 
         $postData = [
-            'entity' => 'users'
+            'entity' => 'inventory_items'
         ];
 
         $request
@@ -839,7 +839,7 @@ class GalleryOneControllerTest extends CIUnitTestCase
         );
 
         $postData = [
-            'entity' => 'users',
+            'entity' => 'inventory_items',
             'uuid' => 'test-uuid',
             'context' => 'profile'
         ];
@@ -1178,7 +1178,7 @@ class GalleryOneControllerTest extends CIUnitTestCase
         );
 
         $postData = [
-            'entity' => 'users',
+            'entity' => 'inventory_items',
             'uuid' => 'test-uuid',
             'context' => 'profile'
         ];

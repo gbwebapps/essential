@@ -67,7 +67,7 @@ class UploadPreviewModel extends BackendModel
 	{
 		return [
 			'images' => [
-			    'rules' => ['checkImages[size:2048,ext:png|jpg|jpeg|webp]']
+			    'rules' => ['checkImages'] // [size:2048,ext:png|jpg|jpeg|webp]
 			]
 		];
 	}
@@ -111,7 +111,9 @@ class UploadPreviewModel extends BackendModel
 					return ['result' => false, 'message' => lang('backend/components/uploadPreview.messages.saveImagesError')];
 				endif;
 
-		        log_admin_activity('SAVE_IMAGES', 'upload preview', 'Salvataggio immagini.');
+				$currentAdmin = service('authorization')->currentAdmin();
+
+		        log_admin_activity('SAVE_IMAGES', 'upload preview', 'Salvataggio immagini.', $currentAdmin);
 
 		        return ['result' => true, 'message' => lang('backend/components/uploadPreview.messages.saveImagesSuccess')];
 

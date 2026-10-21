@@ -1,5 +1,5 @@
 /* Import delle costanti e utility da backend.js */
-import { action } from './backend.js';
+import { action, confirmDiscardChanges } from './backend.js';
 
 /* Import della classe logica */
 import { GroupsManager } from './modules/Groups.js';
@@ -9,6 +9,18 @@ const actions = {
 
         /* Istanziazione pulita senza parametri passed dall'esterno */
         const groupManager = new GroupsManager();
+
+        /* Controlla l'eventuale pannello principale che verrà chiuso */
+        const confirmMainPanelClosure = async targetCollapse => {
+            const currentCollapse = document.querySelector(
+                '#mainGroupsDashboard > .accordion-item > .accordion-collapse.show, ' +
+                '#mainGroupsDashboard > .accordion-item > .accordion-collapse.collapsing'
+            );
+
+            if (!currentCollapse || currentCollapse === targetCollapse) return true;
+
+            return confirmDiscardChanges(currentCollapse);
+        };
 
         /* --- 1. GESTIONE MANUALE E FLUIDA: Aggiungi Gruppo --- */
         document.addEventListener('click', async (e) => {
@@ -23,9 +35,14 @@ const actions = {
             const bsCollapseAdd = bootstrap.Collapse.getOrCreateInstance(mainCollapseAdd, { toggle: false });
 
             if (mainCollapseAdd.classList.contains('show') || mainCollapseAdd.classList.contains('collapsing')) {
+                const confirmed = await confirmDiscardChanges(mainCollapseAdd);
+                if (!confirmed) return;
+
                 bsCollapseAdd.hide();
                 return;
             }
+
+            if (!await confirmMainPanelClosure(mainCollapseAdd)) return;
 
             const container = document.getElementById('add-groups-container');
             if (container && container.innerHTML.trim() !== '') {
@@ -69,9 +86,14 @@ const actions = {
             const bsCollapseList = bootstrap.Collapse.getOrCreateInstance(mainCollapseList, { toggle: false });
 
             if (mainCollapseList.classList.contains('show') || mainCollapseList.classList.contains('collapsing')) {
+                const confirmed = await confirmDiscardChanges(mainCollapseList);
+                if (!confirmed) return;
+
                 bsCollapseList.hide();
                 return;
             }
+
+            if (!await confirmMainPanelClosure(mainCollapseList)) return;
 
             const container = document.getElementById('showAll-groups-container');
             if (container && container.innerHTML.trim() !== '') {
@@ -102,6 +124,8 @@ const actions = {
             const subTriggerBtn = e.target.closest('.group-toggle-btn');
             if ( ! subTriggerBtn) return;
 
+            e.preventDefault();
+
             const targetId = subTriggerBtn.getAttribute('data-bs-target');
             const subCollapseEl = document.querySelector(targetId);
             if ( ! subCollapseEl || ! subCollapseEl.closest('#groupsAccordion')) return;
@@ -113,8 +137,21 @@ const actions = {
             }
 
             if (subCollapseEl.classList.contains('show') || subCollapseEl.classList.contains('collapsing')) {
+                const confirmed = await confirmDiscardChanges(subCollapseEl);
+                if (!confirmed) return;
+
                 bsSubCollapse.hide();
                 return;
+            }
+
+            const currentSubCollapse = document.querySelector(
+                '#groupsAccordion > .accordion-item > .accordion-collapse.show, ' +
+                '#groupsAccordion > .accordion-item > .accordion-collapse.collapsing'
+            );
+
+            if (currentSubCollapse && currentSubCollapse !== subCollapseEl) {
+                const confirmed = await confirmDiscardChanges(currentSubCollapse);
+                if (!confirmed) return;
             }
 
             const bodyContainer = subCollapseEl.querySelector('.template-container');
@@ -148,9 +185,14 @@ const actions = {
             const bsCollapseExceptions = bootstrap.Collapse.getOrCreateInstance(mainCollapseExceptions, { toggle: false });
 
             if (mainCollapseExceptions.classList.contains('show') || mainCollapseExceptions.classList.contains('collapsing')) {
+                const confirmed = await confirmDiscardChanges(mainCollapseExceptions);
+                if (!confirmed) return;
+
                 bsCollapseExceptions.hide();
                 return;
             }
+
+            if (!await confirmMainPanelClosure(mainCollapseExceptions)) return;
 
             const container = document.getElementById('exceptions-groups-container');
             if (container && container.innerHTML.trim() !== '') {

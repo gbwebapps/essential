@@ -124,6 +124,10 @@ class SettingsModelTest extends \CodeIgniter\Test\CIUnitTestCase
 
         $this->assertArrayHasKey('dateFormat', $result );
 
+        $this->assertArrayHasKey('theme', $result);
+
+        $this->assertContains('in_list[white,black,grey,dark]', $result['theme']['rules']);
+
         $this->assertContains(
             'in_list[d MMMM yyyy HH:mm:ss,dd/MM/yyyy HH:mm,MMMM d yyyy h:mm:ss a,MM/dd/yyyy h:mm a,yyyy-MM-dd HH:mm:ss]',
             $result['dateFormat']['rules']

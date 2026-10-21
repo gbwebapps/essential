@@ -166,7 +166,7 @@ class ImportModelTest extends CIUnitTestCase
 
         set_error_handler(static fn(): bool => true);
         try {
-            $result = $model->parseAndValidateCsv($file, 'users', ImportModel::IMPORT_MODE_DATABASE);
+            $result = $model->parseAndValidateCsv($file, 'inventory_items', ImportModel::IMPORT_MODE_DATABASE);
         } finally {
             restore_error_handler();
         }
@@ -178,7 +178,7 @@ class ImportModelTest extends CIUnitTestCase
     public function testParseAndValidateCsvRejectsInsufficientColumns(): void
     {
         $model = $this->parseModel([$this->field('id', 'int', 11, 1), $this->field('email', 'varchar', 255, 0)]);
-        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id\n1\n"), 'users', ImportModel::IMPORT_MODE_DATABASE);
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id\n1\n"), 'inventory_items', ImportModel::IMPORT_MODE_DATABASE);
 
         $this->assertFalse($result['status']);
         $this->assertSame(lang('backend/components/import.messages.insufficientColumns'), $result['message']);
@@ -187,7 +187,7 @@ class ImportModelTest extends CIUnitTestCase
     public function testParseAndValidateCsvRejectsDuplicateHeaders(): void
     {
         $model = $this->parseModel([$this->field('id', 'int', 11, 1), $this->field('email', 'varchar', 255, 0)]);
-        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email,email\n1,a@b.test,a@b.test\n"), 'users', ImportModel::IMPORT_MODE_DATABASE);
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email,email\n1,a@b.test,a@b.test\n"), 'inventory_items', ImportModel::IMPORT_MODE_DATABASE);
 
         $this->assertFalse($result['status']);
         $this->assertStringContainsString('email', $result['message']);
@@ -196,7 +196,7 @@ class ImportModelTest extends CIUnitTestCase
     public function testParseAndValidateCsvRejectsMissingPrimaryKeyHeader(): void
     {
         $model = $this->parseModel([$this->field('id', 'int', 11, 1), $this->field('email', 'varchar', 255, 0)]);
-        $result = $model->parseAndValidateCsv($this->uploadedFileFor("email,name\na@b.test,Mario\n"), 'users', ImportModel::IMPORT_MODE_DATABASE);
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor("email,name\na@b.test,Mario\n"), 'inventory_items', ImportModel::IMPORT_MODE_DATABASE);
 
         $this->assertFalse($result['status']);
         $this->assertSame(sprintf(lang('backend/components/import.messages.missingPrimaryKey'), 'id'), $result['message']);
@@ -205,7 +205,7 @@ class ImportModelTest extends CIUnitTestCase
     public function testParseAndValidateCsvRejectsUnknownColumns(): void
     {
         $model = $this->parseModel([$this->field('id', 'int', 11, 1), $this->field('email', 'varchar', 255, 0)]);
-        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email,fake\n1,a@b.test,x\n"), 'users', ImportModel::IMPORT_MODE_DATABASE);
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email,fake\n1,a@b.test,x\n"), 'inventory_items', ImportModel::IMPORT_MODE_DATABASE);
 
         $this->assertFalse($result['status']);
         $this->assertStringContainsString('fake', $result['message']);
@@ -215,7 +215,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $structure = [$this->field('id', 'int', 11, 1), $this->field('email', 'varchar', 255, 0)];
         $model = $this->parseModel($structure, true);
-        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email\n1,a@b.test\n1,c@d.test\n"), 'users', ImportModel::IMPORT_MODE_DATABASE);
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email\n1,a@b.test\n1,c@d.test\n"), 'inventory_items', ImportModel::IMPORT_MODE_DATABASE);
 
         $this->assertFalse($result['status']);
         $this->assertStringContainsString('1', $result['message']);
@@ -225,7 +225,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $structure = [$this->field('id', 'int', 11, 1), $this->field('email', 'varchar', 255, 0)];
         $model = $this->parseModel($structure, false);
-        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email\n\n"), 'users', ImportModel::IMPORT_MODE_DATABASE);
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email\n\n"), 'inventory_items', ImportModel::IMPORT_MODE_DATABASE);
 
         $this->assertFalse($result['status']);
         $this->assertSame(lang('backend/components/import.messages.emptyFile'), $result['message']);
@@ -235,7 +235,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $structure = [$this->field('id', 'int', 11, 1, false, null, true), $this->field('email', 'varchar', 255, 0, false)];
         $model = $this->parseModel($structure, false, ['email' => 'required|valid_email']);
-        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email\n1,not-an-email\n"), 'users', ImportModel::IMPORT_MODE_DATABASE);
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email\n1,not-an-email\n"), 'inventory_items', ImportModel::IMPORT_MODE_DATABASE);
 
         $this->assertFalse($result['status']);
         $this->assertArrayHasKey('validationErrors', $result);
@@ -246,7 +246,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $structure = [$this->field('id', 'int', 11, 1, false, null, true), $this->field('email', 'varchar', 255, 0, false)];
         $model = $this->parseModel($structure, false, []);
-        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email\n,first@example.com\n2,second@example.com\n"), 'users', ImportModel::IMPORT_MODE_DATABASE);
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email\n,first@example.com\n2,second@example.com\n"), 'inventory_items', ImportModel::IMPORT_MODE_DATABASE);
 
         $this->assertTrue($result['status']);
         $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', (string) $result['importId']);
@@ -260,7 +260,7 @@ class ImportModelTest extends CIUnitTestCase
         $this->assertFileExists($directory . 'manifest.json');
 
         $manifest = json_decode((string) file_get_contents($directory . 'manifest.json'), true, 512, JSON_THROW_ON_ERROR);
-        $this->assertSame('users', $manifest['entity']);
+        $this->assertSame('inventory_items', $manifest['entity']);
         $this->assertSame(ImportModel::IMPORT_MODE_DATABASE, $manifest['mode']);
         $this->assertSame('staged', $manifest['status']);
         $this->assertSame($result['plan'], $manifest['plan']);
@@ -279,7 +279,7 @@ class ImportModelTest extends CIUnitTestCase
         $builder->method('get')->willReturn($resultSet);
         $model = $this->parseModel($structure, true, [], $builder);
 
-        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email\n1,same@example.com\n"), 'users', ImportModel::IMPORT_MODE_DATABASE);
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email\n1,same@example.com\n"), 'inventory_items', ImportModel::IMPORT_MODE_DATABASE);
 
         $this->assertTrue($result['status']);
         $this->assertNull($result['importId']);
@@ -295,7 +295,7 @@ class ImportModelTest extends CIUnitTestCase
             $csv .= $i . ",invalid-email-" . $i . "\n";
         endfor;
 
-        $result = $model->parseAndValidateCsv($this->uploadedFileFor($csv), 'users', ImportModel::IMPORT_MODE_DATABASE);
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor($csv), 'inventory_items', ImportModel::IMPORT_MODE_DATABASE);
 
         $this->assertFalse($result['status']);
         $this->assertArrayHasKey('validationErrors', $result);
@@ -317,7 +317,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $structure = [$this->field('id', 'int', 11, 1, false, null, true), $this->field('email', 'varchar', 255, 0, false)];
         $model = $this->parseModel($structure, true, []);
-        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email\n,first@example.com\n"), 'users', ImportModel::IMPORT_MODE_DATABASE);
+        $result = $model->parseAndValidateCsv($this->uploadedFileFor("id,email\n,first@example.com\n"), 'inventory_items', ImportModel::IMPORT_MODE_DATABASE);
         $importId = (string) $result['importId'];
         $this->stagingImportIds[] = $importId;
 
@@ -336,7 +336,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $model = new ImportModel();
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
         $this->injectDatabase($model, $db);
         $importId = $this->createStagingFixture('ready', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
         $backup = $this->attachValidBackup($importId);
@@ -351,7 +351,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $model = new ImportModel();
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
         $this->injectDatabase($model, $db);
         $importId = $this->createStagingFixture('staged', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
         $path = WRITEPATH . 'uploads/staging/' . $importId . '/data.csv';
@@ -377,7 +377,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $model = new ImportModel();
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
         $this->injectDatabase($model, $db);
         $importId = $this->createStagingFixture('completed', ['insert' => 2, 'update' => 1, 'skip' => 0], ['processed' => 3, 'inserted' => 2, 'updated' => 1]);
 
@@ -396,7 +396,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $model = new ImportModel();
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
         $this->injectDatabase($model, $db);
         $importId = $this->createStagingFixture('staged', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
 
@@ -410,7 +410,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $model = new ImportModel();
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
         $this->injectDatabase($model, $db);
         $importId = $this->createStagingFixture('ready', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
         file_put_contents(WRITEPATH . 'uploads/staging/' . $importId . '/recovery.required', '{}');
@@ -426,7 +426,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $model = new ImportModel();
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
         $this->injectDatabase($model, $db);
         $importId = $this->createStagingFixture('staged', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
 
@@ -444,7 +444,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $model = new ImportModel();
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
         $this->injectDatabase($model, $db);
         $importId = $this->createStagingFixture('staged', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
         $manifest = $this->readManifest($importId);
@@ -459,7 +459,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $model = new ImportModel();
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
         $this->injectDatabase($model, $db);
         $importId = $this->createStagingFixture('staged', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
         $path = WRITEPATH . 'uploads/staging/' . $importId . '/data.csv';
@@ -476,7 +476,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $model = new ImportModel();
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
         $this->injectDatabase($model, $db);
         $importId = $this->createStagingFixture('processing', ['insert' => 2, 'update' => 0, 'skip' => 0], ['processed' => 1, 'inserted' => 1, 'updated' => 0]);
         $manifest = $this->readManifest($importId);
@@ -541,7 +541,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $model = new ImportModel();
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
         $this->injectDatabase($model, $db);
         $importId = $this->createStagingFixture('processing', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
 
@@ -553,7 +553,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $model = new ImportModel();
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
         $this->injectDatabase($model, $db);
         $importId = $this->createStagingFixture('failed', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 1, 'inserted' => 1, 'updated' => 0]);
 
@@ -579,7 +579,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $model = new ImportModel();
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
         $db->expects($this->never())->method('transBegin');
         $this->injectDatabase($model, $db);
         $data = "id,email,__import_action,__import_snapshot\n,first@example.com,insert,\n";
@@ -601,7 +601,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $model = new ImportModel();
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
         $this->injectDatabase($model, $db);
         $importId = $this->createStagingFixture('ready', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
         $manifest = $this->readManifest($importId);
@@ -624,7 +624,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $model = new ImportModel();
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
         $this->injectDatabase($model, $db);
         $importId = $this->createStagingFixture('completed', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 1, 'inserted' => 1, 'updated' => 0]);
         $manifest = $this->readManifest($importId);
@@ -649,7 +649,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $model = new ImportModel();
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
         $this->injectDatabase($model, $db);
         $importId = $this->createStagingFixture('ready', ['insert' => 1, 'update' => 0, 'skip' => 0], ['processed' => 0, 'inserted' => 0, 'updated' => 0]);
         $backup = $this->attachValidBackup($importId, '-- backup A');
@@ -671,7 +671,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $model = new ImportModel();
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
         $this->injectDatabase($model, $db);
         $importId = $this->createStagingFixture('processing', ['insert' => 2, 'update' => 0, 'skip' => 0], ['processed' => 1, 'inserted' => 1, 'updated' => 0]);
 
@@ -688,7 +688,7 @@ class ImportModelTest extends CIUnitTestCase
     {
         $structure = [$this->field('id', 'int', 11, 1, false, null, true), $this->field('email', 'varchar', 255, 0, false)];
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
         $db->expects($this->once())->method('transBegin')->willReturn(false);
         $db->expects($this->never())->method('transCommit');
         $db->expects($this->never())->method('transRollback');
@@ -717,8 +717,8 @@ class ImportModelTest extends CIUnitTestCase
         $builder->method('select')->willReturnSelf();
         $builder->method('get')->willReturn($resultSet);
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
-        $db->method('table')->with('users')->willReturn($builder);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
+        $db->method('table')->with('inventory_items')->willReturn($builder);
         $db->method('transBegin')->willReturn(true);
         $db->expects($this->once())->method('transRollback');
         $db->expects($this->never())->method('transCommit');
@@ -743,8 +743,8 @@ class ImportModelTest extends CIUnitTestCase
         $builder->method('where')->willReturnSelf();
         $builder->method('countAllResults')->willReturn(1);
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
-        $db->method('table')->with('users')->willReturn($builder);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
+        $db->method('table')->with('inventory_items')->willReturn($builder);
         $db->method('transBegin')->willReturn(true);
         $db->expects($this->once())->method('transRollback');
         $db->expects($this->never())->method('transCommit');
@@ -766,8 +766,8 @@ class ImportModelTest extends CIUnitTestCase
         $builder = $this->createMock(BaseBuilder::class);
         $builder->method('insert')->willReturn(true);
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
-        $db->method('table')->with('users')->willReturn($builder);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
+        $db->method('table')->with('inventory_items')->willReturn($builder);
         $db->method('transBegin')->willReturn(true);
         $db->method('transStatus')->willReturn(false);
         $db->expects($this->once())->method('transRollback');
@@ -790,8 +790,8 @@ class ImportModelTest extends CIUnitTestCase
         $builder = $this->createMock(BaseBuilder::class);
         $builder->method('insert')->willReturn(true);
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
-        $db->method('table')->with('users')->willReturn($builder);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
+        $db->method('table')->with('inventory_items')->willReturn($builder);
         $db->method('transBegin')->willReturn(true);
         $db->method('transStatus')->willReturn(true);
         $db->expects($this->once())->method('transCommit')->willReturn(false);
@@ -815,8 +815,8 @@ class ImportModelTest extends CIUnitTestCase
         $builder = $this->createMock(BaseBuilder::class);
         $builder->expects($this->exactly(5))->method('insert')->willReturn(true);
         $db = $this->createMock(BaseConnection::class);
-        $db->method('tableExists')->with('users')->willReturn(true);
-        $db->method('table')->with('users')->willReturn($builder);
+        $db->method('tableExists')->with('inventory_items')->willReturn(true);
+        $db->method('table')->with('inventory_items')->willReturn($builder);
         $db->method('transBegin')->willReturn(true);
         $db->method('transStatus')->willReturn(true);
         $db->expects($this->once())->method('transCommit')->willReturn(true);
@@ -1001,7 +1001,7 @@ class ImportModelTest extends CIUnitTestCase
         $manifest = [
             'version' => 1,
             'importId' => $importId,
-            'entity' => 'users',
+            'entity' => 'inventory_items',
             'mode' => ImportModel::IMPORT_MODE_DATABASE,
             'status' => $status,
             'createdAt' => $now,

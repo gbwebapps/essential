@@ -89,7 +89,7 @@ class AuthorizationSecurityTest extends CIUnitTestCase
         $request->setMethod('GET');
 
         $filter = new \App\Filters\Backend\PermissionFilter();
-        $response = $filter->before($request, ['messages_showall']);
+        $response = $filter->before($request, ['brands_show_all']);
 
         $this->assertInstanceOf(
             \CodeIgniter\HTTP\RedirectResponse::class,
@@ -106,7 +106,7 @@ class AuthorizationSecurityTest extends CIUnitTestCase
     {
         $admin = (object) [
             'permissions' => (object) [
-                'messages_showall' => true,
+                'brands_show_all' => true,
             ],
         ];
 
@@ -118,7 +118,7 @@ class AuthorizationSecurityTest extends CIUnitTestCase
         $filter = new \App\Filters\Backend\PermissionFilter();
 
         $this->assertNull(
-            $filter->before($request, ['messages_showall'])
+            $filter->before($request, ['brands_show_all'])
         );
     }
 
@@ -138,7 +138,7 @@ class AuthorizationSecurityTest extends CIUnitTestCase
         $filter = new \App\Filters\Backend\PermissionFilter();
 
         $this->assertNull(
-            $filter->before($request, ['messages_showall'])
+            $filter->before($request, ['brands_show_all'])
         );
     }
 
@@ -156,7 +156,7 @@ class AuthorizationSecurityTest extends CIUnitTestCase
         $request->setHeader('X-Requested-With', 'XMLHttpRequest');
 
         $filter = new \App\Filters\Backend\PermissionFilter();
-        $response = $filter->before($request, ['messages_showall']);
+        $response = $filter->before($request, ['brands_show_all']);
 
         $this->assertInstanceOf(
             \CodeIgniter\HTTP\ResponseInterface::class,

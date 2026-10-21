@@ -1,5 +1,5 @@
 <div class="card-body p-0">
-	<form id="new-group">
+	<form id="new-group" data-unsaved-check>
 
 		<div class="row mb-3">
 			<div class="col-12 col-lg-4 mb-2 mb-lg-0">

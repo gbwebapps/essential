@@ -22,8 +22,7 @@ class RouteSecurityTest extends CIUnitTestCase
         $routes = [
             'backend/dashboard'             => ['authorization'],
             'backend/account/security'      => ['authorization'],
-            'backend/messages/showAll'      => ['authorization', 'permission:messages_showall'],
-            'backend/users/showAll'         => ['authorization', 'permission:users_showall'],
+            'backend/brands/showAll'        => ['authorization', 'permission:brands_show_all'],
             'backend/admins/showAll'        => ['authorization', 'superadmin'],
             'backend/groups'                => ['authorization', 'superadmin'],
             'backend/tools'                 => ['authorization', 'superadmin'],

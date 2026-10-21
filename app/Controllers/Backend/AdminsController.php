@@ -22,15 +22,15 @@ class AdminsController extends BackendController
 	/**
 	 * Restituisce esclusivamente i file realmente inviati, escludendo il placeholder generato dal campo file vuoto.
 	 *
-	 * @return array<int, \CodeIgniter\HTTP\Files\UploadedFile> File ricevuti dalla richiesta
+	 * @return array<array-key, \CodeIgniter\HTTP\Files\UploadedFile> File ricevuti dalla richiesta
 	 */
 	private function getUploadedImages(): array
 	{
 		$images = $this->request->getFileMultiple('images') ?? [];
 
-		return array_values(array_filter($images, static function ($image): bool {
+		return array_filter($images, static function ($image): bool {
 			return $image->getError() !== UPLOAD_ERR_NO_FILE;
-		}));
+		});
 	}
 
 	private function targetAccessError(array $record): ?ResponseInterface

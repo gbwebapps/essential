@@ -12,7 +12,7 @@ class BackendButtonsCellTest extends CIUnitTestCase
     {
         $cell = new BackendButtonsCell();
 
-        $result = $cell->render('users', 'invalid');
+        $result = $cell->render('inventory_items', 'invalid');
 
         $this->assertSame('', $result);
     }
@@ -21,19 +21,19 @@ class BackendButtonsCellTest extends CIUnitTestCase
     {
         $cell = new BackendButtonsCell();
 
-        $result = $cell->render('users', 'add');
+        $result = $cell->render('inventory_items', 'add');
 
         $this->assertStringContainsString('<form method="post" id="add-reset"', $result);
         $this->assertStringContainsString('class="btn&#x20;app-btn-warning&#x20;btn-sm"', $result);
         $this->assertStringContainsString('class="fa-solid fa-refresh"', $result);
         $this->assertStringContainsString('class="btn&#x20;app-btn-success&#x20;btn-sm"', $result);
-        $this->assertStringContainsString('form="users-add"', $result);
+        $this->assertStringContainsString('form="inventory_items-add"', $result);
         $this->assertStringContainsString('class="fa-solid fa-floppy-disk"', $result);
     }
 
     public function testRenderReturnsShowButtonsWithExpectedIdentifiers(): void
     {
-        $result = (new BackendButtonsCell())->render('users', 'show');
+        $result = (new BackendButtonsCell())->render('inventory_items', 'show');
 
         $this->assertStringContainsString('id="show-print-button"', $result);
         $this->assertStringContainsString('id="show-export-button"', $result);
@@ -42,17 +42,17 @@ class BackendButtonsCellTest extends CIUnitTestCase
 
     public function testRenderEscapesControllerInFormAttribute(): void
     {
-        $result = (new BackendButtonsCell())->render('users" onmouseover="alert(1)', 'add');
+        $result = (new BackendButtonsCell())->render('inventory_items" onmouseover="alert(1)', 'add');
 
-        $this->assertStringNotContainsString('form="users" onmouseover=', $result);
-        $this->assertStringContainsString('form="users&quot;&#x20;onmouseover&#x3D;&quot;alert&#x28;1&#x29;-add"', $result);
+        $this->assertStringNotContainsString('form="inventory_items" onmouseover=', $result);
+        $this->assertStringContainsString('form="inventory_items&quot;&#x20;onmouseover&#x3D;&quot;alert&#x28;1&#x29;-add"', $result);
     }
 
     public function testGetButtonConfigReturnsAddConfiguration(): void
     {
         $cell = new BackendButtonsCell();
 
-        $result = $this->invokeGetButtonConfig($cell, 'users', 'add');
+        $result = $this->invokeGetButtonConfig($cell, 'inventory_items', 'add');
 
         $this->assertSame('add-reset', $result['id_output']);
         $this->assertSame('<i class="fa-solid fa-refresh"></i>', $result['icon_left']);
@@ -65,7 +65,7 @@ class BackendButtonsCellTest extends CIUnitTestCase
     {
         $cell = new BackendButtonsCell();
 
-        $result = $this->invokeGetButtonConfig($cell, 'users', 'edit');
+        $result = $this->invokeGetButtonConfig($cell, 'inventory_items', 'edit');
 
         $this->assertSame('edit-refresh', $result['id_output']);
         $this->assertSame('<i class="fa-solid fa-refresh"></i>', $result['icon_left']);
@@ -78,7 +78,7 @@ class BackendButtonsCellTest extends CIUnitTestCase
     {
         $cell = new BackendButtonsCell();
 
-        $result = $this->invokeGetButtonConfig($cell, 'users', 'show');
+        $result = $this->invokeGetButtonConfig($cell, 'inventory_items', 'show');
 
         $this->assertSame('show-print-button', $result['id_left']);
         $this->assertSame('show-export-button', $result['id_right']);

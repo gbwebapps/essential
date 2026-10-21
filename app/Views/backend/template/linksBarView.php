@@ -20,11 +20,15 @@
                                     $icon = $link['icon'] ?? '';
                                     $label = $link['label'] ?? '';
                                     $id = $link['id'] ?? '';
+                                    $href = $link['href'] ?? base_url($route);
+                                    $dataBsToggle = $link['data-bs-toggle'] ?? '';
+                                    $dataBsTarget = $link['data-bs-target'] ?? '';
+                                    $ariaControls = $link['aria-controls'] ?? '';
                                 ?>
 
                                 <!-- Singolo elemento della barra con link dinamico -->
                                 <div class="bar-item">
-                                    <a href="<?= base_url($route); ?>">
+                                    <a href="<?= esc($href, 'attr'); ?>"<?= ($id !== '') ? ' id="' . esc($id, 'attr') . '"' : ''; ?><?= ($dataBsToggle !== '') ? ' data-bs-toggle="' . esc($dataBsToggle, 'attr') . '"' : ''; ?><?= ($dataBsTarget !== '') ? ' data-bs-target="' . esc($dataBsTarget, 'attr') . '"' : ''; ?><?= ($ariaControls !== '') ? ' aria-controls="' . esc($ariaControls, 'attr') . '" aria-haspopup="dialog"' : ''; ?>>
                                         <?= $icon; ?> <?= $label; ?>
                                     </a>
                                 </div>

@@ -39,7 +39,7 @@ class UploadClass
      * ritagliate per le cartelle 'medium' e 'small'.
      *
      * @param array $files Array di istanze UploadedFile provenienti dalla richiesta HTTP
-     * @param string $entity Il nome dell'entità o del modulo di riferimento (es. 'gallery', 'users')
+     * @param string $entity Il nome dell'entità o del modulo di riferimento (es. 'gallery', 'brands')
      * @param string $uuid L'identificatore univoco del record associato
      * @return array|false Restituisce un array con i nomi finali dei file caricati con successo, o false in caso di fallimento totale
      */

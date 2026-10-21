@@ -2,7 +2,7 @@
     <div class="ps-2 py-1 app-bg-surface fw-bold small mb-2 border text-center rounded-2">
         <?= sprintf(lang('backend/groups.labels.groupNameBar'), esc($name)); ?>
     </div>
-    <form id="edit-admin-exceptions-form" data-uuid="<?= esc($uuid, 'attr'); ?>">
+    <form id="edit-admin-exceptions-form" data-uuid="<?= esc($uuid, 'attr'); ?>" data-unsaved-check>
 
         <input type="hidden" name="uuid" value="<?= esc($uuid, 'attr'); ?>">
 

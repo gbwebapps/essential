@@ -157,9 +157,9 @@
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
                                     <!-- Campo Data Da -->
-                                    <label for="admins-created_at-from"><?= lang('backend/admins.labels.dateFrom'); ?></label>
+                                    <label for="admins-created_at-from"><?= lang('backend/admins.labels.dateFromAdd'); ?></label>
                                     <div id="wrapper-admins-created_at-from" class="input-group">
-                                        <input type="text" id="admins-created_at-from" data-input class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.dateFrom'), 'attr'); ?>" data-search-field="created_at-from" autocomplete="off">
+                                        <input type="text" id="admins-created_at-from" data-input class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.dateFromAdd'), 'attr'); ?>" data-search-field="created_at-from" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
@@ -172,9 +172,9 @@
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
                                     <!-- Campo Data A -->
-                                    <label for="admins-created_at-to"><?= lang('backend/admins.labels.dateTo'); ?></label>
+                                    <label for="admins-created_at-to"><?= lang('backend/admins.labels.dateToAdd'); ?></label>
                                     <div id="wrapper-admins-created_at-to" class="input-group">
-                                        <input type="text" id="admins-created_at-to" data-input class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.dateTo'), 'attr'); ?>" data-search-field="created_at-to" autocomplete="off">
+                                        <input type="text" id="admins-created_at-to" data-input class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.dateToAdd'), 'attr'); ?>" data-search-field="created_at-to" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
@@ -187,9 +187,9 @@
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
                                     <!-- Campo Data Da -->
-                                    <label for="admins-updated_at-from"><?= lang('backend/admins.labels.dateFrom'); ?></label>
+                                    <label for="admins-updated_at-from"><?= lang('backend/admins.labels.dateFromEdit'); ?></label>
                                     <div id="wrapper-admins-updated_at-from" class="input-group">
-                                        <input type="text" id="admins-updated_at-from" data-input class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.dateFrom'), 'attr'); ?>" data-search-field="updated_at-from" autocomplete="off">
+                                        <input type="text" id="admins-updated_at-from" data-input class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.dateFromEdit'), 'attr'); ?>" data-search-field="updated_at-from" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
@@ -202,9 +202,9 @@
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
                                     <!-- Campo Data A -->
-                                    <label for="admins-updated_at-to"><?= lang('backend/admins.labels.dateTo'); ?></label>
+                                    <label for="admins-updated_at-to"><?= lang('backend/admins.labels.dateToEdit'); ?></label>
                                     <div id="wrapper-admins-updated_at-to" class="input-group">
-                                        <input type="text" id="admins-updated_at-to" data-input class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.dateTo'), 'attr'); ?>" data-search-field="updated_at-to" autocomplete="off">
+                                        <input type="text" id="admins-updated_at-to" data-input class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.dateToEdit'), 'attr'); ?>" data-search-field="updated_at-to" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>

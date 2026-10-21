@@ -11,8 +11,6 @@ class SimpleModelsTest extends CIUnitTestCase
     {
         return [
             'dashboard' => [\App\Models\Backend\DashboardModel::class],
-            'messages'  => [\App\Models\Backend\MessagesModel::class],
-            'users'     => [\App\Models\Backend\UsersModel::class]
         ];
     }
 

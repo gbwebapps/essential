@@ -259,6 +259,12 @@
                                                             <?= lang('backend/admins.labels.resettedAt'); ?> <span class="fw-bold app-text-warning"><?= convertDate(esc($admin->resetted_at), 'conversational'); ?></span>
                                                         <?php endif; ?>
 
+                                                        <!-- Parte ripristinato -->
+                                                        <?php if( ! is_null($admin->restored_at)): ?>
+                                                            &nbsp;&bull;&nbsp;
+                                                            <?= lang('backend/admins.labels.restoredAt'); ?> <span class="fw-bold app-text-success"><?= convertDate(esc($admin->restored_at), 'conversational'); ?></span>
+                                                        <?php endif; ?>
+
                                                         <!-- Parte eliminato (Cestinato) -->
                                                         <?php if($isTrashed): ?>
                                                             &nbsp;&bull;&nbsp;

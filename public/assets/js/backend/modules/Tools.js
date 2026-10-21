@@ -1,5 +1,5 @@
 /* Import delle utility da backend.js */
-import { urlbase, apiFetch, showAlert, askConfirm, handleValidationErrors, smoothReplace, initRangeDatePicker } from '../backend.js';
+import { urlbase, apiFetch, showAlert, askConfirm, handleValidationErrors, smoothReplace, initRangeDatePicker, markUnsavedClean } from '../backend.js';
 
 export class ToolsManager {
     constructor() {
@@ -645,6 +645,7 @@ export class ToolsManager {
             }
 
             if (data.result === true) {
+                markUnsavedClean(form);
 
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('success', data.message);

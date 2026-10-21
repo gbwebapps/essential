@@ -100,7 +100,7 @@
 
                                             <!-- Cella created At -->
                                             <td class="align-middle">
-                                                <span class="fw-bold"><?= esc(convertDate($audit->created_at, 'conversational')); ?></span>
+                                                <span class="app-text-success fw-bold"><?= esc(convertDate($audit->created_at, 'conversational')); ?></span>
                                             </td>
                                         </tr>
 
@@ -114,7 +114,7 @@
                                                 <div class="collapse" id="meta-<?= esc($audit->id); ?>">
                                                     
                                                     <!-- Box effettivo dei metadati: spazioso, con background neutro -->
-                                                    <div class="p-2 border-bottom app-bg-surface app-text-muted small">
+                                                    <div class="p-2 border-bottom app-bg-surface audit-system-details small">
                                                         
                                                         <!-- Parte useragent -->
                                                         <?php 
@@ -122,24 +122,24 @@
                                                             $userAgent->parse($audit->user_agent);
 
                                                             /* Inizializzazione corretta della variabile in camelCase */
-                                                            $agentText = lang('backend/audits.labels.operatingSystem') . ' <span class="app-text-accent fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
+                                                            $agentText = '<span class="text-white">' . lang('backend/audits.labels.operatingSystem') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
                                                         ?>
 
                                                         <?php
                                                             /* Valutazione con metodi nativi in camelCase di CodeIgniter 4 */
                                                             if($userAgent->isBrowser()):
-                                                                $agentText .= ' &bull; ' . lang('backend/audits.labels.browser') . ' <span class="app-text-accent fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
+                                                                $agentText .= ' &bull; <span class="text-white">' . lang('backend/audits.labels.browser') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
                                                             elseif($userAgent->isMobile()):
-                                                                $agentText .= ' &bull; ' . lang('backend/audits.labels.mobile') . ' <span class="app-text-accent fw-bold">' . esc($userAgent->getMobile()) . '</span>';
+                                                                $agentText .= ' &bull; <span class="text-white">' . lang('backend/audits.labels.mobile') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getMobile()) . '</span>';
                                                             elseif($userAgent->isRobot()):
-                                                                $agentText .= ' &bull; ' . lang('backend/audits.labels.robot') . ' <span class="app-text-accent fw-bold">' . esc($userAgent->getRobot()) . '</span>';
+                                                                $agentText .= ' &bull; <span class="text-white">' . lang('backend/audits.labels.robot') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getRobot()) . '</span>';
                                                             endif;
                                                         ?>
 
                                                         <?= $agentText; ?>
                                                         &nbsp;&bull;&nbsp;
-                                                        <span><?= lang('backend/audits.labels.ipAddress'); ?></span>
-                                                        <span class="app-text-accent fw-bold"><?= esc($audit->ip_address); ?></span>
+                                                        <span class="text-white"><?= lang('backend/audits.labels.ipAddress'); ?></span>
+                                                        <span class="text-primary fw-bold"><?= esc($audit->ip_address); ?></span>
                                                         <!-- End parte useragent -->
 
                                                     </div>

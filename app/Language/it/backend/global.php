@@ -13,8 +13,9 @@ return [
         ],
         'bottomLeft' => [
             'dashboard' => 'Pannelli',
-            'users' => 'Utenti',
-            'messages' => 'Messaggi',
+            'brands' => 'Marche',
+            'categories' => 'Categorie',
+            'products' => 'Prodotti',
         ],
         'bottomRight' => [
             'settings' => 'Impostazioni',
@@ -34,6 +35,8 @@ return [
         'modules' => 'Moduli',
         'services' => 'Servizi',
         'backToTop' => 'Torna in alto', 
+        'expandScreen' => 'Espandi schermo',
+        'reduceScreen' => 'Riduci schermo',
         'options' => 'Opzioni', 
         'undo' => 'Annulla', 
         'export' => 'Esporta', 
@@ -49,6 +52,7 @@ return [
         'err500' => 'Si è verificato un errore critico durante l\'elaborazione della richiesta.',
         'err504' => 'Il server ha impiegato troppo tempo a rispondere. Operazione annullata.',
         'errNetwork' => 'Connessione di rete assente. Verifica lo stato della tua connessione internet.',
+        'fullscreenError' => 'Impossibile modificare la modalità schermo intero.',
     ], 
     'modals' => [
         'exportPdfTitle' => 'Impostazioni Esportazione PDF', 
@@ -80,6 +84,7 @@ return [
         'getDataError' => 'Errore durante operazione di recupero lista.',
         'getUUIDError' => 'Errore durante operazione di recupero dettaglio.', 
         'UUIDNotFound' => 'Record non trovato.', 
-        'permissionDenied' => 'Accesso negato.'
+        'permissionDenied' => 'Accesso negato.',
+        'unsavedChanges' => 'Sono presenti modifiche non salvate. Vuoi uscire senza salvare?'
     ]
 ];

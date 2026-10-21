@@ -295,11 +295,31 @@ class GalleryOneModelTest extends CIUnitTestCase
                 $dbClass
             );
 
+        $resClass
+            =
+            \CodeIgniter\Database\BaseResult::class;
+
+        $resMock
+            =
+            $this
+            ->createMock(
+                $resClass
+            );
+
+        $resMock
+            ->method(
+                'getRowArray'
+            )
+            ->willReturn(
+                ['filename' => 'stored-image.jpg']
+            );
+
         $dbMock
             ->method(
                 'query'
             )
-            ->willReturn(
+            ->willReturnOnConsecutiveCalls(
+                $resMock,
                 true
             );
 
@@ -351,7 +371,7 @@ class GalleryOneModelTest extends CIUnitTestCase
             );
     }
 
-    public function testDeleteImageFailsWhenAffectedRowsIsZero()
+    public function testDeleteImageFailsWhenImageDoesNotBelongToEntity()
     {
         if (
             ! function_exists(
@@ -421,20 +441,44 @@ class GalleryOneModelTest extends CIUnitTestCase
                 $dbClass
             );
 
+        $resClass
+            =
+            \CodeIgniter\Database\BaseResult::class;
+
+        $resMock
+            =
+            $this
+            ->createMock(
+                $resClass
+            );
+
+        $resMock
+            ->method(
+                'getRowArray'
+            )
+            ->willReturn(
+                null
+            );
+
         $dbMock
+            ->expects(
+                $this
+                ->once()
+            )
             ->method(
                 'query'
             )
             ->willReturn(
-                true
+                $resMock
             );
 
         $dbMock
+            ->expects(
+                $this
+                ->never()
+            )
             ->method(
                 'affectedRows'
-            )
-            ->willReturn(
-                0
             );
 
         $injectDb
@@ -544,6 +588,25 @@ class GalleryOneModelTest extends CIUnitTestCase
                 $dbClass
             );
 
+        $resClass
+            =
+            \CodeIgniter\Database\BaseResult::class;
+
+        $resMock
+            =
+            $this
+            ->createMock(
+                $resClass
+            );
+
+        $resMock
+            ->method(
+                'getRowArray'
+            )
+            ->willReturn(
+                ['id' => 10]
+            );
+
         $dbMock
             ->expects(
                 $this
@@ -557,14 +620,28 @@ class GalleryOneModelTest extends CIUnitTestCase
             ->expects(
                 $this
                 ->exactly(
-                    2
+                    3
                 )
             )
             ->method(
                 'query'
             )
-            ->willReturn(
+            ->willReturnOnConsecutiveCalls(
+                $resMock,
+                true,
                 true
+            );
+
+        $dbMock
+            ->expects(
+                $this
+                ->once()
+            )
+            ->method(
+                'affectedRows'
+            )
+            ->willReturn(
+                1
             );
 
         $dbMock
@@ -680,6 +757,25 @@ class GalleryOneModelTest extends CIUnitTestCase
                 $dbClass
             );
 
+        $resClass
+            =
+            \CodeIgniter\Database\BaseResult::class;
+
+        $resMock
+            =
+            $this
+            ->createMock(
+                $resClass
+            );
+
+        $resMock
+            ->method(
+                'getRowArray'
+            )
+            ->willReturn(
+                ['id' => 10]
+            );
+
         $dbMock
             ->expects(
                 $this
@@ -693,8 +789,18 @@ class GalleryOneModelTest extends CIUnitTestCase
             ->method(
                 'query'
             )
-            ->willReturn(
+            ->willReturnOnConsecutiveCalls(
+                $resMock,
+                true,
                 true
+            );
+
+        $dbMock
+            ->method(
+                'affectedRows'
+            )
+            ->willReturn(
+                1
             );
 
         $dbMock

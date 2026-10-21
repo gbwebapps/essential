@@ -336,15 +336,15 @@ class AuthorizationClassTest extends CIUnitTestCase
 
         $groupResult = $this->createMock(BaseResult::class);
         $groupResult->method('getResultObject')->willReturn([
-            (object) ['permission' => 'users.view'],
-            (object) ['permission' => 'users.delete'],
+            (object) ['permission' => 'brands_show'],
+            (object) ['permission' => 'brands_delete'],
             (object) ['permission' => 'messages.view']
         ]);
 
         $userResult = $this->createMock(BaseResult::class);
         $userResult->method('getResultObject')->willReturn([
-            (object) ['permission' => 'users.create', 'allow' => 1],
-            (object) ['permission' => 'users.delete', 'allow' => 0]
+            (object) ['permission' => 'brands_add', 'allow' => 1],
+            (object) ['permission' => 'brands_delete', 'allow' => 0]
         ]);
 
         $db = $this->createMock(ConnectionInterface::class);
@@ -368,10 +368,10 @@ class AuthorizationClassTest extends CIUnitTestCase
 
         $result = $this->invokePrivateMethod($authorization, 'getAdmin', ['admin-uuid']);
 
-        $this->assertTrue($result->permissions->{'users.view'});
+        $this->assertTrue($result->permissions->{'brands_show'});
         $this->assertTrue($result->permissions->{'messages.view'});
-        $this->assertTrue($result->permissions->{'users.create'});
-        $this->assertFalse(property_exists($result->permissions, 'users.delete'));
+        $this->assertTrue($result->permissions->{'brands_add'});
+        $this->assertFalse(property_exists($result->permissions, 'brands_delete'));
     }
 
     private function createAdminRow(bool $superadmin): object

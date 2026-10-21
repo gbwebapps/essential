@@ -1,4 +1,4 @@
-<form id="account-edit">
+<form id="account-edit" data-unsaved-check>
     <div class="card-body pb-0">
 
     	<!-- Nome e cognome -->

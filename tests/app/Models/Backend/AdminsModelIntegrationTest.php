@@ -109,17 +109,17 @@ class AdminsModelIntegrationTest extends CIUnitTestCase
 
         $result = $this->model->changePermission([
             'uuid' => $this->adminUuid,
-            'permission' => 'users_delete'
+            'permission' => 'brands_delete'
         ]);
 
         $this->assertTrue($result['result']);
         $groupPermissions = $this->model->getGroupPermissions((int) $admin->group_id);
         $exceptions = $this->model->getAdminExceptions($this->adminUuid);
-        $usersDeleteEnabled = array_key_exists('users_delete', $exceptions)
-            ? $exceptions['users_delete'] === 1
-            : in_array('users_delete', $groupPermissions, true);
+        $brandsDeleteEnabled = array_key_exists('brands_delete', $exceptions)
+            ? $exceptions['brands_delete'] === 1
+            : in_array('brands_delete', $groupPermissions, true);
 
-        $this->assertTrue($usersDeleteEnabled);
+        $this->assertTrue($brandsDeleteEnabled);
 
         $this->database->query(
             'insert into admins_tokens (admin_uuid, token_hash, token_create, last_activity, token_expire, token_type, user_agent, ip_address, created_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -164,9 +164,9 @@ class AdminsModelIntegrationTest extends CIUnitTestCase
         $result = $this->model->restoreDelete(['uuid' => $this->adminUuid]);
 
         $this->assertTrue($result['result']);
-        $this->assertNull(
-            $this->database->query('select deleted_at from admins where uuid = ?', [$this->adminUuid])->getRow()->deleted_at
-        );
+        $restoredAdmin = $this->database->query('select deleted_at, restored_at from admins where uuid = ?', [$this->adminUuid])->getRow();
+        $this->assertNull($restoredAdmin->deleted_at);
+        $this->assertNotNull($restoredAdmin->restored_at);
 
         $this->assertTrue($this->model->softDelete(['uuid' => $this->adminUuid])['result']);
         $this->assertTrue($this->model->hardDelete(['uuid' => $this->adminUuid])['result']);

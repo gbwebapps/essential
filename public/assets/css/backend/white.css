@@ -1,5 +1,5 @@
 /*
- * Tema monocromatico Essential.
+ * Tema monocromatico Essential autonomo.
  * Contiene esclusivamente variabili cromatiche e adattamenti Bootstrap.
  */
 :root {
@@ -232,6 +232,12 @@
     filter: grayscale(1) contrast(2);
 }
 
+.accordion-item:last-of-type > .accordion-collapse > .accordion-body {
+    border-bottom-right-radius: var(--bs-accordion-inner-border-radius) !important;
+    border-bottom-left-radius: var(--bs-accordion-inner-border-radius) !important;
+    background-clip: padding-box;
+}
+
 .form-control,
 .form-select,
 .input-group-text,
@@ -252,6 +258,10 @@
     border-color: var(--app-border);
 }
 
+.card-header[style*="border-top"] {
+    border-top: var(--bs-card-border-width) solid var(--app-border) !important;
+}
+
 .card {
     border-radius: var(--bs-card-border-radius) !important;
     background-clip: border-box;
@@ -265,6 +275,11 @@
 .card > form:first-child > :first-child > .card-header:first-child {
     border-top-left-radius: var(--bs-card-inner-border-radius) !important;
     border-top-right-radius: var(--bs-card-inner-border-radius) !important;
+}
+
+.card > #images-account-container {
+    border-radius: var(--bs-card-inner-border-radius) !important;
+    overflow: hidden;
 }
 
 .card > .card-header:last-child,
@@ -283,6 +298,31 @@
 .card > :last-child > .list-group:last-child > .list-group-item:last-child {
     border-bottom-right-radius: var(--bs-card-inner-border-radius) !important;
     border-bottom-left-radius: var(--bs-card-inner-border-radius) !important;
+}
+
+.token-system-details .text-white,
+.log-system-details .text-white,
+.audit-system-details .text-white {
+    color: var(--app-text) !important;
+}
+
+#admins-list .no-preview-image .fa-stack,
+#brands-list .no-preview-image .fa-stack,
+#categories-list .no-preview-image .fa-stack,
+#products-list .no-preview-image .fa-stack {
+    width: 2em;
+    height: 1em;
+    line-height: 1em;
+    vertical-align: middle;
+}
+
+#admins-list .no-preview-image .fa-stack-1x,
+#brands-list .no-preview-image .fa-stack-1x,
+#categories-list .no-preview-image .fa-stack-1x,
+#products-list .no-preview-image .fa-stack-1x {
+    line-height: 1em;
+    transform: scale(2);
+    transform-origin: center;
 }
 
 .form-control:focus,
@@ -361,4 +401,21 @@
 ::selection {
     color: var(--app-text-inverse);
     background-color: var(--app-surface-inverse);
+}
+
+/* Chiusura testata Tools > System */
+#mainToolsDashboard #main_heading_system:has(+ #main_collapse_system.show) > .accordion-button,
+#mainToolsDashboard #main_heading_system:has(+ #main_collapse_system.collapsing) > .accordion-button {
+    border-bottom: .0625rem solid var(--app-border-strong) !important;
+}
+
+#mainToolsDashboard #system-tools-container.accordion-body.border-top {
+    border-top: 0 !important;
+}
+
+.left-menu .list-group-item-action:not(.active):hover + .list-group-item.active,
+.left-menu .list-group-item-action:not(.active):focus + .list-group-item.active,
+.left-menu .list-group-item.active + .list-group-item-action:not(.active):hover,
+.left-menu .list-group-item.active + .list-group-item-action:not(.active):focus {
+    box-shadow: inset 0 .0625rem #ffffff !important;
 }

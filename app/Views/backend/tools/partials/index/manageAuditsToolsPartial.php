@@ -1,5 +1,5 @@
 <div class="card-body">
-    <form id="manageAudits-tools-form" autocomplete="off">
+    <form id="manageAudits-tools-form" autocomplete="off" data-unsaved-check>
         <div class="row">
             <div class="col-12">
                 <div class="ps-2 py-1 app-bg-surface fw-bold small mb-3 border text-center rounded-2">

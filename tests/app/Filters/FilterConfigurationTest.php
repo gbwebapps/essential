@@ -31,13 +31,24 @@ class FilterConfigurationTest extends CIUnitTestCase
         $this->assertContains('language', $filters->globals['before']);
     }
 
-    public function testMessageRoutesUseMessagePermissions(): void
+    public function testBrandsRoutesUseBrandsPermissions(): void
     {
         $options = $this->getGetRouteOptions();
 
-        $this->assertContains('permission:messages_index', $options['backend/messages']['filter']);
-        $this->assertContains('permission:messages_showall', $options['backend/messages/showAll']['filter']);
-        $this->assertContains('permission:messages_show', $options['backend/messages/show']['filter']);
+        $this->assertContains('permission:brands_show_all', $options['backend/brands']['filter']);
+        $this->assertContains('permission:brands_show_all', $options['backend/brands/showAll']['filter']);
+
+        $showRoute = null;
+
+        foreach (array_keys($options) as $route):
+            if (str_starts_with($route, 'backend/brands/show/')):
+                $showRoute = $route;
+                break;
+            endif;
+        endforeach;
+
+        $this->assertNotNull($showRoute);
+        $this->assertContains('permission:brands_show', $options[$showRoute]['filter']);
     }
 
     public function testEveryPermissionUsedByGetRoutesExistsInPermissionCatalog(): void

@@ -1,5 +1,5 @@
 /* Import delle utility risalendo di un livello */
-import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace, handleValidationErrors } from '../backend.js';
+import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace, handleValidationErrors, markUnsavedClean } from '../backend.js';
 import { initOtpCountdown } from '../components/OtpCountdown.js';
 
 // Recupera la password corrente e gestisce localmente il campo obbligatorio.
@@ -192,6 +192,12 @@ export class EditManager {
             }
 
             if (data.result === true) {
+                const form = document.querySelector(this.formSelector);
+
+                if (form) {
+                    markUnsavedClean(form);
+                }
+
                 if (data.output) {
                     const container = document.getElementById(this.containerId);
 
@@ -1026,6 +1032,18 @@ export class SecurityManager {
 
         this.eventsBound = true;
 
+        // Il form della password serve esclusivamente al controllo delle modifiche non salvate.
+        document.addEventListener('submit', e => {
+            const formEl = e.target;
+
+            if (!(formEl instanceof HTMLFormElement)) return;
+            if (!formEl.matches('#security-password-form')) return;
+
+            e.preventDefault();
+        }, {
+            signal: this.eventsController.signal
+        });
+
         // 1. Selezione del metodo 2FA.
         document.addEventListener('click', async e => {
             const radio = e.target;
@@ -1389,6 +1407,12 @@ export class SecurityManager {
         // Il server ha confermato l'attivazione.
         this.currentActiveMethod = 'totp';
         this.setupPending = false;
+
+        const form = document.getElementById('confirm-totp-form');
+
+        if (form) {
+            markUnsavedClean(form);
+        }
 
         this.unlockMethods();
         this.restoreActiveMethod();

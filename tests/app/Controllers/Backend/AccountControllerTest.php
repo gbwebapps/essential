@@ -666,14 +666,14 @@ class AccountControllerTest extends CIUnitTestCase
             $builderModel->getMock();
             
         $fakeGroupPerms = 
-            ['users.read'];
+            ['brands_show'];
             
         $mockModel->method('getGroupPermissions')->willReturn(
             $fakeGroupPerms
         );
         
         $fakeExceptions = 
-            ['users.write' => 1];
+            ['brands_edit' => 1];
             
         $mockModel->method('getAdminExceptions')->willReturn(
             $fakeExceptions
@@ -828,14 +828,14 @@ class AccountControllerTest extends CIUnitTestCase
             $builderModel->getMock();
             
         $fakeGroupPerms = 
-            ['users.read'];
+            ['brands_show'];
             
         $mockModel->method('getGroupPermissions')->willReturn(
             $fakeGroupPerms
         );
         
         $fakeExceptions = 
-            ['users.write' => 1];
+            ['brands_edit' => 1];
             
         $mockModel->method('getAdminExceptions')->willReturn(
             $fakeExceptions

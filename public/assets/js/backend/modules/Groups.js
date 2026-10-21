@@ -1,5 +1,5 @@
 /* Import delle utility risalendo di un livello */
-import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace, handleValidationErrors } from '../backend.js';
+import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace, handleValidationErrors, markUnsavedClean } from '../backend.js';
 
 export class GroupsManager {
     constructor() {
@@ -326,6 +326,7 @@ export class GroupsManager {
                 }
 
                 formEl.reset();
+                markUnsavedClean(formEl);
 
                 this.isListLoaded = false;
 
@@ -420,6 +421,8 @@ export class GroupsManager {
             }
 
             if (data.result === true) {
+                markUnsavedClean(formEl);
+
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('success', data.message);
                 }
@@ -846,6 +849,8 @@ export class GroupsManager {
             }
 
             if (data.result === true) {
+                markUnsavedClean(formEl);
+
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('success', data.message);
                 }

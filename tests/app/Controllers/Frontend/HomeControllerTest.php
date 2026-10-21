@@ -201,7 +201,7 @@ class HomeControllerTest extends CIUnitTestCase
 
         $this
             ->assertStringContainsString(
-                '<title>Welcome to CodeIgniter 4!</title>',
+                '<title>Essential</title>',
                 $result
             );
     }

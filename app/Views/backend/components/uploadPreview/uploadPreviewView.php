@@ -36,7 +36,7 @@
 
             <?php if ($saveImages): ?>
                 <div class="ms-1">
-                    <form id="saveImages">
+                    <form id="saveImages" data-unsaved-check>
                         <input type="hidden" name="uuid" value="<?= esc($uuid); ?>">
                         <input type="hidden" name="entity" value="<?= esc($entity); ?>">
                         <input type="hidden" name="context" value="<?= esc($context); ?>">

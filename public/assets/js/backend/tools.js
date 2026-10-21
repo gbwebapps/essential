@@ -1,5 +1,5 @@
 /* Import delle costanti da backend.js */
-import { urlbase, action } from './backend.js';
+import { urlbase, action, confirmDiscardChanges } from './backend.js';
 
 /* Import della classe logica polivalente */
 import { ToolsManager } from './modules/Tools.js';
@@ -31,8 +31,21 @@ const actions = {
             const bsCollapse = bootstrap.Collapse.getOrCreateInstance(mainCollapse, { toggle: false });
 
             if (mainCollapse.classList.contains('show') || mainCollapse.classList.contains('collapsing')) {
+                const confirmed = await confirmDiscardChanges(mainCollapse);
+                if (!confirmed) return;
+
                 bsCollapse.hide();
                 return;
+            }
+
+            const currentCollapse = document.querySelector(
+                '#mainToolsDashboard > .accordion-item > .accordion-collapse.show, ' +
+                '#mainToolsDashboard > .accordion-item > .accordion-collapse.collapsing'
+            );
+
+            if (currentCollapse && currentCollapse !== mainCollapse) {
+                const confirmed = await confirmDiscardChanges(currentCollapse);
+                if (!confirmed) return;
             }
 
             const container = document.getElementById(`${env}-tools-container`);

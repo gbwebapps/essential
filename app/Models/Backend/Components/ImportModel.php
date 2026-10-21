@@ -54,20 +54,27 @@ class ImportModel extends BackendModel
         endif;
 
         $modelClass = str_replace(' ', '', ucwords(str_replace(['-', '_'], ' ', $entity)));
-        $modelName = 'App\\Models\\Backend\\' . $modelClass . 'Model';
+        $modelNames = [
+            'Modules\\Backend\\' . $modelClass . '\\Models\\' . $modelClass . 'Model',
+            'App\\Models\\Backend\\' . $modelClass . 'Model',
+        ];
 
-        if ( ! class_exists($modelName)):
-            return null;
-        endif;
+        foreach ($modelNames as $modelName):
+            if ( ! class_exists($modelName)):
+                continue;
+            endif;
 
-        try {
-            $model = new $modelName();
-        } catch (\Throwable $e) {
-            log_message('error', 'ImportModel: unable to instantiate ' . $modelName . ': ' . $e->getMessage());
-            return null;
-        }
+            try {
+                $model = new $modelName();
+            } catch (\Throwable $e) {
+                log_message('error', 'ImportModel: unable to instantiate ' . $modelName . ': ' . $e->getMessage());
+                return null;
+            }
 
-        return $model instanceof BackendModel ? $model : null;
+            return $model instanceof BackendModel ? $model : null;
+        endforeach;
+
+        return null;
     }
 
     /**

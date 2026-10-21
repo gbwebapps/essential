@@ -1,7 +1,8 @@
-<!-- Definizioni di lingua per TomSelect -->
+<!-- Definizioni di lingua globali -->
 <div id="lang-definitions" class="d-none" 
     data-remove="<?= esc(lang('backend/global.buttons.remove')); ?>"
-    data-select="<?= esc(lang('backend/global.labels.select')); ?>">
+    data-select="<?= esc(lang('backend/global.labels.select')); ?>"
+    data-unsaved-changes="<?= esc(lang('backend/global.messages.unsavedChanges')); ?>">
 </div>
 
 <!-- Localizzazione errori JS -->

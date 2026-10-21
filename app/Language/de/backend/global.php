@@ -13,8 +13,9 @@ return [
         ],
         'bottomLeft' => [
             'dashboard' => 'Panels',
-            'users' => 'Benutzer',
-            'messages' => 'Nachrichten',
+            'brands' => 'Marken',
+            'categories' => 'Kategorien',
+            'products' => 'Produkte',
         ],
         'bottomRight' => [
             'settings' => 'Einstellungen',
@@ -34,6 +35,8 @@ return [
         'modules' => 'Module',
         'services' => 'Dienste',
         'backToTop' => 'Nach oben', 
+        'expandScreen' => 'Vollbild aktivieren',
+        'reduceScreen' => 'Vollbild beenden',
         'options' => 'Optionen', 
         'undo' => 'Abbrechen', 
         'export' => 'Exportieren', 
@@ -49,6 +52,7 @@ return [
         'err500' => 'Ein kritischer Fehler ist bei der Verarbeitung der Anfrage aufgetreten.',
         'err504' => 'Der Server hat zu lange für eine Antwort gebraucht. Vorgang abgebrochen.',
         'errNetwork' => 'Keine Netzwerkverbindung. Bitte überprüfen Sie Ihre Internetverbindung.',
+        'fullscreenError' => 'Der Vollbildmodus konnte nicht geändert werden.',
     ], 
     'modals' => [
         'exportPdfTitle' => 'PDF-Exporteinstellungen', 
@@ -80,6 +84,7 @@ return [
         'getDataError' => 'Fehler beim Abrufen der Liste.',
         'getUUIDError' => 'Fehler beim Abrufen der Details.', 
         'UUIDNotFound' => 'Datensatz nicht gefunden.', 
-        'permissionDenied' => 'Zugriff verweigert.'
+        'permissionDenied' => 'Zugriff verweigert.',
+        'unsavedChanges' => 'Es gibt nicht gespeicherte Änderungen. Möchten Sie die Seite verlassen, ohne zu speichern?'
     ]
 ];

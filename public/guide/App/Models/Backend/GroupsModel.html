@@ -468,16 +468,6 @@ la risoluzione delle eccezioni (override) assegnate ai singoli utenti.</p></p>  
             </div>
                     <div class="row">
                 <div class="col-md-2 type">
-                    void
-                </div>
-                <div class="col-md-8">
-                    <a href="#method_logActivitySafely">logActivitySafely</a>(string $action, string $details)
-        
-                                            <p><p>Registra l'audit senza alterare l'esito di una transazione già consolidata.</p></p>                </div>
-                <div class="col-md-2"></div>
-            </div>
-                    <div class="row">
-                <div class="col-md-2 type">
                     array
                 </div>
                 <div class="col-md-8">
@@ -1326,56 +1316,8 @@ durante l'esecuzione dei test unitari tramite il pattern Extract Method.</p></p>
 
             </div>
                     <div class="method-item">
-                    <h3 id="method_logActivitySafely">
-        <div class="location">at line 100</div>
-        <code>            protected        void
-    <strong>logActivitySafely</strong>(string $action, string $details)
-        </code>
-    </h3>
-    <div class="details">    
-            
-    
-            
-
-        <div class="method-description">
-                            <p><p>Registra l'audit senza alterare l'esito di una transazione già consolidata.</p></p>                        
-        </div>
-        <div class="tags">
-                            <h4>Parameters</h4>
-
-                    <table class="table table-condensed">
-                    <tr>
-                <td>string</td>
-                <td>$action</td>
-                <td><p>Codice dell'azione eseguita</p></td>
-            </tr>
-                    <tr>
-                <td>string</td>
-                <td>$details</td>
-                <td><p>Dettaglio descrittivo dell'operazione</p></td>
-            </tr>
-            </table>
-
-            
-                            <h4>Return Value</h4>
-
-                    <table class="table table-condensed">
-        <tr>
-            <td>void</td>
-            <td></td>
-        </tr>
-    </table>
-
-            
-            
-            
-                    </div>
-    </div>
-
-            </div>
-                    <div class="method-item">
                     <h3 id="method_addValidationRules">
-        <div class="location">at line 125</div>
+        <div class="location">at line 103</div>
         <code>                    array
     <strong>addValidationRules</strong>()
         </code>
@@ -1410,7 +1352,7 @@ Questo garantisce che nessun permesso inventato o malevolo possa essere salvato 
             </div>
                     <div class="method-item">
                     <h3 id="method_getGroupByIdValidationRules">
-        <div class="location">at line 166</div>
+        <div class="location">at line 144</div>
         <code>                    array
     <strong>getGroupByIdValidationRules</strong>()
         </code>
@@ -1445,7 +1387,7 @@ bloccando richieste per record inesistenti.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_editValidationRules">
-        <div class="location">at line 186</div>
+        <div class="location">at line 164</div>
         <code>                    array
     <strong>editValidationRules</strong>(array $posts)
         </code>
@@ -1490,7 +1432,7 @@ permettendo di salvare il modulo senza che il sistema segnali falsi conflitti su
             </div>
                     <div class="method-item">
                     <h3 id="method_delValidationRules">
-        <div class="location">at line 230</div>
+        <div class="location">at line 208</div>
         <code>                    array
     <strong>delValidationRules</strong>()
         </code>
@@ -1524,7 +1466,7 @@ di tentare la query di DELETE.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_saveExceptionsValidationRules">
-        <div class="location">at line 249</div>
+        <div class="location">at line 227</div>
         <code>                    array
     <strong>saveExceptionsValidationRules</strong>()
         </code>
@@ -1559,7 +1501,7 @@ fatto per l'inserimento dei gruppi.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_dropdownAdminsRules">
-        <div class="location">at line 289</div>
+        <div class="location">at line 267</div>
         <code>                    array
     <strong>dropdownAdminsRules</strong>()
         </code>
@@ -1593,7 +1535,7 @@ e caratteri accentati (utili per i cognomi), scartando input complessi o pericol
             </div>
                     <div class="method-item">
                     <h3 id="method_adminPermissionsValidationRules">
-        <div class="location">at line 307</div>
+        <div class="location">at line 285</div>
         <code>                    array
     <strong>adminPermissionsValidationRules</strong>()
         </code>
@@ -1627,7 +1569,7 @@ rispondendo con messaggi di errore localizzati.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_getGroups">
-        <div class="location">at line 329</div>
+        <div class="location">at line 307</div>
         <code>                    array
     <strong>getGroups</strong>()
         </code>
@@ -1661,7 +1603,7 @@ ID e nome del gruppo ordinati per data di creazione.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_getGroup">
-        <div class="location">at line 354</div>
+        <div class="location">at line 332</div>
         <code>                    array
     <strong>getGroup</strong>(int $groupId)
         </code>
@@ -1692,7 +1634,7 @@ della colonna 'permission', semplificando i successivi confronti logici.</p></p>
                     <table class="table table-condensed">
         <tr>
             <td>array</td>
-            <td><p>Array monodimensionale di stringhe (es. ['manage_users', 'view_logs'])</p></td>
+            <td><p>Array monodimensionale di stringhe (es. ['brands_show', 'view_logs'])</p></td>
         </tr>
     </table>
 
@@ -1705,7 +1647,7 @@ della colonna 'permission', semplificando i successivi confronti logici.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_getGroupById">
-        <div class="location">at line 380</div>
+        <div class="location">at line 358</div>
         <code>                    object|null
     <strong>getGroupById</strong>(array $posts)
         </code>
@@ -1749,7 +1691,7 @@ restituisce un singolo oggetto corrispondente al record.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_add">
-        <div class="location">at line 410</div>
+        <div class="location">at line 388</div>
         <code>                    array
     <strong>add</strong>(array $posts)
         </code>
@@ -1795,7 +1737,7 @@ In caso di fallimento effettua il rollback automatico e registra tutto nei log d
             </div>
                     <div class="method-item">
                     <h3 id="method_edit">
-        <div class="location">at line 478</div>
+        <div class="location">at line 457</div>
         <code>                    array
     <strong>edit</strong>(array $posts)
         </code>
@@ -1842,7 +1784,7 @@ prevenendo accavallamenti o doppioni.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_del">
-        <div class="location">at line 556</div>
+        <div class="location">at line 536</div>
         <code>                    array
     <strong>del</strong>(array $posts)
         </code>
@@ -1886,7 +1828,7 @@ nell'Audit Log e procede poi all'eliminazione (DELETE) fisica dalla tabella.</p>
             </div>
                     <div class="method-item">
                     <h3 id="method_hasGroupChanged">
-        <div class="location">at line 606</div>
+        <div class="location">at line 587</div>
         <code>            protected        bool
     <strong>hasGroupChanged</strong>(array $posts, object $original)
         </code>
@@ -1936,7 +1878,7 @@ ed esegue un confronto assoluto. Se gli array non combaciano, rileva la modifica
             </div>
                     <div class="method-item">
                     <h3 id="method_getDropdownAdmins">
-        <div class="location">at line 641</div>
+        <div class="location">at line 622</div>
         <code>                    array
     <strong>getDropdownAdmins</strong>(array $posts)
         </code>
@@ -1981,7 +1923,7 @@ Restituisce una lista (UUID e nome completo concatenato) facile da leggere lato 
             </div>
                     <div class="method-item">
                     <h3 id="method_getAdminByUuid">
-        <div class="location">at line 683</div>
+        <div class="location">at line 664</div>
         <code>                    array|null
     <strong>getAdminByUuid</strong>(array $posts)
         </code>
@@ -2025,7 +1967,7 @@ Molto utile per popolare viste o elaborare logiche in contesti legati alla profi
             </div>
                     <div class="method-item">
                     <h3 id="method_getGroupPermissionsArray">
-        <div class="location">at line 713</div>
+        <div class="location">at line 694</div>
         <code>                    array
     <strong>getGroupPermissionsArray</strong>(int $groupId)
         </code>
@@ -2069,7 +2011,7 @@ una lista monodimensionale pulita delle chiavi di permesso attive per l'ID richi
             </div>
                     <div class="method-item">
                     <h3 id="method_getAdminExceptionsArray">
-        <div class="location">at line 729</div>
+        <div class="location">at line 710</div>
         <code>                    array
     <strong>getAdminExceptionsArray</strong>(string $adminUuid)
         </code>
@@ -2113,7 +2055,7 @@ in un array associativo dove la chiave è il permesso e il valore è 1 (concesso
             </div>
                     <div class="method-item">
                     <h3 id="method_saveExceptions">
-        <div class="location">at line 755</div>
+        <div class="location">at line 736</div>
         <code>                    array
     <strong>saveExceptions</strong>(array $posts)
         </code>
@@ -2161,7 +2103,7 @@ e salva le nuove differenze con un rapido Bulk Insert.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_hasAdminsAttached">
-        <div class="location">at line 865</div>
+        <div class="location">at line 847</div>
         <code>                    bool
     <strong>hasAdminsAttached</strong>(int $groupId)
         </code>

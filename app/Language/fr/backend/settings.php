@@ -111,6 +111,7 @@ return [
 		'timezone' => 'Fuseau horaire', 
 		'language' => 'Langue', 
 		'dateFormat' => 'Format de date', 
+		'theme' => 'Thème graphique',
 	], 
 	'placeholders' => [
 		'attemptsLimit' => 'Saisir la limite des tentatives de connexion...',
@@ -157,6 +158,12 @@ return [
 		'german' => 'Allemand', 
 		'chinese' => 'Chinois', 
 	], 
+	'themes' => [
+		'white' => 'Blanc à contraste élevé',
+		'black' => 'Noir à contraste élevé',
+		'grey' => 'Gris',
+		'dark' => 'Sombre',
+	],
 	'dateFormats' => [
 		'extended' => '16 août 2026 15:30:00 (Étendu 24h)', 
 		'compact' => '16/08/2026 15:30 (Compact 24h)', 

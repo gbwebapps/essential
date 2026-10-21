@@ -14,7 +14,7 @@
                 <h5 class="fw-bold mb-2"><?= lang('backend/account.titles.totpSetupTitle'); ?></h5>
                 <p class="app-text-muted small mb-3"><?= lang('backend/account.labels.totpSetupDesc'); ?></p>
 
-                <form id="confirm-totp-form" novalidate>
+                <form id="confirm-totp-form" novalidate data-unsaved-check>
                     <div class="row g-3 align-items-end">
                         
                         <!-- Chiave Segreta: Piena larghezza in portrait, affiancata in landscape -->

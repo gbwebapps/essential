@@ -651,6 +651,7 @@ class AdminsControllerTest extends CIUnitTestCase
                 'updated_at' => '2026-09-25 15:00:00',
                 'suspended_at' => '2026-09-22 15:00:00',
                 'resetted_at' => '2026-09-21 15:00:00',
+                'restored_at' => null,
                 'deleted_at' => null
             ];
 
@@ -751,6 +752,7 @@ class AdminsControllerTest extends CIUnitTestCase
                 'updated_at' => '2026-09-25 15:00:00',
                 'suspended_at' => '2026-09-22 15:00:00',
                 'resetted_at' => '2026-09-21 15:00:00',
+                'restored_at' => null,
                 'deleted_at' => null
             ];
 
@@ -1985,6 +1987,7 @@ class AdminsControllerTest extends CIUnitTestCase
                 'created_at'   => '2026-09-20 10:00:00',
                 'updated_at'   => '2026-09-25 15:00:00',
                 'resetted_at'   => '2026-09-23 15:00:00',
+                'restored_at'   => null,
                 'deleted_at'   => null
             ];
 
@@ -2362,6 +2365,7 @@ class AdminsControllerTest extends CIUnitTestCase
                 'updated_at'   => '2026-09-25 15:00:00',
                 'resetted_at'   => '2026-09-25 15:00:00',
                 'suspended_at'   => '2026-09-25 15:00:00',
+                'restored_at'   => null,
                 'deleted_at'   => null
             ];
 
@@ -3121,7 +3125,8 @@ class AdminsControllerTest extends CIUnitTestCase
                 'updated_at'   => '2026-09-25 15:00:00',
                 'deleted_at'   => null,
                 'resetted_at'  => null,
-                'suspended_at' => null
+                'suspended_at' => null,
+                'restored_at'  => null
             ];
 
         $mockModel->method('getByUUID')
@@ -3894,6 +3899,7 @@ class AdminsControllerTest extends CIUnitTestCase
                 'updated_at'   => '2026-09-25 15:00:00',
                 'resetted_at'   => '2026-09-25 15:00:00',
                 'suspended_at'   => '2026-09-25 15:00:00',
+                'restored_at'   => null,
                 'deleted_at'   => null,
                 'status'       => 1
             ];

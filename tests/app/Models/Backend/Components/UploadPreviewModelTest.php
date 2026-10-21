@@ -60,7 +60,7 @@ class UploadPreviewModelTest extends CIUnitTestCase
             ->assertSame(
                 [
                     'images' => [
-                        'rules' => ['checkImages[size:2048,ext:png|jpg|jpeg|webp]']
+                        'rules' => ['checkImages']
                     ]
                 ],
                 $result

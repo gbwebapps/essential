@@ -1,13 +1,15 @@
 /* Import delle utility risalendo di un livello */
-import { langDefinitions, apiFetch, urlbase, handleValidationImages, showAlert } from '../backend.js';
+import { langDefinitions, apiFetch, urlbase, handleValidationImages, showAlert, setUnsavedExternalState } from '../backend.js';
 
 export class UploadPreviewImgManager {
-    constructor(galleryOneManager = null) {
+    constructor(galleryOneManager = null, config = {}) {
 
         if (UploadPreviewImgManager.instance) {
             return UploadPreviewImgManager.instance;
         }
         UploadPreviewImgManager.instance = this;
+
+        this.saveImagesUrl = config.saveImagesUrl ?? urlbase + 'backend/uploadPreview/saveImages';
 
         /* Salviamo i selettori stringa, NON i nodi del DOM, così rimangono validi per sempre */
         this.inputSelector = '#inputImages';
@@ -24,6 +26,26 @@ export class UploadPreviewImgManager {
         this.isSubmitting = false; 
 
         this.bindEvents();
+    }
+
+    /* Recupera il form responsabile del salvataggio delle immagini */
+    getUnsavedForm() {
+        const standaloneForm = document.querySelector('#saveImages[data-unsaved-check]');
+
+        if (standaloneForm) return standaloneForm;
+
+        const input = document.querySelector(this.inputSelector);
+
+        return input?.closest('form[data-unsaved-check]') || null;
+    }
+
+    /* Sincronizza la coda immagini con il controllo delle modifiche non salvate */
+    syncUnsavedState() {
+        const form = this.getUnsavedForm();
+
+        if (form) {
+            setUnsavedExternalState(form, this.files.length > 0);
+        }
     }
 
     /* Animazione ingresso miniatura */
@@ -105,6 +127,7 @@ export class UploadPreviewImgManager {
 
             const id = removeBtn.dataset.id;
             this.files = this.files.filter(f => f.id !== id);
+            this.syncUnsavedState();
             this.removePreview(id);
         });
 
@@ -167,6 +190,7 @@ export class UploadPreviewImgManager {
         const id = existingId || (Date.now().toString(36) + Math.random().toString(36).slice(2, 7));
         if ( ! existingId) {
             this.files.push({ id, file: fileBlob });
+            this.syncUnsavedState();
         }
 
         const reader = new FileReader();
@@ -219,6 +243,7 @@ export class UploadPreviewImgManager {
     /* Svuota lo stato: richiamato direttamente da AddManager ed EditManager */
     reset() {
         this.files = [];
+        this.syncUnsavedState();
         const previewContainer = document.querySelector(this.previewSelector);
         if (previewContainer) {
             previewContainer.innerHTML = '';
@@ -237,18 +262,12 @@ export class UploadPreviewImgManager {
                 formData.append(`images[${id}]`, file);
             });
                     
-            const response = await apiFetch(urlbase + 'backend/uploadPreview/saveImages', {
+            const response = await apiFetch(this.saveImagesUrl, {
                 method: 'POST',
                 body: formData
             });
 
             const data = await response.json();
-
-            /* Controllo sessione scaduta */
-            if (data.result === 'no_current_user_logged') {
-                window.location.href = urlbase + 'backend/auth/login';
-                return;
-            }
 
             /* Gestione Errori di Validazione */
             if (data.imagesErrors) {

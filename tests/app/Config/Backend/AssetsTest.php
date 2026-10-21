@@ -15,9 +15,23 @@ class AssetsTest extends CIUnitTestCase
         $this->assertSame([
             ['id' => 'bootstrap-css','path' => 'assets/vendor/bootstrap/css/bootstrap.min.css'],
             ['id' => 'fontawesome','path' => 'assets/vendor/fontawesome/css/all.min.css'],
-            ['id' => 'backend-theme','path' => 'assets/css/backend/dark.css'],
+            ['id' => 'backend-theme','path' => 'assets/css/backend/grey.css'],
             ['id' => 'backend-css','path' => 'assets/css/backend/backend.css'],
         ], $result);
+    }
+
+    public function testGetCoreCssUsesSelectedTheme(): void
+    {
+        $result = Assets::getCoreCss('dark');
+
+        $this->assertSame('assets/css/backend/dark.css', $result[2]['path']);
+    }
+
+    public function testGetCoreCssRejectsInvalidTheme(): void
+    {
+        $result = Assets::getCoreCss('../invalid');
+
+        $this->assertSame('assets/css/backend/grey.css', $result[2]['path']);
     }
 
     public function testGetCoreJsReturnsOnlyCoreAssetWhenControllerIsNull(): void
@@ -31,11 +45,11 @@ class AssetsTest extends CIUnitTestCase
 
     public function testGetCoreJsAddsControllerAsset(): void
     {
-        $result = Assets::getCoreJs('users');
+        $result = Assets::getCoreJs('brands');
 
         $this->assertSame([
             ['id' => 'bootstrap-js', 'path' => 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js', 'isModule' => false],
-            ['id' => 'users-js', 'path' => 'assets/js/backend/users.js', 'isModule' => true],
+            ['id' => 'brands-js', 'path' => 'assets/js/backend/brands.js', 'isModule' => true],
         ], $result);
     }
 }

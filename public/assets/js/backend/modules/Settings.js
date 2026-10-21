@@ -1,5 +1,5 @@
 /* Import delle utility risalendo di un livello */
-import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace, handleValidationErrors, initTomSelects, resetTomSelects } from '../backend.js';
+import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace, handleValidationErrors, initTomSelects, resetTomSelects, markUnsavedClean } from '../backend.js';
 
 export class SettingsManager {
 
@@ -163,6 +163,46 @@ export class SettingsManager {
         });
     }
 
+    /* Restituisce il tema attualmente caricato dal foglio di stile principale */
+    getActiveTheme() {
+        const themeStylesheet = document.getElementById('backend-theme');
+        const stylesheetPath = themeStylesheet?.getAttribute('href') || '';
+        const match = stylesheetPath.match(/\/(white|black|grey|dark)\.css(?:\?.*)?$/);
+
+        return match ? match[1] : null;
+    }
+
+    /* Carica il nuovo tema e rimuove il precedente soltanto quando il CSS è disponibile */
+    async applyTheme(theme) {
+        const allowedThemes = ['white', 'black', 'grey', 'dark'];
+        const currentStylesheet = document.getElementById('backend-theme');
+
+        if (!allowedThemes.includes(theme) || !currentStylesheet) {
+            window.location.reload();
+            return;
+        }
+
+        const nextStylesheet = currentStylesheet.cloneNode(false);
+        nextStylesheet.id = 'backend-theme-loading';
+        nextStylesheet.href = `${urlbase}assets/css/backend/${theme}.css`;
+
+        await new Promise(resolve => {
+            nextStylesheet.addEventListener('load', () => {
+                currentStylesheet.remove();
+                nextStylesheet.id = 'backend-theme';
+                resolve();
+            }, { once: true });
+
+            nextStylesheet.addEventListener('error', () => {
+                nextStylesheet.remove();
+                window.location.reload();
+                resolve();
+            }, { once: true });
+
+            currentStylesheet.after(nextStylesheet);
+        });
+    }
+
     /* Carica il contenuto prima dell'apertura dell'accordion */
     async loadPanel(containerId, env) {
         if (this.destroyed || this.pendingPanels.has(containerId)) return false;
@@ -237,6 +277,9 @@ export class SettingsManager {
         const formData = new FormData(form);
         formData.append('env', env);
 
+        const submittedTheme = env === 'general' ? formData.get('theme') : null;
+        const themeChanged = typeof submittedTheme === 'string' && submittedTheme !== this.getActiveTheme();
+
         const container = form.closest('.accordion-body');
         const containerId = container?.id;
         const version = containerId ? this.getPanelVersion(containerId) : null;
@@ -277,6 +320,12 @@ export class SettingsManager {
             }
 
             if (data.result === true) {
+                markUnsavedClean(form);
+
+                if (themeChanged) {
+                    await this.applyTheme(submittedTheme);
+                }
+
                 if (data.output) {
                     this.destroyTomSelects(container);
                     smoothReplace(container, data.output);
@@ -367,6 +416,13 @@ export class SettingsManager {
             ) return;
 
             if (data.result === true) {
+                markUnsavedClean(form);
+
+                if (data.reload === true) {
+                    window.location.reload();
+                    return;
+                }
+
                 if (data.message && typeof showAlert === 'function') {
                     showAlert('success', data.message);
                 }

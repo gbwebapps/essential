@@ -13,7 +13,7 @@
         <?php endif; ?>
     </div>
     
-    <form id="general-settings" autocomplete="off" novalidate>
+    <form id="general-settings" autocomplete="off" novalidate data-unsaved-check>
         <div class="row">
             <div class="col-12">
             
@@ -70,6 +70,23 @@
                             <?php endforeach; ?>
                         </select>
                         <div class="error_dateFormat app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="theme" class="form-label mb-1">
+                            <i class="fa-solid fa-circle-arrow-down"></i>
+                            <?= lang('backend/settings.labels.theme'); ?>
+                        </label>
+                        <select name="theme" id="theme" class="form-select">
+                            <?php foreach ($themes as $code => $label): ?>
+                                <option value="<?= esc($code); ?>" <?= ($code === esc($generalSettings['theme'])) ? 'selected' : ''; ?>>
+                                    <?= esc($label); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div class="error_theme app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                     </div>
                 </div>
 

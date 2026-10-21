@@ -281,7 +281,7 @@ rispettino regole rigorose prima di sovrascrivere le impostazioni.</p></p>      
                                                                                 
                                     </td>
                 <td>$allowedGeneralFields</td>
-                <td class="last"><p>Whitelist dei campi consentiti per le impostazioni Generali (lingua, data, fuso orario).</p></td>
+                <td class="last"><p>Whitelist dei campi consentiti per le impostazioni Generali (lingua, data, fuso orario, tema).</p></td>
                 <td></td>
             </tr>
                     <tr>
@@ -318,16 +318,6 @@ rispettino regole rigorose prima di sovrascrivere le impostazioni.</p></p>      
                                     </td>
                 <td>$settingsCache</td>
                 <td class="last"><p>Cache in memoria. Conserva i dati letti dal database per ogni sezione (namespace).</p></td>
-                <td></td>
-            </tr>
-                    <tr>
-                <td class="type" id="property_requiresReloadFields">
-                                        protected                                        array
-                                                                                
-                                    </td>
-                <td>$requiresReloadFields</td>
-                <td class="last"><p>Elenco di chiavi (impostazioni) critiche che, se modificate, richiedono
-un ricaricamento forzato o particolare attenzione da parte del frontend (es. cambio lingua).</p></td>
                 <td></td>
             </tr>
             </table>
@@ -623,7 +613,7 @@ il metodo di inizializzazione interno per predisporre le risorse di base (come i
             </div>
                     <div class="method-item">
                     <h3 id="method_initModel">
-        <div class="location">at line 118</div>
+        <div class="location">at line 108</div>
         <code>            protected        void
     <strong>initModel</strong>()
         </code>
@@ -1238,7 +1228,7 @@ durante l'esecuzione dei test unitari tramite il pattern Extract Method.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_authSettingsValidateRules">
-        <div class="location">at line 132</div>
+        <div class="location">at line 122</div>
         <code>                    array
     <strong>authSettingsValidateRules</strong>(array $posts = [])
         </code>
@@ -1282,7 +1272,7 @@ dall'amministratore siano numeri, mail valide o booleani sicuri.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_uploadSettingsValidateRules">
-        <div class="location">at line 223</div>
+        <div class="location">at line 213</div>
         <code>                    array
     <strong>uploadSettingsValidateRules</strong>(array $posts = [])
         </code>
@@ -1326,7 +1316,7 @@ consentite siano stringhe alfanumeriche (senza caratteri strani).</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_emailSettingsValidateRules">
-        <div class="location">at line 282</div>
+        <div class="location">at line 272</div>
         <code>                    array
     <strong>emailSettingsValidateRules</strong>(array $posts = [])
         </code>
@@ -1370,7 +1360,7 @@ i parametri di connessione (host, porta, tipo di auth) diventano improvvisamente
             </div>
                     <div class="method-item">
                     <h3 id="method_generalSettingsValidateRules">
-        <div class="location">at line 353</div>
+        <div class="location">at line 343</div>
         <code>                    array
     <strong>generalSettingsValidateRules</strong>(array $posts = [])
         </code>
@@ -1414,7 +1404,7 @@ esattamente a quelle previste dalle liste interne di CodeIgniter o del progetto.
             </div>
                     <div class="method-item">
                     <h3 id="method_getSettings">
-        <div class="location">at line 383</div>
+        <div class="location">at line 377</div>
         <code>                    array
     <strong>getSettings</strong>(string $namespace, array|null $keys = null)
         </code>
@@ -1465,7 +1455,7 @@ con quelli personalizzati trovati nel DB.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_hasDatabaseSettings">
-        <div class="location">at line 434</div>
+        <div class="location">at line 428</div>
         <code>                    bool
     <strong>hasDatabaseSettings</strong>(string $namespace)
         </code>
@@ -1509,7 +1499,7 @@ se si tratta del primo salvataggio in assoluto o di una modifica.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_saveSettings">
-        <div class="location">at line 456</div>
+        <div class="location">at line 450</div>
         <code>                    array|null
     <strong>saveSettings</strong>(string $namespace, array $posts)
         </code>
@@ -1561,7 +1551,7 @@ Alla fine, registra l'operazione nei log di sistema.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_getChangedKeys">
-        <div class="location">at line 530</div>
+        <div class="location">at line 524</div>
         <code>                    array
     <strong>getChangedKeys</strong>(string $namespace, array $posts)
         </code>
@@ -1612,7 +1602,7 @@ di fare il paragone per evitare finti rilevamenti dovuti solo all'ordine disordi
             </div>
                     <div class="method-item">
                     <h3 id="method_deleteSettings">
-        <div class="location">at line 572</div>
+        <div class="location">at line 566</div>
         <code>                    bool|null
     <strong>deleteSettings</strong>(string $namespace)
         </code>
@@ -1657,7 +1647,7 @@ scrive un evento nell'Audit log per mantenere traccia dell'operazione.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_hasSettingsChanged">
-        <div class="location">at line 617</div>
+        <div class="location">at line 611</div>
         <code>                    bool
     <strong>hasSettingsChanged</strong>(string $namespace, array $posts)
         </code>

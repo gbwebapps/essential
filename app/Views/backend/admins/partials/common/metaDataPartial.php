@@ -35,5 +35,14 @@
             </div>
         <?php endif; ?>
 
+        <?php if( ! is_null($admin->restored_at)): ?>
+            <div class="col-12 col-lg-6">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/admins.labels.restoredAt'); ?></li>
+                    <li class="list-group-item fw-bold"><?= convertDate(esc($admin->restored_at), 'conversational'); ?></li>
+                </ul>
+            </div>
+        <?php endif; ?>
+
     </div>
 </div>

@@ -15,14 +15,15 @@ use App\Models\Backend\BackendModel;
 class SettingsModel extends BackendModel
 {
     /**
-     * Whitelist dei campi consentiti per le impostazioni Generali (lingua, data, fuso orario).
+     * Whitelist dei campi consentiti per le impostazioni Generali (lingua, data, fuso orario, tema).
      * 
      * @var array 
      */
     private array $allowedGeneralFields = [
         'timezone',
         'language',
-        'dateFormat'
+        'dateFormat',
+        'theme'
     ];
 
     /**
@@ -98,17 +99,6 @@ class SettingsModel extends BackendModel
      * @var array 
      */
     protected array $settingsCache = [];
-
-    /**
-     * Elenco di chiavi (impostazioni) critiche che, se modificate, richiedono 
-     * un ricaricamento forzato o particolare attenzione da parte del frontend (es. cambio lingua).
-     * 
-     * @var array 
-     */
-    protected array $requiresReloadFields = [
-        'language',
-        'timezone'
-    ];
 
     /**
      * Metodo di inizializzazione nativo di CodeIgniter.
@@ -364,6 +354,10 @@ class SettingsModel extends BackendModel
             'dateFormat' => [
                 'label' => lang('backend/settings.labels.dateFormat'),
                 'rules' => ['required', 'in_list[d MMMM yyyy HH:mm:ss,dd/MM/yyyy HH:mm,MMMM d yyyy h:mm:ss a,MM/dd/yyyy h:mm a,yyyy-MM-dd HH:mm:ss]'],
+            ],
+            'theme' => [
+                'label' => lang('backend/settings.labels.theme'),
+                'rules' => ['required', 'in_list[white,black,grey,dark]'],
             ],
         ];
     }

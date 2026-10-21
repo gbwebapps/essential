@@ -18,7 +18,7 @@ class ImageFileSystemService
      * univoco (UUID), per poi invocare una procedura ricorsiva che distrugge permanentemente tutti i file 
      * e le sottocartelle (es. formati large, medium, small) in essa contenuti, operando una pulizia totale.
      *
-     * @param string $entity Il nome dell'entità o del modulo di riferimento (es. 'gallery', 'users')
+     * @param string $entity Il nome dell'entità o del modulo di riferimento (es. 'gallery', 'brands')
      * @param string $uuid L'identificatore univoco del record a cui appartiene la cartella da eliminare
 	 * @return bool
 	 */

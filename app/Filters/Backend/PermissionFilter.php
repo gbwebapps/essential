@@ -25,7 +25,7 @@ class PermissionFilter implements FilterInterface
      * standard verso la dashboard.
      *
      * @param RequestInterface $request L'oggetto rappresentante la richiesta HTTP in ingresso
-     * @param array|null $arguments Array configurato nelle rotte contenente il permesso richiesto (es. ['manage_users'])
+     * @param array|null $arguments Array configurato nelle rotte contenente i permessi richiesti (es. ['brands_show'])
      * @return \CodeIgniter\HTTP\RedirectResponse|\CodeIgniter\HTTP\ResponseInterface|null Restituisce null se l'accesso è autorizzato, oppure una risposta (JSON o Redirect) per negare l'accesso
      */
     public function before(RequestInterface $request, $arguments = null)
@@ -46,22 +46,21 @@ class PermissionFilter implements FilterInterface
             return null;
         endif;
 
-        /* Controllo del permesso richiesto dalla rotta */
+        /* Controllo dei permessi richiesti dalla rotta: almeno uno deve essere disponibile */
         if ( ! empty($arguments)):
-            $requiredPermission = $arguments[0];
-
-            /* Verifichiamo se la proprietà associata al permesso esiste nell'oggetto permissions dell'admin */
-            if (
-                isset($currentAdmin->permissions)
-                &&
-                is_object($currentAdmin->permissions)
-                &&
-                property_exists($currentAdmin->permissions, $requiredPermission)
-                &&
-                $currentAdmin->permissions->{$requiredPermission} === true
-            ):
-                return null;
-            endif;
+            foreach ($arguments as $requiredPermission):
+                if (
+                    isset($currentAdmin->permissions)
+                    &&
+                    is_object($currentAdmin->permissions)
+                    &&
+                    property_exists($currentAdmin->permissions, $requiredPermission)
+                    &&
+                    $currentAdmin->permissions->{$requiredPermission} === true
+                ):
+                    return null;
+                endif;
+            endforeach;
         endif;
 
         /* --- SE IL PERMESSO MANCA: ABORTO DELLA RICHIESTA --- */

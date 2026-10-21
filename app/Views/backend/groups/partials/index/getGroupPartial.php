@@ -1,5 +1,5 @@
 <div class="card-body p-0">
-    <form class="edit-group-form" data-id="<?= esc($group->id, 'attr'); ?>">
+    <form class="edit-group-form" data-id="<?= esc($group->id, 'attr'); ?>" data-unsaved-check>
 
         <input type="hidden" name="id" value="<?= esc($group->id, 'attr'); ?>">
 

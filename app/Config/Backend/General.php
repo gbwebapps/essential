@@ -29,4 +29,11 @@ class General extends BaseConfig
      * @var string 
      */
     public string $dateFormat = 'd MMMM yyyy HH:mm:ss';
+
+    /**
+     * Tema grafico predefinito utilizzato nel backend
+     *
+     * @var string
+     */
+    public string $theme = 'grey';
 }

@@ -11,8 +11,8 @@ class AdminsRulesTest extends CIUnitTestCase
         $rules = new AdminsRules();
 
         $this->assertTrue($rules->permissionArray([]));
-        $this->assertTrue($rules->permissionArray(['users_index']));
-        $this->assertFalse($rules->permissionArray('users_index'));
+        $this->assertTrue($rules->permissionArray(['brands_show']));
+        $this->assertFalse($rules->permissionArray('brands_show'));
         $this->assertFalse($rules->permissionArray(null));
     }
 

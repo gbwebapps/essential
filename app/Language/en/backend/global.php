@@ -13,8 +13,9 @@ return [
         ],
         'bottomLeft' => [
             'dashboard' => 'Dashboards',
-            'users' => 'Users',
-            'messages' => 'Messages',
+            'brands' => 'Brands',
+            'categories' => 'Categories',
+            'products' => 'Products',
         ],
         'bottomRight' => [
             'settings' => 'Settings',
@@ -34,6 +35,8 @@ return [
         'modules' => 'Modules',
         'services' => 'Services',
         'backToTop' => 'Back to Top', 
+        'expandScreen' => 'Enter Full Screen',
+        'reduceScreen' => 'Exit Full Screen',
         'options' => 'Options', 
         'undo' => 'Undo', 
         'export' => 'Export', 
@@ -49,6 +52,7 @@ return [
         'err500' => 'A critical error occurred while processing the request.',
         'err504' => 'The server took too long to respond. Operation cancelled.',
         'errNetwork' => 'Network connection unavailable. Check your internet connection status.',
+        'fullscreenError' => 'Unable to change fullscreen mode.',
     ], 
     'modals' => [
         'exportPdfTitle' => 'PDF Export Settings', 
@@ -80,6 +84,7 @@ return [
         'getDataError' => 'Error during list retrieval operation.',
         'getUUIDError' => 'Error during detail retrieval operation.', 
         'UUIDNotFound' => 'Record not found.', 
-        'permissionDenied' => 'Access denied.'
+        'permissionDenied' => 'Access denied.',
+        'unsavedChanges' => 'There are unsaved changes. Do you want to leave without saving?'
     ]
 ];

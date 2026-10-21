@@ -1,7 +1,7 @@
 <div class="card-body">
 	<div class="row">
 		<div class="col-12">
-			<form id="getResetPassword" class="w-100" data-message="<?= esc(lang('backend/account.messages.areYouSureStartingReset'), 'attr'); ?>">
+			<form id="getResetPassword" class="w-100" data-message="<?= esc(lang('backend/account.messages.areYouSureStartingReset'), 'attr'); ?>" data-unsaved-check>
 				<div class="row justify-content-start">
 					<div class="col-12 col-lg-4">
 						<label for="currentPassword" class="form-label"><?= lang('backend/account.labels.currentPassword'); ?></label>

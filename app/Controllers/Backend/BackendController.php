@@ -181,7 +181,7 @@ abstract class BackendController extends BaseController
         /* Procede con la normale compilazione degli asset fissi e il ritorno della vista */
         $finalData = array_merge($this->data, $data);
         
-        $coreCss = \Config\Backend\Assets::getCoreCss();
+        $coreCss = \Config\Backend\Assets::getCoreCss(setting('Backend\General', 'theme'));
         
         /* Passiamo il nome del controller per includere il JS specifico */
         $currentController = $this->data['controller'] ?? null;

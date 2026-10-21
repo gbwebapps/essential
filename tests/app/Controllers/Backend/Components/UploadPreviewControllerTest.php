@@ -199,7 +199,7 @@ class UploadPreviewControllerTest extends CIUnitTestCase
             'getPost'
         )
         ->willReturn(
-            ['uuid' => 'invalid', 'entity' => 'users', 'context' => 'profile']
+            ['uuid' => 'invalid', 'entity' => 'brands', 'context' => 'profile']
         );
 
         $uploadPreviewModel = 

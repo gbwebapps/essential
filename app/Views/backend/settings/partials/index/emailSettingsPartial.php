@@ -13,7 +13,7 @@
         <?php endif; ?>
     </div>
     
-    <form id="email-settings" autocomplete="off" novalidate>
+    <form id="email-settings" autocomplete="off" novalidate data-unsaved-check>
         <div class="row">
             <div class="col-12">
                 

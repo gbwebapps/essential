@@ -12,7 +12,7 @@
 
     <?php /* Ciclo per l'inclusione dei file CSS specifici della pagina */ ?>
     <?php if(isset($assets['css'])): foreach($assets['css'] as $css): ?>
-        <link rel="stylesheet" href="<?= base_url($css['path']); ?>">
+        <link id="<?= esc($css['id']); ?>" rel="stylesheet" href="<?= base_url($css['path']); ?>">
     <?php endforeach; endif; ?>
 </head>
 
