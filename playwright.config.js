@@ -13,7 +13,7 @@ module.exports = defineConfig({
     reporter: 'list',
 
     use: {
-        baseURL: 'https://essential.test',
+        baseURL: 'https://gbwebapps.test/essential/',
         trace: 'retain-on-failure',
         screenshot: 'only-on-failure'
     },

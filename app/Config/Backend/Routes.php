@@ -124,6 +124,9 @@ $routes->group('backend', function($routes) {
             $routes->post('executeImport', '\App\Controllers\Backend\Components\ImportController::executeImport');
             $routes->post('deleteFile', '\App\Controllers\Backend\Components\ImportController::deleteFile');
         });
+
+        /* WAREHOUSE */
+        require ROOTPATH . 'Modules/Backend/Warehouse/Config/Routes.php';
         
         /* SETTINGS */
         $routes->group('settings', function($routes) {

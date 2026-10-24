@@ -23,7 +23,8 @@ return [
         'resetFilters' => '清除搜索',
         'resetSorting' => '重置排序',
         'reloadList' => '重新加载列表',
-        'activeRecords' => '有效',
+        'activeRecords' => '已启用',
+        'suspendedRecords' => '已停用',
         'trashedRecords' => '已删除',
         'allRecords' => '全部',
     ],
@@ -89,6 +90,7 @@ return [
         'changeStatusBrand' => '更新品牌 %s 的状态',
     ],
     'messages' => [
+        'suspendAssociated' => '该品牌已关联产品，无法停用。',
         'areYouSureResetData' => '确定要重置数据吗？',
         'areYouSureRefreshData' => '确定要重新加载数据吗？',
         'areYouSureChangeStatus' => '确定要更改 <b>%s</b> 的状态吗？',

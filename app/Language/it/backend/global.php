@@ -12,7 +12,7 @@ return [
             'logout' => 'Esci'
         ],
         'bottomLeft' => [
-            'dashboard' => 'Pannelli',
+            'dashboard' => 'Dashboard',
             'brands' => 'Marche',
             'categories' => 'Categorie',
             'products' => 'Prodotti',
@@ -20,7 +20,13 @@ return [
         'bottomRight' => [
             'settings' => 'Impostazioni',
             'tools' => 'Strumenti', 
+            'warehouse' => 'Magazzino',
         ],
+    ],
+    'menuCounts' => [
+        'active' => 'Attivi',
+        'trashed' => 'Eliminati',
+        'suspended' => 'Sospesi',
     ],
     'links' => [
         'selectAll' => 'Seleziona tutti'

@@ -3,10 +3,17 @@
 namespace Modules\Backend\Products\Libraries;
 
 /**
- * Prepara barre dei collegamenti e asset specifici del modulo Products.
+ * Prepara le barre dei collegamenti e gli asset specifici del modulo Products.
  */
 class ProductsClass
 {
+    /* LINKS BAR ----------------------------------------------------------------------------------- */
+
+    /**
+     * Restituisce i collegamenti disponibili nella lista dei prodotti.
+     *
+     * @return array<int, array<string, string>>
+     */
     public function getLinksBarShowAll(): array
     {
         return [
@@ -14,6 +21,11 @@ class ProductsClass
         ];
     }
 
+    /**
+     * Restituisce i collegamenti disponibili durante l'inserimento.
+     *
+     * @return array<int, array<string, string>>
+     */
     public function getLinksBarAdd(): array
     {
         return [
@@ -21,6 +33,12 @@ class ProductsClass
         ];
     }
 
+    /**
+     * Restituisce i collegamenti disponibili durante la modifica.
+     *
+     * @param string|null $uuid Identificativo del prodotto corrente
+     * @return array<int, array<string, string>>
+     */
     public function getLinksBarEdit(?string $uuid = null): array
     {
         if ( ! $uuid):
@@ -34,6 +52,12 @@ class ProductsClass
         ];
     }
 
+    /**
+     * Restituisce i collegamenti disponibili nella scheda di dettaglio.
+     *
+     * @param string|null $uuid Identificativo del prodotto corrente
+     * @return array<int, array<string, string>>
+     */
     public function getLinksBarShow(?string $uuid = null): array
     {
         if ( ! $uuid):
@@ -47,6 +71,13 @@ class ProductsClass
         ];
     }
 
+    /* JAVASCRIPT ---------------------------------------------------------------------------------- */
+
+    /**
+     * Restituisce gli script richiesti dalla lista dei prodotti.
+     *
+     * @return array<int, array<string, string>>
+     */
     public function getJsShowAll(): array
     {
         $lang = setting('Backend\General')->language;
@@ -58,6 +89,11 @@ class ProductsClass
         ];
     }
 
+    /**
+     * Restituisce gli script richiesti dal form di inserimento.
+     *
+     * @return array<int, array<string, string>>
+     */
     public function getJsAdd(): array
     {
         return [
@@ -65,11 +101,21 @@ class ProductsClass
         ];
     }
 
+    /**
+     * Restituisce gli script richiesti dal form di modifica.
+     *
+     * @return array<int, array<string, string>>
+     */
     public function getJsEdit(): array
     {
         return $this->getJsAdd();
     }
 
+    /**
+     * Restituisce gli script richiesti dalla scheda di dettaglio.
+     *
+     * @return array<int, array<string, string>>
+     */
     public function getJsShow(): array
     {
         return [
@@ -77,6 +123,13 @@ class ProductsClass
         ];
     }
 
+    /* CSS ----------------------------------------------------------------------------------------- */
+
+    /**
+     * Restituisce i fogli di stile richiesti dalla lista dei prodotti.
+     *
+     * @return array<int, array<string, string>>
+     */
     public function getCssShowAll(): array
     {
         return [
@@ -84,6 +137,11 @@ class ProductsClass
         ];
     }
 
+    /**
+     * Restituisce i fogli di stile richiesti dal form di inserimento.
+     *
+     * @return array<int, array<string, string>>
+     */
     public function getCssAdd(): array
     {
         return [
@@ -91,8 +149,21 @@ class ProductsClass
         ];
     }
 
+    /**
+     * Restituisce i fogli di stile richiesti dal form di modifica.
+     *
+     * @return array<int, array<string, string>>
+     */
     public function getCssEdit(): array
     {
         return $this->getCssAdd();
     }
+
+    /* OPTIONS ------------------------------------------------------------------------------------- */
+
+    /* Inserire qui eventuali configurazioni di opzioni specifiche del modulo Products. */
+
+    /* COMPONENTI FUTURI --------------------------------------------------------------------------- */
+
+    /* Inserire qui configurazioni di componenti specifici del modulo Products. */
 }

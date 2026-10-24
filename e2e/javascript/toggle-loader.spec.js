@@ -1,10 +1,11 @@
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
 test('toggleLoader ripristina correttamente lo stato dei controlli', async ({ page }) => {
-    await page.goto('/backend/auth/login');
+    await page.goto(appUrl('/backend/auth/login'));
 
     await page.evaluate(async () => {
-        const { toggleLoader } = await import('/assets/js/backend/backend.js');
+        const { toggleLoader } = await import(new URL('assets/js/backend/backend.js', document.getElementById('hidden-urlbase').dataset.urlbase).href);
 
         document.getElementById('show-loader')?.remove();
 
@@ -27,7 +28,7 @@ test('toggleLoader ripristina correttamente lo stato dei controlli', async ({ pa
     await expect(page.locator('#e2e-excluded')).toBeEnabled();
 
     await page.evaluate(async () => {
-        const { toggleLoader } = await import('/assets/js/backend/backend.js');
+        const { toggleLoader } = await import(new URL('assets/js/backend/backend.js', document.getElementById('hidden-urlbase').dataset.urlbase).href);
 
         toggleLoader(false);
     });

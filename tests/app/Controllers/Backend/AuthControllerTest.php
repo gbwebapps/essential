@@ -1775,7 +1775,7 @@ class AuthControllerTest extends CIUnitTestCase
     {
         /* Mock delle dipendenze native di CodeIgniter */
         $request = 
-            $this->createMock(\CodeIgniter\HTTP\RequestInterface::class);
+            $this->createMock(\CodeIgniter\HTTP\IncomingRequest::class);
 
         $response = 
             $this->createMock(\CodeIgniter\HTTP\ResponseInterface::class);

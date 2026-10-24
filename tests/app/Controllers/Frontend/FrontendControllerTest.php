@@ -18,7 +18,7 @@ class FrontendControllerTest extends CIUnitTestCase
 
         $reqClass
             =
-            \CodeIgniter\HTTP\RequestInterface::class;
+            \CodeIgniter\HTTP\IncomingRequest::class;
 
         $req
             =

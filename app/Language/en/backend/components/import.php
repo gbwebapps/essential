@@ -24,6 +24,7 @@ return [
         'import' => 'Import CSV',
 	], 
     'buttons' => [
+        'cancel' => 'Cancel',
     	'close' => 'Close', 
     	'import' => 'Import', 
         'remove' => 'Remove', 

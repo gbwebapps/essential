@@ -209,7 +209,11 @@ class ImportController extends BackendController
                     $errorOutput = view('backend/components/import/errorsModalPartial', [
                         'validationErrors' => $previewData['validationErrors']
                     ]);
-                    return $this->jsonResponse(['result' => false, 'errorOutput' => $errorOutput]);
+                    return $this->jsonResponse([
+                        'result' => false,
+                        'message' => sprintf(lang('backend/components/import.messages.validationErrors'), count($previewData['validationErrors'])),
+                        'errorOutput' => $errorOutput,
+                    ]);
                 endif;
 
                 return $this->jsonResponse(['result' => false, 'message' => $previewData['message']]);

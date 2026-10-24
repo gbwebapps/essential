@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
 test('La pagina di autenticazione non genera errori JavaScript', async ({ page }) => {
     const errors = [];
@@ -7,7 +8,7 @@ test('La pagina di autenticazione non genera errori JavaScript', async ({ page }
         errors.push(error.message);
     });
 
-    await page.goto('/backend/auth');
+    await page.goto(appUrl('/backend/auth'));
 
     await expect(page.locator('body')).toBeVisible();
 

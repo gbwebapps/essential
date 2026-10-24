@@ -1,13 +1,14 @@
 
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
 test.use({
     storageState: 'e2e/.auth/admin.json'
 });
 
-const pageUrl = '/backend/admins/showAll';
-const modulePath = '/assets/js/backend/modules/Crud.js';
-const statusUrl = '/backend/admins/changeStatus';
+const pageUrl = appUrl('/backend/admins/showAll');
+const modulePath = appUrl('/assets/js/backend/modules/Crud.js');
+const statusUrl = appUrl('/backend/admins/changeStatus');
 
 async function openPage(page) {
     await page.goto(pageUrl);
@@ -33,7 +34,7 @@ async function openPage(page) {
 
 function isStatusRequest(request) {
     return request.method() === 'POST' &&
-        new URL(request.url()).pathname === statusUrl;
+        new URL(request.url()).pathname === new URL(appUrl(statusUrl)).pathname;
 }
 
 async function runStatusChange(page) {

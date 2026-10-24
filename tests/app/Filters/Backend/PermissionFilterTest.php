@@ -165,7 +165,7 @@ class PermissionFilterTest extends CIUnitTestCase
         $this->assertSame(base_url('backend/dashboard'), $result->getHeaderLine('Location'));
         $this->assertSame(lang('backend/global.messages.permissionDenied'), session()->getFlashdata('message'));
         $this->assertSame('app-alert-danger fw-bold', session()->getFlashdata('class'));
-        $this->assertSame('<i class="fa-solid fa-ban"></i>', session()->getFlashdata('icon'));
+        $this->assertSame('<i class="fa-solid fa-triangle-exclamation"></i>', session()->getFlashdata('icon'));
     }
 
     public function testBeforeDeniesAccessWhenArgumentsAreEmpty(): void
@@ -187,7 +187,7 @@ class PermissionFilterTest extends CIUnitTestCase
         $this->assertSame(base_url('backend/dashboard'), $result->getHeaderLine('Location'));
         $this->assertSame(lang('backend/global.messages.permissionDenied'), session()->getFlashdata('message'));
         $this->assertSame('app-alert-danger fw-bold', session()->getFlashdata('class'));
-        $this->assertSame('<i class="fa-solid fa-ban"></i>', session()->getFlashdata('icon'));
+        $this->assertSame('<i class="fa-solid fa-triangle-exclamation"></i>', session()->getFlashdata('icon'));
     }
 
     public function testAfterReturnsNull(): void

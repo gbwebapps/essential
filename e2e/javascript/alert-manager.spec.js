@@ -1,7 +1,8 @@
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
-const pageUrl = '/backend/auth/login';
-const modulePath = '/assets/js/backend/backend.js';
+const pageUrl = appUrl('/backend/auth/login');
+const modulePath = appUrl('/assets/js/backend/backend.js');
 
 test.beforeEach(async ({ page }) => {
     await page.goto(pageUrl);

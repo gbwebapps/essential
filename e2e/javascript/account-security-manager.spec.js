@@ -1,12 +1,13 @@
 
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
 test.use({
     storageState: 'e2e/.auth/admin.json'
 });
 
-const pageUrl = '/backend/account/edit';
-const modulePath = '/assets/js/backend/modules/Account.js';
+const pageUrl = appUrl('/backend/account/edit');
+const modulePath = appUrl('/assets/js/backend/modules/Account.js');
 
 test('SecurityManager aggiorna il metodo 2FA solo dopo il successo del server', async ({ page }) => {
     await page.goto(pageUrl);
@@ -99,14 +100,14 @@ test('SecurityManager aggiorna il metodo 2FA solo dopo il successo del server', 
         const emailSelected = document.getElementById('method-email').checked;
         const emailBorder = document.getElementById('method-email')
             .closest('.card')
-            .classList.contains('border-primary');
+            .classList.contains('app-border-accent');
 
         const secondResult = await manager.saveBasicMethod('none');
 
         const noneSelected = document.getElementById('method-none').checked;
         const noneBorder = document.getElementById('method-none')
             .closest('.card')
-            .classList.contains('border-primary');
+            .classList.contains('app-border-accent');
 
         return {
             initialMethod,
@@ -406,7 +407,7 @@ test('SecurityManager preserva il metodo attivo dopo errori di salvataggio', asy
         fixture.id = 'e2eSecurityFixture';
 
         fixture.innerHTML = `
-            <div class="card border-primary bg-light">
+            <div class="card app-border-accent app-bg-surface">
                 <input
                     type="radio"
                     id="method-none"
@@ -539,7 +540,7 @@ test('SecurityManager inizializza il setup TOTP e blocca gli altri metodi', asyn
         fixture.id = 'e2eSecurityFixture';
 
         fixture.innerHTML = `
-            <div class="card border-primary bg-light">
+            <div class="card app-border-accent app-bg-surface">
                 <input
                     type="radio"
                     id="method-none"
@@ -702,7 +703,7 @@ test('SecurityManager ripristina i metodi dopo annullamento ed errore TOTP', asy
                 data-required-message="Inserisci la password corrente."
             >
 
-            <div class="card border-primary bg-light">
+            <div class="card app-border-accent app-bg-surface">
                 <input
                     type="radio"
                     id="method-none"
@@ -915,7 +916,7 @@ test('SecurityManager conferma il TOTP solo dopo una verifica riuscita', async (
         fixture.id = 'e2eSecurityFixture';
 
         fixture.innerHTML = `
-            <div class="card border-primary bg-light">
+            <div class="card app-border-accent app-bg-surface">
                 <input
                     type="radio"
                     id="method-none"
@@ -1109,7 +1110,7 @@ test('SecurityManager gestisce hook asincroni ed eccezioni senza perdere lo stat
         fixture.id = 'e2eSecurityFixture';
 
         fixture.innerHTML = `
-            <div class="card border-primary bg-light">
+            <div class="card app-border-accent app-bg-surface">
                 <input
                     type="radio"
                     id="method-none"
@@ -1304,7 +1305,7 @@ test('SecurityManager gestisce destroy e reinizializzazione del setup TOTP', asy
                 data-required-message="Inserisci la password corrente."
             >
 
-            <div class="card border-primary bg-light">
+            <div class="card app-border-accent app-bg-surface">
                 <input
                     type="radio"
                     id="method-none"

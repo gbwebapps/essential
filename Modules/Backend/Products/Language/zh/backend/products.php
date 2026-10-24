@@ -1,5 +1,8 @@
 <?php declare(strict_types = 1);
 
+/**
+ * Traduzioni cinesi del modulo Products.
+ */
 return [
     'titles' => [
         'index' => '产品数据',
@@ -23,16 +26,19 @@ return [
         'resetFilters' => '清除搜索',
         'resetSorting' => '重置排序',
         'reloadList' => '重新加载列表',
-        'activeRecords' => '有效',
+        'activeRecords' => '已启用',
+        'suspendedRecords' => '已停用',
         'trashedRecords' => '已删除',
         'allRecords' => '全部',
     ],
     'labels' => [
+        'suspendedRelation' => '已停用',
         'uuid' => 'UUID',
         'product' => '产品',
         'sku' => 'SKU',
         'quantity' => '数量',
         'price' => '价格',
+        'totalValue' => '总价值',
         'brands' => '品牌',
         'categories' => '类别',
         'quantityFrom' => '最小数量',
@@ -89,7 +95,7 @@ return [
         'refreshData' => '重新加载数据',
         'reload' => '重新加载面板',
         'print' => '打印',
-        'exportPdf' => '导出 PDF'
+        'exportPdf' => '导出 PDF',
     ],
     'errors' => [
         'uuid' => 'UUID 无效。',
@@ -132,6 +138,7 @@ return [
         'changeStatusSuccess' => '产品 %s 的状态更新成功。',
         'changeStatusError' => '产品状态更新失败。',
         'cannotModifyDeleted' => '无法修改已删除的产品。',
+        'importExistingOnly' => '本地导入只能更新现有产品。',
         'relationsRequired' => '必须至少选择一个品牌和一个类别。',
         'invalidBrands' => '一个或多个所选品牌无效。',
         'invalidCategories' => '一个或多个所选类别无效。',

@@ -61,6 +61,14 @@ class DashboardController extends BackendController
         $this->data['title'] = lang('backend/dashboard.titles.index');
         $this->data['icon'] = '<i class="fa-solid fa-gauge"></i>';
 
+        $overview = $this->dashboardModel->getOverview($this->currentAdmin ?? null);
+        $this->data['menuCounts'] = $overview['counts'];
+        $this->data['dashboardCards'] = $this->dashboardClass->getCards($overview['counts'], $this->currentAdmin ?? null);
+        $this->data['dashboardRankings'] = $this->dashboardClass->getRankings($overview['rankings']);
+        $this->data['dashboardTotals'] = $overview['totals'];
+        $this->data['dashboardPresenter'] = $this->dashboardClass;
+        $this->data['dashboardTheme'] = setting('Backend\General', 'theme');
+
         return $this->render('backend/dashboard/indexView', $this->data);
     }
 }

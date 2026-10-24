@@ -127,6 +127,8 @@ class AccountController extends BackendController
     {
         $this->data['action'] = 'general';
 
+        $this->data['groupName'] = $this->accountModel->getGroupName((int) $this->currentAdmin->group_id);
+
         return $this->render('backend/account/generalView', $this->data);
     }
 
@@ -207,6 +209,7 @@ class AccountController extends BackendController
             $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
             $this->data['group_perms'] = $this->accountModel->getGroupPermissions((int) $this->currentAdmin->group_id);
             $this->data['admin_exceptions'] = $this->accountModel->getAdminExceptions($this->currentAdmin->uuid);
+            $this->data['groupName'] = $this->accountModel->getGroupName((int) $this->currentAdmin->group_id);
 
             return $this->jsonResponse([
                 'result' => true,
@@ -220,6 +223,7 @@ class AccountController extends BackendController
         $this->data['permissions'] = config(\Config\Backend\Permissions::class)->getPermissions();
         $this->data['group_perms'] = $this->accountModel->getGroupPermissions((int) $this->currentAdmin->group_id);
         $this->data['admin_exceptions'] = $this->accountModel->getAdminExceptions($this->currentAdmin->uuid);
+        $this->data['groupName'] = $this->accountModel->getGroupName((int) $this->currentAdmin->group_id);
 
         return $this->render('backend/account/permissionsView', $this->data);
     }

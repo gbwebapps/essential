@@ -24,6 +24,7 @@ return [
         'resetSorting' => 'Sortierung zurücksetzen',
         'reloadList' => 'Liste neu laden',
         'activeRecords' => 'Aktiv',
+        'suspendedRecords' => 'Gesperrt',
         'trashedRecords' => 'Gelöscht',
         'allRecords' => 'Alle',
     ],
@@ -89,6 +90,7 @@ return [
         'changeStatusBrand' => 'Status der Marke %s aktualisiert',
     ],
     'messages' => [
+        'suspendAssociated' => 'Die Marke kann nicht gesperrt werden, da ihr Produkte zugeordnet sind.',
         'areYouSureResetData' => 'Möchten Sie die Daten wirklich zurücksetzen?',
         'areYouSureRefreshData' => 'Möchten Sie die Daten wirklich neu laden?',
         'areYouSureChangeStatus' => 'Möchten Sie den Status von <b>%s</b> wirklich ändern?',

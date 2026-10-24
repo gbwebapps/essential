@@ -1,12 +1,13 @@
 
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
 test.use({
     storageState: 'e2e/.auth/admin.json'
 });
 
-const pageUrl = '/backend/groups';
-const modulePath = '/assets/js/backend/modules/Groups.js';
+const pageUrl = appUrl('/backend/groups');
+const modulePath = appUrl('/assets/js/backend/modules/Groups.js');
 
 test('GroupsManager carica le viste prima di aprire gli accordion e le svuota alla chiusura', async ({ page }) => {
     await page.goto(pageUrl);

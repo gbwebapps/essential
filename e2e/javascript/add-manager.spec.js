@@ -1,12 +1,13 @@
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
 test.use({
     storageState: 'e2e/.auth/admin.json'
 });
 
-const pageUrl = '/backend/admins/add';
+const pageUrl = appUrl('/backend/admins/add');
 const ajaxPath = '/backend/admins/add';
-const modulePath = '/assets/js/backend/modules/Crud.js';
+const modulePath = appUrl('/assets/js/backend/modules/Crud.js');
 
 async function openAddPage(page) {
     await page.goto(pageUrl);
@@ -27,7 +28,7 @@ async function openAddPage(page) {
 
 function isAddRequest(request) {
     return request.method() === 'POST' &&
-        new URL(request.url()).pathname === ajaxPath;
+        new URL(request.url()).pathname === new URL(appUrl(ajaxPath)).pathname;
 }
 
 function mockResponse(result, extra = {}) {

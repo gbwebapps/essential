@@ -180,6 +180,10 @@ abstract class BackendController extends BaseController
 
         /* Procede con la normale compilazione degli asset fissi e il ritorno della vista */
         $finalData = array_merge($this->data, $data);
+
+        if ( ! isset($finalData['menuCounts'])):
+            $finalData['menuCounts'] = model(\App\Models\Backend\MenuCountsModel::class)->getCounts($finalData['currentAdmin'] ?? null);
+        endif;
         
         $coreCss = \Config\Backend\Assets::getCoreCss(setting('Backend\General', 'theme'));
         

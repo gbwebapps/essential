@@ -134,6 +134,15 @@ l'assegnazione ai gruppi, l'override dei permessi (eccezioni), i blocchi di sicu
                 <td></td>
             </tr>
                     <tr>
+                <td class="type" id="property_hasStatusFilter">
+                                        protected                                        bool
+                                                                                
+                                    </td>
+                <td>$hasStatusFilter</td>
+                <td class="last"></td>
+                <td></td>
+            </tr>
+                    <tr>
                 <td class="type" id="property_getDataQuery">
                                         protected                                        string
                                                                                 
@@ -320,6 +329,17 @@ e alla ricerca testuale o temporale, validando rigorosamente l'input dell'operat
             </div>
                     <div class="row">
                 <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_supportsStatusFilter">supportsStatusFilter</a>()
+        
+                                            <p><p>Espone la capacità anche ai componenti che devono rispettare i filtri della lista.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_supportsStatusFilter">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
                     array
                 </div>
                 <div class="col-md-8">
@@ -449,6 +469,16 @@ e alla ricerca testuale o temporale, validando rigorosamente l'input dell'operat
                                             <p><p>Restituisce l'istanza del servizio di upload.</p></p>                </div>
                 <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_getUploadService">
 <abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getTrashCounts">getTrashCounts</a>()
+        
+                                            <p><p>Conta attivi, sospesi, eliminati e totale, senza ricerca o paginazione.</p></p>                </div>
+                <div class="col-md-2"></div>
             </div>
                     <div class="row">
                 <div class="col-md-2 type">
@@ -884,7 +914,7 @@ il metodo di inizializzazione interno per predisporre le risorse di base (come i
             </div>
                     <div class="method-item">
                     <h3 id="method_initModel">
-        <div class="location">at line 182</div>
+        <div class="location">at line 184</div>
         <code>            protected        void
     <strong>initModel</strong>()
         </code>
@@ -917,9 +947,43 @@ le connessioni al DB e gli helper condivisi.</p></p>
 
             </div>
                     <div class="method-item">
+                    <h3 id="method_supportsStatusFilter">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_supportsStatusFilter">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 38</div>
+        <code>                    bool
+    <strong>supportsStatusFilter</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Espone la capacità anche ai componenti che devono rispettare i filtri della lista.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
                     <h3 id="method_getData">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_getData">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 159</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 168</div>
         <code>                    array
     <strong>getData</strong>(array $posts)
         </code>
@@ -967,7 +1031,7 @@ i filtri esatti per garantire la perfetta coerenza totale/risultati.</p></p>
                     <div class="method-item">
                     <h3 id="method_getNumRows">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_getNumRows">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 228</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 238</div>
         <code>            protected        int
     <strong>getNumRows</strong>(array $paramsFilter)
         </code>
@@ -1013,7 +1077,7 @@ di conoscere l'esatto volume di dati indipendentemente dai limiti della singola 
                     <div class="method-item">
                     <h3 id="method_buildFilters">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_buildFilters">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 259</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 269</div>
         <code>            protected        string
     <strong>buildFilters</strong>(array $searchFields, array $params)
         </code>
@@ -1064,7 +1128,7 @@ nell'array dei parametri ($params), delegando la protezione contro l'Injection a
                     <div class="method-item">
                     <h3 id="method_buildDateFilters">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_buildDateFilters">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 284</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 294</div>
         <code>            protected        string
     <strong>buildDateFilters</strong>(array $searchDates, array $params)
         </code>
@@ -1115,7 +1179,7 @@ accodando i valori referenziati all'array di bind per preservare l'integrità st
                     <div class="method-item">
                     <h3 id="method_buildTrashFilter">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_buildTrashFilter">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 320</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 330</div>
         <code>            protected        string
     <strong>buildTrashFilter</strong>(string $filter, string $table, bool $hasSoftDelete = true)
         </code>
@@ -1138,7 +1202,7 @@ Il comportamento di fallback obbligatorio (active) sigilla l'esposizione dei rec
                     <tr>
                 <td>string</td>
                 <td>$filter</td>
-                <td><p>Lo stato di visibilità richiesto (active, trashed, all)</p></td>
+                <td><p>Lo stato di visibilità richiesto (active, suspended, trashed, all)</p></td>
             </tr>
                     <tr>
                 <td>string</td>
@@ -1172,7 +1236,7 @@ Il comportamento di fallback obbligatorio (active) sigilla l'esposizione dei rec
                     <div class="method-item">
                     <h3 id="method_getByUUID">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_getByUUID">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 352</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 367</div>
         <code>                    array
     <strong>getByUUID</strong>(string $uuid)
         </code>
@@ -1218,7 +1282,7 @@ di array fissa e immutabile, garantendo al BackendController un pattern di rispo
                     <div class="method-item">
                     <h3 id="method_hasDataChanged">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_hasDataChanged">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 383</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 398</div>
         <code>            protected        bool
     <strong>hasDataChanged</strong>(array $posts, object $original)
         </code>
@@ -1270,7 +1334,7 @@ l'esistenza di operazioni multimediali in pendenza, ritornando true al primo dif
                     <div class="method-item">
                     <h3 id="method_insertImages">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_insertImages">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 429</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 444</div>
         <code>            protected        bool
     <strong>insertImages</strong>(array $filenames, string $uuid, string $entity, string $action = &#039;add&#039;)
         </code>
@@ -1331,7 +1395,7 @@ alla prima immagine dell'array iterato, qualora un query lookup preventivo certi
                     <div class="method-item">
                     <h3 id="method_rrmdir">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_rrmdir">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 485</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 500</div>
         <code>            protected        void
     <strong>rrmdir</strong>(string $dir)
         </code>
@@ -1378,7 +1442,7 @@ da file in stato "Locked" (OS I/O block) o transitorie indisponibilità di perme
                     <div class="method-item">
                     <h3 id="method_generateUUID">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_generateUUID">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 514</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 529</div>
         <code>            protected        string
     <strong>generateUUID</strong>()
         </code>
@@ -1414,7 +1478,7 @@ Converte infine il buffer binario in esadecimale stringa con trattini (hyphen).<
                     <div class="method-item">
                     <h3 id="method_checkAllowedFields">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_checkAllowedFields">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 537</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 552</div>
         <code>            protected        array
     <strong>checkAllowedFields</strong>(array $posts, array $allowedFields)
         </code>
@@ -1465,7 +1529,7 @@ introdotta per forzare alterazioni su colonne sensibili del database (es. iniezi
                     <div class="method-item">
                     <h3 id="method_getUploadService">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_getUploadService">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 558</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 573</div>
         <code>            protected        <a href="../../../App/Libraries/Backend/UploadClass.html"><abbr title="App\Libraries\Backend\UploadClass">UploadClass</abbr></a>
     <strong>getUploadService</strong>()
         </code>
@@ -1499,8 +1563,41 @@ durante l'esecuzione dei test unitari tramite il pattern Extract Method.</p></p>
 
             </div>
                     <div class="method-item">
+                    <h3 id="method_getTrashCounts">
+        <div class="location">at line 194</div>
+        <code>                    array
+    <strong>getTrashCounts</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Conta attivi, sospesi, eliminati e totale, senza ricerca o paginazione.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
                     <h3 id="method_cleanupUploadedImages">
-        <div class="location">at line 193</div>
+        <div class="location">at line 219</div>
         <code>            protected        void
     <strong>cleanupUploadedImages</strong>(array $filenames, string $uuid)
         </code>
@@ -1548,7 +1645,7 @@ durante l'esecuzione dei test unitari tramite il pattern Extract Method.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_showAllValidationRules">
-        <div class="location">at line 205</div>
+        <div class="location">at line 231</div>
         <code>                    array
     <strong>showAllValidationRules</strong>()
         </code>
@@ -1581,7 +1678,7 @@ durante l'esecuzione dei test unitari tramite il pattern Extract Method.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_showAllSearchValidationRules">
-        <div class="location">at line 234</div>
+        <div class="location">at line 260</div>
         <code>                    array
     <strong>showAllSearchValidationRules</strong>()
         </code>
@@ -1615,7 +1712,7 @@ rispettino pattern sicuri, prevenendo injection direttamente sui parametri di ri
             </div>
                     <div class="method-item">
                     <h3 id="method_addValidationRules">
-        <div class="location">at line 280</div>
+        <div class="location">at line 306</div>
         <code>                    array
     <strong>addValidationRules</strong>()
         </code>
@@ -1649,7 +1746,7 @@ rispettino pattern sicuri, prevenendo injection direttamente sui parametri di ri
             </div>
                     <div class="method-item">
                     <h3 id="method_editValidationRules">
-        <div class="location">at line 331</div>
+        <div class="location">at line 357</div>
         <code>                    array
     <strong>editValidationRules</strong>(array $posts)
         </code>
@@ -1694,7 +1791,7 @@ evitando così falsi conflitti con i dati dell'utente stesso.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_importAllowedFields">
-        <div class="location">at line 407</div>
+        <div class="location">at line 433</div>
         <code>                    array
     <strong>importAllowedFields</strong>()
         </code>
@@ -1727,7 +1824,7 @@ evitando così falsi conflitti con i dati dell'utente stesso.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_exportAllowedFields">
-        <div class="location">at line 417</div>
+        <div class="location">at line 443</div>
         <code>                    array
     <strong>exportAllowedFields</strong>()
         </code>
@@ -1760,7 +1857,7 @@ evitando così falsi conflitti con i dati dell'utente stesso.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_importAddValidationRules">
-        <div class="location">at line 431</div>
+        <div class="location">at line 457</div>
         <code>                    array
     <strong>importAddValidationRules</strong>()
         </code>
@@ -1795,7 +1892,7 @@ al fallback strutturale generato dallo schema della tabella.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_importEditValidationRules">
-        <div class="location">at line 482</div>
+        <div class="location">at line 508</div>
         <code>                    array
     <strong>importEditValidationRules</strong>(array $data)
         </code>
@@ -1840,7 +1937,7 @@ sostituiscono, per i campi interessati, il fallback derivato dallo schema SQL.</
             </div>
                     <div class="method-item">
                     <h3 id="method_importBusinessValidationErrors">
-        <div class="location">at line 531</div>
+        <div class="location">at line 557</div>
         <code>                    array
     <strong>importBusinessValidationErrors</strong>(string $action, array $data, array|null $currentRow)
         </code>
@@ -1894,7 +1991,7 @@ deve mantenere gli stessi invarianti anche se scrive tramite il motore generico.
             </div>
                     <div class="method-item">
                     <h3 id="method_changeGroupValidationRules">
-        <div class="location">at line 553</div>
+        <div class="location">at line 579</div>
         <code>                    array
     <strong>changeGroupValidationRules</strong>()
         </code>
@@ -1927,7 +2024,7 @@ deve mantenere gli stessi invarianti anche se scrive tramite il motore generico.
             </div>
                     <div class="method-item">
                     <h3 id="method_delValidationRules">
-        <div class="location">at line 572</div>
+        <div class="location">at line 598</div>
         <code>                    array
     <strong>delValidationRules</strong>()
         </code>
@@ -1960,7 +2057,7 @@ deve mantenere gli stessi invarianti anche se scrive tramite il motore generico.
             </div>
                     <div class="method-item">
                     <h3 id="method_resetPasswordValidationRules">
-        <div class="location">at line 591</div>
+        <div class="location">at line 617</div>
         <code>                    array
     <strong>resetPasswordValidationRules</strong>()
         </code>
@@ -1993,7 +2090,7 @@ deve mantenere gli stessi invarianti anche se scrive tramite il motore generico.
             </div>
                     <div class="method-item">
                     <h3 id="method_changeStatusValidationRules">
-        <div class="location">at line 613</div>
+        <div class="location">at line 639</div>
         <code>                    array
     <strong>changeStatusValidationRules</strong>()
         </code>
@@ -2027,7 +2124,7 @@ deve mantenere gli stessi invarianti anche se scrive tramite il motore generico.
             </div>
                     <div class="method-item">
                     <h3 id="method_getTokensValidationRules">
-        <div class="location">at line 642</div>
+        <div class="location">at line 668</div>
         <code>                    array
     <strong>getTokensValidationRules</strong>()
         </code>
@@ -2061,7 +2158,7 @@ o tentativi di estrazione dati arbitrari.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_generalDataValidationRules">
-        <div class="location">at line 664</div>
+        <div class="location">at line 690</div>
         <code>                    array
     <strong>generalDataValidationRules</strong>()
         </code>
@@ -2095,7 +2192,7 @@ provenga da una vista autorizzata a mostrare ('show') o modificare ('edit') tali
             </div>
                     <div class="method-item">
                     <h3 id="method_metaDataValidationRules">
-        <div class="location">at line 694</div>
+        <div class="location">at line 720</div>
         <code>                    array
     <strong>metaDataValidationRules</strong>()
         </code>
@@ -2129,7 +2226,7 @@ dell'UUID (tramite Regex) prima di procedere con l'estrazione dei dati temporali
             </div>
                     <div class="method-item">
                     <h3 id="method_getPermissionsValidationRules">
-        <div class="location">at line 717</div>
+        <div class="location">at line 743</div>
         <code>                    array
     <strong>getPermissionsValidationRules</strong>()
         </code>
@@ -2164,7 +2261,7 @@ vengano caricate solo in scenari previsti dall'architettura.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_deleteTokenValidationRules">
-        <div class="location">at line 748</div>
+        <div class="location">at line 774</div>
         <code>                    array
     <strong>deleteTokenValidationRules</strong>()
         </code>
@@ -2199,7 +2296,7 @@ finalizzate a eliminare sessioni di altri amministratori.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_changePermissionValidationRules">
-        <div class="location">at line 779</div>
+        <div class="location">at line 805</div>
         <code>                    array
     <strong>changePermissionValidationRules</strong>()
         </code>
@@ -2234,7 +2331,7 @@ o deprecato possa essere iniettato nel database alterando l'integrità del siste
             </div>
                     <div class="method-item">
                     <h3 id="method_getPermissions">
-        <div class="location">at line 819</div>
+        <div class="location">at line 845</div>
         <code>                    array
     <strong>getPermissions</strong>(string $uuid)
         </code>
@@ -2277,7 +2374,7 @@ o deprecato possa essere iniettato nel database alterando l'integrità del siste
             </div>
                     <div class="method-item">
                     <h3 id="method_getTokens">
-        <div class="location">at line 832</div>
+        <div class="location">at line 858</div>
         <code>                    array
     <strong>getTokens</strong>(string $uuid)
         </code>
@@ -2320,7 +2417,7 @@ o deprecato possa essere iniettato nel database alterando l'integrità del siste
             </div>
                     <div class="method-item">
                     <h3 id="method_getAttempts">
-        <div class="location">at line 845</div>
+        <div class="location">at line 871</div>
         <code>                    array
     <strong>getAttempts</strong>(string $uuid)
         </code>
@@ -2363,7 +2460,7 @@ o deprecato possa essere iniettato nel database alterando l'integrità del siste
             </div>
                     <div class="method-item">
                     <h3 id="method_getTwoFaAttempts">
-        <div class="location">at line 858</div>
+        <div class="location">at line 884</div>
         <code>                    array
     <strong>getTwoFaAttempts</strong>(string $uuid)
         </code>
@@ -2406,7 +2503,7 @@ o deprecato possa essere iniettato nel database alterando l'integrità del siste
             </div>
                     <div class="method-item">
                     <h3 id="method_getTwoFaCodes">
-        <div class="location">at line 871</div>
+        <div class="location">at line 897</div>
         <code>                    array
     <strong>getTwoFaCodes</strong>(string $uuid)
         </code>
@@ -2449,7 +2546,7 @@ o deprecato possa essere iniettato nel database alterando l'integrità del siste
             </div>
                     <div class="method-item">
                     <h3 id="method_getTwoFa">
-        <div class="location">at line 884</div>
+        <div class="location">at line 910</div>
         <code>                    object|null
     <strong>getTwoFa</strong>(string $uuid)
         </code>
@@ -2492,7 +2589,7 @@ o deprecato possa essere iniettato nel database alterando l'integrità del siste
             </div>
                     <div class="method-item">
                     <h3 id="method_getGroups">
-        <div class="location">at line 896</div>
+        <div class="location">at line 922</div>
         <code>                    array
     <strong>getGroups</strong>()
         </code>
@@ -2525,7 +2622,7 @@ o deprecato possa essere iniettato nel database alterando l'integrità del siste
             </div>
                     <div class="method-item">
                     <h3 id="method_getGroupPermissions">
-        <div class="location">at line 908</div>
+        <div class="location">at line 934</div>
         <code>                    array
     <strong>getGroupPermissions</strong>(int $groupId)
         </code>
@@ -2568,7 +2665,7 @@ o deprecato possa essere iniettato nel database alterando l'integrità del siste
             </div>
                     <div class="method-item">
                     <h3 id="method_getAdminExceptions">
-        <div class="location">at line 929</div>
+        <div class="location">at line 955</div>
         <code>                    array
     <strong>getAdminExceptions</strong>(string $uuid)
         </code>
@@ -2611,7 +2708,7 @@ o deprecato possa essere iniettato nel database alterando l'integrità del siste
             </div>
                     <div class="method-item">
                     <h3 id="method_add">
-        <div class="location">at line 959</div>
+        <div class="location">at line 985</div>
         <code>                    array
     <strong>add</strong>(array $posts, <abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr> $request)
         </code>
@@ -2662,7 +2759,7 @@ In caso di fallimento in uno di questi passaggi, il Rollback annulla ogni operaz
             </div>
                     <div class="method-item">
                     <h3 id="method_edit">
-        <div class="location">at line 1079</div>
+        <div class="location">at line 1105</div>
         <code>                    array
     <strong>edit</strong>(array $posts)
         </code>
@@ -2709,7 +2806,7 @@ o negative a 0), e gestisce le eventuali nuove immagini.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_hasAdminChanged">
-        <div class="location">at line 1216</div>
+        <div class="location">at line 1242</div>
         <code>                    bool
     <strong>hasAdminChanged</strong>(array $posts, object $original)
         </code>
@@ -2759,7 +2856,7 @@ Ordina e confronta questa matrice con i permessi inviati tramite form: restituis
             </div>
                     <div class="method-item">
                     <h3 id="method_hardDelete">
-        <div class="location">at line 1276</div>
+        <div class="location">at line 1302</div>
         <code>                    array
     <strong>hardDelete</strong>(array $posts)
         </code>
@@ -2804,7 +2901,7 @@ il file system per distruggere fisicamente la cartella con le foto profilo colle
             </div>
                     <div class="method-item">
                     <h3 id="method_softDelete">
-        <div class="location">at line 1355</div>
+        <div class="location">at line 1381</div>
         <code>                    array
     <strong>softDelete</strong>(array $posts)
         </code>
@@ -2850,7 +2947,7 @@ Elimina inoltre tutti i token di sessione e i codici 2FA per chiudere immediatam
             </div>
                     <div class="method-item">
                     <h3 id="method_restoreDelete">
-        <div class="location">at line 1436</div>
+        <div class="location">at line 1462</div>
         <code>                    array
     <strong>restoreDelete</strong>(array $posts)
         </code>
@@ -2899,7 +2996,7 @@ lo ripristina bloccandolo (<code>status = 0</code>) e avvisa l'operatore tramite
             </div>
                     <div class="method-item">
                     <h3 id="method_resetPassword">
-        <div class="location">at line 1525</div>
+        <div class="location">at line 1551</div>
         <code>                    array
     <strong>resetPassword</strong>(array $posts, <abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr> $request)
         </code>
@@ -2949,7 +3046,7 @@ con il link di ripristino per impostare la nuova password.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_changeStatus">
-        <div class="location">at line 1626</div>
+        <div class="location">at line 1652</div>
         <code>                    array
     <strong>changeStatus</strong>(array $posts)
         </code>
@@ -2994,7 +3091,7 @@ e lo inverte (da 0 a 1, o da 1 a 0). Se lo stato passa a Sospeso (0), valorizza 
             </div>
                     <div class="method-item">
                     <h3 id="method_changePermission">
-        <div class="location">at line 1718</div>
+        <div class="location">at line 1744</div>
         <code>                    array
     <strong>changePermission</strong>(array $posts)
         </code>
@@ -3042,7 +3139,7 @@ Questo sistema mantiene la tabella delle eccezioni pulita, salvando solo le devi
             </div>
                     <div class="method-item">
                     <h3 id="method_deleteToken">
-        <div class="location">at line 1817</div>
+        <div class="location">at line 1843</div>
         <code>                    array
     <strong>deleteToken</strong>(array $posts)
         </code>
@@ -3087,7 +3184,7 @@ la riga dalla tabella <code>admins_tokens</code> disconnettendo all'istante l'ut
             </div>
                     <div class="method-item">
                     <h3 id="method_deletePermissions">
-        <div class="location">at line 1893</div>
+        <div class="location">at line 1919</div>
         <code>                    
     <strong>deletePermissions</strong>(string $admin_uuid)
         </code>

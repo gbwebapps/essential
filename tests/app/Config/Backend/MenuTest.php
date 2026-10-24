@@ -31,18 +31,21 @@ class MenuTest extends CIUnitTestCase
     {
         $config = new Menu();
 
-        $this->assertCount(2, $config->bottomLeft);
+        $this->assertCount(4, $config->bottomLeft);
         $this->assertSame('backend/dashboard', $config->bottomLeft[0]['route']);
         $this->assertSame('backend/brands/showAll', $config->bottomLeft[1]['route']);
+        $this->assertSame('backend/categories/showAll', $config->bottomLeft[2]['route']);
+        $this->assertSame('backend/products/showAll', $config->bottomLeft[3]['route']);
     }
 
     public function testConstructorBuildsBottomRightMenu(): void
     {
         $config = new Menu();
 
-        $this->assertCount(2, $config->bottomRight);
-        $this->assertSame('backend/tools', $config->bottomRight[0]['route']);
-        $this->assertSame('backend/settings', $config->bottomRight[1]['route']);
+        $this->assertCount(3, $config->bottomRight);
+        $this->assertSame('backend/warehouse', $config->bottomRight[0]['route']);
+        $this->assertSame('backend/tools', $config->bottomRight[1]['route']);
+        $this->assertSame('backend/settings', $config->bottomRight[2]['route']);
     }
 
     public function testEveryMenuItemHasACompleteUniqueAndRoutableDefinition(): void

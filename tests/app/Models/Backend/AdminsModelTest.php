@@ -4043,7 +4043,7 @@ class AdminsModelTest extends CIUnitTestCase
                 'rules' => ['required', 'is_natural_no_zero']
             ],
             'trash_filter' => [
-                'rules' => ['in_list[active,trashed,all]']
+                'rules' => ['in_list[active,suspended,trashed,all]']
             ]
         ];
 

@@ -24,6 +24,7 @@ return [
         'import' => '导入 CSV',
 	], 
     'buttons' => [
+        'cancel' => '取消',
     	'close' => '关闭', 
     	'import' => '导入', 
         'remove' => '移除', 

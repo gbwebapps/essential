@@ -1,14 +1,14 @@
-const { test, expect } = require('@playwright/test');
+const { test, expect, adminUuid } = require('../support/admin-fixture');
+const { appUrl } = require('../support/app-url');
 
 test.use({
     storageState: 'e2e/.auth/admin.json'
 });
 
-const adminUuid = 'aef9b10c-ebe7-4e55-af1f-19aef22c53c8';
 
-const pageUrl = `/backend/admins/edit/${adminUuid}`;
+const pageUrl = appUrl(`/backend/admins/edit/${adminUuid}`);
 const ajaxPath = '/backend/admins/edit';
-const modulePath = '/assets/js/backend/modules/Crud.js';
+const modulePath = appUrl('/assets/js/backend/modules/Crud.js');
 const formSelector = '#admins-edit';
 
 async function openEditPage(page) {
@@ -38,7 +38,7 @@ async function openEditPage(page) {
 
 function isEditRequest(request) {
     return request.method() === 'POST' &&
-        new URL(request.url()).pathname === ajaxPath;
+        new URL(request.url()).pathname === new URL(appUrl(ajaxPath)).pathname;
 }
 
 function mockResponse(result, extra = {}) {

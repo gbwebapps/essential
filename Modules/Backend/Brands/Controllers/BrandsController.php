@@ -137,6 +137,8 @@ class BrandsController extends BackendController
                 $this->data['posts'] = $posts;
 
                 $json['output'] = view(Views::SHOW_ALL_PARTIAL, $this->data);
+                $json['trashCounts'] = $this->brandsModel->getTrashCounts();
+                $json['menuCounts'] = model(\App\Models\Backend\MenuCountsModel::class)->getCounts($this->currentAdmin, 'brands');
                 $json['result'] = true;
 
             elseif($this->data['data']['result'] === false):

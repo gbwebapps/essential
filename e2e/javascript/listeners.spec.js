@@ -1,7 +1,8 @@
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
 test('Un listener non deve essere eseguito più volte per un singolo evento', async ({ page }) => {
-    await page.goto('/backend/auth');
+    await page.goto(appUrl('/backend/auth'));
 
     const result = await page.evaluate(() => {
         const element = document.createElement('button');

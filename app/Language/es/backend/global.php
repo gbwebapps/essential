@@ -20,7 +20,13 @@ return [
         'bottomRight' => [
             'settings' => 'Configuración',
             'tools' => 'Herramientas',
+            'warehouse' => 'Almacén',
         ],
+    ],
+    'menuCounts' => [
+        'active' => 'Activos',
+        'trashed' => 'Eliminados',
+        'suspended' => 'Deshabilitados',
     ],
     'links' => [
         'selectAll' => 'Seleccionar todos'

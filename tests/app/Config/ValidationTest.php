@@ -5,6 +5,7 @@ namespace Config;
 use App\Validation\Backend\AdminsRules;
 use App\Validation\Backend\AuthRules;
 use App\Validation\Backend\CustomRules;
+use App\Validation\Backend\GroupsRules;
 use App\Validation\Backend\ImagesRules;
 use App\Validation\Backend\SettingsRules;
 use CodeIgniter\Test\CIUnitTestCase;
@@ -28,6 +29,7 @@ class ValidationTest extends CIUnitTestCase
             AdminsRules::class,
             ImagesRules::class,
             SettingsRules::class,
+            GroupsRules::class,
         ];
 
         $this->assertSame($expected, $config->ruleSets);

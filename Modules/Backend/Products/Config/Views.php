@@ -9,11 +9,15 @@ use CodeIgniter\Config\BaseConfig;
  */
 class Views extends BaseConfig
 {
+    /* VISTE PRINCIPALI --------------------------------------------------------------------------- */
+
     public const INDEX_VIEW = 'Modules\\Backend\\Products\\Views\\indexView';
     public const SHOW_ALL_VIEW = 'Modules\\Backend\\Products\\Views\\showAllView';
     public const ADD_VIEW = 'Modules\\Backend\\Products\\Views\\addView';
     public const EDIT_VIEW = 'Modules\\Backend\\Products\\Views\\editView';
     public const SHOW_VIEW = 'Modules\\Backend\\Products\\Views\\showView';
+
+    /* VISTE PARZIALI ----------------------------------------------------------------------------- */
 
     public const INDEX_PARTIAL = 'Modules\\Backend\\Products\\Views\\partials\\index\\indexPartial';
     public const SHOW_ALL_PARTIAL = 'Modules\\Backend\\Products\\Views\\partials\\showAll\\showAllPartial';

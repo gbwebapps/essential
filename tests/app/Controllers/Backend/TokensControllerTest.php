@@ -25,7 +25,7 @@ class TokensControllerTest extends CIUnitTestCase
         $request = 
         $this
         ->createMock(
-            \CodeIgniter\HTTP\RequestInterface::class
+            \CodeIgniter\HTTP\IncomingRequest::class
         );
 
         $response = 

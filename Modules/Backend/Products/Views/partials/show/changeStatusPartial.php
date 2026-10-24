@@ -1,8 +1,15 @@
 <?php
     $status = (int) $product->status;
-    $statusText = ($status === 1) ? lang('backend/products.labels.active') : lang('backend/products.labels.unactive');
-    $statusClass = ($status === 1) ? 'app-text-success fw-bold btn btn-link shadow-none' : 'app-text-danger fw-bold btn btn-link shadow-none';
+
+    if($status === 1):
+        $statusText = lang('backend/products.labels.active');
+        $statusClass = 'app-text-success fw-bold btn btn-link shadow-none';
+    else:
+        $statusText = lang('backend/products.labels.unactive');
+        $statusClass = 'app-text-danger fw-bold btn btn-link shadow-none';
+    endif;
 ?>
+
 <form class="changeStatus" data-controller="products" data-message="<?= esc(sprintf(lang('backend/products.messages.areYouSureChangeStatus'), $product->product), 'attr'); ?>">
     <input type="hidden" name="uuid" value="<?= esc($product->uuid, 'attr'); ?>">
     <input type="hidden" name="context" value="show">

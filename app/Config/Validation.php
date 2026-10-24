@@ -13,6 +13,7 @@ use App\Validation\Backend\AdminsRules;
 use App\Validation\Backend\ImagesRules;
 use App\Validation\Backend\SettingsRules;
 use App\Validation\Backend\CustomRules;
+use App\Validation\Backend\GroupsRules;
 
 class Validation extends BaseConfig
 {
@@ -36,6 +37,7 @@ class Validation extends BaseConfig
         AdminsRules::class, 
         ImagesRules::class, 
         SettingsRules::class, 
+        GroupsRules::class, 
     ];
 
     /**

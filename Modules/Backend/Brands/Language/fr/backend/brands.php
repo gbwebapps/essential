@@ -23,7 +23,8 @@ return [
         'resetFilters' => 'Effacer la recherche',
         'resetSorting' => 'Réinitialiser le tri',
         'reloadList' => 'Recharger la liste',
-        'activeRecords' => 'Actives',
+        'activeRecords' => 'Actifs',
+        'suspendedRecords' => 'Suspendus',
         'trashedRecords' => 'Supprimées',
         'allRecords' => 'Toutes',
     ],
@@ -89,6 +90,7 @@ return [
         'changeStatusBrand' => 'Modification du statut de la marque %s',
     ],
     'messages' => [
+        'suspendAssociated' => 'La marque ne peut pas être suspendue car des produits lui sont associés.',
         'areYouSureResetData' => 'Voulez-vous vraiment réinitialiser les données ?',
         'areYouSureRefreshData' => 'Voulez-vous vraiment recharger les données ?',
         'areYouSureChangeStatus' => 'Voulez-vous vraiment modifier le statut de <b>%s</b> ?',

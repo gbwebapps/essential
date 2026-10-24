@@ -188,7 +188,7 @@ class GalleryOneModel extends BackendModel
 
         $currentAdmin = service('authorization')->currentAdmin();
 
-        log_admin_activity('DELETE_IMAGE', 'gallery one', 'Eliminazione immagine.', $currentAdmin);
+        log_admin_activity('DELETE_IMAGE', 'gallery one - ' . $posts['entity'], 'Eliminazione immagine.', $currentAdmin);
 
         return true;
     }
@@ -237,7 +237,7 @@ class GalleryOneModel extends BackendModel
 
             $currentAdmin = service('authorization')->currentAdmin();
 
-            log_admin_activity('SET_COVER', 'gallery one', 'Impostazione cover.', $currentAdmin);
+            log_admin_activity('SET_COVER', 'gallery one - ' . $posts['entity'], 'Impostazione cover.', $currentAdmin);
 
             return true;
 
@@ -271,7 +271,7 @@ class GalleryOneModel extends BackendModel
 
         $currentAdmin = service('authorization')->currentAdmin();
 
-        log_admin_activity('REMOVE_COVER', 'gallery one', 'Rimozione cover.', $currentAdmin);
+        log_admin_activity('REMOVE_COVER', 'gallery one - ' . $posts['entity'], 'Rimozione cover.', $currentAdmin);
 
         return true;
     }

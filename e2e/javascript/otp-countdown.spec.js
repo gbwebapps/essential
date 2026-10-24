@@ -1,7 +1,8 @@
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
-const pageUrl = '/backend/auth';
-const modulePath = '/assets/js/backend/components/OtpCountdown.js';
+const pageUrl = appUrl('/backend/auth');
+const modulePath = appUrl('/assets/js/backend/components/OtpCountdown.js');
 
 test('Il countdown OTP usa scadenze e periodi reali del server', async ({ page }) => {
     await page.goto(pageUrl);

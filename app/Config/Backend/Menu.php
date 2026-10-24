@@ -30,6 +30,14 @@ class Menu extends BaseConfig
      */
     public array $bottomRight = [];
 
+    /** Tabelle abilitate ai badge e permessi di consultazione delle rispettive liste. */
+    public array $counterPermissions = [
+        'admins' => null,
+        'brands' => 'brands_show_all',
+        'categories' => 'categories_show_all',
+        'products' => 'products_show_all',
+    ];
+
     /**
      * Inizializza la configurazione dei menu popolando le sezioni di navigazione con le rispettive voci localizzate e rotte.
      * 
@@ -56,6 +64,7 @@ class Menu extends BaseConfig
         ];
 
         $this->bottomRight = [
+            ['label' => lang('backend/global.menu.bottomRight.warehouse'), 'route' => 'backend/warehouse', 'icon' => '<i class="fa-solid fa-warehouse"></i>', 'controller' => 'warehouse'],
             ['label' => lang('backend/global.menu.bottomRight.tools'), 'route' => 'backend/tools', 'icon' => '<i class="fa-solid fa-screwdriver-wrench"></i>', 'controller' => 'tools'],
             ['label' => lang('backend/global.menu.bottomRight.settings'), 'route' => 'backend/settings', 'icon' => '<i class="fa-solid fa-sliders"></i>', 'controller' => 'settings'],
         ];

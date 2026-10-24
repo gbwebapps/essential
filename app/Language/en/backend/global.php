@@ -20,7 +20,13 @@ return [
         'bottomRight' => [
             'settings' => 'Settings',
             'tools' => 'Tools', 
+            'warehouse' => 'Warehouse',
         ],
+    ],
+    'menuCounts' => [
+        'active' => 'Active',
+        'trashed' => 'Deleted',
+        'suspended' => 'Disabled',
     ],
     'links' => [
         'selectAll' => 'Select All'

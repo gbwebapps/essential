@@ -1,12 +1,13 @@
 
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
 test.use({
     storageState: 'e2e/.auth/admin.json'
 });
 
-const pageUrl = '/backend/account/edit';
-const modulePath = '/assets/js/backend/modules/Account.js';
+const pageUrl = appUrl('/backend/account/edit');
+const modulePath = appUrl('/assets/js/backend/modules/Account.js');
 const deleteUrl = '/backend/account/deleteToken';
 
 test('DeleteTokenManager gestisce errori e aggiorna il contenitore', async ({ page }) => {

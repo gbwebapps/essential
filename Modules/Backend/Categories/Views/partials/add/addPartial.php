@@ -36,7 +36,7 @@
                                     <select name="parent_id" class="form-select" id="parent_id">
                                         <option value=""><?= lang('backend/categories.labels.rootCategory'); ?></option>
                                         <?php foreach($parentCategories as $parentCategory): ?>
-                                            <option value="<?= esc($parentCategory->id, 'attr'); ?>"><?= esc($parentCategory->path ?? $parentCategory->category); ?></option>
+                                            <option value="<?= esc($parentCategory->id, 'attr'); ?>"<?= ((int) $parentCategory->status === 0) ? ' disabled' : ''; ?>><?= esc($parentCategory->path ?? $parentCategory->category); ?><?= ((int) $parentCategory->status === 0) ? ' — ' . esc(lang('backend/categories.labels.suspendedRelation')) : ''; ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                     <div class="error_parent_id app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>

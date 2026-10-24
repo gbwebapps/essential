@@ -22,7 +22,7 @@ class PermissionsTest extends CIUnitTestCase
 
         $result = $config->getPermissions();
 
-        $this->assertCount(1, $result);
+        $this->assertCount(3, $result);
 
         $this->assertSame('brands', $result[0]['controller']);
         $this->assertArrayHasKey('brands_add', $result[0]['perms']);
@@ -31,6 +31,22 @@ class PermissionsTest extends CIUnitTestCase
         $this->assertArrayHasKey('brands_show_all', $result[0]['perms']);
         $this->assertArrayHasKey('brands_delete', $result[0]['perms']);
         $this->assertArrayHasKey('brands_change_status', $result[0]['perms']);
+
+        $this->assertSame('categories', $result[1]['controller']);
+        $this->assertArrayHasKey('categories_add', $result[1]['perms']);
+        $this->assertArrayHasKey('categories_edit', $result[1]['perms']);
+        $this->assertArrayHasKey('categories_show', $result[1]['perms']);
+        $this->assertArrayHasKey('categories_show_all', $result[1]['perms']);
+        $this->assertArrayHasKey('categories_delete', $result[1]['perms']);
+        $this->assertArrayHasKey('categories_change_status', $result[1]['perms']);
+
+        $this->assertSame('products', $result[2]['controller']);
+        $this->assertArrayHasKey('products_add', $result[2]['perms']);
+        $this->assertArrayHasKey('products_edit', $result[2]['perms']);
+        $this->assertArrayHasKey('products_show', $result[2]['perms']);
+        $this->assertArrayHasKey('products_show_all', $result[2]['perms']);
+        $this->assertArrayHasKey('products_delete', $result[2]['perms']);
+        $this->assertArrayHasKey('products_change_status', $result[2]['perms']);
     }
 
     public function testPermissionCatalogHasCompleteAndUniqueEntries(): void

@@ -136,6 +136,16 @@ rispettino regole rigorose prima di sovrascrivere le impostazioni.</p></p>      
 <abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
             </tr>
                     <tr>
+                <td class="type" id="property_hasStatusFilter">
+                                        protected                                        bool
+                                                                                
+                                    </td>
+                <td>$hasStatusFilter</td>
+                <td class="last"><p>Abilita la separazione fra record attivi e sospesi nei CRUD che hanno uno stato.</p></td>
+                <td><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#property_hasStatusFilter">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
                 <td class="type" id="property_getDataQuery">
                                         protected                                        string|null
                                                                                 
@@ -346,6 +356,17 @@ rispettino regole rigorose prima di sovrascrivere le impostazioni.</p></p>      
         
                                             <p><p>Metodo di inizializzazione nativo di CodeIgniter.</p></p>                </div>
                 <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_supportsStatusFilter">supportsStatusFilter</a>()
+        
+                                            <p><p>Espone la capacità anche ai componenti che devono rispettare i filtri della lista.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../App/Models/Backend/BackendModel.html#method_supportsStatusFilter">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
             </div>
                     <div class="row">
                 <div class="col-md-2 type">
@@ -645,9 +666,43 @@ il metodo di inizializzazione interno per predisporre le risorse di base (come i
 
             </div>
                     <div class="method-item">
+                    <h3 id="method_supportsStatusFilter">
+        <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_supportsStatusFilter">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 38</div>
+        <code>                    bool
+    <strong>supportsStatusFilter</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Espone la capacità anche ai componenti che devono rispettare i filtri della lista.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
                     <h3 id="method_getData">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_getData">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 159</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 168</div>
         <code>                    array
     <strong>getData</strong>(array $posts)
         </code>
@@ -695,7 +750,7 @@ i filtri esatti per garantire la perfetta coerenza totale/risultati.</p></p>
                     <div class="method-item">
                     <h3 id="method_getNumRows">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_getNumRows">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 228</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 238</div>
         <code>            protected        int
     <strong>getNumRows</strong>(array $paramsFilter)
         </code>
@@ -741,7 +796,7 @@ di conoscere l'esatto volume di dati indipendentemente dai limiti della singola 
                     <div class="method-item">
                     <h3 id="method_buildFilters">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_buildFilters">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 259</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 269</div>
         <code>            protected        string
     <strong>buildFilters</strong>(array $searchFields, array $params)
         </code>
@@ -792,7 +847,7 @@ nell'array dei parametri ($params), delegando la protezione contro l'Injection a
                     <div class="method-item">
                     <h3 id="method_buildDateFilters">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_buildDateFilters">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 284</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 294</div>
         <code>            protected        string
     <strong>buildDateFilters</strong>(array $searchDates, array $params)
         </code>
@@ -843,7 +898,7 @@ accodando i valori referenziati all'array di bind per preservare l'integrità st
                     <div class="method-item">
                     <h3 id="method_buildTrashFilter">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_buildTrashFilter">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 320</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 330</div>
         <code>            protected        string
     <strong>buildTrashFilter</strong>(string $filter, string $table, bool $hasSoftDelete = true)
         </code>
@@ -866,7 +921,7 @@ Il comportamento di fallback obbligatorio (active) sigilla l'esposizione dei rec
                     <tr>
                 <td>string</td>
                 <td>$filter</td>
-                <td><p>Lo stato di visibilità richiesto (active, trashed, all)</p></td>
+                <td><p>Lo stato di visibilità richiesto (active, suspended, trashed, all)</p></td>
             </tr>
                     <tr>
                 <td>string</td>
@@ -900,7 +955,7 @@ Il comportamento di fallback obbligatorio (active) sigilla l'esposizione dei rec
                     <div class="method-item">
                     <h3 id="method_getByUUID">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_getByUUID">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 352</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 367</div>
         <code>                    array
     <strong>getByUUID</strong>(string $uuid)
         </code>
@@ -946,7 +1001,7 @@ di array fissa e immutabile, garantendo al BackendController un pattern di rispo
                     <div class="method-item">
                     <h3 id="method_hasDataChanged">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_hasDataChanged">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 383</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 398</div>
         <code>            protected        bool
     <strong>hasDataChanged</strong>(array $posts, object $original)
         </code>
@@ -998,7 +1053,7 @@ l'esistenza di operazioni multimediali in pendenza, ritornando true al primo dif
                     <div class="method-item">
                     <h3 id="method_insertImages">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_insertImages">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 429</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 444</div>
         <code>            protected        bool
     <strong>insertImages</strong>(array $filenames, string $uuid, string $entity, string $action = &#039;add&#039;)
         </code>
@@ -1059,7 +1114,7 @@ alla prima immagine dell'array iterato, qualora un query lookup preventivo certi
                     <div class="method-item">
                     <h3 id="method_rrmdir">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_rrmdir">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 485</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 500</div>
         <code>            protected        void
     <strong>rrmdir</strong>(string $dir)
         </code>
@@ -1106,7 +1161,7 @@ da file in stato "Locked" (OS I/O block) o transitorie indisponibilità di perme
                     <div class="method-item">
                     <h3 id="method_generateUUID">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_generateUUID">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 514</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 529</div>
         <code>            protected        string
     <strong>generateUUID</strong>()
         </code>
@@ -1142,7 +1197,7 @@ Converte infine il buffer binario in esadecimale stringa con trattini (hyphen).<
                     <div class="method-item">
                     <h3 id="method_checkAllowedFields">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_checkAllowedFields">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 537</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 552</div>
         <code>            protected        array
     <strong>checkAllowedFields</strong>(array $posts, array $allowedFields)
         </code>
@@ -1193,7 +1248,7 @@ introdotta per forzare alterazioni su colonne sensibili del database (es. iniezi
                     <div class="method-item">
                     <h3 id="method_getUploadService">
         <div class="location">in <a href="../../../App/Models/Backend/BackendModel.html#method_getUploadService">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 558</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 573</div>
         <code>            protected        <a href="../../../App/Libraries/Backend/UploadClass.html"><abbr title="App\Libraries\Backend\UploadClass">UploadClass</abbr></a>
     <strong>getUploadService</strong>()
         </code>

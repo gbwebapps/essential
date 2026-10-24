@@ -89,6 +89,14 @@ const assetsToCopy = [
     {
         from: 'Modules/Backend/Products/Assets/js/products.js',
         to: 'public/assets/js/backend/products.js'
+    },
+    {
+        from: 'Modules/Backend/Warehouse/Assets/js/warehouse.js',
+        to: 'public/assets/js/backend/warehouse.js'
+    },
+    {
+        from: 'Modules/Backend/Warehouse/Assets/js/modules/Warehouse.js',
+        to: 'public/assets/js/backend/modules/Warehouse.js'
     }
 ];
 

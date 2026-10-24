@@ -21,6 +21,10 @@ abstract class BaseController extends Controller
      */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
+        if ( ! $request instanceof \CodeIgniter\HTTP\IncomingRequest && ! $request instanceof \CodeIgniter\HTTP\CLIRequest):
+            throw new \InvalidArgumentException('Tipo di richiesta non supportato dal controller.');
+        endif;
+
         parent::initController($request, $response, $logger);
     }
 }

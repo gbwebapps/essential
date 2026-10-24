@@ -130,6 +130,56 @@ metriche, KPI, statistiche o dati di riepilogo necessari al popolamento dinamico
                                             <p><p>Inizializza la libreria di supporto iniettando il modello associato alla dashboard.</p></p>                </div>
                 <div class="col-md-2"></div>
             </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getCssIndex">getCssIndex</a>()
+        
+                                            <p><p>Carica solo nella dashboard gli stili dedicati ai riepiloghi e ai grafici.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_formatCount">formatCount</a>(int $count)
+        
+                                            <p><p>Formatta i conteggi secondo la lingua dell'interfaccia, senza decimali.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_formatValue">formatValue</a>(string $value)
+        
+                                            <p><p>Formatta gli importi decimali senza convertirli in float o supporre una valuta.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getCards">getCards</a>(array $counts, object|null $admin)
+        
+                                            <p><p>Prepara i quattro riepiloghi; quello degli amministratori è esclusivamente superadmin.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_getRankings">getRankings</a>(array $rankings)
+        
+                                            <p><p>Calcola l'ampiezza relativa delle barre; non somma le associazioni molti-a-molti.</p></p>                </div>
+                <div class="col-md-2"></div>
+            </div>
             </div>
 
 
@@ -138,7 +188,7 @@ metriche, KPI, statistiche o dati di riepilogo necessari al popolamento dinamico
             <div id="method-details">
                     <div class="method-item">
                     <h3 id="method___construct">
-        <div class="location">at line 28</div>
+        <div class="location">at line 29</div>
         <code>                    
     <strong>__construct</strong>(<a href="../../../App/Models/Backend/DashboardModel.html"><abbr title="App\Models\Backend\DashboardModel">DashboardModel</abbr></a> $dashboardModel)
         </code>
@@ -163,6 +213,216 @@ metriche, KPI, statistiche o dati di riepilogo necessari al popolamento dinamico
             </table>
 
             
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getCssIndex">
+        <div class="location">at line 35</div>
+        <code>                    array
+    <strong>getCssIndex</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Carica solo nella dashboard gli stili dedicati ai riepiloghi e ai grafici.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_formatCount">
+        <div class="location">at line 41</div>
+        <code>                    string
+    <strong>formatCount</strong>(int $count)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Formatta i conteggi secondo la lingua dell'interfaccia, senza decimali.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>int</td>
+                <td>$count</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_formatValue">
+        <div class="location">at line 47</div>
+        <code>                    string
+    <strong>formatValue</strong>(string $value)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Formatta gli importi decimali senza convertirli in float o supporre una valuta.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$value</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getCards">
+        <div class="location">at line 56</div>
+        <code>                    array
+    <strong>getCards</strong>(array $counts, object|null $admin)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Prepara i quattro riepiloghi; quello degli amministratori è esclusivamente superadmin.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$counts</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>object|null</td>
+                <td>$admin</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getRankings">
+        <div class="location">at line 79</div>
+        <code>                    array
+    <strong>getRankings</strong>(array $rankings)
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Calcola l'ampiezza relativa delle barre; non somma le associazioni molti-a-molti.</p></p>                        
+        </div>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$rankings</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td></td>
+        </tr>
+    </table>
+
             
             
             

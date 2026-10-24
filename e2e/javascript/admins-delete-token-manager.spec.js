@@ -1,13 +1,13 @@
 
-const { test, expect } = require('@playwright/test');
+const { test, expect, adminUuid } = require('../support/admin-fixture');
+const { appUrl } = require('../support/app-url');
 
 test.use({
     storageState: 'e2e/.auth/admin.json'
 });
 
-const adminUuid = 'aef9b10c-ebe7-4e55-af1f-19aef22c53c8';
-const pageUrl = `/backend/admins/edit/${adminUuid}`;
-const modulePath = '/assets/js/backend/modules/Admins.js';
+const pageUrl = appUrl(`/backend/admins/edit/${adminUuid}`);
+const modulePath = appUrl('/assets/js/backend/modules/Admins.js');
 
 test('DeleteTokenManager gestisce fallimento, successo e aggiornamento token', async ({ page }) => {
     await page.goto(pageUrl);

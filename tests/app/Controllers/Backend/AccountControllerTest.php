@@ -12,11 +12,19 @@ class AccountControllerTest extends CIUnitTestCase
     use ControllerTestTrait;
     use DatabaseTestTrait;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        /* Rende autonomi anche i test che invocano direttamente i singoli endpoint. */
+        helper('settings');
+    }
+
     public function testInitControllerSetsCorrectDataAndProperties(): void
     {
         /* 1. MOCK DIPENDENZE CONTROLLER */
         $request = 
-            $this->createMock(\CodeIgniter\HTTP\RequestInterface::class);
+            $this->createMock(\CodeIgniter\HTTP\IncomingRequest::class);
 
         $response = 
             $this->createMock(\CodeIgniter\HTTP\ResponseInterface::class);
@@ -3205,11 +3213,16 @@ class AccountControllerTest extends CIUnitTestCase
             
         $controller->method('render')->willReturn('mock_view_general');
 
+        $accountModel = $this->createMock(\App\Models\Backend\AccountModel::class);
+        $accountModel->expects($this->once())->method('getGroupName')->with(1)->willReturn((object) ['name' => 'Administrators']);
+
         /* 2. INIEZIONE */
         $injector = 
-            function() {
+            function() use ($accountModel) {
                 $this->data = 
                     [];
+                $this->accountModel = $accountModel;
+                $this->currentAdmin = (object) ['group_id' => 1];
             };
             
         $boundInjector = 

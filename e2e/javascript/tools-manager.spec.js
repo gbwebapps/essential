@@ -1,12 +1,13 @@
 
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
 test.use({
     storageState: 'e2e/.auth/admin.json'
 });
 
-const pageUrl = '/backend/tools';
-const modulePath = '/assets/js/backend/modules/Tools.js';
+const pageUrl = appUrl('/backend/tools');
+const modulePath = appUrl('/assets/js/backend/modules/Tools.js');
 
 async function createTestManager(page, html) {
     await page.evaluate(async ({ path, markup }) => {
@@ -451,14 +452,14 @@ test('ToolsManager aggiorna le statistiche delle tabelle e genera backup senza d
 
                 <ul>
                     <li data-table="admins">
-                        <div class="text-muted d-flex">Stato iniziale admins</div>
+                        <div class="app-text-muted d-flex">Stato iniziale admins</div>
                     </li>
                     <li data-table="groups">
-                        <div class="text-muted d-flex">Stato iniziale groups</div>
+                        <div class="app-text-muted d-flex">Stato iniziale groups</div>
                     </li>
                 </ul>
 
-                <div class="text-muted infoDb">Totali iniziali</div>
+                <div class="app-text-muted infoDb">Totali iniziali</div>
 
                 <button type="button"
                     class="btn-optimize-table"
@@ -488,8 +489,8 @@ test('ToolsManager aggiorna le statistiche delle tabelle e genera backup senza d
 
     await expect.poll(() => optimizations).toBe(1);
 
-    await expect(page.locator('li[data-table="admins"] .text-muted.d-flex')).toContainText('Righe 12');
-    await expect(page.locator('li[data-table="admins"] .text-muted.d-flex')).toContainText('Spazio 2.50');
+    await expect(page.locator('li[data-table="admins"] .app-text-muted.d-flex')).toContainText('Righe 12');
+    await expect(page.locator('li[data-table="admins"] .app-text-muted.d-flex')).toContainText('Spazio 2.50');
 
     await expect.poll(() => getManagerState(page)).toEqual({
         isSubmitting: false,
@@ -502,9 +503,9 @@ test('ToolsManager aggiorna le statistiche delle tabelle e genera backup senza d
 
     await expect.poll(() => optimizations).toBe(2);
 
-    await expect(page.locator('li[data-table="groups"] .text-muted.d-flex')).toContainText('Righe 8');
-    await expect(page.locator('.text-muted.infoDb')).toContainText('Spazio 4.00');
-    await expect(page.locator('.text-muted.infoDb')).toContainText('Overhead 0.30');
+    await expect(page.locator('li[data-table="groups"] .app-text-muted.d-flex')).toContainText('Righe 8');
+    await expect(page.locator('.app-text-muted.infoDb')).toContainText('Spazio 4.00');
+    await expect(page.locator('.app-text-muted.infoDb')).toContainText('Overhead 0.30');
 
     // Gli input temporanei devono essere rimossi.
     await expect(page.locator('#dbMaintenance-tools-form input[name="table"]')).toHaveCount(0);

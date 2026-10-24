@@ -960,6 +960,23 @@ body {
     border-color: #111111 !important;
 }
 
+/* Chiusura dell'albero categorie: rosso semantico e bordi del tema Grey. */
+#categoriesTreeModal .modal-footer [data-bs-dismiss="modal"] {
+    --bs-btn-color: #ffffff;
+    --bs-btn-hover-color: #ffffff;
+    --bs-btn-active-color: #ffffff;
+    --bs-btn-border-color: #6c757d;
+    --bs-btn-hover-border-color: #6c757d;
+    --bs-btn-active-border-color: #6c757d;
+    background: linear-gradient(to bottom, var(--app-danger), var(--app-danger-hover));
+}
+
+#categoriesTreeModal .modal-footer [data-bs-dismiss="modal"]:hover,
+#categoriesTreeModal .modal-footer [data-bs-dismiss="modal"]:focus,
+#categoriesTreeModal .modal-footer [data-bs-dismiss="modal"]:active {
+    background: linear-gradient(to bottom, var(--app-danger-hover), var(--app-danger));
+}
+
 .app-btn-secondary:not(.toggle-password-visibility) {
     --bs-btn-color: #ffffff;
     --bs-btn-border-color: var(--app-button-border);
@@ -1563,4 +1580,21 @@ body {
 
 #mainToolsDashboard #system-tools-container.accordion-body.border-top {
     border-top: 0 !important;
+}
+
+/* Azione di importazione del pacchetto Warehouse. */
+#warehouse-import-link {
+    display: inline-block;
+    padding: .375rem .75rem;
+    color: #ffffff !important;
+    background: linear-gradient(to bottom, var(--app-success), var(--app-success-hover));
+    border: .0625rem solid var(--app-button-border);
+    border-radius: var(--bs-border-radius);
+    text-decoration: none !important;
+}
+
+#warehouse-import-link:hover,
+#warehouse-import-link:focus,
+#warehouse-import-link:active {
+    background: linear-gradient(to bottom, var(--app-success-hover), var(--app-success));
 }

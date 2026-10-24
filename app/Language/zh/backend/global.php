@@ -20,7 +20,13 @@ return [
         'bottomRight' => [
             'settings' => '设置',
             'tools' => '工具', 
+            'warehouse' => '仓库管理',
         ],
+    ],
+    'menuCounts' => [
+        'active' => '已启用',
+        'trashed' => '已删除',
+        'suspended' => '已停用',
     ],
     'links' => [
         'selectAll' => '全选'

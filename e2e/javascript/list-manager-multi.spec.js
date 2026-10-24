@@ -1,9 +1,10 @@
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
 test.use({ storageState: 'e2e/.auth/admin.json' });
 
 test('Due ListManager mantengono filtri, paginazione e risultati indipendenti', async ({ page }) => {
-    await page.goto('/backend/admins/showAll');
+    await page.goto(appUrl('/backend/admins/showAll'));
     await expect(page).toHaveURL(/\/backend\/admins\/showAll\/?$/);
 
     const payloads = { alpha: [], beta: [] };
@@ -26,7 +27,7 @@ test('Due ListManager mantengono filtri, paginazione e risultati indipendenti', 
     }
 
     await page.evaluate(async () => {
-        const { ListManager } = await import('/assets/js/backend/modules/Crud.js');
+        const { ListManager } = await import(new URL('assets/js/backend/modules/Crud.js', document.getElementById('hidden-urlbase').dataset.urlbase).href);
         for (const controller of ['alpha', 'beta']) {
             const root = document.createElement('section');
             root.id = `e2e-${controller}-root`;
@@ -63,7 +64,7 @@ test('Due ListManager mantengono filtri, paginazione e risultati indipendenti', 
     await page.locator('#e2e-beta-root .changeNumRows').selectOption('10');
     await expect.poll(() => payloads.beta.length).toBeGreaterThan(1);
     const state = await page.evaluate(async () => {
-        const { ListManager } = await import('/assets/js/backend/modules/Crud.js');
+        const { ListManager } = await import(new URL('assets/js/backend/modules/Crud.js', document.getElementById('hidden-urlbase').dataset.urlbase).href);
         const alpha = ListManager.instances['e2e-alpha-results'];
         const beta = ListManager.instances['e2e-beta-results'];
         const result = {

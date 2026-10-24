@@ -1,8 +1,10 @@
 <!-- Form per la conferma finale -->
+<?php if (empty($embedded)): ?>
 <form id="importForm">
     
     <input type="hidden" name="importId" value="<?= esc($importId ?? ''); ?>">
     <input type="hidden" name="step" value="confirm">
+<?php endif; ?>
 
     <?php if ($plan['insert'] === 0 && $plan['update'] === 0): ?>
 
@@ -11,7 +13,7 @@
             <i class="fa-solid fa-check-circle fa-2x me-3"></i>
             <div>
                 <strong><?= lang('backend/components/import.labels.perfectSync'); ?></strong><br>
-                <?= sprintf(lang('backend/components/import.labels.syncNoChanges'), $plan['skip']); ?>
+                <?= sprintf($syncNoChanges ?? lang('backend/components/import.labels.syncNoChanges'), $plan['skip']); ?>
             </div>
         </div>
     <?php else: ?>
@@ -78,4 +80,6 @@
         </div>
     <?php endif; ?>
 
+<?php if (empty($embedded)): ?>
 </form>
+<?php endif; ?>

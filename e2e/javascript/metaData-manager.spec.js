@@ -1,12 +1,13 @@
 
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
 test.use({
     storageState: 'e2e/.auth/admin.json'
 });
 
-const pageUrl = '/backend/admins/showAll';
-const modulePath = '/assets/js/backend/modules/Crud.js';
+const pageUrl = appUrl('/backend/admins/showAll');
+const modulePath = appUrl('/assets/js/backend/modules/Crud.js');
 const dataUrl = '/backend/admins/e2e-meta-data';
 
 async function openPage(page) {

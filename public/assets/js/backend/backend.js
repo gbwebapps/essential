@@ -98,6 +98,28 @@ document.addEventListener('click', (e) => {
     }
 });
 
+/** Aggiorna solo i badge dei menu presenti nella pagina e autorizzati dal server. */
+function updateMenuCounts(countsByEntity) {
+    if ( ! countsByEntity || typeof countsByEntity !== 'object') return;
+
+    document.querySelectorAll('[data-menu-counts]').forEach(container => {
+        const counts = countsByEntity[container.dataset.menuCounts];
+        const types = ['active', 'trashed', 'suspended'];
+
+        if ( ! counts || ! types.every(type => Number.isSafeInteger(counts[type]) && counts[type] >= 0)) return;
+
+        container.querySelectorAll('[data-menu-count]').forEach(badge => {
+            const type = badge.dataset.menuCount;
+            if ( ! types.includes(type)) return;
+
+            badge.textContent = String(counts[type]);
+            const label = badge.dataset.label + ': ' + counts[type];
+            badge.title = label;
+            badge.setAttribute('aria-label', label);
+        });
+    });
+}
+
 /* --- Gestione globale Loader e Controlli --- */
 export function toggleLoader(show) {
     const loader = document.getElementById('show-loader');
@@ -158,6 +180,8 @@ async function executeFetch(input, init = {}) {
         /* 1. Gestione dei casi con Status 200 OK */
         if (response.ok) {
             const data = await response.json();
+
+            if (data?.result === true) updateMenuCounts(data.menuCounts);
 
             /* Sbarramento Sessione Scaduta */
             if (data && data.result === 'no_current_user_logged') {
@@ -755,7 +779,7 @@ export function initTomSelects() {
     const textSelect = langDef ? langDef.dataset.select : 'Seleziona';
     const textRemove = langDef ? langDef.dataset.remove : 'Rimuovi';
 
-    document.querySelectorAll('.tom-select:not(.tomselected)').forEach(select => {
+    document.querySelectorAll('select.tom-select:not(.tomselected)').forEach(select => {
         new TomSelect(select, {
             placeholder: textSelect,
             plugins: {

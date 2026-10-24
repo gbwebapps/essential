@@ -24,6 +24,7 @@ return [
         'resetSorting' => 'Resetta ordinamento',
         'reloadList' => 'Ricarica lista',
         'activeRecords' => 'Attivi',
+        'suspendedRecords' => 'Sospesi',
         'trashedRecords' => 'Eliminati',
         'allRecords' => 'Tutti',
     ],
@@ -89,6 +90,7 @@ return [
         'changeStatusBrand' => 'Aggiornamento stato marca %s',
     ],
     'messages' => [
+        'suspendAssociated' => 'La marca non può essere sospesa perché è associata a uno o più prodotti.',
         'areYouSureResetData' => 'Sei sicuro di voler resettare i dati?', 
         'areYouSureRefreshData' => 'Sei sicuro di voler ricaricare i dati?', 
         'areYouSureChangeStatus' => 'Sei sicuro di voler modificare lo stato di <b>%s</b>?',

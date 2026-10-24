@@ -481,6 +481,22 @@ body {
     border-top-color: #111111 !important;
 }
 
+/* Conteggi nei menu: attivi, sospesi, eliminati. */
+[data-menu-counts] [data-menu-count="active"] {
+    color: #ffffff !important;
+    background-color: var(--app-success) !important;
+}
+
+[data-menu-counts] [data-menu-count="suspended"] {
+    color: #000000 !important;
+    background-color: var(--app-text-accent-color) !important;
+}
+
+[data-menu-counts] [data-menu-count="trashed"] {
+    color: #ffffff !important;
+    background-color: var(--app-danger) !important;
+}
+
 #buttons_block .card,
 #buttons_block .card-body,
 #buttons-block .card,
@@ -971,6 +987,28 @@ body {
     border-color: #111111 !important;
 }
 
+/* L'albero categorie mantiene uno sfondo uniforme e bordi specifici nel tema Dark. */
+#categoriesTreeModal .modal-content {
+    background: #444444 !important;
+    border-color: #222222 !important;
+}
+
+#categoriesTreeModal .modal-footer [data-bs-dismiss="modal"] {
+    --bs-btn-color: #ffffff;
+    --bs-btn-hover-color: #ffffff;
+    --bs-btn-active-color: #ffffff;
+    --bs-btn-border-color: #222222;
+    --bs-btn-hover-border-color: #222222;
+    --bs-btn-active-border-color: #222222;
+    background: linear-gradient(to bottom, var(--app-danger), var(--app-danger-hover));
+}
+
+#categoriesTreeModal .modal-footer [data-bs-dismiss="modal"]:hover,
+#categoriesTreeModal .modal-footer [data-bs-dismiss="modal"]:focus,
+#categoriesTreeModal .modal-footer [data-bs-dismiss="modal"]:active {
+    background: linear-gradient(to bottom, var(--app-danger-hover), var(--app-danger));
+}
+
 .app-btn-secondary:not(.toggle-password-visibility) {
     --bs-btn-color: #ffffff;
     --bs-btn-border-color: var(--app-button-border);
@@ -1085,6 +1123,10 @@ body {
     border-color: #111111 !important;
 }
 
+#importModal .modal-content {
+    background: #444444 !important;
+}
+
 #exportPdfModal .modal-content {
     border: .0625rem solid #111111 !important;
 }
@@ -1170,4 +1212,21 @@ body {
 
 #backups-tools-container .list-group-item {
     background-color: #222222 !important;
+}
+
+/* Azione di importazione del pacchetto Warehouse. */
+#warehouse-import-link {
+    display: inline-block;
+    padding: .375rem .75rem;
+    color: #ffffff !important;
+    background: linear-gradient(to bottom, var(--app-success), var(--app-success-hover));
+    border: .0625rem solid #222222;
+    border-radius: var(--bs-border-radius);
+    text-decoration: none !important;
+}
+
+#warehouse-import-link:hover,
+#warehouse-import-link:focus,
+#warehouse-import-link:active {
+    background: linear-gradient(to bottom, var(--app-success-hover), var(--app-success));
 }

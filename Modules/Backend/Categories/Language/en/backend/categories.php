@@ -26,10 +26,12 @@ return [
         'resetSorting' => 'Reset sorting',
         'reloadList' => 'Reload list',
         'activeRecords' => 'Active',
+        'suspendedRecords' => 'Suspended',
         'trashedRecords' => 'Deleted',
         'allRecords' => 'All',
     ],
     'labels' => [
+        'suspendedRelation' => 'Suspended',
         'uuid' => 'UUID',
         'category' => 'Category',
         'parentCategory' => 'Parent category',
@@ -98,6 +100,9 @@ return [
         'changeStatusCategory' => 'Update category status %s',
     ],
     'messages' => [
+        'suspendAssociated' => 'The category cannot be suspended because it is associated with one or more products.',
+        'suspendHasChildren' => 'The category cannot be suspended because it contains subcategories.',
+        'parentSuspended' => 'The selected parent category is suspended.',
         'areYouSureResetData' => 'Are you sure you want to reset the data?',
         'areYouSureRefreshData' => 'Are you sure you want to reload the data?',
         'areYouSureChangeStatus' => 'Are you sure you want to change the status of <b>%s</b>?',

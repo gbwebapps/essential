@@ -1,11 +1,23 @@
+<!-- Struttura principale del form di aggiornamento -->
+
+<!-- Form per aggiornamento dati generali -->
 <form id="getGeneralData"></form>
+
+<!-- Form per aggiornamento metadati -->
 <form id="getMetaData"></form>
+
+<!-- Form per aggiornamento immagini -->
 <form id="getImages"></form>
 
 <div class="row">
     <div class="col-12 col-lg-8 offset-lg-2">
+
         <div class="card">
+
+            <!-- Form identificato per la gestione AJAX -->
             <form id="products-edit" data-unsaved-check>
+
+                <!-- Dati generali -->
                 <div class="card-header rounded-0 d-flex justify-content-between align-items-center">
                     <h2 class="card-title text-start mb-0"><?= lang('backend/products.panels.generalData'); ?></h2>
                     <input type="hidden" name="uuid" value="<?= esc($product->uuid, 'attr'); ?>" form="getGeneralData">
@@ -14,14 +26,19 @@
                         <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/products.buttons.reload'); ?>
                     </button>
                 </div>
+
                 <div id="generalData">
                     <?= $this->include(\Modules\Backend\Products\Config\Views::EDIT_GENERAL_DATA_PARTIAL, $this->data); ?>
                 </div>
+                <!-- End Dati generali -->
 
+                <!-- Upload e anteprima immagini -->
                 <div id="uploadPreview">
                     <?= $this->include('backend/components/uploadPreview/uploadPreviewView'); ?>
                 </div>
+                <!-- End Upload e anteprima immagini -->
 
+                <!-- Galleria immagini -->
                 <div class="card-header rounded-0 d-flex justify-content-between align-items-center" style="border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);">
                     <h2 class="card-title text-start mb-0"><?= lang('backend/components/galleryOne.title'); ?></h2>
                     <input form="getImages" type="hidden" name="uuid" value="<?= esc($product->uuid, 'attr'); ?>">
@@ -31,10 +48,13 @@
                         <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/components/galleryOne.buttons.reload'); ?>
                     </button>
                 </div>
+
                 <div id="galleryOne">
                     <?= $this->include('backend/components/galleryOne/galleryOneView', $this->data); ?>
                 </div>
+                <!-- End Galleria immagini -->
 
+                <!-- Metadati -->
                 <div class="card-header rounded-0 d-flex justify-content-between align-items-center" style="border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);">
                     <h2 class="card-title text-start mb-0"><?= lang('backend/products.panels.metaData'); ?></h2>
                     <input type="hidden" name="uuid" value="<?= esc($product->uuid, 'attr'); ?>" form="getMetaData">
@@ -42,12 +62,18 @@
                         <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/products.buttons.reload'); ?>
                     </button>
                 </div>
+
                 <div id="metaData">
                     <?= $this->include(\Modules\Backend\Products\Config\Views::META_DATA_PARTIAL, $this->data); ?>
                 </div>
+                <!-- End Metadati -->
 
+                <!-- UUID immutabile del prodotto -->
                 <input type="hidden" name="uuid" id="uuid" value="<?= esc($product->uuid, 'attr'); ?>">
+
             </form>
+
         </div>
+
     </div>
 </div>

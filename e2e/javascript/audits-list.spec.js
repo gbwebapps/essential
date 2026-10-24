@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
 test.use({ storageState: 'e2e/.auth/admin.json' });
 
@@ -17,7 +18,7 @@ function waitForAuditsResponse(page, predicate) {
 test('Audits collega vista e ListManager per righe, filtri e ordinamento', async ({ page }) => {
     const initialResponse = waitForAuditsResponse(page, params => params.get('rows') === '5');
 
-    await page.goto('/backend/audits');
+    await page.goto(appUrl('/backend/audits'));
     await expect(page).toHaveURL(/\/backend\/audits\/?$/);
     await initialResponse;
 

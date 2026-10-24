@@ -1,5 +1,8 @@
 <?php declare(strict_types = 1);
 
+/**
+ * Traduzioni francesi del modulo Products.
+ */
 return [
     'titles' => [
         'index' => 'Données des produits',
@@ -23,16 +26,19 @@ return [
         'resetFilters' => 'Effacer la recherche',
         'resetSorting' => 'Réinitialiser le tri',
         'reloadList' => 'Recharger la liste',
-        'activeRecords' => 'Actives',
+        'activeRecords' => 'Actifs',
+        'suspendedRecords' => 'Suspendus',
         'trashedRecords' => 'Supprimées',
         'allRecords' => 'Toutes',
     ],
     'labels' => [
+        'suspendedRelation' => 'Suspendue',
         'uuid' => 'UUID',
         'product' => 'Produit',
         'sku' => 'SKU',
         'quantity' => 'Quantité',
         'price' => 'Prix',
+        'totalValue' => 'Valeur totale',
         'brands' => 'Marques',
         'categories' => 'Catégories',
         'quantityFrom' => 'Quantité minimale',
@@ -89,7 +95,7 @@ return [
         'refreshData' => 'Recharger les données',
         'reload' => 'Recharger le panneau',
         'print' => 'Imprimer',
-        'exportPdf' => 'Exporter en PDF'
+        'exportPdf' => 'Exporter en PDF',
     ],
     'errors' => [
         'uuid' => 'UUID non valide.',
@@ -132,6 +138,7 @@ return [
         'changeStatusSuccess' => 'Statut du produit %s modifié avec succès.',
         'changeStatusError' => 'Échec de la modification du statut du produit.',
         'cannotModifyDeleted' => 'Impossible de modifier un produit supprimé.',
+        'importExistingOnly' => 'L’importation locale permet uniquement de mettre à jour des produits existants.',
         'relationsRequired' => 'Au moins une marque et une catégorie doivent être sélectionnées.',
         'invalidBrands' => 'Une ou plusieurs marques sélectionnées ne sont pas valides.',
         'invalidCategories' => 'Une ou plusieurs catégories sélectionnées ne sont pas valides.',

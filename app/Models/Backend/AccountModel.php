@@ -317,6 +317,22 @@ class AccountModel extends BackendModel
         return null;
     }
 
+    public function getGroupName(int $id): ?object
+    {
+        try 
+        {
+            $sql = "select name from admins_groups where id = ? limit 1";
+            $query = $this->db->query($sql, [$id]);
+            
+            return $query->getRow() ?: null;
+        } 
+        catch (\Throwable $e) 
+        {
+            log_message('error', 'Errore recupero nome gruppo: ' . $e);
+            return null;
+        }
+    }
+
     /**
      * Revoca e distrugge fisicamente un token (sessione, cookie o attivazione) dal database.
      * 

@@ -1,12 +1,13 @@
 
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
 test.use({
     storageState: 'e2e/.auth/admin.json'
 });
 
-const pageUrl = '/backend/settings';
-const modulePath = '/assets/js/backend/modules/Settings.js';
+const pageUrl = appUrl('/backend/settings');
+const modulePath = appUrl('/assets/js/backend/modules/Settings.js');
 
 test('Settings Auth espone la protezione separata del reset password pubblico', async ({ page }) => {
     await page.goto(pageUrl);

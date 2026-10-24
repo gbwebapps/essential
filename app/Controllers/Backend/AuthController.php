@@ -224,18 +224,18 @@ class AuthController extends BackendController
         endif;
 
         $this->data['action'] = 'verify';
+
         $this->data['title'] = lang('backend/auth.titles.verify');
         $this->data['icon'] = '<i class="fa-solid fa-mobile-screen"></i>';
+
 		$method = (string) ($pending['method'] ?? 'totp');
+
 		$config = setting('Backend\Auth');
+
 		$this->data['otpCountdownMode'] = $method === 'email' ? 'expiry' : 'period';
 		$this->data['otpCountdownServerTime'] = microtime(true);
-		$this->data['otpCountdownExpiresAt'] = $method === 'email'
-			? ($this->authModel->getEmailOtpExpiresAt((string) $pending['admin_uuid']) ?? time())
-			: 0;
-		$this->data['otpCountdownPeriod'] = $method === 'totp'
-			? (int) ($config->twoFactorOtpExpiry ?? config(\Config\Backend\Auth::class)->twoFactorOtpExpiry)
-			: 0;
+		$this->data['otpCountdownExpiresAt'] = $method === 'email' ? ($this->authModel->getEmailOtpExpiresAt((string) $pending['admin_uuid']) ?? time()) : 0;
+		$this->data['otpCountdownPeriod'] = $method === 'totp' ? (int) ($config->twoFactorOtpExpiry ?? config(\Config\Backend\Auth::class)->twoFactorOtpExpiry) : 0;
 
         return $this->render('backend/auth/verifyView', $this->data);
     }

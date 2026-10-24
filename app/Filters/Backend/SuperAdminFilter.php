@@ -49,14 +49,14 @@ class SuperAdminFilter implements FilterInterface
             $message = lang('backend/auth.messages.loginNeeded');
         endif;
 
-        session()->setFlashdata('message', $message);
-        session()->setFlashdata('class', 'app-alert-danger fw-bold');
-        session()->setFlashdata('icon', '<i class="fa-solid fa-ban"></i>');
-
         /* Blocco AJAX: restituisce esito negativo e messaggio */
         if ($request->isAJAX() && $request->is('post')):
             return service('response')->setJSON(['result' => false, 'message' => $message]);
         endif;
+
+        session()->setFlashdata('message', $message);
+        session()->setFlashdata('class', 'app-alert-danger fw-bold');
+        session()->setFlashdata('icon', '<i class="fa-solid fa-triangle-exclamation"></i>');
 
         /* Blocco Standard: reindirizza alla dashboard */
         return redirect()->to(base_url('backend/dashboard'));

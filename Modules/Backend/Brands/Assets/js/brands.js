@@ -20,6 +20,23 @@ const actions = {
             containerId: 'showAll-brands-container',
             searchFields: ['brand', 'status'],
             searchDates: ['created_at', 'updated_at']
+        }, {
+            /* Aggiorna i tre totali solo dopo un caricamento riuscito della lista. */
+            onShowAfter: data => {
+                const counts = data.trashCounts;
+                const filters = ['active', 'suspended', 'trashed', 'all'];
+
+                if ( ! counts || ! filters.every(filter => Number.isSafeInteger(counts[filter]) && counts[filter] >= 0)
+                    || counts.active + counts.suspended + counts.trashed !== counts.all) return;
+
+                brandsManager.root.querySelectorAll('[data-trash-count]').forEach(badge => {
+                    const filter = badge.dataset.trashCount;
+                    if ( ! filters.includes(filter)) return;
+
+                    badge.textContent = String(counts[filter]);
+                    badge.hidden = false;
+                });
+            }
         });
         brandsManager.init();
 

@@ -1,5 +1,8 @@
 <?php declare(strict_types = 1);
 
+/**
+ * Traduzioni inglesi del modulo Products.
+ */
 return [
     'titles' => [
         'index' => 'Product data',
@@ -24,15 +27,18 @@ return [
         'resetSorting' => 'Reset sorting',
         'reloadList' => 'Reload list',
         'activeRecords' => 'Active',
+        'suspendedRecords' => 'Suspended',
         'trashedRecords' => 'Deleted',
         'allRecords' => 'All',
     ],
     'labels' => [
+        'suspendedRelation' => 'Suspended',
         'uuid' => 'UUID',
         'product' => 'Product',
         'sku' => 'SKU',
         'quantity' => 'Quantity',
         'price' => 'Price',
+        'totalValue' => 'Total value',
         'brands' => 'Brands',
         'categories' => 'Categories',
         'quantityFrom' => 'Minimum quantity',
@@ -89,7 +95,7 @@ return [
         'refreshData' => 'Reload data',
         'reload' => 'Reload panel',
         'print' => 'Print',
-        'exportPdf' => 'Export PDF'
+        'exportPdf' => 'Export PDF',
     ],
     'errors' => [
         'uuid' => 'Invalid UUID.',
@@ -132,6 +138,7 @@ return [
         'changeStatusSuccess' => 'Status for product %s updated successfully.',
         'changeStatusError' => 'Product status update failed.',
         'cannotModifyDeleted' => 'Cannot modify a deleted product.',
+        'importExistingOnly' => 'Local import can only update existing products.',
         'relationsRequired' => 'At least one brand and one category must be selected.',
         'invalidBrands' => 'One or more selected brands are invalid.',
         'invalidCategories' => 'One or more selected categories are invalid.',

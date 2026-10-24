@@ -1,13 +1,14 @@
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
 // Guest Mode: non utilizziamo admin.json.
-const pageUrl = '/backend/auth/setPassword';
-const modulePath = '/assets/js/backend/modules/Auth.js';
+const pageUrl = appUrl('/backend/auth/setPassword');
+const modulePath = appUrl('/assets/js/backend/modules/Auth.js');
 const setUrl = '/backend/auth/setPassword';
 
 test('SetPasswordManager gestisce validazione e fallimenti logici', async ({ page }) => {
     
-    await page.goto('/backend/auth');
+    await page.goto(appUrl('/backend/auth'));
 
     await page.evaluate(() => {
         const form = document.createElement('form');
@@ -87,7 +88,7 @@ test('SetPasswordManager gestisce validazione e fallimenti logici', async ({ pag
 
 
 test('SetPasswordManager impedisce richieste duplicate', async ({ page }) => {
-    await page.goto('/backend/auth');
+    await page.goto(appUrl('/backend/auth'));
 
     await page.evaluate(() => {
         const form = document.createElement('form');
@@ -162,7 +163,7 @@ test('SetPasswordManager impedisce richieste duplicate', async ({ page }) => {
 
 
 test('SetPasswordManager recupera dopo errori e resetta il form al successo', async ({ page }) => {
-    await page.goto('/backend/auth');
+    await page.goto(appUrl('/backend/auth'));
 
     await page.evaluate(() => {
         const form = document.createElement('form');

@@ -1,9 +1,10 @@
 
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
 // Guest Mode: non utilizziamo admin.json.
-const pageUrl = '/backend/auth';
-const modulePath = '/assets/js/backend/modules/Auth.js';
+const pageUrl = appUrl('/backend/auth');
+const modulePath = appUrl('/assets/js/backend/modules/Auth.js');
 const verifyUrl = '/backend/auth/verify';
 
 test('VerifyManager gestisce validazione OTP e codici errati', async ({ page }) => {

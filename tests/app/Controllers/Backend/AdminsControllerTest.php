@@ -471,7 +471,7 @@ class AdminsControllerTest extends CIUnitTestCase
         $mockModel = 
             $this->getMockBuilder(\App\Models\Backend\AdminsModel::class)
                  ->disableOriginalConstructor()
-                 ->onlyMethods(['showAllValidationRules', 'showAllSearchValidationRules', 'getData'])
+                 ->onlyMethods(['showAllValidationRules', 'showAllSearchValidationRules', 'getData', 'getTrashCounts'])
                  ->getMock();
 
         /* Inseriamo regole minime valide per far passare validateData */
@@ -486,6 +486,9 @@ class AdminsControllerTest extends CIUnitTestCase
                   ]);
                   
         /* Forniamo la struttura completa attesa dalla view partial per evitare crash nel rendering */
+        $mockModel->expects($this->once())->method('getTrashCounts')
+                  ->willReturn(['active' => 3, 'suspended' => 0, 'trashed' => 2, 'all' => 5]);
+
         $mockModel->method('getData')
                   ->willReturn([
                       'result'       => true,
@@ -564,6 +567,8 @@ class AdminsControllerTest extends CIUnitTestCase
             'output', 
             $json
         );
+
+        $this->assertSame(['active' => 3, 'suspended' => 0, 'trashed' => 2, 'all' => 5], $json['trashCounts']);
 
         /* Pulizia */
         $_POST = [];

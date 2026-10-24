@@ -97,7 +97,7 @@ class SuperAdminFilterTest extends CIUnitTestCase
         $this->assertSame(302, $result->getStatusCode());
         $this->assertSame(base_url('backend/dashboard'), $result->getHeaderLine('Location'));
         $this->assertSame('app-alert-danger fw-bold', session()->getFlashdata('class'));
-        $this->assertSame('<i class="fa-solid fa-ban"></i>', session()->getFlashdata('icon'));
+        $this->assertSame('<i class="fa-solid fa-triangle-exclamation"></i>', session()->getFlashdata('icon'));
     }
 
     public function testAfterReturnsNull(): void

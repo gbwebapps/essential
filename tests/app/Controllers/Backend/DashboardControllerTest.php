@@ -9,13 +9,21 @@ use Config\Services;
 
 class DashboardControllerTest extends CIUnitTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        /* Il test di index non esegue l'inizializzazione completa del controller. */
+        helper('settings');
+    }
+
 	public function testInitControllerSetsCorrectProperties(): void
     {
         /* Mock delle dipendenze richieste dal metodo */
         $request = 
         $this
         ->createMock(
-            \CodeIgniter\HTTP\RequestInterface::class
+            \CodeIgniter\HTTP\IncomingRequest::class
         );
 
         $response = 
@@ -118,12 +126,17 @@ class DashboardControllerTest extends CIUnitTestCase
             'rendered_index_view'
         );
 
+        $dashboardModel = $this->createMock(\App\Models\Backend\DashboardModel::class);
+        $dashboardModel->method('getOverview')->willReturn(['counts' => [], 'rankings' => [], 'totals' => []]);
+
         /* Inizializzazione proprietà base */
         $closure = 
-        function() {
+        function() use ($dashboardModel) {
             $this
             ->data = 
             [];
+            $this->dashboardModel = $dashboardModel;
+            $this->dashboardClass = new \App\Libraries\Backend\DashboardClass($dashboardModel);
         };
 
         \Closure::bind(

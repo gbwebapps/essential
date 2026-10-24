@@ -24,6 +24,7 @@ return [
         'resetSorting' => 'Reset sorting',
         'reloadList' => 'Reload list',
         'activeRecords' => 'Active',
+        'suspendedRecords' => 'Suspended',
         'trashedRecords' => 'Deleted',
         'allRecords' => 'All',
     ],
@@ -89,6 +90,7 @@ return [
         'changeStatusBrand' => 'Update brand status %s',
     ],
     'messages' => [
+        'suspendAssociated' => 'The brand cannot be suspended because it is associated with one or more products.',
         'areYouSureResetData' => 'Are you sure you want to reset the data?',
         'areYouSureRefreshData' => 'Are you sure you want to reload the data?',
         'areYouSureChangeStatus' => 'Are you sure you want to change the status of <b>%s</b>?',

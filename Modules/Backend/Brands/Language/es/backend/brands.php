@@ -23,7 +23,8 @@ return [
         'resetFilters' => 'Limpiar búsqueda',
         'resetSorting' => 'Restablecer orden',
         'reloadList' => 'Recargar lista',
-        'activeRecords' => 'Activas',
+        'activeRecords' => 'Activos',
+        'suspendedRecords' => 'Suspendidos',
         'trashedRecords' => 'Eliminadas',
         'allRecords' => 'Todas',
     ],
@@ -89,6 +90,7 @@ return [
         'changeStatusBrand' => 'Actualizado estado de la marca %s',
     ],
     'messages' => [
+        'suspendAssociated' => 'La marca no puede suspenderse porque tiene productos asociados.',
         'areYouSureResetData' => '¿Seguro que quieres restablecer los datos?',
         'areYouSureRefreshData' => '¿Seguro que quieres recargar los datos?',
         'areYouSureChangeStatus' => '¿Seguro que quieres cambiar el estado de <b>%s</b>?',

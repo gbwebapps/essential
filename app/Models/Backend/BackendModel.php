@@ -31,6 +31,15 @@ abstract class BackendModel extends BaseModel
 	 */
 	protected bool $hasSoftDelete = false;
 
+	/** Abilita la separazione fra record attivi e sospesi nei CRUD che hanno uno stato. */
+	protected bool $hasStatusFilter = false;
+
+	/** Espone la capacità anche ai componenti che devono rispettare i filtri della lista. */
+	public function supportsStatusFilter(): bool
+	{
+		return $this->hasStatusFilter;
+	}
+
 	/**
 	 * Costrutto SQL nativo preparato per l'estrazione paginata dei record (metodo getData).
 	 * 
@@ -172,7 +181,8 @@ abstract class BackendModel extends BaseModel
 			$sql = $this->getDataQuery;
 
 			/* Filtro Cestino basato sulla proprietà module */
-			$trashStatus = (isset($posts['trash_filter']) && in_array($posts['trash_filter'], ['active', 'trashed', 'all'])) ? $posts['trash_filter'] : 'active';
+			$allowedFilters = $this->hasStatusFilter ? ['active', 'suspended', 'trashed', 'all'] : ['active', 'trashed', 'all'];
+			$trashStatus = (isset($posts['trash_filter']) && in_array($posts['trash_filter'], $allowedFilters, true)) ? $posts['trash_filter'] : 'active';
 			$sql .= $this->buildTrashFilter($trashStatus, $this->module, $this->hasSoftDelete);
 			$paramsFilter['trash_filter'] = $trashStatus;
 
@@ -312,7 +322,7 @@ abstract class BackendModel extends BaseModel
 	 * un cestino logico ($hasSoftDelete = false) restituisce una stringa vuota, prevenendo eccezioni SQL per colonne inesistenti. 
 	 * Il comportamento di fallback obbligatorio (active) sigilla l'esposizione dei record cancellati.
 	 *
-	 * @param string $filter Lo stato di visibilità richiesto (active, trashed, all)
+	 * @param string $filter Lo stato di visibilità richiesto (active, suspended, trashed, all)
 	 * @param string $table Il nome stringa della tabella di riferimento (sanitizzato internamente)
 	 * @param bool $hasSoftDelete Flag strutturale sulla persistenza logica (default true)
 	 * @return string Clausola condizionale SQL mirata (es. " AND table.deleted_at IS NULL") o vuota
@@ -333,6 +343,11 @@ abstract class BackendModel extends BaseModel
 
 	    if ($filter === 'all'):
 	        return ""; /* Nessuna restrizione, restituisce l'intero storico */
+	    endif;
+
+	    if ($this->hasStatusFilter):
+	        $status = $filter === 'suspended' ? 0 : 1;
+	        return " and {$table}.deleted_at is null and {$table}.status = {$status}";
 	    endif;
 
 	    /* Comportamento enterprise di default (active): blocco rigoroso dei record cestinati */

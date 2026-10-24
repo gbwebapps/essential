@@ -1,11 +1,12 @@
 
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
 test.use({
     storageState: 'e2e/.auth/admin.json'
 });
 
-const modulePath = '/assets/js/backend/modules/PasswordVisibility.js';
+const modulePath = appUrl('/assets/js/backend/modules/PasswordVisibility.js');
 
 async function getManager(page) {
     return page.evaluate(async path => {
@@ -22,8 +23,28 @@ async function getManager(page) {
 
 test('PasswordVisibility mostra e nasconde la chiave TOTP in Account Security', async ({ page }) => {
 
-    /* Simula esclusivamente la risposta AJAX che carica la vista TOTP */
+    const currentPassword = 'E2E-current-password';
+    const requests = [];
+
+    /* Simula la verifica, senza inviare credenziali o modificare il vero account. */
+    await page.route('**/backend/account/verifyCurrentPassword', async route => {
+        expect(route.request().method()).toBe('POST');
+        expect(route.request().postData()).toContain(currentPassword);
+        requests.push('verify');
+
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ result: true })
+        });
+    });
+
+    /* Simula la risposta AJAX che carica la vista TOTP. */
     await page.route('**/backend/account/setupTotp', async route => {
+        expect(route.request().method()).toBe('POST');
+        expect(route.request().postData()).toContain(currentPassword);
+        requests.push('setup');
+
         await route.fulfill({
             status: 200,
             contentType: 'application/json',
@@ -47,22 +68,35 @@ test('PasswordVisibility mostra e nasconde la chiave TOTP in Account Security', 
         });
     });
 
-    await page.goto('/backend/account/security');
+    await page.goto(appUrl('/backend/account/security'));
 
     await expect(page).toHaveURL(/\/backend\/account\/security\/?$/);
+
+    /* Controlla solo lo stato iniziale nel browser, non le impostazioni salvate. */
+    await page.evaluate(async path => {
+        const { SecurityManager } = await import(path);
+        SecurityManager.instance.currentActiveMethod = 'none';
+        SecurityManager.instance.restoreActiveMethod();
+    }, appUrl('/assets/js/backend/modules/Account.js'));
 
     /* Il campo TOTP è contenuto in una vista caricata dinamicamente */
     const totpMethod = page.locator('#method-totp');
 
     await expect(totpMethod).toHaveCount(1);
 
+    await page.locator('#securityCurrentPassword').fill(currentPassword);
     await totpMethod.click();
+
+    await expect(page.locator('#globalConfirmModal')).toBeVisible();
+    expect(requests).toEqual(['verify']);
+    await page.locator('#globalConfirmModal .btn-ok').click();
 
     const input = page.locator('#totp-secret-field');
     const button = input.locator('xpath=..').locator('.toggle-password-visibility');
     const icon = button.locator('i');
 
     await expect(input).toBeAttached();
+    expect(requests).toEqual(['verify', 'setup']);
     await expect(button).toHaveCount(1);
 
     await expect(input).toHaveAttribute('type', 'password');
@@ -99,7 +133,7 @@ test('PasswordVisibility mostra e nasconde la chiave TOTP in Account Security', 
 });
 
 test('PasswordVisibility funziona in Settings Email anche dopo il ricaricamento AJAX', async ({ page }) => {
-    await page.goto('/backend/settings');
+    await page.goto(appUrl('/backend/settings'));
 
     await expect(page).toHaveURL(/\/backend\/settings\/?$/);
 
@@ -145,7 +179,7 @@ test('PasswordVisibility funziona in Settings Email anche dopo il ricaricamento 
 });
 
 test('PasswordVisibility gestisce campi indipendenti e rimuove i listener con destroy', async ({ page }) => {
-    await page.goto('/backend/auth');
+    await page.goto(appUrl('/backend/auth'));
 
     const initialState = await getManager(page);
 

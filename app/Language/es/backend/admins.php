@@ -32,6 +32,7 @@ return [
 		'resetSorting' => 'Restablecer orden',
 		'reloadList' => 'Recargar lista',
 		'activeRecords' => 'Activos',
+		'suspendedRecords' => 'Suspendidos',
 		'trashedRecords' => 'Eliminados',
 		'allRecords' => 'Todos',
 	],

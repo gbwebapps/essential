@@ -1,21 +1,13 @@
 /* Import delle costanti da backend.js */
-import { urlbase, action, confirmDiscardChanges } from './backend.js';
+import { action, confirmDiscardChanges } from './backend.js';
 
 /* Import della classe logica polivalente */
 import { ToolsManager } from './modules/Tools.js';
-
-/* Import dei gestori CSV */
-import { ExportCsvManager } from './components/ExportCsv.js';
-import { ImportCsvManager } from './components/ImportCsv.js';
 
 const actions = {
     index: function() {
 
         const manager = new ToolsManager();
-        
-        /* Variabili per memorizzare le istanze e non ricrearle ad ogni click */
-        let exportManager = null;
-        let importManager = null;
 
         /* Delegazione globale per i click sui pulsanti accordion */
         document.addEventListener('click', async (e) => {
@@ -54,28 +46,6 @@ const actions = {
             if ( ! container || container.innerHTML.trim() === '') {
                 const success = await manager.loadPanel(`${env}-tools-container`, env);
                 if (success === false) return;
-                
-                /* Controlla se l'accordion aperto è quello della manutenzione */
-                if (env === 'dbMaintenance') {
-                    
-                    if ( ! exportManager) {
-                        exportManager = new ExportCsvManager({
-                            linkId: '.export-entity',
-                            urlModal: urlbase + 'backend/export/database/showModal',
-                            urlExport: urlbase + 'backend/export/database/generate'
-                        });
-                        exportManager.init();
-                    }
-                    
-                    if ( ! importManager) {
-                        importManager = new ImportCsvManager({
-                            linkId: '.import-entity',
-                            urlModal: urlbase + 'backend/import/database/showModal',
-                            urlProcess: urlbase + 'backend/import/database/processCsv'
-                        });
-                        importManager.init();
-                    }
-                }
             }
 
             bsCollapse.show();

@@ -328,6 +328,16 @@ e la creazione di backup di sicurezza preventivi.</p></p>        </div>
 <abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
             </tr>
                     <tr>
+                <td class="type" id="property_hasStatusFilter">
+                                        protected                                        bool
+                                                                                
+                                    </td>
+                <td>$hasStatusFilter</td>
+                <td class="last"><p>Abilita la separazione fra record attivi e sospesi nei CRUD che hanno uno stato.</p></td>
+                <td><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#property_hasStatusFilter">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></td>
+            </tr>
+                    <tr>
                 <td class="type" id="property_getDataQuery">
                                         protected                                        string|null
                                                                                 
@@ -493,6 +503,17 @@ e la creazione di backup di sicurezza preventivi.</p></p>        </div>
         
                                             <p><p>Inizializza le risorse strutturali del modello.</p></p>                </div>
                 <div class="col-md-2"><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#method_initModel">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8">
+                    <a href="#method_supportsStatusFilter">supportsStatusFilter</a>()
+        
+                                            <p><p>Espone la capacità anche ai componenti che devono rispettare i filtri della lista.</p></p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../../../App/Models/Backend/BackendModel.html#method_supportsStatusFilter">
 <abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a></small></div>
             </div>
                     <div class="row">
@@ -993,7 +1014,7 @@ il metodo di inizializzazione interno per predisporre le risorse di base (come i
                     <div class="method-item">
                     <h3 id="method_initModel">
         <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_initModel">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 140</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 149</div>
         <code>            protected        void
     <strong>initModel</strong>()
         </code>
@@ -1028,9 +1049,43 @@ setup al momento del caricamento.</p></p>
 
             </div>
                     <div class="method-item">
+                    <h3 id="method_supportsStatusFilter">
+        <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_supportsStatusFilter">
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 38</div>
+        <code>                    bool
+    <strong>supportsStatusFilter</strong>()
+        </code>
+    </h3>
+    <div class="details">    
+            
+    
+            
+
+        <div class="method-description">
+                            <p><p>Espone la capacità anche ai componenti che devono rispettare i filtri della lista.</p></p>                        
+        </div>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
                     <h3 id="method_getData">
         <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_getData">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 159</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 168</div>
         <code>                    array
     <strong>getData</strong>(array $posts)
         </code>
@@ -1078,7 +1133,7 @@ i filtri esatti per garantire la perfetta coerenza totale/risultati.</p></p>
                     <div class="method-item">
                     <h3 id="method_getNumRows">
         <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_getNumRows">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 228</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 238</div>
         <code>            protected        int
     <strong>getNumRows</strong>(array $paramsFilter)
         </code>
@@ -1124,7 +1179,7 @@ di conoscere l'esatto volume di dati indipendentemente dai limiti della singola 
                     <div class="method-item">
                     <h3 id="method_buildFilters">
         <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_buildFilters">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 259</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 269</div>
         <code>            protected        string
     <strong>buildFilters</strong>(array $searchFields, array $params)
         </code>
@@ -1175,7 +1230,7 @@ nell'array dei parametri ($params), delegando la protezione contro l'Injection a
                     <div class="method-item">
                     <h3 id="method_buildDateFilters">
         <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_buildDateFilters">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 284</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 294</div>
         <code>            protected        string
     <strong>buildDateFilters</strong>(array $searchDates, array $params)
         </code>
@@ -1226,7 +1281,7 @@ accodando i valori referenziati all'array di bind per preservare l'integrità st
                     <div class="method-item">
                     <h3 id="method_buildTrashFilter">
         <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_buildTrashFilter">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 320</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 330</div>
         <code>            protected        string
     <strong>buildTrashFilter</strong>(string $filter, string $table, bool $hasSoftDelete = true)
         </code>
@@ -1249,7 +1304,7 @@ Il comportamento di fallback obbligatorio (active) sigilla l'esposizione dei rec
                     <tr>
                 <td>string</td>
                 <td>$filter</td>
-                <td><p>Lo stato di visibilità richiesto (active, trashed, all)</p></td>
+                <td><p>Lo stato di visibilità richiesto (active, suspended, trashed, all)</p></td>
             </tr>
                     <tr>
                 <td>string</td>
@@ -1283,7 +1338,7 @@ Il comportamento di fallback obbligatorio (active) sigilla l'esposizione dei rec
                     <div class="method-item">
                     <h3 id="method_getByUUID">
         <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_getByUUID">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 352</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 367</div>
         <code>                    array
     <strong>getByUUID</strong>(string $uuid)
         </code>
@@ -1329,7 +1384,7 @@ di array fissa e immutabile, garantendo al BackendController un pattern di rispo
                     <div class="method-item">
                     <h3 id="method_hasDataChanged">
         <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_hasDataChanged">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 383</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 398</div>
         <code>            protected        bool
     <strong>hasDataChanged</strong>(array $posts, object $original)
         </code>
@@ -1381,7 +1436,7 @@ l'esistenza di operazioni multimediali in pendenza, ritornando true al primo dif
                     <div class="method-item">
                     <h3 id="method_insertImages">
         <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_insertImages">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 429</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 444</div>
         <code>            protected        bool
     <strong>insertImages</strong>(array $filenames, string $uuid, string $entity, string $action = &#039;add&#039;)
         </code>
@@ -1442,7 +1497,7 @@ alla prima immagine dell'array iterato, qualora un query lookup preventivo certi
                     <div class="method-item">
                     <h3 id="method_rrmdir">
         <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_rrmdir">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 485</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 500</div>
         <code>            protected        void
     <strong>rrmdir</strong>(string $dir)
         </code>
@@ -1489,7 +1544,7 @@ da file in stato "Locked" (OS I/O block) o transitorie indisponibilità di perme
                     <div class="method-item">
                     <h3 id="method_generateUUID">
         <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_generateUUID">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 514</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 529</div>
         <code>            protected        string
     <strong>generateUUID</strong>()
         </code>
@@ -1525,7 +1580,7 @@ Converte infine il buffer binario in esadecimale stringa con trattini (hyphen).<
                     <div class="method-item">
                     <h3 id="method_checkAllowedFields">
         <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_checkAllowedFields">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 537</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 552</div>
         <code>            protected        array
     <strong>checkAllowedFields</strong>(array $posts, array $allowedFields)
         </code>
@@ -1576,7 +1631,7 @@ introdotta per forzare alterazioni su colonne sensibili del database (es. iniezi
                     <div class="method-item">
                     <h3 id="method_getUploadService">
         <div class="location">in <a href="../../../../App/Models/Backend/BackendModel.html#method_getUploadService">
-<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 558</div>
+<abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a> at line 573</div>
         <code>            protected        <a href="../../../../App/Libraries/Backend/UploadClass.html"><abbr title="App\Libraries\Backend\UploadClass">UploadClass</abbr></a>
     <strong>getUploadService</strong>()
         </code>
@@ -1611,7 +1666,7 @@ durante l'esecuzione dei test unitari tramite il pattern Extract Method.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_getTargetModelInstance">
-        <div class="location">at line 50</div>
+        <div class="location">at line 51</div>
         <code>                private    <a href="../../../../App/Models/Backend/BackendModel.html"><abbr title="App\Models\Backend\BackendModel">BackendModel</abbr></a>|null
     <strong>getTargetModelInstance</strong>(string $entity)
         </code>
@@ -1655,7 +1710,7 @@ Tools &gt; Database non usa model di dominio e resta basato esclusivamente sullo
             </div>
                     <div class="method-item">
                     <h3 id="method_getImportValidationProvider">
-        <div class="location">at line 83</div>
+        <div class="location">at line 84</div>
         <code>                private    <a href="../../../../App/Interfaces/ImportValidationInterface.html"><abbr title="App\Interfaces\ImportValidationInterface">ImportValidationInterface</abbr></a>|null
     <strong>getImportValidationProvider</strong>(string $entity)
         </code>
@@ -1698,7 +1753,7 @@ Tools &gt; Database non usa model di dominio e resta basato esclusivamente sullo
             </div>
                     <div class="method-item">
                     <h3 id="method_cleanupExpiredStagingImports">
-        <div class="location">at line 97</div>
+        <div class="location">at line 98</div>
         <code>                private    void
     <strong>cleanupExpiredStagingImports</strong>()
         </code>
@@ -1733,7 +1788,7 @@ con chunk attivi.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_cleanupExpiredImportBackups">
-        <div class="location">at line 179</div>
+        <div class="location">at line 180</div>
         <code>                private    void
     <strong>cleanupExpiredImportBackups</strong>()
         </code>
@@ -1767,7 +1822,7 @@ mai perdere il proprio snapshot. Vengono rimossi soltanto artefatti senza stagin
             </div>
                     <div class="method-item">
                     <h3 id="method_createStagingContext">
-        <div class="location">at line 232</div>
+        <div class="location">at line 233</div>
         <code>                private    array|null
     <strong>createStagingContext</strong>()
         </code>
@@ -1800,7 +1855,7 @@ mai perdere il proprio snapshot. Vengono rimossi soltanto artefatti senza stagin
             </div>
                     <div class="method-item">
                     <h3 id="method_getImportOwnerFingerprint">
-        <div class="location">at line 262</div>
+        <div class="location">at line 263</div>
         <code>                private    string|null
     <strong>getImportOwnerFingerprint</strong>()
         </code>
@@ -1833,7 +1888,7 @@ mai perdere il proprio snapshot. Vengono rimossi soltanto artefatti senza stagin
             </div>
                     <div class="method-item">
                     <h3 id="method_writeStagingManifest">
-        <div class="location">at line 276</div>
+        <div class="location">at line 277</div>
         <code>                private    bool
     <strong>writeStagingManifest</strong>(string $importId, string $entity, string $mode, string $filePath, array $headers, array $plan)
         </code>
@@ -1901,7 +1956,7 @@ mai perdere il proprio snapshot. Vengono rimossi soltanto artefatti senza stagin
             </div>
                     <div class="method-item">
                     <h3 id="method_persistStagingManifest">
-        <div class="location">at line 332</div>
+        <div class="location">at line 333</div>
         <code>                private    bool
     <strong>persistStagingManifest</strong>(string $importId, array $manifest)
         </code>
@@ -1949,7 +2004,7 @@ mai perdere il proprio snapshot. Vengono rimossi soltanto artefatti senza stagin
             </div>
                     <div class="method-item">
                     <h3 id="method_acquireImportLock">
-        <div class="location">at line 373</div>
+        <div class="location">at line 374</div>
         <code>                private    resource|null
     <strong>acquireImportLock</strong>(string $importId)
         </code>
@@ -1992,7 +2047,7 @@ mai perdere il proprio snapshot. Vengono rimossi soltanto artefatti senza stagin
             </div>
                     <div class="method-item">
                     <h3 id="method_releaseImportLock">
-        <div class="location">at line 404</div>
+        <div class="location">at line 405</div>
         <code>                private    void
     <strong>releaseImportLock</strong>(resource $handle)
         </code>
@@ -2035,7 +2090,7 @@ mai perdere il proprio snapshot. Vengono rimossi soltanto artefatti senza stagin
             </div>
                     <div class="method-item">
                     <h3 id="method_markImportFailed">
-        <div class="location">at line 413</div>
+        <div class="location">at line 414</div>
         <code>                private    void
     <strong>markImportFailed</strong>(string $importId, array $manifest, string $reason)
         </code>
@@ -2088,7 +2143,7 @@ mai perdere il proprio snapshot. Vengono rimossi soltanto artefatti senza stagin
             </div>
                     <div class="method-item">
                     <h3 id="method_writeRecoveryFlag">
-        <div class="location">at line 432</div>
+        <div class="location">at line 433</div>
         <code>                private    void
     <strong>writeRecoveryFlag</strong>(string $importId, string $reason)
         </code>
@@ -2136,7 +2191,7 @@ mai perdere il proprio snapshot. Vengono rimossi soltanto artefatti senza stagin
             </div>
                     <div class="method-item">
                     <h3 id="method_writeChunkJournal">
-        <div class="location">at line 455</div>
+        <div class="location">at line 456</div>
         <code>                private    bool
     <strong>writeChunkJournal</strong>(string $importId, array $progress)
         </code>
@@ -2185,7 +2240,7 @@ impedisce di rieseguire alla cieca un blocco il cui esito sul database potrebbe 
             </div>
                     <div class="method-item">
                     <h3 id="method_deleteChunkJournal">
-        <div class="location">at line 481</div>
+        <div class="location">at line 482</div>
         <code>                private    void
     <strong>deleteChunkJournal</strong>(string $importId)
         </code>
@@ -2228,7 +2283,7 @@ impedisce di rieseguire alla cieca un blocco il cui esito sul database potrebbe 
             </div>
                     <div class="method-item">
                     <h3 id="method_resolveStagingContext">
-        <div class="location">at line 495</div>
+        <div class="location">at line 496</div>
         <code>                private    array|null
     <strong>resolveStagingContext</strong>(string $importId, bool $verifyChecksum = false, bool $allowExpired = false)
         </code>
@@ -2281,7 +2336,7 @@ impedisce di rieseguire alla cieca un blocco il cui esito sul database potrebbe 
             </div>
                     <div class="method-item">
                     <h3 id="method_isCsvRowEmpty">
-        <div class="location">at line 598</div>
+        <div class="location">at line 599</div>
         <code>                private    bool
     <strong>isCsvRowEmpty</strong>(array $row)
         </code>
@@ -2324,7 +2379,7 @@ impedisce di rieseguire alla cieca un blocco il cui esito sul database potrebbe 
             </div>
                     <div class="method-item">
                     <h3 id="method_buildRowSnapshot">
-        <div class="location">at line 615</div>
+        <div class="location">at line 616</div>
         <code>                private    string
     <strong>buildRowSnapshot</strong>(array $row, array $headers, string $mode)
         </code>
@@ -2378,7 +2433,7 @@ applicativi sono esclusi perché gestiti internamente; in modalità database res
             </div>
                     <div class="method-item">
                     <h3 id="method_validateStagingDefinition">
-        <div class="location">at line 643</div>
+        <div class="location">at line 644</div>
         <code>                private    bool
     <strong>validateStagingDefinition</strong>(array $headers, array $manifest, array $structure, string|null $primaryKey)
         </code>
@@ -2436,7 +2491,7 @@ applicativi sono esclusi perché gestiti internamente; in modalità database res
             </div>
                     <div class="method-item">
                     <h3 id="method_deleteStagingDirectory">
-        <div class="location">at line 687</div>
+        <div class="location">at line 688</div>
         <code>                private    void
     <strong>deleteStagingDirectory</strong>(string $directory)
         </code>
@@ -2479,7 +2534,7 @@ applicativi sono esclusi perché gestiti internamente; in modalità database res
             </div>
                     <div class="method-item">
                     <h3 id="method_deleteStagingImport">
-        <div class="location">at line 707</div>
+        <div class="location">at line 708</div>
         <code>                    bool
     <strong>deleteStagingImport</strong>(string $importId)
         </code>
@@ -2522,7 +2577,7 @@ applicativi sono esclusi perché gestiti internamente; in modalità database res
             </div>
                     <div class="method-item">
                     <h3 id="method_backupImport">
-        <div class="location">at line 763</div>
+        <div class="location">at line 764</div>
         <code>                    bool
     <strong>backupImport</strong>(string $importId)
         </code>
@@ -2565,7 +2620,7 @@ applicativi sono esclusi perché gestiti internamente; in modalità database res
             </div>
                     <div class="method-item">
                     <h3 id="method_writeStream">
-        <div class="location">at line 842</div>
+        <div class="location">at line 843</div>
         <code>                private    bool
     <strong>writeStream</strong>(resource $handle, string $data)
         </code>
@@ -2613,7 +2668,7 @@ applicativi sono esclusi perché gestiti internamente; in modalità database res
             </div>
                     <div class="method-item">
                     <h3 id="method_escapeBackupValue">
-        <div class="location">at line 863</div>
+        <div class="location">at line 864</div>
         <code>                private    string
     <strong>escapeBackupValue</strong>(mixed $value, array $field)
         </code>
@@ -2661,7 +2716,7 @@ applicativi sono esclusi perché gestiti internamente; in modalità database res
             </div>
                     <div class="method-item">
                     <h3 id="method_writeBackupInsertStatement">
-        <div class="location">at line 891</div>
+        <div class="location">at line 892</div>
         <code>                private    bool
     <strong>writeBackupInsertStatement</strong>(resource $handle, string $prefix, array $tuples)
         </code>
@@ -2714,7 +2769,7 @@ applicativi sono esclusi perché gestiti internamente; in modalità database res
             </div>
                     <div class="method-item">
                     <h3 id="method_createTableBackup">
-        <div class="location">at line 908</div>
+        <div class="location">at line 909</div>
         <code>                private    array|null
     <strong>createTableBackup</strong>(string $entity, string $importId)
         </code>
@@ -2762,7 +2817,7 @@ applicativi sono esclusi perché gestiti internamente; in modalità database res
             </div>
                     <div class="method-item">
                     <h3 id="method_isImportBackupValid">
-        <div class="location">at line 1142</div>
+        <div class="location">at line 1143</div>
         <code>                private    bool
     <strong>isImportBackupValid</strong>(string $importId, array $manifest, bool $verifyChecksum = false)
         </code>
@@ -2815,7 +2870,7 @@ applicativi sono esclusi perché gestiti internamente; in modalità database res
             </div>
                     <div class="method-item">
                     <h3 id="method_deleteBackupArtifacts">
-        <div class="location">at line 1181</div>
+        <div class="location">at line 1182</div>
         <code>                private    void
     <strong>deleteBackupArtifacts</strong>(string $importId)
         </code>
@@ -2858,7 +2913,7 @@ applicativi sono esclusi perché gestiti internamente; in modalità database res
             </div>
                     <div class="method-item">
                     <h3 id="method_getTableStructure">
-        <div class="location">at line 1210</div>
+        <div class="location">at line 1211</div>
         <code>                    array
     <strong>getTableStructure</strong>(string $table)
         </code>
@@ -2904,7 +2959,7 @@ le regole di validazione di fallback.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_getImportTableStructure">
-        <div class="location">at line 1284</div>
+        <div class="location">at line 1285</div>
         <code>                    array
     <strong>getImportTableStructure</strong>(string $entity, string $mode = self::IMPORT_MODE_CRUD)
         </code>
@@ -2954,7 +3009,7 @@ importAllowedFields(); configurazioni incoerenti falliscono in modo chiuso.</p><
             </div>
                     <div class="method-item">
                     <h3 id="method_parseAndValidateCsv">
-        <div class="location">at line 1362</div>
+        <div class="location">at line 1363</div>
         <code>                    array
     <strong>parseAndValidateCsv</strong>(<abbr title="CodeIgniter\HTTP\Files\UploadedFile">UploadedFile</abbr> $file, string $entity, string $mode = self::IMPORT_MODE_CRUD)
         </code>
@@ -3014,7 +3069,7 @@ importAllowedFields(); configurazioni incoerenti falliscono in modo chiuso.</p><
             </div>
                     <div class="method-item">
                     <h3 id="method_executeImport">
-        <div class="location">at line 1743</div>
+        <div class="location">at line 1744</div>
         <code>                    array
     <strong>executeImport</strong>(string $importId)
         </code>
@@ -3059,7 +3114,7 @@ della prima scrittura. In caso di errore lo staging e il backup vengono conserva
             </div>
                     <div class="method-item">
                     <h3 id="method_buildDynamicRules">
-        <div class="location">at line 2396</div>
+        <div class="location">at line 2403</div>
         <code>            protected        array
     <strong>buildDynamicRules</strong>(array $structure, string $action, string $mode)
         </code>
@@ -3115,7 +3170,7 @@ Garantisce che l'importazione rispetti i limiti stringenti del database prevenen
             </div>
                     <div class="method-item">
                     <h3 id="method_isUuidPrimaryKey">
-        <div class="location">at line 2472</div>
+        <div class="location">at line 2479</div>
         <code>                private    bool
     <strong>isUuidPrimaryKey</strong>(array $field)
         </code>

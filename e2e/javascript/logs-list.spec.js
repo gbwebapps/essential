@@ -1,8 +1,9 @@
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
 test.use({ storageState: 'e2e/.auth/admin.json' });
 
-const modulePath = '/assets/js/backend/modules/Crud.js';
+const modulePath = appUrl('/assets/js/backend/modules/Crud.js');
 
 function waitForLogsResponse(page, predicate) {
     return page.waitForResponse(response => {
@@ -29,7 +30,7 @@ async function openLogs(page) {
 
     const initialResponse = waitForLogsResponse(page, params => params.get('rows') === '5');
 
-    await page.goto('/backend/logs');
+    await page.goto(appUrl('/backend/logs'));
     await expect(page).toHaveURL(/\/backend\/logs\/?$/);
     await initialResponse;
 
@@ -114,7 +115,7 @@ test('Logs instrada la disconnessione verso l endpoint dedicato', async ({ page 
         return manager.config.urls.disconnectSession;
     }, modulePath);
 
-    expect(new URL(endpoint, 'https://essential.test').pathname).toBe('/backend/logs/disconnectSession');
+    expect(new URL(endpoint, appUrl('')).pathname).toBe(new URL(appUrl('/backend/logs/disconnectSession')).pathname);
     expect(requestBody).toContain('name="tokenId"');
     expect(requestBody).toContain('123');
 });

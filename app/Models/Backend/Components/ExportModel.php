@@ -4,13 +4,14 @@ namespace App\Models\Backend\Components;
 
 use App\Interfaces\ExportValidationInterface;
 use App\Models\Backend\BackendModel;
+use Config\Backend\Export as ExportConfig;
 
 class ExportModel extends BackendModel
 {
     public const CONTEXT_CRUD = 'crud';
     public const CONTEXT_DATABASE = 'database';
 
-    private const EXPORT_CHUNK_SIZE = 5;
+    private const EXPORT_CHUNK_SIZE = ExportConfig::CHUNK_SIZE;
     private const EXPORT_VERSION = 1;
     private const EXPORT_MANIFEST = 'manifest.json';
     private const EXPORT_FILE = 'data.csv';
@@ -53,7 +54,7 @@ class ExportModel extends BackendModel
             'entity' => ['label' => lang('backend/components/export.labels.entity'), 'rules' => ['required', 'alpha_dash']],
             'order' => ['label' => lang('backend/components/export.labels.order'), 'rules' => ['permit_empty', 'in_list[asc,desc,ASC,DESC]']],
             'column' => ['label' => lang('backend/components/export.labels.column'), 'rules' => ['permit_empty', 'alpha_dash']],
-            'trash_filter' => ['label' => lang('backend/components/export.labels.trash_filter'), 'rules' => ['permit_empty', 'in_list[active,trashed,all]']],
+            'trash_filter' => ['label' => lang('backend/components/export.labels.trash_filter'), 'rules' => ['permit_empty', 'in_list[active,suspended,trashed,all]']],
             'page' => ['label' => lang('backend/components/export.labels.page'), 'rules' => ['permit_empty', 'is_natural_no_zero']],
         ];
     }
@@ -600,7 +601,19 @@ class ExportModel extends BackendModel
             endif;
         endforeach;
 
-        if (($manifest['filters']['trash_filter'] ?? null) === 'active' && in_array('deleted_at', $schemaColumns, true)):
+        $trashFilter = $manifest['filters']['trash_filter'] ?? null;
+        $targetModel = $manifest['context'] === self::CONTEXT_CRUD ? $this->getTargetModelInstance($entity) : null;
+        $hasStatusFilter = $targetModel instanceof BackendModel && $targetModel->supportsStatusFilter();
+
+        if ($trashFilter === 'suspended' && ! $hasStatusFilter):
+            throw new \InvalidArgumentException('Filtro sospesi non disponibile per questa esportazione.');
+        endif;
+
+        if ($hasStatusFilter && in_array($trashFilter, ['active', 'suspended'], true)):
+            $sql .= ' and ' . $this->db->protectIdentifiers('deleted_at') . ' is null';
+            $sql .= ' and ' . $this->db->protectIdentifiers('status') . ' = ?';
+            $bindings[] = $trashFilter === 'suspended' ? 0 : 1;
+        elseif ($trashFilter === 'active' && in_array('deleted_at', $schemaColumns, true)):
             $sql .= ' and ' . $this->db->protectIdentifiers('deleted_at') . ' is null';
         elseif (($manifest['filters']['trash_filter'] ?? null) === 'trashed' && in_array('deleted_at', $schemaColumns, true)):
             $sql .= ' and ' . $this->db->protectIdentifiers('deleted_at') . ' is not null';
@@ -637,7 +650,14 @@ class ExportModel extends BackendModel
             endif;
 
             if ($key === 'trash_filter'):
-                if (in_array($value, ['active', 'trashed', 'all'], true)):
+                if ($value === 'suspended'):
+                    $targetModel = $this->getTargetModelInstance($entity);
+                    if ( ! $targetModel instanceof BackendModel || ! $targetModel->supportsStatusFilter()):
+                        throw new \InvalidArgumentException('Filtro sospesi non disponibile per questa entità.');
+                    endif;
+                endif;
+
+                if (in_array($value, ['active', 'suspended', 'trashed', 'all'], true)):
                     $filters[$key] = $value;
                 endif;
                 continue;

@@ -28,8 +28,9 @@
                         $dataIdAttr = isset($ele['id']) ? ' data-id="' . esc($ele['id']) . '"' : '';
                 ?>
                     <li>
-                        <a class="dropdown-item<?= $active; ?>" href="<?= $href; ?>"<?= $dataIdAttr; ?>>
-                            <span class="me-2"><?= $ele['icon'] ?? ''; ?></span> <?= $ele['label'] ?? ''; ?>
+                        <a class="dropdown-item<?= $active; ?><?= isset($menuCounts[$eleController]) ? ' d-flex align-items-center gap-3' : ''; ?>" href="<?= $href; ?>"<?= $dataIdAttr; ?>>
+                            <span><span class="me-2"><?= $ele['icon'] ?? ''; ?></span> <?= $ele['label'] ?? ''; ?></span>
+                            <?= view('backend/template/menuCountsPartial', ['menuCountEntity' => $eleController, 'menuCounts' => $menuCounts ?? []]); ?>
                         </a>
                     </li>
                     

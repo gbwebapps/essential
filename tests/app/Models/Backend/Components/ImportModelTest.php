@@ -43,6 +43,21 @@ class ImportModelTest extends CIUnitTestCase
         parent::tearDown();
     }
 
+    public function testItalianImportSuccessMessageUsesInsertedAndUpdatedCounters(): void
+    {
+        $language = service('language');
+        $originalLocale = $language->getLocale();
+        $language->setLocale('it');
+
+        try {
+            $message = sprintf(lang('backend/components/import.messages.importSuccess'), 1, 2);
+        } finally {
+            $language->setLocale($originalLocale);
+        }
+
+        $this->assertSame('Importazione completata con successo. Inseriti 1 record, aggiornati 2 record.', $message);
+    }
+
     public function testGetTargetModelInstanceReturnsInstanceWhenClassExists(): void
     {
         $model = new ImportModel();

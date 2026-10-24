@@ -4,7 +4,7 @@
 
     <div class="row">
         <div class="col-12">
-            <div id="index-dashboard-container">
+            <div id="index-dashboard-container" data-dashboard-theme="<?= esc($dashboardTheme, 'attr'); ?>">
                 <?= $this->include('backend/dashboard/partials/index/indexPartial'); ?>
             </div>
         </div>

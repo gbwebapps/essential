@@ -79,8 +79,9 @@
                                             </button>
                                         </form>
                                     <?php else: ?>
-                                        <a class="dropdown-item<?= $activeClass; ?>" href="<?= $href; ?>"<?= $dataIdAttr; ?><?= $dataMessageAttr; ?>>
-                                            <?= $ele['icon'] ?? ''; ?> <span class="ms-1"><?= $ele['label'] ?? ''; ?></span>
+                                        <a class="dropdown-item<?= $activeClass; ?><?= isset($menuCounts[$eleController]) ? ' d-flex align-items-center gap-3' : ''; ?>" href="<?= $href; ?>"<?= $dataIdAttr; ?><?= $dataMessageAttr; ?>>
+                                            <span><?= $ele['icon'] ?? ''; ?> <span class="ms-1"><?= $ele['label'] ?? ''; ?></span></span>
+                                            <?= view('backend/template/menuCountsPartial', ['menuCountEntity' => $eleController, 'menuCounts' => $menuCounts ?? []]); ?>
                                         </a>
                                     <?php endif; ?>
                                 </li>

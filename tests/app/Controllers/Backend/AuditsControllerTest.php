@@ -564,7 +564,7 @@ class AuditsControllerTest extends CIUnitTestCase
     public function testInitControllerSetsCorrectDataAndProperties(): void
     {
         $request = 
-            $this->createMock(\CodeIgniter\HTTP\RequestInterface::class);
+            $this->createMock(\CodeIgniter\HTTP\IncomingRequest::class);
 
         $response = 
             $this->createMock(\CodeIgniter\HTTP\ResponseInterface::class);

@@ -1,5 +1,8 @@
 <?php declare(strict_types = 1);
 
+/**
+ * Traduzioni italiane del modulo Products.
+ */
 return [
     'titles' => [
         'index' => 'Dati prodotti',
@@ -24,15 +27,18 @@ return [
         'resetSorting' => 'Resetta ordinamento',
         'reloadList' => 'Ricarica lista',
         'activeRecords' => 'Attivi',
+        'suspendedRecords' => 'Sospesi',
         'trashedRecords' => 'Eliminati',
         'allRecords' => 'Tutti',
     ],
     'labels' => [
+        'suspendedRelation' => 'Sospesa',
         'uuid' => 'UUID',
         'product' => 'Prodotto',
         'sku' => 'SKU',
         'quantity' => 'Quantità',
         'price' => 'Prezzo',
+        'totalValue' => 'Valore totale',
         'brands' => 'Marche',
         'categories' => 'Categorie',
         'quantityFrom' => 'Quantità minima',
@@ -89,7 +95,7 @@ return [
         'refreshData' => 'Ricarica dati', 
         'reload' => 'Ricarica pannello', 
         'print' => 'Stampa', 
-        'exportPdf' => 'Esporta Pdf'
+        'exportPdf' => 'Esporta Pdf',
     ],
     'errors' => [
         'uuid' => 'UUID non conforme.',
@@ -132,6 +138,7 @@ return [
         'changeStatusSuccess' => 'Stato del prodotto %s aggiornato con successo.',
         'changeStatusError' => 'Modifica dello stato del prodotto non riuscita.',
         'cannotModifyDeleted' => 'Non è possibile modificare un prodotto eliminato.',
+        'importExistingOnly' => 'L’importazione locale consente soltanto di aggiornare prodotti esistenti.',
         'relationsRequired' => 'È necessario selezionare almeno una marca e una categoria.',
         'invalidBrands' => 'Una o più marche selezionate non sono valide.',
         'invalidCategories' => 'Una o più categorie selezionate non sono valide.',

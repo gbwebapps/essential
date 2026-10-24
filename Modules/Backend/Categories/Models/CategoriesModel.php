@@ -29,6 +29,8 @@ class CategoriesModel extends BackendModel implements ImportValidationInterface,
      */
     protected bool $hasSoftDelete = true;
 
+    protected bool $hasStatusFilter = true;
+
     /**
      * Whitelist dei campi consentiti durante la visualizzazione dell'elenco category.
      * Include i parametri strutturali per la paginazione, l'ordinamento e la gestione della vista cestino.
@@ -150,6 +152,30 @@ class CategoriesModel extends BackendModel implements ImportValidationInterface,
     }
 
     /**
+     * Conta attivi, sospesi, eliminati e totale, senza ricerca o paginazione.
+     *
+     * @return array{active: int, suspended: int, trashed: int, all: int}
+     */
+    public function getTrashCounts(): array
+    {
+        $query = $this->db->query('select count(*) as total,
+                                        count(case when deleted_at is null and status = 1 then 1 end) as active,
+                                        count(case when deleted_at is not null then 1 end) as trashed,
+                                        count(case when deleted_at is null and status = 0 then 1 end) as suspended
+                                 from categories');
+
+        if ($query === false || ($counts = $query->getRowArray()) === null):
+            throw new \RuntimeException(lang('backend/global.messages.getDataError'));
+        endif;
+
+        $total = (int) $counts['total'];
+        $trashed = (int) $counts['trashed'];
+        $suspended = (int) $counts['suspended'];
+
+        return ['active' => (int) $counts['active'], 'suspended' => $suspended, 'trashed' => $trashed, 'all' => $total];
+    }
+
+    /**
      * Rimuove i file creati durante un upload che non ha raggiunto il commit.
      *
      * @param array $filenames Nomi dei file caricati nella transazione corrente
@@ -168,13 +194,13 @@ class CategoriesModel extends BackendModel implements ImportValidationInterface,
      * @param string $uuid Identificativo del category
      * @return bool True quando esiste almeno un'associazione
      */
-    protected function hasProducts(string $uuid): bool
+    protected function hasProducts(string $uuid, bool $lockRows = false): bool
     {
         $sql = "select 1
                 from categories_to_products
                 inner join categories on categories.id = categories_to_products.category_id
                 where categories.uuid = ?
-                limit 1";
+                limit 1" . ($lockRows ? ' for update' : '');
 
         return $this->db->query($sql, [$uuid])->getRow() !== null;
     }
@@ -182,15 +208,25 @@ class CategoriesModel extends BackendModel implements ImportValidationInterface,
     /**
      * Verifica se la categoria contiene sottocategorie.
      */
-    protected function hasChildren(string $uuid): bool
+    protected function hasChildren(string $uuid, bool $lockRows = false): bool
     {
         $sql = "select 1
                 from categories as child
                 inner join categories as parent on parent.id = child.parent_id
                 where parent.uuid = ?
-                limit 1";
+                limit 1" . ($lockRows ? ' for update' : '');
 
         return $this->db->query($sql, [$uuid])->getRow() !== null;
+    }
+
+    /** La sospensione richiede una categoria priva di qualsiasi contenuto, anche cestinato. */
+    protected function suspensionError(string $uuid, bool $lockRows = false): ?string
+    {
+        if ($this->hasProducts($uuid, $lockRows)):
+            return lang('backend/categories.messages.suspendAssociated');
+        endif;
+
+        return $this->hasChildren($uuid, $lockRows) ? lang('backend/categories.messages.suspendHasChildren') : null;
     }
 
     /**
@@ -202,14 +238,18 @@ class CategoriesModel extends BackendModel implements ImportValidationInterface,
             return null;
         endif;
 
-        $parentSql = "select id, parent_id, deleted_at from categories where id = ? limit 1" . ($lockRows ? ' for update' : '');
+        $parentSql = "select id, parent_id, status, deleted_at from categories where id = ? limit 1" . ($lockRows ? ' for update' : '');
         $parent = $this->db->query($parentSql, [$parentId])->getRow();
 
         if ($parent === null || $parent->deleted_at !== null):
             return lang('backend/categories.messages.invalidParent');
         endif;
 
-        $productsSql = "select 1 from categories_to_products where category_id = ? limit 1";
+        if ((int) $parent->status !== 1):
+            return lang('backend/categories.messages.parentSuspended');
+        endif;
+
+        $productsSql = "select 1 from categories_to_products where category_id = ? limit 1" . ($lockRows ? ' for update' : '');
         if ($this->db->query($productsSql, [$parentId])->getRow() !== null):
             return lang('backend/categories.messages.parentHasProducts');
         endif;
@@ -366,7 +406,7 @@ class CategoriesModel extends BackendModel implements ImportValidationInterface,
      */
     public function getParentOptions(?string $excludeUuid = null): array
     {
-        $sql = "select id, uuid, parent_id, category,
+        $sql = "select id, uuid, parent_id, category, status,
                     exists (
                         select 1 from categories_to_products where categories_to_products.category_id = categories.id
                     ) as has_products
@@ -434,7 +474,7 @@ class CategoriesModel extends BackendModel implements ImportValidationInterface,
                 'rules' => ['required', 'is_natural_no_zero'] 
             ],
             'trash_filter' => [
-                'rules' => ['in_list[active,trashed,all]'] 
+                'rules' => ['in_list[active,suspended,trashed,all]']
             ],
         ];
     }
@@ -665,12 +705,19 @@ class CategoriesModel extends BackendModel implements ImportValidationInterface,
             return [lang('backend/categories.messages.cannotModifyDeleted')];
         endif;
 
-        $parentId = isset($data['parent_id']) && $data['parent_id'] !== '' ? (int) $data['parent_id'] : null;
-        $currentUuid = $action === 'update' ? (string) ($data['uuid'] ?? '') : null;
-        $parentError = $this->parentAssignmentError($parentId, $currentUuid !== '' ? $currentUuid : null);
+        $candidate = $data + ($currentRow ?? []);
+        $parentId = isset($candidate['parent_id']) && $candidate['parent_id'] !== '' ? (int) $candidate['parent_id'] : null;
+        $currentUuid = $action === 'update' ? (string) ($candidate['uuid'] ?? '') : null;
+        $lockRows = $this->db->transDepth > 0;
+        $parentError = $this->parentAssignmentError($parentId, $currentUuid !== '' ? $currentUuid : null, $lockRows);
 
         if ($parentError !== null):
             return [$parentError];
+        endif;
+
+        if ($action === 'update' && $currentUuid !== null && (int) ($candidate['status'] ?? 1) === 0):
+            $error = $this->suspensionError($currentUuid, $lockRows);
+            return $error === null ? [] : [$error];
         endif;
 
         return [];
@@ -937,7 +984,15 @@ class CategoriesModel extends BackendModel implements ImportValidationInterface,
                 return ['result' => false, 'message' => lang('backend/categories.messages.cannotModifyDeleted')]; /* Ricorda di creare la stringa lingua */
             endif;
 
-            $parentId = ($posts['parent_id'] ?? '') !== '' ? (int) $posts['parent_id'] : null;
+            if ((int) $posts['status'] === 0 && ($error = $this->suspensionError($posts['uuid'], true)) !== null):
+                $this->db->transRollback();
+                return ['result' => false, 'message' => $error];
+            endif;
+
+            /* Una option disabilitata non viene inviata: non trasformarla implicitamente in radice. */
+            $parentValue = array_key_exists('parent_id', $posts) ? $posts['parent_id'] : $category['row']->parent_id;
+            $parentId = $parentValue === null || $parentValue === '' ? null : (int) $parentValue;
+            $posts['parent_id'] = $parentId;
             $parentError = $this->parentAssignmentError($parentId, $posts['uuid'], true);
 
             if ($parentError !== null):
@@ -1202,26 +1257,40 @@ class CategoriesModel extends BackendModel implements ImportValidationInterface,
             /* Match dei posts con i campi consentiti */
             $posts = $this->checkAllowedFields($posts, $this->delAllowedFields);
 
+            $this->db->transBegin();
+
             /* Recupero diretto dal DB per aggirare eventuali filtri sui record attivi */
-            $sql = "select * from categories where uuid = ?";
+            $sql = "select * from categories where uuid = ? for update";
             $row = $this->db->query($sql, [$posts['uuid']])->getRow();
 
 			if (empty($row)):
+				$this->db->transRollback();
 				return ['result' => false, 'message' => lang('backend/categories.messages.notFound')];
 			endif;
 
 			if ($row->deleted_at === null):
+				$this->db->transRollback();
 				return ['result' => false, 'message' => lang('backend/categories.messages.restoreRequiresTrash')];
 			endif;
 
             if ($row->parent_id !== null):
-                $parent = $this->db->query("select deleted_at from categories where id = ? limit 1", [(int) $row->parent_id])->getRow();
-                if ($parent === null || $parent->deleted_at !== null):
+                $parent = $this->db->query("select status, deleted_at from categories where id = ? limit 1 for update", [(int) $row->parent_id])->getRow();
+                if ($parent === null || $parent->deleted_at !== null || (int) $parent->status !== 1):
+                    $this->db->transRollback();
                     return ['result' => false, 'message' => lang('backend/categories.messages.restoreParentUnavailable')];
                 endif;
             endif;
 
-            $this->db->transBegin();
+            if ((int) $row->status === 0 && ($error = $this->suspensionError($posts['uuid'], true)) !== null):
+                $this->db->transRollback();
+                return ['result' => false, 'message' => $error];
+            endif;
+
+            $parentError = $this->parentAssignmentError($row->parent_id === null ? null : (int) $row->parent_id, $posts['uuid'], true);
+            if ($parentError !== null):
+                $this->db->transRollback();
+                return ['result' => false, 'message' => $parentError];
+            endif;
 
             /* Ripristino del category */
             $sqlUpdate = "update categories set deleted_at = null, restored_at = ? where uuid = ?";
@@ -1272,19 +1341,35 @@ class CategoriesModel extends BackendModel implements ImportValidationInterface,
             /* Match dei posts con i campi consentiti */
             $posts = $this->checkAllowedFields($posts, $this->changeStatusAllowedFields);
 
+            $this->db->transBegin();
+            $this->db->query('select id from categories where uuid = ? for update', [$posts['uuid']]);
+
             /* Recupero i dati del category */
             $data = $this->getByUUID($posts['uuid']);
 
             if($data['result'] === false):
+                $this->db->transRollback();
                 return ['result' => false, 'message' => $data['message']];
             endif;
 
             /* Scudo Enterprise: blocco immediato se il record si trova nel cestino */
             if ($data['row']->deleted_at !== null):
+                $this->db->transRollback();
                 return ['result' => false, 'message' => lang('backend/categories.messages.cannotModifyDeleted')]; /* Ricorda di creare la stringa lingua */
             endif;
 
             $currentStatus = (int) $data['row']->status;
+
+            if ($currentStatus === 1 && ($error = $this->suspensionError($posts['uuid'], true)) !== null):
+                $this->db->transRollback();
+                return ['result' => false, 'message' => $error];
+            endif;
+
+            $parentError = $this->parentAssignmentError($data['row']->parent_id === null ? null : (int) $data['row']->parent_id, $posts['uuid'], true);
+            if ($parentError !== null):
+                $this->db->transRollback();
+                return ['result' => false, 'message' => $parentError];
+            endif;
 
             $newStatus = null;
 
@@ -1303,8 +1388,6 @@ class CategoriesModel extends BackendModel implements ImportValidationInterface,
 
             $updatedAt = date('Y-m-d H:i:s');
             $data['row']->updated_at = $updatedAt;
-
-            $this->db->transBegin();
 
             /* Cambio stato category */
             $sql = "update categories set status = ?, updated_at = ? where uuid = ?";

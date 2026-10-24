@@ -1,4 +1,7 @@
 <div class="card-body pb-0">
+    <div class="ps-2 py-1 app-bg-surface fw-bold small mb-2 border text-center rounded-2">
+        <?= sprintf(lang('backend/groups.labels.groupNameBar'), esc($groupName->name)); ?>
+    </div>
 
     <?php foreach($permissions as $permission): ?>
 

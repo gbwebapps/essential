@@ -6,6 +6,14 @@ use CodeIgniter\Test\CIUnitTestCase;
 
 class AccountModelTest extends CIUnitTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        /* Non dipende dagli helper caricati o definiti dai metodi precedenti. */
+        helper('settings');
+    }
+
 	public function testGetGroupPermissionsReturnsEmptyArrayWhenNoResults(): void
     {
         /* 1. MOCK DB CON RISULTATO VUOTO */

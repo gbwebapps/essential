@@ -20,6 +20,9 @@ class AccountModelIntegrationTest extends CIUnitTestCase
 	{
 		parent::setUp();
 
+		/* AccountModel usa setting già durante la propria inizializzazione. */
+		helper('settings');
+
 		$this->database = db_connect();
 		$this->assertSame('essential_test', $this->database->getDatabase());
 

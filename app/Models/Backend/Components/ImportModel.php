@@ -4,6 +4,7 @@ namespace App\Models\Backend\Components;
 
 use App\Interfaces\ImportValidationInterface;
 use App\Models\Backend\BackendModel;
+use Config\Backend\Import as ImportConfig;
 
 /**
  * Modello dedicato al Componente Globale di Importazione Dati (ImportModel).
@@ -27,7 +28,7 @@ class ImportModel extends BackendModel
     private const STAGING_RECOVERY_FLAG = 'recovery.required';
     private const STAGING_CHUNK_JOURNAL = 'chunk.pending';
     private const BACKUP_FILENAME = 'backup.sql';
-    private const IMPORT_CHUNK_SIZE = 5;
+    private const IMPORT_CHUNK_SIZE = ImportConfig::CHUNK_SIZE;
     private const BACKUP_CHUNK_SIZE = 1000;
     private const BACKUP_MAX_STATEMENT_BYTES = 1048576;
     private const BACKUP_RETENTION = 2592000; // 30 giorni
@@ -1641,7 +1642,7 @@ class ImportModel extends BackendModel
             endif;
 
             if ( ! $rowHasErrors && $targetModel !== null):
-                $currentRow = $action === 'update' ? ($existingDataMap[$idValue] ?? null) : null;
+                $currentRow = $action === 'update' ? $existingDataMap[$idValue] : null;
                 $businessErrors = $targetModel->importBusinessValidationErrors($action, $data, $currentRow);
 
                 foreach ($businessErrors as $error):
@@ -2088,7 +2089,10 @@ class ImportModel extends BackendModel
                         $currentRowBuilder->select(array_unique(array_merge([$primaryKey], $snapshotColumns)));
                     endif;
 
-                    $currentRow = $currentRowBuilder->get()->getRowArray();
+                    /* Mantiene stabili record e stato durante i controlli applicativi e l'update. */
+                    $currentRow = $this->db->getPlatform() === 'MySQLi'
+                        ? $this->db->query($currentRowBuilder->getCompiledSelect() . ' for update')->getRowArray()
+                        : $currentRowBuilder->get()->getRowArray();
 
                     if ($currentRow === null || $this->buildRowSnapshot($currentRow, $snapshotColumns, $mode) !== $expectedSnapshot):
                         $this->db->transRollback();
@@ -2322,18 +2326,21 @@ class ImportModel extends BackendModel
             $this->deleteChunkJournal($importId);
 
             if ($isFinished):
-                $currentAdmin = service('authorization')->currentAdmin();
-                log_admin_activity(
-                    'IMPORT_DATA',
-                    $entity,
-                    sprintf(
-                        lang('backend/components/import.messages.importSuccess'),
+                try {
+                    $currentAdmin = service('authorization')->currentAdmin();
+                    log_admin_activity(
+                        'IMPORT_DATA',
                         $entity,
-                        $totalInserted,
-                        $totalUpdated
-                    ),
-                    $currentAdmin
-                );
+                        sprintf(
+                            lang('backend/components/import.messages.importSuccess'),
+                            $totalInserted,
+                            $totalUpdated
+                        ),
+                        $currentAdmin
+                    );
+                } catch (\Throwable $e) {
+                    log_message('error', 'ImportModel audit error [' . $importId . ']: ' . $e->getMessage());
+                }
             endif;
 
             return [

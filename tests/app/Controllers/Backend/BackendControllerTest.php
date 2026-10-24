@@ -12,6 +12,14 @@ class BackendControllerTest extends CIUnitTestCase
     use ControllerTestTrait;
     use DatabaseTestTrait;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        /* Il test deve disporre dell'helper anche senza inizializzare il controller. */
+        helper('settings');
+    }
+
     protected function tearDown(): void
     {
         \Config\Services::resetSingle('renderer');

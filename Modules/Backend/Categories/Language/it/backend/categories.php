@@ -26,10 +26,12 @@ return [
         'resetSorting' => 'Resetta ordinamento',
         'reloadList' => 'Ricarica lista',
         'activeRecords' => 'Attivi',
+        'suspendedRecords' => 'Sospesi',
         'trashedRecords' => 'Eliminati',
         'allRecords' => 'Tutti',
     ],
     'labels' => [
+        'suspendedRelation' => 'Sospesa',
         'uuid' => 'UUID',
         'category' => 'Categoria',
         'parentCategory' => 'Categoria padre',
@@ -98,6 +100,9 @@ return [
         'changeStatusCategory' => 'Aggiornamento stato categoria %s',
     ],
     'messages' => [
+        'suspendAssociated' => 'La categoria non può essere sospesa perché è associata a uno o più prodotti.',
+        'suspendHasChildren' => 'La categoria non può essere sospesa perché contiene sottocategorie.',
+        'parentSuspended' => 'La categoria padre selezionata è sospesa.',
         'areYouSureResetData' => 'Sei sicuro di voler resettare i dati?', 
         'areYouSureRefreshData' => 'Sei sicuro di voler ricaricare i dati?', 
         'areYouSureChangeStatus' => 'Sei sicuro di voler modificare lo stato di <b>%s</b>?',

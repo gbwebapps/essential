@@ -24,6 +24,7 @@ return [
         'import' => 'Importa CSV',
 	], 
     'buttons' => [
+        'cancel' => 'Annulla',
     	'close' => 'Chiudi', 
     	'import' => 'Importa', 
         'remove' => 'Rimuovi', 
@@ -41,7 +42,7 @@ return [
         'headerMismatch' => 'Nomi colonne oppure ordine colonne non sono conformi.', 
         'noDataToPreview' => 'Nessun dato di anteprima disponibile.', 
         'previewInfo' => 'I dati del file sono corretti e pronti per l\'inserimento. Ecco un\'anteprima (massimo 10 righe). Conferma per importare l\'intero file nel database.', 
-        'importSuccess' => 'Importazione dati nella tabella %s. Inseriti %d records, aggiornati %d records.', 
+        'importSuccess' => 'Importazione completata con successo. Inseriti %d record, aggiornati %d record.',
         'noDataFound' => 'Non sono presenti dati da importare nel file.', 
         'noDataProcessed' => 'Non sono presenti dati da importare nel file.', 
         'backupError' => 'Errore durante la creazione del backup della tabella.', 

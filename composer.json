@@ -13,6 +13,7 @@
         "php": "^8.2",
         "codeigniter4/framework": "^4.7",
         "endroid/qr-code": "^6.0",
+        "phpoffice/phpspreadsheet": "^5.10",
         "spomky-labs/otphp": "^11.5"
     },
     "require-dev": {
@@ -31,6 +32,7 @@
             "Modules\\Backend\\Brands\\": "Modules/Backend/Brands/",
             "Modules\\Backend\\Categories\\": "Modules/Backend/Categories/",
             "Modules\\Backend\\Products\\": "Modules/Backend/Products/",
+            "Modules\\Backend\\Warehouse\\": "Modules/Backend/Warehouse/",
             "Modules\\": "Modules/"
         },
         "exclude-from-classmap": [

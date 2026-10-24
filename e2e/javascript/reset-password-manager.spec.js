@@ -1,9 +1,10 @@
 
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
 // Guest Mode: non utilizziamo admin.json.
-const pageUrl = '/backend/auth/resetPassword';
-const modulePath = '/assets/js/backend/modules/Auth.js';
+const pageUrl = appUrl('/backend/auth/resetPassword');
+const modulePath = appUrl('/assets/js/backend/modules/Auth.js');
 const resetUrl = '/backend/auth/resetPassword';
 
 test('ResetPasswordManager gestisce validazione e fallimenti logici', async ({ page }) => {

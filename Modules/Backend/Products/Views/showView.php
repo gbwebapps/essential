@@ -1,6 +1,7 @@
 <?= $this->extend('backend/template/mainView') ?>
 
 <?= $this->section('content') ?>
+
     <div class="row">
         <div class="col-12">
             <div id="show-products-container">
@@ -9,5 +10,8 @@
         </div>
     </div>
 
+    <!-- Modale esportazione PDF -->
     <?= $this->include('backend/template/exportPdfView', $this->data); ?>
+    <!-- End Modale esportazione PDF -->
+
 <?= $this->endSection() ?>

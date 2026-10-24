@@ -1,0 +1,277 @@
+/* Dashboard: palette del tema attivo, senza modificare gli stili delle altre sezioni. */
+#index-dashboard-container {
+    --dashboard-chart-fill: color-mix(in srgb, var(--app-primary) 45%, var(--app-text-muted));
+    --dashboard-surface: var(--app-surface-elevated);
+    --dashboard-muted: var(--app-surface-muted);
+    --dashboard-border: var(--app-border);
+    --dashboard-header-start: var(--app-surface-muted);
+    --dashboard-header-end: var(--app-surface-elevated);
+}
+
+/* Il Dark usa ancora superfici legacy non rappresentate dai token globali. */
+#index-dashboard-container[data-dashboard-theme="dark"] {
+    --dashboard-surface: #444444;
+    --dashboard-muted: #333333;
+    --dashboard-border: #111111;
+    --dashboard-header-start: #222222;
+    --dashboard-header-end: #333333;
+}
+
+#index-dashboard-container .dashboard-summaries,
+#index-dashboard-container .dashboard-rankings {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.125rem;
+}
+
+#index-dashboard-container .dashboard-card,
+#index-dashboard-container .dashboard-ranking {
+    min-width: 0;
+    margin: 0;
+    color: var(--app-text);
+    background: var(--dashboard-surface);
+    border: 1px solid var(--dashboard-border);
+    border-radius: var(--bs-border-radius-lg);
+    box-shadow: 0 .2rem .6rem color-mix(in srgb, var(--app-shadow) 40%, transparent);
+}
+
+#index-dashboard-container .dashboard-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#index-dashboard-container .dashboard-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: .5rem;
+    min-height: 3.75rem;
+    padding: 1rem;
+    background: linear-gradient(115deg, var(--dashboard-header-start), var(--dashboard-header-end));
+    border-bottom: 1px solid var(--dashboard-border);
+}
+
+#index-dashboard-container .dashboard-card-header h2 {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+#index-dashboard-container .dashboard-role {
+    flex-shrink: 0;
+    font-size: .6875rem;
+    color: var(--app-text-muted);
+}
+
+#index-dashboard-container .dashboard-summary-body {
+    display: grid;
+    flex: 1;
+    grid-template-columns: 6.5rem minmax(0, 1fr);
+    align-items: center;
+    gap: 1rem;
+    padding: 1.375rem 1rem;
+}
+
+#index-dashboard-container .dashboard-donut {
+    width: 6.5rem;
+    height: 6.5rem;
+    padding: .6rem;
+    border-radius: 50%;
+    background: conic-gradient(var(--app-success) 0 var(--dashboard-active-end), var(--app-warning) var(--dashboard-active-end) var(--dashboard-suspended-end), var(--app-danger) var(--dashboard-suspended-end) 100%);
+}
+
+#index-dashboard-container .dashboard-donut-empty {
+    background: var(--dashboard-muted);
+}
+
+#index-dashboard-container .dashboard-donut-core {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .125rem;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--dashboard-surface);
+}
+
+#index-dashboard-container .dashboard-total {
+    max-width: 100%;
+    font-size: clamp(1rem, 1.8vw, 1.65rem);
+    font-weight: 500;
+    letter-spacing: -.04em;
+    font-variant-numeric: tabular-nums;
+}
+
+#index-dashboard-container .dashboard-total-label {
+    font-size: .6875rem;
+    color: var(--app-text-muted);
+}
+
+#index-dashboard-container .dashboard-states {
+    display: grid;
+    gap: .8rem;
+    margin: 0;
+}
+
+#index-dashboard-container .dashboard-states > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+}
+
+#index-dashboard-container .dashboard-states dt {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    color: var(--app-text-muted);
+    font-size: .75rem;
+    font-weight: 400;
+}
+
+#index-dashboard-container .dashboard-states dd {
+    margin: 0;
+    font-size: .9375rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+#index-dashboard-container .dashboard-dot {
+    flex-shrink: 0;
+    width: .45rem;
+    height: .45rem;
+    border-radius: 50%;
+}
+
+#index-dashboard-container .dashboard-state-active { background: var(--app-success); }
+#index-dashboard-container .dashboard-state-suspended { background: var(--app-warning); }
+#index-dashboard-container .dashboard-state-trashed { background: var(--app-danger); }
+
+#index-dashboard-container .dashboard-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    padding: .7rem 1rem;
+    color: var(--app-text);
+    font-size: .75rem;
+    text-decoration: none;
+    background: var(--dashboard-muted);
+    border-top: 1px solid var(--dashboard-border);
+}
+
+#index-dashboard-container .dashboard-card-footer:hover {
+    background: color-mix(in srgb, var(--dashboard-muted) 80%, var(--app-surface-inverse));
+}
+
+#index-dashboard-container .dashboard-analysis-title {
+    margin: 1.75rem 0 .9rem;
+    font-size: 1.125rem;
+    font-weight: 500;
+}
+
+#index-dashboard-container .dashboard-ranking {
+    padding: 1.25rem 1.125rem;
+}
+
+/* Il totale proviene dai prodotti, non dalla somma delle classifiche molti-a-molti. */
+#index-dashboard-container .dashboard-inventory-value {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.125rem;
+    padding: 1.25rem 1.125rem;
+    color: var(--app-text);
+    background: linear-gradient(115deg, var(--dashboard-header-start), var(--dashboard-header-end));
+    border: 1px solid var(--dashboard-border);
+    border-radius: var(--bs-border-radius-lg);
+}
+
+#index-dashboard-container .dashboard-inventory-value h3 { margin: 0 0 .3rem; font-size: 1rem; font-weight: 500; }
+#index-dashboard-container .dashboard-inventory-value p { margin: 0; color: var(--app-text-muted); font-size: .75rem; }
+#index-dashboard-container .dashboard-inventory-amount { max-width: 100%; overflow-wrap: anywhere; font-size: 1.75rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+#index-dashboard-container .dashboard-ranking-value .dashboard-bar-fill { background: var(--app-success); }
+#index-dashboard-container .dashboard-ranking-value .dashboard-bar-value { overflow-wrap: anywhere; }
+
+#index-dashboard-container .dashboard-ranking h3 {
+    margin: 0 0 .3rem;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+#index-dashboard-container .dashboard-ranking-description,
+#index-dashboard-container .dashboard-ranking-note {
+    color: var(--app-text-muted);
+    font-size: .75rem;
+}
+
+#index-dashboard-container .dashboard-ranking-description { margin: 0 0 1.3rem; }
+#index-dashboard-container .dashboard-ranking-note { margin: 1.25rem 0 0; }
+#index-dashboard-container .dashboard-empty { margin: 1.5rem 0; color: var(--app-text-muted); }
+
+#index-dashboard-container .dashboard-bars {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#index-dashboard-container .dashboard-bars li {
+    display: grid;
+    grid-template-columns: minmax(5rem, 30%) minmax(0, 1fr) max-content;
+    align-items: center;
+    gap: .6rem;
+    font-size: .75rem;
+}
+
+#index-dashboard-container .dashboard-bar-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#index-dashboard-container .dashboard-bar-track {
+    height: .7rem;
+    overflow: hidden;
+    border-radius: .2rem;
+    background: var(--dashboard-muted);
+}
+
+#index-dashboard-container .dashboard-bar-fill {
+    height: 100%;
+    border-radius: .2rem;
+    background: var(--dashboard-chart-fill);
+}
+
+#index-dashboard-container .dashboard-bar-value {
+    text-align: right;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 1200px) {
+    #index-dashboard-container .dashboard-summaries {
+        grid-template-columns: repeat(var(--dashboard-columns, 4), minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 639.98px) {
+    #index-dashboard-container .dashboard-summaries,
+    #index-dashboard-container .dashboard-rankings {
+        grid-template-columns: 1fr;
+    }
+
+    #index-dashboard-container .dashboard-card-header { flex-wrap: wrap; }
+    #index-dashboard-container .dashboard-role { margin-left: auto; }
+    #index-dashboard-container .dashboard-total { font-size: 1.65rem; }
+}

@@ -1,9 +1,10 @@
 
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
 // Non utilizziamo admin.json: LoginManager opera in Guest Mode.
-const pageUrl = '/backend/auth/login';
-const modulePath = '/assets/js/backend/modules/Auth.js';
+const pageUrl = appUrl('/backend/auth/login');
+const modulePath = appUrl('/assets/js/backend/modules/Auth.js');
 const loginUrl = '/backend/auth/login';
 
 test('LoginManager gestisce validazione e credenziali errate', async ({ page }) => {

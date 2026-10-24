@@ -31,6 +31,8 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
      */
     protected bool $hasSoftDelete = true;
 
+    protected bool $hasStatusFilter = true;
+
     /**
      * Whitelist dei campi consentiti durante la richiesta di visualizzazione dell'elenco amministratori.
      * Include i parametri strutturali per la paginazione, l'ordinamento e la gestione della vista cestino.
@@ -185,6 +187,30 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
     }
 
     /**
+     * Conta attivi, sospesi, eliminati e totale, senza ricerca o paginazione.
+     *
+     * @return array{active: int, suspended: int, trashed: int, all: int}
+     */
+    public function getTrashCounts(): array
+    {
+        $query = $this->db->query('select count(*) as total,
+                                        count(case when deleted_at is null and status = 1 then 1 end) as active,
+                                        count(case when deleted_at is not null then 1 end) as trashed,
+                                        count(case when deleted_at is null and status = 0 then 1 end) as suspended
+                                 from admins');
+
+        if ($query === false || ($counts = $query->getRowArray()) === null):
+            throw new \RuntimeException(lang('backend/global.messages.getDataError'));
+        endif;
+
+        $total = (int) $counts['total'];
+        $trashed = (int) $counts['trashed'];
+        $suspended = (int) $counts['suspended'];
+
+        return ['active' => (int) $counts['active'], 'suspended' => $suspended, 'trashed' => $trashed, 'all' => $total];
+    }
+
+    /**
      * Rimuove i file creati durante un upload che non ha raggiunto il commit.
      *
      * @param array $filenames Nomi dei file caricati nella transazione corrente
@@ -218,7 +244,7 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
                 'rules' => ['required', 'is_natural_no_zero'] 
             ],
             'trash_filter' => [
-                'rules' => ['in_list[active,trashed,all]'] 
+                'rules' => ['in_list[active,suspended,trashed,all]']
             ],
         ];
     }

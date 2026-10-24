@@ -59,6 +59,7 @@ class RoutesTest extends CIUnitTestCase
         $prefixes = [
             'backend/settings',
             'backend/tools',
+            'backend/warehouse',
             'backend/groups',
             'backend/audits',
             'backend/tokens',
@@ -95,6 +96,13 @@ class RoutesTest extends CIUnitTestCase
             'backend/admins/softDelete',
             'backend/admins/restoreDelete',
             'backend/admins/changeStatus',
+            'backend/products/hardDelete',
+            'backend/products/softDelete',
+            'backend/products/restoreDelete',
+            'backend/products/changeStatus',
+            'backend/warehouse/export',
+            'backend/warehouse/prepareImport',
+            'backend/warehouse/executeImport',
             'backend/auth/logout',
         ];
 

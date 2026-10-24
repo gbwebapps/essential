@@ -1,8 +1,9 @@
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
 test.use({ storageState: 'e2e/.auth/admin.json' });
 
-const modulePath = '/assets/js/backend/modules/Crud.js';
+const modulePath = appUrl('/assets/js/backend/modules/Crud.js');
 
 function waitForTokensResponse(page, predicate) {
     return page.waitForResponse(response => {
@@ -29,7 +30,7 @@ async function openTokens(page) {
 
     const initialResponse = waitForTokensResponse(page, params => params.get('rows') === '5');
 
-    await page.goto('/backend/tokens');
+    await page.goto(appUrl('/backend/tokens'));
     await expect(page).toHaveURL(/\/backend\/tokens\/?$/);
     await initialResponse;
 
@@ -112,7 +113,7 @@ test('Tokens instrada la revoca verso hardDelete', async ({ page }) => {
         return manager.config.urls.hardDelete;
     }, modulePath);
 
-    expect(new URL(endpoint, 'https://essential.test').pathname).toBe('/backend/tokens/hardDelete');
+    expect(new URL(endpoint, appUrl('')).pathname).toBe(new URL(appUrl('/backend/tokens/hardDelete')).pathname);
     expect(requestBody).toContain('name="id"');
     expect(requestBody).toContain('123');
     expect(requestBody).toContain('name="uuid"');

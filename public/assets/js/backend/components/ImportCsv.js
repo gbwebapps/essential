@@ -16,7 +16,7 @@ export class ImportCsvManager {
             modalContainerId: 'import-modal-container', 
             modalId: 'importModal', 
             linkId: '#import-entity', 
-            removeId: '#btnCancelImport', 
+            removeId: '#btnCancelImport, #btnCancelImportTop',
             urlDelete: urlbase + 'backend/import/deleteFile',
             maxNetworkRetries: 2,
             retryDelayMs: 500,
@@ -144,6 +144,8 @@ export class ImportCsvManager {
                 if (typeof this.hooks.onModalAfter === 'function') {
                     this.hooks.onModalAfter(data);
                 }
+
+                this.updateModalControls(Boolean(this.activeImportId), data.hasProcessableData !== false);
             }
 
         } catch (error) {
@@ -154,6 +156,21 @@ export class ImportCsvManager {
         } finally {
             this.isSubmitting = false;
         }
+    }
+
+    /* Mantiene allineati i comandi in testata e nel footer del modale. */
+    updateModalControls(hasPreview, hasProcessableData = true) {
+        const modal = document.getElementById(this.config.modalId);
+        if ( ! modal) return;
+
+        modal.querySelectorAll('button[form="importForm"]').forEach(button => {
+            button.hidden = ! hasProcessableData;
+            button.disabled = this.recoveryRequired;
+        });
+
+        modal.querySelectorAll('[data-import-close-label]').forEach(label => {
+            label.textContent = hasPreview && hasProcessableData ? label.dataset.cancel : label.dataset.close;
+        });
     }
 
     async deleteTempFile() {
@@ -281,6 +298,12 @@ export class ImportCsvManager {
         }
 
         try {
+            if ( ! isContinuation) {
+                const alerts = document.getElementById('import-alert-container');
+                if (alerts) smoothReplace(alerts, '');
+                document.querySelector('#alert-container [data-import-validation-alert]')?.remove();
+            }
+
             const formData = isContinuation && this.activeImportId
                 ? new FormData()
                 : new FormData(formElement);
@@ -312,8 +335,9 @@ export class ImportCsvManager {
                     this.activeImportId = data.importId || this.activeImportId;
 
                     /* Nessun retry applicativo è sicuro in uno stato ambiguo/parzialmente committed. */
-                    const submitBtn = document.querySelector('#' + this.config.modalId + ' button[form="importForm"]');
-                    if (submitBtn) submitBtn.disabled = true;
+                    document.querySelectorAll('#' + this.config.modalId + ' button[form="importForm"]').forEach(button => {
+                        button.disabled = true;
+                    });
                 }
 
                 /* 1. Caso errori massivi: inietta l'HTML pre-compilato nel contenitore del modale */
@@ -323,12 +347,20 @@ export class ImportCsvManager {
                     if (modalAlertContainer) {
                         smoothReplace(modalAlertContainer, data.errorOutput);
 
+                        const modalBody = modalAlertContainer.closest('.modal-body');
+                        if (modalBody) modalBody.scrollTop = 0;
+
                         const currentAlert = modalAlertContainer.querySelector('.alert');
                         if (currentAlert) {
                             currentAlert.addEventListener('closed.bs.alert', function () {
                                 smoothReplace(modalAlertContainer, '');
                             });
                         }
+                    }
+
+                    if (data.message && typeof showAlert === 'function') {
+                        showAlert('danger', data.message);
+                        document.querySelector('#alert-container .alert')?.setAttribute('data-import-validation-alert', '');
                     }
                 } 
                 /* 2. Caso errore generico: utilizza la funzione globale standard */
@@ -352,14 +384,10 @@ export class ImportCsvManager {
                     }
 
                     /* Nasconde la conferma quando il CSV è già allineato al database. */
-                    const submitBtn = document.querySelector('#' + this.config.modalId + ' button[form="importForm"]');
-                    if (submitBtn) {
-                        if (data.hasProcessableData === false) {
-                            submitBtn.style.display = 'none';
-                        } else {
-                            submitBtn.style.display = ''; /* Ripristina la visualizzazione di default */
-                        }
-                    }
+                    this.updateModalControls(true, data.hasProcessableData !== false);
+
+                    const scrollBody = document.querySelector('#' + this.config.modalId + ' .modal-body');
+                    if (scrollBody) scrollBody.scrollTop = 0;
                     
                     this.isSubmitting = false; // Sblocca perché attende il click dell'utente per il secondo step
                 } 

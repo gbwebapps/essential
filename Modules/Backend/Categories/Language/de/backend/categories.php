@@ -26,10 +26,12 @@ return [
         'resetSorting' => 'Sortierung zurücksetzen',
         'reloadList' => 'Liste neu laden',
         'activeRecords' => 'Aktiv',
+        'suspendedRecords' => 'Gesperrt',
         'trashedRecords' => 'Gelöscht',
         'allRecords' => 'Alle',
     ],
     'labels' => [
+        'suspendedRelation' => 'Gesperrt',
         'uuid' => 'UUID',
         'category' => 'Kategorie',
         'parentCategory' => 'Übergeordnete Kategorie',
@@ -98,6 +100,9 @@ return [
         'changeStatusCategory' => 'Status der Kategorie %s aktualisiert',
     ],
     'messages' => [
+        'suspendAssociated' => 'Die Kategorie kann nicht gesperrt werden, da ihr Produkte zugeordnet sind.',
+        'suspendHasChildren' => 'Die Kategorie kann nicht gesperrt werden, da sie Unterkategorien enthält.',
+        'parentSuspended' => 'Die ausgewählte übergeordnete Kategorie ist gesperrt.',
         'areYouSureResetData' => 'Möchten Sie die Daten wirklich zurücksetzen?',
         'areYouSureRefreshData' => 'Möchten Sie die Daten wirklich neu laden?',
         'areYouSureChangeStatus' => 'Möchten Sie den Status von <b>%s</b> wirklich ändern?',

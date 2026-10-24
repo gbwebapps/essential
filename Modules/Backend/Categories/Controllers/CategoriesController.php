@@ -160,6 +160,8 @@ class CategoriesController extends BackendController
                 endforeach;
 
                 $json['output'] = view(Views::SHOW_ALL_PARTIAL, $this->data);
+                $json['trashCounts'] = $this->categoriesModel->getTrashCounts();
+                $json['menuCounts'] = model(\App\Models\Backend\MenuCountsModel::class)->getCounts($this->currentAdmin, 'categories');
                 $json['result'] = true;
 
             elseif($this->data['data']['result'] === false):

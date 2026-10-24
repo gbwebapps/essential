@@ -89,7 +89,7 @@ namespace App\Models\Backend\Components {
             $this->assertContains('required', $rules['entity']['rules']);
             $this->assertContains('alpha_dash', $rules['entity']['rules']);
             $this->assertContains('in_list[asc,desc,ASC,DESC]', $rules['order']['rules']);
-            $this->assertContains('in_list[active,trashed,all]', $rules['trash_filter']['rules']);
+            $this->assertContains('in_list[active,suspended,trashed,all]', $rules['trash_filter']['rules']);
         }
 
         public function testGetExportColumnsRejectsInvalidContextBeforeDatabaseLookup(): void

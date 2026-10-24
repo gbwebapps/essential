@@ -20,7 +20,13 @@ return [
         'bottomRight' => [
             'settings' => 'Paramètres',
             'tools' => 'Outils', 
+            'warehouse' => 'Entrepôt',
         ],
+    ],
+    'menuCounts' => [
+        'active' => 'Actifs',
+        'trashed' => 'Supprimés',
+        'suspended' => 'Désactivés',
     ],
     'links' => [
         'selectAll' => 'Tout sélectionner'

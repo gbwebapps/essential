@@ -198,7 +198,7 @@ CREATE TABLE IF NOT EXISTS `essential`.`admins_logs` (
 CREATE TABLE IF NOT EXISTS `essential`.`sessions` (
     `id` varchar(128) NOT NULL,
     `ip_address` varchar(45) NOT NULL,
-    `timestamp` int(10) unsigned DEFAULT 0 NOT NULL,
+    `timestamp` datetime not null default current_timestamp,
     `data` blob NOT NULL,
     PRIMARY KEY (`id`),
     KEY `sessions_timestamp` (`timestamp`)
@@ -278,7 +278,7 @@ create table if not exists `essential`.`products` (
     `deleted_at` datetime null default null,
     `restored_at` datetime null default null,
     primary key (`uuid`),
-    index `idx_products_product` (`product`),
+    unique index `idx_products_product` (`product`),
     index `idx_products_quantity` (`quantity`),
     index `idx_products_price` (`price`),
     index `idx_products_status` (`status`),

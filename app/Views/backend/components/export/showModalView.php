@@ -5,7 +5,7 @@
 
             <div class="modal-header border-0 pb-0">
                 <h5 class="modal-title">
-                    <i class="fa-solid fa-file-export"></i> <?= sprintf(lang('backend/components/export.panels.main'), esc($entity)); ?>
+                    <i class="fa-solid fa-file-export"></i> <?= isset($modalTitle) ? esc($modalTitle) : sprintf(lang('backend/components/export.panels.main'), esc($entity)); ?>
                 </h5>
             </div>
 
@@ -13,8 +13,16 @@
 
                 <div id="export-alert-container"></div>
 
-                <!-- FASE 1: Selezione Colonne -->
+                <!-- FASE 1: Contenuto del pacchetto oppure selezione colonne CSV -->
                 <div id="export-selection-area">
+                    <?php if (isset($fixedPackage)): ?>
+                        <p class="app-text-muted small mb-3"><?= esc($packageDescription); ?></p>
+                        <ul class="list-unstyled mb-0">
+                            <?php foreach ($fixedPackage as $table): ?>
+                                <li class="mb-2"><i class="fa-solid fa-table me-2"></i><?= esc($table); ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php else: ?>
                     <p class="app-text-muted small mb-3"><?= lang('backend/components/export.labels.selectColumns'); ?></p>
 
                     <form id="export-columns-form">
@@ -47,6 +55,7 @@
                             <?php endforeach; ?>
                         </div>
                     </form>
+                    <?php endif; ?>
                 </div>
 
                 <!-- FASE 2: Loader di Esportazione (Inizialmente Nascosto) -->
@@ -59,10 +68,10 @@
             </div>
 
             <div class="modal-footer border-0 justify-content-center">
-                <button type="button" class="btn btn-sm app-btn-danger no-general-disabled" id="export-cancel-btn">
+                <button type="button" class="btn btn-sm app-btn-danger no-general-disabled" id="<?= esc($controlsPrefix ?? 'export', 'attr'); ?>-cancel-btn">
                     <i class="fa-solid fa-xmark"></i> <?= lang('backend/components/export.buttons.operationUndo'); ?>
                 </button>
-                <button type="button" class="btn btn-sm app-btn-success" id="export-start-btn">
+                <button type="button" class="btn btn-sm app-btn-success" id="<?= esc($controlsPrefix ?? 'export', 'attr'); ?>-start-btn">
                     <i class="fa-solid fa-play"></i> <?= lang('backend/components/export.buttons.exportationStart'); ?>
                 </button>
             </div>

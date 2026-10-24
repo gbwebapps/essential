@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const { appUrl } = require('../support/app-url');
 
 test('Login amministratore tramite AJAX', async ({ page }) => {
     const email = process.env.E2E_ADMIN_EMAIL;
@@ -7,7 +8,7 @@ test('Login amministratore tramite AJAX', async ({ page }) => {
     expect(email).toBeTruthy();
     expect(password).toBeTruthy();
 
-    await page.goto('/backend/auth/login');
+    await page.goto(appUrl('/backend/auth/login'));
 
     await page.locator('[name="email"]').fill(email);
     await page.locator('[name="password"]').fill(password);

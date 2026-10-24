@@ -29,6 +29,8 @@ class BrandsModel extends BackendModel implements ImportValidationInterface, Exp
      */
     protected bool $hasSoftDelete = true;
 
+    protected bool $hasStatusFilter = true;
+
     /**
      * Whitelist dei campi consentiti durante la visualizzazione dell'elenco brand.
      * Include i parametri strutturali per la paginazione, l'ordinamento e la gestione della vista cestino.
@@ -147,6 +149,30 @@ class BrandsModel extends BackendModel implements ImportValidationInterface, Exp
     }
 
     /**
+     * Conta attivi, sospesi, eliminati e totale, senza ricerca o paginazione.
+     *
+     * @return array{active: int, suspended: int, trashed: int, all: int}
+     */
+    public function getTrashCounts(): array
+    {
+        $query = $this->db->query('select count(*) as total,
+                                        count(case when deleted_at is null and status = 1 then 1 end) as active,
+                                        count(case when deleted_at is not null then 1 end) as trashed,
+                                        count(case when deleted_at is null and status = 0 then 1 end) as suspended
+                                 from brands');
+
+        if ($query === false || ($counts = $query->getRowArray()) === null):
+            throw new \RuntimeException(lang('backend/global.messages.getDataError'));
+        endif;
+
+        $total = (int) $counts['total'];
+        $trashed = (int) $counts['trashed'];
+        $suspended = (int) $counts['suspended'];
+
+        return ['active' => (int) $counts['active'], 'suspended' => $suspended, 'trashed' => $trashed, 'all' => $total];
+    }
+
+    /**
      * Rimuove i file creati durante un upload che non ha raggiunto il commit.
      *
      * @param array $filenames Nomi dei file caricati nella transazione corrente
@@ -165,15 +191,21 @@ class BrandsModel extends BackendModel implements ImportValidationInterface, Exp
      * @param string $uuid Identificativo del brand
      * @return bool True quando esiste almeno un'associazione
      */
-    protected function hasProducts(string $uuid): bool
+    protected function hasProducts(string $uuid, bool $lockRows = false): bool
     {
         $sql = "select 1
                 from brands_to_products
                 inner join brands on brands.id = brands_to_products.brand_id
                 where brands.uuid = ?
-                limit 1";
+                limit 1" . ($lockRows ? ' for update' : '');
 
         return $this->db->query($sql, [$uuid])->getRow() !== null;
+    }
+
+    /** Impedisce la sospensione finché esistono pivot, anche inattive o verso prodotti cestinati. */
+    protected function suspensionError(string $uuid, bool $lockRows = false): ?string
+    {
+        return $this->hasProducts($uuid, $lockRows) ? lang('backend/brands.messages.suspendAssociated') : null;
     }
 
     /**
@@ -197,7 +229,7 @@ class BrandsModel extends BackendModel implements ImportValidationInterface, Exp
                 'rules' => ['required', 'is_natural_no_zero'] 
             ],
             'trash_filter' => [
-                'rules' => ['in_list[active,trashed,all]'] 
+                'rules' => ['in_list[active,suspended,trashed,all]']
             ],
         ];
     }
@@ -416,6 +448,11 @@ class BrandsModel extends BackendModel implements ImportValidationInterface, Exp
             return [lang('backend/brands.messages.cannotModifyDeleted')];
         endif;
 
+        if ((int) ($data['status'] ?? $currentRow['status'] ?? 1) === 0):
+            $error = $this->suspensionError((string) $currentRow['uuid'], $this->db->transDepth > 0);
+            return $error === null ? [] : [$error];
+        endif;
+
         return [];
     }
 
@@ -620,26 +657,35 @@ class BrandsModel extends BackendModel implements ImportValidationInterface, Exp
 
             $uploadUuid = $posts['uuid'];
 
+            $this->db->transBegin();
+            $this->db->query('select id from brands where uuid = ? for update', [$posts['uuid']]);
+
             /* Recupero i dati del brand prima dell'aggiornamento */
             $brand = $this->getByUUID($posts['uuid']);
 
             if($brand['result'] === false):
+                $this->db->transRollback();
                 return ['result' => false, 'message' => $brand['message']];
             endif;
 
             /* Scudo Enterprise: blocco immediato se il record si trova nel cestino */
             if ($brand['row']->deleted_at !== null):
+                $this->db->transRollback();
                 return ['result' => false, 'message' => lang('backend/brands.messages.cannotModifyDeleted')]; /* Ricorda di creare la stringa lingua */
+            endif;
+
+            if ((int) $posts['status'] === 0 && ($error = $this->suspensionError($posts['uuid'], true)) !== null):
+                $this->db->transRollback();
+                return ['result' => false, 'message' => $error];
             endif;
 
             /* Se non è stato effettuato alcun cambio sui dati gestiti, interrompiamo subito */
             if( ! $this->hasBrandChanged($posts, $brand['row'])):
+                $this->db->transRollback();
                 return ['result' => false, 'message' => lang('backend/brands.messages.noDataChanged')];
             endif;
 
             $updated_at = date('Y-m-d H:i:s');
-
-            $this->db->transBegin();
 
             /* Aggiorno la tabella principale */
             $sql = 'update brands set brand = ?, status = ?, note = ?, updated_at = ? where uuid = ?';
@@ -799,23 +845,27 @@ class BrandsModel extends BackendModel implements ImportValidationInterface, Exp
             /* Match dei posts con i campi consentiti */
             $posts = $this->checkAllowedFields($posts, $this->delAllowedFields);
 
+            $this->db->transBegin();
+            $this->db->query('select id from brands where uuid = ? for update', [$posts['uuid']]);
+
             /* Recupero i dati del brand prima dell'eliminazione */
             $data = $this->getByUUID($posts['uuid']);
 
             if($data['result'] === false):
+                $this->db->transRollback();
                 return ['result' => false, 'message' => $data['message']];
             endif;
 
             /* Scudo Enterprise: blocco immediato se il record si trova nel cestino */
             if ($data['row']->deleted_at !== null):
+                $this->db->transRollback();
                 return ['result' => false, 'message' => lang('backend/brands.messages.cannotModifyDeleted')]; /* Ricorda di creare la stringa lingua */
             endif;
 
-            if ($this->hasProducts($posts['uuid'])):
+            if ($this->hasProducts($posts['uuid'], true)):
+                $this->db->transRollback();
                 return ['result' => false, 'message' => lang('backend/brands.messages.deleteAssociated')];
             endif;
-
-            $this->db->transBegin();
 
             /* Cestinamento */
             $sql = "update brands set deleted_at = now() where uuid = ?";
@@ -864,19 +914,26 @@ class BrandsModel extends BackendModel implements ImportValidationInterface, Exp
             /* Match dei posts con i campi consentiti */
             $posts = $this->checkAllowedFields($posts, $this->delAllowedFields);
 
+            $this->db->transBegin();
+
             /* Recupero diretto dal DB per aggirare eventuali filtri sui record attivi */
-            $sql = "select * from brands where uuid = ?";
+            $sql = "select * from brands where uuid = ? for update";
             $row = $this->db->query($sql, [$posts['uuid']])->getRow();
 
 			if (empty($row)):
+				$this->db->transRollback();
 				return ['result' => false, 'message' => lang('backend/brands.messages.notFound')];
 			endif;
 
 			if ($row->deleted_at === null):
+				$this->db->transRollback();
 				return ['result' => false, 'message' => lang('backend/brands.messages.restoreRequiresTrash')];
 			endif;
 
-            $this->db->transBegin();
+            if ((int) $row->status === 0 && ($error = $this->suspensionError($posts['uuid'], true)) !== null):
+                $this->db->transRollback();
+                return ['result' => false, 'message' => $error];
+            endif;
 
             /* Ripristino del brand */
             $sqlUpdate = "update brands set deleted_at = null, restored_at = ? where uuid = ?";
@@ -927,19 +984,29 @@ class BrandsModel extends BackendModel implements ImportValidationInterface, Exp
             /* Match dei posts con i campi consentiti */
             $posts = $this->checkAllowedFields($posts, $this->changeStatusAllowedFields);
 
+            $this->db->transBegin();
+            $this->db->query('select id from brands where uuid = ? for update', [$posts['uuid']]);
+
             /* Recupero i dati del brand */
             $data = $this->getByUUID($posts['uuid']);
 
             if($data['result'] === false):
+                $this->db->transRollback();
                 return ['result' => false, 'message' => $data['message']];
             endif;
 
             /* Scudo Enterprise: blocco immediato se il record si trova nel cestino */
             if ($data['row']->deleted_at !== null):
+                $this->db->transRollback();
                 return ['result' => false, 'message' => lang('backend/brands.messages.cannotModifyDeleted')]; /* Ricorda di creare la stringa lingua */
             endif;
 
             $currentStatus = (int) $data['row']->status;
+
+            if ($currentStatus === 1 && ($error = $this->suspensionError($posts['uuid'], true)) !== null):
+                $this->db->transRollback();
+                return ['result' => false, 'message' => $error];
+            endif;
 
             $newStatus = null;
 
@@ -958,8 +1025,6 @@ class BrandsModel extends BackendModel implements ImportValidationInterface, Exp
 
             $updatedAt = date('Y-m-d H:i:s');
             $data['row']->updated_at = $updatedAt;
-
-            $this->db->transBegin();
 
             /* Cambio stato brand */
             $sql = "update brands set status = ?, updated_at = ? where uuid = ?";

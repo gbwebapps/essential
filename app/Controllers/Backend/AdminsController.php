@@ -142,6 +142,8 @@ class AdminsController extends BackendController
                 $this->data['posts'] = $posts;
 
                 $json['output'] = view('backend/admins/partials/showAll/showAllPartial', $this->data);
+                $json['trashCounts'] = $this->adminsModel->getTrashCounts();
+                $json['menuCounts'] = model(\App\Models\Backend\MenuCountsModel::class)->getCounts($this->currentAdmin, 'admins');
                 $json['result'] = true;
 
             elseif($this->data['data']['result'] === false):

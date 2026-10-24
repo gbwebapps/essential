@@ -48,12 +48,19 @@
                                         <div class="d-flex flex-column flex-md-row gap-0 gap-md-3 me-md-auto mb-3 mb-md-0 border-md-end pe-md-3">
                                             <a href="#" class="cmd-link active-filter" data-trash-filter="active">
                                                 <i class="fa-solid fa-check"></i> <?= lang('backend/brands.links.activeRecords'); ?>
+                                                <span class="badge app-bg-surface app-text-muted border rounded-1 ms-1" data-trash-count="active" hidden></span>
+                                            </a>
+                                            <a href="#" class="cmd-link" data-trash-filter="suspended">
+                                                <i class="fa-solid fa-pause"></i> <?= lang('backend/brands.links.suspendedRecords'); ?>
+                                                <span class="badge app-bg-surface app-text-muted border rounded-1 ms-1" data-trash-count="suspended" hidden></span>
                                             </a>
                                             <a href="#" class="cmd-link" data-trash-filter="trashed">
                                                 <i class="fa-solid fa-trash-can"></i> <?= lang('backend/brands.links.trashedRecords'); ?>
+                                                <span class="badge app-bg-surface app-text-muted border rounded-1 ms-1" data-trash-count="trashed" hidden></span>
                                             </a>
                                             <a href="#" class="cmd-link" data-trash-filter="all">
                                                 <i class="fa-solid fa-list"></i> <?= lang('backend/brands.links.allRecords'); ?>
+                                                <span class="badge app-bg-surface app-text-muted border rounded-1 ms-1" data-trash-count="all" hidden></span>
                                             </a>
                                         </div>
                                         <!-- End Selezione stato record -->
