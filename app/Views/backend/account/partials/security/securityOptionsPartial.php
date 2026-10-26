@@ -2,19 +2,19 @@
 
     <div class="row mb-3 g-0 app-bg-surface security-section-title pt-2 ps-2 pe-2 border rounded-1">
         <div class="col-12 text-start">
-            <h5><?= lang('backend/account.titles.twoFactor'); ?></h5>
+            <h5><?= ui_text('backend/account.titles.twoFactor', [], false); ?></h5>
         </div>
     </div>
 
 	<form id="security-password-form" data-unsaved-check>
 		<div class="row mb-3">
 			<div class="col-12 col-lg-4">
-				<label for="securityCurrentPassword" class="form-label"><?= lang('backend/account.labels.currentPassword'); ?></label>
+				<label for="securityCurrentPassword" class="form-label"><?= ui_text('backend/account.labels.currentPassword', [], false); ?></label>
 				<div class="input-group">
-					<button class="btn app-btn-secondary app-bg-surface-elevated border toggle-password-visibility" type="button" aria-label="<?= esc(lang('backend/account.buttons.showPassword'), 'attr'); ?>" aria-pressed="false">
+					<button <?= ui_binding('backend/account.buttons.showPassword', 'aria-label', [], true); ?> class="btn app-btn-secondary app-bg-surface-elevated border toggle-password-visibility" type="button" aria-label="<?= esc(lang('backend/account.buttons.showPassword'), 'attr'); ?>" aria-pressed="false">
 						<i class="fa-solid fa-eye app-text-muted"></i>
 					</button>
-					<input type="password" id="securityCurrentPassword" name="currentPassword" class="form-control" autocomplete="current-password" data-required-message="<?= esc(lang('backend/account.errors.currentPasswordRequired'), 'attr'); ?>" placeholder="<?= esc(lang('backend/account.placeholders.currentPassword'), 'attr'); ?>">
+					<input <?= ui_binding('backend/account.errors.currentPasswordRequired', 'data-required-message', [], true); ?> <?= ui_binding('backend/account.placeholders.currentPassword', 'placeholder', [], true); ?> type="password" id="securityCurrentPassword" name="currentPassword" class="form-control" autocomplete="current-password" data-required-message="<?= esc(lang('backend/account.errors.currentPasswordRequired'), 'attr'); ?>" placeholder="<?= esc(lang('backend/account.placeholders.currentPassword'), 'attr'); ?>">
 				</div>
 				<div class="error_currentPassword app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
 			</div>
@@ -31,7 +31,7 @@
                 <div class="card h-100 border <?= ($activeMethod === $method) ? 'app-border-accent app-bg-surface' : ''; ?>">
                     <div class="card-body d-flex align-items-start p-3">
                         <div class="form-check w-100 m-0">
-                            <input class="form-check-input twofactor-method-trigger" 
+                            <input <?= ui_binding('backend/account.messages.areYouSureChangeMethod', 'data-message', [], false); ?> class="form-check-input twofactor-method-trigger" 
                                    type="radio" 
                                    name="twoFactorMethod" 
                                    id="method-<?= esc($method); ?>" 
@@ -46,9 +46,9 @@
                                     <?php elseif ($method === 'totp') : ?>
                                         <i class="fa-solid fa-mobile-screen me-1"></i>
                                     <?php endif; ?>
-                                    <?= lang('backend/account.labels.method' . ucfirst($method) . 'Title'); ?>
+                                    <?= ui_text('backend/account.labels.method' . ucfirst($method) . 'Title', [], false); ?>
                                 </span>
-                                <small class="app-text-muted d-block"><?= lang('backend/account.labels.method' . ucfirst($method) . 'Desc'); ?></small>
+                                <small class="app-text-muted d-block"><?= ui_text('backend/account.labels.method' . ucfirst($method) . 'Desc', [], false); ?></small>
                             </label>
                         </div>
                     </div>

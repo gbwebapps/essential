@@ -23,14 +23,14 @@
     <div class="row">
         <div class="col-6">
             <h2 class="card-title text-start mb-0">
-                <?= lang('backend/components/uploadPreview.title'); ?>
+                <?= ui_text('backend/components/uploadPreview.title', [], false); ?>
             </h2>
         </div>
         <div class="col-6 d-flex justify-content-end align-items-center">
             <div>
                 <input type="file" name="images[]" id="inputImages" style="display: none;" multiple>
                 <button type="button" class="btn btn-sm app-btn-secondary" id="buttonImages">
-                    <i class="fa-solid fa-arrow-pointer me-1"></i><?= lang('backend/components/uploadPreview.buttons.uploadImages'); ?>
+                    <i class="fa-solid fa-arrow-pointer me-1"></i><?= ui_text('backend/components/uploadPreview.buttons.uploadImages', [], false); ?>
                 </button>
             </div>
 
@@ -41,7 +41,7 @@
                         <input type="hidden" name="entity" value="<?= esc($entity); ?>">
                         <input type="hidden" name="context" value="<?= esc($context); ?>">
                         <button type="submit" class="btn btn-sm app-btn-success">
-                            <i class="fa-solid fa-upload me-1"></i> <?= lang('backend/components/uploadPreview.buttons.sendImages'); ?>
+                            <i class="fa-solid fa-upload me-1"></i> <?= ui_text('backend/components/uploadPreview.buttons.sendImages', [], false); ?>
                         </button>
                     </form>
                 </div>
@@ -58,12 +58,12 @@
             <!-- 1. Area Drop Zone indipendente dal ciclo di vita delle anteprime -->
             <div id="drop-zone-area" class="drop-zone-custom d-flex align-items-center justify-content-center p-3 mb-3 app-text-muted w-100">
                 <span class="fw-bold">
-                    <i class="fa-solid fa-cloud-arrow-up me-2"></i> <?= lang('backend/components/uploadPreview.labels.dragAndDrop'); ?>
+                    <i class="fa-solid fa-cloud-arrow-up me-2"></i> <?= ui_text('backend/components/uploadPreview.labels.dragAndDrop', [], false); ?>
                 </span>
             </div>
 
             <!-- 2. Contenitore esclusivo per l'iniezione JS delle miniature -->
-            <div id="previewImages" class="row justify-content-center align-items-center" data-required-text="<?= lang('backend/components/uploadPreview.messages.notImagesSelected'); ?>"></div>
+            <div <?= ui_binding('backend/components/uploadPreview.messages.notImagesSelected', 'data-required-text', [], false); ?> id="previewImages" class="row justify-content-center align-items-center" data-required-text="<?= lang('backend/components/uploadPreview.messages.notImagesSelected'); ?>"></div>
             
         </div>
     </div>

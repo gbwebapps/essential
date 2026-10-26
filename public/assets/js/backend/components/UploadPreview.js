@@ -203,7 +203,7 @@ export class UploadPreviewImgManager {
                     <img src="${e.target.result}" class="img-fluid w-100 d-block" alt="">
                     <div class="preview-overlay d-flex align-items-center justify-content-center">
                         <button type="button" class="btn app-btn-danger btn-sm remove-preview" data-id="${id}">
-                            <i class="fa-solid fa-trash me-1"></i> ${ langDefinitions.dataset.remove }
+                            <i class="fa-solid fa-trash me-1"></i> <span data-i18n-text='{"key":"backend/global.buttons.remove"}'>${ langDefinitions.dataset.remove }</span>
                         </button>
                     </div>
                 </div>

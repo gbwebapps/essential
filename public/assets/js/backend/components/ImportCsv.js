@@ -1,5 +1,5 @@
 /* Import delle utility risalendo di un livello */
-import { urlbase, apiFetch, showAlert, smoothReplace } from '../backend.js';
+import { urlbase, apiFetch, showAlert, smoothReplace, changeLanguageManager } from '../backend.js';
 
 export class ImportCsvManager {
     constructor(config = {}, hooks = {}) {
@@ -169,6 +169,7 @@ export class ImportCsvManager {
         });
 
         modal.querySelectorAll('[data-import-close-label]').forEach(label => {
+            label.setAttribute('data-i18n-text', JSON.stringify({ key: 'backend/components/import.buttons.' + (hasPreview && hasProcessableData ? 'cancel' : 'close') }));
             label.textContent = hasPreview && hasProcessableData ? label.dataset.cancel : label.dataset.close;
         });
     }
@@ -404,6 +405,7 @@ export class ImportCsvManager {
                             const progressText = document.getElementById('import-progress-text');
                             if (progressText && data.progressMessage) {
                                 progressText.textContent = data.progressMessage;
+                                changeLanguageManager.bindMessage(progressText, data.progressMessage, true);
                             }
                         }
                     }

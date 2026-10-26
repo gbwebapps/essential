@@ -23,18 +23,18 @@
                                     <div class="app-text-muted">
                                         <span><i class="fa-solid fa-file-lines me-2"></i>
                                             <?php $def = ($folder['count'] === 1) ? 'file' : 'files'; ?>
-                                            <?= esc((string) $folder['count']); ?> <?= esc(lang('backend/tools.labels.' . $def)); ?>
+                                            <?= esc((string) $folder['count']); ?> <?= ui_text('backend/tools.labels.' . $def, [], true); ?>
                                         </span>
                                     </div>
                                 </div>
                                 
                                 <!-- Blocco Destra: Pulsante Pulisci -->
                                 <div class="col-12 col-md-4 text-start text-md-end d-grid d-md-block">
-                                    <button type="button" class="btn btn-sm app-btn-danger btn-clean-folder"
+                                    <button <?= ui_binding('backend/tools.messages.confirmCleanFolder', 'data-confirm', [$folder['name']], true); ?> type="button" class="btn btn-sm app-btn-danger btn-clean-folder"
                                             data-folder="<?= esc($folder['name'], 'attr'); ?>"
                                             data-confirm="<?= esc(sprintf(lang('backend/tools.messages.confirmCleanFolder'), $folder['name']), 'attr'); ?>"
                                             <?= $folder['count'] == 0 ? 'disabled' : ''; ?>>
-                                        <i class="fa-solid fa-trash-can me-2"></i><?= lang('backend/tools.buttons.cleanFolder'); ?>
+                                        <i class="fa-solid fa-trash-can me-2"></i><?= ui_text('backend/tools.buttons.cleanFolder', [], false); ?>
                                     </button>
                                 </div>
                                 

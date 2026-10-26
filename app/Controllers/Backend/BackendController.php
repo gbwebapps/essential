@@ -25,7 +25,7 @@ abstract class BackendController extends BaseController
      * Array di helper precaricati da CodeIgniter per essere disponibili in tutto il backend.
      * @var list<string>
      */
-    protected $helpers = ['date', 'array', 'cookie', 'settings'];
+    protected $helpers = ['date', 'array', 'cookie', 'settings', 'interface'];
 
     /**
      * Array associativo globale utilizzato per passare variabili e contesti strutturati alle viste.
@@ -185,7 +185,7 @@ abstract class BackendController extends BaseController
             $finalData['menuCounts'] = model(\App\Models\Backend\MenuCountsModel::class)->getCounts($finalData['currentAdmin'] ?? null);
         endif;
         
-        $coreCss = \Config\Backend\Assets::getCoreCss(setting('Backend\General', 'theme'));
+        $coreCss = \Config\Backend\Assets::getCoreCss(backend_theme());
         
         /* Passiamo il nome del controller per includere il JS specifico */
         $currentController = $this->data['controller'] ?? null;
@@ -254,6 +254,10 @@ abstract class BackendController extends BaseController
 
         /* Unione dei dati originali con le chiavi CSRF */
         $payload = array_merge($data, $csrfData);
+        $translationBindings = \App\Libraries\Backend\InterfaceTranslations::messages($data);
+        if ($translationBindings !== []):
+            $payload['translationBindings'] = $translationBindings;
+        endif;
 
         return $this->response->setStatusCode($statusCode)->setJSON($payload);
     }

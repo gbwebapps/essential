@@ -1,17 +1,17 @@
 <div>
     <p>
-        <?= sprintf(lang("backend/email.admins.resetPassword.greeting"), esc($firstname) . ' ' . esc($lastname)); ?>
+        <?= ui_text("backend/email.admins.resetPassword.greeting", [esc($firstname) . ' ' . esc($lastname)], false); ?>
     </p>
     <p>
-        <?= lang("backend/email.admins.resetPassword.requestPassword"); ?><br>
-        <?= sprintf(lang("backend/email.admins.resetPassword.usernameReminder"), esc($email)); ?>
+        <?= ui_text("backend/email.admins.resetPassword.requestPassword", [], false); ?><br>
+        <?= ui_text("backend/email.admins.resetPassword.usernameReminder", [esc($email)], false); ?>
     </p>
     <p>
         <a href="<?= esc(base_url('backend/auth/setPassword/' . rawurlencode($token)), 'attr'); ?>">
-            <?= lang("backend/email.admins.resetPassword.setPasswordButton"); ?>
+            <?= ui_text("backend/email.admins.resetPassword.setPasswordButton", [], false); ?>
         </a>
     </p>
     <p>
-        <?= lang("backend/email.admins.resetPassword.ignoreNotice"); ?>
+        <?= ui_text("backend/email.admins.resetPassword.ignoreNotice", [], false); ?>
     </p>
 </div>

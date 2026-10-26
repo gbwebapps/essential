@@ -46,6 +46,7 @@ class RouteSecurityTest extends CIUnitTestCase
     public function testProtectedPostRoutes(): void
     {
         $routes = [
+            'backend/interface/change'            => ['authorization', 'csrf'],
             'backend/admins/add'                  => ['authorization', 'superadmin', 'csrf'],
             'backend/admins/edit'                 => ['authorization', 'superadmin', 'csrf'],
             'backend/admins/hardDelete'           => ['authorization', 'superadmin', 'csrf'],

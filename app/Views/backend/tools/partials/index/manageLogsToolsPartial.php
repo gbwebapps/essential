@@ -4,9 +4,9 @@
             <div class="col-12">
                 <div class="ps-2 py-1 app-bg-surface fw-bold small mb-3 border text-center rounded-2">
                     <?php if ($stats['total'] === 0): ?>
-                        <?= lang('backend/tools.labels.noLogsStats'); ?>
+                        <?= ui_text('backend/tools.labels.noLogsStats', [], false); ?>
                     <?php else: ?>
-                        <?= esc(sprintf(lang('backend/tools.labels.logsStats'), $stats['total'], convertDate($stats['min_date'], 'conversational'), convertDate($stats['max_date'], 'conversational'))); ?>
+                        <?= ui_text('backend/tools.labels.logsStats', [$stats['total'], convertDate($stats['min_date'], 'conversational'), convertDate($stats['max_date'], 'conversational')], true); ?>
                     <?php endif; ?>
                 </div>
             </div>
@@ -18,9 +18,9 @@
                     <div class="col-md-4">
                         <div class="mb-2 mb-md-0">
                             <!-- Campo Data Da -->
-                            <label for="logs-created_at-from"><?= lang('backend/logs.labels.dateFrom'); ?></label>
+                            <label for="logs-created_at-from"><?= ui_text('backend/logs.labels.dateFrom', [], false); ?></label>
                             <div id="wrapper-logs-created_at-from" class="input-group">
-                                <input type="text" id="logs-created_at-from" name="fromDate" data-input class="form-control" placeholder="<?= esc(lang('backend/logs.placeholders.dateFrom'), 'attr'); ?>" autocomplete="off">
+                                <input <?= ui_binding('backend/logs.placeholders.dateFrom', 'placeholder', [], true); ?> type="text" id="logs-created_at-from" name="fromDate" data-input class="form-control" placeholder="<?= esc(lang('backend/logs.placeholders.dateFrom'), 'attr'); ?>" autocomplete="off">
                                 <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                 <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                             </div>
@@ -33,9 +33,9 @@
                     <div class="col-md-4">
                         <div class="mb-2 mb-md-0">
                             <!-- Campo Data A -->
-                            <label for="logs-created_at-to"><?= lang('backend/logs.labels.dateTo'); ?></label>
+                            <label for="logs-created_at-to"><?= ui_text('backend/logs.labels.dateTo', [], false); ?></label>
                             <div id="wrapper-logs-created_at-to" class="input-group">
-                                <input type="text" id="logs-created_at-to" name="toDate" data-input class="form-control" placeholder="<?= esc(lang('backend/logs.placeholders.dateTo'), 'attr'); ?>" autocomplete="off">
+                                <input <?= ui_binding('backend/logs.placeholders.dateTo', 'placeholder', [], true); ?> type="text" id="logs-created_at-to" name="toDate" data-input class="form-control" placeholder="<?= esc(lang('backend/logs.placeholders.dateTo'), 'attr'); ?>" autocomplete="off">
                                 <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                 <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                             </div>
@@ -49,11 +49,11 @@
                 <!-- Pulsanti -->
                 <div class="row mt-lg-2">
                     <div class="col-12 d-flex align-middle justify-content-center">
-                        <button type="button" class="btn app-btn-warning btn-sm me-2 btn-reset-tools" data-confirm="<?= esc(lang('backend/tools.messages.areYouSureToResetData'), 'attr'); ?>">
-                            <i class="fa-solid fa-refresh me-1"></i><?= lang('backend/tools.buttons.resetData'); ?>
+                        <button <?= ui_binding('backend/tools.messages.areYouSureToResetData', 'data-confirm', [], true); ?> type="button" class="btn app-btn-warning btn-sm me-2 btn-reset-tools" data-confirm="<?= esc(lang('backend/tools.messages.areYouSureToResetData'), 'attr'); ?>">
+                            <i class="fa-solid fa-refresh me-1"></i><?= ui_text('backend/tools.buttons.resetData', [], false); ?>
                         </button>
                         <button type="button" class="btn app-btn-success btn-sm mx-2 btn-action-logs" data-action="delete">
-                            <i class="fa-solid fa-trash me-1"></i><?= lang('backend/tools.buttons.deleteLogs'); ?>
+                            <i class="fa-solid fa-trash me-1"></i><?= ui_text('backend/tools.buttons.deleteLogs', [], false); ?>
                         </button>
                     </div>
                 </div>

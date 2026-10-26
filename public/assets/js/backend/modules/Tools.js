@@ -687,9 +687,9 @@ export class ToolsManager {
 
                             if (dataContainer) {
                                 const htmlContent = `
-                                    <span class="mb-2 mb-lg-0"><i class="fa-solid fa-list me-2"></i>${langRows.replace('%d', table.rows)}</span>
-                                    <span class="mb-2 mb-lg-0"><i class="fa-solid fa-hard-drive me-2"></i>${langTotalSpace.replace('%s', table.size.toFixed(2))}</span>
-                                    <span class="app-text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>${langOverhead.replace('%s', table.overhead.toFixed(2))}</span>
+                                    <span class="mb-2 mb-lg-0"><i class="fa-solid fa-list me-2"></i><span data-i18n-text='${JSON.stringify({key: "backend/tools.labels.rows", parameters: [table.rows]})}'>${langRows.replace('%d', table.rows)}</span></span>
+                                    <span class="mb-2 mb-lg-0"><i class="fa-solid fa-hard-drive me-2"></i><span data-i18n-text='${JSON.stringify({key: "backend/tools.labels.totalSpace", parameters: [table.size.toFixed(2)]})}'>${langTotalSpace.replace('%s', table.size.toFixed(2))}</span></span>
+                                    <span class="app-text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i><span data-i18n-text='${JSON.stringify({key: "backend/tools.labels.overhead", parameters: [table.overhead.toFixed(2)]})}'>${langOverhead.replace('%s', table.overhead.toFixed(2))}</span></span>
                                 `;
 
                                 smoothReplace(dataContainer, htmlContent);
@@ -707,8 +707,8 @@ export class ToolsManager {
 
                         if (headerSmall) {
                             const htmlHeader = `
-                                <span class="mb-2 mb-lg-0 me-lg-4"><i class="fa-solid fa-hard-drive me-2"></i>${langTotalSpace.replace('%s', totalSize.toFixed(2))}</span>
-                                <span class="app-text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>${langOverhead.replace('%s', totalOverhead.toFixed(2))}</span>
+                                <span class="mb-2 mb-lg-0 me-lg-4"><i class="fa-solid fa-hard-drive me-2"></i><span data-i18n-text='${JSON.stringify({key: "backend/tools.labels.totalSpace", parameters: [totalSize.toFixed(2)]})}'>${langTotalSpace.replace('%s', totalSize.toFixed(2))}</span></span>
+                                <span class="app-text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i><span data-i18n-text='${JSON.stringify({key: "backend/tools.labels.overhead", parameters: [totalOverhead.toFixed(2)]})}'>${langOverhead.replace('%s', totalOverhead.toFixed(2))}</span></span>
                             `;
 
                             smoothReplace(headerSmall, htmlHeader);

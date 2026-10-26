@@ -1,5 +1,5 @@
 /* Import delle utility risalendo di un livello */
-import { urlbase, apiFetch, showAlert, smoothReplace, handleValidationErrors } from '../backend.js';
+import { urlbase, apiFetch, showAlert, smoothReplace, handleValidationErrors, changeLanguageManager } from '../backend.js';
 
 export class ExportCsvManager {
     /**
@@ -260,6 +260,7 @@ export class ExportCsvManager {
 
                 if (progressText && data.progressMessage) {
                     progressText.textContent = data.progressMessage;
+                    changeLanguageManager.bindMessage(progressText, data.progressMessage, true);
                 }
 
                 await this.triggerExport();

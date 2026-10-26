@@ -22,7 +22,7 @@
                                 </div>
                                 
                                 <div class="lead fw-bold text-center text-sm-end">
-                                    <?= $section['title']; ?>
+                                    <?= ui_value($section['title'], false); ?>
                                 </div>
                                 
                             </div>

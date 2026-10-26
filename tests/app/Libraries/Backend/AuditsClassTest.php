@@ -15,7 +15,8 @@ class AuditsClassTest extends CIUnitTestCase
 	protected function setUp(): void
     {
         parent::setUp();
-        $this->mockSettings(['Backend\General' => ['language' => 'it']]);
+        $this->mockSettings(['Backend\General' => ['language' => 'en']]);
+        service('request')->setLocale('it');
     }
 
 	protected function tearDown(): void

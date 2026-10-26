@@ -65,7 +65,7 @@ class LogsController extends BackendController
             $rules = $this->logsModel->showAllValidationRules();
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/logs.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result'  => false, 'message' => ui_message('backend/logs.messages.validationToastErrors', [$errorMessage], lang('backend/logs.messages.validationToastErrors'))]);
             endif;
 
             $posts['searchFields'] = $posts['searchFields'] ?? [];
@@ -127,7 +127,7 @@ class LogsController extends BackendController
 
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/logs.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result'  => false, 'message' => ui_message('backend/logs.messages.validationToastErrors', [$errorMessage], lang('backend/logs.messages.validationToastErrors'))]);
             endif;
 
             $json = $this->logsModel->disconnectSession((int) $posts['tokenId']);

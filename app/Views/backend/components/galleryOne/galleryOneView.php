@@ -24,26 +24,26 @@
                                 
                                 <div class="gallery-one-overlay d-flex justify-content-center align-items-center">
                                     <?php if ((int) $img['is_cover'] === 1): ?>
-                                        <i class="fa-solid fa-minus galleryOneAction app-text-inverse mx-2 fs-5"
+                                        <i <?= ui_binding('backend/components/galleryOne.labels.removeCover', 'title', [], false); ?> <?= ui_binding('backend/components/galleryOne.messages.areYouSureRemoveCover', 'data-message', [], false); ?> class="fa-solid fa-minus galleryOneAction app-text-inverse mx-2 fs-5"
                                            title="<?= lang('backend/components/galleryOne.labels.removeCover'); ?>"
                                            data-action="removeCover"
                                            data-message="<?= lang('backend/components/galleryOne.messages.areYouSureRemoveCover'); ?>">
                                         </i>
                                     <?php else: ?>
-                                        <i class="fa-solid fa-check galleryOneAction app-text-inverse mx-2 fs-5"
+                                        <i <?= ui_binding('backend/components/galleryOne.labels.setCover', 'title', [], false); ?> <?= ui_binding('backend/components/galleryOne.messages.areYouSureSetCover', 'data-message', [], false); ?> class="fa-solid fa-check galleryOneAction app-text-inverse mx-2 fs-5"
                                            title="<?= lang('backend/components/galleryOne.labels.setCover'); ?>"
                                            data-action="setCover"
                                            data-message="<?= lang('backend/components/galleryOne.messages.areYouSureSetCover'); ?>">
                                         </i>
                                     <?php endif; ?>
                                     
-                                    <i class="fa-solid fa-trash galleryOneAction app-text-inverse mx-2 fs-5"
+                                    <i <?= ui_binding('backend/components/galleryOne.labels.delete', 'title', [], false); ?> <?= ui_binding('backend/components/galleryOne.messages.areYouSureDeleteImage', 'data-message', [], false); ?> class="fa-solid fa-trash galleryOneAction app-text-inverse mx-2 fs-5"
                                        title="<?= lang('backend/components/galleryOne.labels.delete'); ?>"
                                        data-action="deleteImage"
                                        data-message="<?= lang('backend/components/galleryOne.messages.areYouSureDeleteImage'); ?>">
                                     </i>
                                     
-                                    <a href="<?= base_url('images/backend/' . $entity . '/' . esc($uuid) . '/large/' . esc($img['filename'])); ?>"
+                                    <a <?= ui_binding('backend/components/galleryOne.labels.viewImage', 'title', [], false); ?> href="<?= base_url('images/backend/' . $entity . '/' . esc($uuid) . '/large/' . esc($img['filename'])); ?>"
                                        target="_blank"
                                        class="app-text-inverse mx-2 fs-5"
                                        title="<?= lang('backend/components/galleryOne.labels.viewImage'); ?>">
@@ -73,7 +73,7 @@
                 <?php endforeach; ?>
             <?php else: ?>
                 <div class="col-12 text-center fw-bold">
-                    <?= lang('backend/components/galleryOne.labels.noImagesFound'); ?>
+                    <?= ui_text('backend/components/galleryOne.labels.noImagesFound', [], false); ?>
                 </div>
             <?php endif; ?>
         </div>

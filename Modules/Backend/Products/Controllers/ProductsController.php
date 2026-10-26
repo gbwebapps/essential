@@ -160,7 +160,7 @@ class ProductsController extends BackendController
 
                 return $this->jsonResponse([
                     'result' => false,
-                    'message' => sprintf(lang('backend/products.messages.validationToastErrors'), $errorMessage),
+                    'message' => ui_message('backend/products.messages.validationToastErrors', [$errorMessage], lang('backend/products.messages.validationToastErrors')),
                 ]);
             endif;
 
@@ -446,7 +446,7 @@ class ProductsController extends BackendController
 
                 return $this->jsonResponse([
                     'result' => false,
-                    'message' => sprintf(lang('backend/products.messages.validationToastErrors'), $errorMessage),
+                    'message' => ui_message('backend/products.messages.validationToastErrors', [$errorMessage], lang('backend/products.messages.validationToastErrors')),
                 ]);
             endif;
 
@@ -474,7 +474,7 @@ class ProductsController extends BackendController
 
                 return $this->jsonResponse([
                     'result' => false,
-                    'message' => sprintf(lang('backend/products.messages.validationToastErrors'), $errorMessage),
+                    'message' => ui_message('backend/products.messages.validationToastErrors', [$errorMessage], lang('backend/products.messages.validationToastErrors')),
                 ]);
             endif;
 
@@ -502,7 +502,7 @@ class ProductsController extends BackendController
 
                 return $this->jsonResponse([
                     'result' => false,
-                    'message' => sprintf(lang('backend/products.messages.validationToastErrors'), $errorMessage),
+                    'message' => ui_message('backend/products.messages.validationToastErrors', [$errorMessage], lang('backend/products.messages.validationToastErrors')),
                 ]);
             endif;
 
@@ -530,7 +530,7 @@ class ProductsController extends BackendController
 
                 return $this->jsonResponse([
                     'result' => false,
-                    'message' => sprintf(lang('backend/products.messages.validationToastErrors'), $errorMessage),
+                    'message' => ui_message('backend/products.messages.validationToastErrors', [$errorMessage], lang('backend/products.messages.validationToastErrors')),
                 ]);
             endif;
 
@@ -573,7 +573,7 @@ class ProductsController extends BackendController
 
                 return $this->jsonResponse([
                     'result' => false,
-                    'message' => sprintf(lang('backend/products.messages.validationToastErrors'), $errorMessage),
+                    'message' => ui_message('backend/products.messages.validationToastErrors', [$errorMessage], lang('backend/products.messages.validationToastErrors')),
                 ]);
             endif;
 
@@ -616,7 +616,7 @@ class ProductsController extends BackendController
 
                 return $this->jsonResponse([
                     'result' => false,
-                    'message' => sprintf(lang('backend/products.messages.validationToastErrors'), $errorMessage),
+                    'message' => ui_message('backend/products.messages.validationToastErrors', [$errorMessage], lang('backend/products.messages.validationToastErrors')),
                 ]);
             endif;
 

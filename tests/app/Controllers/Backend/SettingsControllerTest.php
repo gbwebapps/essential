@@ -933,7 +933,7 @@ class SettingsControllerTest extends CIUnitTestCase
             'getSettings'
         )
         ->willReturn(
-            ['dummy' => 'setting']
+            ['language' => 'en', 'theme' => 'grey']
         );
 
         $settingsClass = 
@@ -1036,7 +1036,7 @@ class SettingsControllerTest extends CIUnitTestCase
 
                 $this
                 ->assertArrayHasKey(
-                    'fragments', 
+                    'interface', 
                     $data
                 );
 

@@ -22,11 +22,11 @@
 
                 <!-- General Data -->
                 <div class="card-header rounded-0 d-flex justify-content-between align-items-center">
-                    <h2 class="card-title text-start mb-0"><?= lang('backend/admins.panels.generalData'); ?></h2>
+                    <h2 class="card-title text-start mb-0"><?= ui_text('backend/admins.panels.generalData', [], false); ?></h2>
                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>" form="getGeneralData">
                     <input type="hidden" name="context" value="edit" form="getGeneralData">
                     <button type="submit" class="btn btn-sm app-btn-secondary" form="getGeneralData">
-                        <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/admins.buttons.reload'); ?>
+                        <i class="fa-solid fa-arrows-rotate me-1"></i><?= ui_text('backend/admins.buttons.reload', [], false); ?>
                     </button>
                 </div>
                 <div id="generalData">
@@ -36,11 +36,11 @@
 
                 <!-- Permissions -->
                 <div class="card-header rounded-0 d-flex justify-content-between align-items-center" style="border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);">
-                    <h2 class="card-title text-start mb-0"><?= lang('backend/admins.panels.permissions'); ?></h2>
+                    <h2 class="card-title text-start mb-0"><?= ui_text('backend/admins.panels.permissions', [], false); ?></h2>
                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>" form="getPermissions">
                     <input type="hidden" name="context" value="edit" form="getPermissions">
                     <button type="submit" class="btn btn-sm app-btn-secondary" form="getPermissions">
-                        <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/admins.buttons.reload'); ?>
+                        <i class="fa-solid fa-arrows-rotate me-1"></i><?= ui_text('backend/admins.buttons.reload', [], false); ?>
                     </button>
                 </div>
                 <div id="permissions">
@@ -56,12 +56,12 @@
 
                 <!-- Gallery One -->
                 <div class="card-header rounded-0 d-flex justify-content-between align-items-center" style="border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);">
-                    <h2 class="card-title text-start mb-0"><?= lang('backend/components/galleryOne.title'); ?></h2>
+                    <h2 class="card-title text-start mb-0"><?= ui_text('backend/components/galleryOne.title', [], false); ?></h2>
                     <input form="getImages" type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>">
                     <input form="getImages" type="hidden" name="entity" value="<?= esc($entity, 'attr'); ?>">
                     <input form="getImages" type="hidden" name="context" value="<?= esc($context, 'attr'); ?>">
                     <button form="getImages" type="submit" class="btn btn-sm app-btn-secondary">
-                        <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/components/galleryOne.buttons.reload'); ?>
+                        <i class="fa-solid fa-arrows-rotate me-1"></i><?= ui_text('backend/components/galleryOne.buttons.reload', [], false); ?>
                     </button>
                 </div>
                 <div id="galleryOne">
@@ -71,10 +71,10 @@
 
                 <!-- Meta Data -->
                 <div class="card-header rounded-0 d-flex justify-content-between align-items-center" style="border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);">
-                    <h2 class="card-title text-start mb-0"><?= lang('backend/admins.panels.metaData'); ?></h2>
+                    <h2 class="card-title text-start mb-0"><?= ui_text('backend/admins.panels.metaData', [], false); ?></h2>
                     <input type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>" form="getMetaData">
                     <button type="submit" class="btn btn-sm app-btn-secondary" form="getMetaData">
-                        <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/admins.buttons.reload'); ?>
+                        <i class="fa-solid fa-arrows-rotate me-1"></i><?= ui_text('backend/admins.buttons.reload', [], false); ?>
                     </button>
                 </div>
                 <div id="metaData">

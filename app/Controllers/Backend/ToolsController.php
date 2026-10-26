@@ -143,7 +143,7 @@ class ToolsController extends BackendController
             $to = convertDate($auditData['to'], 'conversational');
 
             /* Iniezione dinamica dei parametri: 1° %s (da), 2° %s (a), 3° %d (totale) */
-            $confirmMessage = sprintf(lang('backend/tools.messages.areYouSureToDeleteAudits'), $from, $to, $auditData['count']);
+            $confirmMessage = ui_message('backend/tools.messages.areYouSureToDeleteAudits', [$from, $to, $auditData['count']], lang('backend/tools.messages.areYouSureToDeleteAudits'));
 
             $json = ['result' => true, 'count' => $auditData['count'], 'confirmMessage' => $confirmMessage];
             
@@ -214,7 +214,7 @@ class ToolsController extends BackendController
             $to = convertDate($logData['to'], 'conversational');
 
             /* Iniezione dinamica dei parametri: 1° %s (da), 2° %s (a), 3° %d (totale) */
-            $confirmMessage = sprintf(lang('backend/tools.messages.areYouSureToDeleteLogs'), $from, $to, $logData['count']);
+            $confirmMessage = ui_message('backend/tools.messages.areYouSureToDeleteLogs', [$from, $to, $logData['count']], lang('backend/tools.messages.areYouSureToDeleteLogs'));
 
             $json = ['result' => true, 'count' => $logData['count'], 'confirmMessage' => $confirmMessage];
             
@@ -272,7 +272,7 @@ class ToolsController extends BackendController
 
             if ( ! $this->validateData($this->request->getPost(), $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/tools.messages.validateToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result' => false, 'message' => ui_message('backend/tools.messages.validateToastErrors', [$errorMessage], lang('backend/tools.messages.validateToastErrors'))]);
             endif;
 
             $optimizationResult = $this->toolsModel->runOptimization($table);
@@ -282,7 +282,7 @@ class ToolsController extends BackendController
             endif;
 
             /* Scegliamo il messaggio corretto */
-            $message = is_array($table) ? lang('backend/tools.messages.optimizeAllSuccess') : sprintf(lang('backend/tools.messages.optimizeSuccess'), $table);
+            $message = is_array($table) ? lang('backend/tools.messages.optimizeAllSuccess') : ui_message('backend/tools.messages.optimizeSuccess', [$table], lang('backend/tools.messages.optimizeSuccess'));
 
             /* tableData conterrà sempre un array (di 1 elemento o di N elementi) */
             return $this->jsonResponse(['result' => true, 'message'   => $message, 'tableData' => $optimizationResult]);

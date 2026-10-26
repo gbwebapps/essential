@@ -19,6 +19,15 @@ use CodeIgniter\Config\BaseService;
  */
 class Services extends BaseService
 {
+    public static function language(?string $locale = null, bool $getShared = true)
+    {
+        if ($getShared):
+            return static::getSharedInstance('language', $locale);
+        endif;
+
+        return new \App\Libraries\Backend\InterfaceLanguage($locale ?? config('App')->defaultLocale);
+    }
+
     /**
      * Inizializza e restituisce il servizio Email utilizzando le impostazioni unificate (database + configurazione).
      *

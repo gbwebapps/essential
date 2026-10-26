@@ -12,8 +12,8 @@
         <div class="alert app-alert-success d-flex align-items-center mb-3">
             <i class="fa-solid fa-check-circle fa-2x me-3"></i>
             <div>
-                <strong><?= lang('backend/components/import.labels.perfectSync'); ?></strong><br>
-                <?= sprintf($syncNoChanges ?? lang('backend/components/import.labels.syncNoChanges'), $plan['skip']); ?>
+                <strong><?= ui_text('backend/components/import.labels.perfectSync', [], false); ?></strong><br>
+                <?= ui_value_format($syncNoChanges ?? lang('backend/components/import.labels.syncNoChanges'), [$plan['skip']]); ?>
             </div>
         </div>
     <?php else: ?>
@@ -21,7 +21,7 @@
         <!-- STATO: AZIONI TROVATE -->
         <div class="alert app-alert-warning mb-3">
             <i class="fa-solid fa-database me-2"></i>
-            <?= sprintf(lang('backend/components/import.labels.executionPlan'), $plan['insert'], $plan['update'], $plan['skip']); ?>
+            <?= ui_text('backend/components/import.labels.executionPlan', [$plan['insert'], $plan['update'], $plan['skip']], false); ?>
         </div>
     <?php endif; ?>
 
@@ -60,7 +60,7 @@
                 <?php else: ?>
                     <tr>
                         <td colspan="<?= count($headers); ?>" class="text-center app-text-muted p-3">
-                            <?= lang('backend/components/import.messages.noDataToPreview'); ?>
+                            <?= ui_text('backend/components/import.messages.noDataToPreview', [], false); ?>
                         </td>
                     </tr>
                 <?php endif; ?>
@@ -76,7 +76,7 @@
     ?>
         <div class="text-center app-text-muted small mt-2">
             <i class="fa-solid fa-info-circle me-1"></i>
-            <?= sprintf(lang('backend/components/import.labels.previewNotice'), $previewCount, $totalToProcess - $previewCount); ?>
+            <?= ui_text('backend/components/import.labels.previewNotice', [$previewCount, $totalToProcess - $previewCount], false); ?>
         </div>
     <?php endif; ?>
 

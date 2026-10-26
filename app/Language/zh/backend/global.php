@@ -1,6 +1,12 @@
 <?php declare(strict_types = 1);
 
 return [
+    'interface' => [
+        'showPassword' => '显示密码',
+        'hidePassword' => '隐藏密码',
+        'themes' => '主题',
+        'changeError' => '无法更改偏好设置，请重试。',
+    ],
     'menu' => [
         'topRight' => [
             'admins' => '管理员',

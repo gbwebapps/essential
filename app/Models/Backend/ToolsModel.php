@@ -203,9 +203,9 @@ class ToolsModel extends BackendModel
 	        $toLog = convertDate($dates['to'], 'conversational');
 
 			$currentAdmin = service('authorization')->currentAdmin();
-			log_admin_activity('DELETE_AUDITS', 'tools', sprintf(lang('backend/tools.audits.deleteAudits'), $fromLog, $toLog), $currentAdmin);
+			log_admin_activity('DELETE_AUDITS', 'tools', ui_message('backend/tools.audits.deleteAudits', [$fromLog, $toLog], lang('backend/tools.audits.deleteAudits')), $currentAdmin);
 
-			return ['result' => true, 'message' => sprintf(lang('backend/tools.messages.deleteAuditsSuccess'), $deleted, $fromLog, $toLog)];
+			return ['result' => true, 'message' => ui_message('backend/tools.messages.deleteAuditsSuccess', [$deleted, $fromLog, $toLog], lang('backend/tools.messages.deleteAuditsSuccess'))];
 
 		endif;
 
@@ -324,9 +324,9 @@ class ToolsModel extends BackendModel
             $toLog = convertDate($dates['to'], 'conversational');
 
     		$currentAdmin = service('authorization')->currentAdmin();
-    		log_admin_activity('DELETE_LOGS', 'tools', sprintf(lang('backend/tools.audits.deleteLogs'), $fromLog, $toLog), $currentAdmin);
+    		log_admin_activity('DELETE_LOGS', 'tools', ui_message('backend/tools.audits.deleteLogs', [$fromLog, $toLog], lang('backend/tools.audits.deleteLogs')), $currentAdmin);
 
-    		return ['result' => true, 'message' => sprintf(lang('backend/tools.messages.deleteLogsSuccess'), $deleted, $fromLog, $toLog)];
+    		return ['result' => true, 'message' => ui_message('backend/tools.messages.deleteLogsSuccess', [$deleted, $fromLog, $toLog], lang('backend/tools.messages.deleteLogsSuccess'))];
 
     	endif;
 
@@ -418,7 +418,7 @@ class ToolsModel extends BackendModel
 		/* Registrazione attività */
 		$currentAdmin = service('authorization')->currentAdmin();
 		$targetLog = is_string($target) ? "la tabella {$target}" : "tutte le tabelle del database";
-		log_admin_activity('OPTIMIZE_DB', 'tools', sprintf(lang('backend/tools.audits.targetLog'), $targetLog), $currentAdmin);
+		log_admin_activity('OPTIMIZE_DB', 'tools', ui_message('backend/tools.audits.targetLog', [$targetLog], lang('backend/tools.audits.targetLog')), $currentAdmin);
 
 		/* Se la richiesta era per una tabella singola, estraiamo solo quella */
 		if (is_string($target)):
@@ -758,7 +758,7 @@ class ToolsModel extends BackendModel
 
 		try {
 			$currentAdmin = service('authorization')->currentAdmin();
-			log_admin_activity('GENERATE_BACKUP', 'tools', sprintf(lang('backend/tools.audits.generateBackup'), $zipFilename), $currentAdmin);
+			log_admin_activity('GENERATE_BACKUP', 'tools', ui_message('backend/tools.audits.generateBackup', [$zipFilename], lang('backend/tools.audits.generateBackup')), $currentAdmin);
 		} catch (\Throwable $e) {
 			log_message('error', 'Tools backup audit error: ' . $e->getMessage());
 		}
@@ -809,7 +809,7 @@ class ToolsModel extends BackendModel
 				
 				/* Registrazione attività */
 				$currentAdmin = service('authorization')->currentAdmin();
-				log_admin_activity('DELETE_BACKUP', 'tools', sprintf(lang('backend/tools.audits.deleteBackup'), basename($filename)), $currentAdmin);
+				log_admin_activity('DELETE_BACKUP', 'tools', ui_message('backend/tools.audits.deleteBackup', [basename($filename)], lang('backend/tools.audits.deleteBackup')), $currentAdmin);
 				
 				return true;
 			endif;
@@ -868,7 +868,7 @@ class ToolsModel extends BackendModel
 	    $files = $this->getCleanableFiles($path);
 
 	    if ($files === false):
-	        return ['result' => false, 'message' => sprintf(lang('backend/tools.messages.folderCleanUnavailable'), $folder)];
+	        return ['result' => false, 'message' => ui_message('backend/tools.messages.folderCleanUnavailable', [$folder], lang('backend/tools.messages.folderCleanUnavailable'))];
 	    endif;
 
 	    foreach ($files as $filePath):
@@ -881,13 +881,13 @@ class ToolsModel extends BackendModel
 
 	    /* Registrazione attività */
 	    $currentAdmin = service('authorization')->currentAdmin();
-	    log_admin_activity('CLEAN_' . strtoupper(str_replace('/', '_', $folder)), 'tools', sprintf(lang('backend/tools.audits.cleanFolder'), $folder, $deletedCount), $currentAdmin);
+	    log_admin_activity('CLEAN_' . strtoupper(str_replace('/', '_', $folder)), 'tools', ui_message('backend/tools.audits.cleanFolder', [$folder, $deletedCount], lang('backend/tools.audits.cleanFolder')), $currentAdmin);
 
 	    if ($failedCount > 0):
-	        return ['result' => false, 'message' => sprintf(lang('backend/tools.messages.folderCleanError'), $failedCount, $folder)];
+	        return ['result' => false, 'message' => ui_message('backend/tools.messages.folderCleanError', [$failedCount, $folder], lang('backend/tools.messages.folderCleanError'))];
 	    endif;
 
-	    return ['result' => true, 'message' => sprintf(lang('backend/tools.messages.folderCleanSuccess'), $deletedCount, $folder)];
+	    return ['result' => true, 'message' => ui_message('backend/tools.messages.folderCleanSuccess', [$deletedCount, $folder], lang('backend/tools.messages.folderCleanSuccess'))];
 	}
 
 	/**

@@ -2,6 +2,7 @@
 
 /** Renderizza esclusivamente le viste di dashboard: nessun bootstrap HTTP o accesso al database. */
 $dashboardRoot = dirname(__DIR__, 3);
+require_once $dashboardRoot . '/app/Helpers/interface_helper.php';
 require $dashboardRoot . '/vendor/autoload.php';
 require_once $dashboardRoot . '/app/Config/Backend/Dashboard.php';
 

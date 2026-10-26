@@ -11,7 +11,7 @@
                 <div id="generalData">
 
                     <div class="card-header">
-                        <h2 class="card-title text-center text-lg-start mb-0"><?= lang('backend/admins.panels.generalData'); ?></h2>
+                        <h2 class="card-title text-center text-lg-start mb-0"><?= ui_text('backend/admins.panels.generalData', [], false); ?></h2>
                     </div>
 
                     <div class="card-body">
@@ -20,16 +20,16 @@
                         <div class="row">
                             <div class="col-12 col-lg-6">
                                 <div class="mb-2">
-                                    <label for="firstname" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.firstname'); ?></label>
-                                    <input type="text" id="firstname" name="firstname" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.firstname'), 'attr'); ?>">
+                                    <label for="firstname" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= ui_text('backend/admins.labels.firstname', [], false); ?></label>
+                                    <input <?= ui_binding('backend/admins.placeholders.firstname', 'placeholder', [], true); ?> type="text" id="firstname" name="firstname" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.firstname'), 'attr'); ?>">
                                     <!-- Contenitore dinamico per l'errore di validazione -->
                                     <div class="error_firstname app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                                 </div>
                             </div>
                             <div class="col-12 col-lg-6">
                                 <div class="mb-2">
-                                    <label for="lastname" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.lastname'); ?></label>
-                                    <input type="text" id="lastname" name="lastname" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.lastname'), 'attr'); ?>">
+                                    <label for="lastname" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= ui_text('backend/admins.labels.lastname', [], false); ?></label>
+                                    <input <?= ui_binding('backend/admins.placeholders.lastname', 'placeholder', [], true); ?> type="text" id="lastname" name="lastname" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.lastname'), 'attr'); ?>">
                                     <div class="error_lastname app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                                 </div>
                             </div>
@@ -40,15 +40,15 @@
                         <div class="row">
                             <div class="col-12 col-lg-6">
                                 <div class="mb-2">
-                                    <label for="email" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.email'); ?></label>
-                                    <input type="text" id="email" name="email" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.email'), 'attr'); ?>">
+                                    <label for="email" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= ui_text('backend/admins.labels.email', [], false); ?></label>
+                                    <input <?= ui_binding('backend/admins.placeholders.email', 'placeholder', [], true); ?> type="text" id="email" name="email" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.email'), 'attr'); ?>">
                                     <div class="error_email app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                                 </div>
                             </div>
                             <div class="col-12 col-lg-6">
                                 <div class="mb-2">
-                                    <label for="phone" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.phone'); ?></label>
-                                    <input type="text" id="phone" name="phone" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.phone'), 'attr'); ?>">
+                                    <label for="phone" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= ui_text('backend/admins.labels.phone', [], false); ?></label>
+                                    <input <?= ui_binding('backend/admins.placeholders.phone', 'placeholder', [], true); ?> type="text" id="phone" name="phone" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.phone'), 'attr'); ?>">
                                     <div class="error_phone app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                                 </div>
                             </div>
@@ -60,7 +60,7 @@
                             <div class="col-12 col-lg-6">
                                 <div class="mb-2">
                                     <label for="group_id" class="form-label">
-                                        <i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.group'); ?>
+                                        <i class="fa-solid fa-circle-arrow-down"></i><?= ui_text('backend/admins.labels.group', [], false); ?>
                                     </label>
                                     <select name="group_id" class="form-select" id="group_id">
                                         <?php if (! empty($groups)): ?>
@@ -75,11 +75,11 @@
                             <div class="col-12 col-lg-6">
                                 <div class="mb-2">
                                     <label for="status" class="form-label">
-                                        <i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.status'); ?>
+                                        <i class="fa-solid fa-circle-arrow-down"></i><?= ui_text('backend/admins.labels.status', [], false); ?>
                                     </label>
                                     <select name="status" class="form-select" id="status">
-                                        <option value="1"><?= lang('backend/admins.labels.active'); ?></option>
-                                        <option value="0"><?= lang('backend/admins.labels.unactive'); ?></option>
+                                        <option <?= ui_binding('backend/admins.labels.active', 'text', [], false); ?> value="1"><?= lang('backend/admins.labels.active'); ?></option>
+                                        <option <?= ui_binding('backend/admins.labels.unactive', 'text', [], false); ?> value="0"><?= lang('backend/admins.labels.unactive'); ?></option>
                                     </select>
                                     <div class="error_status app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                                 </div>
@@ -91,8 +91,8 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="mb-2">
-                                    <label for="note"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/admins.labels.note'); ?></label>
-                                    <textarea name="note" id="note" rows="7" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.note'), 'attr'); ?>"></textarea>
+                                    <label for="note"><i class="fa-solid fa-circle-arrow-down"></i><?= ui_text('backend/admins.labels.note', [], false); ?></label>
+                                    <textarea <?= ui_binding('backend/admins.placeholders.note', 'placeholder', [], true); ?> name="note" id="note" rows="7" class="form-control" placeholder="<?= esc(lang('backend/admins.placeholders.note'), 'attr'); ?>"></textarea>
                                     <div class="error_note app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                                 </div>
                             </div>

@@ -1,6 +1,12 @@
 <?php declare(strict_types = 1);
 
 return [
+    'interface' => [
+        'showPassword' => 'Mostra password',
+        'hidePassword' => 'Nascondi password',
+        'themes' => 'Temi',
+        'changeError' => 'Impossibile cambiare la preferenza. Riprova.',
+    ],
     'menu' => [
         'topRight' => [
             'admins' => 'Amministratori',

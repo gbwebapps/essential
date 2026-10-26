@@ -7,6 +7,18 @@ export const langDefinitions = document.getElementById('lang-definitions');
 
 import { ExportPdfManager } from './modules/ExportPdf.js';
 import { PasswordVisibility } from './modules/PasswordVisibility.js';
+import { ChangeThemeManager } from './modules/ChangeThemeManager.js';
+import { ChangeLanguageManager } from './modules/ChangeLanguageManager.js';
+
+export const changeThemeManager = new ChangeThemeManager();
+export const changeLanguageManager = new ChangeLanguageManager();
+
+/* Mantiene accessibile il dropdown senza disattivare il focus trap del dialogo. */
+document.addEventListener('focusin', event => {
+    if (event.target.closest('#interface-preferences, #navbar-top-view .navbar-toggler') && document.querySelector('.modal.show, .offcanvas.show')) {
+        event.stopImmediatePropagation();
+    }
+}, true);
 
 /* Gestione modalità schermo intero */
 const fullscreenToggle = document.getElementById('fullscreen-toggle');
@@ -14,13 +26,11 @@ const fullscreenToggle = document.getElementById('fullscreen-toggle');
 if (fullscreenToggle) {
     const fullscreenIcon = fullscreenToggle.querySelector('i');
     const fullscreenText = fullscreenToggle.querySelector('.fullscreen-toggle-text');
-    const expandText = fullscreenToggle.dataset.expandText;
-    const reduceText = fullscreenToggle.dataset.reduceText;
     let fullscreenTransitionPending = false;
 
     const updateFullscreenToggle = () => {
         const isFullscreen = document.fullscreenElement !== null;
-        const currentText = isFullscreen ? reduceText : expandText;
+        const currentText = isFullscreen ? fullscreenToggle.dataset.reduceText : fullscreenToggle.dataset.expandText;
 
         fullscreenIcon?.classList.toggle('fa-expand', ! isFullscreen);
         fullscreenIcon?.classList.toggle('fa-compress', isFullscreen);
@@ -55,6 +65,7 @@ if (fullscreenToggle) {
         });
 
         document.addEventListener('fullscreenchange', updateFullscreenToggle);
+        document.addEventListener('interface:language', updateFullscreenToggle);
         updateFullscreenToggle();
     } else {
         fullscreenToggle.hidden = true;
@@ -116,6 +127,10 @@ function updateMenuCounts(countsByEntity) {
             const label = badge.dataset.label + ': ' + counts[type];
             badge.title = label;
             badge.setAttribute('aria-label', label);
+            ['title', 'aria-label'].forEach(attribute => {
+                const binding = badge.getAttribute('data-i18n-' + attribute);
+                if (binding) badge.setAttribute('data-i18n-' + attribute, JSON.stringify({ ...JSON.parse(binding), suffix: ': ' + counts[type] }));
+            });
         });
     });
 }
@@ -159,6 +174,8 @@ export function apiFetch(input, init = {}) {
 }
 
 async function executeFetch(input, init = {}) {
+    const reloadOnForbidden = init.reloadOnForbidden !== false;
+    delete init.reloadOnForbidden;
     toggleLoader(true);
 
     const defaultHeaders = { 'X-Requested-With': 'XMLHttpRequest' };
@@ -182,6 +199,7 @@ async function executeFetch(input, init = {}) {
             const data = await response.json();
 
             if (data?.result === true) updateMenuCounts(data.menuCounts);
+            changeLanguageManager.rememberMessages(data.translationBindings);
 
             /* Sbarramento Sessione Scaduta */
             if (data && data.result === 'no_current_user_logged') {
@@ -234,7 +252,7 @@ async function executeFetch(input, init = {}) {
 
         handleAjaxError({ status: response.status }, customMessage, null);
         
-        if (response.status === 403) {
+        if (response.status === 403 && reloadOnForbidden) {
             setTimeout(() => {
                 window.location.reload();
             }, 2000);
@@ -325,6 +343,7 @@ export function handleValidationErrors(errors) {
     Object.entries(errors).forEach(([key, value]) => {
         document.querySelectorAll('.error_' + key).forEach(el => {
             el.textContent = value;
+            changeLanguageManager.bindMessage(el, value, true);
             el.dataset.validationAlertToken = token;
             // el.classList.add('error-show'); // fade-in
         });
@@ -346,6 +365,7 @@ export function handleValidationImages(errors) {
             
             if (errorBox) {
                 errorBox.textContent = Array.isArray(message) ? message.join(', ') : String(message);
+                changeLanguageManager.bindMessage(errorBox, errorBox.textContent, true);
             }
         }
     });
@@ -400,7 +420,7 @@ export function showAlert(type, message, customIcon = '')
     const alertHTML = `
         <div class="alert ${alertClass} alert-dismissible fade show border-0 d-flex align-items-center p-3 mb-0" role="alert">
             <div class="w-100 text-center p-0 ms-4">
-                ${iconHTML}${message}
+                ${iconHTML}<span class="alert-message">${message}</span>
             </div>
             <button type="button" class="badge app-bg-danger p-2 border-0 rounded-1 ms-auto" data-bs-dismiss="alert" style="cursor: pointer;">
                 <i class="fa-solid fa-xmark"></i> ${ langDefinitions.dataset.remove }
@@ -431,6 +451,7 @@ export function showAlert(type, message, customIcon = '')
     alertElement.innerHTML = alertHTML.trim();
     const currentAlert = alertElement.firstChild;
     
+    changeLanguageManager.bindMessage(currentAlert.querySelector('.alert-message'), message);
     alertContainer.appendChild(currentAlert);
 
     currentAlert.addEventListener('closed.bs.alert', function () {
@@ -494,6 +515,7 @@ export async function askConfirm(message) {
 
         /* 3. Aggiornamento esclusivo del messaggio iniettando l'HTML sanificato */
         modalEl.querySelector('.modal-body').innerHTML = sanitizeHTML(message);
+        changeLanguageManager.bindMessage(modalEl.querySelector('.modal-body'), message);
 
         /* 4. Prevenzione Multi-Esecuzione: controlli di esistenza prima della clonazione */
         let oldOkBtn = modalEl.querySelector('.btn-ok');
@@ -780,6 +802,7 @@ export function initTomSelects() {
     const textRemove = langDef ? langDef.dataset.remove : 'Rimuovi';
 
     document.querySelectorAll('select.tom-select:not(.tomselected)').forEach(select => {
+        changeLanguageManager.update(select);
         new TomSelect(select, {
             placeholder: textSelect,
             plugins: {

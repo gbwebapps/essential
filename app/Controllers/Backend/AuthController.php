@@ -261,7 +261,7 @@ class AuthController extends BackendController
         endif;
 
         /* 3. Prepara il messaggio di saluto utilizzando i dati appena salvati */
-        $message = sprintf(lang('backend/auth.messages.goodbye'), $firstname, $lastname);
+        $message = ui_message('backend/auth.messages.goodbye', [$firstname, $lastname], lang('backend/auth.messages.goodbye'));
 
         /* 4. Imposta i flashdata nativi di CI4 */
         $this->session->setFlashdata('message', $message);

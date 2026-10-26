@@ -1116,12 +1116,12 @@ class ProductsModel extends BackendModel implements ImportValidationInterface, E
 
             $this->logProductActivity(
                 'ADD_PRODUCTS',
-                sprintf(lang('backend/products.audits.addProduct'), esc($posts['product']))
+                ui_message('backend/products.audits.addProduct', [esc($posts['product'])], lang('backend/products.audits.addProduct'))
             );
 
             return [
                 'result' => true,
-                'message' => sprintf(lang('backend/products.messages.addSuccess'), esc($posts['product'])),
+                'message' => ui_message('backend/products.messages.addSuccess', [esc($posts['product'])], lang('backend/products.messages.addSuccess')),
             ];
 
         } catch (\Throwable $e) {
@@ -1246,12 +1246,12 @@ class ProductsModel extends BackendModel implements ImportValidationInterface, E
 
             $this->logProductActivity(
                 'EDIT_PRODUCTS',
-                sprintf(lang('backend/products.audits.editProduct'), esc($posts['product']))
+                ui_message('backend/products.audits.editProduct', [esc($posts['product'])], lang('backend/products.audits.editProduct'))
             );
 
             return [
                 'result' => true,
-                'message' => sprintf(lang('backend/products.messages.editSuccess'), esc($posts['product'])),
+                'message' => ui_message('backend/products.messages.editSuccess', [esc($posts['product'])], lang('backend/products.messages.editSuccess')),
                 'row' => $result['row'],
             ];
 
@@ -1315,7 +1315,7 @@ class ProductsModel extends BackendModel implements ImportValidationInterface, E
 
             $this->logProductActivity(
                 'HARD_DELETE_PRODUCTS',
-                sprintf(lang('backend/products.audits.hardDeleteProduct'), esc($product['row']->product))
+                ui_message('backend/products.audits.hardDeleteProduct', [esc($product['row']->product)], lang('backend/products.audits.hardDeleteProduct'))
             );
 
             try {
@@ -1325,7 +1325,7 @@ class ProductsModel extends BackendModel implements ImportValidationInterface, E
                 log_message('error', lang('backend/products.messages.hardDeleteImagesError') . ' - ' . $e->getMessage());
             }
 
-            $message = sprintf(lang('backend/products.messages.hardDeleteSuccess'), esc($product['row']->product));
+            $message = ui_message('backend/products.messages.hardDeleteSuccess', [esc($product['row']->product)], lang('backend/products.messages.hardDeleteSuccess'));
 
             if ( ! $cleanup):
                 log_message('error', lang('backend/products.messages.hardDeleteImagesError'));
@@ -1389,12 +1389,12 @@ class ProductsModel extends BackendModel implements ImportValidationInterface, E
 
             $this->logProductActivity(
                 'SOFT_DELETE_PRODUCTS',
-                sprintf(lang('backend/products.audits.softDeleteProduct'), esc($product['row']->product))
+                ui_message('backend/products.audits.softDeleteProduct', [esc($product['row']->product)], lang('backend/products.audits.softDeleteProduct'))
             );
 
             return [
                 'result' => true,
-                'message' => sprintf(lang('backend/products.messages.softDeleteSuccess'), esc($product['row']->product)),
+                'message' => ui_message('backend/products.messages.softDeleteSuccess', [esc($product['row']->product)], lang('backend/products.messages.softDeleteSuccess')),
             ];
 
         } catch (\Throwable $e) {
@@ -1456,12 +1456,12 @@ class ProductsModel extends BackendModel implements ImportValidationInterface, E
 
             $this->logProductActivity(
                 'RESTORE_DELETE_PRODUCTS',
-                sprintf(lang('backend/products.audits.restoreDeleteProduct'), esc($product['row']->product))
+                ui_message('backend/products.audits.restoreDeleteProduct', [esc($product['row']->product)], lang('backend/products.audits.restoreDeleteProduct'))
             );
 
             return [
                 'result' => true,
-                'message' => sprintf(lang('backend/products.messages.restoreDeleteSuccess'), esc($product['row']->product)),
+                'message' => ui_message('backend/products.messages.restoreDeleteSuccess', [esc($product['row']->product)], lang('backend/products.messages.restoreDeleteSuccess')),
             ];
 
         } catch (\Throwable $e) {
@@ -1521,12 +1521,12 @@ class ProductsModel extends BackendModel implements ImportValidationInterface, E
 
             $this->logProductActivity(
                 'CHANGE_STATUS_PRODUCTS',
-                sprintf(lang('backend/products.audits.changeStatusProduct'), esc($product['row']->product))
+                ui_message('backend/products.audits.changeStatusProduct', [esc($product['row']->product)], lang('backend/products.audits.changeStatusProduct'))
             );
 
             return [
                 'result' => true,
-                'message' => sprintf(lang('backend/products.messages.changeStatusSuccess'), esc($product['row']->product)),
+                'message' => ui_message('backend/products.messages.changeStatusSuccess', [esc($product['row']->product)], lang('backend/products.messages.changeStatusSuccess')),
                 'product' => $product['row'],
             ];
 

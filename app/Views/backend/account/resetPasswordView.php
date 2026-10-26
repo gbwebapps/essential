@@ -14,7 +14,7 @@
                 <div class="card-header rounded-0 d-flex justify-content-between align-items-center">
                     <h2 class="card-title text-start mb-0">
                         <?= $sections['resetPassword']['icon']; ?>
-                        <?= lang('backend/account.titles.resetPassword'); ?>
+                        <?= ui_text('backend/account.titles.resetPassword', [], false); ?>
                     </h2>
                 </div>
                 <div id="reset-account-container">

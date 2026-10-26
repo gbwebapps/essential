@@ -9,10 +9,10 @@
         $statusClass = "app-text-danger fw-bold btn btn-link shadow-none";
     endif;
 ?>
-<form class="changeStatus" data-controller="brands" data-message="<?= esc(sprintf(lang('backend/brands.messages.areYouSureChangeStatus'), $brand->brand), 'attr'); ?>">
+<form <?= ui_binding('backend/brands.messages.areYouSureChangeStatus', 'data-message', [$brand->brand], true); ?> class="changeStatus" data-controller="brands" data-message="<?= esc(sprintf(lang('backend/brands.messages.areYouSureChangeStatus'), $brand->brand), 'attr'); ?>">
     <input type="hidden" name="uuid" value="<?= esc($brand->uuid, 'attr'); ?>">
     <input type="hidden" name="context" value="show">
     <button type="submit" class="<?= $statusClass; ?>">
-        <?= $statusText; ?>
+        <?= ui_value($statusText, false); ?>
     </button>
 </form>

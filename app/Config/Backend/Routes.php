@@ -31,6 +31,9 @@ $routes->group('backend', function($routes) {
     /* AUTHORIZED */
     $routes->group('', ['filter' => 'authorization'], function($routes) {
         
+        /* Preferenze temporanee dell'interfaccia, disponibili agli amministratori autenticati. */
+        $routes->post('interface/change', '\App\Controllers\Backend\InterfaceController::change');
+
         /* DASHBOARD */
         $routes->get('dashboard', '\App\Controllers\Backend\DashboardController::index');
         

@@ -76,7 +76,7 @@ class UploadPreviewController extends BackendController
             /* Validazione campi nascosti */
             if ( ! $this->validateData($hidden, $hiddenRules)) :
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/components/uploadPreview.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result'  => false, 'message' => ui_message('backend/components/uploadPreview.messages.validationToastErrors', [$errorMessage], lang('backend/components/uploadPreview.messages.validationToastErrors'))]);
             endif;
 
 			if ( ! $this->canAccess($hidden)):

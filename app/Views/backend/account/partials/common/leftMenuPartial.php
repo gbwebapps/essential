@@ -7,7 +7,7 @@
             <a href="<?= base_url($section['route']); ?>"
                class="list-group-item list-group-item-action<?= ($action === $key) ? ' active' : ''; ?>">
                 <?= $section['icon']; ?>
-                <?= $section['title']; ?>
+                <?= ui_value($section['title'], false); ?>
             </a>
             
         <?php endforeach; ?>

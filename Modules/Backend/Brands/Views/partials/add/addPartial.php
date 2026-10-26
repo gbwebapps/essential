@@ -11,7 +11,7 @@
                 <div id="generalData">
 
                     <div class="card-header">
-                        <h2 class="card-title text-center text-lg-start mb-0"><?= lang('backend/brands.panels.generalData'); ?></h2>
+                        <h2 class="card-title text-center text-lg-start mb-0"><?= ui_text('backend/brands.panels.generalData', [], false); ?></h2>
                     </div>
 
                     <div class="card-body">
@@ -20,8 +20,8 @@
                         <div class="row">
                             <div class="col-12 col-lg-6">
                                 <div class="mb-2">
-                                    <label for="brand" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/brands.labels.brand'); ?></label>
-                                    <input type="text" id="brand" name="brand" class="form-control" placeholder="<?= esc(lang('backend/brands.placeholders.brand'), 'attr'); ?>">
+                                    <label for="brand" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= ui_text('backend/brands.labels.brand', [], false); ?></label>
+                                    <input <?= ui_binding('backend/brands.placeholders.brand', 'placeholder', [], true); ?> type="text" id="brand" name="brand" class="form-control" placeholder="<?= esc(lang('backend/brands.placeholders.brand'), 'attr'); ?>">
                                     <!-- Contenitore dinamico per l'errore di validazione -->
                                     <div class="error_brand app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                                 </div>
@@ -29,11 +29,11 @@
                             <div class="col-12 col-lg-6">
                                 <div class="mb-2">
                                     <label for="status" class="form-label">
-                                        <i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/brands.labels.status'); ?>
+                                        <i class="fa-solid fa-circle-arrow-down"></i><?= ui_text('backend/brands.labels.status', [], false); ?>
                                     </label>
                                     <select name="status" class="form-select" id="status">
-                                        <option value="1"><?= lang('backend/brands.labels.active'); ?></option>
-                                        <option value="0"><?= lang('backend/brands.labels.unactive'); ?></option>
+                                        <option <?= ui_binding('backend/brands.labels.active', 'text', [], false); ?> value="1"><?= lang('backend/brands.labels.active'); ?></option>
+                                        <option <?= ui_binding('backend/brands.labels.unactive', 'text', [], false); ?> value="0"><?= lang('backend/brands.labels.unactive'); ?></option>
                                     </select>
                                     <div class="error_status app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                                 </div>
@@ -45,8 +45,8 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="mb-2">
-                                    <label for="note"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/brands.labels.note'); ?></label>
-                                    <textarea name="note" id="note" rows="7" class="form-control" placeholder="<?= esc(lang('backend/brands.placeholders.note'), 'attr'); ?>"></textarea>
+                                    <label for="note"><i class="fa-solid fa-circle-arrow-down"></i><?= ui_text('backend/brands.labels.note', [], false); ?></label>
+                                    <textarea <?= ui_binding('backend/brands.placeholders.note', 'placeholder', [], true); ?> name="note" id="note" rows="7" class="form-control" placeholder="<?= esc(lang('backend/brands.placeholders.note'), 'attr'); ?>"></textarea>
                                     <div class="error_note app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
                                 </div>
                             </div>

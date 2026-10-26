@@ -57,7 +57,7 @@ class ImportController extends BackendController
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 return $this->jsonResponse([
                     'result' => false,
-                    'message' => sprintf(lang('backend/components/import.messages.validateToastErrors'), $errorMessage)
+                    'message' => ui_message('backend/components/import.messages.validateToastErrors', [$errorMessage], lang('backend/components/import.messages.validateToastErrors'))
                 ]);
             endif;
 
@@ -211,7 +211,7 @@ class ImportController extends BackendController
                     ]);
                     return $this->jsonResponse([
                         'result' => false,
-                        'message' => sprintf(lang('backend/components/import.messages.validationErrors'), count($previewData['validationErrors'])),
+                        'message' => ui_message('backend/components/import.messages.validationErrors', [count($previewData['validationErrors'])], lang('backend/components/import.messages.validationErrors')),
                         'errorOutput' => $errorOutput,
                     ]);
                 endif;
@@ -273,7 +273,7 @@ class ImportController extends BackendController
             if ($importResult['status'] === false):
                 $recoveryRequired = (bool) ($importResult['recoveryRequired'] ?? false);
                 $message = $recoveryRequired
-                    ? sprintf(lang('backend/components/import.messages.recoveryRequired'), $importId)
+                    ? ui_message('backend/components/import.messages.recoveryRequired', [$importId], lang('backend/components/import.messages.recoveryRequired'))
                     : $importResult['message'];
 
                 return $this->jsonResponse([
@@ -294,7 +294,7 @@ class ImportController extends BackendController
                 'totalUpdated' => $importResult['totalUpdated'],
                 'processed' => $importResult['processed'],
                 'progressOutput' => view('backend/components/import/loadingModalPartial'),
-                'progressMessage' => sprintf(lang('backend/components/import.messages.processedRows'), $importResult['processed']),
+                'progressMessage' => ui_message('backend/components/import.messages.processedRows', [$importResult['processed']], lang('backend/components/import.messages.processedRows')),
             ]);
 
         endif;

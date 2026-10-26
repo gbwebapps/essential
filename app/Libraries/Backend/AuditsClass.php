@@ -22,7 +22,7 @@ class AuditsClass
 	 */
 	public function getJsIndex(): array
 	{
-		$lang = setting('Backend\General')->language;
+		$lang = service('request')->getLocale();
 		$locale = ($lang === 'en' ? 'default' : $lang);
 		
 	    return [

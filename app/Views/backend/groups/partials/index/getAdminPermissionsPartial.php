@@ -1,6 +1,6 @@
 <div class="card-body p-0 mt-4">
     <div class="ps-2 py-1 app-bg-surface fw-bold small mb-2 border text-center rounded-2">
-        <?= sprintf(lang('backend/groups.labels.groupNameBar'), esc($name)); ?>
+        <?= ui_text('backend/groups.labels.groupNameBar', [esc($name)], false); ?>
     </div>
     <form id="edit-admin-exceptions-form" data-uuid="<?= esc($uuid, 'attr'); ?>" data-unsaved-check>
 
@@ -10,12 +10,12 @@
 
             <div class="row mb-2 g-0 app-bg-surface permission-section-title pt-2 ps-2 pe-2 border rounded-2">
                 <div class="col-6 text-start">
-                    <h5><?= $permission['icon']; ?> <?= esc(ucfirst($permission['title'])); ?></h5>
+                    <h5><?= $permission['icon']; ?> <?= ui_value(ucfirst($permission['title'])); ?></h5>
                 </div>
                 <div class="col-6 text-end">
                     <a href="#" class="select-all" data-controller="<?= esc($permission['controller'], 'attr'); ?>">
                         <i class="fa-solid fa-square-check"></i>
-                        <?= lang('backend/global.links.selectAll'); ?>
+                        <?= ui_text('backend/global.links.selectAll', [], false); ?>
                     </a>
                 </div>
             </div>
@@ -45,13 +45,13 @@
                                 <ul class="list-group list-group-flush border rounded-2">
                                     <li class="list-group-item" style="min-height: 75px;">
                                         <label for="exc_<?= esc($k, 'attr'); ?>" class="fw-bold app-text d-block mb-1">
-                                            <i class="fa-solid fa-circle-arrow-down"></i><?= esc($v); ?>
+                                            <i class="fa-solid fa-circle-arrow-down"></i><?= ui_value($v); ?>
                                         </label>
                                         
                                         <?php if ($isGroupActive): ?>
-                                            <span class="badge app-bg-inverse app-text-inverse border app-border-success-subtle fs-8"><?= lang('backend/groups.labels.assignedToGroup'); ?></span>
+                                            <span class="badge app-bg-inverse app-text-inverse border app-border-success-subtle fs-8"><?= ui_text('backend/groups.labels.assignedToGroup', [], false); ?></span>
                                         <?php else: ?>
-                                            <span class="badge app-bg-surface app-text border fs-8"><?= lang('backend/groups.labels.notAssignedToGroup'); ?></span>
+                                            <span class="badge app-bg-surface app-text border fs-8"><?= ui_text('backend/groups.labels.notAssignedToGroup', [], false); ?></span>
                                         <?php endif; ?>
                                     </li>
                                     <li class="list-group-item">
@@ -75,11 +75,11 @@
         <div class="row">
             <div class="col-12">
                 <div class="d-flex flex-column flex-md-row justify-content-center gap-2">
-                    <button type="button" class="btn app-btn-warning btn-sm btn-refresh-admin-perms" data-uuid="<?= esc($uuid, 'attr'); ?>" data-message="<?= esc(lang('backend/groups.messages.areYouSureToReload'), 'attr'); ?>">
-                        <i class="fa-solid fa-refresh me-1"></i> <?= lang('backend/groups.buttons.resetData'); ?>
+                    <button <?= ui_binding('backend/groups.messages.areYouSureToReload', 'data-message', [], true); ?> type="button" class="btn app-btn-warning btn-sm btn-refresh-admin-perms" data-uuid="<?= esc($uuid, 'attr'); ?>" data-message="<?= esc(lang('backend/groups.messages.areYouSureToReload'), 'attr'); ?>">
+                        <i class="fa-solid fa-refresh me-1"></i> <?= ui_text('backend/groups.buttons.resetData', [], false); ?>
                     </button>
                     <button type="submit" class="btn app-btn-success btn-sm">
-                        <i class="fa-solid fa-floppy-disk me-1"></i> <?= lang('backend/groups.buttons.sendData'); ?>
+                        <i class="fa-solid fa-floppy-disk me-1"></i> <?= ui_text('backend/groups.buttons.sendData', [], false); ?>
                     </button>
                 </div>
             </div>

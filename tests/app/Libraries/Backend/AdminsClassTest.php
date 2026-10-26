@@ -15,7 +15,8 @@ class AdminsClassTest extends CIUnitTestCase
     {
         parent::setUp();
 
-        $this->mockSettings(['Backend\General' => ['language' => 'it']]);
+        $this->mockSettings(['Backend\General' => ['language' => 'en']]);
+        service('request')->setLocale('it');
         $this->admins = new AdminsClass();
     }
 
@@ -62,7 +63,7 @@ class AdminsClassTest extends CIUnitTestCase
         $this->assertSame('backend/admins/edit/admin-uuid', $result[2]['route']);
     }
 
-    public function testGetJsShowAllUsesConfiguredLocale(): void
+    public function testGetJsShowAllUsesRequestLocale(): void
     {
         $result = $this->admins->getJsShowAll();
 

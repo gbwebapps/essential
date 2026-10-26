@@ -272,7 +272,7 @@ class AuthModel extends BackendModel
                     $transactionStarted = false;
                 endif;
 
-                log_admin_activity('LOGIN_FAILED', 'auth', sprintf(lang('backend/auth.audits.loginFailed'), esc($admin->firstname), esc($admin->lastname)), $admin);
+                log_admin_activity('LOGIN_FAILED', 'auth', ui_message('backend/auth.audits.loginFailed', [esc($admin->firstname), esc($admin->lastname)], lang('backend/auth.audits.loginFailed')), $admin);
 
                 return ['result' => false, 'message' => lang('backend/auth.messages.loginFailed')];
                 
@@ -321,7 +321,7 @@ class AuthModel extends BackendModel
 
                     endif;
 
-                    log_admin_activity('2FA_REQUIRED', 'auth', sprintf(lang('backend/auth.audits.2faRequired'), esc($twofa->method), esc($admin->firstname), esc($admin->lastname)), $admin);
+                    log_admin_activity('2FA_REQUIRED', 'auth', ui_message('backend/auth.audits.2faRequired', [esc($twofa->method), esc($admin->firstname), esc($admin->lastname)], lang('backend/auth.audits.2faRequired')), $admin);
 
                     /* Il client riceve solo la notifica del successo parziale senza dati sensibili esposti */
                     return ['result' => '2fa_required', 'method' => $twofa->method];
@@ -461,10 +461,11 @@ class AuthModel extends BackendModel
         }
 
         /* Audit del login riuscito */
-        log_admin_activity('LOGIN_SUCCESS', 'auth', sprintf(lang('backend/auth.audits.loginSuccess'), esc($admin->firstname), esc($admin->lastname)), $admin);
+        log_admin_activity('LOGIN_SUCCESS', 'auth', ui_message('backend/auth.audits.loginSuccess', [esc($admin->firstname), esc($admin->lastname)], lang('backend/auth.audits.loginSuccess')), $admin);
 
         /* Rigenerazione dell'ID di sessione contro Session Fixation */
         session()->regenerate(true);
+        (new \App\Libraries\Backend\InterfacePreferences())->clear();
 
         /* ID del log per il futuro logout */
         session()->set('login_log_id', $loginLogId);
@@ -490,9 +491,10 @@ class AuthModel extends BackendModel
         endif;
 
         /* Messaggio di benvenuto */
-        $welcomeMessage = sprintf(lang('backend/auth.messages.welcome'), esc($admin->firstname), esc($admin->lastname));
+        $welcomeMessage = ui_message('backend/auth.messages.welcome', [esc($admin->firstname), esc($admin->lastname)], lang('backend/auth.messages.welcome'));
 
-        session()->setFlashdata(['message' => $welcomeMessage, 'class' => 'app-alert-success fw-bold', 'icon' => '<i class="fa-solid fa-handshake"></i>']);
+        $welcomeBinding = \App\Libraries\Backend\InterfaceTranslations::binding($welcomeMessage);
+        session()->setFlashdata(['message' => $welcomeMessage, 'message_translation' => $welcomeBinding !== null ? \App\Libraries\Backend\InterfaceTranslations::variants($welcomeBinding) : null, 'class' => 'app-alert-success fw-bold', 'icon' => '<i class="fa-solid fa-handshake"></i>']);
 
         return ['result' => true];
     }
@@ -605,7 +607,7 @@ class AuthModel extends BackendModel
 
                 $this->db->transCommit();
 
-                log_admin_activity('RESET_PASSWORD_AUTH', 'auth', sprintf(lang('backend/auth.audits.resetPasswordAuth'), esc($admin->firstname), esc($admin->lastname)), $admin);
+                log_admin_activity('RESET_PASSWORD_AUTH', 'auth', ui_message('backend/auth.audits.resetPasswordAuth', [esc($admin->firstname), esc($admin->lastname)], lang('backend/auth.audits.resetPasswordAuth')), $admin);
 
             } catch (\Throwable $e) {
                 $this->db->transRollback();
@@ -924,9 +926,9 @@ class AuthModel extends BackendModel
 
                 $transactionStarted = false;
 
-                log_admin_activity('SET_PASSWORD', 'auth', sprintf(lang('backend/auth.audits.setPassword'), esc($admin->firstname), esc($admin->lastname)), $admin);
+                log_admin_activity('SET_PASSWORD', 'auth', ui_message('backend/auth.audits.setPassword', [esc($admin->firstname), esc($admin->lastname)], lang('backend/auth.audits.setPassword')), $admin);
 
-                $message = sprintf(lang('backend/auth.messages.setPasswordSuccess'), esc($admin->firstname), esc($admin->lastname));
+                $message = ui_message('backend/auth.messages.setPasswordSuccess', [esc($admin->firstname), esc($admin->lastname)], lang('backend/auth.messages.setPasswordSuccess'));
 
                 return ['result' => true, 'message' => $message];
 
@@ -1088,7 +1090,7 @@ class AuthModel extends BackendModel
 
                     $transactionStarted = false;
 
-                    log_admin_activity('2FA_BLOCKED', 'auth', sprintf(lang('backend/auth.audits.2faBlocked'), esc($admin->firstname), esc($admin->lastname)), $admin);
+                    log_admin_activity('2FA_BLOCKED', 'auth', ui_message('backend/auth.audits.2faBlocked', [esc($admin->firstname), esc($admin->lastname)], lang('backend/auth.audits.2faBlocked')), $admin);
 
                     return ['result' => false, 'message' => lang('backend/auth.messages.tooManyAttempts')];
                 endif;
@@ -1147,7 +1149,7 @@ class AuthModel extends BackendModel
                     $transactionStarted = false;
                 endif;
 
-                log_admin_activity('2FA_FAILED', 'auth', sprintf(lang('backend/auth.audits.2faFailed'), esc($admin->firstname), esc($admin->lastname)), $admin);
+                log_admin_activity('2FA_FAILED', 'auth', ui_message('backend/auth.audits.2faFailed', [esc($admin->firstname), esc($admin->lastname)], lang('backend/auth.audits.2faFailed')), $admin);
 
                 /* Scegliamo il messaggio specifico in base allo stato */
                 $errorMessage = $isExpired ? lang('backend/auth.messages.expiredCode') : lang('backend/auth.messages.wrongCode');
@@ -1208,6 +1210,7 @@ class AuthModel extends BackendModel
      */
     public function logoutBySession(string $reason = 'manual'): void
     {
+        (new \App\Libraries\Backend\InterfacePreferences())->clear();
         try {
             if (session()->has('backendSession')):
                 
@@ -1243,6 +1246,7 @@ class AuthModel extends BackendModel
      */
     public function logoutByCookie(string $cookieValue, string $reason = 'manual'): void
     {
+        (new \App\Libraries\Backend\InterfacePreferences())->clear();
         try {
             $decryptedValue = service('crypto')->decrypt($cookieValue);
 

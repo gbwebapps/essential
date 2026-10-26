@@ -10,8 +10,8 @@
     endif;
 ?>
 
-<form class="changeStatus" data-controller="products" data-message="<?= esc(sprintf(lang('backend/products.messages.areYouSureChangeStatus'), $product->product), 'attr'); ?>">
+<form <?= ui_binding('backend/products.messages.areYouSureChangeStatus', 'data-message', [$product->product], true); ?> class="changeStatus" data-controller="products" data-message="<?= esc(sprintf(lang('backend/products.messages.areYouSureChangeStatus'), $product->product), 'attr'); ?>">
     <input type="hidden" name="uuid" value="<?= esc($product->uuid, 'attr'); ?>">
     <input type="hidden" name="context" value="show">
-    <button type="submit" class="<?= esc($statusClass, 'attr'); ?>"><?= $statusText; ?></button>
+    <button type="submit" class="<?= esc($statusClass, 'attr'); ?>"><?= ui_value($statusText, false); ?></button>
 </form>

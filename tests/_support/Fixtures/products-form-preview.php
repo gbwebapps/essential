@@ -2,6 +2,7 @@
 
 /** Renderizza i partial reali dei form, senza avviare l'applicazione o il database. */
 $productsRoot = dirname(__DIR__, 3);
+require_once $productsRoot . '/app/Helpers/interface_helper.php';
 $productsLabels = require $productsRoot . '/Modules/Backend/Products/Language/it/backend/products.php';
 
 function lang(string $key): string

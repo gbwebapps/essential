@@ -4,7 +4,7 @@
 
         <div class="row mb-2 g-0 app-bg-surface permission-section-title pt-2 ps-2 pe-2 border rounded-1">
             <div class="col-6 text-start">
-                <h5><?= $permission['icon']; ?> <?= ucfirst($permission['title']); ?></h5>
+                <h5><?= $permission['icon']; ?> <?= ui_value(ucfirst($permission['title'])); ?></h5>
             </div>
             <div class="col-6 text-end"></div>
         </div>
@@ -47,22 +47,22 @@
                         <div class="col-12 col-lg-3 text-center py-1">
                             <ul class="list-group list-group-flush border rounded-2">
                                 <li class="list-group-item" style="min-height: 75px;">
-                                    <form class="changePermission fw-bold app-text d-block mb-1" data-message="<?= esc(sprintf(lang('backend/admins.messages.areYouSureChangePermission'), $actionVerb, $v, $admin->firstname, $admin->lastname), 'attr'); ?>">
+                                    <form <?= ui_binding('backend/admins.messages.areYouSureChangePermission', 'data-message', [\App\Libraries\Backend\InterfaceTranslations::binding($actionVerb) ?? $actionVerb, \App\Libraries\Backend\InterfaceTranslations::binding($v) ?? $v, $admin->firstname, $admin->lastname], true); ?> class="changePermission fw-bold app-text d-block mb-1" data-message="<?= esc(sprintf(lang('backend/admins.messages.areYouSureChangePermission'), $actionVerb, $v, $admin->firstname, $admin->lastname), 'attr'); ?>">
                                         <input type="hidden" name="permission" value="<?= esc($k, 'attr'); ?>">
                                         <input type="hidden" name="uuid" value="<?= esc($admin->uuid, 'attr'); ?>">
                                         <button type="submit" class="<?= esc($permClass, 'attr'); ?>">
-                                            <i class="fa-solid fa-circle-arrow-down"></i><?= esc($v); ?>
+                                            <i class="fa-solid fa-circle-arrow-down"></i><?= ui_value($v); ?>
                                         </button>
                                     </form>
                                     
                                     <?php if ($isGroupActive): ?>
-                                        <span class="badge app-bg-inverse app-text-inverse border app-border-success-subtle fs-8"><?= lang('backend/admins.labels.assignedToGroup'); ?></span>
+                                        <span class="badge app-bg-inverse app-text-inverse border app-border-success-subtle fs-8"><?= ui_text('backend/admins.labels.assignedToGroup', [], false); ?></span>
                                     <?php else: ?>
-                                        <span class="badge app-bg-surface app-text border fs-8"><?= lang('backend/admins.labels.notAssignedToGroup'); ?></span>
+                                        <span class="badge app-bg-surface app-text border fs-8"><?= ui_text('backend/admins.labels.notAssignedToGroup', [], false); ?></span>
                                     <?php endif; ?>
                                 </li>
                                 <li class="list-group-item">
-                                    <span class="<?= esc($permClass, 'attr'); ?>" style="cursor: default;"><?= esc($permText); ?></span>
+                                    <span class="<?= esc($permClass, 'attr'); ?>" style="cursor: default;"><?= ui_value($permText); ?></span>
                                 </li>
                             </ul>
                         </div>

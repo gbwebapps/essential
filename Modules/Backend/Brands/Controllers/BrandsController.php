@@ -115,7 +115,7 @@ class BrandsController extends BackendController
             $rules = $this->brandsModel->showAllValidationRules();
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/brands.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result'  => false, 'message' => ui_message('backend/brands.messages.validationToastErrors', [$errorMessage], lang('backend/brands.messages.validationToastErrors'))]);
             endif;
 
             $posts['searchFields'] = $posts['searchFields'] ?? [];
@@ -351,7 +351,7 @@ class BrandsController extends BackendController
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 
-                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/brands.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result'  => false, 'message' => ui_message('backend/brands.messages.validationToastErrors', [$errorMessage], lang('backend/brands.messages.validationToastErrors'))]);
             endif;
 
             $json = $this->brandsModel->hardDelete($posts);
@@ -378,7 +378,7 @@ class BrandsController extends BackendController
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 
-                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/brands.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result'  => false, 'message' => ui_message('backend/brands.messages.validationToastErrors', [$errorMessage], lang('backend/brands.messages.validationToastErrors'))]);
             endif;
 
             $json = $this->brandsModel->softDelete($posts);
@@ -405,7 +405,7 @@ class BrandsController extends BackendController
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 
-                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/brands.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result'  => false, 'message' => ui_message('backend/brands.messages.validationToastErrors', [$errorMessage], lang('backend/brands.messages.validationToastErrors'))]);
             endif;
 
             $json = $this->brandsModel->restoreDelete($posts);
@@ -432,7 +432,7 @@ class BrandsController extends BackendController
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 
-                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/brands.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result'  => false, 'message' => ui_message('backend/brands.messages.validationToastErrors', [$errorMessage], lang('backend/brands.messages.validationToastErrors'))]);
             endif;
 
             $json = $this->brandsModel->changeStatus($posts);
@@ -473,7 +473,7 @@ class BrandsController extends BackendController
 
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/brands.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result' => false, 'message' => ui_message('backend/brands.messages.validationToastErrors', [$errorMessage], lang('backend/brands.messages.validationToastErrors'))]);
             endif;
 
 			$record = $this->brandsModel->getByUUID($posts['uuid']);
@@ -524,7 +524,7 @@ class BrandsController extends BackendController
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 
-                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/brands.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result'  => false, 'message' => ui_message('backend/brands.messages.validationToastErrors', [$errorMessage], lang('backend/brands.messages.validationToastErrors'))]);
             endif;
 
 			$record = $this->brandsModel->getByUUID($posts['uuid']);

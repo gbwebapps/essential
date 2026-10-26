@@ -188,6 +188,27 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* Custom style */
+/* I selettori di presentazione restano accessibili anche con un dialogo aperto. */
+body:has(.modal.show, .offcanvas.show) #navbar-top-view .navbar {
+    z-index: 1060;
+    pointer-events: none;
+}
+
+body:has(.modal.show, .offcanvas.show) #interface-preferences,
+body:has(.modal.show, .offcanvas.show) #navbar-top-view .navbar-toggler {
+    pointer-events: auto;
+}
+
+#navbar-top-view:has(#interface-preferences .dropdown-menu.show) .navbar,
+#navbar-top-view:has(#navbarSupportedContent.show) .navbar {
+    z-index: 1090;
+}
+
+#interface-preferences .dropdown-menu {
+    max-height: calc(100dvh - 7rem);
+    overflow-y: auto;
+}
+
 #customBackdrop {
     position: fixed;
     inset: 0;
@@ -461,6 +482,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
 .cmd-link:hover {
     color: var(--app-text-muted);
+}
+
+#interface-preferences .dropdown-menu > li:not(:last-child) {
+    border-bottom: var(--bs-dropdown-border-width) solid var(--bs-dropdown-divider-bg);
 }
 
 @media (max-width: 991px) {

@@ -14,7 +14,7 @@
                 <div class="card-header">
                     <h2 class="card-title text-center text-lg-start mb-0">
                         <?= $sections['security']['icon']; ?>
-                        <?= lang('backend/account.titles.security'); ?>
+                        <?= ui_text('backend/account.titles.security', [], false); ?>
                     </h2>
                 </div>
                 <div id="security-account-container">

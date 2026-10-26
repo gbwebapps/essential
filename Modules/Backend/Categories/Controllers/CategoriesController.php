@@ -133,7 +133,7 @@ class CategoriesController extends BackendController
             $rules = $this->categoriesModel->showAllValidationRules();
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/categories.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result'  => false, 'message' => ui_message('backend/categories.messages.validationToastErrors', [$errorMessage], lang('backend/categories.messages.validationToastErrors'))]);
             endif;
 
             $posts['searchFields'] = $posts['searchFields'] ?? [];
@@ -388,7 +388,7 @@ class CategoriesController extends BackendController
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 
-                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/categories.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result'  => false, 'message' => ui_message('backend/categories.messages.validationToastErrors', [$errorMessage], lang('backend/categories.messages.validationToastErrors'))]);
             endif;
 
             $json = $this->categoriesModel->hardDelete($posts);
@@ -415,7 +415,7 @@ class CategoriesController extends BackendController
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 
-                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/categories.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result'  => false, 'message' => ui_message('backend/categories.messages.validationToastErrors', [$errorMessage], lang('backend/categories.messages.validationToastErrors'))]);
             endif;
 
             $json = $this->categoriesModel->softDelete($posts);
@@ -442,7 +442,7 @@ class CategoriesController extends BackendController
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 
-                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/categories.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result'  => false, 'message' => ui_message('backend/categories.messages.validationToastErrors', [$errorMessage], lang('backend/categories.messages.validationToastErrors'))]);
             endif;
 
             $json = $this->categoriesModel->restoreDelete($posts);
@@ -469,7 +469,7 @@ class CategoriesController extends BackendController
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 
-                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/categories.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result'  => false, 'message' => ui_message('backend/categories.messages.validationToastErrors', [$errorMessage], lang('backend/categories.messages.validationToastErrors'))]);
             endif;
 
             $json = $this->categoriesModel->changeStatus($posts);
@@ -510,7 +510,7 @@ class CategoriesController extends BackendController
 
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/categories.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result' => false, 'message' => ui_message('backend/categories.messages.validationToastErrors', [$errorMessage], lang('backend/categories.messages.validationToastErrors'))]);
             endif;
 
 			$record = $this->categoriesModel->getByUUID($posts['uuid']);
@@ -564,7 +564,7 @@ class CategoriesController extends BackendController
 
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/categories.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result' => false, 'message' => ui_message('backend/categories.messages.validationToastErrors', [$errorMessage], lang('backend/categories.messages.validationToastErrors'))]);
             endif;
 
             $selectedUuid = null;
@@ -610,7 +610,7 @@ class CategoriesController extends BackendController
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 
-                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/categories.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result'  => false, 'message' => ui_message('backend/categories.messages.validationToastErrors', [$errorMessage], lang('backend/categories.messages.validationToastErrors'))]);
             endif;
 
 			$record = $this->categoriesModel->getByUUID($posts['uuid']);

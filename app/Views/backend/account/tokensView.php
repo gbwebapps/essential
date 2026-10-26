@@ -14,12 +14,12 @@
                 <div class="card-header rounded-0 d-flex justify-content-between align-items-center">
                     <h2 class="card-title text-start mb-0">
                         <?= $sections['tokens']['icon']; ?>
-                        <?= lang('backend/account.titles.tokens'); ?>
+                        <?= ui_text('backend/account.titles.tokens', [], false); ?>
                     </h2>
                     <div>
                         <form id="getTokens">
                             <button type="submit" class="btn btn-sm app-btn-secondary">
-                                <i class="fa-solid fa-arrows-rotate me-1"></i> <?= lang('backend/account.buttons.reload'); ?>
+                                <i class="fa-solid fa-arrows-rotate me-1"></i> <?= ui_text('backend/account.buttons.reload', [], false); ?>
                             </button>
                         </form>
                     </div>

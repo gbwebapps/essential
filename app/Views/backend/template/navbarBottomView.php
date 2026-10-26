@@ -9,7 +9,7 @@
             <div class="btn-group dropup me-auto">
                 <button type="button" class="btn app-btn-secondary dropdown-toggle btn-sm" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa-solid fa-cubes"></i> 
-                    <span><?= lang('backend/global.buttons.modules'); ?></span>
+                    <span><?= ui_text('backend/global.buttons.modules', [], false); ?></span>
                 </button>
 
                 <ul class="dropdown-menu">
@@ -29,7 +29,7 @@
                 ?>
                     <li>
                         <a class="dropdown-item<?= $active; ?><?= isset($menuCounts[$eleController]) ? ' d-flex align-items-center gap-3' : ''; ?>" href="<?= $href; ?>"<?= $dataIdAttr; ?>>
-                            <span><span class="me-2"><?= $ele['icon'] ?? ''; ?></span> <?= $ele['label'] ?? ''; ?></span>
+                            <span><span class="me-2"><?= $ele['icon'] ?? ''; ?></span> <?= ui_value($ele['label'] ?? '', false); ?></span>
                             <?= view('backend/template/menuCountsPartial', ['menuCountEntity' => $eleController, 'menuCounts' => $menuCounts ?? []]); ?>
                         </a>
                     </li>
@@ -52,7 +52,7 @@
             <div class="btn-group dropup ms-auto">
                 <button type="button" class="btn app-btn-secondary dropdown-toggle btn-sm" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa-solid fa-gears"></i> 
-                    <span><?= lang('backend/global.buttons.services'); ?></span>
+                    <span><?= ui_text('backend/global.buttons.services', [], false); ?></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                 <?php
@@ -71,7 +71,7 @@
                 ?>
                     <li>
                         <a class="dropdown-item<?= $active; ?>" href="<?= $href; ?>"<?= $dataIdAttr; ?>>
-                            <span class="me-2"><?= $ele['icon'] ?? ''; ?></span> <?= $ele['label'] ?? ''; ?>
+                            <span class="me-2"><?= $ele['icon'] ?? ''; ?></span> <?= ui_value($ele['label'] ?? '', false); ?>
                         </a>
                     </li>
                     

@@ -14,7 +14,7 @@
                 <div class="card-header">
                     <h2 class="card-title text-center text-lg-start mb-0">
                         <?= $sections['edit']['icon']; ?>
-                        <?= lang('backend/account.titles.edit'); ?>
+                        <?= ui_text('backend/account.titles.edit', [], false); ?>
                     </h2>
                 </div>
                 <div id="edit-account-container">

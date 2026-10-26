@@ -16,6 +16,7 @@ class BackendButtonsCell
      */
     public function render(string $controller, string $action): string
     {
+        helper('interface');
         if ( ! in_array($action, ['add', 'edit', 'show', 'edit_account'])):
             return '';
         endif;

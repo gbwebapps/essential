@@ -521,7 +521,7 @@ class ExportModel extends BackendModel
                 'isFinished' => false,
                 'exportId' => $exportId,
                 'processedCount' => (int) $manifest['processed'],
-                'progressMessage' => sprintf(lang('backend/components/export.messages.processedRows'), (int) $manifest['processed']),
+                'progressMessage' => ui_message('backend/components/export.messages.processedRows', [(int) $manifest['processed']], lang('backend/components/export.messages.processedRows')),
             ];
         } finally {
             $this->releaseExportLock($lockHandle);
@@ -911,7 +911,7 @@ class ExportModel extends BackendModel
         log_admin_activity(
             'EXPORT_DATA',
             (string) $manifest['entity'],
-            sprintf(lang('backend/components/export.messages.exportSuccess'), (int) $manifest['processed'], (string) $manifest['entity']),
+            ui_message('backend/components/export.messages.exportSuccess', [(int) $manifest['processed'], (string) $manifest['entity']], lang('backend/components/export.messages.exportSuccess')),
             $currentAdmin
         );
     }
@@ -949,7 +949,7 @@ class ExportModel extends BackendModel
             'isFinished' => true,
             'exportId' => (string) $manifest['exportId'],
             'processedCount' => (int) $manifest['processed'],
-            'message' => sprintf(lang('backend/components/export.messages.exportSuccess'), (int) $manifest['processed'], (string) $manifest['entity']),
+            'message' => ui_message('backend/components/export.messages.exportSuccess', [(int) $manifest['processed'], (string) $manifest['entity']], lang('backend/components/export.messages.exportSuccess')),
             'downloadUrl' => base_url('backend/export/download/' . $manifest['exportId']),
         ];
     }

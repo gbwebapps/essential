@@ -11,17 +11,17 @@
 
             <!-- Colonna Contenuti e Form -->
             <div class="col-12 col-lg-6">
-                <h5 class="fw-bold mb-2"><?= lang('backend/account.titles.totpSetupTitle'); ?></h5>
-                <p class="app-text-muted small mb-3"><?= lang('backend/account.labels.totpSetupDesc'); ?></p>
+                <h5 class="fw-bold mb-2"><?= ui_text('backend/account.titles.totpSetupTitle', [], false); ?></h5>
+                <p class="app-text-muted small mb-3"><?= ui_text('backend/account.labels.totpSetupDesc', [], false); ?></p>
 
                 <form id="confirm-totp-form" novalidate data-unsaved-check>
                     <div class="row g-3 align-items-end">
                         
                         <!-- Chiave Segreta: Piena larghezza in portrait, affiancata in landscape -->
                         <div class="col-12 col-lg-7">
-                            <label class="form-label app-text-muted small fw-bold mb-1"><?= lang('backend/account.labels.totpSecretKey'); ?></label>
+                            <label class="form-label app-text-muted small fw-bold mb-1"><?= ui_text('backend/account.labels.totpSecretKey', [], false); ?></label>
                             <div class="input-group">
-                                <button class="btn app-btn-secondary app-bg-surface-elevated border toggle-password-visibility"
+                                <button <?= ui_binding('backend/account.buttons.showPassword', 'aria-label', [], true); ?> class="btn app-btn-secondary app-bg-surface-elevated border toggle-password-visibility"
                                         type="button"
                                         aria-label="<?= esc(lang('backend/account.buttons.showPassword'), 'attr'); ?>"
                                         aria-pressed="false">
@@ -37,7 +37,7 @@
 
                         <!-- Input Codice OTP: Piena larghezza in portrait, affiancato in landscape -->
                         <div class="col-12 col-lg-5">
-                            <label for="otp-code" class="form-label small fw-bold mb-1"><?= lang('backend/account.labels.enterOtpCode'); ?></label>
+                            <label for="otp-code" class="form-label small fw-bold mb-1"><?= ui_text('backend/account.labels.enterOtpCode', [], false); ?></label>
                             <div class="input-group input-group-sm">
                                 <input type="text"
                                        id="otp-code"
@@ -49,7 +49,7 @@
                                        maxlength="6"
                                        placeholder="000000"
                                        style="letter-spacing: 4px; font-size: 1.1rem;">
-                                <span class="input-group-text font-monospace"
+                                <span <?= ui_binding('backend/account.labels.enterOtpCode', 'aria-label', [], true); ?> class="input-group-text font-monospace"
                                       data-otp-countdown
                                       data-otp-countdown-mode="period"
                                       data-server-time="<?= esc((string) $otpCountdownServerTime, 'attr'); ?>"
@@ -63,10 +63,10 @@
                         <div class="col-12">
                             <div class="d-flex flex-column flex-sm-row gap-2">
                                 <button type="submit" class="btn app-btn-success btn-sm flex-fill">
-                                    <i class="fa-solid fa-circle-check"></i> <?= lang('backend/account.buttons.verifyAndActivate'); ?>
+                                    <i class="fa-solid fa-circle-check"></i> <?= ui_text('backend/account.buttons.verifyAndActivate', [], false); ?>
                                 </button>
                                 <button type="button" id="cancel-setup-btn" class="btn app-btn-danger btn-sm flex-fill">
-                                    <i class="fa-solid fa-xmark"></i> <?= lang('backend/account.buttons.undoClose'); ?>
+                                    <i class="fa-solid fa-xmark"></i> <?= ui_text('backend/account.buttons.undoClose', [], false); ?>
                                 </button>
                             </div>
                         </div>

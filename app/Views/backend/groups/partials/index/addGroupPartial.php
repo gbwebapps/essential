@@ -3,13 +3,13 @@
 
 		<div class="row mb-3">
 			<div class="col-12 col-lg-4 mb-2 mb-lg-0">
-				<label for="name" class="pb-1"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/groups.labels.groupName'); ?></label>
-				<input type="text" name="name" id="name" class="form-control" placeholder="<?= esc(lang('backend/groups.placeholders.groupName'), 'attr'); ?>">
+				<label for="name" class="pb-1"><i class="fa-solid fa-circle-arrow-down"></i><?= ui_text('backend/groups.labels.groupName', [], false); ?></label>
+				<input <?= ui_binding('backend/groups.placeholders.groupName', 'placeholder', [], true); ?> type="text" name="name" id="name" class="form-control" placeholder="<?= esc(lang('backend/groups.placeholders.groupName'), 'attr'); ?>">
 				<div class="error_name app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
 			</div>
 			<div class="col-12 col-lg-8">
-				<label for="description" class="pb-1"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/groups.labels.groupDescription'); ?></label>
-				<input type="text" name="description" id="description" class="form-control" placeholder="<?= esc(lang('backend/groups.placeholders.groupDescription'), 'attr'); ?>">
+				<label for="description" class="pb-1"><i class="fa-solid fa-circle-arrow-down"></i><?= ui_text('backend/groups.labels.groupDescription', [], false); ?></label>
+				<input <?= ui_binding('backend/groups.placeholders.groupDescription', 'placeholder', [], true); ?> type="text" name="description" id="description" class="form-control" placeholder="<?= esc(lang('backend/groups.placeholders.groupDescription'), 'attr'); ?>">
 				<div class="error_description app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
 			</div>
 		</div>
@@ -18,12 +18,12 @@
 
 		    <div class="row mb-2 g-0 app-bg-surface permission-section-title pt-2 ps-2 pe-2 border rounded-2">
 		        <div class="col-6 text-start">
-		            <h5><?= $permission['icon']; ?> <?= esc(ucfirst($permission['title'])); ?></h5>
+		            <h5><?= $permission['icon']; ?> <?= ui_value(ucfirst($permission['title'])); ?></h5>
 		        </div>
 		        <div class="col-6 text-end">
 		            <a href="#" class="select-all" data-controller="<?= esc($permission['controller'], 'attr'); ?>">
 		                <i class="fa-solid fa-square-check"></i>
-		                <?= lang('backend/global.links.selectAll'); ?>
+		                <?= ui_text('backend/global.links.selectAll', [], false); ?>
 		            </a>
 		        </div>
 		    </div>
@@ -41,7 +41,7 @@
 		                        <ul class="list-group list-group-flush border rounded-2">
 		                            <li class="list-group-item">
 		                                <label for="<?= esc($k, 'attr'); ?>">
-		                                    <i class="fa-solid fa-circle-arrow-down"></i><?= esc($v); ?>
+		                                    <i class="fa-solid fa-circle-arrow-down"></i><?= ui_value($v); ?>
 		                                </label>
 		                            </li>
 		                            <li class="list-group-item">
@@ -65,11 +65,11 @@
 		<div class="row">
             <div class="col-12">
             	<div class="d-flex flex-column flex-md-row justify-content-center gap-2">
-                    <button type="button" class="btn app-btn-warning btn-sm btn-reset-group" data-message="<?= esc(lang('backend/groups.messages.areYouSureToResetData'), 'attr'); ?>">
-                	    <i class="fa-solid fa-refresh me-1"></i><?= lang('backend/groups.buttons.resetData'); ?>
+                    <button <?= ui_binding('backend/groups.messages.areYouSureToResetData', 'data-message', [], true); ?> type="button" class="btn app-btn-warning btn-sm btn-reset-group" data-message="<?= esc(lang('backend/groups.messages.areYouSureToResetData'), 'attr'); ?>">
+                	    <i class="fa-solid fa-refresh me-1"></i><?= ui_text('backend/groups.buttons.resetData', [], false); ?>
                 	</button>
                     <button type="submit" class="btn app-btn-success btn-sm">
-                        <i class="fa-solid fa-floppy-disk me-1"></i><?= lang('backend/groups.buttons.sendData'); ?>
+                        <i class="fa-solid fa-floppy-disk me-1"></i><?= ui_text('backend/groups.buttons.sendData', [], false); ?>
                     </button>
             	</div>
             </div>

@@ -28,35 +28,35 @@
                                         <!-- Colonna username -->
                                         <th style="width: 15%;">
                                             <a class="sort" href="#" data-column="username" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'username') ? 'asc' : 'desc'); ?>">
-                                                <?= lang('backend/audits.labels.username'); ?> <?= (($posts['column'] == 'username') ? '&nbsp;' . $icon : ''); ?>
+                                                <?= ui_text('backend/audits.labels.username', [], false); ?> <?= (($posts['column'] == 'username') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
                                         </th>
 
                                         <!-- Colonna action -->
                                         <th style="width: 15%;">
                                             <a class="sort" href="#" data-column="action" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'action') ? 'asc' : 'desc'); ?>">
-                                                <?= lang('backend/audits.labels.action'); ?>&nbsp;<?= (($posts['column'] == 'action') ? '&nbsp;' . $icon : ''); ?>
+                                                <?= ui_text('backend/audits.labels.action', [], false); ?>&nbsp;<?= (($posts['column'] == 'action') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
                                         </th>
 
                                         <!-- Colonna section -->
                                         <th style="width: 12.5%;">
                                             <a class="sort" href="#" data-column="section" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'section') ? 'asc' : 'desc'); ?>">
-                                                <?= lang('backend/audits.labels.section'); ?>&nbsp;<?= (($posts['column'] == 'section') ? '&nbsp;' . $icon : ''); ?>
+                                                <?= ui_text('backend/audits.labels.section', [], false); ?>&nbsp;<?= (($posts['column'] == 'section') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
                                         </th>
 
                                         <!-- Colonna details -->
                                         <th style="width: 42.5%;">
                                             <a class="sort" href="#" data-column="details" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'details') ? 'asc' : 'desc'); ?>">
-                                                <?= lang('backend/audits.labels.details'); ?>&nbsp;<?= (($posts['column'] == 'details') ? '&nbsp;' . $icon : ''); ?>
+                                                <?= ui_text('backend/audits.labels.details', [], false); ?>&nbsp;<?= (($posts['column'] == 'details') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
                                         </th>
 
                                         <!-- Colonna created At -->
                                         <th style="width: 12.5%;">
                                             <a class="sort" href="#" data-column="created_at" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'created_at') ? 'asc' : 'desc'); ?>">
-                                                <?= lang('backend/audits.labels.createdAt'); ?>&nbsp;<?= (($posts['column'] == 'created_at') ? '&nbsp;' . $icon : ''); ?>
+                                                <?= ui_text('backend/audits.labels.createdAt', [], false); ?>&nbsp;<?= (($posts['column'] == 'created_at') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
                                         </th>
 
@@ -73,7 +73,7 @@
                                             
                                             <!-- Cella chevron -->
                                             <td class="align-middle fw-bold">
-                                                <button class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 app-text-muted shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($audit->id); ?>" aria-expanded="false" title="<?= esc(lang('backend/audits.labels.showSystemDetails'), 'attr'); ?>">
+                                                <button <?= ui_binding('backend/audits.labels.showSystemDetails', 'title', [], true); ?> class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 app-text-muted shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($audit->id); ?>" aria-expanded="false" title="<?= esc(lang('backend/audits.labels.showSystemDetails'), 'attr'); ?>">
                                                     <i class="fa-solid fa-chevron-right"></i>
                                                 </button>
                                             </td>
@@ -122,23 +122,23 @@
                                                             $userAgent->parse($audit->user_agent);
 
                                                             /* Inizializzazione corretta della variabile in camelCase */
-                                                            $agentText = '<span class="text-white">' . lang('backend/audits.labels.operatingSystem') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
+                                                            $agentText = '<span class="text-white">' . ui_text('backend/audits.labels.operatingSystem') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
                                                         ?>
 
                                                         <?php
                                                             /* Valutazione con metodi nativi in camelCase di CodeIgniter 4 */
                                                             if($userAgent->isBrowser()):
-                                                                $agentText .= ' &bull; <span class="text-white">' . lang('backend/audits.labels.browser') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
+                                                                $agentText .= ' &bull; <span class="text-white">' . ui_text('backend/audits.labels.browser') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
                                                             elseif($userAgent->isMobile()):
-                                                                $agentText .= ' &bull; <span class="text-white">' . lang('backend/audits.labels.mobile') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getMobile()) . '</span>';
+                                                                $agentText .= ' &bull; <span class="text-white">' . ui_text('backend/audits.labels.mobile') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getMobile()) . '</span>';
                                                             elseif($userAgent->isRobot()):
-                                                                $agentText .= ' &bull; <span class="text-white">' . lang('backend/audits.labels.robot') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getRobot()) . '</span>';
+                                                                $agentText .= ' &bull; <span class="text-white">' . ui_text('backend/audits.labels.robot') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getRobot()) . '</span>';
                                                             endif;
                                                         ?>
 
                                                         <?= $agentText; ?>
                                                         &nbsp;&bull;&nbsp;
-                                                        <span class="text-white"><?= lang('backend/audits.labels.ipAddress'); ?></span>
+                                                        <span class="text-white"><?= ui_text('backend/audits.labels.ipAddress', [], false); ?></span>
                                                         <span class="text-primary fw-bold"><?= esc($audit->ip_address); ?></span>
                                                         <!-- End parte useragent -->
 
@@ -162,7 +162,7 @@
 
             <!-- ...altrimenti visualizzo messaggio adeguato. -->
             <?php else: ?>
-                <div class="text-center py-3 fw-bold"><?= lang('backend/audits.messages.noAuditsFound'); ?></div>
+                <div class="text-center py-3 fw-bold"><?= ui_text('backend/audits.messages.noAuditsFound', [], false); ?></div>
             <?php endif; ?>
         </div>
     </div>

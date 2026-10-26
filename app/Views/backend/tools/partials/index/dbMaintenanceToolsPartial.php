@@ -1,5 +1,5 @@
 <div class="card-body tools-card-body-dark">
-    <form id="dbMaintenance-tools-form" autocomplete="off"
+    <form <?= ui_binding('backend/tools.labels.totalSpace', 'data-lang-total-space', [], true); ?> <?= ui_binding('backend/tools.labels.rows', 'data-lang-rows', [], true); ?> <?= ui_binding('backend/tools.labels.overhead', 'data-lang-overhead', [], true); ?> id="dbMaintenance-tools-form" autocomplete="off"
       data-lang-total-space="<?= esc(lang('backend/tools.labels.totalSpace'), 'attr'); ?>"
       data-lang-rows="<?= esc(lang('backend/tools.labels.rows'), 'attr'); ?>"
       data-lang-overhead="<?= esc(lang('backend/tools.labels.overhead'), 'attr'); ?>">
@@ -45,8 +45,8 @@
                             <div class="col-12 col-lg-7 mb-3 mb-lg-0">
                                 <!-- Rimosso justify-content-center e modificato l'allineamento verticale per mobile -->
                                 <div class="app-text-muted infoDb d-flex flex-column flex-lg-row align-items-start align-items-lg-center text-center">
-                                    <span class="mb-2 mb-lg-0 me-lg-4"><i class="fa-solid fa-hard-drive me-2"></i><?= sprintf(lang('backend/tools.labels.totalSpace'), number_format($totalSize, 2)); ?></span>
-                                    <span class="app-text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i><?= sprintf(lang('backend/tools.labels.overhead'), number_format($totalOverhead, 2)); ?></span>
+                                    <span class="mb-2 mb-lg-0 me-lg-4"><i class="fa-solid fa-hard-drive me-2"></i><?= ui_text('backend/tools.labels.totalSpace', [number_format($totalSize, 2)], false); ?></span>
+                                    <span class="app-text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i><?= ui_text('backend/tools.labels.overhead', [number_format($totalOverhead, 2)], false); ?></span>
                                 </div>
                             </div>
 
@@ -54,7 +54,7 @@
                             <div class="col-12 col-lg-2">
                                 <!-- Passiamo l'intero array di tabelle codificato in JSON al dataset -->
                                 <button type="button" class="btn btn-sm app-btn-primary btn-optimize-all w-100" data-tables="<?= esc(json_encode($allTableNames, JSON_THROW_ON_ERROR), 'attr'); ?>">
-                                    <i class="fa-solid fa-wand-magic-sparkles me-2"></i><?= lang('backend/tools.buttons.dbOptimize'); ?>
+                                    <i class="fa-solid fa-wand-magic-sparkles me-2"></i><?= ui_text('backend/tools.buttons.dbOptimize', [], false); ?>
                                 </button>
                             </div>
 
@@ -79,16 +79,16 @@
                                 <!-- Blocco Centrale: Statistiche -->
                                 <div class="col-12 col-lg-7 mb-3 mb-lg-0">
                                     <div class="app-text-muted d-flex flex-column flex-lg-row justify-content-lg-around align-items-start align-items-lg-center">
-                                        <span class="mb-2 mb-lg-0"><i class="fa-solid fa-list me-2"></i><?= sprintf(lang('backend/tools.labels.rows'), $table['rows']); ?></span>
-                                        <span class="mb-2 mb-lg-0"><i class="fa-solid fa-hard-drive me-2"></i><?= sprintf(lang('backend/tools.labels.totalSpace'), number_format($table['size'], 2)); ?></span>
-                                        <span class="app-text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i><?= sprintf(lang('backend/tools.labels.overhead'), number_format($table['overhead'], 2)); ?></span>
+                                        <span class="mb-2 mb-lg-0"><i class="fa-solid fa-list me-2"></i><?= ui_text('backend/tools.labels.rows', [$table['rows']], false); ?></span>
+                                        <span class="mb-2 mb-lg-0"><i class="fa-solid fa-hard-drive me-2"></i><?= ui_text('backend/tools.labels.totalSpace', [number_format($table['size'], 2)], false); ?></span>
+                                        <span class="app-text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i><?= ui_text('backend/tools.labels.overhead', [number_format($table['overhead'], 2)], false); ?></span>
                                     </div>
                                 </div>
                                 
                                 <!-- Blocco Destra: Azioni -->
                                 <div class="col-12 col-lg-2">
                                     <a href="#" class="btn-optimize-table d-block text-decoration-none" data-table="<?= esc($table['name'], 'attr'); ?>">
-                                        <i class="fa-solid fa-wand-magic-sparkles me-1"></i> <?= lang('backend/tools.buttons.tableOptimize'); ?>
+                                        <i class="fa-solid fa-wand-magic-sparkles me-1"></i> <?= ui_text('backend/tools.buttons.tableOptimize', [], false); ?>
                                     </a>
                                 </div>
 

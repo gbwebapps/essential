@@ -26,23 +26,23 @@
                         <span><?= esc($node['category']); ?></span>
 
                         <?php if($hasChildren): ?>
-                            <span class="badge app-bg-muted-subtle app-text-muted-emphasis"><?= lang('backend/categories.labels.containsCategories'); ?></span>
+                            <span class="badge app-bg-muted-subtle app-text-muted-emphasis"><?= ui_text('backend/categories.labels.containsCategories', [], false); ?></span>
                         <?php endif; ?>
 
                         <?php if($hasProducts): ?>
-                            <span class="badge app-bg-info"><?= lang('backend/categories.labels.containsProducts'); ?></span>
+                            <span class="badge app-bg-info"><?= ui_text('backend/categories.labels.containsProducts', [], false); ?></span>
                         <?php endif; ?>
 
                         <?php if( ! $hasChildren && ! $hasProducts): ?>
-                            <span class="badge app-bg-muted-subtle app-text-muted-emphasis"><?= lang('backend/categories.labels.emptyCategory'); ?></span>
+                            <span class="badge app-bg-muted-subtle app-text-muted-emphasis"><?= ui_text('backend/categories.labels.emptyCategory', [], false); ?></span>
                         <?php endif; ?>
 
                         <?php if($isSelected): ?>
-                            <span class="badge app-bg-info"><?= lang('backend/categories.labels.currentCategory'); ?></span>
+                            <span class="badge app-bg-info"><?= ui_text('backend/categories.labels.currentCategory', [], false); ?></span>
                         <?php endif; ?>
 
                         <?php if($isDeleted): ?>
-                            <span class="badge app-bg-danger"><?= lang('backend/categories.labels.deleted'); ?></span>
+                            <span class="badge app-bg-danger"><?= ui_text('backend/categories.labels.deleted', [], false); ?></span>
                         <?php endif; ?>
                     </div>
 
@@ -63,7 +63,7 @@
 ?>
         <?php if($selectedCategoryPath !== null): ?>
             <div class="mb-3">
-                <i class="fa-solid fa-route me-1"></i><?= lang('backend/categories.labels.path'); ?>:
+                <i class="fa-solid fa-route me-1"></i><?= ui_text('backend/categories.labels.path', [], false); ?>:
                 <span class="fw-bold"><?= esc($selectedCategoryPath); ?></span>
             </div>
         <?php endif; ?>
@@ -71,7 +71,7 @@
         <?php if($treeHtml !== ''): ?>
             <?= $treeHtml; ?>
         <?php else: ?>
-            <div class="text-center py-3 fw-bold"><?= lang('backend/categories.messages.noTreeCategories'); ?></div>
+            <div class="text-center py-3 fw-bold"><?= ui_text('backend/categories.messages.noTreeCategories', [], false); ?></div>
         <?php endif; ?>
 <?php
         return (string) ob_get_clean();
@@ -87,7 +87,7 @@
             <div class="modal-content shadow">
                 <div class="modal-header border-0">
                     <h5 class="modal-title" id="categoriesTreeModalLabel">
-                        <i class="fa-solid fa-folder-tree me-1"></i><?= lang('backend/categories.panels.categoryTree'); ?>
+                        <i class="fa-solid fa-folder-tree me-1"></i><?= ui_text('backend/categories.panels.categoryTree', [], false); ?>
                     </h5>
                 </div>
                 <div class="modal-body" id="categoryTreeModalPanel">
@@ -95,7 +95,7 @@
                 </div>
                 <div class="modal-footer border-0 justify-content-center">
                     <button type="button" class="btn btn-sm app-btn-secondary" data-bs-dismiss="modal">
-                        <i class="fa-solid fa-xmark me-1"></i><?= lang('backend/global.buttons.close'); ?>
+                        <i class="fa-solid fa-xmark me-1"></i><?= ui_text('backend/global.buttons.close', [], false); ?>
                     </button>
                 </div>
             </div>
@@ -110,14 +110,14 @@
 
     <div class="card-header rounded-0 d-flex justify-content-between align-items-center" style="border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);">
         <h2 class="card-title text-start mb-0">
-            <?= lang('backend/categories.panels.categoryTree'); ?>
+            <?= ui_text('backend/categories.panels.categoryTree', [], false); ?>
         </h2>
         <input type="hidden" name="context" value="<?= esc($categoryTreeContext, 'attr'); ?>" form="getTree">
         <?php if($selectedCategoryUuid !== null): ?>
             <input type="hidden" name="uuid" value="<?= esc($selectedCategoryUuid, 'attr'); ?>" form="getTree">
         <?php endif; ?>
         <button type="submit" class="btn btn-sm app-btn-secondary" form="getTree">
-            <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/categories.buttons.reload'); ?>
+            <i class="fa-solid fa-arrows-rotate me-1"></i><?= ui_text('backend/categories.buttons.reload', [], false); ?>
         </button>
     </div>
     <div class="card-body" id="categoryTreePanel">

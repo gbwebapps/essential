@@ -25,25 +25,25 @@
                                         <th style="width: 2.5%;" class="text-center">&nbsp;</th>
                                         <th style="width: 20%;">
                                             <a class="sort" href="#" data-column="username" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'username') ? 'asc' : 'desc'); ?>">
-                                                <?= lang('backend/logs.labels.username'); ?> <?= (($posts['column'] == 'username') ? '&nbsp;' . $icon : ''); ?>
+                                                <?= ui_text('backend/logs.labels.username', [], false); ?> <?= (($posts['column'] == 'username') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
                                         </th>
                                         <th style="width: 20%;">
                                             <a class="sort" href="#" data-column="login" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'login') ? 'asc' : 'desc'); ?>">
-                                                <?= lang('backend/logs.labels.login'); ?>&nbsp;<?= (($posts['column'] == 'login') ? '&nbsp;' . $icon : ''); ?>
+                                                <?= ui_text('backend/logs.labels.login', [], false); ?>&nbsp;<?= (($posts['column'] == 'login') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
                                         </th>
                                         <th style="width: 20%;">
                                             <a class="sort" href="#" data-column="logout" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'logout') ? 'asc' : 'desc'); ?>">
-                                                <?= lang('backend/logs.labels.logout'); ?>&nbsp;<?= (($posts['column'] == 'logout') ? '&nbsp;' . $icon : ''); ?>
+                                                <?= ui_text('backend/logs.labels.logout', [], false); ?>&nbsp;<?= (($posts['column'] == 'logout') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
                                         </th>
                                         <th style="width: 15%;">
-                                            <?= lang('backend/logs.labels.duration'); ?>
+                                            <?= ui_text('backend/logs.labels.duration', [], false); ?>
                                         </th>
                                         <th style="width: 17.5%;">
                                             <a class="sort" href="#" data-column="logout_reason" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'logout_reason') ? 'asc' : 'desc'); ?>">
-                                                <?= lang('backend/logs.labels.logoutReason'); ?>&nbsp;<?= (($posts['column'] == 'logout_reason') ? '&nbsp;' . $icon : ''); ?>
+                                                <?= ui_text('backend/logs.labels.logoutReason', [], false); ?>&nbsp;<?= (($posts['column'] == 'logout_reason') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
                                         </th>
                                         <th style="width: 5%;" class="text-center">&nbsp;</th>
@@ -57,10 +57,10 @@
                                             $now = Time::now();
 
                                             $typeMap = [
-                                                'manual' => lang('backend/logs.labels.manual'),
-                                                'timeout' => lang('backend/logs.labels.timeout'),
-                                                'banned' => lang('backend/logs.labels.banned'), 
-                                                'deleted' => lang('backend/logs.labels.deleted'), 
+                                                'manual' => ui_text('backend/logs.labels.manual'),
+                                                'timeout' => ui_text('backend/logs.labels.timeout'),
+                                                'banned' => ui_text('backend/logs.labels.banned'), 
+                                                'deleted' => ui_text('backend/logs.labels.deleted'), 
                                             ];
 
                                             $isSuperadmin = (int) $log->superadmin === 1;
@@ -68,8 +68,8 @@
                                             /* 1. Sessione chiusa */
                                             if ( ! is_null($log->logout)):
                                                 
-                                                $logoutHtml = '<span class="fw-bold">' . convertDate(esc($log->logout), 'conversational') . '</span>';
-                                                $reasonHtml = '<span class="fw-bold">' . ($typeMap[$log->logout_reason] ?? lang('backend/logs.labels.undefined')) . '</span>';
+                                                $logoutHtml = '<span class="fw-bold">' . ui_date(esc($log->logout), 'conversational') . '</span>';
+                                                $reasonHtml = '<span class="fw-bold">' . ($typeMap[$log->logout_reason] ?? ui_text('backend/logs.labels.undefined')) . '</span>';
                                                 
                                                 $start = new \DateTime($log->login);
                                                 $end   = new \DateTime($log->logout);
@@ -88,8 +88,8 @@
 
                                                 if ( ! empty($log->token_expire) && $now->isBefore($log->token_expire)):
                                                     
-                                                    $logoutHtml   = '<span class="app-text-success fw-bold">' . lang('backend/logs.labels.pending') . '</span>';
-                                                    $reasonHtml   = '<span class="app-text-success fw-bold">' . lang('backend/logs.labels.pending') . '</span>';
+                                                    $logoutHtml   = '<span class="app-text-success fw-bold">' . ui_text('backend/logs.labels.pending') . '</span>';
+                                                    $reasonHtml   = '<span class="app-text-success fw-bold">' . ui_text('backend/logs.labels.pending') . '</span>';
                                                     
                                                     $start = new \DateTime($log->login);
                                                     $end   = new \DateTime( ! empty($log->last_activity) ? $log->last_activity : $now->format('Y-m-d H:i:s'));
@@ -105,9 +105,9 @@
                                                     
                                                 else:
                                                     
-                                                    $logoutHtml   = '<span class="app-text-danger fw-bold text-decoration-line-through">' . lang('backend/logs.labels.undefined') . '</span>';
-                                                    $durationHtml = '<span class="app-text-danger fw-bold text-decoration-line-through">' . lang('backend/logs.labels.undefined') . '</span>';
-                                                    $reasonHtml   = '<span class="app-text-danger fw-bold text-decoration-line-through">' . lang('backend/logs.labels.undefined') . '</span>';
+                                                    $logoutHtml   = '<span class="app-text-danger fw-bold text-decoration-line-through">' . ui_text('backend/logs.labels.undefined') . '</span>';
+                                                    $durationHtml = '<span class="app-text-danger fw-bold text-decoration-line-through">' . ui_text('backend/logs.labels.undefined') . '</span>';
+                                                    $reasonHtml   = '<span class="app-text-danger fw-bold text-decoration-line-through">' . ui_text('backend/logs.labels.undefined') . '</span>';
                                                     
                                                 endif;
 
@@ -116,7 +116,7 @@
 
                                         <tr class="border-end border-start table-row-60<?= $isSuperadmin ? ' table-bg-superadmin' : ''; ?>">
                                             <td class="align-middle fw-bold">
-                                                <button class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 app-text-muted shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($log->id, 'attr'); ?>" aria-expanded="false" title="<?= esc(lang('backend/logs.labels.showSystemDetails'), 'attr'); ?>">
+                                                <button <?= ui_binding('backend/logs.labels.showSystemDetails', 'title', [], true); ?> class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 app-text-muted shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($log->id, 'attr'); ?>" aria-expanded="false" title="<?= esc(lang('backend/logs.labels.showSystemDetails'), 'attr'); ?>">
                                                     <i class="fa-solid fa-chevron-right"></i>
                                                 </button>
                                             </td>
@@ -124,7 +124,7 @@
                                                 <span class="fw-bold"><?= esc($log->username); ?></span>
                                             </td>
                                             <td class="align-middle">
-                                                <span class="fw-bold"><?= convertDate(esc($log->login), 'conversational'); ?></span>
+                                                <span class="fw-bold"><?= ui_date(esc($log->login), 'conversational'); ?></span>
                                             </td>
                                             <td class="align-middle">
                                                 <?= $logoutHtml; ?>
@@ -146,10 +146,10 @@
                                                         <div class="d-flex flex-column gap-1">
 
                                                             <!-- Pulsante di disconnessione della sessione -->
-                                                            <form class="disconnectSessionRecord m-0 p-0" data-controller="logs" data-message="<?= esc(sprintf(lang('backend/logs.messages.areYouSureDisconnectSession'), $log->firstname, $log->lastname), 'attr'); ?>">
+                                                            <form <?= ui_binding('backend/logs.messages.areYouSureDisconnectSession', 'data-message', [$log->firstname, $log->lastname], true); ?> class="disconnectSessionRecord m-0 p-0" data-controller="logs" data-message="<?= esc(sprintf(lang('backend/logs.messages.areYouSureDisconnectSession'), $log->firstname, $log->lastname), 'attr'); ?>">
                                                                 <input type="hidden" name="tokenId" value="<?= esc($log->token_id_val, 'attr'); ?>">
                                                                 <button type="submit" class="btn btn-link p-0 m-0 app-text-danger text-decoration-none action shadow-none">
-                                                                    <i class="fa-solid fa-xmark fa-fw"></i> <?= lang('backend/logs.actions.disconnectSession'); ?>
+                                                                    <i class="fa-solid fa-xmark fa-fw"></i> <?= ui_text('backend/logs.actions.disconnectSession', [], false); ?>
                                                                 </button>
                                                             </form>
 
@@ -170,22 +170,22 @@
                                                         <?php 
                                                             $userAgent->parse($log->user_agent);
 
-                                                            $agentText = '<span class="text-white">' . lang('backend/logs.labels.createdAt') . '</span> <span class="app-text-success fw-bold">' . convertDate(esc($log->created_at), 'conversational') . '</span>';
-                                                            $agentText .= ' &bull; <span class="text-white">' . lang('backend/logs.labels.typeToken') . '</span> <span class="app-text-warning fw-bold">' . esc($log->token_type) . '</span>';
-                                                            $agentText .= ' &bull; <span class="text-white">' . lang('backend/logs.labels.operatingSystem') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
+                                                            $agentText = '<span class="text-white">' . ui_text('backend/logs.labels.createdAt') . '</span> <span class="app-text-success fw-bold">' . ui_date(esc($log->created_at), 'conversational') . '</span>';
+                                                            $agentText .= ' &bull; <span class="text-white">' . ui_text('backend/logs.labels.typeToken') . '</span> <span class="app-text-warning fw-bold">' . esc($log->token_type) . '</span>';
+                                                            $agentText .= ' &bull; <span class="text-white">' . ui_text('backend/logs.labels.operatingSystem') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
                                                         ?>
                                                         <?php
                                                             if($userAgent->isBrowser()):
-                                                                $agentText .= ' &bull; <span class="text-white">' . lang('backend/logs.labels.browser') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
+                                                                $agentText .= ' &bull; <span class="text-white">' . ui_text('backend/logs.labels.browser') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
                                                             elseif($userAgent->isMobile()):
-                                                                $agentText .= ' &bull; <span class="text-white">' . lang('backend/logs.labels.mobile') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getMobile()) . '</span>';
+                                                                $agentText .= ' &bull; <span class="text-white">' . ui_text('backend/logs.labels.mobile') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getMobile()) . '</span>';
                                                             elseif($userAgent->isRobot()):
-                                                                $agentText .= ' &bull; <span class="text-white">' . lang('backend/logs.labels.robot') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getRobot()) . '</span>';
+                                                                $agentText .= ' &bull; <span class="text-white">' . ui_text('backend/logs.labels.robot') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getRobot()) . '</span>';
                                                             endif;
                                                         ?>
                                                         <?= $agentText; ?>
                                                         &nbsp;&bull;&nbsp;
-                                                        <span class="text-white"><?= lang('backend/logs.labels.ipAddress'); ?></span>
+                                                        <span class="text-white"><?= ui_text('backend/logs.labels.ipAddress', [], false); ?></span>
                                                         <span class="text-primary fw-bold"><?= esc($log->ip_address); ?></span>
                                                     </div>
                                                 </div>
@@ -203,7 +203,7 @@
                 <?= $this->include('backend/template/paginationView'); ?>
 
             <?php else: ?>
-                <div class="text-center py-3 fw-bold"><?= lang('backend/logs.messages.noLogsFound'); ?></div>
+                <div class="text-center py-3 fw-bold"><?= ui_text('backend/logs.messages.noLogsFound', [], false); ?></div>
             <?php endif; ?>
         </div>
     </div>

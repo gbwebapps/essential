@@ -23,7 +23,7 @@ if ( ! function_exists('convertDate')):
      * @param string|null $format Il pattern di formattazione ICU desiderato o la keyword speciale 'conversational'
      * @return string La stringa formattata e localizzata, un'istanza vuota se l'input manca, o la stringa originale in caso di errore
      */
-    function convertDate(?string $date, ?string $format = null): string
+    function convertDate(?string $date, ?string $format = null, ?string $locale = null): string
     {
         /* Verifica preliminare della validità dell'input */
         if (empty($date) || trim($date) === ''):
@@ -36,11 +36,11 @@ if ( ! function_exists('convertDate')):
             $userTimezone  = setting('Backend\General', 'timezone') ?? $appTimezone;
             
             /* Recupero della lingua attuale impostata nel framework */
-            $currentLocale = setting('Backend\General', 'language');
+            $currentLocale = $locale ?? service('request')->getLocale();
             
             /* Determinazione del pattern di formattazione */
             if ($format === 'conversational'):
-                $userFormat = lang('backend/global.formats.conversationalDate');
+                $userFormat = lang('backend/global.formats.conversationalDate', [], $currentLocale);
             else:
                 /* Formato di fallback 'EEEE' aggiunge il giorno della settimana per esteso */
                 $userFormat = $format ?? setting('Backend\General', 'dateFormat') ?? 'EEEE d MMMM yyyy HH:mm:ss';

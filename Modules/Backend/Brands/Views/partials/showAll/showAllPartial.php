@@ -38,14 +38,14 @@
                                         <!-- Colonna brand -->
                                         <th style="width: 30%;">
                                             <a class="sort" href="#" data-column="brand" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'brand') ? 'asc' : 'desc'); ?>">
-                                                <?= lang('backend/brands.labels.brand'); ?> <?= (($posts['column'] == 'brand') ? '&nbsp;' . $icon : ''); ?>
+                                                <?= ui_text('backend/brands.labels.brand', [], false); ?> <?= (($posts['column'] == 'brand') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
                                         </th>
 
                                         <!-- Colonna status -->
                                         <th style="width: 47.5%; text-align: center;">
                                             <a class="sort" href="#" data-column="status" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'status') ? 'asc' : 'desc'); ?>">
-                                                <?= lang('backend/brands.labels.status'); ?>&nbsp;<?= (($posts['column'] == 'status') ? '&nbsp;' . $icon : ''); ?>
+                                                <?= ui_text('backend/brands.labels.status', [], false); ?>&nbsp;<?= (($posts['column'] == 'status') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
                                         </th>
 
@@ -73,7 +73,7 @@
                                             <!-- Cella immagine (rowspan rimosso, aggiunto py-3 per altezza) -->
                                             <td class="align-middle text-center border-end app-bg-surface brand-cover-cell py-3<?= is_null($cover) ? ' no-preview-image' : ''; ?>">
                                                 <?php if(is_null($cover)): ?>
-                                                    <span class="fa-stack" role="img" aria-label="<?= esc(lang('backend/brands.labels.noImage'), 'attr'); ?>">
+                                                    <span <?= ui_binding('backend/brands.labels.noImage', 'aria-label', [], true); ?> class="fa-stack" role="img" aria-label="<?= esc(lang('backend/brands.labels.noImage'), 'attr'); ?>">
                                                         <i class="fa-solid fa-camera fa-stack-1x"></i>
                                                         <i class="fa-solid fa-slash fa-stack-1x"></i>
                                                     </span>
@@ -84,7 +84,7 @@
 
                                             <!-- Cella chevron -->
                                             <td class="align-middle fw-bold">
-                                                <button class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 app-text shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($brand->uuid, 'attr'); ?>" aria-expanded="false" title="<?= esc(lang('backend/brands.buttons.showSystemDetails'), 'attr'); ?>">
+                                                <button <?= ui_binding('backend/brands.buttons.showSystemDetails', 'title', [], true); ?> class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 app-text shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($brand->uuid, 'attr'); ?>" aria-expanded="false" title="<?= esc(lang('backend/brands.buttons.showSystemDetails'), 'attr'); ?>">
                                                     <i class="fa-solid fa-chevron-right"></i>
                                                 </button>
                                             </td>
@@ -109,15 +109,15 @@
                                                             $statusClass ="app-text-danger btn btn-link shadow-none fw-bold";
                                                         endif;
                                                     ?>
-                                                    <form class="changeStatus" data-controller="brands" data-message="<?= esc(sprintf(lang('backend/brands.messages.areYouSureChangeStatus'), $brand->brand), 'attr'); ?>">
+                                                    <form <?= ui_binding('backend/brands.messages.areYouSureChangeStatus', 'data-message', [$brand->brand], true); ?> class="changeStatus" data-controller="brands" data-message="<?= esc(sprintf(lang('backend/brands.messages.areYouSureChangeStatus'), $brand->brand), 'attr'); ?>">
                                                         <input type="hidden" name="uuid" value="<?= esc($brand->uuid, 'attr'); ?>">
                                                         <button type="submit" class="<?= esc($statusClass, 'attr'); ?>">
-                                                            <?= $statusText; ?>
+                                                            <?= ui_value($statusText, false); ?>
                                                         </button>
                                                     </form>
                                                 <?php else: ?>
                                                     <?php if($isTrashed): ?>
-                                                        <span class="badge app-bg-danger brand-deleted-status p-2 border-0 rounded-1"><?= lang('backend/brands.labels.deleted'); ?></span>
+                                                        <span class="badge app-bg-danger brand-deleted-status p-2 border-0 rounded-1"><?= ui_text('backend/brands.labels.deleted', [], false); ?></span>
                                                     <?php endif; ?>
                                                 <?php endif; ?>
 
@@ -132,37 +132,37 @@
                                                         
                                                         <!-- Pulsante Dettaglio -->
                                                         <a href="<?= esc(base_url('backend/brands/show/' . rawurlencode($brand->uuid)), 'attr'); ?>" class="text-decoration-none badge app-bg-muted-subtle app-text-muted-emphasis action">
-                                                            <i class="fa-solid fa-eye fa-fw"></i> <?= lang('backend/brands.actions.show'); ?>
+                                                            <i class="fa-solid fa-eye fa-fw"></i> <?= ui_text('backend/brands.actions.show', [], false); ?>
                                                         </a>
 
                                                         <!-- Pulsante Aggiorna -->
                                                         <a href="<?= esc(base_url('backend/brands/edit/' . rawurlencode($brand->uuid)), 'attr'); ?>" class="text-decoration-none badge app-bg-muted-subtle app-text-muted-emphasis action">
-                                                            <i class="fa-solid fa-pen fa-fw"></i> <?= lang('backend/brands.actions.edit'); ?>
+                                                            <i class="fa-solid fa-pen fa-fw"></i> <?= ui_text('backend/brands.actions.edit', [], false); ?>
                                                         </a>
 
                                                         <!-- Pulsante Elimina (Soft Delete) -->
-                                                        <form class="deleteRecord m-0 p-0" data-controller="brands" data-message="<?= esc(sprintf(lang('backend/brands.messages.areYouSureSoftDelete'), $brand->brand), 'attr'); ?>">
+                                                        <form <?= ui_binding('backend/brands.messages.areYouSureSoftDelete', 'data-message', [$brand->brand], true); ?> class="deleteRecord m-0 p-0" data-controller="brands" data-message="<?= esc(sprintf(lang('backend/brands.messages.areYouSureSoftDelete'), $brand->brand), 'attr'); ?>">
                                                             <input type="hidden" name="uuid" value="<?= esc($brand->uuid, 'attr'); ?>">
                                                             <button type="submit" class="btn badge app-bg-danger-subtle app-text-danger-emphasis action shadow-none w-100 border-0">
-                                                                <i class="fa-solid fa-xmark fa-fw"></i> <?= lang('backend/brands.actions.softDelete'); ?>
+                                                                <i class="fa-solid fa-xmark fa-fw"></i> <?= ui_text('backend/brands.actions.softDelete', [], false); ?>
                                                             </button>
                                                         </form>
                                                         
                                                     <?php else: ?>
                                                         
                                                         <!-- Pulsante Ripristina (Restore Delete) -->
-                                                        <form class="restoreRecord m-0 p-0" data-controller="brands" data-message="<?= esc(sprintf(lang('backend/brands.messages.areYouSureRestoreDelete'), $brand->brand), 'attr'); ?>">
+                                                        <form <?= ui_binding('backend/brands.messages.areYouSureRestoreDelete', 'data-message', [$brand->brand], true); ?> class="restoreRecord m-0 p-0" data-controller="brands" data-message="<?= esc(sprintf(lang('backend/brands.messages.areYouSureRestoreDelete'), $brand->brand), 'attr'); ?>">
                                                             <input type="hidden" name="uuid" value="<?= esc($brand->uuid, 'attr'); ?>">
                                                             <button type="submit" class="btn badge app-bg-success-subtle app-text-success-emphasis action shadow-none w-100 border-0">
-                                                                <i class="fa-solid fa-trash-arrow-up fa-fw"></i> <?= lang('backend/brands.actions.restoreDelete'); ?>
+                                                                <i class="fa-solid fa-trash-arrow-up fa-fw"></i> <?= ui_text('backend/brands.actions.restoreDelete', [], false); ?>
                                                             </button>
                                                         </form>
 
                                                         <!-- Pulsante Elimina Definitivamente (Hard Delete) -->
-                                                        <form class="hardDeleteRecord m-0 p-0" data-controller="brands" data-message="<?= esc(sprintf(lang('backend/brands.messages.areYouSureHardDelete'), $brand->brand), 'attr'); ?>">
+                                                        <form <?= ui_binding('backend/brands.messages.areYouSureHardDelete', 'data-message', [$brand->brand], true); ?> class="hardDeleteRecord m-0 p-0" data-controller="brands" data-message="<?= esc(sprintf(lang('backend/brands.messages.areYouSureHardDelete'), $brand->brand), 'attr'); ?>">
                                                             <input type="hidden" name="uuid" value="<?= esc($brand->uuid, 'attr'); ?>">
                                                             <button type="submit" class="btn badge app-bg-danger-subtle app-text-danger-emphasis action shadow-none w-100 border-0">
-                                                                <i class="fa-solid fa-xmark fa-fw"></i> <?= lang('backend/brands.actions.hardDelete'); ?>
+                                                                <i class="fa-solid fa-xmark fa-fw"></i> <?= ui_text('backend/brands.actions.hardDelete', [], false); ?>
                                                             </button>
                                                         </form>
                                                         
@@ -186,24 +186,24 @@
                                                     <div class="p-2 border-bottom app-bg-surface app-text small">
                                                         
                                                         <!-- Parte creato -->
-                                                        <?= lang('backend/brands.labels.createdAt'); ?> <span class="fw-bold app-text-success"><?= convertDate(esc($brand->created_at), 'conversational'); ?></span>
+                                                        <?= ui_text('backend/brands.labels.createdAt', [], false); ?> <span class="fw-bold app-text-success"><?= ui_date(esc($brand->created_at), 'conversational'); ?></span>
 
                                                         <!-- Parte aggiornato -->
                                                         <?php if( ! is_null($brand->updated_at)): ?>
                                                             &nbsp;&bull;&nbsp;
-                                                            <?= lang('backend/brands.labels.updatedAt'); ?> <span class="fw-bold app-text-success"><?= convertDate(esc($brand->updated_at), 'conversational'); ?></span>
+                                                            <?= ui_text('backend/brands.labels.updatedAt', [], false); ?> <span class="fw-bold app-text-success"><?= ui_date(esc($brand->updated_at), 'conversational'); ?></span>
                                                         <?php endif; ?>
 
                                                         <!-- Parte ripristinato -->
                                                         <?php if( ! is_null($brand->restored_at)): ?>
                                                             &nbsp;&bull;&nbsp;
-                                                            <?= lang('backend/brands.labels.restoredAt'); ?> <span class="fw-bold app-text-success"><?= convertDate(esc($brand->restored_at), 'conversational'); ?></span>
+                                                            <?= ui_text('backend/brands.labels.restoredAt', [], false); ?> <span class="fw-bold app-text-success"><?= ui_date(esc($brand->restored_at), 'conversational'); ?></span>
                                                         <?php endif; ?>
 
                                                         <!-- Parte eliminato (Cestinato) -->
                                                         <?php if($isTrashed): ?>
                                                             &nbsp;&bull;&nbsp;
-                                                            <?= lang('backend/brands.labels.deletedAt'); ?> <span class="fw-bold app-text-danger"><?= convertDate(esc($brand->deleted_at), 'conversational'); ?></span>
+                                                            <?= ui_text('backend/brands.labels.deletedAt', [], false); ?> <span class="fw-bold app-text-danger"><?= ui_date(esc($brand->deleted_at), 'conversational'); ?></span>
                                                         <?php endif; ?>
 
                                                     </div>
@@ -226,7 +226,7 @@
 
             <!-- ...altrimenti visualizzo messaggio adeguato. -->
             <?php else: ?>
-                <div class="text-center py-3 fw-bold"><?= lang('backend/brands.messages.noBrandsFound'); ?></div>
+                <div class="text-center py-3 fw-bold"><?= ui_text('backend/brands.messages.noBrandsFound', [], false); ?></div>
             <?php endif; ?>
         </div>
     </div>

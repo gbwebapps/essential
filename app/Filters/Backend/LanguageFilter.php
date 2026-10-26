@@ -46,7 +46,21 @@ class LanguageFilter implements FilterInterface
         ):
             $activeLanguage = $requestedLanguage;
         else:
-            $activeLanguage = $this->getStoredLanguage();
+            $path = $request->getUri()?->getPath() ?? '';
+            $path = trim($path, '/');
+            $basePath = trim((string) parse_url($appConfig->baseURL, PHP_URL_PATH), '/');
+            if ($basePath !== '' && str_starts_with($path, $basePath . '/')):
+                $path = substr($path, strlen($basePath) + 1);
+            endif;
+            $isBackend = $path === 'backend' || str_starts_with($path, 'backend/');
+            $isAuth = $path === 'backend/auth' || str_starts_with($path, 'backend/auth/');
+            $temporaryPreferences = ($isBackend && ! $isAuth)
+                ? session()->get(\App\Libraries\Backend\InterfacePreferences::SESSION_KEY)
+                : [];
+            $temporaryLanguage = is_array($temporaryPreferences) ? ($temporaryPreferences['language'] ?? null) : null;
+            $activeLanguage = is_string($temporaryLanguage) && in_array($temporaryLanguage, $appConfig->supportedLocales, true)
+                ? $temporaryLanguage
+                : $this->getStoredLanguage();
         endif;
 
         if ( ! in_array($activeLanguage, $appConfig->supportedLocales, true)):

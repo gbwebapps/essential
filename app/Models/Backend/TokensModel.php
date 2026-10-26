@@ -269,9 +269,9 @@ class TokensModel extends BackendModel
             $transactionStarted = false;
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('DELETE_TOKEN', 'tokens', sprintf(lang('backend/tokens.audits.deleteToken'), esc($tokenRow->firstname), esc($tokenRow->lastname)), $currentAdmin);
+            log_admin_activity('DELETE_TOKEN', 'tokens', ui_message('backend/tokens.audits.deleteToken', [esc($tokenRow->firstname), esc($tokenRow->lastname)], lang('backend/tokens.audits.deleteToken')), $currentAdmin);
 
-            return ['result' => true, 'message' => sprintf(lang('backend/tokens.messages.deleteTokenSuccess'), esc($tokenRow->firstname), esc($tokenRow->lastname)), 'admin' => $tokenRow];
+            return ['result' => true, 'message' => ui_message('backend/tokens.messages.deleteTokenSuccess', [esc($tokenRow->firstname), esc($tokenRow->lastname)], lang('backend/tokens.messages.deleteTokenSuccess')), 'admin' => $tokenRow];
 
         } catch(\Throwable $e) {
 

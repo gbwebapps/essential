@@ -70,7 +70,7 @@ class TokensController extends BackendController
             $rules = $this->tokensModel->showAllValidationRules();
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/tokens.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result'  => false, 'message' => ui_message('backend/tokens.messages.validationToastErrors', [$errorMessage], lang('backend/tokens.messages.validationToastErrors'))]);
             endif;
 
             $posts['searchFields'] = $posts['searchFields'] ?? [];
@@ -132,7 +132,7 @@ class TokensController extends BackendController
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
                 
-                return $this->jsonResponse(['result'  => false, 'message' => sprintf(lang('backend/tokens.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result'  => false, 'message' => ui_message('backend/tokens.messages.validationToastErrors', [$errorMessage], lang('backend/tokens.messages.validationToastErrors'))]);
             endif;
 
             $json = $this->tokensModel->hardDelete($posts);

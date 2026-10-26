@@ -7,15 +7,15 @@
             <!-- Framework -->
             <div class="card shadow-sm border mb-4">
                 <div class="card-header app-bg-surface fw-bold">
-                    <i class="fa-solid fa-code me-2 app-text-accent"></i> <?= lang('backend/tools.labels.framework'); ?>
+                    <i class="fa-solid fa-code me-2 app-text-accent"></i> <?= ui_text('backend/tools.labels.framework', [], false); ?>
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><?= lang('backend/tools.labels.ciVersion'); ?></span>
+                        <span><?= ui_text('backend/tools.labels.ciVersion', [], false); ?></span>
                         <strong><?= esc($sysInfo['framework']['ci_version']); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><?= lang('backend/tools.labels.environment'); ?></span>
+                        <span><?= ui_text('backend/tools.labels.environment', [], false); ?></span>
                         <?php 
                             /* Badge verde per produzione, giallo per sviluppo */
                             $envClass = ($sysInfo['framework']['environment'] === 'production') ? 'app-bg-success' : 'app-bg-warning';
@@ -28,15 +28,15 @@
             <!-- Impostazioni Locali -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header app-bg-surface fw-bold">
-                    <i class="fa-solid fa-earth-europe me-2 app-text-accent"></i> <?= lang('backend/tools.labels.local'); ?>
+                    <i class="fa-solid fa-earth-europe me-2 app-text-accent"></i> <?= ui_text('backend/tools.labels.local', [], false); ?>
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><?= lang('backend/tools.labels.timezone'); ?></span>
+                        <span><?= ui_text('backend/tools.labels.timezone', [], false); ?></span>
                         <strong><?= esc($sysInfo['local']['timezone']); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><?= lang('backend/tools.labels.language'); ?></span>
+                        <span><?= ui_text('backend/tools.labels.language', [], false); ?></span>
                         <strong><?= esc($sysInfo['local']['locale']); ?></strong>
                     </li>
                 </ul>
@@ -45,15 +45,15 @@
             <!-- Server -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header app-bg-surface fw-bold">
-                    <i class="fa-solid fa-server me-2 app-text-accent"></i> <?= lang('backend/tools.labels.server'); ?>
+                    <i class="fa-solid fa-server me-2 app-text-accent"></i> <?= ui_text('backend/tools.labels.server', [], false); ?>
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><?= lang('backend/tools.labels.os'); ?></span>
+                        <span><?= ui_text('backend/tools.labels.os', [], false); ?></span>
                         <strong><?= esc($sysInfo['server']['os']); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><?= lang('backend/tools.labels.webServer'); ?></span>
+                        <span><?= ui_text('backend/tools.labels.webServer', [], false); ?></span>
                         <strong><?= esc($sysInfo['server']['software']); ?></strong>
                     </li>
                 </ul>
@@ -62,7 +62,7 @@
             <!-- Estensioni -->
             <div class="card shadow-sm">
                 <div class="card-header app-bg-surface fw-bold">
-                    <i class="fa-solid fa-puzzle-piece me-2 app-text-accent"></i> <?= lang('backend/tools.labels.extensions'); ?>
+                    <i class="fa-solid fa-puzzle-piece me-2 app-text-accent"></i> <?= ui_text('backend/tools.labels.extensions', [], false); ?>
                 </div>
                 <div class="card-body">
                     <div class="d-flex flex-wrap gap-3">
@@ -83,43 +83,43 @@
             <!-- PHP Core -->
             <div class="card shadow-sm">
                 <div class="card-header app-bg-surface fw-bold">
-                    <i class="fa-brands fa-php me-2 app-text-accent"></i> <?= lang('backend/tools.labels.phpCore'); ?>
+                    <i class="fa-brands fa-php me-2 app-text-accent"></i> <?= ui_text('backend/tools.labels.phpCore', [], false); ?>
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><?= lang('backend/tools.labels.phpVersion'); ?></span>
+                        <span><?= ui_text('backend/tools.labels.phpVersion', [], false); ?></span>
                         <strong><?= esc($sysInfo['php']['version']); ?> (<?= esc($sysInfo['php']['architecture']); ?>)</strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><?= lang('backend/tools.labels.sapi'); ?></span>
+                        <span><?= ui_text('backend/tools.labels.sapi', [], false); ?></span>
                         <strong><?= esc($sysInfo['php']['sapi']); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><?= lang('backend/tools.labels.memoryLimit'); ?></span>
+                        <span><?= ui_text('backend/tools.labels.memoryLimit', [], false); ?></span>
                         <strong><?= esc($sysInfo['php']['memory_limit']); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><?= lang('backend/tools.labels.maxExecutionTime'); ?></span>
-                        <strong><?= esc($sysInfo['php']['max_execution_time']); ?> <?= esc(lang('backend/tools.labels.seconds')); ?></strong>
+                        <span><?= ui_text('backend/tools.labels.maxExecutionTime', [], false); ?></span>
+                        <strong><?= esc($sysInfo['php']['max_execution_time']); ?> <?= ui_text('backend/tools.labels.seconds', [], true); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><?= lang('backend/tools.labels.uploadMax'); ?></span>
+                        <span><?= ui_text('backend/tools.labels.uploadMax', [], false); ?></span>
                         <strong><?= esc($sysInfo['php']['upload_max_filesize']); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><?= lang('backend/tools.labels.postMax'); ?></span>
+                        <span><?= ui_text('backend/tools.labels.postMax', [], false); ?></span>
                         <strong><?= esc($sysInfo['php']['post_max_size']); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><?= lang('backend/tools.labels.maxFileUploads'); ?></span>
+                        <span><?= ui_text('backend/tools.labels.maxFileUploads', [], false); ?></span>
                         <strong><?= esc($sysInfo['php']['max_file_uploads']); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><?= lang('backend/tools.labels.maxInputVars'); ?></span>
+                        <span><?= ui_text('backend/tools.labels.maxInputVars', [], false); ?></span>
                         <strong><?= esc($sysInfo['php']['max_input_vars']); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><?= lang('backend/tools.labels.displayErrors'); ?></span>
+                        <span><?= ui_text('backend/tools.labels.displayErrors', [], false); ?></span>
                         <?php 
                             /* Rosso se abilitato in produzione, verde se disabilitato */
                             $errClass = ($sysInfo['php']['display_errors'] === 'On') ? 'app-text-danger' : 'app-text-success';
@@ -127,7 +127,7 @@
                         <strong class="<?= esc($errClass, 'attr'); ?>"><?= esc($sysInfo['php']['display_errors']); ?></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><?= lang('backend/tools.labels.opcache'); ?></span>
+                        <span><?= ui_text('backend/tools.labels.opcache', [], false); ?></span>
                         <?php 
                             /* Verde se abilitato, giallo se disabilitato */
                             $opClass = ($sysInfo['php']['opcache'] === 'On') ? 'app-text-success' : 'app-text-warning';

@@ -27,7 +27,7 @@
                             <!-- Bottone Mobile per aprire l'Offcanvas -->
                             <div class="col-12 d-md-none mb-3">
                                 <button class="btn app-btn-secondary w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#audits-actionsOffcanvas" aria-controls="audits-actionsOffcanvas">
-                                    <i class="fa-solid fa-bars"></i> <?= lang('backend/audits.labels.filtersAndOptions'); ?>
+                                    <i class="fa-solid fa-bars"></i> <?= ui_text('backend/audits.labels.filtersAndOptions', [], false); ?>
                                 </button>
                             </div>
                             <!-- End Bottone Mobile -->
@@ -36,7 +36,7 @@
                             <div class="col-12 col-md-11 offcanvas-md offcanvas-bottom" tabindex="-1" id="audits-actionsOffcanvas">
                                 <div class="offcanvas-header">
                                     <h5 class="offcanvas-title">
-                                        <i class="fa-solid fa-bars"></i> <?= lang('backend/audits.labels.filtersAndOptions'); ?>
+                                        <i class="fa-solid fa-bars"></i> <?= ui_text('backend/audits.labels.filtersAndOptions', [], false); ?>
                                     </h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#audits-actionsOffcanvas" aria-label="Close"></button>
                                 </div>
@@ -46,23 +46,23 @@
 
                                         <!-- Azioni e Filtri -->
                                         <a href="#" data-bs-toggle="collapse" data-bs-target="#audits-search-bar" class="cmd-link link-search">
-                                            <i class="fa-solid fa-magnifying-glass"></i> <?= lang('backend/audits.links.filters'); ?>
+                                            <i class="fa-solid fa-magnifying-glass"></i> <?= ui_text('backend/audits.links.filters', [], false); ?>
                                         </a>
 
                                         <a href="#" class="cmd-link link-reset-search">
-                                            <i class="fa-solid fa-xmark"></i> <?= lang('backend/audits.links.resetFilters'); ?>
+                                            <i class="fa-solid fa-xmark"></i> <?= ui_text('backend/audits.links.resetFilters', [], false); ?>
                                         </a>
                                         
                                         <a href="#" class="cmd-link reset-sorting-link">
-                                            <i class="fa-solid fa-sort"></i> <?= lang('backend/audits.links.resetSorting'); ?>
+                                            <i class="fa-solid fa-sort"></i> <?= ui_text('backend/audits.links.resetSorting', [], false); ?>
                                         </a>
                                         
                                         <a href="#" class="cmd-link refresh-list">
-                                            <i class="fa-solid fa-arrows-rotate"></i> <?= lang('backend/audits.links.reloadList'); ?>
+                                            <i class="fa-solid fa-arrows-rotate"></i> <?= ui_text('backend/audits.links.reloadList', [], false); ?>
                                         </a>
 
                                         <a href="#" id="export-entity" data-export-entity="admins_audits" class="cmd-link">
-                                            <i class="fa-solid fa-file-export"></i> <?= lang('backend/components/export.links.export'); ?>
+                                            <i class="fa-solid fa-file-export"></i> <?= ui_text('backend/components/export.links.export', [], false); ?>
                                         </a>
                                         <!-- End Azioni e Filtri -->
 
@@ -82,9 +82,9 @@
                             <!-- Ricerca avanzata per username -->
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
-                                    <label for="audits-username"><?= lang('backend/audits.labels.username'); ?></label>
+                                    <label for="audits-username"><?= ui_text('backend/audits.labels.username', [], false); ?></label>
                                     <div class="input-group">
-                                        <input type="text" id="audits-username" class="form-control" placeholder="<?= esc(lang('backend/audits.placeholders.searchUsername'), 'attr'); ?>" data-search-field="username" autocomplete="off">
+                                        <input <?= ui_binding('backend/audits.placeholders.searchUsername', 'placeholder', [], true); ?> type="text" id="audits-username" class="form-control" placeholder="<?= esc(lang('backend/audits.placeholders.searchUsername'), 'attr'); ?>" data-search-field="username" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
                                     <div data-search-error="username" class="error_username app-text-danger fw-bold small pt-1">&nbsp;</div>
@@ -95,9 +95,9 @@
                             <!-- Ricerca avanzata per azione -->
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
-                                    <label for="audits-action"><?= lang('backend/audits.labels.action'); ?></label>
+                                    <label for="audits-action"><?= ui_text('backend/audits.labels.action', [], false); ?></label>
                                     <div class="input-group">
-                                        <input type="text" id="audits-action" class="form-control" placeholder="<?= esc(lang('backend/audits.placeholders.searchAction'), 'attr'); ?>" data-search-field="action" autocomplete="off">
+                                        <input <?= ui_binding('backend/audits.placeholders.searchAction', 'placeholder', [], true); ?> type="text" id="audits-action" class="form-control" placeholder="<?= esc(lang('backend/audits.placeholders.searchAction'), 'attr'); ?>" data-search-field="action" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
                                     <div data-search-error="action" class="error_action app-text-danger fw-bold small pt-1">&nbsp;</div>
@@ -108,9 +108,9 @@
                             <!-- Ricerca avanzata per sezione -->
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
-                                    <label for="audits-section"><?= lang('backend/audits.labels.section'); ?></label>
+                                    <label for="audits-section"><?= ui_text('backend/audits.labels.section', [], false); ?></label>
                                     <div class="input-group">
-                                        <input type="text" id="audits-section" class="form-control" placeholder="<?= esc(lang('backend/audits.placeholders.searchSection'), 'attr'); ?>" data-search-field="section" autocomplete="off">
+                                        <input <?= ui_binding('backend/audits.placeholders.searchSection', 'placeholder', [], true); ?> type="text" id="audits-section" class="form-control" placeholder="<?= esc(lang('backend/audits.placeholders.searchSection'), 'attr'); ?>" data-search-field="section" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
                                     <div data-search-error="section" class="error_section app-text-danger fw-bold small pt-1">&nbsp;</div>
@@ -121,9 +121,9 @@
                             <!-- Ricerca avanzata per dettagli -->
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
-                                    <label for="audits-details"><?= lang('backend/audits.labels.details'); ?></label>
+                                    <label for="audits-details"><?= ui_text('backend/audits.labels.details', [], false); ?></label>
                                     <div class="input-group">
-                                        <input type="text" id="audits-details" class="form-control" placeholder="<?= esc(lang('backend/audits.placeholders.searchDetails'), 'attr'); ?>" data-search-field="details" autocomplete="off">
+                                        <input <?= ui_binding('backend/audits.placeholders.searchDetails', 'placeholder', [], true); ?> type="text" id="audits-details" class="form-control" placeholder="<?= esc(lang('backend/audits.placeholders.searchDetails'), 'attr'); ?>" data-search-field="details" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
                                     <div data-search-error="details" class="error_details app-text-danger fw-bold small pt-1">&nbsp;</div>
@@ -139,9 +139,9 @@
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
                                     <!-- Campo Data Da -->
-                                    <label for="audits-created_at-from"><?= lang('backend/audits.labels.dateFrom'); ?></label>
+                                    <label for="audits-created_at-from"><?= ui_text('backend/audits.labels.dateFrom', [], false); ?></label>
                                     <div id="wrapper-audits-created_at-from" class="input-group">
-                                        <input type="text" id="audits-created_at-from" data-input class="form-control" placeholder="<?= esc(lang('backend/audits.placeholders.dateFrom'), 'attr'); ?>" data-search-field="created_at-from" autocomplete="off">
+                                        <input <?= ui_binding('backend/audits.placeholders.dateFrom', 'placeholder', [], true); ?> type="text" id="audits-created_at-from" data-input class="form-control" placeholder="<?= esc(lang('backend/audits.placeholders.dateFrom'), 'attr'); ?>" data-search-field="created_at-from" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
@@ -154,9 +154,9 @@
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
                                     <!-- Campo Data A -->
-                                    <label for="audits-created_at-to"><?= lang('backend/audits.labels.dateTo'); ?></label>
+                                    <label for="audits-created_at-to"><?= ui_text('backend/audits.labels.dateTo', [], false); ?></label>
                                     <div id="wrapper-audits-created_at-to" class="input-group">
-                                        <input type="text" id="audits-created_at-to" data-input class="form-control" placeholder="<?= esc(lang('backend/audits.placeholders.dateTo'), 'attr'); ?>" data-search-field="created_at-to" autocomplete="off">
+                                        <input <?= ui_binding('backend/audits.placeholders.dateTo', 'placeholder', [], true); ?> type="text" id="audits-created_at-to" data-input class="form-control" placeholder="<?= esc(lang('backend/audits.placeholders.dateTo'), 'attr'); ?>" data-search-field="created_at-to" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>

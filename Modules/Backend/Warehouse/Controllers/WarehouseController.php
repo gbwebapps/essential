@@ -129,7 +129,7 @@ class WarehouseController extends BackendController
                 {
                     log_admin_activity(
                         'EXPORT_WAREHOUSE', 'warehouse',
-                        sprintf(lang('backend/warehouse.audits.export'), $export['processedCount']),
+                        ui_message('backend/warehouse.audits.export', [$export['processedCount']], lang('backend/warehouse.audits.export')),
                         $this->currentAdmin
                     );
                 }
@@ -255,6 +255,7 @@ class WarehouseController extends BackendController
                 'uploadAccept' => '.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 'uploadLabel' => lang('backend/warehouse.labels.selectFile'),
                 'uploadHelp' => lang('backend/warehouse.messages.mergeWarning') . ' ' . lang('backend/warehouse.descriptions.importHelp') . ' ' . lang('backend/warehouse.descriptions.reExport'),
+                'uploadHelpParts' => [['key' => 'backend/warehouse.messages.mergeWarning'], ' ', ['key' => 'backend/warehouse.descriptions.importHelp'], ' ', ['key' => 'backend/warehouse.descriptions.reExport']],
             ];
             $status = null;
 
@@ -338,7 +339,7 @@ class WarehouseController extends BackendController
             if ( ! $prepared['result']):
                 return $this->jsonResponse([
                     'result' => false,
-                    'message' => sprintf(lang('backend/components/import.messages.validationErrors'), count($prepared['validationErrors'])),
+                    'message' => ui_message('backend/components/import.messages.validationErrors', [count($prepared['validationErrors'])], lang('backend/components/import.messages.validationErrors')),
                     'errorOutput' => view(Views::IMPORT_ERRORS_PARTIAL, ['validationErrors' => $prepared['validationErrors']]),
                 ]);
             endif;
@@ -402,7 +403,7 @@ class WarehouseController extends BackendController
             if (($result['result'] ?? true) === false):
                 return $this->jsonResponse([
                     'result' => false,
-                    'message' => sprintf(lang('backend/components/import.messages.validationErrors'), count($result['validationErrors'])),
+                    'message' => ui_message('backend/components/import.messages.validationErrors', [count($result['validationErrors'])], lang('backend/components/import.messages.validationErrors')),
                     'errorOutput' => view(Views::IMPORT_ERRORS_PARTIAL, ['validationErrors' => $result['validationErrors']]),
                 ]);
             endif;
@@ -418,7 +419,7 @@ class WarehouseController extends BackendController
                     log_admin_activity(
                         'IMPORT_WAREHOUSE',
                         'warehouse',
-                        sprintf(lang('backend/warehouse.audits.import'), $result['inserted'] + $result['updated']),
+                        ui_message('backend/warehouse.audits.import', [$result['inserted'] + $result['updated']], lang('backend/warehouse.audits.import')),
                         $this->currentAdmin
                     );
                 }
@@ -433,7 +434,7 @@ class WarehouseController extends BackendController
                 'isFinished' => true,
                 'totalInserted' => $result['inserted'],
                 'totalUpdated' => $result['updated'],
-                'message' => sprintf(lang('backend/warehouse.messages.importSuccess'), $result['inserted'], $result['updated']),
+                'message' => ui_message('backend/warehouse.messages.importSuccess', [$result['inserted'], $result['updated']], lang('backend/warehouse.messages.importSuccess')),
             ]);
         }
         catch (WarehouseRecoveryException $e)

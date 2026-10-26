@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<?= esc(setting('Backend\General')->language) ?>">
+<html lang="<?= esc(backend_language()) ?>">
 
 <head>
     <!-- Configurazione meta e charset -->
@@ -8,7 +8,7 @@
     <meta id="csrf-meta" name="<?= csrf_token(); ?>" content="<?= csrf_hash(); ?>">
 
     <!-- Titolo della pagina dinamico -->
-    <title><?= esc($title); ?> | <?= esc($siteName); ?></title>
+    <title <?= ui_value_binding($title, 'text', ' | ' . $siteName); ?>><?= esc($title); ?> | <?= esc($siteName); ?></title>
 
     <?php /* Ciclo per l'inclusione dei file CSS specifici della pagina */ ?>
     <?php if(isset($assets['css'])): foreach($assets['css'] as $css): ?>
@@ -65,7 +65,7 @@
     <!-- Pulsante per lo scroll rapido verso l'alto -->
     <button type="button" class="scrollup fade-out btn app-btn-secondary btn-sm">
         <i class="fa-solid fa-arrow-circle-up"></i> 
-        <span id="scroll-up-text"><?= lang('backend/global.buttons.backToTop'); ?></span>
+        <span id="scroll-up-text"><?= ui_text('backend/global.buttons.backToTop', [], false); ?></span>
     </button>
 
     <?php /* Passaggio del nome controller al comparto Javascript */ ?>

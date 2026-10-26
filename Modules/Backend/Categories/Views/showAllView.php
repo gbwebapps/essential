@@ -27,7 +27,7 @@
                             <!-- Bottone Mobile per aprire l'Offcanvas -->
                             <div class="col-12 d-md-none mb-3">
                                 <button class="btn app-btn-secondary w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#categories-actionsOffcanvas" aria-controls="categories-actionsOffcanvas">
-                                    <i class="fa-solid fa-bars"></i> <?= lang('backend/categories.labels.filtersAndOptions'); ?>
+                                    <i class="fa-solid fa-bars"></i> <?= ui_text('backend/categories.labels.filtersAndOptions', [], false); ?>
                                 </button>
                             </div>
                             <!-- End Bottone Mobile -->
@@ -36,7 +36,7 @@
                             <div class="col-12 col-md-11 offcanvas-md offcanvas-bottom" tabindex="-1" id="categories-actionsOffcanvas">
                                 <div class="offcanvas-header">
                                     <h5 class="offcanvas-title">
-                                        <i class="fa-solid fa-bars"></i> <?= lang('backend/categories.labels.filtersAndOptions'); ?>
+                                        <i class="fa-solid fa-bars"></i> <?= ui_text('backend/categories.labels.filtersAndOptions', [], false); ?>
                                     </h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#categories-actionsOffcanvas" aria-label="Close"></button>
                                 </div>
@@ -47,19 +47,19 @@
                                         <!-- Selezione stato record -->
                                         <div class="d-flex flex-column flex-md-row gap-0 gap-md-3 me-md-auto mb-3 mb-md-0 border-md-end pe-md-3">
                                             <a href="#" class="cmd-link active-filter" data-trash-filter="active">
-                                                <i class="fa-solid fa-check"></i> <?= lang('backend/categories.links.activeRecords'); ?>
+                                                <i class="fa-solid fa-check"></i> <?= ui_text('backend/categories.links.activeRecords', [], false); ?>
                                                 <span class="badge app-bg-surface app-text-muted border rounded-1 ms-1" data-trash-count="active" hidden></span>
                                             </a>
                                             <a href="#" class="cmd-link" data-trash-filter="suspended">
-                                                <i class="fa-solid fa-pause"></i> <?= lang('backend/categories.links.suspendedRecords'); ?>
+                                                <i class="fa-solid fa-pause"></i> <?= ui_text('backend/categories.links.suspendedRecords', [], false); ?>
                                                 <span class="badge app-bg-surface app-text-muted border rounded-1 ms-1" data-trash-count="suspended" hidden></span>
                                             </a>
                                             <a href="#" class="cmd-link" data-trash-filter="trashed">
-                                                <i class="fa-solid fa-trash-can"></i> <?= lang('backend/categories.links.trashedRecords'); ?>
+                                                <i class="fa-solid fa-trash-can"></i> <?= ui_text('backend/categories.links.trashedRecords', [], false); ?>
                                                 <span class="badge app-bg-surface app-text-muted border rounded-1 ms-1" data-trash-count="trashed" hidden></span>
                                             </a>
                                             <a href="#" class="cmd-link" data-trash-filter="all">
-                                                <i class="fa-solid fa-list"></i> <?= lang('backend/categories.links.allRecords'); ?>
+                                                <i class="fa-solid fa-list"></i> <?= ui_text('backend/categories.links.allRecords', [], false); ?>
                                                 <span class="badge app-bg-surface app-text-muted border rounded-1 ms-1" data-trash-count="all" hidden></span>
                                             </a>
                                         </div>
@@ -67,27 +67,27 @@
 
                                         <!-- Azioni e Filtri -->
                                         <a href="#" data-bs-toggle="collapse" data-bs-target="#categories-search-bar" class="cmd-link link-search">
-                                            <i class="fa-solid fa-magnifying-glass"></i> <?= lang('backend/categories.links.filters'); ?>
+                                            <i class="fa-solid fa-magnifying-glass"></i> <?= ui_text('backend/categories.links.filters', [], false); ?>
                                         </a>
                                         
                                         <a href="#" class="cmd-link link-reset-search">
-                                            <i class="fa-solid fa-xmark"></i> <?= lang('backend/categories.links.resetFilters'); ?>
+                                            <i class="fa-solid fa-xmark"></i> <?= ui_text('backend/categories.links.resetFilters', [], false); ?>
                                         </a>
                                         
                                         <a href="#" class="cmd-link reset-sorting-link">
-                                            <i class="fa-solid fa-sort"></i> <?= lang('backend/categories.links.resetSorting'); ?>
+                                            <i class="fa-solid fa-sort"></i> <?= ui_text('backend/categories.links.resetSorting', [], false); ?>
                                         </a>
                                         
                                         <a href="#" class="cmd-link refresh-list">
-                                            <i class="fa-solid fa-arrows-rotate"></i> <?= lang('backend/categories.links.reloadList'); ?>
+                                            <i class="fa-solid fa-arrows-rotate"></i> <?= ui_text('backend/categories.links.reloadList', [], false); ?>
                                         </a>
                                         
                                         <a href="#" id="export-entity" data-export-entity="categories" class="cmd-link">
-                                            <i class="fa-solid fa-file-export"></i> <?= lang('backend/components/export.links.export'); ?>
+                                            <i class="fa-solid fa-file-export"></i> <?= ui_text('backend/components/export.links.export', [], false); ?>
                                         </a>
 
                                         <a href="#" id="import-entity" data-import-entity="categories" class="cmd-link">
-                                            <i class="fa-solid fa-file-import"></i> <?= lang('backend/components/import.links.import'); ?>
+                                            <i class="fa-solid fa-file-import"></i> <?= ui_text('backend/components/import.links.import', [], false); ?>
                                         </a>
                                         <!-- End Azioni e Filtri -->
 
@@ -107,9 +107,9 @@
                             <!-- Ricerca avanzata per category -->
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
-                                    <label for="categories-category"><?= lang('backend/categories.labels.category'); ?></label>
+                                    <label for="categories-category"><?= ui_text('backend/categories.labels.category', [], false); ?></label>
                                     <div class="input-group">
-                                        <input type="text" id="categories-category" class="form-control" placeholder="<?= esc(lang('backend/categories.placeholders.searchCategory'), 'attr'); ?>" data-search-field="category" autocomplete="off">
+                                        <input <?= ui_binding('backend/categories.placeholders.searchCategory', 'placeholder', [], true); ?> type="text" id="categories-category" class="form-control" placeholder="<?= esc(lang('backend/categories.placeholders.searchCategory'), 'attr'); ?>" data-search-field="category" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
                                     <div data-search-error="category" class="error_category app-text-danger fw-bold small pt-1">&nbsp;</div>
@@ -120,12 +120,12 @@
                             <!-- Ricerca avanzata per stato -->
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
-                                    <label for="categories-status"><?= lang('backend/categories.labels.status'); ?></label>
+                                    <label for="categories-status"><?= ui_text('backend/categories.labels.status', [], false); ?></label>
                                     <div class="input-group">
                                         <select id="categories-status" class="form-select" data-search-field="status">
-                                            <option value=""><?= lang('backend/categories.links.allRecords'); ?></option>
-                                            <option value="1"><?= lang('backend/categories.labels.active'); ?></option>
-                                            <option value="0"><?= lang('backend/categories.labels.unactive'); ?></option>
+                                            <option <?= ui_binding('backend/categories.links.allRecords', 'text', [], false); ?> value=""><?= lang('backend/categories.links.allRecords'); ?></option>
+                                            <option <?= ui_binding('backend/categories.labels.active', 'text', [], false); ?> value="1"><?= lang('backend/categories.labels.active'); ?></option>
+                                            <option <?= ui_binding('backend/categories.labels.unactive', 'text', [], false); ?> value="0"><?= lang('backend/categories.labels.unactive'); ?></option>
                                         </select>
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
@@ -141,9 +141,9 @@
                             <!-- Ricerca avanzata per data creazione da -->
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
-                                    <label for="categories-created_at-from"><?= lang('backend/categories.labels.dateFromAdd'); ?></label>
+                                    <label for="categories-created_at-from"><?= ui_text('backend/categories.labels.dateFromAdd', [], false); ?></label>
                                     <div id="wrapper-categories-created_at-from" class="input-group">
-                                        <input type="text" id="categories-created_at-from" data-input class="form-control" placeholder="<?= esc(lang('backend/categories.placeholders.dateFromAdd'), 'attr'); ?>" data-search-field="created_at-from" autocomplete="off">
+                                        <input <?= ui_binding('backend/categories.placeholders.dateFromAdd', 'placeholder', [], true); ?> type="text" id="categories-created_at-from" data-input class="form-control" placeholder="<?= esc(lang('backend/categories.placeholders.dateFromAdd'), 'attr'); ?>" data-search-field="created_at-from" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
@@ -155,9 +155,9 @@
                             <!-- Ricerca avanzata per data creazione a -->
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
-                                    <label for="categories-created_at-to"><?= lang('backend/categories.labels.dateToAdd'); ?></label>
+                                    <label for="categories-created_at-to"><?= ui_text('backend/categories.labels.dateToAdd', [], false); ?></label>
                                     <div id="wrapper-categories-created_at-to" class="input-group">
-                                        <input type="text" id="categories-created_at-to" data-input class="form-control" placeholder="<?= esc(lang('backend/categories.placeholders.dateToAdd'), 'attr'); ?>" data-search-field="created_at-to" autocomplete="off">
+                                        <input <?= ui_binding('backend/categories.placeholders.dateToAdd', 'placeholder', [], true); ?> type="text" id="categories-created_at-to" data-input class="form-control" placeholder="<?= esc(lang('backend/categories.placeholders.dateToAdd'), 'attr'); ?>" data-search-field="created_at-to" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
@@ -169,9 +169,9 @@
                             <!-- Ricerca avanzata per data modifica da -->
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
-                                    <label for="categories-updated_at-from"><?= lang('backend/categories.labels.dateFromEdit'); ?></label>
+                                    <label for="categories-updated_at-from"><?= ui_text('backend/categories.labels.dateFromEdit', [], false); ?></label>
                                     <div id="wrapper-categories-updated_at-from" class="input-group">
-                                        <input type="text" id="categories-updated_at-from" data-input class="form-control" placeholder="<?= esc(lang('backend/categories.placeholders.dateFromEdit'), 'attr'); ?>" data-search-field="updated_at-from" autocomplete="off">
+                                        <input <?= ui_binding('backend/categories.placeholders.dateFromEdit', 'placeholder', [], true); ?> type="text" id="categories-updated_at-from" data-input class="form-control" placeholder="<?= esc(lang('backend/categories.placeholders.dateFromEdit'), 'attr'); ?>" data-search-field="updated_at-from" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
@@ -183,9 +183,9 @@
                             <!-- Ricerca avanzata per data modifica a -->
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
-                                    <label for="categories-updated_at-to"><?= lang('backend/categories.labels.dateToEdit'); ?></label>
+                                    <label for="categories-updated_at-to"><?= ui_text('backend/categories.labels.dateToEdit', [], false); ?></label>
                                     <div id="wrapper-categories-updated_at-to" class="input-group">
-                                        <input type="text" id="categories-updated_at-to" data-input class="form-control" placeholder="<?= esc(lang('backend/categories.placeholders.dateToEdit'), 'attr'); ?>" data-search-field="updated_at-to" autocomplete="off">
+                                        <input <?= ui_binding('backend/categories.placeholders.dateToEdit', 'placeholder', [], true); ?> type="text" id="categories-updated_at-to" data-input class="form-control" placeholder="<?= esc(lang('backend/categories.placeholders.dateToEdit'), 'attr'); ?>" data-search-field="updated_at-to" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>

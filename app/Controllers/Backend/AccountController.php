@@ -285,7 +285,7 @@ class AccountController extends BackendController
 
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/account.messages.validateToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result' => false, 'message' => ui_message('backend/account.messages.validateToastErrors', [$errorMessage], lang('backend/account.messages.validateToastErrors'))]);
             endif;
 
             /* Delega totale al Model per l'ID corrente, poi lo passa per lo sbarramento */

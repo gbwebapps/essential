@@ -27,7 +27,7 @@
                             <!-- Bottone Mobile per aprire l'Offcanvas -->
                             <div class="col-12 d-md-none mb-3">
                                 <button class="btn app-btn-secondary w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#brands-actionsOffcanvas" aria-controls="brands-actionsOffcanvas">
-                                    <i class="fa-solid fa-bars"></i> <?= lang('backend/brands.labels.filtersAndOptions'); ?>
+                                    <i class="fa-solid fa-bars"></i> <?= ui_text('backend/brands.labels.filtersAndOptions', [], false); ?>
                                 </button>
                             </div>
                             <!-- End Bottone Mobile -->
@@ -36,7 +36,7 @@
                             <div class="col-12 col-md-11 offcanvas-md offcanvas-bottom" tabindex="-1" id="brands-actionsOffcanvas">
                                 <div class="offcanvas-header">
                                     <h5 class="offcanvas-title">
-                                        <i class="fa-solid fa-bars"></i> <?= lang('backend/brands.labels.filtersAndOptions'); ?>
+                                        <i class="fa-solid fa-bars"></i> <?= ui_text('backend/brands.labels.filtersAndOptions', [], false); ?>
                                     </h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#brands-actionsOffcanvas" aria-label="Close"></button>
                                 </div>
@@ -47,19 +47,19 @@
                                         <!-- Selezione stato record -->
                                         <div class="d-flex flex-column flex-md-row gap-0 gap-md-3 me-md-auto mb-3 mb-md-0 border-md-end pe-md-3">
                                             <a href="#" class="cmd-link active-filter" data-trash-filter="active">
-                                                <i class="fa-solid fa-check"></i> <?= lang('backend/brands.links.activeRecords'); ?>
+                                                <i class="fa-solid fa-check"></i> <?= ui_text('backend/brands.links.activeRecords', [], false); ?>
                                                 <span class="badge app-bg-surface app-text-muted border rounded-1 ms-1" data-trash-count="active" hidden></span>
                                             </a>
                                             <a href="#" class="cmd-link" data-trash-filter="suspended">
-                                                <i class="fa-solid fa-pause"></i> <?= lang('backend/brands.links.suspendedRecords'); ?>
+                                                <i class="fa-solid fa-pause"></i> <?= ui_text('backend/brands.links.suspendedRecords', [], false); ?>
                                                 <span class="badge app-bg-surface app-text-muted border rounded-1 ms-1" data-trash-count="suspended" hidden></span>
                                             </a>
                                             <a href="#" class="cmd-link" data-trash-filter="trashed">
-                                                <i class="fa-solid fa-trash-can"></i> <?= lang('backend/brands.links.trashedRecords'); ?>
+                                                <i class="fa-solid fa-trash-can"></i> <?= ui_text('backend/brands.links.trashedRecords', [], false); ?>
                                                 <span class="badge app-bg-surface app-text-muted border rounded-1 ms-1" data-trash-count="trashed" hidden></span>
                                             </a>
                                             <a href="#" class="cmd-link" data-trash-filter="all">
-                                                <i class="fa-solid fa-list"></i> <?= lang('backend/brands.links.allRecords'); ?>
+                                                <i class="fa-solid fa-list"></i> <?= ui_text('backend/brands.links.allRecords', [], false); ?>
                                                 <span class="badge app-bg-surface app-text-muted border rounded-1 ms-1" data-trash-count="all" hidden></span>
                                             </a>
                                         </div>
@@ -67,27 +67,27 @@
 
                                         <!-- Azioni e Filtri -->
                                         <a href="#" data-bs-toggle="collapse" data-bs-target="#brands-search-bar" class="cmd-link link-search">
-                                            <i class="fa-solid fa-magnifying-glass"></i> <?= lang('backend/brands.links.filters'); ?>
+                                            <i class="fa-solid fa-magnifying-glass"></i> <?= ui_text('backend/brands.links.filters', [], false); ?>
                                         </a>
                                         
                                         <a href="#" class="cmd-link link-reset-search">
-                                            <i class="fa-solid fa-xmark"></i> <?= lang('backend/brands.links.resetFilters'); ?>
+                                            <i class="fa-solid fa-xmark"></i> <?= ui_text('backend/brands.links.resetFilters', [], false); ?>
                                         </a>
                                         
                                         <a href="#" class="cmd-link reset-sorting-link">
-                                            <i class="fa-solid fa-sort"></i> <?= lang('backend/brands.links.resetSorting'); ?>
+                                            <i class="fa-solid fa-sort"></i> <?= ui_text('backend/brands.links.resetSorting', [], false); ?>
                                         </a>
                                         
                                         <a href="#" class="cmd-link refresh-list">
-                                            <i class="fa-solid fa-arrows-rotate"></i> <?= lang('backend/brands.links.reloadList'); ?>
+                                            <i class="fa-solid fa-arrows-rotate"></i> <?= ui_text('backend/brands.links.reloadList', [], false); ?>
                                         </a>
                                         
                                         <a href="#" id="export-entity" data-export-entity="brands" class="cmd-link">
-                                            <i class="fa-solid fa-file-export"></i> <?= lang('backend/components/export.links.export'); ?>
+                                            <i class="fa-solid fa-file-export"></i> <?= ui_text('backend/components/export.links.export', [], false); ?>
                                         </a>
 
                                         <a href="#" id="import-entity" data-import-entity="brands" class="cmd-link">
-                                            <i class="fa-solid fa-file-import"></i> <?= lang('backend/components/import.links.import'); ?>
+                                            <i class="fa-solid fa-file-import"></i> <?= ui_text('backend/components/import.links.import', [], false); ?>
                                         </a>
                                         <!-- End Azioni e Filtri -->
 
@@ -107,9 +107,9 @@
                             <!-- Ricerca avanzata per brand -->
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
-                                    <label for="brands-brand"><?= lang('backend/brands.labels.brand'); ?></label>
+                                    <label for="brands-brand"><?= ui_text('backend/brands.labels.brand', [], false); ?></label>
                                     <div class="input-group">
-                                        <input type="text" id="brands-brand" class="form-control" placeholder="<?= esc(lang('backend/brands.placeholders.searchBrand'), 'attr'); ?>" data-search-field="brand" autocomplete="off">
+                                        <input <?= ui_binding('backend/brands.placeholders.searchBrand', 'placeholder', [], true); ?> type="text" id="brands-brand" class="form-control" placeholder="<?= esc(lang('backend/brands.placeholders.searchBrand'), 'attr'); ?>" data-search-field="brand" autocomplete="off">
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
                                     <div data-search-error="brand" class="error_brand app-text-danger fw-bold small pt-1">&nbsp;</div>
@@ -120,12 +120,12 @@
                             <!-- Ricerca avanzata per stato -->
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
-                                    <label for="brands-status"><?= lang('backend/brands.labels.status'); ?></label>
+                                    <label for="brands-status"><?= ui_text('backend/brands.labels.status', [], false); ?></label>
                                     <div class="input-group">
                                         <select id="brands-status" class="form-select" data-search-field="status">
-                                            <option value=""><?= lang('backend/brands.links.allRecords'); ?></option>
-                                            <option value="1"><?= lang('backend/brands.labels.active'); ?></option>
-                                            <option value="0"><?= lang('backend/brands.labels.unactive'); ?></option>
+                                            <option <?= ui_binding('backend/brands.links.allRecords', 'text', [], false); ?> value=""><?= lang('backend/brands.links.allRecords'); ?></option>
+                                            <option <?= ui_binding('backend/brands.labels.active', 'text', [], false); ?> value="1"><?= lang('backend/brands.labels.active'); ?></option>
+                                            <option <?= ui_binding('backend/brands.labels.unactive', 'text', [], false); ?> value="0"><?= lang('backend/brands.labels.unactive'); ?></option>
                                         </select>
                                         <span class="input-group-text reset-search-field"><i class="fa-solid fa-times"></i></span>
                                     </div>
@@ -141,9 +141,9 @@
                             <!-- Ricerca avanzata per data creazione da -->
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
-                                    <label for="brands-created_at-from"><?= lang('backend/brands.labels.dateFromAdd'); ?></label>
+                                    <label for="brands-created_at-from"><?= ui_text('backend/brands.labels.dateFromAdd', [], false); ?></label>
                                     <div id="wrapper-brands-created_at-from" class="input-group">
-                                        <input type="text" id="brands-created_at-from" data-input class="form-control" placeholder="<?= esc(lang('backend/brands.placeholders.dateFromAdd'), 'attr'); ?>" data-search-field="created_at-from" autocomplete="off">
+                                        <input <?= ui_binding('backend/brands.placeholders.dateFromAdd', 'placeholder', [], true); ?> type="text" id="brands-created_at-from" data-input class="form-control" placeholder="<?= esc(lang('backend/brands.placeholders.dateFromAdd'), 'attr'); ?>" data-search-field="created_at-from" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
@@ -155,9 +155,9 @@
                             <!-- Ricerca avanzata per data creazione a -->
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
-                                    <label for="brands-created_at-to"><?= lang('backend/brands.labels.dateToAdd'); ?></label>
+                                    <label for="brands-created_at-to"><?= ui_text('backend/brands.labels.dateToAdd', [], false); ?></label>
                                     <div id="wrapper-brands-created_at-to" class="input-group">
-                                        <input type="text" id="brands-created_at-to" data-input class="form-control" placeholder="<?= esc(lang('backend/brands.placeholders.dateToAdd'), 'attr'); ?>" data-search-field="created_at-to" autocomplete="off">
+                                        <input <?= ui_binding('backend/brands.placeholders.dateToAdd', 'placeholder', [], true); ?> type="text" id="brands-created_at-to" data-input class="form-control" placeholder="<?= esc(lang('backend/brands.placeholders.dateToAdd'), 'attr'); ?>" data-search-field="created_at-to" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
@@ -169,9 +169,9 @@
                             <!-- Ricerca avanzata per data modifica da -->
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
-                                    <label for="brands-updated_at-from"><?= lang('backend/brands.labels.dateFromEdit'); ?></label>
+                                    <label for="brands-updated_at-from"><?= ui_text('backend/brands.labels.dateFromEdit', [], false); ?></label>
                                     <div id="wrapper-brands-updated_at-from" class="input-group">
-                                        <input type="text" id="brands-updated_at-from" data-input class="form-control" placeholder="<?= esc(lang('backend/brands.placeholders.dateFromEdit'), 'attr'); ?>" data-search-field="updated_at-from" autocomplete="off">
+                                        <input <?= ui_binding('backend/brands.placeholders.dateFromEdit', 'placeholder', [], true); ?> type="text" id="brands-updated_at-from" data-input class="form-control" placeholder="<?= esc(lang('backend/brands.placeholders.dateFromEdit'), 'attr'); ?>" data-search-field="updated_at-from" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
@@ -183,9 +183,9 @@
                             <!-- Ricerca avanzata per data modifica a -->
                             <div class="col-md-3">
                                 <div class="mb-2 mb-md-0">
-                                    <label for="brands-updated_at-to"><?= lang('backend/brands.labels.dateToEdit'); ?></label>
+                                    <label for="brands-updated_at-to"><?= ui_text('backend/brands.labels.dateToEdit', [], false); ?></label>
                                     <div id="wrapper-brands-updated_at-to" class="input-group">
-                                        <input type="text" id="brands-updated_at-to" data-input class="form-control" placeholder="<?= esc(lang('backend/brands.placeholders.dateToEdit'), 'attr'); ?>" data-search-field="updated_at-to" autocomplete="off">
+                                        <input <?= ui_binding('backend/brands.placeholders.dateToEdit', 'placeholder', [], true); ?> type="text" id="brands-updated_at-to" data-input class="form-control" placeholder="<?= esc(lang('backend/brands.placeholders.dateToEdit'), 'attr'); ?>" data-search-field="updated_at-to" autocomplete="off">
                                         <span class="input-group-text reset-search-field" data-clear><i class="fa-solid fa-times"></i></span>
                                         <span class="input-group-text" data-open><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>

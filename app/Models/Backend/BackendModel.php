@@ -150,7 +150,7 @@ abstract class BackendModel extends BaseModel
 	{
 		parent::initModel();
 		
-		helper('audits');
+		helper(['audits', 'interface']);
 	}
 
 	/**

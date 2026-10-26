@@ -26,7 +26,7 @@
                                 <button class="accordion-button collapsed shadow-none app-bg-surface app-text-muted py-3 btn-trigger-<?= $env; ?>-settings" data-env="<?= $env; ?>" type="button" aria-expanded="false" aria-controls="main_collapse_<?= $env; ?>">
                                     <h2 class="card-title mb-0 fs-5">
                                         <i class="fa-solid <?= $icon; ?> me-2"></i>
-                                        <span id="lang_<?= $env; ?>"><?= lang('backend/settings.panels.' . $env . 'Setting'); ?></span>
+                                        <span id="lang_<?= $env; ?>"><?= ui_text('backend/settings.panels.' . $env . 'Setting', [], false); ?></span>
                                     </h2>
                                 </button>
                             </h2>

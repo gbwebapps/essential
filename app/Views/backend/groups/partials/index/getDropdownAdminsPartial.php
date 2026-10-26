@@ -13,7 +13,7 @@
 <?php else: ?>
     <div class="list-group position-absolute top-100 start-0 w-100 shadow-sm z-3">
         <div class="list-group-item app-text-muted text-center py-2 fs-7">
-            <i class="fa-solid fa-exclamation-circle me-1"></i> <?= lang('backend/groups.messages.noAdminFound'); ?>
+            <i class="fa-solid fa-exclamation-circle me-1"></i> <?= ui_text('backend/groups.messages.noAdminFound', [], false); ?>
         </div>
     </div>
 <?php endif; ?>

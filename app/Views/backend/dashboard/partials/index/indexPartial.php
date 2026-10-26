@@ -5,19 +5,19 @@
         <?php endforeach; ?>
     </div>
 <?php else: ?>
-    <p class="app-text-muted" role="status"><?= lang('backend/dashboard.messages.noSections'); ?></p>
+    <p class="app-text-muted" role="status"><?= ui_text('backend/dashboard.messages.noSections', [], false); ?></p>
 <?php endif; ?>
 
 <?php if ($dashboardRankings !== [] || $dashboardTotals !== []): ?>
-    <h2 class="dashboard-analysis-title"><?= lang('backend/dashboard.panels.warehouse'); ?></h2>
+    <h2 class="dashboard-analysis-title"><?= ui_text('backend/dashboard.panels.warehouse', [], false); ?></h2>
     <?php if (array_key_exists('inventoryValue', $dashboardTotals)): ?>
         <section class="dashboard-inventory-value" data-dashboard-inventory-value aria-labelledby="dashboard-inventory-value-title">
             <div>
-                <h3 id="dashboard-inventory-value-title"><?= lang('backend/dashboard.panels.inventoryValue'); ?></h3>
-                <p><?= lang('backend/dashboard.descriptions.inventoryValue'); ?></p>
+                <h3 id="dashboard-inventory-value-title"><?= ui_text('backend/dashboard.panels.inventoryValue', [], false); ?></h3>
+                <p><?= ui_text('backend/dashboard.descriptions.inventoryValue', [], false); ?></p>
             </div>
             <?php if ($dashboardTotals['inventoryValue'] === null): ?>
-                <p role="status"><?= lang('backend/dashboard.messages.unavailable'); ?></p>
+                <p role="status"><?= ui_text('backend/dashboard.messages.unavailable', [], false); ?></p>
             <?php else: ?>
                 <strong class="dashboard-inventory-amount"><?= esc($dashboardPresenter->formatValue($dashboardTotals['inventoryValue'])); ?></strong>
             <?php endif; ?>

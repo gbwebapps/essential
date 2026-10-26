@@ -163,21 +163,17 @@ class SettingsController extends BackendController
                 $this->data['title'] = lang('backend/settings.titles.index');
                 $this->data['icon'] = '<i class="fa-solid fa-sliders"></i>';
 
-                /* Le viste eseguiranno i loro lang() usando il Locale appena intercettato */
-                $json['fragments'] = [
-                    '#navbar-top-view' => view('backend/template/navbarTopView', $this->data),
-                    '#section-view' => view('backend/template/sectionView', $this->data),
-                    '#links-bar-view' => view('backend/template/linksBarView', $this->data), 
-                    '#navbar-bottom-view' => view('backend/template/navbarBottomView', $this->data), 
-                    '#lang-definitions-view' => view('backend/template/langDefinitionsView', $this->data), 
-                    '#modal-alert-view' => view('backend/template/alertView', $this->data), 
-                    '#scroll-up-text' => lang('backend/global.buttons.backToTop')
+                /* Il salvataggio esplicito riallinea la sessione alle impostazioni persistenti. */
+                $preferences = new \App\Libraries\Backend\InterfacePreferences();
+                $preferences->clear();
+                $language = $this->data['generalSettings']['language'];
+                $this->request->setLocale($language);
+                service('language')->setLocale($language);
+                $json['interface'] = [
+                    'language' => $language,
+                    'theme' => $this->data['generalSettings']['theme'],
+                    'translations' => $preferences->translations($language),
                 ];
-
-                /* Cicliamo gli ambienti per aggiornare solo i testi dei titoli */
-                foreach($this->allowedEnvs as $v):
-                    $json['fragments']['#lang_' . $v] = lang('backend/settings.panels.' . $v . 'Setting');
-                endforeach;
 
             endif;
 
@@ -261,6 +257,10 @@ class SettingsController extends BackendController
 
             if ($deleted === false) :
                 return $this->jsonResponse(['result'  => false, 'message' => lang('backend/settings.messages.deleteError')]);
+            endif;
+
+            if ($env === 'general'):
+                (new \App\Libraries\Backend\InterfacePreferences())->clear();
             endif;
 
             return $this->jsonResponse([

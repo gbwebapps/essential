@@ -7,14 +7,14 @@
 <div class="alert alert-app-alert-danger fw-bold alert-dismissible fade show d-flex flex-column p-3" role="alert">
     <div class="d-flex align-items-center w-100">
         <div class="ms-4">
-            <i class="fa-solid fa-triangle-exclamation"></i> <?= sprintf(lang('backend/components/import.messages.validationErrors'), $errorCount); ?>
+            <i class="fa-solid fa-triangle-exclamation"></i> <?= ui_text('backend/components/import.messages.validationErrors', [$errorCount], false); ?>
         </div>
         <div class="ms-auto d-flex gap-2">
             <button type="button" class="badge app-bg-danger p-2 border-0 rounded-1" data-bs-toggle="collapse" data-bs-target="#collapseValidationErrors" aria-expanded="false" aria-controls="collapseValidationErrors">
-                <i class="fa-solid fa-chevron-down"></i> <span class="fw-bold"><?= lang('backend/components/import.labels.toggleVisibility') ?></span>
+                <i class="fa-solid fa-chevron-down"></i> <span class="fw-bold"><?= ui_text('backend/components/import.labels.toggleVisibility', [], false); ?></span>
             </button>
             <button type="button" class="badge app-bg-danger p-2 border-0 rounded-1" data-bs-dismiss="alert" style="cursor: pointer;">
-                <i class="fa-solid fa-xmark"></i> <?= lang('backend/components/import.buttons.remove') ?>
+                <i class="fa-solid fa-xmark"></i> <?= ui_text('backend/components/import.buttons.remove', [], false); ?>
             </button>
         </div>
     </div>

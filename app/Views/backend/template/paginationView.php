@@ -2,7 +2,7 @@
 
 <div class="row">
     <div class="col-md-4">
-        <?php $left = ($data['pagination']['totalRows'] == 0) ? '' : sprintf(lang('backend/global.pagination.messageLeft'), $data['pagination']['page'], $numOfPages); ?>
+        <?php $left = ($data['pagination']['totalRows'] == 0) ? '' : ui_text('backend/global.pagination.messageLeft', [$data['pagination']['page'], $numOfPages]); ?>
         <div class="pagination-left"><?= $left ?></div>
     </div>
     <div class="col-md-4">
@@ -16,8 +16,8 @@
                 <?php else: ?>
                     <?php $pageprev = $data['pagination']['page'] - 1; ?>
 
-                    <li class="page-item"><a class="page-link" href="#" data-page="1"><?= lang('backend/global.pagination.first'); ?></a></li>
-                    <li class="page-item"><a class="page-link" href="#" data-page="<?= $pageprev ?>"><?= lang('backend/global.pagination.previous'); ?></a></li>
+                    <li class="page-item"><a class="page-link" href="#" data-page="1"><?= ui_text('backend/global.pagination.first', [], false); ?></a></li>
+                    <li class="page-item"><a class="page-link" href="#" data-page="<?= $pageprev ?>"><?= ui_text('backend/global.pagination.previous', [], false); ?></a></li>
 
                 <?php endif; ?>
 
@@ -58,8 +58,8 @@
 
                 <?php if(($data['pagination']['totalRows'] - ($data['pagination']['limit'] * $data['pagination']['page'])) > 0): ?>
                     <?php $pagenext = $data['pagination']['page'] + 1; ?>
-                    <li class="page-item"><a class="page-link" href="#" data-page="<?= $pagenext ?>"><?= lang('backend/global.pagination.next'); ?></a></li>
-                    <li class="page-item"><a class="page-link" href="#" data-page="<?= $numOfPages ?>"><?= lang('backend/global.pagination.last'); ?></a></li>
+                    <li class="page-item"><a class="page-link" href="#" data-page="<?= $pagenext ?>"><?= ui_text('backend/global.pagination.next', [], false); ?></a></li>
+                    <li class="page-item"><a class="page-link" href="#" data-page="<?= $numOfPages ?>"><?= ui_text('backend/global.pagination.last', [], false); ?></a></li>
                 <?php endif; ?>
 
             <?php else: ?>
@@ -84,7 +84,7 @@
         if ($resultEnd > $data['pagination']['totalRows']):
             $resultEnd = $data['pagination']['totalRows'];
         endif;
-        $right = ($data['pagination']['totalRows'] == 0) ? '' : sprintf(lang('backend/global.pagination.messageRight'), $resultStart, $resultEnd, $data['pagination']['totalRows']); ?>
+        $right = ($data['pagination']['totalRows'] == 0) ? '' : ui_text('backend/global.pagination.messageRight', [$resultStart, $resultEnd, $data['pagination']['totalRows']]); ?>
         <div class="pagination-right"><?= $right ?></div>
     </div>
 </div>

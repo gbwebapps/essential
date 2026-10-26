@@ -2,18 +2,18 @@
 <div class="card-body text-center pb-3">
     <form id="backup-tools-form" autocomplete="off">
         <button type="button" class="btn app-btn-success btn-generate-backups btn-sm" title="Crea e scarica un nuovo backup del database in formato ZIP">
-            <i class="fa-solid fa-file-zipper me-2"></i><?= lang('backend/tools.buttons.generateBackups'); ?>
+            <i class="fa-solid fa-file-zipper me-2"></i><?= ui_text('backend/tools.buttons.generateBackups', [], false); ?>
         </button>
     </form>
 </div>
 
 <!-- Sezione Lista Backup -->
 <div class="card-body">
-    <h5 class="mb-3"><i class="fa-solid fa-circle-arrow-down me-2"></i><?= lang('backend/tools.labels.lastAvailableBackups'); ?></h5>
+    <h5 class="mb-3"><i class="fa-solid fa-circle-arrow-down me-2"></i><?= ui_text('backend/tools.labels.lastAvailableBackups', [], false); ?></h5>
     
     <?php if (empty($backups)): ?>
         <div class="text-center app-text py-3 fw-bold">
-            <?= lang('backend/tools.labels.noBackupsFound'); ?>
+            <?= ui_text('backend/tools.labels.noBackupsFound', [], false); ?>
         </div>
     <?php else: ?>
         <ul class="list-group">
@@ -29,7 +29,7 @@
                             <h6 class="mb-1 fw-bold"><?= esc($backup['filename']); ?></h6>
                             <small class="app-text-muted">
                                 <span class="me-3"><i class="fa-regular fa-calendar me-1"></i><?= esc($backup['humanDateTime']); ?></span>
-                                <span><i class="fa-solid fa-hard-drive me-1"></i><?= esc(sprintf(lang('backend/tools.labels.totalSpace'), $backup['size'])); ?></span>
+                                <span><i class="fa-solid fa-hard-drive me-1"></i><?= ui_text('backend/tools.labels.totalSpace', [$backup['size']], true); ?></span>
                             </small>
                         </div>
 
@@ -37,14 +37,14 @@
                         <div class="col-12 col-md-4 col-lg-3">
                             <div class="d-flex justify-content-center justify-content-md-end gap-2">
                                 <button type="button" class="btn btn-sm app-btn-primary flex-fill flex-md-grow-0 btn-download-backups" data-filename="<?= esc($backup['filename'], 'attr'); ?>">
-                                    <i class="fa-solid fa-download me-1"></i><?= lang('backend/tools.buttons.download'); ?>
+                                    <i class="fa-solid fa-download me-1"></i><?= ui_text('backend/tools.buttons.download', [], false); ?>
                                 </button>
                                 
                                 <!-- Iniezione singola della data discorsiva tramite sprintf -->
-                                <button type="button" class="btn btn-sm app-btn-danger flex-fill flex-md-grow-0 btn-delete-backups"
+                                <button <?= ui_binding('backend/tools.messages.areYouSureToDeleteBackups', 'data-message', [$backup['humanDateTime']], true); ?> type="button" class="btn btn-sm app-btn-danger flex-fill flex-md-grow-0 btn-delete-backups"
                                         data-filename="<?= esc($backup['filename'], 'attr'); ?>"
                                         data-message="<?= esc(sprintf(lang('backend/tools.messages.areYouSureToDeleteBackups'), $backup['humanDateTime']), 'attr'); ?>">
-                                    <i class="fa-solid fa-trash me-1"></i><?= lang('backend/tools.buttons.delete'); ?>
+                                    <i class="fa-solid fa-trash me-1"></i><?= ui_text('backend/tools.buttons.delete', [], false); ?>
                                 </button>
                             </div>
                         </div>

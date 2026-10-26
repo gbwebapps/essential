@@ -1,5 +1,5 @@
 /* Import delle utility risalendo di un livello */
-import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace, handleValidationErrors, initTomSelects, resetTomSelects, markUnsavedClean } from '../backend.js';
+import { urlbase, apiFetch, showAlert, askConfirm, smoothReplace, handleValidationErrors, initTomSelects, resetTomSelects, markUnsavedClean, changeThemeManager, changeLanguageManager } from '../backend.js';
 
 export class SettingsManager {
 
@@ -163,44 +163,12 @@ export class SettingsManager {
         });
     }
 
-    /* Restituisce il tema attualmente caricato dal foglio di stile principale */
     getActiveTheme() {
-        const themeStylesheet = document.getElementById('backend-theme');
-        const stylesheetPath = themeStylesheet?.getAttribute('href') || '';
-        const match = stylesheetPath.match(/\/(white|black|grey|dark)\.css(?:\?.*)?$/);
-
-        return match ? match[1] : null;
+        return changeThemeManager.getActiveTheme();
     }
 
-    /* Carica il nuovo tema e rimuove il precedente soltanto quando il CSS è disponibile */
     async applyTheme(theme) {
-        const allowedThemes = ['white', 'black', 'grey', 'dark'];
-        const currentStylesheet = document.getElementById('backend-theme');
-
-        if (!allowedThemes.includes(theme) || !currentStylesheet) {
-            window.location.reload();
-            return;
-        }
-
-        const nextStylesheet = currentStylesheet.cloneNode(false);
-        nextStylesheet.id = 'backend-theme-loading';
-        nextStylesheet.href = `${urlbase}assets/css/backend/${theme}.css`;
-
-        await new Promise(resolve => {
-            nextStylesheet.addEventListener('load', () => {
-                currentStylesheet.remove();
-                nextStylesheet.id = 'backend-theme';
-                resolve();
-            }, { once: true });
-
-            nextStylesheet.addEventListener('error', () => {
-                nextStylesheet.remove();
-                window.location.reload();
-                resolve();
-            }, { once: true });
-
-            currentStylesheet.after(nextStylesheet);
-        });
+        await changeThemeManager.apply(theme);
     }
 
     /* Carica il contenuto prima dell'apertura dell'accordion */
@@ -345,7 +313,11 @@ export class SettingsManager {
                     }
                 }
 
-                if (data.fragments) {
+                if (data.interface) {
+                    await changeLanguageManager.apply(data.interface);
+                }
+
+                if (data.fragments && !data.interface) {
                     Object.entries(data.fragments).forEach(([selector, htmlContent]) => {
                         const fragmentContainer = document.querySelector(selector);
 

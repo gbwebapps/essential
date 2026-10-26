@@ -43,7 +43,9 @@ export class PasswordVisibility {
             icon.classList.toggle('fa-eye-slash', !isVisible);
 
             button.setAttribute('aria-pressed', String(!isVisible));
-            button.setAttribute('aria-label', isVisible ? 'Mostra password' : 'Nascondi password');
+            const definitions = document.getElementById('lang-definitions');
+            button.setAttribute('aria-label', isVisible ? definitions?.dataset.showPassword || '' : definitions?.dataset.hidePassword || '');
+            button.setAttribute('data-i18n-aria-label', JSON.stringify({ key: 'backend/global.interface.' + (isVisible ? 'showPassword' : 'hidePassword') }));
 
         }, {
             signal: this.eventsController.signal

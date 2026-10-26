@@ -1422,21 +1422,21 @@ class ImportModel extends BackendModel
             fclose($handle);
             return [
                 'status' => false,
-                'message' => sprintf(lang('backend/components/import.messages.invalidColumns'), implode(', ', $duplicateHeaders)),
+                'message' => ui_message('backend/components/import.messages.invalidColumns', [implode(', ', $duplicateHeaders)], lang('backend/components/import.messages.invalidColumns')),
             ];
         endif;
 
         /* Controllo validità colonne CSV (Presenza obbligatoria Primary Key) */
         if ( ! in_array($primaryKey, $csvHeaders, true)):
             fclose($handle);
-            return ['status' => false, 'message' => sprintf(lang('backend/components/import.messages.missingPrimaryKey'), $primaryKey)];
+            return ['status' => false, 'message' => ui_message('backend/components/import.messages.missingPrimaryKey', [$primaryKey], lang('backend/components/import.messages.missingPrimaryKey'))];
         endif;
 
         /* Controllo validità colonne CSV (Nessuna colonna estranea consentita) */
         $invalidColumns = array_diff($csvHeaders, $expectedHeaders);
         if ( ! empty($invalidColumns)):
             fclose($handle);
-            return ['status' => false, 'message' => sprintf(lang('backend/components/import.messages.invalidColumns'), implode(', ', $invalidColumns))];
+            return ['status' => false, 'message' => ui_message('backend/components/import.messages.invalidColumns', [implode(', ', $invalidColumns)], lang('backend/components/import.messages.invalidColumns'))];
         endif;
 
         /* MAPPA IN MEMORIA OTTIMIZZATA */
@@ -1469,10 +1469,7 @@ class ImportModel extends BackendModel
 
                     return [
                         'status' => false,
-                        'message' => sprintf(
-                            lang('backend/components/import.messages.duplicatePrimaryKeys'),
-                            implode(', ', array_keys($duplicatePrimaryKeys))
-                        ),
+                        'message' => ui_message('backend/components/import.messages.duplicatePrimaryKeys', [implode(', ', array_keys($duplicatePrimaryKeys))], lang('backend/components/import.messages.duplicatePrimaryKeys')),
                     ];
                 endif;
 
@@ -1550,7 +1547,7 @@ class ImportModel extends BackendModel
             endif;
 
             if (count($row) !== count($csvHeaders)):
-                $errors[] = sprintf(lang('backend/components/import.messages.wrongColumnsNumber'), $lineNumber, count($row), count($csvHeaders));
+                $errors[] = ui_message('backend/components/import.messages.wrongColumnsNumber', [$lineNumber, count($row), count($csvHeaders)], lang('backend/components/import.messages.wrongColumnsNumber'));
                 $lineNumber++;
                 continue;
             endif;
@@ -1842,7 +1839,7 @@ class ImportModel extends BackendModel
                     'status' => true,
                     'message' => (($progress['inserted'] + $progress['updated']) === 0)
                         ? lang('backend/components/import.messages.importationNoRecordsModified')
-                        : sprintf(lang('backend/components/import.messages.importSuccess'), $progress['inserted'], $progress['updated']),
+                        : ui_message('backend/components/import.messages.importSuccess', [$progress['inserted'], $progress['updated']], lang('backend/components/import.messages.importSuccess')),
                     'isFinished' => true,
                     'inserted' => 0,
                     'updated' => 0,
@@ -2331,11 +2328,7 @@ class ImportModel extends BackendModel
                     log_admin_activity(
                         'IMPORT_DATA',
                         $entity,
-                        sprintf(
-                            lang('backend/components/import.messages.importSuccess'),
-                            $totalInserted,
-                            $totalUpdated
-                        ),
+                        ui_message('backend/components/import.messages.importSuccess', [$totalInserted, $totalUpdated], lang('backend/components/import.messages.importSuccess')),
                         $currentAdmin
                     );
                 } catch (\Throwable $e) {
@@ -2348,7 +2341,7 @@ class ImportModel extends BackendModel
                 'message' => $isFinished
                     ? (($totalInserted + $totalUpdated) === 0
                         ? lang('backend/components/import.messages.importationNoRecordsModified')
-                        : sprintf(lang('backend/components/import.messages.importSuccess'), $totalInserted, $totalUpdated))
+                        : ui_message('backend/components/import.messages.importSuccess', [$totalInserted, $totalUpdated], lang('backend/components/import.messages.importSuccess')))
                     : '',
                 'isFinished' => $isFinished,
                 'inserted' => $inserted,

@@ -619,9 +619,9 @@ class BrandsModel extends BackendModel implements ImportValidationInterface, Exp
             $this->db->transCommit();
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('ADD_BRANDS', 'brands', sprintf(lang('backend/brands.audits.addBrand'), esc($data['row']->brand)), $currentAdmin);
+            log_admin_activity('ADD_BRANDS', 'brands', ui_message('backend/brands.audits.addBrand', [esc($data['row']->brand)], lang('backend/brands.audits.addBrand')), $currentAdmin);
 
-            $message = sprintf(lang('backend/brands.messages.addSuccess'), esc($data['row']->brand));
+            $message = ui_message('backend/brands.messages.addSuccess', [esc($data['row']->brand)], lang('backend/brands.messages.addSuccess'));
             return ['result' => true, 'message' => $message];
 
         } catch (\Throwable $e) {
@@ -722,11 +722,11 @@ class BrandsModel extends BackendModel implements ImportValidationInterface, Exp
             $brand['row']->updated_at = $updated_at;
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('EDIT_BRANDS', 'brands', sprintf(lang('backend/brands.audits.editBrand'), esc($brand['row']->brand)), $currentAdmin);
+            log_admin_activity('EDIT_BRANDS', 'brands', ui_message('backend/brands.audits.editBrand', [esc($brand['row']->brand)], lang('backend/brands.audits.editBrand')), $currentAdmin);
 
             return [
                 'result'  => true, 
-                'message' => sprintf(lang('backend/brands.messages.editSuccess'), esc($posts['brand'])), 
+                'message' => ui_message('backend/brands.messages.editSuccess', [esc($posts['brand'])], lang('backend/brands.messages.editSuccess')), 
                 'row'     => $brand['row']
             ];
 
@@ -806,18 +806,18 @@ class BrandsModel extends BackendModel implements ImportValidationInterface, Exp
             $this->db->transCommit();
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('HARD_DELETE_BRANDS', 'brands', sprintf(lang('backend/brands.audits.hardDeleteBrand'), esc($data['row']->brand)), $currentAdmin);
+            log_admin_activity('HARD_DELETE_BRANDS', 'brands', ui_message('backend/brands.audits.hardDeleteBrand', [esc($data['row']->brand)], lang('backend/brands.audits.hardDeleteBrand')), $currentAdmin);
 
 			if ( ! \App\Libraries\ImageFileSystemService::removeAllImages('brands', $posts['uuid'])):
 				log_message('error', lang('backend/brands.messages.hardDeleteImagesError'));
 				return [
 					'result' => true,
 					'cleanup' => false,
-					'message' => sprintf(lang('backend/brands.messages.hardDeleteSuccess'), esc($data['row']->brand)) . ' ' . lang('backend/brands.messages.hardDeleteImagesError')
+					'message' => ui_message('backend/brands.messages.hardDeleteSuccess', [esc($data['row']->brand)], lang('backend/brands.messages.hardDeleteSuccess')) . ' ' . lang('backend/brands.messages.hardDeleteImagesError')
 				];
 			endif;
 
-			return ['result' => true, 'cleanup' => true, 'message' => sprintf(lang('backend/brands.messages.hardDeleteSuccess'), esc($data['row']->brand))];
+			return ['result' => true, 'cleanup' => true, 'message' => ui_message('backend/brands.messages.hardDeleteSuccess', [esc($data['row']->brand)], lang('backend/brands.messages.hardDeleteSuccess'))];
 
         } catch (\Throwable $e) {
 
@@ -883,10 +883,10 @@ class BrandsModel extends BackendModel implements ImportValidationInterface, Exp
 
             /* Registrazione attività */
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('SOFT_DELETE_BRANDS', 'brands', sprintf(lang('backend/brands.audits.softDeleteBrand'), esc($data['row']->brand)), $currentAdmin);
+            log_admin_activity('SOFT_DELETE_BRANDS', 'brands', ui_message('backend/brands.audits.softDeleteBrand', [esc($data['row']->brand)], lang('backend/brands.audits.softDeleteBrand')), $currentAdmin);
 
             /* Nota: usa una stringa di lingua dedicata come softDelSuccess se l'hai creata */
-            return ['result' => true, 'message' => sprintf(lang('backend/brands.messages.softDeleteSuccess'), esc($data['row']->brand))];
+            return ['result' => true, 'message' => ui_message('backend/brands.messages.softDeleteSuccess', [esc($data['row']->brand)], lang('backend/brands.messages.softDeleteSuccess'))];
 
         } catch (\Throwable $e) {
 
@@ -939,7 +939,7 @@ class BrandsModel extends BackendModel implements ImportValidationInterface, Exp
             $sqlUpdate = "update brands set deleted_at = null, restored_at = ? where uuid = ?";
             $this->db->query($sqlUpdate, [date('Y-m-d H:i:s'), $posts['uuid']]);
             
-            $message = sprintf(lang('backend/brands.messages.restoreDeleteSuccess'), esc($row->brand));
+            $message = ui_message('backend/brands.messages.restoreDeleteSuccess', [esc($row->brand)], lang('backend/brands.messages.restoreDeleteSuccess'));
 
             if ($this->db->transStatus() === false):
 
@@ -953,7 +953,7 @@ class BrandsModel extends BackendModel implements ImportValidationInterface, Exp
 
             /* Registrazione attività */
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('RESTORE_DELETE_BRANDS', 'brands', sprintf(lang('backend/brands.audits.restoreDeleteBrand'), esc($row->brand)), $currentAdmin);
+            log_admin_activity('RESTORE_DELETE_BRANDS', 'brands', ui_message('backend/brands.audits.restoreDeleteBrand', [esc($row->brand)], lang('backend/brands.audits.restoreDeleteBrand')), $currentAdmin);
 
             return ['result' => true, 'message' => $message];
 
@@ -1041,9 +1041,9 @@ class BrandsModel extends BackendModel implements ImportValidationInterface, Exp
             $this->db->transCommit();
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('CHANGE_STATUS_BRANDS', 'brands', sprintf(lang('backend/brands.audits.changeStatusBrand'), esc($data['row']->brand)), $currentAdmin);
+            log_admin_activity('CHANGE_STATUS_BRANDS', 'brands', ui_message('backend/brands.audits.changeStatusBrand', [esc($data['row']->brand)], lang('backend/brands.audits.changeStatusBrand')), $currentAdmin);
 
-            return ['result' => true, 'message' => sprintf(lang('backend/brands.messages.changeStatusSuccess'), esc($data['row']->brand)), 'brand' => $data['row']];
+            return ['result' => true, 'message' => ui_message('backend/brands.messages.changeStatusSuccess', [esc($data['row']->brand)], lang('backend/brands.messages.changeStatusSuccess')), 'brand' => $data['row']];
 
         } catch (\Throwable $e) {
 

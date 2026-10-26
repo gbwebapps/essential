@@ -1055,7 +1055,7 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
             $this->db->transCommit();
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('ADD_ADMIN', 'admins', sprintf(lang('backend/admins.audits.addAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+            log_admin_activity('ADD_ADMIN', 'admins', ui_message('backend/admins.audits.addAdmin', [esc($data['row']->firstname), esc($data['row']->lastname)], lang('backend/admins.audits.addAdmin')), $currentAdmin);
 
         } catch (\Throwable $e) {
             
@@ -1079,12 +1079,12 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
         /* Chiamata al metodo con i parametri separati */
         if ( ! $emailService->sendActivationEmail($data['row'], $token->getValue(), $this->module, $template, $subjectLangKey)):
 
-            $message = sprintf(lang('backend/admins.messages.addSuccessNoEmail'), esc($data['row']->firstname), esc($data['row']->lastname));
+            $message = ui_message('backend/admins.messages.addSuccessNoEmail', [esc($data['row']->firstname), esc($data['row']->lastname)], lang('backend/admins.messages.addSuccessNoEmail'));
 			return ['result' => true, 'emailSent' => false, 'message' => $message];
             
         else:
             
-            $message = sprintf(lang('backend/admins.messages.addSuccess'), esc($data['row']->firstname), esc($data['row']->lastname));
+            $message = ui_message('backend/admins.messages.addSuccess', [esc($data['row']->firstname), esc($data['row']->lastname)], lang('backend/admins.messages.addSuccess'));
             return ['result' => true, 'message' => $message];
             
         endif;
@@ -1212,11 +1212,11 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
             $data['row']->updated_at = $updated_at;
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('EDIT_ADMIN', 'admins', sprintf(lang('backend/admins.audits.editAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+            log_admin_activity('EDIT_ADMIN', 'admins', ui_message('backend/admins.audits.editAdmin', [esc($data['row']->firstname), esc($data['row']->lastname)], lang('backend/admins.audits.editAdmin')), $currentAdmin);
 
             return [
                 'result'  => true, 
-                'message' => sprintf(lang('backend/admins.messages.editSuccess'), esc($posts['firstname']), esc($posts['lastname'])), 
+                'message' => ui_message('backend/admins.messages.editSuccess', [esc($posts['firstname']), esc($posts['lastname'])], lang('backend/admins.messages.editSuccess')), 
                 'row'     => $data['row']
             ];
 
@@ -1343,18 +1343,18 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
             $this->db->transCommit();
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('HARD_DELETE_ADMINS', 'admins', sprintf(lang('backend/admins.audits.hardDeleteAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+            log_admin_activity('HARD_DELETE_ADMINS', 'admins', ui_message('backend/admins.audits.hardDeleteAdmin', [esc($data['row']->firstname), esc($data['row']->lastname)], lang('backend/admins.audits.hardDeleteAdmin')), $currentAdmin);
 
 			if ( ! \App\Libraries\ImageFileSystemService::removeAllImages('admins', $posts['uuid'])):
 				log_message('error', lang('backend/admins.messages.hardDeleteImagesError'));
 				return [
 					'result' => true,
 					'cleanup' => false,
-					'message' => sprintf(lang('backend/admins.messages.hardDeleteSuccess'), esc($data['row']->firstname), esc($data['row']->lastname)) . ' ' . lang('backend/admins.messages.hardDeleteImagesError')
+					'message' => ui_message('backend/admins.messages.hardDeleteSuccess', [esc($data['row']->firstname), esc($data['row']->lastname)], lang('backend/admins.messages.hardDeleteSuccess')) . ' ' . lang('backend/admins.messages.hardDeleteImagesError')
 				];
 			endif;
 
-			return ['result' => true, 'cleanup' => true, 'message' => sprintf(lang('backend/admins.messages.hardDeleteSuccess'), esc($data['row']->firstname), esc($data['row']->lastname))];
+			return ['result' => true, 'cleanup' => true, 'message' => ui_message('backend/admins.messages.hardDeleteSuccess', [esc($data['row']->firstname), esc($data['row']->lastname)], lang('backend/admins.messages.hardDeleteSuccess'))];
 
         } catch (\Throwable $e) {
 
@@ -1431,10 +1431,10 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
 
             /* Registrazione attività */
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('SOFT_DELETE_ADMINS', 'admins', sprintf(lang('backend/admins.audits.softDeleteAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+            log_admin_activity('SOFT_DELETE_ADMINS', 'admins', ui_message('backend/admins.audits.softDeleteAdmin', [esc($data['row']->firstname), esc($data['row']->lastname)], lang('backend/admins.audits.softDeleteAdmin')), $currentAdmin);
 
             /* Nota: usa una stringa di lingua dedicata come softDelSuccess se l'hai creata */
-            return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.softDeleteSuccess'), esc($data['row']->firstname), esc($data['row']->lastname))];
+            return ['result' => true, 'message' => ui_message('backend/admins.messages.softDeleteSuccess', [esc($data['row']->firstname), esc($data['row']->lastname)], lang('backend/admins.messages.softDeleteSuccess'))];
 
         } catch (\Throwable $e) {
 
@@ -1506,7 +1506,7 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
                 $sqlUpdate = "update admins set email = ?, deleted_at = null, restored_at = ? where uuid = ?";
                 $this->db->query($sqlUpdate, [$cleanEmail, date('Y-m-d H:i:s'), $posts['uuid']]);
                 
-                $message = sprintf(lang('backend/admins.messages.restoreDeleteSuccess'), esc($row->firstname), esc($row->lastname));
+                $message = ui_message('backend/admins.messages.restoreDeleteSuccess', [esc($row->firstname), esc($row->lastname)], lang('backend/admins.messages.restoreDeleteSuccess'));
                 
             endif;
 
@@ -1522,7 +1522,7 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
 
             /* Registrazione attività */
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('RESTORE_DELETE_ADMINS', 'admins', sprintf(lang('backend/admins.audits.restoreDeleteAdmin'), esc($row->firstname), esc($row->lastname)), $currentAdmin);
+            log_admin_activity('RESTORE_DELETE_ADMINS', 'admins', ui_message('backend/admins.audits.restoreDeleteAdmin', [esc($row->firstname), esc($row->lastname)], lang('backend/admins.audits.restoreDeleteAdmin')), $currentAdmin);
 
             return ['result' => true, 'message' => $message];
 
@@ -1607,7 +1607,7 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
             $this->db->transCommit();
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('RESET_PASSWORD_ADMIN', 'admins', sprintf(lang('backend/admins.audits.resetPasswordAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+            log_admin_activity('RESET_PASSWORD_ADMIN', 'admins', ui_message('backend/admins.audits.resetPasswordAdmin', [esc($data['row']->firstname), esc($data['row']->lastname)], lang('backend/admins.audits.resetPasswordAdmin')), $currentAdmin);
 
         } catch (\Throwable $e) {
 
@@ -1628,12 +1628,12 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
         /* Chiamata al metodo con i nuovi parametri separati */
         if ( ! $emailService->sendActivationEmail($data['row'], $token->getValue(), $this->module, $template, $subjectLangKey)):
 
-            $message = sprintf(lang('backend/admins.messages.resetPasswordSuccessNoEmail'), esc($data['row']->firstname), esc($data['row']->lastname));
+            $message = ui_message('backend/admins.messages.resetPasswordSuccessNoEmail', [esc($data['row']->firstname), esc($data['row']->lastname)], lang('backend/admins.messages.resetPasswordSuccessNoEmail'));
 			return ['result' => true, 'emailSent' => false, 'message' => $message];
             
         else:
             
-            $message = sprintf(lang('backend/admins.messages.resetPasswordSuccess'), esc($data['row']->firstname), esc($data['row']->lastname));
+            $message = ui_message('backend/admins.messages.resetPasswordSuccess', [esc($data['row']->firstname), esc($data['row']->lastname)], lang('backend/admins.messages.resetPasswordSuccess'));
             return ['result' => true, 'message' => $message];
             
         endif;
@@ -1715,9 +1715,9 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
             $this->db->transCommit();
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('CHANGE_STATUS_ADMIN', 'admins', sprintf(lang('backend/admins.audits.changeStatusAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+            log_admin_activity('CHANGE_STATUS_ADMIN', 'admins', ui_message('backend/admins.audits.changeStatusAdmin', [esc($data['row']->firstname), esc($data['row']->lastname)], lang('backend/admins.audits.changeStatusAdmin')), $currentAdmin);
 
-            return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.changeStatusSuccess'), esc($data['row']->firstname), esc($data['row']->lastname)), 'admin' => $data['row']];
+            return ['result' => true, 'message' => ui_message('backend/admins.messages.changeStatusSuccess', [esc($data['row']->firstname), esc($data['row']->lastname)], lang('backend/admins.messages.changeStatusSuccess')), 'admin' => $data['row']];
 
         } catch (\Throwable $e) {
 
@@ -1813,13 +1813,13 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
             $this->db->transCommit();
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('CHANGE_PERMISSION_ADMIN', 'admins', sprintf(lang('backend/admins.audits.changePermissionAdmin'), esc($admin->firstname), esc($admin->lastname)), $currentAdmin);
+            log_admin_activity('CHANGE_PERMISSION_ADMIN', 'admins', ui_message('backend/admins.audits.changePermissionAdmin', [esc($admin->firstname), esc($admin->lastname)], lang('backend/admins.audits.changePermissionAdmin')), $currentAdmin);
 
             $admin->updated_at = $updatedAt;
 
             return [
                 'result'  => true, 
-                'message' => sprintf(lang('backend/admins.messages.changePermissionSuccess'), esc($admin->firstname), esc($admin->lastname)), 
+                'message' => ui_message('backend/admins.messages.changePermissionSuccess', [esc($admin->firstname), esc($admin->lastname)], lang('backend/admins.messages.changePermissionSuccess')), 
                 'admin'   => $admin
             ];
 
@@ -1890,9 +1890,9 @@ class AdminsModel extends BackendModel implements ImportValidationInterface, Exp
 				$this->db->transCommit();
 
                 $currentAdmin = service('authorization')->currentAdmin();
-                log_admin_activity('DELETE_TOKEN_ADMIN', 'admins', sprintf(lang('backend/admins.audits.deleteTokenAdmin'), esc($data['row']->firstname), esc($data['row']->lastname)), $currentAdmin);
+                log_admin_activity('DELETE_TOKEN_ADMIN', 'admins', ui_message('backend/admins.audits.deleteTokenAdmin', [esc($data['row']->firstname), esc($data['row']->lastname)], lang('backend/admins.audits.deleteTokenAdmin')), $currentAdmin);
 
-                return ['result' => true, 'message' => sprintf(lang('backend/admins.messages.deleteTokenSuccess'), esc($data['row']->firstname), esc($data['row']->lastname)), 'admin' => $data['row']];
+                return ['result' => true, 'message' => ui_message('backend/admins.messages.deleteTokenSuccess', [esc($data['row']->firstname), esc($data['row']->lastname)], lang('backend/admins.messages.deleteTokenSuccess')), 'admin' => $data['row']];
 			endif;
 
 			$this->db->transRollback();

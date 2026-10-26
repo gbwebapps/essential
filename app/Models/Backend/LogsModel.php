@@ -214,7 +214,7 @@ class LogsModel extends BackendModel
             $currentAdmin = service('authorization')->currentAdmin();
             log_admin_activity('DISCONNECT_SESSION', 'logs', lang('backend/logs.audits.disconnectSession'), $currentAdmin);
 
-            return ['result' => true, 'message' => sprintf(lang('backend/logs.messages.disconnectSessionSuccess'), esc($tokenRow->firstname), esc($tokenRow->lastname))];
+            return ['result' => true, 'message' => ui_message('backend/logs.messages.disconnectSessionSuccess', [esc($tokenRow->firstname), esc($tokenRow->lastname)], lang('backend/logs.messages.disconnectSessionSuccess'))];
 
         } catch (\Throwable $e) {
             if ($transactionStarted):

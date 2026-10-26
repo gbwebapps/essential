@@ -7,14 +7,14 @@
         <div class="alert app-alert-success d-flex align-items-center mb-3">
             <i class="fa-solid fa-check-circle fa-2x me-3"></i>
             <div>
-                <strong><?= lang('backend/components/import.labels.perfectSync'); ?></strong><br>
-                <?= sprintf(lang('backend/warehouse.messages.syncNoChanges'), $plan['skip']); ?>
+                <strong><?= ui_text('backend/components/import.labels.perfectSync', [], false); ?></strong><br>
+                <?= ui_text('backend/warehouse.messages.syncNoChanges', [$plan['skip']], false); ?>
             </div>
         </div>
     <?php else: ?>
         <div class="alert app-alert-warning mb-3">
             <i class="fa-solid fa-database me-2"></i>
-            <?= sprintf(lang('backend/components/import.labels.executionPlan'), $plan['insert'], $plan['update'], $plan['skip']); ?>
+            <?= ui_text('backend/components/import.labels.executionPlan', [$plan['insert'], $plan['update'], $plan['skip']], false); ?>
         </div>
     <?php endif; ?>
 
@@ -23,5 +23,5 @@
         <?= view('backend/components/import/previewModalPartial', $sheet + ['embedded' => true, 'syncNoChanges' => lang('backend/warehouse.messages.syncNoChanges')]); ?>
     <?php endforeach; ?>
 
-    <p class="small app-text-muted mt-3 mb-0"><?= esc(lang('backend/warehouse.descriptions.reExport')); ?></p>
+    <p class="small app-text-muted mt-3 mb-0"><?= ui_text('backend/warehouse.descriptions.reExport', [], true); ?></p>
 </form>

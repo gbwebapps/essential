@@ -931,9 +931,9 @@ class CategoriesModel extends BackendModel implements ImportValidationInterface,
             $this->db->transCommit();
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('ADD_CATEGORIES', 'categories', sprintf(lang('backend/categories.audits.addCategory'), esc($data['row']->category)), $currentAdmin);
+            log_admin_activity('ADD_CATEGORIES', 'categories', ui_message('backend/categories.audits.addCategory', [esc($data['row']->category)], lang('backend/categories.audits.addCategory')), $currentAdmin);
 
-            $message = sprintf(lang('backend/categories.messages.addSuccess'), esc($data['row']->category));
+            $message = ui_message('backend/categories.messages.addSuccess', [esc($data['row']->category)], lang('backend/categories.messages.addSuccess'));
             return ['result' => true, 'message' => $message];
 
         } catch (\Throwable $e) {
@@ -1053,11 +1053,11 @@ class CategoriesModel extends BackendModel implements ImportValidationInterface,
             $category['row']->updated_at = $updated_at;
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('EDIT_CATEGORIES', 'categories', sprintf(lang('backend/categories.audits.editCategory'), esc($category['row']->category)), $currentAdmin);
+            log_admin_activity('EDIT_CATEGORIES', 'categories', ui_message('backend/categories.audits.editCategory', [esc($category['row']->category)], lang('backend/categories.audits.editCategory')), $currentAdmin);
 
             return [
                 'result'  => true, 
-                'message' => sprintf(lang('backend/categories.messages.editSuccess'), esc($posts['category'])), 
+                'message' => ui_message('backend/categories.messages.editSuccess', [esc($posts['category'])], lang('backend/categories.messages.editSuccess')), 
                 'row'     => $category['row']
             ];
 
@@ -1146,18 +1146,18 @@ class CategoriesModel extends BackendModel implements ImportValidationInterface,
             $this->db->transCommit();
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('HARD_DELETE_CATEGORIES', 'categories', sprintf(lang('backend/categories.audits.hardDeleteCategory'), esc($data['row']->category)), $currentAdmin);
+            log_admin_activity('HARD_DELETE_CATEGORIES', 'categories', ui_message('backend/categories.audits.hardDeleteCategory', [esc($data['row']->category)], lang('backend/categories.audits.hardDeleteCategory')), $currentAdmin);
 
 			if ( ! \App\Libraries\ImageFileSystemService::removeAllImages('categories', $posts['uuid'])):
 				log_message('error', lang('backend/categories.messages.hardDeleteImagesError'));
 				return [
 					'result' => true,
 					'cleanup' => false,
-					'message' => sprintf(lang('backend/categories.messages.hardDeleteSuccess'), esc($data['row']->category)) . ' ' . lang('backend/categories.messages.hardDeleteImagesError')
+					'message' => ui_message('backend/categories.messages.hardDeleteSuccess', [esc($data['row']->category)], lang('backend/categories.messages.hardDeleteSuccess')) . ' ' . lang('backend/categories.messages.hardDeleteImagesError')
 				];
 			endif;
 
-			return ['result' => true, 'cleanup' => true, 'message' => sprintf(lang('backend/categories.messages.hardDeleteSuccess'), esc($data['row']->category))];
+			return ['result' => true, 'cleanup' => true, 'message' => ui_message('backend/categories.messages.hardDeleteSuccess', [esc($data['row']->category)], lang('backend/categories.messages.hardDeleteSuccess'))];
 
         } catch (\Throwable $e) {
 
@@ -1228,10 +1228,10 @@ class CategoriesModel extends BackendModel implements ImportValidationInterface,
 
             /* Registrazione attività */
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('SOFT_DELETE_CATEGORIES', 'categories', sprintf(lang('backend/categories.audits.softDeleteCategory'), esc($data['row']->category)), $currentAdmin);
+            log_admin_activity('SOFT_DELETE_CATEGORIES', 'categories', ui_message('backend/categories.audits.softDeleteCategory', [esc($data['row']->category)], lang('backend/categories.audits.softDeleteCategory')), $currentAdmin);
 
             /* Nota: usa una stringa di lingua dedicata come softDelSuccess se l'hai creata */
-            return ['result' => true, 'message' => sprintf(lang('backend/categories.messages.softDeleteSuccess'), esc($data['row']->category))];
+            return ['result' => true, 'message' => ui_message('backend/categories.messages.softDeleteSuccess', [esc($data['row']->category)], lang('backend/categories.messages.softDeleteSuccess'))];
 
         } catch (\Throwable $e) {
 
@@ -1298,7 +1298,7 @@ class CategoriesModel extends BackendModel implements ImportValidationInterface,
             $sqlUpdate = "update categories set deleted_at = null, restored_at = ? where uuid = ?";
             $this->db->query($sqlUpdate, [date('Y-m-d H:i:s'), $posts['uuid']]);
             
-            $message = sprintf(lang('backend/categories.messages.restoreDeleteSuccess'), esc($row->category));
+            $message = ui_message('backend/categories.messages.restoreDeleteSuccess', [esc($row->category)], lang('backend/categories.messages.restoreDeleteSuccess'));
 
             if ($this->db->transStatus() === false):
 
@@ -1312,7 +1312,7 @@ class CategoriesModel extends BackendModel implements ImportValidationInterface,
 
             /* Registrazione attività */
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('RESTORE_DELETE_CATEGORIES', 'categories', sprintf(lang('backend/categories.audits.restoreDeleteCategory'), esc($row->category)), $currentAdmin);
+            log_admin_activity('RESTORE_DELETE_CATEGORIES', 'categories', ui_message('backend/categories.audits.restoreDeleteCategory', [esc($row->category)], lang('backend/categories.audits.restoreDeleteCategory')), $currentAdmin);
 
             return ['result' => true, 'message' => $message];
 
@@ -1406,9 +1406,9 @@ class CategoriesModel extends BackendModel implements ImportValidationInterface,
             $this->db->transCommit();
 
             $currentAdmin = service('authorization')->currentAdmin();
-            log_admin_activity('CHANGE_STATUS_CATEGORIES', 'categories', sprintf(lang('backend/categories.audits.changeStatusCategory'), esc($data['row']->category)), $currentAdmin);
+            log_admin_activity('CHANGE_STATUS_CATEGORIES', 'categories', ui_message('backend/categories.audits.changeStatusCategory', [esc($data['row']->category)], lang('backend/categories.audits.changeStatusCategory')), $currentAdmin);
 
-            return ['result' => true, 'message' => sprintf(lang('backend/categories.messages.changeStatusSuccess'), esc($data['row']->category)), 'category' => $data['row']];
+            return ['result' => true, 'message' => ui_message('backend/categories.messages.changeStatusSuccess', [esc($data['row']->category)], lang('backend/categories.messages.changeStatusSuccess')), 'category' => $data['row']];
 
         } catch (\Throwable $e) {
 

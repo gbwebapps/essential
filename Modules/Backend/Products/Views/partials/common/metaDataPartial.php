@@ -5,9 +5,9 @@
         <div class="col-12 col-lg-6">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/products.labels.createdAt'); ?>
+                    <i class="fa-solid fa-circle-arrow-down"></i> <?= ui_text('backend/products.labels.createdAt', [], false); ?>
                 </li>
-                <li class="list-group-item fw-bold"><?= convertDate(esc($product->created_at), 'conversational'); ?></li>
+                <li class="list-group-item fw-bold"><?= ui_date(esc($product->created_at), 'conversational'); ?></li>
             </ul>
         </div>
         <!-- End Data di creazione -->
@@ -17,9 +17,9 @@
             <div class="col-12 col-lg-6">
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">
-                        <i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/products.labels.updatedAt'); ?>
+                        <i class="fa-solid fa-circle-arrow-down"></i> <?= ui_text('backend/products.labels.updatedAt', [], false); ?>
                     </li>
-                    <li class="list-group-item fw-bold"><?= convertDate(esc($product->updated_at), 'conversational'); ?></li>
+                    <li class="list-group-item fw-bold"><?= ui_date(esc($product->updated_at), 'conversational'); ?></li>
                 </ul>
             </div>
         <?php endif; ?>
@@ -30,9 +30,9 @@
             <div class="col-12 col-lg-6">
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">
-                        <i class="fa-solid fa-circle-arrow-down"></i> <?= lang('backend/products.labels.restoredAt'); ?>
+                        <i class="fa-solid fa-circle-arrow-down"></i> <?= ui_text('backend/products.labels.restoredAt', [], false); ?>
                     </li>
-                    <li class="list-group-item fw-bold"><?= convertDate(esc($product->restored_at), 'conversational'); ?></li>
+                    <li class="list-group-item fw-bold"><?= ui_date(esc($product->restored_at), 'conversational'); ?></li>
                 </ul>
             </div>
         <?php endif; ?>

@@ -16,7 +16,8 @@ class TokensClassTest extends CIUnitTestCase
         parent::setUp();
         Factories::reset();
         helper('settings');
-        $this->mockSettings(['Backend\General' => ['language' => 'it']]);
+        $this->mockSettings(['Backend\General' => ['language' => 'en']]);
+        service('request')->setLocale('it');
     }
 
     protected function tearDown(): void

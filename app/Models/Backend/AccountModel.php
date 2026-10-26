@@ -255,11 +255,11 @@ class AccountModel extends BackendModel
 
 	        /* Ricarichiamo l'istanza dell'admin aggiornata per passarla al controller */
 	        $currentAdmin = service('authorization')->refresh()->currentAdmin();
-	        log_admin_activity('UPDATE_DATA', 'account', sprintf(lang('backend/account.audits.updateData'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)), $currentAdmin);
+	        log_admin_activity('UPDATE_DATA', 'account', ui_message('backend/account.audits.updateData', [esc($currentAdmin->firstname), esc($currentAdmin->lastname)], lang('backend/account.audits.updateData')), $currentAdmin);
 
 	        return [
 	            'result' => true, 
-	            'message' => sprintf(lang('backend/account.messages.editSuccess'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)), 
+	            'message' => ui_message('backend/account.messages.editSuccess', [esc($currentAdmin->firstname), esc($currentAdmin->lastname)], lang('backend/account.messages.editSuccess')), 
 	            'currentAdmin' => $currentAdmin
 	        ];
 
@@ -403,8 +403,8 @@ class AccountModel extends BackendModel
 
 			$transactionStarted = false;
 
-			log_admin_activity('DELETE_TOKEN', 'account', sprintf(lang('backend/account.audits.deleteToken'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)), $currentAdmin);
-			return ['result' => true, 'message' => sprintf(lang('backend/account.messages.deleteTokenSuccess'), esc($currentAdmin->firstname), esc($currentAdmin->lastname))];
+			log_admin_activity('DELETE_TOKEN', 'account', ui_message('backend/account.audits.deleteToken', [esc($currentAdmin->firstname), esc($currentAdmin->lastname)], lang('backend/account.audits.deleteToken')), $currentAdmin);
+			return ['result' => true, 'message' => ui_message('backend/account.messages.deleteTokenSuccess', [esc($currentAdmin->firstname), esc($currentAdmin->lastname)], lang('backend/account.messages.deleteTokenSuccess'))];
 
         } catch(\Throwable $e) {
 			if ($transactionStarted):
@@ -475,7 +475,7 @@ class AccountModel extends BackendModel
 
 	        $transactionStarted = false;
 
-	        log_admin_activity('RESET_PASSWORD', 'account', sprintf(lang('backend/account.audits.resetPassword'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)), $currentAdmin);
+	        log_admin_activity('RESET_PASSWORD', 'account', ui_message('backend/account.audits.resetPassword', [esc($currentAdmin->firstname), esc($currentAdmin->lastname)], lang('backend/account.audits.resetPassword')), $currentAdmin);
 
 	    } catch (\Throwable $e) {
 
@@ -499,12 +499,12 @@ class AccountModel extends BackendModel
 	    /* Chiamata al metodo con i nuovi parametri separati */
 	    if ( ! $emailService->sendActivationEmail($currentAdmin, $token->getValue(), $module, $template, $subjectLangKey)):
 
-	        $message = sprintf(lang('backend/account.messages.resetPasswordSuccessNoEmail'), esc($currentAdmin->firstname), esc($currentAdmin->lastname));
+	        $message = ui_message('backend/account.messages.resetPasswordSuccessNoEmail', [esc($currentAdmin->firstname), esc($currentAdmin->lastname)], lang('backend/account.messages.resetPasswordSuccessNoEmail'));
 	        return ['result' => 'db_committed_no_email', 'message' => $message];
 	        
 	    else:
 	        
-	        $message = sprintf(lang('backend/account.messages.resetPasswordSuccess'), esc($currentAdmin->firstname), esc($currentAdmin->lastname));
+	        $message = ui_message('backend/account.messages.resetPasswordSuccess', [esc($currentAdmin->firstname), esc($currentAdmin->lastname)], lang('backend/account.messages.resetPasswordSuccess'));
 	        return ['result' => true, 'message' => $message];
 	        
 	    endif;
@@ -601,7 +601,7 @@ class AccountModel extends BackendModel
 			$transactionStarted = false;
 			$this->clearTemporarySecret();
 
-            log_admin_activity('ACTIVATE_' . strtoupper($method), 'account', sprintf(lang('backend/account.audits.activateMethod'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)), $currentAdmin);
+            log_admin_activity('ACTIVATE_' . strtoupper($method), 'account', ui_message('backend/account.audits.activateMethod', [esc($currentAdmin->firstname), esc($currentAdmin->lastname)], lang('backend/account.audits.activateMethod')), $currentAdmin);
 
             return true;
 
@@ -722,7 +722,7 @@ class AccountModel extends BackendModel
 			$transactionStarted = false;
 			$this->clearTemporarySecret();
 
-            log_admin_activity('ACTIVATE_TOTP', 'account', sprintf(lang('backend/account.audits.activateTotp'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)), $currentAdmin);
+            log_admin_activity('ACTIVATE_TOTP', 'account', ui_message('backend/account.audits.activateTotp', [esc($currentAdmin->firstname), esc($currentAdmin->lastname)], lang('backend/account.audits.activateTotp')), $currentAdmin);
 
             return true;
 

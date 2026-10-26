@@ -116,7 +116,7 @@ class GroupsController extends BackendController
             /* Validazione dei posts */
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/groups.messages.validateToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result' => false, 'message' => ui_message('backend/groups.messages.validateToastErrors', [$errorMessage], lang('backend/groups.messages.validateToastErrors'))]);
             endif;
 
             /* Recuperiamo i dati del gruppo (nome e descrizione) */
@@ -284,7 +284,7 @@ class GroupsController extends BackendController
             /* Validazione dei posts */
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/groups.messages.validateToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result' => false, 'message' => ui_message('backend/groups.messages.validateToastErrors', [$errorMessage], lang('backend/groups.messages.validateToastErrors'))]);
             endif;
 
             if ($this->groupsModel->hasAdminsAttached((int) $posts['id'])):
@@ -365,7 +365,7 @@ class GroupsController extends BackendController
             /* Validazione dei posts */
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/groups.messages.validateToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result' => false, 'message' => ui_message('backend/groups.messages.validateToastErrors', [$errorMessage], lang('backend/groups.messages.validateToastErrors'))]);
             endif;
 
             /* Carichiamo gli amministratori filtrati dal model passando la query */
@@ -398,7 +398,7 @@ class GroupsController extends BackendController
             /* Validazione dei posts */
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/groups.messages.validateToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result' => false, 'message' => ui_message('backend/groups.messages.validateToastErrors', [$errorMessage], lang('backend/groups.messages.validateToastErrors'))]);
             endif;
 
             /* Recuperiamo i dettagli dell'amministratore (ci servirà il suo group_id) */

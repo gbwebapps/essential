@@ -92,7 +92,7 @@ class GalleryOneController extends BackendController
 
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/components/galleryOne.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result' => false, 'message' => ui_message('backend/components/galleryOne.messages.validationToastErrors', [$errorMessage], lang('backend/components/galleryOne.messages.validationToastErrors'))]);
             endif;
 
             if ( ! $this->canAccess($posts)):
@@ -114,7 +114,7 @@ class GalleryOneController extends BackendController
 
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/components/galleryOne.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result' => false, 'message' => ui_message('backend/components/galleryOne.messages.validationToastErrors', [$errorMessage], lang('backend/components/galleryOne.messages.validationToastErrors'))]);
             endif;
 
             if ( ! $this->canAccess($posts)):
@@ -140,7 +140,7 @@ class GalleryOneController extends BackendController
 
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/components/galleryOne.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result' => false, 'message' => ui_message('backend/components/galleryOne.messages.validationToastErrors', [$errorMessage], lang('backend/components/galleryOne.messages.validationToastErrors'))]);
             endif;
 
             if ( ! $this->canAccess($posts)):
@@ -166,7 +166,7 @@ class GalleryOneController extends BackendController
 
             if ( ! $this->validateData($posts, $rules)):
                 $errorMessage = implode('<br>', $this->validator->getErrors());
-                return $this->jsonResponse(['result' => false, 'message' => sprintf(lang('backend/components/galleryOne.messages.validationToastErrors'), $errorMessage)]);
+                return $this->jsonResponse(['result' => false, 'message' => ui_message('backend/components/galleryOne.messages.validationToastErrors', [$errorMessage], lang('backend/components/galleryOne.messages.validationToastErrors'))]);
             endif;
 
             if ( ! $this->canAccess($posts)):

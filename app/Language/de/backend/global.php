@@ -1,6 +1,12 @@
 <?php declare(strict_types = 1);
 
 return [
+    'interface' => [
+        'showPassword' => 'Passwort anzeigen',
+        'hidePassword' => 'Passwort ausblenden',
+        'themes' => 'Designs',
+        'changeError' => 'Die Einstellung konnte nicht geändert werden. Bitte erneut versuchen.',
+    ],
     'menu' => [
         'topRight' => [
             'admins' => 'Administratoren',

@@ -5,7 +5,7 @@
         <div class="col-12 col-lg-4">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <i class="fa-solid fa-arrow-circle-down"></i><?= lang('backend/products.labels.sku'); ?>
+                    <i class="fa-solid fa-arrow-circle-down"></i><?= ui_text('backend/products.labels.sku', [], false); ?>
                 </li>
                 <li class="list-group-item fw-bold"><?= esc($product->sku); ?></li>
             </ul>
@@ -14,7 +14,7 @@
         <div class="col-12 col-lg-5">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <i class="fa-solid fa-arrow-circle-down"></i><?= lang('backend/products.labels.product'); ?>
+                    <i class="fa-solid fa-arrow-circle-down"></i><?= ui_text('backend/products.labels.product', [], false); ?>
                 </li>
                 <li class="list-group-item fw-bold"><?= esc($product->product); ?></li>
             </ul>
@@ -23,7 +23,7 @@
         <div class="col-12 col-lg-3">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <i class="fa-solid fa-arrow-circle-down"></i><?= lang('backend/products.labels.status'); ?>
+                    <i class="fa-solid fa-arrow-circle-down"></i><?= ui_text('backend/products.labels.status', [], false); ?>
                 </li>
                 <li class="list-group-item">
                     <div id="changeStatusPartial">
@@ -40,7 +40,7 @@
         <div class="col-12 col-lg-6">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <i class="fa-solid fa-arrow-circle-down"></i><?= lang('backend/products.labels.quantity'); ?>
+                    <i class="fa-solid fa-arrow-circle-down"></i><?= ui_text('backend/products.labels.quantity', [], false); ?>
                 </li>
                 <li class="list-group-item fw-bold"><?= esc((string) $product->quantity); ?></li>
             </ul>
@@ -49,7 +49,7 @@
         <div class="col-12 col-lg-6">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <i class="fa-solid fa-arrow-circle-down"></i><?= lang('backend/products.labels.price'); ?>
+                    <i class="fa-solid fa-arrow-circle-down"></i><?= ui_text('backend/products.labels.price', [], false); ?>
                 </li>
                 <li class="list-group-item fw-bold"><?= esc(number_format((float) $product->price, 2, ',', '.')); ?></li>
             </ul>
@@ -62,7 +62,7 @@
         <div class="col-12 col-lg-6">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <i class="fa-solid fa-arrow-circle-down"></i><?= lang('backend/products.labels.brands'); ?>
+                    <i class="fa-solid fa-arrow-circle-down"></i><?= ui_text('backend/products.labels.brands', [], false); ?>
                 </li>
                 <li class="list-group-item fw-bold">
                     <?php foreach($product->brands as $brand): ?>
@@ -75,7 +75,7 @@
         <div class="col-12 col-lg-6">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <i class="fa-solid fa-arrow-circle-down"></i><?= lang('backend/products.labels.categories'); ?>
+                    <i class="fa-solid fa-arrow-circle-down"></i><?= ui_text('backend/products.labels.categories', [], false); ?>
                 </li>
                 <li class="list-group-item fw-bold">
                     <?php foreach($product->categories as $category): ?>
@@ -93,7 +93,7 @@
             <div class="col-12">
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">
-                        <i class="fa-solid fa-arrow-circle-down"></i><?= lang('backend/products.labels.note'); ?>
+                        <i class="fa-solid fa-arrow-circle-down"></i><?= ui_text('backend/products.labels.note', [], false); ?>
                     </li>
                     <li class="list-group-item fw-bold"><?= esc($product->note); ?></li>
                 </ul>

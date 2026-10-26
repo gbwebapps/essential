@@ -15,9 +15,11 @@
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <?= $this->include('backend/template/interfacePreferencesPartial'); ?>
+
                     <!-- Attivazione modalità schermo intero -->
                     <li class="nav-item">
-                        <a id="fullscreen-toggle" class="nav-link" href="#" role="button"
+                        <a <?= ui_binding('backend/global.buttons.expandScreen', 'data-expand-text', [], true); ?> <?= ui_binding('backend/global.buttons.reduceScreen', 'data-reduce-text', [], true); ?> <?= ui_binding('backend/global.errors.fullscreenError', 'data-error-text', [], true); ?> <?= ui_binding('backend/global.buttons.expandScreen', 'aria-label', [], true); ?> <?= ui_binding('backend/global.buttons.expandScreen', 'title', [], true); ?> id="fullscreen-toggle" class="nav-link" href="#" role="button"
                            data-expand-text="<?= esc(lang('backend/global.buttons.expandScreen'), 'attr'); ?>"
                            data-reduce-text="<?= esc(lang('backend/global.buttons.reduceScreen'), 'attr'); ?>"
                            data-error-text="<?= esc(lang('backend/global.errors.fullscreenError'), 'attr'); ?>"
@@ -25,7 +27,7 @@
                            aria-pressed="false"
                            title="<?= esc(lang('backend/global.buttons.expandScreen'), 'attr'); ?>">
                             <i class="fa-solid fa-expand" aria-hidden="true"></i>
-                            <span class="ms-1 fullscreen-toggle-text"><?= lang('backend/global.buttons.expandScreen'); ?></span>
+                            <span class="ms-1 fullscreen-toggle-text"><?= ui_text('backend/global.buttons.expandScreen', [], false); ?></span>
                         </a>
                     </li>
 
@@ -75,12 +77,12 @@
                                         <form action="<?= $href; ?>" method="post" data-unsaved-navigation>
                                             <?= csrf_field(); ?>
                                             <button type="submit" class="dropdown-item<?= $activeClass; ?>"<?= $dataIdAttr; ?><?= $dataMessageAttr; ?>>
-                                                <?= $ele['icon'] ?? ''; ?> <span class="ms-1"><?= $ele['label'] ?? ''; ?></span>
+                                                <?= $ele['icon'] ?? ''; ?> <span class="ms-1"><?= ui_value($ele['label'] ?? '', false); ?></span>
                                             </button>
                                         </form>
                                     <?php else: ?>
                                         <a class="dropdown-item<?= $activeClass; ?><?= isset($menuCounts[$eleController]) ? ' d-flex align-items-center gap-3' : ''; ?>" href="<?= $href; ?>"<?= $dataIdAttr; ?><?= $dataMessageAttr; ?>>
-                                            <span><?= $ele['icon'] ?? ''; ?> <span class="ms-1"><?= $ele['label'] ?? ''; ?></span></span>
+                                            <span><?= $ele['icon'] ?? ''; ?> <span class="ms-1"><?= ui_value($ele['label'] ?? '', false); ?></span></span>
                                             <?= view('backend/template/menuCountsPartial', ['menuCountEntity' => $eleController, 'menuCounts' => $menuCounts ?? []]); ?>
                                         </a>
                                     <?php endif; ?>

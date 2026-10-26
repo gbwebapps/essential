@@ -27,7 +27,7 @@
                             <h2 class="accordion-header" id="main_heading_<?= esc($env, 'attr'); ?>">
                                 <button class="accordion-button collapsed shadow-none app-bg-surface app-text-muted py-3 btn-trigger-<?= esc($env, 'attr'); ?>-tools" data-env="<?= esc($env, 'attr'); ?>" type="button" aria-expanded="false" aria-controls="main_collapse_<?= esc($env, 'attr'); ?>">
                                     <h2 class="card-title mb-0 fs-5">
-                                        <i class="fa-solid <?= esc($icon, 'attr'); ?> me-2"></i><?= esc(lang('backend/tools.panels.' . $env)); ?>
+                                        <i class="fa-solid <?= esc($icon, 'attr'); ?> me-2"></i><?= ui_text('backend/tools.panels.' . $env, [], true); ?>
                                     </h2>
                                 </button>
                             </h2>

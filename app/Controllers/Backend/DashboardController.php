@@ -67,7 +67,7 @@ class DashboardController extends BackendController
         $this->data['dashboardRankings'] = $this->dashboardClass->getRankings($overview['rankings']);
         $this->data['dashboardTotals'] = $overview['totals'];
         $this->data['dashboardPresenter'] = $this->dashboardClass;
-        $this->data['dashboardTheme'] = setting('Backend\General', 'theme');
+        $this->data['dashboardTheme'] = backend_theme();
 
         return $this->render('backend/dashboard/indexView', $this->data);
     }

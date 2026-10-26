@@ -38,24 +38,24 @@
                                         <!-- Colonna category -->
                                         <th style="width: 20%;">
                                             <a class="sort" href="#" data-column="category" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'category') ? 'asc' : 'desc'); ?>">
-                                                <?= lang('backend/categories.labels.category'); ?> <?= (($posts['column'] == 'category') ? '&nbsp;' . $icon : ''); ?>
+                                                <?= ui_text('backend/categories.labels.category', [], false); ?> <?= (($posts['column'] == 'category') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
                                         </th>
 
                                         <!-- Colonna percorso -->
                                         <th style="width: 25%;">
-                                            <?= lang('backend/categories.labels.path'); ?>
+                                            <?= ui_text('backend/categories.labels.path', [], false); ?>
                                         </th>
 
                                         <!-- Colonna contenuto -->
                                         <th style="width: 20%;" class="text-center">
-                                            <?= lang('backend/categories.labels.content'); ?>
+                                            <?= ui_text('backend/categories.labels.content', [], false); ?>
                                         </th>
 
                                         <!-- Colonna status -->
                                         <th style="width: 12.5%; text-align: center;">
                                             <a class="sort" href="#" data-column="status" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'status') ? 'asc' : 'desc'); ?>">
-                                                <?= lang('backend/categories.labels.status'); ?>&nbsp;<?= (($posts['column'] == 'status') ? '&nbsp;' . $icon : ''); ?>
+                                                <?= ui_text('backend/categories.labels.status', [], false); ?>&nbsp;<?= (($posts['column'] == 'status') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
                                         </th>
 
@@ -85,7 +85,7 @@
                                             <!-- Cella immagine (rowspan rimosso, aggiunto py-3 per altezza) -->
                                             <td class="align-middle text-center border-end app-bg-surface category-cover-cell py-3<?= is_null($cover) ? ' no-preview-image' : ''; ?>">
                                                 <?php if(is_null($cover)): ?>
-                                                    <span class="fa-stack" role="img" aria-label="<?= esc(lang('backend/categories.labels.noImage'), 'attr'); ?>">
+                                                    <span <?= ui_binding('backend/categories.labels.noImage', 'aria-label', [], true); ?> class="fa-stack" role="img" aria-label="<?= esc(lang('backend/categories.labels.noImage'), 'attr'); ?>">
                                                         <i class="fa-solid fa-camera fa-stack-1x"></i>
                                                         <i class="fa-solid fa-slash fa-stack-1x"></i>
                                                     </span>
@@ -96,7 +96,7 @@
 
                                             <!-- Cella chevron -->
                                             <td class="align-middle fw-bold">
-                                                <button class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 app-text shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($category->uuid, 'attr'); ?>" aria-expanded="false" title="<?= esc(lang('backend/categories.buttons.showSystemDetails'), 'attr'); ?>">
+                                                <button <?= ui_binding('backend/categories.buttons.showSystemDetails', 'title', [], true); ?> class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 app-text shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($category->uuid, 'attr'); ?>" aria-expanded="false" title="<?= esc(lang('backend/categories.buttons.showSystemDetails'), 'attr'); ?>">
                                                     <i class="fa-solid fa-chevron-right"></i>
                                                 </button>
                                             </td>
@@ -115,19 +115,19 @@
                                             <td class="align-middle text-center">
                                                 <div class="d-flex flex-column align-items-center gap-1">
                                                     <?php if($hasChildren): ?>
-                                                        <span class="badge app-bg-muted-subtle app-text-muted-emphasis"><?= lang('backend/categories.labels.containsCategories'); ?></span>
+                                                        <span class="badge app-bg-muted-subtle app-text-muted-emphasis"><?= ui_text('backend/categories.labels.containsCategories', [], false); ?></span>
                                                     <?php endif; ?>
 
                                                     <?php if($hasProducts): ?>
-                                                        <span class="badge app-bg-info"><?= lang('backend/categories.labels.containsProducts'); ?></span>
+                                                        <span class="badge app-bg-info"><?= ui_text('backend/categories.labels.containsProducts', [], false); ?></span>
                                                     <?php endif; ?>
 
                                                     <?php if( ! $hasChildren && ! $hasProducts): ?>
-                                                        <span class="badge app-bg-muted-subtle app-text-muted-emphasis"><?= lang('backend/categories.labels.emptyCategory'); ?></span>
+                                                        <span class="badge app-bg-muted-subtle app-text-muted-emphasis"><?= ui_text('backend/categories.labels.emptyCategory', [], false); ?></span>
                                                     <?php endif; ?>
 
                                                     <?php if($isTrashed): ?>
-                                                        <span class="badge app-bg-danger"><?= lang('backend/categories.labels.deleted'); ?></span>
+                                                        <span class="badge app-bg-danger"><?= ui_text('backend/categories.labels.deleted', [], false); ?></span>
                                                     <?php endif; ?>
                                                 </div>
                                             </td>
@@ -147,15 +147,15 @@
                                                             $statusClass ="app-text-danger btn btn-link shadow-none fw-bold";
                                                         endif;
                                                     ?>
-                                                    <form class="changeStatus" data-controller="categories" data-message="<?= esc(sprintf(lang('backend/categories.messages.areYouSureChangeStatus'), $category->category), 'attr'); ?>">
+                                                    <form <?= ui_binding('backend/categories.messages.areYouSureChangeStatus', 'data-message', [$category->category], true); ?> class="changeStatus" data-controller="categories" data-message="<?= esc(sprintf(lang('backend/categories.messages.areYouSureChangeStatus'), $category->category), 'attr'); ?>">
                                                         <input type="hidden" name="uuid" value="<?= esc($category->uuid, 'attr'); ?>">
                                                         <button type="submit" class="<?= esc($statusClass, 'attr'); ?>">
-                                                            <?= $statusText; ?>
+                                                            <?= ui_value($statusText, false); ?>
                                                         </button>
                                                     </form>
                                                 <?php else: ?>
                                                     <?php if($isTrashed): ?>
-                                                        <span class="badge app-bg-danger category-deleted-status p-2 border-0 rounded-1"><?= lang('backend/categories.labels.deleted'); ?></span>
+                                                        <span class="badge app-bg-danger category-deleted-status p-2 border-0 rounded-1"><?= ui_text('backend/categories.labels.deleted', [], false); ?></span>
                                                     <?php endif; ?>
                                                 <?php endif; ?>
 
@@ -170,37 +170,37 @@
                                                         
                                                         <!-- Pulsante Dettaglio -->
                                                         <a href="<?= esc(base_url('backend/categories/show/' . rawurlencode($category->uuid)), 'attr'); ?>" class="text-decoration-none badge app-bg-muted-subtle app-text-muted-emphasis action">
-                                                            <i class="fa-solid fa-eye fa-fw"></i> <?= lang('backend/categories.actions.show'); ?>
+                                                            <i class="fa-solid fa-eye fa-fw"></i> <?= ui_text('backend/categories.actions.show', [], false); ?>
                                                         </a>
 
                                                         <!-- Pulsante Aggiorna -->
                                                         <a href="<?= esc(base_url('backend/categories/edit/' . rawurlencode($category->uuid)), 'attr'); ?>" class="text-decoration-none badge app-bg-muted-subtle app-text-muted-emphasis action">
-                                                            <i class="fa-solid fa-pen fa-fw"></i> <?= lang('backend/categories.actions.edit'); ?>
+                                                            <i class="fa-solid fa-pen fa-fw"></i> <?= ui_text('backend/categories.actions.edit', [], false); ?>
                                                         </a>
 
                                                         <!-- Pulsante Elimina (Soft Delete) -->
-                                                        <form class="deleteRecord m-0 p-0" data-controller="categories" data-message="<?= esc(sprintf(lang('backend/categories.messages.areYouSureSoftDelete'), $category->category), 'attr'); ?>">
+                                                        <form <?= ui_binding('backend/categories.messages.areYouSureSoftDelete', 'data-message', [$category->category], true); ?> class="deleteRecord m-0 p-0" data-controller="categories" data-message="<?= esc(sprintf(lang('backend/categories.messages.areYouSureSoftDelete'), $category->category), 'attr'); ?>">
                                                             <input type="hidden" name="uuid" value="<?= esc($category->uuid, 'attr'); ?>">
                                                             <button type="submit" class="btn badge app-bg-danger-subtle app-text-danger-emphasis action shadow-none w-100 border-0">
-                                                                <i class="fa-solid fa-xmark fa-fw"></i> <?= lang('backend/categories.actions.softDelete'); ?>
+                                                                <i class="fa-solid fa-xmark fa-fw"></i> <?= ui_text('backend/categories.actions.softDelete', [], false); ?>
                                                             </button>
                                                         </form>
                                                         
                                                     <?php else: ?>
                                                         
                                                         <!-- Pulsante Ripristina (Restore Delete) -->
-                                                        <form class="restoreRecord m-0 p-0" data-controller="categories" data-message="<?= esc(sprintf(lang('backend/categories.messages.areYouSureRestoreDelete'), $category->category), 'attr'); ?>">
+                                                        <form <?= ui_binding('backend/categories.messages.areYouSureRestoreDelete', 'data-message', [$category->category], true); ?> class="restoreRecord m-0 p-0" data-controller="categories" data-message="<?= esc(sprintf(lang('backend/categories.messages.areYouSureRestoreDelete'), $category->category), 'attr'); ?>">
                                                             <input type="hidden" name="uuid" value="<?= esc($category->uuid, 'attr'); ?>">
                                                             <button type="submit" class="btn badge app-bg-success-subtle app-text-success-emphasis action shadow-none w-100 border-0">
-                                                                <i class="fa-solid fa-trash-arrow-up fa-fw"></i> <?= lang('backend/categories.actions.restoreDelete'); ?>
+                                                                <i class="fa-solid fa-trash-arrow-up fa-fw"></i> <?= ui_text('backend/categories.actions.restoreDelete', [], false); ?>
                                                             </button>
                                                         </form>
 
                                                         <!-- Pulsante Elimina Definitivamente (Hard Delete) -->
-                                                        <form class="hardDeleteRecord m-0 p-0" data-controller="categories" data-message="<?= esc(sprintf(lang('backend/categories.messages.areYouSureHardDelete'), $category->category), 'attr'); ?>">
+                                                        <form <?= ui_binding('backend/categories.messages.areYouSureHardDelete', 'data-message', [$category->category], true); ?> class="hardDeleteRecord m-0 p-0" data-controller="categories" data-message="<?= esc(sprintf(lang('backend/categories.messages.areYouSureHardDelete'), $category->category), 'attr'); ?>">
                                                             <input type="hidden" name="uuid" value="<?= esc($category->uuid, 'attr'); ?>">
                                                             <button type="submit" class="btn badge app-bg-danger-subtle app-text-danger-emphasis action shadow-none w-100 border-0">
-                                                                <i class="fa-solid fa-xmark fa-fw"></i> <?= lang('backend/categories.actions.hardDelete'); ?>
+                                                                <i class="fa-solid fa-xmark fa-fw"></i> <?= ui_text('backend/categories.actions.hardDelete', [], false); ?>
                                                             </button>
                                                         </form>
                                                         
@@ -224,24 +224,24 @@
                                                     <div class="p-2 border-bottom app-bg-surface app-text small">
                                                         
                                                         <!-- Parte creato -->
-                                                        <?= lang('backend/categories.labels.createdAt'); ?> <span class="fw-bold app-text-success"><?= convertDate(esc($category->created_at), 'conversational'); ?></span>
+                                                        <?= ui_text('backend/categories.labels.createdAt', [], false); ?> <span class="fw-bold app-text-success"><?= ui_date(esc($category->created_at), 'conversational'); ?></span>
 
                                                         <!-- Parte aggiornato -->
                                                         <?php if( ! is_null($category->updated_at)): ?>
                                                             &nbsp;&bull;&nbsp;
-                                                            <?= lang('backend/categories.labels.updatedAt'); ?> <span class="fw-bold app-text-success"><?= convertDate(esc($category->updated_at), 'conversational'); ?></span>
+                                                            <?= ui_text('backend/categories.labels.updatedAt', [], false); ?> <span class="fw-bold app-text-success"><?= ui_date(esc($category->updated_at), 'conversational'); ?></span>
                                                         <?php endif; ?>
 
                                                         <!-- Parte ripristinato -->
                                                         <?php if( ! is_null($category->restored_at)): ?>
                                                             &nbsp;&bull;&nbsp;
-                                                            <?= lang('backend/categories.labels.restoredAt'); ?> <span class="fw-bold app-text-success"><?= convertDate(esc($category->restored_at), 'conversational'); ?></span>
+                                                            <?= ui_text('backend/categories.labels.restoredAt', [], false); ?> <span class="fw-bold app-text-success"><?= ui_date(esc($category->restored_at), 'conversational'); ?></span>
                                                         <?php endif; ?>
 
                                                         <!-- Parte eliminato (Cestinato) -->
                                                         <?php if($isTrashed): ?>
                                                             &nbsp;&bull;&nbsp;
-                                                            <?= lang('backend/categories.labels.deletedAt'); ?> <span class="fw-bold app-text-danger"><?= convertDate(esc($category->deleted_at), 'conversational'); ?></span>
+                                                            <?= ui_text('backend/categories.labels.deletedAt', [], false); ?> <span class="fw-bold app-text-danger"><?= ui_date(esc($category->deleted_at), 'conversational'); ?></span>
                                                         <?php endif; ?>
 
                                                     </div>
@@ -264,7 +264,7 @@
 
             <!-- ...altrimenti visualizzo messaggio adeguato. -->
             <?php else: ?>
-                <div class="text-center py-3 fw-bold"><?= lang('backend/categories.messages.noCategoriesFound'); ?></div>
+                <div class="text-center py-3 fw-bold"><?= ui_text('backend/categories.messages.noCategoriesFound', [], false); ?></div>
             <?php endif; ?>
         </div>
     </div>

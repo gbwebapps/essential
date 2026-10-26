@@ -14,7 +14,7 @@
                 <div class="card-header">
                     <h2 class="card-title text-center text-lg-start mb-0">
 						<?= $sections['general']['icon']; ?>
-                        <?= lang('backend/account.titles.general'); ?>
+                        <?= ui_text('backend/account.titles.general', [], false); ?>
                     </h2>
                 </div>
                 <div id="general-account-container">

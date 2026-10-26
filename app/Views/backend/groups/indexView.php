@@ -12,7 +12,7 @@
                         <h2 class="accordion-header" id="main_heading_add">
                             <button class="accordion-button collapsed shadow-none app-bg-surface app-text-muted py-3 btn-trigger-add-group" type="button" aria-expanded="false" aria-controls="main_collapse_add">
                                 <h2 class="card-title mb-0 fs-5">
-                                    <i class="fa-solid fa-plus-circle me-2"></i><?= lang('backend/groups.panels.addGroup'); ?>
+                                    <i class="fa-solid fa-plus-circle me-2"></i><?= ui_text('backend/groups.panels.addGroup', [], false); ?>
                                 </h2>
                             </button>
                         </h2>
@@ -25,7 +25,7 @@
                         <h2 class="accordion-header" id="main_heading_list">
                             <button class="accordion-button collapsed shadow-none app-bg-surface app-text-muted py-3" type="button" data-bs-toggle="collapse" data-bs-target="#main_collapse_list" aria-expanded="false" aria-controls="main_collapse_list">
                                 <h2 class="card-title mb-0 fs-5">
-                                    <i class="fa-solid fa-list me-2"></i><?= lang('backend/groups.panels.listGroup'); ?>
+                                    <i class="fa-solid fa-list me-2"></i><?= ui_text('backend/groups.panels.listGroup', [], false); ?>
                                 </h2>
                             </button>
                         </h2>
@@ -38,7 +38,7 @@
                         <h2 class="accordion-header" id="main_heading_exceptions">
                             <button class="accordion-button collapsed shadow-none app-bg-surface app-text-muted py-3 btn-trigger-exceptions-group" type="button" aria-expanded="false" aria-controls="main_collapse_exceptions">
                                 <h2 class="card-title mb-0 fs-5">
-                                    <i class="fa-solid fa-code-branch me-2"></i><?= lang('backend/groups.panels.exceptionsPerms'); ?>
+                                    <i class="fa-solid fa-code-branch me-2"></i><?= ui_text('backend/groups.panels.exceptionsPerms', [], false); ?>
                                 </h2>
                             </button>
                         </h2>

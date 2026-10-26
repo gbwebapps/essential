@@ -28,35 +28,35 @@
                                         <!-- Colonna email -->
                                         <th style="width: 20%;">
                                             <a class="sort" href="#" data-column="email" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'email') ? 'asc' : 'desc'); ?>">
-                                                <?= lang('backend/tokens.labels.username'); ?> <?= (($posts['column'] == 'email') ? '&nbsp;' . $icon : ''); ?>
+                                                <?= ui_text('backend/tokens.labels.username', [], false); ?> <?= (($posts['column'] == 'email') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
                                         </th>
 
                                         <!-- Colonna data inizio -->
                                         <th style="width: 20%;">
                                             <a class="sort" href="#" data-column="token_create" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'token_create') ? 'asc' : 'desc'); ?>">
-                                                <?= lang('backend/tokens.labels.tokenCreate'); ?>&nbsp;<?= (($posts['column'] == 'token_create') ? '&nbsp;' . $icon : ''); ?>
+                                                <?= ui_text('backend/tokens.labels.tokenCreate', [], false); ?>&nbsp;<?= (($posts['column'] == 'token_create') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
                                         </th>
 
                                         <!-- Colonna data fine -->
                                         <th style="width: 20%;">
                                             <a class="sort" href="#" data-column="token_expire" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'token_expire') ? 'asc' : 'desc'); ?>">
-                                                <?= lang('backend/tokens.labels.tokenExpire'); ?>&nbsp;<?= (($posts['column'] == 'token_expire') ? '&nbsp;' . $icon : ''); ?>
+                                                <?= ui_text('backend/tokens.labels.tokenExpire', [], false); ?>&nbsp;<?= (($posts['column'] == 'token_expire') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
                                         </th>
 
                                         <!-- Colonna token_type -->
                                         <th style="width: 12.5%;">
                                             <a class="sort" href="#" data-column="token_type" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'token_type') ? 'asc' : 'desc'); ?>">
-                                                <?= lang('backend/tokens.labels.tokenType'); ?>&nbsp;<?= (($posts['column'] == 'token_type') ? '&nbsp;' . $icon : ''); ?>
+                                                <?= ui_text('backend/tokens.labels.tokenType', [], false); ?>&nbsp;<?= (($posts['column'] == 'token_type') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
                                         </th>
 
                                         <!-- Colonna created_at -->
                                         <th style="width: 17.5%;">
                                             <a class="sort" href="#" data-column="created_at" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'created_at') ? 'asc' : 'desc'); ?>">
-                                                <?= lang('backend/tokens.labels.createdAt'); ?>&nbsp;<?= (($posts['column'] == 'created_at') ? '&nbsp;' . $icon : ''); ?>
+                                                <?= ui_text('backend/tokens.labels.createdAt', [], false); ?>&nbsp;<?= (($posts['column'] == 'created_at') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
                                         </th>
 
@@ -96,7 +96,7 @@
                                         <tr class="border-end border-start table-row-60<?= $isSuperadmin ? ' table-bg-superadmin' : ''; ?>">
                                             <!-- Cella chevron -->
                                             <td class="align-middle fw-bold">
-                                                <button class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 app-text-muted shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($token->id, 'attr'); ?>" aria-expanded="false" title="<?= esc(lang('backend/tokens.labels.showSystemDetails'), 'attr'); ?>">
+                                                <button <?= ui_binding('backend/tokens.labels.showSystemDetails', 'title', [], true); ?> class="toggle-meta-btn btn btn-sm btn-link p-0 me-1 app-text-muted shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#meta-<?= esc($token->id, 'attr'); ?>" aria-expanded="false" title="<?= esc(lang('backend/tokens.labels.showSystemDetails'), 'attr'); ?>">
                                                     <i class="fa-solid fa-chevron-right"></i>
                                                 </button>
                                             </td>
@@ -108,22 +108,22 @@
 
                                             <!-- Cella token_create -->
                                             <td class="align-middle">
-                                                <span class="fw-bold"><?= convertDate(esc($token->token_create), 'conversational'); ?></span>
+                                                <span class="fw-bold"><?= ui_date(esc($token->token_create), 'conversational'); ?></span>
                                             </td>
 
                                             <!-- Cella token_expire -->
                                             <td class="align-middle">
-                                                <span class="<?= $class; ?>"><?= convertDate($dateExpire->format('Y-m-d H:i:s'), 'conversational'); ?></span>
+                                                <span class="<?= $class; ?>"><?= ui_date($dateExpire->format('Y-m-d H:i:s'), 'conversational'); ?></span>
                                             </td>
 
                                             <!-- Cella token_type -->
                                             <td class="align-middle">
-                                                <span class="fw-bold"><?= esc($tokenType); ?></span>
+                                                <span class="fw-bold"><?= ui_value($tokenType); ?></span>
                                             </td>
 
                                             <!-- Cella created_at -->
                                             <td class="align-middle">
-                                                <span class="fw-bold"><?= convertDate(esc($token->created_at), 'conversational'); ?></span>
+                                                <span class="fw-bold"><?= ui_date(esc($token->created_at), 'conversational'); ?></span>
                                             </td>
 
                                             <!-- Cella actions -->
@@ -134,11 +134,11 @@
                                                     <div class="d-flex flex-column gap-1">
 
                                                         <!-- Pulsante Elimina Definitivamente (Hard Delete) -->
-                                                        <form class="hardDeleteRecord m-0 p-0" data-controller="tokens" data-message="<?= esc(sprintf(lang('backend/tokens.messages.areYouSureHardDelete'), $token->firstname, $token->lastname), 'attr'); ?>">
+                                                        <form <?= ui_binding('backend/tokens.messages.areYouSureHardDelete', 'data-message', [$token->firstname, $token->lastname], true); ?> class="hardDeleteRecord m-0 p-0" data-controller="tokens" data-message="<?= esc(sprintf(lang('backend/tokens.messages.areYouSureHardDelete'), $token->firstname, $token->lastname), 'attr'); ?>">
                                                             <input type="hidden" name="uuid" value="<?= esc($token->uuid, 'attr'); ?>">
                                                             <input type="hidden" name="id" value="<?= esc($token->id, 'attr'); ?>">
                                                             <button type="submit" class="btn btn-link px-2 py-1 m-0 app-text-danger text-decoration-none action shadow-none">
-                                                                <i class="fa-solid fa-xmark fa-fw"></i> <?= lang('backend/tokens.actions.hardDelete'); ?>
+                                                                <i class="fa-solid fa-xmark fa-fw"></i> <?= ui_text('backend/tokens.actions.hardDelete', [], false); ?>
                                                             </button>
                                                         </form>
 
@@ -167,23 +167,23 @@
                                                             $userAgent->parse($token->user_agent);
 
                                                             /* Inizializzazione corretta della variabile in camelCase */
-                                                            $agentText = '<span class="text-white">' . lang('backend/tokens.labels.operatingSystem') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
+                                                            $agentText = '<span class="text-white">' . ui_text('backend/tokens.labels.operatingSystem') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
                                                         ?>
 
                                                         <?php
                                                             /* Valutazione con metodi nativi in camelCase di CodeIgniter 4 */
                                                             if($userAgent->isBrowser()):
-                                                                $agentText .= ' &bull; <span class="text-white">' . lang('backend/tokens.labels.browser') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
+                                                                $agentText .= ' &bull; <span class="text-white">' . ui_text('backend/tokens.labels.browser') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
                                                             elseif($userAgent->isMobile()):
-                                                                $agentText .= ' &bull; <span class="text-white">' . lang('backend/tokens.labels.mobile') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getMobile()) . '</span>';
+                                                                $agentText .= ' &bull; <span class="text-white">' . ui_text('backend/tokens.labels.mobile') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getMobile()) . '</span>';
                                                             elseif($userAgent->isRobot()):
-                                                                $agentText .= ' &bull; <span class="text-white">' . lang('backend/tokens.labels.robot') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getRobot()) . '</span>';
+                                                                $agentText .= ' &bull; <span class="text-white">' . ui_text('backend/tokens.labels.robot') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getRobot()) . '</span>';
                                                             endif;
                                                         ?>
 
                                                         <?= $agentText; ?>
                                                         &nbsp;&bull;&nbsp;
-                                                        <span class="text-white"><?= lang('backend/tokens.labels.ipAddress'); ?></span>
+                                                        <span class="text-white"><?= ui_text('backend/tokens.labels.ipAddress', [], false); ?></span>
                                                         <span class="text-primary fw-bold"><?= esc($token->ip_address); ?></span>
                                                         <!-- End parte useragent -->
 
@@ -207,7 +207,7 @@
 
             <!-- ...altrimenti visualizzo messaggio adeguato. -->
             <?php else: ?>
-                <div class="text-center py-3 fw-bold"><?= lang('backend/tokens.messages.noTokensFound'); ?></div>
+                <div class="text-center py-3 fw-bold"><?= ui_text('backend/tokens.messages.noTokensFound', [], false); ?></div>
             <?php endif; ?>
         </div>
     </div>

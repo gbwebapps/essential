@@ -172,7 +172,7 @@ class WarehouseImportModel extends ImportModel
                 $current = $currentByUuid[$table][$uuid] ?? null;
 
                 if ($table === 'products' && $current === null && $fileId === null):
-                    $errors[] = sprintf(lang('backend/warehouse.messages.requiredId'), $table, $line);
+                    $errors[] = ui_message('backend/warehouse.messages.requiredId', [$table, $line], lang('backend/warehouse.messages.requiredId'));
                     continue;
                 endif;
 
@@ -193,7 +193,7 @@ class WarehouseImportModel extends ImportModel
                     endif;
 
                     if ($current !== null && (int) $current['id'] !== (int) $fileId):
-                        $errors[] = sprintf(lang('backend/warehouse.messages.idUuidMismatch'), $table, $line);
+                        $errors[] = ui_message('backend/warehouse.messages.idUuidMismatch', [$table, $line], lang('backend/warehouse.messages.idUuidMismatch'));
                         continue;
                     endif;
 
@@ -612,7 +612,7 @@ class WarehouseImportModel extends ImportModel
         $errors = [];
 
         foreach ($validator->getErrors() as $field => $error):
-            $errors[$field] = sprintf(lang('backend/warehouse.messages.invalidCell'), $table, $operation['line'], $field) . ' ' . $error;
+            $errors[$field] = ui_message('backend/warehouse.messages.invalidCell', [$table, $operation['line'], $field], lang('backend/warehouse.messages.invalidCell')) . ' ' . $error;
         endforeach;
 
         if ($table === 'products' && array_key_exists('price', $operation['data'])
@@ -806,9 +806,9 @@ class WarehouseImportModel extends ImportModel
                 $hasChildren[(int) $parentId] = true;
 
                 if ( ! isset($categories[$parentId]) || (int) $parentId === (int) $id || $categories[$parentId]['deleted_at'] !== null):
-                    $errors[] = sprintf(lang('backend/warehouse.messages.invalidParent'), $id);
+                    $errors[] = ui_message('backend/warehouse.messages.invalidParent', [$id], lang('backend/warehouse.messages.invalidParent'));
                 elseif ((int) $categories[$parentId]['status'] !== 1):
-                    $errors[] = sprintf(lang('backend/warehouse.messages.suspendedParent'), $id);
+                    $errors[] = ui_message('backend/warehouse.messages.suspendedParent', [$id], lang('backend/warehouse.messages.suspendedParent'));
                 endif;
             endif;
         endforeach;
@@ -834,9 +834,9 @@ class WarehouseImportModel extends ImportModel
 
         foreach ($projected['brands_to_products'] as $row):
             if ( ! isset($brands[$row['brand_id']], $products[$row['product_id']]) || $brands[$row['brand_id']]['deleted_at'] !== null):
-                $errors[] = sprintf(lang('backend/warehouse.messages.invalidRelation'), 'brands_to_products', 0);
+                $errors[] = ui_message('backend/warehouse.messages.invalidRelation', ['brands_to_products', 0], lang('backend/warehouse.messages.invalidRelation'));
             elseif ((int) $brands[$row['brand_id']]['status'] !== 1):
-                $errors[] = sprintf(lang('backend/warehouse.messages.suspendedBrand'), $row['brand_id']);
+                $errors[] = ui_message('backend/warehouse.messages.suspendedBrand', [$row['brand_id']], lang('backend/warehouse.messages.suspendedBrand'));
             endif;
 
             if ((int) $row['status'] === 1):
@@ -846,13 +846,13 @@ class WarehouseImportModel extends ImportModel
 
         foreach ($projected['categories_to_products'] as $row):
             if ( ! isset($categories[$row['category_id']], $products[$row['product_id']]) || $categories[$row['category_id']]['deleted_at'] !== null):
-                $errors[] = sprintf(lang('backend/warehouse.messages.invalidRelation'), 'categories_to_products', 0);
+                $errors[] = ui_message('backend/warehouse.messages.invalidRelation', ['categories_to_products', 0], lang('backend/warehouse.messages.invalidRelation'));
             elseif ((int) $categories[$row['category_id']]['status'] !== 1):
-                $errors[] = sprintf(lang('backend/warehouse.messages.suspendedCategory'), $row['category_id']);
+                $errors[] = ui_message('backend/warehouse.messages.suspendedCategory', [$row['category_id']], lang('backend/warehouse.messages.suspendedCategory'));
             endif;
 
             if (isset($hasChildren[$row['category_id']])):
-                $errors[] = sprintf(lang('backend/warehouse.messages.mixedCategoryContents'), $row['category_id']);
+                $errors[] = ui_message('backend/warehouse.messages.mixedCategoryContents', [$row['category_id']], lang('backend/warehouse.messages.mixedCategoryContents'));
             endif;
 
             if ((int) $row['status'] === 1):
@@ -862,7 +862,7 @@ class WarehouseImportModel extends ImportModel
 
         foreach ($products as $id => $product):
             if ( ! isset($hasBrand[$id], $hasCategory[$id])):
-                $errors[] = sprintf(lang('backend/warehouse.messages.missingProductRelations'), $product['sku'] ?? $id);
+                $errors[] = ui_message('backend/warehouse.messages.missingProductRelations', [$product['sku'] ?? $id], lang('backend/warehouse.messages.missingProductRelations'));
             endif;
         endforeach;
 
@@ -878,13 +878,13 @@ class WarehouseImportModel extends ImportModel
     /** Identifica il campo che contiene il valore non valido. */
     private function rowError(string $table, int $line, string $field): string
     {
-        return sprintf(lang('backend/warehouse.messages.invalidCell'), $table, $line, $field);
+        return ui_message('backend/warehouse.messages.invalidCell', [$table, $line, $field], lang('backend/warehouse.messages.invalidCell'));
     }
 
     /** Identifica un duplicato all'interno del singolo foglio. */
     private function duplicateError(string $table, int $line, string $field): string
     {
-        return sprintf(lang('backend/warehouse.messages.duplicateValue'), $table, $line, $field);
+        return ui_message('backend/warehouse.messages.duplicateValue', [$table, $line, $field], lang('backend/warehouse.messages.duplicateValue'));
     }
 
     /** Converte ogni falso del Query Builder in un fallimento della transazione. */

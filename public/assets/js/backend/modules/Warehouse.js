@@ -1,6 +1,6 @@
 /* Il flusso del modale resta quello del componente Import condiviso. */
 import { ImportCsvManager } from '../components/ImportCsv.js';
-import { urlbase, apiFetch, showAlert, smoothReplace } from '../backend.js';
+import { urlbase, apiFetch, showAlert, smoothReplace, changeLanguageManager } from '../backend.js';
 
 /* Pausa dimostrativa fra blocchi da cinque, senza rallentare i componenti CSV. */
 const CHUNK_DELAY_MS = 350;
@@ -242,6 +242,7 @@ export class WarehouseExportManager {
 
                 if (progress && typeof data.progressMessage === 'string') {
                     progress.textContent = data.progressMessage;
+                    changeLanguageManager.bindMessage(progress, data.progressMessage, true);
                 }
 
                 await new Promise(resolve => setTimeout(resolve, CHUNK_DELAY_MS));

@@ -181,7 +181,7 @@ class ExportController extends BackendController
 
         return $this->jsonResponse([
             'result' => false,
-            'message' => sprintf(lang('backend/components/export.messages.validateToastErrors'), $errorMessage),
+            'message' => ui_message('backend/components/export.messages.validateToastErrors', [$errorMessage], lang('backend/components/export.messages.validateToastErrors')),
         ]);
     }
 }

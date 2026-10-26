@@ -27,7 +27,7 @@
                 <?php endforeach; ?>
             <?php else: ?>
                 <div class="text-center app-text-muted py-3">
-                    <?= lang('backend/groups.messages.noGroupFound'); ?>
+                    <?= ui_text('backend/groups.messages.noGroupFound', [], false); ?>
                 </div>
             <?php endif; ?>
 

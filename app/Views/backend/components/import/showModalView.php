@@ -5,14 +5,14 @@
 
             <div class="modal-header border-0 flex-wrap gap-2">
                 <h5 class="modal-title">
-                    <i class="fa-solid fa-file-import"></i> <?= isset($modalTitle) ? esc($modalTitle) : sprintf(lang('backend/components/import.panels.main'), esc($entity)); ?>
+                    <i class="fa-solid fa-file-import"></i> <?= isset($modalTitle) ? ui_value($modalTitle) : ui_text('backend/components/import.panels.main', [esc($entity)]); ?>
                 </h5>
                 <div class="d-flex gap-2 ms-auto">
                     <button type="button" id="btnCancelImportTop" class="btn app-btn-danger btn-sm" data-bs-dismiss="modal">
-                        <i class="fa-solid fa-xmark"></i> <span data-import-close-label data-close="<?= esc(lang('backend/components/import.buttons.close'), 'attr'); ?>" data-cancel="<?= esc(lang('backend/components/import.buttons.cancel'), 'attr'); ?>"><?= lang('backend/components/import.buttons.close'); ?></span>
+                        <i class="fa-solid fa-xmark"></i> <span <?= ui_binding('backend/components/import.buttons.close', 'data-close', [], true); ?> <?= ui_binding('backend/components/import.buttons.cancel', 'data-cancel', [], true); ?> data-import-close-label data-close="<?= esc(lang('backend/components/import.buttons.close'), 'attr'); ?>" data-cancel="<?= esc(lang('backend/components/import.buttons.cancel'), 'attr'); ?>"><?= ui_text('backend/components/import.buttons.close', [], false); ?></span>
                     </button>
                     <button type="submit" class="btn app-btn-success btn-sm" form="importForm">
-                        <i class="fa-solid fa-file-import"></i> <?= lang('backend/components/import.buttons.import'); ?>
+                        <i class="fa-solid fa-file-import"></i> <?= ui_text('backend/components/import.buttons.import', [], false); ?>
                     </button>
                 </div>
             </div>
@@ -37,7 +37,7 @@
                             <!-- Link per il download del template CSV coerente con il contesto di importazione -->
                             <div class="d-flex justify-content-center mb-3 lead">
                                 <a href="<?= esc($downloadUrl, 'attr'); ?>">
-                                    <i class="fa-solid fa-download"></i> <?= isset($templateLabel) ? esc($templateLabel) : sprintf(lang('backend/components/import.links.downloadTemplate'), esc($entity)); ?>
+                                    <i class="fa-solid fa-download"></i> <?= isset($templateLabel) ? ui_value($templateLabel) : ui_text('backend/components/import.links.downloadTemplate', [esc($entity)]); ?>
                                 </a>
                             </div>
 
@@ -57,10 +57,10 @@
                             <table class="table table-sm table-bordered align-middle<?= ! empty($compactStructures) ? ' small mb-0' : ''; ?>">
                                 <thead class="app-table-header">
                                     <tr>
-                                        <th><?= lang('backend/components/import.labels.columnName'); ?></th>
-                                        <th><?= lang('backend/components/import.labels.dataType'); ?></th>
-                                        <th><?= lang('backend/components/import.labels.maxLength'); ?></th>
-                                        <th class="text-center"><?= lang('backend/components/import.labels.keysAndIndexes'); ?></th>
+                                        <th><?= ui_text('backend/components/import.labels.columnName', [], false); ?></th>
+                                        <th><?= ui_text('backend/components/import.labels.dataType', [], false); ?></th>
+                                        <th><?= ui_text('backend/components/import.labels.maxLength', [], false); ?></th>
+                                        <th class="text-center"><?= ui_text('backend/components/import.labels.keysAndIndexes', [], false); ?></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -83,7 +83,7 @@
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <tr>
-                                            <td colspan="4" class="text-center app-text-muted"><?= lang('backend/components/import.messages.noStructure'); ?></td>
+                                            <td colspan="4" class="text-center app-text-muted"><?= ui_text('backend/components/import.messages.noStructure', [], false); ?></td>
                                         </tr>
                                     <?php endif; ?>
                                 </tbody>
@@ -101,9 +101,9 @@
                         <!-- Input per caricamento file CSV -->
                         <div class="mb-3">
                             <?php if (isset($uploadHelp)): ?>
-                                <p class="small app-text-muted"><?= esc($uploadHelp); ?></p>
+                                <p class="small app-text-muted" <?= isset($uploadHelpParts) ? ui_parts($uploadHelpParts, 'text') : ui_value_binding($uploadHelp); ?>><?= esc($uploadHelp); ?></p>
                             <?php endif; ?>
-                            <label for="csvFile" class="form-label fw-bold"><?= esc($uploadLabel ?? lang('backend/components/import.labels.uploadCsv')); ?></label>
+                            <label for="csvFile" class="form-label fw-bold"><?= ui_value($uploadLabel ?? lang('backend/components/import.labels.uploadCsv')); ?></label>
                             <input class="form-control form-control-sm" type="file" id="csvFile" name="<?= esc($uploadName ?? 'csvFile', 'attr'); ?>" accept="<?= esc($uploadAccept ?? '.csv,.txt,text/csv,text/plain', 'attr'); ?>">
                         </div>
 
@@ -116,10 +116,10 @@
 
             <div class="modal-footer border-0">
                 <button type="button" id="btnCancelImport" class="btn app-btn-danger btn-sm" data-bs-dismiss="modal">
-                    <i class="fa-solid fa-xmark"></i> <span data-import-close-label data-close="<?= esc(lang('backend/components/import.buttons.close'), 'attr'); ?>" data-cancel="<?= esc(lang('backend/components/import.buttons.cancel'), 'attr'); ?>"><?= lang('backend/components/import.buttons.close'); ?></span>
+                    <i class="fa-solid fa-xmark"></i> <span <?= ui_binding('backend/components/import.buttons.close', 'data-close', [], true); ?> <?= ui_binding('backend/components/import.buttons.cancel', 'data-cancel', [], true); ?> data-import-close-label data-close="<?= esc(lang('backend/components/import.buttons.close'), 'attr'); ?>" data-cancel="<?= esc(lang('backend/components/import.buttons.cancel'), 'attr'); ?>"><?= ui_text('backend/components/import.buttons.close', [], false); ?></span>
                 </button>
                 <button type="submit" class="btn app-btn-success btn-sm" form="importForm">
-                    <i class="fa-solid fa-file-import"></i> <?= lang('backend/components/import.buttons.import'); ?>
+                    <i class="fa-solid fa-file-import"></i> <?= ui_text('backend/components/import.buttons.import', [], false); ?>
                 </button>
             </div>
 

@@ -29,7 +29,7 @@
                                 <!-- Singolo elemento della barra con link dinamico -->
                                 <div class="bar-item">
                                     <a href="<?= esc($href, 'attr'); ?>"<?= ($id !== '') ? ' id="' . esc($id, 'attr') . '"' : ''; ?><?= ($dataBsToggle !== '') ? ' data-bs-toggle="' . esc($dataBsToggle, 'attr') . '"' : ''; ?><?= ($dataBsTarget !== '') ? ' data-bs-target="' . esc($dataBsTarget, 'attr') . '"' : ''; ?><?= ($ariaControls !== '') ? ' aria-controls="' . esc($ariaControls, 'attr') . '" aria-haspopup="dialog"' : ''; ?>>
-                                        <?= $icon; ?> <?= $label; ?>
+                                        <?= $icon; ?> <?= ui_value($label, false); ?>
                                     </a>
                                 </div>
 

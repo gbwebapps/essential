@@ -4,12 +4,12 @@
 
         <div class="row mb-2 g-0 app-bg-surface permission-section-title pt-2 ps-2 pe-2 border rounded-1">
             <div class="col-6 text-start">
-                <h5><?= $permission['icon']; ?> <?= ucfirst($permission['title']); ?></h5>
+                <h5><?= $permission['icon']; ?> <?= ui_value(ucfirst($permission['title'])); ?></h5>
             </div>
             <div class="col-6 text-end">
                 <a href="#" class="select-all" data-controller="<?= esc($permission['controller'], 'attr'); ?>">
                     <i class="fa-solid fa-square-check"></i>
-                    <?= lang('backend/global.links.selectAll'); ?>
+                    <?= ui_text('backend/global.links.selectAll', [], false); ?>
                 </a>
             </div>
         </div>
@@ -40,13 +40,13 @@
                             <ul class="list-group list-group-flush border rounded-2">
                                 <li class="list-group-item" style="min-height: 75px;">
                                     <label for="exc_<?= esc($k, 'attr'); ?>" class="fw-bold <?= esc($permissionStateClass, 'attr'); ?> d-block mb-1">
-                                        <i class="fa-solid fa-circle-arrow-down"></i><?= esc($v); ?>
+                                        <i class="fa-solid fa-circle-arrow-down"></i><?= ui_value($v); ?>
                                     </label>
                                     
                                     <?php if ($isGroupActive): ?>
-                                        <span class="badge app-bg-inverse app-text-inverse border app-border-success-subtle fs-8"><?= lang('backend/admins.labels.assignedToGroup'); ?></span>
+                                        <span class="badge app-bg-inverse app-text-inverse border app-border-success-subtle fs-8"><?= ui_text('backend/admins.labels.assignedToGroup', [], false); ?></span>
                                     <?php else: ?>
-                                        <span class="badge app-bg-surface app-text border fs-8"><?= lang('backend/admins.labels.notAssignedToGroup'); ?></span>
+                                        <span class="badge app-bg-surface app-text border fs-8"><?= ui_text('backend/admins.labels.notAssignedToGroup', [], false); ?></span>
                                     <?php endif; ?>
                                 </li>
                                 <li class="list-group-item">

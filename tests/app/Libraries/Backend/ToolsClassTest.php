@@ -16,6 +16,7 @@ class ToolsClassTest extends CIUnitTestCase
         Factories::reset();
         helper('settings');
         $this->mockSettings(['Backend\General' => ['language' => 'en']]);
+        service('request')->setLocale('en');
     }
 
     protected function tearDown(): void

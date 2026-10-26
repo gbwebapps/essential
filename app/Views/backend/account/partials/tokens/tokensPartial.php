@@ -27,15 +27,15 @@
 					$userAgent->parse((string) $token->user_agent);
                     
                     /* Inizializzazione corretta della variabile in camelCase */
-					$agentText = '<span class="text-white">' . lang('backend/account.labels.operatingSystem') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
+					$agentText = '<span class="text-white">' . ui_text('backend/account.labels.operatingSystem') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getPlatform()) . '</span>';
                     
                     /* Valutazione con metodi nativi in camelCase di CodeIgniter 4 */
                     if($userAgent->isBrowser()):
-						$agentText .= ' &bull; <span class="text-white">' . lang('backend/account.labels.browser') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
+						$agentText .= ' &bull; <span class="text-white">' . ui_text('backend/account.labels.browser') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getBrowser()) . '</span>';
                     elseif($userAgent->isMobile()):
-						$agentText .= ' &bull; <span class="text-white">' . lang('backend/account.labels.mobile') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getMobile()) . '</span>';
+						$agentText .= ' &bull; <span class="text-white">' . ui_text('backend/account.labels.mobile') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getMobile()) . '</span>';
                     elseif($userAgent->isRobot()):
-						$agentText .= ' &bull; <span class="text-white">' . lang('backend/account.labels.robot') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getRobot()) . '</span>';
+						$agentText .= ' &bull; <span class="text-white">' . ui_text('backend/account.labels.robot') . '</span> <span class="text-primary fw-bold">' . esc($userAgent->getRobot()) . '</span>';
                     endif;
                 ?>
 
@@ -47,16 +47,16 @@
                             
                             <div class="row">
                                 <div class="col-12 col-md-4 mb-3 mb-md-0 text-start">
-                                    <small class="app-text-muted fw-bold d-block mb-1"><i class="fa-solid fa-circle-arrow-down me-1"></i><?= lang('backend/account.labels.createdToken'); ?></small>
+                                    <small class="app-text-muted fw-bold d-block mb-1"><i class="fa-solid fa-circle-arrow-down me-1"></i><?= ui_text('backend/account.labels.createdToken', [], false); ?></small>
 									<span class="fw-bold"><?= esc(convertDate($token->token_create, 'conversational')); ?></span>
                                 </div>
                                 <div class="col-12 col-md-4 mb-3 mb-md-0 text-start">
-                                    <small class="app-text-muted fw-bold d-block mb-1"><i class="fa-solid fa-circle-arrow-down me-1"></i><?= lang('backend/account.labels.expiredToken'); ?></small>
+                                    <small class="app-text-muted fw-bold d-block mb-1"><i class="fa-solid fa-circle-arrow-down me-1"></i><?= ui_text('backend/account.labels.expiredToken', [], false); ?></small>
 									<span class="<?= $class; ?>"><?= esc(convertDate($dateExpire->format('Y-m-d H:i:s'), 'conversational')); ?></span>
                                 </div>
                                 <div class="col-12 col-md-4 mb-3 mb-md-0 text-start">
-                                    <small class="app-text-muted fw-bold d-block mb-1"><i class="fa-solid fa-circle-arrow-down me-1"></i><?= lang('backend/account.labels.typeToken'); ?></small>
-                                    <span class="fw-bold"><?= esc($tokenType); ?></span>
+                                    <small class="app-text-muted fw-bold d-block mb-1"><i class="fa-solid fa-circle-arrow-down me-1"></i><?= ui_text('backend/account.labels.typeToken', [], false); ?></small>
+                                    <span class="fw-bold"><?= ui_value($tokenType); ?></span>
                                 </div>
                             </div>
                             
@@ -67,7 +67,7 @@
                                     <small class="token-system-details">
                                         <?= $agentText; ?>
                                         &bull; 
-                                        <span class="text-white"><?= lang('backend/account.labels.ipAddress'); ?></span>
+                                        <span class="text-white"><?= ui_text('backend/account.labels.ipAddress', [], false); ?></span>
                                         <span class="text-primary fw-bold"><?= esc($token->ip_address); ?></span>
                                     </small>
                                 </div>
@@ -82,16 +82,16 @@
                                 
                                 <!-- Segnaposto per la sessione in corso: non eliminabile -->
                                 <span class="badge app-bg-success py-2 px-3 shadow-sm">
-                                    <i class="fa-solid fa-desktop me-1"></i> <?= lang('backend/account.labels.currentDevice'); ?>
+                                    <i class="fa-solid fa-desktop me-1"></i> <?= ui_text('backend/account.labels.currentDevice', [], false); ?>
                                 </span>
                                 
                             <?php else: ?>
                                 
                                 <!-- Form per eliminare tutti gli ALTRI tokens -->
-                                <form class="deleteToken d-grid d-lg-block" data-message="<?= sprintf(lang('backend/account.messages.areYouSureDeleteToken'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)); ?>">
+                                <form <?= ui_binding('backend/account.messages.areYouSureDeleteToken', 'data-message', [esc($currentAdmin->firstname), esc($currentAdmin->lastname)], false); ?> class="deleteToken d-grid d-lg-block" data-message="<?= sprintf(lang('backend/account.messages.areYouSureDeleteToken'), esc($currentAdmin->firstname), esc($currentAdmin->lastname)); ?>">
                                     <input type="hidden" name="id" value="<?= esc($token->id); ?>">
                                     <button type="submit" class="btn app-btn-danger btn-sm shadow-none">
-                                        <i class="fa-solid fa-trash me-1"></i> <?= lang('backend/account.buttons.delete'); ?>
+                                        <i class="fa-solid fa-trash me-1"></i> <?= ui_text('backend/account.buttons.delete', [], false); ?>
                                     </button>
                                 </form>
                                 
@@ -106,7 +106,7 @@
         </ul>
     <?php else: ?>
         <div class="text-center py-3 fw-bold">
-            <?= lang('backend/account.messages.noTokensFound'); ?>
+            <?= ui_text('backend/account.messages.noTokensFound', [], false); ?>
         </div>
     <?php endif; ?>
 </div>

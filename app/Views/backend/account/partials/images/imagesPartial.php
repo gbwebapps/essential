@@ -6,13 +6,13 @@
 
 <!-- Gallery One -->
 <div class="card-header rounded-0 d-flex justify-content-between align-items-center" style="border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);">
-    <h2 class="card-title text-start mb-0"><?= lang('backend/components/galleryOne.title'); ?></h2>
+    <h2 class="card-title text-start mb-0"><?= ui_text('backend/components/galleryOne.title', [], false); ?></h2>
     <form id="getImages">
         <input type="hidden" name="uuid" value="<?= esc($currentAdmin->uuid); ?>">
         <input type="hidden" name="entity" value="<?= esc($entity); ?>">
         <input type="hidden" name="context" value="<?= esc($context); ?>">
         <button type="submit" class="btn btn-sm app-btn-secondary">
-            <i class="fa-solid fa-arrows-rotate me-1"></i><?= lang('backend/components/galleryOne.buttons.reload'); ?>
+            <i class="fa-solid fa-arrows-rotate me-1"></i><?= ui_text('backend/components/galleryOne.buttons.reload', [], false); ?>
         </button>
     </form>
 </div>

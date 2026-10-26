@@ -3,7 +3,7 @@
     <div class="dropdown pb-2">
         <!-- Pulsante di attivazione del menu Opzioni -->
         <button class="btn app-btn-secondary dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <?= lang('backend/global.buttons.options'); ?>
+            <?= ui_text('backend/global.buttons.options', [], false); ?>
         </button>
         
         <!-- Menu a comparsa allineato alla fine del contenitore -->
@@ -24,7 +24,7 @@
                 <li>
                     <!-- Link dell'opzione con classi e ID dinamici -->
                     <a class="dropdown-item <?= $class; ?>" href="<?= base_url($item['route']); ?>" id="<?= $id; ?>">
-                        <?= $icon; ?> <?= $item['label']; ?>
+                        <?= $icon; ?> <?= ui_value($item['label'], false); ?>
                     </a>
                 </li>
 

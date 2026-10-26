@@ -1498,6 +1498,10 @@ body {
     border-top-color: #6c757d !important;
 }
 
+#interface-preferences .dropdown-menu {
+    --bs-dropdown-divider-bg: #6c757d;
+}
+
 .alert button[data-bs-dismiss="alert"] {
     color: #ffffff !important;
     border-color: #6c757d !important;

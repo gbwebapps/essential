@@ -5,7 +5,7 @@
         <p class="lead"><i class="fa-solid fa-phone"></i> <span class="fw-bold"><?= esc($currentAdmin->phone); ?> </span></p>
         <p class="lead"><i class="fa-solid fa-user-shield"></i> 
             <span class="fw-bold">
-                <?= sprintf(lang('backend/groups.labels.groupNameBar'), esc($groupName->name)); ?> 
+                <?= ui_text('backend/groups.labels.groupNameBar', [esc($groupName->name)], false); ?> 
             </span>
         </p>
     </div>
