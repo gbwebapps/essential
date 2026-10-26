@@ -110,7 +110,7 @@
 
     <div class="card-header rounded-0 d-flex justify-content-between align-items-center" style="border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);">
         <h2 class="card-title text-start mb-0">
-            <i class="fa-solid fa-folder-tree me-1"></i><?= lang('backend/categories.panels.categoryTree'); ?>
+            <?= lang('backend/categories.panels.categoryTree'); ?>
         </h2>
         <input type="hidden" name="context" value="<?= esc($categoryTreeContext, 'attr'); ?>" form="getTree">
         <?php if($selectedCategoryUuid !== null): ?>

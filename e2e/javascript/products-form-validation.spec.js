@@ -7,6 +7,7 @@ const origin = 'https://products-validation.test';
 
 /** Usa il form Add e i manager reali; le risposte hanno il contratto verificato dai test PHP. */
 async function openForm(page, errors) {
+    const requests = [];
     const rendered = spawnSync('php', ['tests/_support/Fixtures/products-form-preview.php'], { cwd: root, encoding: 'utf8' });
     if (rendered.status !== 0 || rendered.stderr) throw new Error(rendered.stderr || rendered.stdout);
     const failures = [];
@@ -26,7 +27,10 @@ async function openForm(page, errors) {
             return;
         }
         if (pathname === '/backend/products/add') {
-            await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ errors }) });
+            expect(route.request().method()).toBe('POST');
+            requests.push(route.request());
+            const responseErrors = typeof errors === 'function' ? errors(requests.length) : errors;
+            await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ errors: responseErrors }) });
             return;
         }
         if (pathname.startsWith('/assets/') && pathname.endsWith('.js')) {
@@ -46,28 +50,32 @@ async function openForm(page, errors) {
         window.productsAdd.init();
     });
 
-    return failures;
+    return { failures, requests };
 }
 
 test('Prodotti Add: mostra tutti gli errori e consente un secondo invio senza eccezioni', async ({ page }) => {
     const errors = { sku: 'SKU obbligatorio', product: 'Prodotto obbligatorio', quantity: 'Quantità obbligatoria', price: 'Prezzo obbligatorio', status: 'Stato obbligatorio', brand_uuids: 'Marca obbligatoria', category_uuids: 'Categoria obbligatoria' };
-    const failures = await openForm(page, errors);
+    const fixture = await openForm(page, attempt => Object.fromEntries(
+        Object.entries(errors).map(([field, message]) => [field, `${message} (${attempt})`])
+    ));
 
     for (let attempt = 0; attempt < 2; attempt++) {
         await page.getByRole('button', { name: 'Salva' }).click();
+        await expect.poll(() => fixture.requests.length).toBe(attempt + 1);
         for (const [field, message] of Object.entries(errors)) {
-            await expect(page.locator('.error_' + field)).toHaveText(message);
+            await expect(page.locator('.error_' + field)).toHaveText(`${message} (${attempt + 1})`);
         }
         await expect.poll(() => page.evaluate(() => window.productsAdd.isSubmitting)).toBe(false);
     }
-    expect(failures).toEqual([]);
+    expect(fixture.failures).toEqual([]);
 });
 
 test('Prodotti Add: gli errori delle immagini conservano il collegamento alla preview', async ({ page }) => {
-    const failures = await openForm(page, { brand_uuids: 'UUID marca non valido', category_uuids: 'UUID categoria non valido', 'images.preview-id': 'Immagine non valida' });
+    const fixture = await openForm(page, { brand_uuids: 'UUID marca non valido', category_uuids: 'UUID categoria non valido', 'images.preview-id': 'Immagine non valida' });
     await page.getByRole('button', { name: 'Salva' }).click();
     await expect(page.locator('.error_brand_uuids')).toHaveText('UUID marca non valido');
     await expect(page.locator('.error_category_uuids')).toHaveText('UUID categoria non valido');
     await expect(page.locator('#error-img-preview-id')).toHaveText('Immagine non valida');
-    expect(failures).toEqual([]);
+    expect(fixture.requests).toHaveLength(1);
+    expect(fixture.failures).toEqual([]);
 });

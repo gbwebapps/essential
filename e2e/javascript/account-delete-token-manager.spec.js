@@ -61,6 +61,12 @@ test('DeleteTokenManager gestisce errori e aggiorna il contenitore', async ({ pa
             document.body.appendChild(container);
         }
 
+        if (!document.querySelector('.error_id')) {
+            const errorField = document.createElement('div');
+            errorField.className = 'error_id';
+            document.body.appendChild(errorField);
+        }
+
         const manager = new DeleteTokenManager();
         manager.init();
 
@@ -69,15 +75,23 @@ test('DeleteTokenManager gestisce errori e aggiorna il contenitore', async ({ pa
 
         await manager.deleteToken(formData);
         const unlockedAfterValidation = !manager.isSubmitting;
+        const validationField = document.querySelector('.error_id').textContent;
+        const validationFieldVisible = document.querySelector('.error_id').checkVisibility();
+        const validationAlert = document.querySelector('#alert-container [role="alert"]').checkVisibility() && document.querySelector('#alert-container [role="alert"]').textContent.includes('Errore di validazione');
 
         await manager.deleteToken(formData);
         const unlockedAfterFailure = !manager.isSubmitting;
+        const failureAlert = document.querySelector('#alert-container [role="alert"]').checkVisibility() && document.querySelector('#alert-container [role="alert"]').textContent.includes('Impossibile eliminare il token');
 
         await manager.deleteToken(formData);
 
         return {
             unlockedAfterValidation,
+            validationField,
+            validationFieldVisible,
+            validationAlert,
             unlockedAfterFailure,
+            failureAlert,
             isSubmitting: manager.isSubmitting
         };
     }, modulePath);
@@ -86,7 +100,11 @@ test('DeleteTokenManager gestisce errori e aggiorna il contenitore', async ({ pa
 
     expect(result).toEqual({
         unlockedAfterValidation: true,
+        validationField: 'Token non valido',
+        validationFieldVisible: true,
+        validationAlert: true,
         unlockedAfterFailure: true,
+        failureAlert: true,
         isSubmitting: false
     });
 

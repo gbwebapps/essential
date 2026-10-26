@@ -75,6 +75,9 @@ test('Account EditManager gestisce la validazione e aggiorna account e navbar', 
         await manager.edit(firstData);
 
         const unlockedAfterValidation = !manager.isSubmitting;
+        const validationField = document.querySelector('.error_firstname').textContent;
+        const validationFieldVisible = document.querySelector('.error_firstname').checkVisibility();
+        const validationAlert = document.querySelector('#alert-container [role="alert"]').checkVisibility() && document.querySelector('#alert-container [role="alert"]').textContent.includes('Errore di validazione');
 
         const secondData = new FormData();
         secondData.append('firstname', 'Utente E2E');
@@ -83,6 +86,9 @@ test('Account EditManager gestisce la validazione e aggiorna account e navbar', 
 
         return {
             unlockedAfterValidation,
+            validationField,
+            validationFieldVisible,
+            validationAlert,
             isSubmitting: manager.isSubmitting
         };
     }, modulePath);
@@ -92,6 +98,9 @@ test('Account EditManager gestisce la validazione e aggiorna account e navbar', 
 
     expect(result).toEqual({
         unlockedAfterValidation: true,
+        validationField: 'Nome obbligatorio',
+        validationFieldVisible: true,
+        validationAlert: true,
         isSubmitting: false
     });
 

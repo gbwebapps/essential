@@ -61,6 +61,12 @@ test('GetPermissionsManager gestisce errori e aggiorna i permessi', async ({ pag
             document.body.appendChild(container);
         }
 
+        if (!document.querySelector('.error_uuid')) {
+            const errorField = document.createElement('div');
+            errorField.className = 'error_uuid';
+            document.body.appendChild(errorField);
+        }
+
         const manager = new GetPermissionsManager();
         manager.init();
 
@@ -69,15 +75,23 @@ test('GetPermissionsManager gestisce errori e aggiorna i permessi', async ({ pag
 
         await manager.getPermissions(formData);
         const unlockedAfterValidation = !manager.isSubmitting;
+        const validationField = document.querySelector('.error_uuid').textContent;
+        const validationFieldVisible = document.querySelector('.error_uuid').checkVisibility();
+        const validationAlert = document.querySelector('#alert-container [role="alert"]').checkVisibility() && document.querySelector('#alert-container [role="alert"]').textContent.includes('Errore di validazione');
 
         await manager.getPermissions(formData);
         const unlockedAfterFailure = !manager.isSubmitting;
+        const failureAlert = document.querySelector('#alert-container [role="alert"]').checkVisibility() && document.querySelector('#alert-container [role="alert"]').textContent.includes('Impossibile recuperare i permessi');
 
         await manager.getPermissions(formData);
 
         return {
             unlockedAfterValidation,
+            validationField,
+            validationFieldVisible,
+            validationAlert,
             unlockedAfterFailure,
+            failureAlert,
             isSubmitting: manager.isSubmitting
         };
     }, modulePath);
@@ -86,7 +100,11 @@ test('GetPermissionsManager gestisce errori e aggiorna i permessi', async ({ pag
 
     expect(result).toEqual({
         unlockedAfterValidation: true,
+        validationField: 'Identificativo non valido',
+        validationFieldVisible: true,
+        validationAlert: true,
         unlockedAfterFailure: true,
+        failureAlert: true,
         isSubmitting: false
     });
 

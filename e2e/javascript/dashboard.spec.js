@@ -4,6 +4,14 @@ const path = require('node:path');
 
 const root = path.resolve(__dirname, '../..');
 const origin = 'https://dashboard-preview.test';
+const expectedLabels = {
+    it: ['Dentro il magazzino', 'Valore del magazzino', 'Valore prodotti per categoria'],
+    en: ['Inside the warehouse', 'Inventory value', 'Product value by category'],
+    de: ['Lagerübersicht', 'Lagerwert', 'Produktwert nach Kategorie'],
+    es: ['Dentro del almacén', 'Valor del almacén', 'Valor de productos por categoría'],
+    fr: ['Vue de l’entrepôt', 'Valeur du stock', 'Valeur des produits par catégorie'],
+    zh: ['仓库概览', '库存总值', '按类别统计产品价值']
+};
 
 /** Usa le viste, il presenter e gli asset reali; i dati sono fixture e non provengono dal database. */
 async function openDashboard(page, theme, locale = 'it', scenario = 'normal') {
@@ -65,6 +73,9 @@ for (const locale of ['it', 'en', 'de', 'es', 'fr', 'zh']) {
     test('Dashboard: testi e layout mobile in lingua ' + locale, async ({ page }) => {
         await page.setViewportSize({ width: 390, height: 1000 });
         const errors = await openDashboard(page, 'grey', locale);
+        await expect(page.locator('.dashboard-analysis-title')).toHaveText(expectedLabels[locale][0]);
+        await expect(page.locator('#dashboard-inventory-value-title')).toHaveText(expectedLabels[locale][1]);
+        await expect(page.locator('[data-dashboard-ranking="categoriesValue"] h3')).toHaveText(expectedLabels[locale][2]);
         await expect(page.locator('[data-dashboard-summary]')).toHaveCount(4);
         await expect(page.locator('main')).not.toContainText('backend/dashboard.');
         const overflow = await page.locator('#index-dashboard-container').evaluate(root => ({

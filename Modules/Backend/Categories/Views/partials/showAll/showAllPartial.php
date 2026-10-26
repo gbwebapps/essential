@@ -36,7 +36,7 @@
                                         <th style="width: 2.5%;" class="text-center">&nbsp;</th>
 
                                         <!-- Colonna category -->
-                                        <th style="width: 25%;">
+                                        <th style="width: 20%;">
                                             <a class="sort" href="#" data-column="category" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'category') ? 'asc' : 'desc'); ?>">
                                                 <?= lang('backend/categories.labels.category'); ?> <?= (($posts['column'] == 'category') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
@@ -47,8 +47,13 @@
                                             <?= lang('backend/categories.labels.path'); ?>
                                         </th>
 
+                                        <!-- Colonna contenuto -->
+                                        <th style="width: 20%;" class="text-center">
+                                            <?= lang('backend/categories.labels.content'); ?>
+                                        </th>
+
                                         <!-- Colonna status -->
-                                        <th style="width: 27.5%; text-align: center;">
+                                        <th style="width: 12.5%; text-align: center;">
                                             <a class="sort" href="#" data-column="status" data-order="<?= (($posts['order'] == 'desc' && $posts['column'] == 'status') ? 'asc' : 'desc'); ?>">
                                                 <?= lang('backend/categories.labels.status'); ?>&nbsp;<?= (($posts['column'] == 'status') ? '&nbsp;' . $icon : ''); ?>
                                             </a>
@@ -67,6 +72,8 @@
                                         <!-- Definisco un default se non c'é immagine -->
                                         <?php $cover = ($category->cover ?? null); ?>
                                         <?php $isTrashed = ( ! is_null($category->deleted_at)); ?>
+                                        <?php $hasChildren = ((int) $category->has_children === 1); ?>
+                                        <?php $hasProducts = ((int) $category->has_products === 1); ?>
                                         
                                         <tr class="border-end border-start table-row-110">
 
@@ -100,8 +107,29 @@
                                             </td>
 
                                             <!-- Cella percorso -->
-                                            <td class="align-middle">
+                                            <td class="align-middle text-wrap">
                                                 <span><?= esc($category->category_path ?? $category->category); ?></span>
+                                            </td>
+
+                                            <!-- Cella contenuto -->
+                                            <td class="align-middle text-center">
+                                                <div class="d-flex flex-column align-items-center gap-1">
+                                                    <?php if($hasChildren): ?>
+                                                        <span class="badge app-bg-muted-subtle app-text-muted-emphasis"><?= lang('backend/categories.labels.containsCategories'); ?></span>
+                                                    <?php endif; ?>
+
+                                                    <?php if($hasProducts): ?>
+                                                        <span class="badge app-bg-info"><?= lang('backend/categories.labels.containsProducts'); ?></span>
+                                                    <?php endif; ?>
+
+                                                    <?php if( ! $hasChildren && ! $hasProducts): ?>
+                                                        <span class="badge app-bg-muted-subtle app-text-muted-emphasis"><?= lang('backend/categories.labels.emptyCategory'); ?></span>
+                                                    <?php endif; ?>
+
+                                                    <?php if($isTrashed): ?>
+                                                        <span class="badge app-bg-danger"><?= lang('backend/categories.labels.deleted'); ?></span>
+                                                    <?php endif; ?>
+                                                </div>
                                             </td>
 
                                             <!-- Cella status -->
@@ -186,8 +214,8 @@
                                         <!-- Riga inferiore (Metadati a comparsa fluida) -->
                                         <tr class="border-end border-start">
 
-                                            <!-- Colspan 7 copre l'intera tabella. Nessun padding sul td per evitare scatti nell'animazione -->
-                                            <td colspan="7" class="p-0 border-0">
+                                            <!-- Colspan 8 copre l'intera tabella. Nessun padding sul td per evitare scatti nell'animazione -->
+                                            <td colspan="8" class="p-0 border-0">
                                                 
                                                 <!-- Contenitore collassabile puntato dal bottone -->
                                                 <div class="collapse" id="meta-<?= esc($category->uuid, 'attr'); ?>">

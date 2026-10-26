@@ -6,9 +6,13 @@ test.use({
 });
 
 test('Accesso alla dashboard con sessione salvata', async ({ page }) => {
-    await page.goto(appUrl('/backend/dashboard'));
+    const response = await page.goto(appUrl('/backend/dashboard'));
+
+    expect(response).not.toBeNull();
+    expect(response.status()).toBe(200);
 
     await expect(page).toHaveURL(/\/backend\/dashboard\/?$/);
 
-    await expect(page.locator('body')).toBeVisible();
+    await expect(page.locator('#index-dashboard-container')).toBeVisible();
+    await expect(page.locator('[data-dashboard-summary]').first()).toBeVisible();
 });

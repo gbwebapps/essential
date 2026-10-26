@@ -25,6 +25,10 @@ test('SecurityManager aggiorna il metodo 2FA solo dopo il successo del server', 
     });
 
     const requests = [];
+    let releaseRequest;
+    const blocked = new Promise(resolve => {
+        releaseRequest = resolve;
+    });
 
     await page.route('**/backend/account/saveBasicMethod', async route => {
         if (route.request().method() !== 'POST') {
@@ -40,6 +44,10 @@ test('SecurityManager aggiorna il metodo 2FA solo dopo il successo del server', 
 
         requests.push(method);
 
+        if (requests.length === 1) {
+            await blocked;
+        }
+
         await route.fulfill({
             status: 200,
             contentType: 'application/json',
@@ -49,7 +57,7 @@ test('SecurityManager aggiorna il metodo 2FA solo dopo il successo del server', 
         });
     });
 
-    const result = await page.evaluate(async path => {
+    const action = page.evaluate(async path => {
         const { SecurityManager } = await import(path);
 
         SecurityManager.instance?.destroy();
@@ -121,6 +129,26 @@ test('SecurityManager aggiorna il metodo 2FA solo dopo il successo del server', 
             isSubmitting: manager.isSubmitting
         };
     }, modulePath);
+
+    let result;
+
+    try {
+        await expect.poll(() => requests.length).toBe(1);
+        await expect(page.locator('#method-none')).toBeChecked();
+        await expect(page.locator('#method-email')).not.toBeChecked();
+        expect(await page.evaluate(async path => {
+            const { SecurityManager } = await import(path);
+            return {
+                activeMethod: SecurityManager.instance.currentActiveMethod,
+                isSubmitting: SecurityManager.instance.isSubmitting
+            };
+        }, modulePath)).toEqual({ activeMethod: 'none', isSubmitting: true });
+
+        releaseRequest();
+        result = await action;
+    } finally {
+        releaseRequest();
+    }
 
     expect(requests).toEqual(['email', 'none']);
 
@@ -641,6 +669,17 @@ test('SecurityManager ripristina i metodi dopo annullamento ed errore TOTP', asy
     await expect(page).toHaveURL(/\/backend\/account\/edit\/?$/);
 
     let requests = 0;
+    let cancellations = 0;
+
+    await page.route('**/backend/account/cancelTotpSetup', async route => {
+        expect(route.request().method()).toBe('POST');
+        cancellations++;
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ result: true })
+        });
+    });
 
     await page.route('**/backend/account/verifyCurrentPassword', async route => {
         await route.fulfill({
@@ -803,6 +842,8 @@ test('SecurityManager ripristina i metodi dopo annullamento ed errore TOTP', asy
     });
 
     await expect(page.locator('#confirm-totp-form')).toHaveCount(0);
+
+    expect(cancellations).toBe(1);
 
     // Secondo scenario: il server rifiuta il setup.
     await page.locator('#securityCurrentPassword').fill('PasswordCorretta!');

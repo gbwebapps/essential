@@ -7,7 +7,7 @@
             <!-- Campo email -->
             <div class="mb-2">
                 <label for="email" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/auth.labels.email'); ?></label>
-                <input type="email" id="email" name="email" value="gbwebapps@gmail.com" class="form-control" placeholder="<?= lang('backend/auth.placeholders.email'); ?>" autocomplete="username" aria-describedby="error-email">
+                <input type="email" id="email" name="email" class="form-control" placeholder="<?= lang('backend/auth.placeholders.email'); ?>" autocomplete="username" aria-describedby="error-email">
                 <div id="error-email" class="error_email app-text-danger fw-bold small pt-1" aria-live="polite">&nbsp;</div>
             </div>
             <!-- End Campo email -->
@@ -16,7 +16,7 @@
             <div class="mb-2">
                 <label for="password" class="form-label"><i class="fa-solid fa-circle-arrow-down"></i><?= lang('backend/auth.labels.password'); ?></label>
                 <div class="input-group">
-                    <input type="password" id="password" name="password" value="06Febbraio69@" class="form-control" placeholder="<?= lang('backend/auth.placeholders.password'); ?>" autocomplete="current-password" aria-describedby="error-password">
+                    <input type="password" id="password" name="password" class="form-control" placeholder="<?= lang('backend/auth.placeholders.password'); ?>" autocomplete="current-password" aria-describedby="error-password">
                     <button class="btn app-btn-secondary app-bg-surface-elevated border toggle-password-visibility" type="button" aria-label="Mostra password" aria-pressed="false">
                         <i class="fa-solid fa-eye app-text-muted"></i>
                     </button>

@@ -53,6 +53,7 @@ async function submitAction(page, className) {
 
         form.className = className;
         form.dataset.controller = 'admins';
+        form.dataset.message = 'Confermi questa operazione di test?';
 
         const uuid = document.createElement('input');
         uuid.name = 'uuid';
@@ -96,19 +97,24 @@ test('DeleteManager instrada correttamente soft delete, restore e hard delete', 
         ['restoreRecord', urls.restoreDelete],
         ['hardDeleteRecord', urls.hardDelete]
     ]) {
-        // Il test della logica di instradamento evita la UI di conferma.
-        await page.evaluate(async ({ path, target }) => {
+        await submitAction(page, className);
+        const modal = page.locator('#globalConfirmModal');
+        await expect(modal).toBeVisible();
+        await expect.poll(() => modal.evaluate(element => {
+            return bootstrap.Modal.getInstance(element)._isTransitioning;
+        })).toBe(false);
+        await modal.locator('.btn-ok').click();
+
+        await expect.poll(() => requests.length).toBe([
+            urls.softDelete, urls.restoreDelete, urls.hardDelete
+        ].indexOf(expectedUrl) + 1);
+
+        await page.waitForFunction(async path => {
             const { DeleteManager } = await import(path);
-            const manager = DeleteManager.instances.get('admins');
-
-            const formData = new FormData();
-            formData.append('uuid', 'e2e-test-uuid');
-
-            await manager.processAction(target, formData);
-        }, {
-            path: modulePath,
-            target: expectedUrl
-        });
+            return DeleteManager.instances.get('admins').isSubmitting === false;
+        }, modulePath);
+        expect(requests[requests.length - 1]).toBe(expectedUrl);
+        await expect(modal).toBeHidden();
     }
 
     expect(requests).toEqual([

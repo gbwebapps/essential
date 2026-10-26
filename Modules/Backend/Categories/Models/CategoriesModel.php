@@ -107,6 +107,8 @@ class CategoriesModel extends BackendModel implements ImportValidationInterface,
      * @var string 
      */
     protected ?string $getDataQuery = "select id, uuid, parent_id, category, status, created_at, updated_at, deleted_at, restored_at,
+                                        exists (select 1 from categories as child where child.parent_id = categories.id) as has_children,
+                                        exists (select 1 from categories_to_products where categories_to_products.category_id = categories.id) as has_products,
                                         (select parent.category from categories as parent where parent.id = categories.parent_id limit 1) as parent_category,
                                         (select images.filename from images where images.entity_uuid = categories.uuid and images.entity = 'categories' and images.is_cover = 1 limit 1) as cover, 
                                         (select count(*) from images where images.entity_uuid = categories.uuid and images.entity = 'categories') as images_num 

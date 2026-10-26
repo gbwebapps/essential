@@ -41,6 +41,7 @@ return [
         'containsCategories' => '包含类别',
         'containsProducts' => '包含产品',
         'emptyCategory' => '空类别',
+        'content' => '内容',
         'status' => '状态',
         'context' => '上下文',
         'images' => '图片',

@@ -41,6 +41,7 @@ return [
         'containsCategories' => 'Contiene categorie',
         'containsProducts' => 'Contiene prodotti',
         'emptyCategory' => 'Vuota',
+        'content' => 'Contenuto',
         'status' => 'Stato',
         'context' => 'Contesto',
         'images' => 'Immagini',
