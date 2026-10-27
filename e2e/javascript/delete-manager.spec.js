@@ -212,7 +212,7 @@ test('DeleteManager aggiorna la lista e ripristina lo stato dopo errori', async 
         let refreshes = 0;
 
         manager.config.listManager = {
-            root: document.body,
+            root: document.createElement('div'),
             storageKey: 'admins',
             state: { page: 2 },
             async showAll() {
@@ -223,12 +223,6 @@ test('DeleteManager aggiorna la lista e ripristina lo stato dopo errori', async 
         const listManager = manager.config.listManager;
 
         localStorage.setItem('admins_page', '2');
-
-        const existingMarker = listManager.root.querySelector('.lastItemPage');
-
-        if (existingMarker) {
-            existingMarker.remove();
-        }
 
         const marker = document.createElement('div');
         marker.className = 'lastItemPage';
@@ -242,6 +236,7 @@ test('DeleteManager aggiorna la lista e ripristina lo stato dopo errori', async 
         await manager.processAction('/backend/admins/delete', firstData);
 
         const unlockedAfterError = manager.isSubmitting === false;
+        const pageAfterError = manager.config.listManager.state.page;
 
         const secondData = new FormData();
         secondData.append('uuid', 'e2e-test-uuid');
@@ -250,8 +245,10 @@ test('DeleteManager aggiorna la lista e ripristina lo stato dopo errori', async 
 
         return {
             unlockedAfterError,
+            pageAfterError,
             isSubmitting: manager.isSubmitting,
             page: manager.config.listManager.state.page,
+            storedPage: localStorage.getItem('admins_page'),
             refreshes
         };
     }, modulePath);
@@ -260,8 +257,10 @@ test('DeleteManager aggiorna la lista e ripristina lo stato dopo errori', async 
 
     expect(result).toEqual({
         unlockedAfterError: true,
+        pageAfterError: 2,
         isSubmitting: false,
-        page: 2,
+        page: 1,
+        storedPage: '1',
         refreshes: 1
     });
 });

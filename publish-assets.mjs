@@ -75,27 +75,27 @@ const assetsToCopy = [
         to: 'public/assets/vendor/html2pdf/js/html2pdf.bundle.min.js'
     },
     {
-        from: 'Modules/Backend/Brands/Assets/js/brands.js',
+        from: 'modules/Backend/Brands/Assets/js/brands.js',
         to: 'public/assets/js/backend/brands.js'
     },
     {
-        from: 'Modules/Backend/Categories/Assets/js/categories.js',
+        from: 'modules/Backend/Categories/Assets/js/categories.js',
         to: 'public/assets/js/backend/categories.js'
     },
     {
-        from: 'Modules/Backend/Categories/Assets/js/modules/Categories.js',
+        from: 'modules/Backend/Categories/Assets/js/modules/Categories.js',
         to: 'public/assets/js/backend/modules/Categories.js'
     },
     {
-        from: 'Modules/Backend/Products/Assets/js/products.js',
+        from: 'modules/Backend/Products/Assets/js/products.js',
         to: 'public/assets/js/backend/products.js'
     },
     {
-        from: 'Modules/Backend/Warehouse/Assets/js/warehouse.js',
+        from: 'modules/Backend/Warehouse/Assets/js/warehouse.js',
         to: 'public/assets/js/backend/warehouse.js'
     },
     {
-        from: 'Modules/Backend/Warehouse/Assets/js/modules/Warehouse.js',
+        from: 'modules/Backend/Warehouse/Assets/js/modules/Warehouse.js',
         to: 'public/assets/js/backend/modules/Warehouse.js'
     }
 ];

@@ -55,7 +55,7 @@ class InterfacePreferences
         endif;
 
         $catalogues = [APPPATH . 'Language'];
-        foreach (glob(ROOTPATH . 'Modules/Backend/*/Language', GLOB_ONLYDIR) ?: [] as $directory):
+        foreach (glob(ROOTPATH . 'modules/Backend/*/Language', GLOB_ONLYDIR) ?: [] as $directory):
             $catalogues[] = $directory;
         endforeach;
 

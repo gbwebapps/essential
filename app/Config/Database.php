@@ -82,8 +82,8 @@ class Database extends Config
     {
         parent::__construct();
 
-        // if (in_array(ENVIRONMENT, ['testing', 'e2e'], true)) {
-        //     $this->defaultGroup = 'tests';
-        // }
+        if (in_array(ENVIRONMENT, ['testing', 'e2e'], true)) {
+            $this->defaultGroup = 'tests';
+        }
     }
 }

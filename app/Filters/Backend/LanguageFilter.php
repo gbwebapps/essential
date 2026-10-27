@@ -46,7 +46,7 @@ class LanguageFilter implements FilterInterface
         ):
             $activeLanguage = $requestedLanguage;
         else:
-            $path = $request->getUri()?->getPath() ?? '';
+            $path = $request->getUri()->getPath();
             $path = trim($path, '/');
             $basePath = trim((string) parse_url($appConfig->baseURL, PHP_URL_PATH), '/');
             if ($basePath !== '' && str_starts_with($path, $basePath . '/')):

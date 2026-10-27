@@ -3,7 +3,7 @@
 /** Renderizza i partial reali dei form, senza avviare l'applicazione o il database. */
 $productsRoot = dirname(__DIR__, 3);
 require_once $productsRoot . '/app/Helpers/interface_helper.php';
-$productsLabels = require $productsRoot . '/Modules/Backend/Products/Language/it/backend/products.php';
+$productsLabels = require $productsRoot . '/modules/Backend/Products/Language/it/backend/products.php';
 
 function lang(string $key): string
 {
@@ -47,9 +47,9 @@ $preview = new class {
 
         if ($context === 'edit'):
             $product = (object) ['uuid' => '00000000-0000-4000-8000-000000000005', 'sku' => 'TEST-SKU', 'product' => 'Test product', 'quantity' => 1, 'price' => '1.00', 'status' => 1, 'note' => '', 'brand_uuids' => [], 'category_uuids' => []];
-            include $root . '/Modules/Backend/Products/Views/partials/edit/generalDataPartial.php';
+            include $root . '/modules/Backend/Products/Views/partials/edit/generalDataPartial.php';
         else:
-            include $root . '/Modules/Backend/Products/Views/partials/add/addPartial.php';
+            include $root . '/modules/Backend/Products/Views/partials/add/addPartial.php';
         endif;
     }
 };

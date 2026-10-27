@@ -19,7 +19,7 @@ use CodeIgniter\Config\BaseService;
  */
 class Services extends BaseService
 {
-    public static function language(?string $locale = null, bool $getShared = true)
+    public static function language(?string $locale = null, bool $getShared = true): \CodeIgniter\Language\Language
     {
         if ($getShared):
             return static::getSharedInstance('language', $locale);

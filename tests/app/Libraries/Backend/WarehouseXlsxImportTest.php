@@ -288,10 +288,10 @@ class WarehouseXlsxImportTest extends CIUnitTestCase
 
     public function testAllModuleLanguagesExposeTheImportKeys(): void
     {
-        $expected = require ROOTPATH . 'Modules/Backend/Warehouse/Language/it/backend/warehouse.php';
+        $expected = require ROOTPATH . 'modules/Backend/Warehouse/Language/it/backend/warehouse.php';
 
         foreach (['en', 'de', 'es', 'fr', 'zh'] as $locale):
-            $actual = require ROOTPATH . 'Modules/Backend/Warehouse/Language/' . $locale . '/backend/warehouse.php';
+            $actual = require ROOTPATH . 'modules/Backend/Warehouse/Language/' . $locale . '/backend/warehouse.php';
 
             foreach ($expected as $section => $values):
                 $this->assertSame(array_keys($values), array_keys($actual[$section]), $locale . ': ' . $section);

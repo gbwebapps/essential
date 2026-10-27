@@ -59,6 +59,7 @@ class LanguageFilterTest extends CIUnitTestCase
     public function testBeforeUsesStoredLanguageWhenPostLanguageIsMissing(): void
     {
         $request = $this->createMock(IncomingRequest::class);
+        $request->method('getUri')->willReturn(new \CodeIgniter\HTTP\URI('http://essential.test/'));
 
         $request->method('getPost')->with('language')->willReturn(null);
         $request->expects($this->once())->method('setLocale')->with('en');
@@ -88,6 +89,7 @@ class LanguageFilterTest extends CIUnitTestCase
     public function testBeforeRejectsUnsupportedPostedLanguage(): void
     {
         $request = $this->createMock(IncomingRequest::class);
+        $request->method('getUri')->willReturn(new \CodeIgniter\HTTP\URI('http://essential.test/'));
         $request->method('getPost')->with('language')->willReturn('unsupported-locale');
         $request->expects($this->once())->method('setLocale')->with('it');
 
@@ -112,6 +114,7 @@ class LanguageFilterTest extends CIUnitTestCase
     public function testBeforeRejectsNonStringPostedLanguage(): void
     {
         $request = $this->createMock(IncomingRequest::class);
+        $request->method('getUri')->willReturn(new \CodeIgniter\HTTP\URI('http://essential.test/'));
         $request->method('getPost')->with('language')->willReturn(['it']);
         $request->expects($this->once())->method('setLocale')->with('en');
 
@@ -136,6 +139,7 @@ class LanguageFilterTest extends CIUnitTestCase
     public function testBeforeFallsBackWhenStoredLanguageIsUnsupported(): void
     {
         $request = $this->createMock(IncomingRequest::class);
+        $request->method('getUri')->willReturn(new \CodeIgniter\HTTP\URI('http://essential.test/'));
         $request->method('getPost')->with('language')->willReturn(null);
         $request->expects($this->once())->method('setLocale')->with('en');
 

@@ -1649,7 +1649,7 @@ il cookie cifrato o la sessione standard, restituendo al frontend un messaggio f
             </div>
                     <div class="method-item">
                     <h3 id="method_resetPassword">
-        <div class="location">at line 512</div>
+        <div class="location">at line 514</div>
         <code>                    array
     <strong>resetPassword</strong>(array $posts, <abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr> $request)
         </code>
@@ -1700,7 +1700,7 @@ contenente il link di recupero.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_getAttemptIdentifierHash">
-        <div class="location">at line 657</div>
+        <div class="location">at line 659</div>
         <code>                private    string
     <strong>getAttemptIdentifierHash</strong>(string $identifier)
         </code>
@@ -1743,7 +1743,7 @@ contenente il link di recupero.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_getAttemptsStatus">
-        <div class="location">at line 675</div>
+        <div class="location">at line 677</div>
         <code>                private    array
     <strong>getAttemptsStatus</strong>(string $scope, array $identifier, string $ipAddress, int $limit, int $interval)
         </code>
@@ -1807,7 +1807,7 @@ intenzionalmente più alto e deriva dal moltiplicatore interno non esposto nei S
             </div>
                     <div class="method-item">
                     <h3 id="method_registerAttempt">
-        <div class="location">at line 742</div>
+        <div class="location">at line 744</div>
         <code>                private    void
     <strong>registerAttempt</strong>(string $scope, array $identifier, string $ipAddress)
         </code>
@@ -1860,7 +1860,7 @@ intenzionalmente più alto e deriva dal moltiplicatore interno non esposto nei S
             </div>
                     <div class="method-item">
                     <h3 id="method_renewAttemptsWindow">
-        <div class="location">at line 778</div>
+        <div class="location">at line 780</div>
         <code>                private    void
     <strong>renewAttemptsWindow</strong>(string $scope, array $identifier, string $ipAddress, array $status)
         </code>
@@ -1918,7 +1918,7 @@ intenzionalmente più alto e deriva dal moltiplicatore interno non esposto nei S
             </div>
                     <div class="method-item">
                     <h3 id="method_clearAttempts">
-        <div class="location">at line 825</div>
+        <div class="location">at line 827</div>
         <code>                private    void
     <strong>clearAttempts</strong>(string $scope, array $identifier)
         </code>
@@ -1966,7 +1966,7 @@ intenzionalmente più alto e deriva dal moltiplicatore interno non esposto nei S
             </div>
                     <div class="method-item">
                     <h3 id="method_getAttemptsTable">
-        <div class="location">at line 853</div>
+        <div class="location">at line 855</div>
         <code>                private    string
     <strong>getAttemptsTable</strong>(string $scope)
         </code>
@@ -2009,7 +2009,7 @@ intenzionalmente più alto e deriva dal moltiplicatore interno non esposto nei S
             </div>
                     <div class="method-item">
                     <h3 id="method_setPassword">
-        <div class="location">at line 880</div>
+        <div class="location">at line 882</div>
         <code>                    array
     <strong>setPassword</strong>(array $posts)
         </code>
@@ -2054,7 +2054,7 @@ chiude i log aperti e revoca tutti i token attivi dell'amministratore.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_checkAuthToken">
-        <div class="location">at line 964</div>
+        <div class="location">at line 966</div>
         <code>                    bool
     <strong>checkAuthToken</strong>(string $token)
         </code>
@@ -2099,7 +2099,7 @@ superato la data di scadenza prestabilita (<code>token_expire</code>).</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_getEmailOtpExpiresAt">
-        <div class="location">at line 1002</div>
+        <div class="location">at line 1004</div>
         <code>                    int|null
     <strong>getEmailOtpExpiresAt</strong>(string $adminUuid)
         </code>
@@ -2142,7 +2142,7 @@ superato la data di scadenza prestabilita (<code>token_expire</code>).</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_verify">
-        <div class="location">at line 1030</div>
+        <div class="location">at line 1032</div>
         <code>                    array
     <strong>verify</strong>(array $posts, <abbr title="CodeIgniter\HTTP\IncomingRequest">IncomingRequest</abbr> $request)
         </code>
@@ -2195,7 +2195,7 @@ finalizza l'ingresso invocando <code>innerLogin()</code>.</p></p>
             </div>
                     <div class="method-item">
                     <h3 id="method_logoutBySession">
-        <div class="location">at line 1209</div>
+        <div class="location">at line 1211</div>
         <code>                    void
     <strong>logoutBySession</strong>(string $reason = &#039;manual&#039;)
         </code>
@@ -2241,7 +2241,7 @@ Infine distrugge il record del token dal database e resetta completamente la ses
             </div>
                     <div class="method-item">
                     <h3 id="method_logoutByCookie">
-        <div class="location">at line 1244</div>
+        <div class="location">at line 1247</div>
         <code>                    void
     <strong>logoutByCookie</strong>(string $cookieValue, string $reason = &#039;manual&#039;)
         </code>
@@ -2291,7 +2291,7 @@ ed elimina definitivamente il token di tipo 'cookie' dal database, invalidando g
             </div>
                     <div class="method-item">
                     <h3 id="method_closeLoginLog">
-        <div class="location">at line 1278</div>
+        <div class="location">at line 1282</div>
         <code>                private    void
     <strong>closeLoginLog</strong>(string $tokenHash, string $tokenType, string $reason)
         </code>

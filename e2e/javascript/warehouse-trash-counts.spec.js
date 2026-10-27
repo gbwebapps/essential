@@ -9,7 +9,7 @@ const fields = { brands: 'brand', categories: 'category', products: 'product' };
 /** Legge i link reali del modulo; le espressioni di lingua sono sostituite solo nella fixture. */
 function getLinks(entity) {
     const moduleName = { brands: 'Brands', categories: 'Categories', products: 'Products' }[entity];
-    const source = fs.readFileSync(path.join(root, 'Modules/Backend', moduleName, 'Views/showAllView.php'), 'utf8');
+    const source = fs.readFileSync(path.join(root, 'modules/Backend', moduleName, 'Views/showAllView.php'), 'utf8');
     const labels = { activeRecords: 'Attivi', suspendedRecords: 'Sospesi', trashedRecords: 'Eliminati', allRecords: 'Tutti' };
 
     return source.match(/<a\b[^>]*data-trash-filter="(?:active|suspended|trashed|all)"[^>]*>[\s\S]*?<\/a>/g).join('\n')
@@ -142,7 +142,7 @@ for (const entity of ['brands', 'categories', 'products']) {
 
     test(entity + ': asset sorgente e pubblico sincronizzati', () => {
         const moduleName = { brands: 'Brands', categories: 'Categories', products: 'Products' }[entity];
-        const source = fs.readFileSync(path.join(root, 'Modules/Backend', moduleName, 'Assets/js', entity + '.js'), 'utf8');
+        const source = fs.readFileSync(path.join(root, 'modules/Backend', moduleName, 'Assets/js', entity + '.js'), 'utf8');
         const published = fs.readFileSync(path.join(root, 'public/assets/js/backend', entity + '.js'), 'utf8');
         expect(published).toBe(source);
     });

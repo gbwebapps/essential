@@ -4,7 +4,7 @@ const path = require('node:path');
 
 const root = path.resolve(__dirname, '../..');
 const origin = 'https://categories-modal.test';
-const source = fs.readFileSync(path.join(root, 'Modules/Backend/Categories/Views/partials/common/categoryTreePartial.php'), 'utf8');
+const source = fs.readFileSync(path.join(root, 'modules/Backend/Categories/Views/partials/common/categoryTreePartial.php'), 'utf8');
 const modal = source.split("<?php if($categoryTreeDisplay === 'modal'): ?>")[1]
     .split('<?php elseif')[0]
     .replace(/<\?=[\s\S]*?\?>/g, expression => expression.includes('buttons.close') ? 'Chiudi' : 'Albero categorie');

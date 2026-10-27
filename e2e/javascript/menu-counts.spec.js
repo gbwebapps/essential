@@ -8,6 +8,8 @@ const origin = 'https://menu-counts.test';
 /** Renderizza le viste PHP reali con dati isolati, senza avviare framework o database. */
 function renderMenus(restricted) {
     const php = `
+        require_once 'app/Libraries/Backend/InterfaceTranslations.php';
+        require_once 'app/Helpers/interface_helper.php';
         function esc($value, $context = null) { return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8'); }
         function lang($key) { $labels = ['active'=>'Attivi', 'trashed'=>'Eliminati', 'suspended'=>'Sospesi']; $parts = explode('.', $key); return $labels[end($parts)] ?? end($parts); }
         function base_url($path) { return '${origin}/' . $path; }
@@ -21,8 +23,16 @@ function renderMenus(restricted) {
         $menuBottomRight = [];
         $menuCounts = [];
         foreach (${restricted ? "['brands']" : "['admins', 'brands', 'categories', 'products']"} as $entity) { $menuCounts[$entity] = ['active'=>4, 'trashed'=>2, 'suspended'=>1]; }
-        include 'app/Views/backend/template/navbarTopView.php';
-        include 'app/Views/backend/template/navbarBottomView.php';
+        $renderer = new class {
+            // Le preferenze dell'interfaccia sono verificate dalla suite dedicata.
+            public function include(string $partial): string { return ''; }
+            public function render(array $data): void {
+                extract($data);
+                include 'app/Views/backend/template/navbarTopView.php';
+                include 'app/Views/backend/template/navbarBottomView.php';
+            }
+        };
+        $renderer->render(get_defined_vars());
     `;
     const result = spawnSync('php', ['-r', php], { cwd: root, encoding: 'utf8' });
     if (result.status !== 0 || result.stderr) throw new Error(result.stderr || 'Rendering PHP fallito');

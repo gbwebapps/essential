@@ -9,6 +9,18 @@ parameters:
         - app/Validation
         - app/Cells
         - app/Helpers
+        - modules/Backend/Brands/Controllers
+        - modules/Backend/Brands/Models
+        - modules/Backend/Brands/Libraries
+        - modules/Backend/Categories/Controllers
+        - modules/Backend/Categories/Models
+        - modules/Backend/Categories/Libraries
+        - modules/Backend/Products/Controllers
+        - modules/Backend/Products/Models
+        - modules/Backend/Products/Libraries
+        - modules/Backend/Warehouse/Controllers
+        - modules/Backend/Warehouse/Models
+        - modules/Backend/Warehouse/Libraries
 
     bootstrapFiles:
         - phpstan-bootstrap.php

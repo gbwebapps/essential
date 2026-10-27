@@ -2,13 +2,13 @@
 
 ## Decisioni confermate
 
-- Modulo autonomo: Modules/Backend/Warehouse, Gestione magazzino, non Tools.
+- Modulo autonomo: modules/Backend/Warehouse, Gestione magazzino, non Tools.
 - Un XLSX, cinque fogli: brands, categories, products, brands_to_products, categories_to_products.
 - Aggiunge e aggiorna; conserva entità e associazioni assenti dal file.
 - UUID = identità; UUID vuoto = inserimento con UUID generato. UUID presente e sconosciuto = inserimento, come Import.
 - ID numerici del file = riferimenti tra fogli, rimappati agli ID locali. Nessuna fusione implicita per marca/SKU.
 - SKU e nome prodotto univoci separatamente, inclusi i record cestinati. Regole CRUD/CSV e controllo duplicati XLSX allineati.
-- DDL root allineato e Modules/Backend/Products/Database/Sql/uniqueProductName.sql applicato al database locale essential il 22 ottobre 2026. Indici UNIQUE separati su sku e product confermati; nessun record modificato (tabella vuota).
+- DDL root allineato e modules/Backend/Products/Database/Sql/uniqueProductName.sql applicato al database locale essential il 22 ottobre 2026. Indici UNIQUE separati su sku e product confermati; nessun record modificato (tabella vuota).
 - Backup precedente all'ALTER: writable/backups/database/products_before_unique_name_2026-10-22_18-10-59_f08efb52.sql.
 - Stesso modale, preview, errori e gestore Import condivisi; trasporto XLSX e transazione unica sono le varianti.
 - Metadati del ciclo di vita non modificabili dal file; created_at/updated_at gestiti dal server.

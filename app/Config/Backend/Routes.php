@@ -70,13 +70,13 @@ $routes->group('backend', function($routes) {
         });
 
         /* BRANDS */
-        require ROOTPATH . 'Modules/Backend/Brands/Config/Routes.php';
+        require ROOTPATH . 'modules/Backend/Brands/Config/Routes.php';
 
         /* CATEGORIES */
-        require ROOTPATH . 'Modules/Backend/Categories/Config/Routes.php';
+        require ROOTPATH . 'modules/Backend/Categories/Config/Routes.php';
 
         /* PRODUCTS */
-        require ROOTPATH . 'Modules/Backend/Products/Config/Routes.php';
+        require ROOTPATH . 'modules/Backend/Products/Config/Routes.php';
 
         /* IMAGES PREVIEW */
         $routes->group('uploadPreview', ['filter' => 'authorization'], function($routes) {
@@ -129,7 +129,7 @@ $routes->group('backend', function($routes) {
         });
 
         /* WAREHOUSE */
-        require ROOTPATH . 'Modules/Backend/Warehouse/Config/Routes.php';
+        require ROOTPATH . 'modules/Backend/Warehouse/Config/Routes.php';
         
         /* SETTINGS */
         $routes->group('settings', function($routes) {

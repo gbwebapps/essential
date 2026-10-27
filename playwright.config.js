@@ -18,7 +18,7 @@ module.exports = defineConfig({
     reporter: 'list',
 
     use: {
-        baseURL: 'https://gbwebapps.test/essential/',
+        baseURL: process.env.E2E_BASE_URL || 'https://gbwebapps.test/essential/',
         trace: 'retain-on-failure',
         screenshot: 'only-on-failure'
     },
@@ -37,7 +37,7 @@ module.exports = defineConfig({
         },
         {
             name: 'chromium',
-            testIgnore: [/auth[\\/]login\.spec\.js/, /database-isolation\.spec\.js/],
+            testIgnore: [/auth[\\/]login\.spec\.js/, /database-isolation\.spec\.js/, /interface-preferences\.spec\.js/],
             dependencies: ['isolation'],
             use: { ...devices['Desktop Chrome'] }
         }
