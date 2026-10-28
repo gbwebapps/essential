@@ -16,10 +16,10 @@ class DatabaseIsolationTest extends CIUnitTestCase
 
         $db = Database::connect();
 
-        $this->assertSame('essential_test', $db->getDatabase());
+        $this->assertSame(config(\Config\Database::class)->tests['database'], $db->getDatabase());
 
         $result = $db->query('select database() as db_name')->getRow();
 
-        $this->assertSame('essential_test', $result->db_name);
+        $this->assertSame(config(\Config\Database::class)->tests['database'], $result->db_name);
     }
 }

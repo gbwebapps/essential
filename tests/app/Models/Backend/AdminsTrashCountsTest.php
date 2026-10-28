@@ -18,8 +18,8 @@ class AdminsTrashCountsTest extends CIUnitTestCase
         parent::setUp();
 
         $this->database = Database::connect('tests', false);
-        $this->assertSame('essential_test', $this->database->getDatabase());
-        $this->assertSame('essential_test', $this->database->query('select database() as db')->getRow()->db);
+        $this->assertSame(config(\Config\Database::class)->tests['database'], $this->database->getDatabase());
+        $this->assertSame(config(\Config\Database::class)->tests['database'], $this->database->query('select database() as db')->getRow()->db);
         $this->database->query('create temporary table admins (id int primary key, status tinyint not null, deleted_at datetime null)');
         $this->model = new AdminsModel();
         (new \ReflectionProperty($this->model, 'db'))->setValue($this->model, $this->database);

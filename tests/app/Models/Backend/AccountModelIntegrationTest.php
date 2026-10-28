@@ -24,7 +24,7 @@ class AccountModelIntegrationTest extends CIUnitTestCase
 		helper('settings');
 
 		$this->database = db_connect();
-		$this->assertSame('essential_test', $this->database->getDatabase());
+		$this->assertSame(config(\Config\Database::class)->tests['database'], $this->database->getDatabase());
 
 		$group = $this->database->query('select id from admins_groups order by id asc limit 1')->getRow();
 		$this->assertNotNull($group);

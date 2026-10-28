@@ -1,5 +1,9 @@
 const path = require('node:path');
-require('dotenv').config({ path: path.resolve(__dirname, '.env.playwright') });
+const fs = require('node:fs');
+const dotenv = require('dotenv');
+dotenv.config({ path: path.resolve(__dirname, '.env.playwright'), quiet: true });
+const environmentFile = path.resolve(__dirname, '.env');
+const applicationEnvironment = fs.existsSync(environmentFile) ? dotenv.parse(fs.readFileSync(environmentFile)) : {};
 
 const { defineConfig, devices } = require('@playwright/test');
 
@@ -18,7 +22,7 @@ module.exports = defineConfig({
     reporter: 'list',
 
     use: {
-        baseURL: process.env.E2E_BASE_URL || 'https://gbwebapps.test/essential/',
+        baseURL: process.env.E2E_BASE_URL || process.env['app.baseURL'] || applicationEnvironment['app.baseURL'] || 'http://localhost:8080/',
         trace: 'retain-on-failure',
         screenshot: 'only-on-failure'
     },

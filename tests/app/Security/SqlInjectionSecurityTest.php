@@ -10,7 +10,7 @@ class SqlInjectionSecurityTest extends CIUnitTestCase
     public function testSqlInjectionOnPermissions(): void
     {
         $this->assertSame('testing', ENVIRONMENT);
-        $this->assertSame('essential_test', db_connect()->getDatabase());
+        $this->assertSame(config(\Config\Database::class)->tests['database'], db_connect()->getDatabase());
 
         $model = new AdminsModel();
 
@@ -24,7 +24,7 @@ class SqlInjectionSecurityTest extends CIUnitTestCase
     public function testSqlInjectionOnTokens(): void
     {
         $this->assertSame('testing', ENVIRONMENT);
-        $this->assertSame('essential_test', db_connect()->getDatabase());
+        $this->assertSame(config(\Config\Database::class)->tests['database'], db_connect()->getDatabase());
 
         $model = new AdminsModel();
 
@@ -39,7 +39,7 @@ class SqlInjectionSecurityTest extends CIUnitTestCase
     public function testSqlInjectionOnOrderBy(): void
     {
         $this->assertSame('testing', ENVIRONMENT);
-        $this->assertSame('essential_test', db_connect()->getDatabase());
+        $this->assertSame(config(\Config\Database::class)->tests['database'], db_connect()->getDatabase());
 
         $model = new AdminsModel();
 
@@ -68,7 +68,7 @@ class SqlInjectionSecurityTest extends CIUnitTestCase
     public function testSqlInjectionOnSearchFields(): void
     {
         $this->assertSame('testing', ENVIRONMENT);
-        $this->assertSame('essential_test', db_connect()->getDatabase());
+        $this->assertSame(config(\Config\Database::class)->tests['database'], db_connect()->getDatabase());
 
         $model = new AdminsModel();
 
@@ -94,7 +94,7 @@ class SqlInjectionSecurityTest extends CIUnitTestCase
     public function testUnauthorizedSearchColumnIsIgnored(): void
     {
         $this->assertSame('testing', ENVIRONMENT);
-        $this->assertSame('essential_test', db_connect()->getDatabase());
+        $this->assertSame(config(\Config\Database::class)->tests['database'], db_connect()->getDatabase());
 
         $model = new AdminsModel();
 
@@ -120,7 +120,7 @@ class SqlInjectionSecurityTest extends CIUnitTestCase
     public function testSqlInjectionOnDateFilters(): void
     {
         $this->assertSame('testing', ENVIRONMENT);
-        $this->assertSame('essential_test', db_connect()->getDatabase());
+        $this->assertSame(config(\Config\Database::class)->tests['database'], db_connect()->getDatabase());
 
         $model = new AdminsModel();
 

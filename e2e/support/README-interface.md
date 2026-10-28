@@ -1,11 +1,11 @@
 # Prove delle preferenze temporanee
 
-Le prove usano esclusivamente `essential_test`. Non modificare `.env` o `Database.php`.
+Le prove usano il database locale della singola installazione, configurato con `database.tests.database` nel suo `.env`. Il gruppo CodeIgniter `tests` resta un nome di configurazione: non richiede un database con suffisso `_test`.
 Servono le credenziali già configurate in `.env.playwright`.
 
 Dal root del progetto, aprire tre terminali PowerShell.
 
-## 1. Backend isolato
+## 1. Backend locale
 
 ```powershell
 [Environment]::SetEnvironmentVariable('database.defaultGroup', 'tests', 'Process')
@@ -35,6 +35,6 @@ $env:CI_ENVIRONMENT = 'e2e'
 npx playwright test -c playwright.interface.config.js
 ```
 
-Il router rifiuta gruppi database diversi da `tests`; il setup verifica anche il nome reale `essential_test`.
+Il router rifiuta gruppi database diversi da `tests`; il setup verifica che il database realmente connesso coincida con quello configurato.
 Il test di General ripristina lingua e tema iniziali in `finally`.
 Le schermate sono in `output/interface-preferences`. Fermare entrambi i server con Ctrl+C.

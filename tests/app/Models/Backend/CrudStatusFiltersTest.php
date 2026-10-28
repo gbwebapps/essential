@@ -28,12 +28,12 @@ class CrudStatusFiltersTest extends CIUnitTestCase
         ];
     }
 
-    /** Usa solo una tabella temporanea della connessione essential_test. */
+    /** Usa solo una tabella temporanea della connessione al database locale configurato. */
     private function prepareModel(string $modelClass, string $table): BackendModel
     {
         $this->database = Database::connect('tests', false);
-        $this->assertSame('essential_test', $this->database->getDatabase());
-        $this->assertSame('essential_test', $this->database->query('select database() as db')->getRow()->db);
+        $this->assertSame(config(\Config\Database::class)->tests['database'], $this->database->getDatabase());
+        $this->assertSame(config(\Config\Database::class)->tests['database'], $this->database->query('select database() as db')->getRow()->db);
         $this->database->query('create temporary table ' . $table . ' (id int primary key, status tinyint not null, deleted_at datetime null)');
         $this->database->query('insert into ' . $table . " values (1, 1, null), (2, 0, null), (3, 1, '2026-10-23 10:00:00'), (4, 0, '2026-10-23 10:00:00')");
         $model = new $modelClass();

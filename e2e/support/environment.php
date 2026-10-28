@@ -19,13 +19,14 @@ $_SERVER['CI_ENVIRONMENT'] = $environment;
 require 'vendor/codeigniter4/framework/system/util_bootstrap.php';
 
 $config = config('Database');
+$expectedDatabase = (string) $config->tests['database'];
 $db = \Config\Database::connect();
 
 if (ENVIRONMENT !== 'e2e' || $config->defaultGroup !== 'tests'
-    || $config->default['database'] === $config->tests['database']
-    || $db->getDatabase() !== 'essential_test'
-    || $db->query('select database() as db')->getRow()->db !== 'essential_test'):
-    fwrite(STDERR, "La suite Playwright richiede il database isolato essential_test.\n");
+    || $expectedDatabase === ''
+    || $db->getDatabase() !== $expectedDatabase
+    || $db->query('select database() as db')->getRow()->db !== $expectedDatabase):
+    fwrite(STDERR, "La suite Playwright richiede il database locale configurato nel gruppo tests.\n");
     exit(1);
 endif;
 

@@ -20,7 +20,7 @@ class TokensModelIntegrationTest extends CIUnitTestCase
         parent::setUp();
 
         $this->database = db_connect();
-        $this->assertSame('essential_test', $this->database->getDatabase());
+        $this->assertSame(config(\Config\Database::class)->tests['database'], $this->database->getDatabase());
 
         $identity = $this->database
             ->query('select uuid, email from admins order by id asc limit 1')

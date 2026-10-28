@@ -18,12 +18,14 @@ chdir(dirname(__DIR__, 2));
 $_SERVER['CI_ENVIRONMENT'] = 'e2e';
 require 'vendor/codeigniter4/framework/system/util_bootstrap.php';
 
+$config = config('Database');
+$expectedDatabase = (string) $config->tests['database'];
 $db = \Config\Database::connect('tests');
 
-/* La doppia verifica impedisce scritture fuori dal database dedicato ai test. */
-if (ENVIRONMENT !== 'e2e' || $db->getDatabase() !== 'essential_test'
-    || $db->query('select database() as db')->getRow()->db !== 'essential_test'):
-    fwrite(STDERR, "La fixture richiede esclusivamente essential_test.\n");
+/* La doppia verifica impedisce scritture fuori dal database locale configurato. */
+if (ENVIRONMENT !== 'e2e' || $expectedDatabase === '' || $db->getDatabase() !== $expectedDatabase
+    || $db->query('select database() as db')->getRow()->db !== $expectedDatabase):
+    fwrite(STDERR, "La fixture richiede CI_ENVIRONMENT=e2e e il database locale configurato.\n");
     exit(1);
 endif;
 

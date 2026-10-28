@@ -26,7 +26,7 @@ class ProductsModelIntegrationTest extends CIUnitTestCase
         parent::setUp();
 
         $this->database = db_connect();
-        $this->assertSame('essential_test', $this->database->getDatabase());
+        $this->assertSame(config(\Config\Database::class)->tests['database'], $this->database->getDatabase());
 
         $this->database->transBegin();
 

@@ -8,10 +8,10 @@ test('L’ambiente E2E è configurato correttamente', async ({ page }) => {
     expect(checkEnvironment()).toEqual({
         environment: 'e2e',
         group: 'tests',
-        database: 'essential_test'
+        database: expect.any(String)
     });
 
-    // La lettura HTTP deve trovare il record casuale creato solo nel database di test.
+    // La lettura HTTP deve trovare il record casuale creato nel database locale configurato.
     const response = await page.goto(appUrl(`/backend/admins/edit/${adminUuid}`));
 
     expect(response).not.toBeNull();

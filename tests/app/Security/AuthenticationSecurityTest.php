@@ -23,7 +23,7 @@ class AuthenticationSecurityTest extends CIUnitTestCase
     public function testUnauthenticatedUser(): void
     {
         $this->assertSame('testing', ENVIRONMENT);
-        $this->assertSame('essential_test', db_connect()->getDatabase());
+        $this->assertSame(config(\Config\Database::class)->tests['database'], db_connect()->getDatabase());
 
         session()->remove('backendSession');
 
@@ -38,7 +38,7 @@ class AuthenticationSecurityTest extends CIUnitTestCase
     public function testUnauthenticatedGetRedirect(): void
     {
         $this->assertSame('testing', ENVIRONMENT);
-        $this->assertSame('essential_test', db_connect()->getDatabase());
+        $this->assertSame(config(\Config\Database::class)->tests['database'], db_connect()->getDatabase());
 
         session()->remove('backendSession');
         session()->remove('login_log_id');
@@ -66,7 +66,7 @@ class AuthenticationSecurityTest extends CIUnitTestCase
     public function testUnauthenticatedAjaxPost(): void
     {
         $this->assertSame('testing', ENVIRONMENT);
-        $this->assertSame('essential_test', db_connect()->getDatabase());
+        $this->assertSame(config(\Config\Database::class)->tests['database'], db_connect()->getDatabase());
 
         session()->remove('backendSession');
         session()->remove('login_log_id');

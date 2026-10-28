@@ -21,8 +21,8 @@ trait WarehouseDatabaseFixture
     protected function startWarehouseDatabase(): void
     {
         $this->warehouseDatabase = Database::connect('tests');
-        $this->assertSame('essential_test', $this->warehouseDatabase->getDatabase());
-        $this->assertSame('essential_test', $this->warehouseDatabase->query('select database() as db')->getRow()->db);
+        $this->assertSame(config(\Config\Database::class)->tests['database'], $this->warehouseDatabase->getDatabase());
+        $this->assertSame(config(\Config\Database::class)->tests['database'], $this->warehouseDatabase->query('select database() as db')->getRow()->db);
         $this->assertSame($this->warehouseDatabase, Database::connect());
         $this->assertSame(0, $this->warehouseDatabase->transDepth);
         $this->warehouseDatabase->resetDataCache();

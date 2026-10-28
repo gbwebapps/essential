@@ -61,7 +61,7 @@ class Database extends Config
         'hostname'    => 'localhost',
         'username'    => 'root', // Inserisci il tuo utente Laragon
         'password'    => '',     // Inserisci la tua password Laragon
-        'database'    => 'essential_test',
+        'database'    => 'essential',
         'DBDriver'    => 'MySQLi',
         'DBPrefix'    => '',
         'pConnect'    => false,

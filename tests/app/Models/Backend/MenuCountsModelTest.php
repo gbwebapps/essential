@@ -18,8 +18,8 @@ class MenuCountsModelTest extends CIUnitTestCase
         parent::setUp();
 
         $this->database = Database::connect('tests', false);
-        $this->assertSame('essential_test', $this->database->getDatabase());
-        $this->assertSame('essential_test', $this->database->query('select database() as db')->getRow()->db);
+        $this->assertSame(config(\Config\Database::class)->tests['database'], $this->database->getDatabase());
+        $this->assertSame(config(\Config\Database::class)->tests['database'], $this->database->query('select database() as db')->getRow()->db);
 
         foreach (['admins', 'brands', 'categories', 'products'] as $table):
             $this->database->query('create temporary table ' . $table . ' (id int primary key, status tinyint not null, deleted_at datetime null)');
